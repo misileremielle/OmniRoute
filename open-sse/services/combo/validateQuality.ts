@@ -563,6 +563,11 @@ export async function validateResponseQuality(
             controller.close();
           }
         },
+        // A discarded replay (releaseQualityClone) must release the reader behind it,
+        // or the abandoned tee branch keeps buffering the rest of the upstream body.
+        cancel(reason) {
+          void readerToForward.cancel(reason).catch(() => {});
+        },
       });
       return new Response(stream, {
         status: response.status,

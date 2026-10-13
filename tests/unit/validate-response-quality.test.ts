@@ -240,3 +240,33 @@ test("non-streaming chat completion that stopped with no text stays invalid", as
   assert.strictEqual(verdict.valid, false);
   assert.match(verdict.reason ?? "", /empty content/);
 });
+
+// A streaming verdict hands back a replay Response that reads the rest of the
+// upstream body through the validator's reader. When the caller discards that
+// replay (releaseQualityClone), the cancel must reach the upstream reader;
+// otherwise the abandoned tee branch keeps buffering the whole remaining body.
+test("cancelling the streaming replay response cancels the upstream reader", async () => {
+  let cancelReason: unknown = "not cancelled";
+  const upstream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(
+        new TextEncoder().encode('data: {"choices":[{"index":0,"delta":{"content":"hi"}}]}\n\n')
+      );
+      // Left open: the upstream is still streaming when the replay is discarded.
+    },
+    cancel(reason) {
+      cancelReason = reason;
+    },
+  });
+  const res = new Response(upstream, {
+    status: 200,
+    headers: { "content-type": "text/event-stream" },
+  });
+
+  const verdict = await validateResponseQuality(res, true, {});
+  assert.strictEqual(verdict.valid, true);
+  assert.ok(verdict.clonedResponse?.body, "expected a replay response");
+
+  await verdict.clonedResponse.body.cancel("discarded");
+  assert.strictEqual(cancelReason, "discarded");
+});
