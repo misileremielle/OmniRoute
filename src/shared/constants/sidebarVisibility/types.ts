@@ -88,11 +88,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "mcp",
   "a2a",
   "plugins",
-  // Gamification
-  "leaderboard",
-  "profile",
-  "tokens",
-  "gamification-admin",
   // Other Features — flat
   "media",
   // Other Features > Batch
