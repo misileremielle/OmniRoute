@@ -215,6 +215,8 @@ test("WS reasoning rules apply Codex-to-Codex effort and reject non-Codex target
     refreshToken: "test-codex-refresh-token",
     expiresAt: Date.now() + 60 * 60 * 1000,
     isActive: true,
+    // Sol/Astra-tier Codex models only route to Pro/Prolite accounts.
+    providerSpecificData: { chatgptPlanType: "pro" },
   });
 
   const codexRule = await rulesDb.createReasoningRoutingRule({

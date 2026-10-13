@@ -52,7 +52,8 @@ async function seedCodexOAuthConnection({
     isActive: true,
     testStatus: "active",
     priority,
-    providerSpecificData: { workspaceId },
+    // Sol/Astra-tier Codex models only route to Pro/Prolite accounts.
+    providerSpecificData: { workspaceId, chatgptPlanType: "pro" },
   });
 }
 

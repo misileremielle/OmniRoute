@@ -231,7 +231,8 @@ test("chat completions streams Codex Responses reasoning through real route HTTP
       expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
       isActive: true,
       testStatus: "active",
-      providerSpecificData: {},
+      // Sol/Astra-tier Codex models only route to Pro/Prolite accounts.
+      providerSpecificData: { chatgptPlanType: "pro" },
     });
 
     const routeHarness = await startRouteServer();

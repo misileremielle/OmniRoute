@@ -405,7 +405,9 @@ async function seedConnection(provider, overrides: SeedConnectionOverrides = {})
     testStatus: overrides.testStatus || "active",
     priority: overrides.priority,
     rateLimitedUntil: overrides.rateLimitedUntil,
-    providerSpecificData: overrides.providerSpecificData || {},
+    // Sol/Astra-tier Codex models only route to Pro/Prolite accounts.
+    providerSpecificData:
+      overrides.providerSpecificData || (provider === "codex" ? { chatgptPlanType: "pro" } : {}),
   });
 }
 

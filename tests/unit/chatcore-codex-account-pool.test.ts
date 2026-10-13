@@ -270,7 +270,8 @@ test("chatCore keeps a Codex Spark 429 scoped so Sol remains selectable", async 
     email: "codex-scope@example.com",
     accessToken: "codex-scope-token",
     isActive: true,
-    providerSpecificData: {},
+    // Sol/Astra-tier Codex models only route to Pro/Prolite accounts.
+    providerSpecificData: { chatgptPlanType: "pro" },
   });
 
   const { result } = await invokeChatCore({
@@ -281,7 +282,7 @@ test("chatCore keeps a Codex Spark 429 scoped so Sol remains selectable", async 
     credentials: {
       accessToken: "codex-scope-token",
       connectionId: connection.id,
-      providerSpecificData: {},
+      providerSpecificData: { chatgptPlanType: "pro" },
     },
     body: {
       model: "gpt-5.3-codex-spark",

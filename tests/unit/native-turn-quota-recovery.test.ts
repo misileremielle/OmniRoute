@@ -183,6 +183,8 @@ test("persisted account cooldown plus exhausted sibling quota recovers without a
       testStatus: "active",
       accessToken: "synthetic-access",
       refreshToken: "synthetic-refresh",
+      // Sol/Astra-tier Codex models only route to Pro/Prolite accounts.
+      providerSpecificData: { chatgptPlanType: "pro" },
     });
   const healthy = await createAccount("cooling-account");
   const exhausted = await createAccount("quota-account");

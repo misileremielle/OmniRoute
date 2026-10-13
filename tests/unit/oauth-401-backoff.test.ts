@@ -46,7 +46,8 @@ async function freshCodexAccount(name: string) {
     expiresAt,
     isActive: true,
     testStatus: "active",
-    providerSpecificData: {},
+    // Sol-tier Codex models only route to Pro/Prolite accounts.
+    providerSpecificData: { chatgptPlanType: "pro" },
   });
   return String(connection.id);
 }

@@ -17,7 +17,10 @@ const { getProviderCredentialsWithQuotaPreflight } =
   await import("../../src/sse/services/auth.ts");
 const { invalidateDbCache } = await import("../../src/lib/db/readCache.ts");
 
-const optedOut = { limitPolicy: { enabled: false }, quotaPreflightEnabled: false };
+// Sol-tier Codex models only route to Pro/Prolite accounts (isModelBlockedByCodexPlan).
+const optedOut = {
+  limitPolicy: { enabled: false }, quotaPreflightEnabled: false, chatgptPlanType: "pro",
+};
 const resetAt = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString();
 const exhausted = {
   used: 100, total: 100, percentUsed: 1, resetAt, limitReached: true,
@@ -29,7 +32,7 @@ test.before(async () => {
   const connection = await providers.createProviderConnection({
     provider: "codex", authType: "oauth", name: "quota-optout-fixture",
     accessToken: "fixture-access", isActive: true, testStatus: "active",
-    providerSpecificData: {},
+    providerSpecificData: { chatgptPlanType: "pro" },
   });
   assert.ok(typeof connection.id === "string");
   connectionId = connection.id;
@@ -101,7 +104,7 @@ test("Partial, malformed and other-provider settings retain exhausted-window fil
 test("Restoring filtering and terminal account protection remain effective",
   { timeout: 5_000 }, async () => {
     await providers.updateProviderConnection(connectionId, {
-      providerSpecificData: {}, testStatus: "active",
+      providerSpecificData: { chatgptPlanType: "pro" }, testStatus: "active",
     });
     invalidateDbCache("connections", connectionId);
     const restored = await getProviderCredentialsWithQuotaPreflight(

@@ -152,6 +152,7 @@ import {
 import {
   isModelExcludedByConnection,
   isModelAdvertisedByConnection,
+  isModelBlockedByCodexPlan,
 } from "@/domain/connectionModelRules";
 import {
   getSyncedAvailableModelsByConnection,
@@ -1456,7 +1457,11 @@ export async function getProviderCredentials(
         connectionFilterStatus.set(c.id, "excluded");
         return false;
       }
-      if (requestedModel && isModelExcludedByConnection(requestedModel, c.providerSpecificData)) {
+      if (
+        requestedModel &&
+        (isModelExcludedByConnection(requestedModel, c.providerSpecificData) ||
+          isModelBlockedByCodexPlan(resolvedId, requestedModel, c.providerSpecificData))
+      ) {
         connectionFilterStatus.set(c.id, "modelExcluded");
         return false;
       }

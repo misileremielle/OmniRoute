@@ -70,6 +70,31 @@ export function isModelExcludedByConnection(
   );
 }
 
+// Codex Astra- and Sol-tier models (gpt-*-astra / gpt-*-sol of any version, with or
+// without a suffix such as -high) only run on these ChatGPT plans.
+const CODEX_PLAN_GATED_MODEL = /(^|\/)gpt-[\w.-]+?-(astra|sol)(-|$)/i;
+const CODEX_PLANS_FOR_GATED_MODELS = new Set(["pro", "prolite"]);
+
+/**
+ * True when `providerId` is Codex, the model is Astra/Sol-tier and the connection's
+ * plan is not Pro/Prolite. A connection with no recorded plan is blocked too. The plan
+ * is read with the same precedence as `isCodexFreePlan` (workspacePlanType first).
+ */
+export function isModelBlockedByCodexPlan(
+  providerId: string,
+  modelId: unknown,
+  providerSpecificData: unknown
+): boolean {
+  if (providerId !== "codex" || typeof modelId !== "string") return false;
+  if (!CODEX_PLAN_GATED_MODEL.test(modelId)) return false;
+  const data = asRecord(providerSpecificData);
+  const plan =
+    typeof data.workspacePlanType === "string" ? data.workspacePlanType : data.chatgptPlanType;
+  return !CODEX_PLANS_FOR_GATED_MODELS.has(
+    typeof plan === "string" ? plan.trim().toLowerCase() : ""
+  );
+}
+
 export function hasEligibleConnectionForModel(
   connections: ConnectionLike[] | null | undefined,
   modelId: unknown

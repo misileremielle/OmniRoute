@@ -179,7 +179,11 @@ test("quota-preflight wrapper claims before returning even when live preflight i
 });
 
 test("lifecycle pre-acquire disables request-scoped OAuth occupancy reservation", async () => {
-  const connection = await seedConnection(1, { provider: "codex" });
+  // Sol-tier Codex models only route to Pro/Prolite accounts.
+  const connection = await seedConnection(1, {
+    provider: "codex",
+    providerSpecificData: { chatgptPlanType: "pro" },
+  });
   const key = await seedManagedKey([connection.id]);
   const selected = await auth.getProviderCredentialsWithQuotaPreflight(
     "codex",

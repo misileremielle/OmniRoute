@@ -113,7 +113,9 @@ async function seedConnection(
     ...(overrides.priority ? { priority: overrides.priority } : {}),
     isActive: true,
     testStatus: "active",
-    providerSpecificData: overrides.providerSpecificData ?? {},
+    // Sol/Astra-tier Codex models only route to Pro/Prolite accounts.
+    providerSpecificData:
+      overrides.providerSpecificData ?? (provider === "codex" ? { chatgptPlanType: "pro" } : {}),
   });
 }
 
@@ -634,7 +636,9 @@ test("v1 image edit POST rejects Codex free-plan accounts before upstream", asyn
   const response = await imageEditRoute.POST(
     new Request("http://localhost/api/v1/images/edits", {
       method: "POST",
-      body: createCodexEditForm("edit this"),
+      // A model outside the Pro-only Sol/Astra tier, so the free-plan account stays
+      // selectable and the route's own paid-plan check is what rejects it.
+      body: createCodexEditForm("edit this", { model: "codex/gpt-5.6-terra" }),
     })
   );
   const body = (await response.json()) as ErrorResponseBody;
