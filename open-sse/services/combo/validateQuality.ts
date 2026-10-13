@@ -559,8 +559,11 @@ export async function validateResponseQuality(
             } else {
               controller.enqueue(value);
             }
-          } catch {
-            controller.close();
+          } catch (error) {
+            // Surface the upstream failure. Closing cleanly would hand the client a
+            // truncated stream that reads as a finished turn (agent clients such as
+            // Claude Code then stop mid-task without an error or a retry).
+            controller.error(error);
           }
         },
         // A discarded replay (releaseQualityClone) must release the reader behind it,

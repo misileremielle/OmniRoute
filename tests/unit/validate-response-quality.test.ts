@@ -270,3 +270,31 @@ test("cancelling the streaming replay response cancels the upstream reader", asy
   await verdict.clonedResponse.body.cancel("discarded");
   assert.strictEqual(cancelReason, "discarded");
 });
+
+// A combo replay must surface an upstream failure instead of ending cleanly: a
+// silently truncated stream reads as a finished turn to agent clients such as
+// Claude Code (no stop_reason, no pending tool call), so they stop mid-task
+// without showing an error or retrying.
+test("an upstream error after the streaming verdict errors the replay response", async () => {
+  let upstreamController: ReadableStreamDefaultController<Uint8Array> | undefined;
+  const upstream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      upstreamController = controller;
+      controller.enqueue(
+        new TextEncoder().encode('data: {"choices":[{"index":0,"delta":{"content":"hi"}}]}\n\n')
+      );
+    },
+  });
+  const res = new Response(upstream, {
+    status: 200,
+    headers: { "content-type": "text/event-stream" },
+  });
+
+  const verdict = await validateResponseQuality(res, true, {});
+  assert.ok(verdict.clonedResponse?.body, "expected a replay response");
+
+  const reader = verdict.clonedResponse.body.getReader();
+  await reader.read(); // replayed prefix
+  upstreamController?.error(new Error("ECONNRESET"));
+  await assert.rejects(reader.read(), /ECONNRESET/);
+});
