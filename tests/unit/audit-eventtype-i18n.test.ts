@@ -23,15 +23,19 @@ test("audit: compliance.eventTypes exists with en/pt-BR parity and key coverage"
   const rawPtKeys = Object.keys(rawPt.compliance?.eventTypes ?? {});
   assert.ok(rawEnKeys.length >= 30, `expected >=30 event-type labels, got ${rawEnKeys.length}`);
   assert.deepEqual(rawEnKeys.sort(), rawPtKeys.sort(), "en/pt-BR eventTypes keys must match");
-  for (const k of ["provider.credentials.created", "auth.login.success", "quota.pool.created", "sync.token.revoked"]) {
-    assert.ok(getNestedValue(en.compliance.eventTypes as Record<string, unknown>, k), `en missing eventTypes.${k}`);
-    assert.ok(getNestedValue(pt.compliance.eventTypes as Record<string, unknown>, k), `pt-BR missing eventTypes.${k}`);
+  for (const k of [
+    "provider.credentials.created",
+    "auth.login.success",
+    "quota.pool.created",
+    "sync.token.revoked",
+  ]) {
+    assert.ok(
+      getNestedValue(en.compliance.eventTypes as Record<string, unknown>, k),
+      `en missing eventTypes.${k}`
+    );
+    assert.ok(
+      getNestedValue(pt.compliance.eventTypes as Record<string, unknown>, k),
+      `pt-BR missing eventTypes.${k}`
+    );
   }
-});
-
-test("audit: ComplianceTab translates action and A2aAuditTab translates task state", () => {
-  const ct = read("src/app/(dashboard)/dashboard/audit/ComplianceTab.tsx");
-  const a2a = read("src/app/(dashboard)/dashboard/audit/A2aAuditTab.tsx");
-  assert.ok(ct.includes("eventTypes.${entry.action}"), "ComplianceTab uses eventTypes i18n lookup");
-  assert.ok(a2a.includes("a2aState${task.state"), "A2aAuditTab uses a2aState i18n lookup");
 });

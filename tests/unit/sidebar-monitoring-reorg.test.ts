@@ -12,12 +12,12 @@ test("monitoring section exists", () => {
   assert.ok(section, "monitoring section must exist");
 });
 
-test("monitoring section has exactly 4 children: 1 item (activity) + 3 groups (logs, audit, system)", () => {
+test("monitoring section has exactly 3 children: 1 item (activity) + 2 groups (logs, system)", () => {
   const section = findSection("monitoring");
   assert.ok(section, "monitoring section must exist");
 
   const children = section.children;
-  assert.equal(children.length, 4, "monitoring must have 4 children");
+  assert.equal(children.length, 3, "monitoring must have 3 children");
 
   // First child is the activity item (not a group)
   const first = children[0] as sidebarVisibility.SidebarItemDefinition;
@@ -28,18 +28,14 @@ test("monitoring section has exactly 4 children: 1 item (activity) + 3 groups (l
     "first child must be activity item"
   );
 
-  // Remaining 3 children are groups
+  // Remaining 2 children are groups
   const groups = children.slice(1);
   for (const g of groups) {
-    assert.ok("type" in g && g.type === "group", "children[1..3] must all be groups");
+    assert.ok("type" in g && g.type === "group", "children[1..2] must all be groups");
   }
 
   const groupIds = groups.map((g) => (g as sidebarVisibility.SidebarItemGroup).id);
-  assert.deepEqual(
-    groupIds,
-    ["logs", "audit", "system"],
-    "group ids must be logs, audit, system in order"
-  );
+  assert.deepEqual(groupIds, ["logs", "system"], "group ids must be logs, system in order");
 });
 
 test("getSectionItems of monitoring does NOT contain logs-activity", () => {

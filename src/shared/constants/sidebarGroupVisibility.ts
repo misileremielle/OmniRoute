@@ -3,7 +3,6 @@ export const HIDEABLE_SIDEBAR_GROUP_IDS = [
   "tools",
   "integrations",
   "logs",
-  "audit",
   "system",
   "batch",
 ] as const;

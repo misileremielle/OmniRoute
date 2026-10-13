@@ -253,22 +253,6 @@ const TOOLS_GROUP: SidebarItemGroup = {
       icon: "cloud",
     },
     {
-      id: "conductor",
-      href: "/dashboard/conductor",
-      i18nKey: "conductor",
-      subtitleKey: "conductorSubtitle",
-      icon: "account_tree",
-      labelFallback: "Conductor",
-      subtitleFallback: "CLI-agent fleet",
-    },
-    {
-      id: "orchestration",
-      href: "/dashboard/orchestration",
-      i18nKey: "orchestration",
-      subtitleKey: "orchestrationSubtitle",
-      icon: "account_tree",
-    },
-    {
       id: "agent-bridge",
       href: "/dashboard/tools/agent-bridge",
       i18nKey: "agentBridge",
@@ -499,36 +483,6 @@ const COSTS_ITEMS: readonly SidebarItemDefinition[] = [
   },
 ];
 
-const AUDIT_GROUP: SidebarItemGroup = {
-  type: "group",
-  id: "audit",
-  titleKey: "auditGroup",
-  titleFallback: "Audit",
-  items: [
-    {
-      id: "audit",
-      href: "/dashboard/audit",
-      i18nKey: "auditLog",
-      subtitleKey: "auditLogSubtitle",
-      icon: "policy",
-    },
-    {
-      id: "audit-mcp",
-      href: "/dashboard/audit/mcp",
-      i18nKey: "auditMcp",
-      subtitleKey: "auditMcpSubtitle",
-      icon: "security",
-    },
-    {
-      id: "audit-a2a",
-      href: "/dashboard/audit/a2a",
-      i18nKey: "auditA2a",
-      subtitleKey: "auditA2aSubtitle",
-      icon: "device_hub",
-    },
-  ],
-};
-
 const DEVTOOLS_ITEMS: readonly SidebarItemDefinition[] = [
   {
     id: "translator",
@@ -575,15 +529,6 @@ const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
     i18nKey: "agentSkills",
     subtitleKey: "agentSkillsSubtitle",
     icon: "share",
-  },
-  {
-    id: "chaos-config",
-    href: "/dashboard/chaos",
-    i18nKey: "chaosConfig",
-    labelFallback: "Chaos Mode",
-    subtitleKey: "chaosConfigSubtitle",
-    subtitleFallback: "Multi-model parallel execution",
-    icon: "blender",
   },
   {
     id: "skills",
@@ -794,7 +739,7 @@ export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
     id: "monitoring",
     titleKey: "monitoringSection",
     titleFallback: "Monitoring",
-    children: [...MONITORING_ITEMS, LOGS_GROUP, AUDIT_GROUP, SYSTEM_GROUP],
+    children: [...MONITORING_ITEMS, LOGS_GROUP, SYSTEM_GROUP],
   },
   {
     id: "devtools",
