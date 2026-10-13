@@ -2,11 +2,11 @@
 
 import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { useApiKey } from "../../providers/hooks/useApiKey";
-import { useProviderModels } from "../../providers/hooks/useProviderModels";
+import { useApiKey } from "../../hooks/useApiKey";
+import { useProviderModels } from "../../hooks/useProviderModels";
 import { PlaygroundCard } from "./PlaygroundCard";
-import { buildCurl } from "../../providers/utils/buildCurl";
-import { PLAYGROUND_KEY_ID_HEADER, resolvePlaygroundKeyId } from "../../providers/utils/playgroundAuth";
+import { buildCurl } from "../../utils/buildCurl";
+import { PLAYGROUND_KEY_ID_HEADER, resolvePlaygroundKeyId } from "../../utils/playgroundAuth";
 
 interface Props {
   providerId: string;

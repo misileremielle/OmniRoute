@@ -41,7 +41,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId, string>> = {
   "api-manager": "apiManagerDescription",
   providers: "providerDescription",
   combos: "comboDescription",
-  batch: "batchDescription",
   costs: "costsDescription",
   analytics: "analyticsDescription",
   cache: "cacheDescription",
@@ -60,13 +59,10 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId, string>> = {
   playground: "playgroundDescription",
   "search-tools": "searchToolsDescription",
   logs: "logsDescription",
-  webhooks: "webhooksDescription",
   health: "healthDescription",
   proxy: "proxyDescription",
   changelog: "changelogDescription",
   "api-endpoints": "apiEndpointsDescription",
-  // Agents & AI sub-pages
-  "batch-files": "batchFilesDescription",
   // Analytics sub-pages
   "analytics-evals": "analyticsEvalsDescription",
   "analytics-search": "analyticsSearchDescription",

@@ -7,16 +7,16 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { LlmChatCard } from "@/app/(dashboard)/dashboard/media-providers/components/LlmChatCard";
-import { ServiceKindTabs } from "@/app/(dashboard)/dashboard/media-providers/components/ServiceKindTabs";
-import { EmbeddingExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/EmbeddingExampleCard";
-import { ImageExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/ImageExampleCard";
-import { TtsExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/TtsExampleCard";
-import { SttExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/SttExampleCard";
-import { WebSearchExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/WebSearchExampleCard";
-import { WebFetchExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/WebFetchExampleCard";
-import { VideoExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/VideoExampleCard";
-import { MusicExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/MusicExampleCard";
+import { LlmChatCard } from "@/app/(dashboard)/dashboard/providers/components/playground/LlmChatCard";
+import { ServiceKindTabs } from "@/app/(dashboard)/dashboard/providers/components/playground/ServiceKindTabs";
+import { EmbeddingExampleCard } from "@/app/(dashboard)/dashboard/providers/components/playground/EmbeddingExampleCard";
+import { ImageExampleCard } from "@/app/(dashboard)/dashboard/providers/components/playground/ImageExampleCard";
+import { TtsExampleCard } from "@/app/(dashboard)/dashboard/providers/components/playground/TtsExampleCard";
+import { SttExampleCard } from "@/app/(dashboard)/dashboard/providers/components/playground/SttExampleCard";
+import { WebSearchExampleCard } from "@/app/(dashboard)/dashboard/providers/components/playground/WebSearchExampleCard";
+import { WebFetchExampleCard } from "@/app/(dashboard)/dashboard/providers/components/playground/WebFetchExampleCard";
+import { VideoExampleCard } from "@/app/(dashboard)/dashboard/providers/components/playground/VideoExampleCard";
+import { MusicExampleCard } from "@/app/(dashboard)/dashboard/providers/components/playground/MusicExampleCard";
 import type { ServiceKind } from "@/shared/constants/providers";
 import { AI_PROVIDERS } from "@/shared/constants/providers";
 import { providerText } from "../providerPageHelpers";

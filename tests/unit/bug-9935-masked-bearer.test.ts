@@ -4,14 +4,13 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { maskStoredApiKey } from "../../src/lib/apiKeyExposure";
 
-const COMPONENT_DIR = resolve("src/app/(dashboard)/dashboard/media-providers/components");
+const COMPONENT_DIR = resolve("src/app/(dashboard)/dashboard/providers/components/playground");
 const EXAMPLE_CARDS = [
   "WebSearchExampleCard.tsx",
   "WebFetchExampleCard.tsx",
   "ImageExampleCard.tsx",
   "TtsExampleCard.tsx",
   "SttExampleCard.tsx",
-  "OcrExampleCard.tsx",
   "MusicExampleCard.tsx",
   "EmbeddingExampleCard.tsx",
   "VideoExampleCard.tsx",

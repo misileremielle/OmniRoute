@@ -4,7 +4,6 @@ export const HIDEABLE_SIDEBAR_GROUP_IDS = [
   "integrations",
   "logs",
   "system",
-  "batch",
 ] as const;
 
 export type HideableSidebarGroupId = (typeof HIDEABLE_SIDEBAR_GROUP_IDS)[number];

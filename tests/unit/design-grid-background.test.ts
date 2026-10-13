@@ -350,14 +350,6 @@ test("log table cards are opaque (no semi-transparent bg-black tint)", () => {
 test("card-less data tables wrap their table in an opaque surface", () => {
   const expect = [
     [
-      "../../src/app/(dashboard)/dashboard/batch/BatchListTab.tsx",
-      "rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]",
-    ],
-    [
-      "../../src/app/(dashboard)/dashboard/batch/FilesListTab.tsx",
-      "rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]",
-    ],
-    [
       "../../src/app/(dashboard)/dashboard/cache/components/CacheEntriesTab.tsx",
       "overflow-x-auto bg-surface",
     ],

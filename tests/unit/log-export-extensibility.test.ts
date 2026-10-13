@@ -1,7 +1,7 @@
 /**
  * Proves the log-export pipeline is destination-agnostic: a fake destination registered
  * through the public registry API drives the whole runner, and no BigQuery vocabulary
- * leaks into the runner, the REST layer, the persistence module or the dashboard.
+ * leaks into the runner, the REST layer or the persistence module.
  */
 
 import test from "node:test";
@@ -181,10 +181,6 @@ test("pipeline_GenericLayers_CarryNoBigQueryVocabulary", () => {
     "src/app/api/log-export/destinations/[id]/route.ts",
     "src/app/api/log-export/destinations/[id]/run/route.ts",
     "src/app/api/log-export/destinations/[id]/test/route.ts",
-    "src/app/(dashboard)/dashboard/log-export/LogExportPageClient.tsx",
-    "src/app/(dashboard)/dashboard/log-export/components/DestinationCard.tsx",
-    "src/app/(dashboard)/dashboard/log-export/components/DestinationFormModal.tsx",
-    "src/app/(dashboard)/dashboard/log-export/types.ts",
   ];
 
   const forbidden = /bigquery|projectId|datasetId|serviceAccountJson|insertAll/i;

@@ -8,7 +8,7 @@ function readSource(path: string): string {
 
 test("shared provider playground uses localized visible copy", () => {
   const source = readSource(
-    "src/app/(dashboard)/dashboard/media-providers/components/LlmChatCard.tsx"
+    "src/app/(dashboard)/dashboard/providers/components/playground/LlmChatCard.tsx"
   );
   for (const rawText of [
     "Send a message to start the conversation",

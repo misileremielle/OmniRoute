@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useApiKey } from "../../providers/hooks/useApiKey";
-import { buildCurl } from "../../providers/utils/buildCurl";
-import { PLAYGROUND_KEY_ID_HEADER, resolvePlaygroundKeyId } from "../../providers/utils/playgroundAuth";
+import { useApiKey } from "../../hooks/useApiKey";
+import { useProviderModels } from "../../hooks/useProviderModels";
+import { buildCurl } from "../../utils/buildCurl";
+import { PLAYGROUND_KEY_ID_HEADER, resolvePlaygroundKeyId } from "../../utils/playgroundAuth";
 import { PlaygroundCard } from "./PlaygroundCard";
 
 interface Props {
   providerId: string;
 }
 
-const ENDPOINT_PATH = "/api/v1/search";
+const ENDPOINT_PATH = "/api/v1/videos/generations";
 
 function extractError(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
@@ -22,61 +23,44 @@ function extractError(data: unknown): string | null {
   return null;
 }
 
-function SearchResultRenderer(data: unknown, fallbackTitle: (number: number) => string) {
+function VideoResultRenderer(data: unknown, unsupportedText: string) {
   if (!data || typeof data !== "object") {
     return <pre className="text-xs p-3 text-text-main">{JSON.stringify(data, null, 2)}</pre>;
   }
   const d = data as Record<string, unknown>;
-  const results = Array.isArray(d.results) ? d.results : Array.isArray(d.data) ? d.data : null;
-  if (!results) {
-    return <pre className="text-xs p-3 text-text-main">{JSON.stringify(data, null, 2)}</pre>;
+  const items = Array.isArray(d.data) ? (d.data as Array<Record<string, unknown>>) : [];
+  const videoUrl =
+    items[0] && typeof items[0].url === "string"
+      ? items[0].url
+      : typeof d.url === "string"
+        ? d.url
+        : null;
+  if (videoUrl) {
+    return (
+      <div className="p-3">
+        <video controls src={videoUrl} className="max-w-full rounded-lg border border-border">
+          {unsupportedText}
+        </video>
+      </div>
+    );
   }
-  return (
-    <div className="flex flex-col divide-y divide-border">
-      {(results as Array<Record<string, unknown>>).map((item, i) => {
-        const title = typeof item.title === "string" ? item.title : fallbackTitle(i + 1);
-        const url = typeof item.url === "string" ? item.url : null;
-        const snippet =
-          typeof item.snippet === "string"
-            ? item.snippet
-            : typeof item.description === "string"
-              ? item.description
-              : null;
-        return (
-          <div key={i} className="p-3">
-            <p className="text-xs font-medium text-text-main">{title}</p>
-            {url && (
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] text-primary hover:underline truncate block"
-              >
-                {url}
-              </a>
-            )}
-            {snippet && <p className="text-[11px] text-text-muted mt-0.5">{snippet}</p>}
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <pre className="text-xs p-3 text-text-main">{JSON.stringify(data, null, 2)}</pre>;
 }
 
-export function WebSearchExampleCard({ providerId }: Props) {
+export function VideoExampleCard({ providerId }: Props) {
   const t = useTranslations("miniPlayground");
   const { apiKey, keys } = useApiKey();
+  const { models } = useProviderModels(providerId);
 
-  const [query, setQuery] = useState<string>(() => t("webSearchSample"));
-  const [numResults, setNumResults] = useState<number>(5);
+  const firstModel = models[0]?.id ?? "";
+  const [model, setModel] = useState<string>("");
+  const [prompt, setPrompt] = useState<string>(() => t("videoSample"));
   const [running, setRunning] = useState<boolean>(false);
   const [result, setResult] = useState<{ data: unknown; latencyMs: number } | undefined>();
   const [error, setError] = useState<string | null>(null);
 
-  // #13245 — The /api/v1/search route selects providers from body.provider,
-  // not the x-connection-id header.  Send both: the body field drives the
-  // backend; the header is kept for call-log attribution.
-  const buildBody = () => ({ query, max_results: numResults, provider: providerId });
+  const effectiveModel = model || firstModel;
+  const buildBody = () => ({ model: effectiveModel, prompt });
 
   const curlSnippet = buildCurl({
     endpoint:
@@ -124,43 +108,43 @@ export function WebSearchExampleCard({ providerId }: Props) {
     }
   };
 
+  const modelOptions = models.length > 0 ? models : [{ id: "wan-2.1-t2v-14b" }];
+
   return (
     <PlaygroundCard
-      kindLabel={t("webSearch")}
+      kindLabel={t("video")}
       apiEndpoint={ENDPOINT_PATH}
       onRun={handleRun}
       curlSnippet={curlSnippet}
       running={running}
       result={result}
       error={error}
-      resultRenderer={(data) =>
-        SearchResultRenderer(data, (number) => t("searchResultFallback", { number }))
-      }
+      resultRenderer={(data) => VideoResultRenderer(data, t("browserVideoUnsupported"))}
     >
-      {/* Query */}
+      {/* Model */}
       <div>
-        <label className="block text-xs text-text-muted mb-1">{t("query")}</label>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("webSearchSample")}
+        <label className="block text-xs text-text-muted mb-1">{t("model")}</label>
+        <select
+          value={model || firstModel}
+          onChange={(e) => setModel(e.target.value)}
           className="w-full rounded-md border border-border bg-bg-subtle text-sm px-2 py-1.5 text-text-main focus:outline-none focus:ring-1 focus:ring-primary"
-        />
+        >
+          {modelOptions.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.id}
+            </option>
+          ))}
+        </select>
       </div>
-      {/* Max results */}
+      {/* Prompt */}
       <div>
-        <label className="block text-xs text-text-muted mb-1">
-          {t("numResults")} ({numResults})
-        </label>
-        <input
-          type="range"
-          min="1"
-          max="20"
-          step="1"
-          value={numResults}
-          onChange={(e) => setNumResults(Number(e.target.value))}
-          className="w-full"
+        <label className="block text-xs text-text-muted mb-1">{t("prompt")}</label>
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          rows={2}
+          placeholder={t("videoSample")}
+          className="w-full rounded-md border border-border bg-bg-subtle text-sm px-2 py-1.5 text-text-main focus:outline-none focus:ring-1 focus:ring-primary resize-none"
         />
       </div>
     </PlaygroundCard>

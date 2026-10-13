@@ -2,17 +2,27 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useApiKey } from "../../providers/hooks/useApiKey";
-import { useProviderModels } from "../../providers/hooks/useProviderModels";
-import { buildCurl } from "../../providers/utils/buildCurl";
-import { PLAYGROUND_KEY_ID_HEADER, resolvePlaygroundKeyId } from "../../providers/utils/playgroundAuth";
+import { useApiKey } from "../../hooks/useApiKey";
+import { buildCurl } from "../../utils/buildCurl";
+import { PLAYGROUND_KEY_ID_HEADER, resolvePlaygroundKeyId } from "../../utils/playgroundAuth";
 import { PlaygroundCard } from "./PlaygroundCard";
 
 interface Props {
   providerId: string;
 }
 
-const ENDPOINT_PATH = "/api/v1/embeddings";
+/**
+ * NOTE: /api/v1/web/fetch does not exist in the current codebase.
+ * This card is included for forward compatibility with Phase 3 (webFetch
+ * providers). The Run button will return a 404 error until the endpoint is
+ * implemented.
+ */
+const ENDPOINT_PATH = "/api/v1/web/fetch";
+
+const FORMAT_OPTIONS = ["markdown", "html", "links", "screenshot"] as const;
+type FetchFormat = (typeof FORMAT_OPTIONS)[number];
+
+const DEPTH_OPTIONS = [0, 1, 2, 3];
 
 function extractError(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
@@ -23,21 +33,18 @@ function extractError(data: unknown): string | null {
   return null;
 }
 
-export function EmbeddingExampleCard({ providerId }: Props) {
+export function WebFetchExampleCard({ providerId }: Props) {
   const t = useTranslations("miniPlayground");
   const { apiKey, keys } = useApiKey();
-  const { models } = useProviderModels(providerId);
 
-  const firstModel = models[0]?.id ?? "";
-  const [model, setModel] = useState<string>("");
-  const [inputText, setInputText] = useState<string>(() => t("embeddingSample"));
+  const [url, setUrl] = useState<string>("https://example.com");
+  const [format, setFormat] = useState<FetchFormat>("markdown");
+  const [depth, setDepth] = useState<number>(0);
   const [running, setRunning] = useState<boolean>(false);
   const [result, setResult] = useState<{ data: unknown; latencyMs: number } | undefined>();
   const [error, setError] = useState<string | null>(null);
 
-  const effectiveModel = model || firstModel;
-
-  const buildBody = () => ({ model: effectiveModel, input: inputText });
+  const buildBody = () => ({ url, provider: providerId, format, depth });
 
   const curlSnippet = buildCurl({
     endpoint:
@@ -85,11 +92,9 @@ export function EmbeddingExampleCard({ providerId }: Props) {
     }
   };
 
-  const modelOptions = models.length > 0 ? models : [{ id: "text-embedding-3-small" }];
-
   return (
     <PlaygroundCard
-      kindLabel={t("embedding")}
+      kindLabel={t("webFetch")}
       apiEndpoint={ENDPOINT_PATH}
       onRun={handleRun}
       curlSnippet={curlSnippet}
@@ -97,31 +102,47 @@ export function EmbeddingExampleCard({ providerId }: Props) {
       result={result}
       error={error}
     >
-      {/* Model select */}
+      {/* URL */}
       <div>
-        <label className="block text-xs text-text-muted mb-1">{t("model")}</label>
-        <select
-          value={model || firstModel}
-          onChange={(e) => setModel(e.target.value)}
-          className="w-full rounded-md border border-border bg-bg-subtle text-sm px-2 py-1.5 text-text-main focus:outline-none focus:ring-1 focus:ring-primary"
-        >
-          {modelOptions.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.id}
-            </option>
-          ))}
-        </select>
-      </div>
-      {/* Input text */}
-      <div>
-        <label className="block text-xs text-text-muted mb-1">{t("input")}</label>
+        <label className="block text-xs text-text-muted mb-1">{t("url")}</label>
         <input
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder={t("embeddingSample")}
+          type="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://example.com/article"
           className="w-full rounded-md border border-border bg-bg-subtle text-sm px-2 py-1.5 text-text-main focus:outline-none focus:ring-1 focus:ring-primary"
         />
+      </div>
+      {/* Format + Depth row */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="block text-xs text-text-muted mb-1">{t("format")}</label>
+          <select
+            value={format}
+            onChange={(e) => setFormat(e.target.value as FetchFormat)}
+            className="w-full rounded-md border border-border bg-bg-subtle text-sm px-2 py-1.5 text-text-main focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            {FORMAT_OPTIONS.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-text-muted mb-1">{t("depth")}</label>
+          <select
+            value={depth}
+            onChange={(e) => setDepth(Number(e.target.value))}
+            className="w-full rounded-md border border-border bg-bg-subtle text-sm px-2 py-1.5 text-text-main focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            {DEPTH_OPTIONS.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </PlaygroundCard>
   );

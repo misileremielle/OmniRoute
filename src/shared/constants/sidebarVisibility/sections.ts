@@ -277,22 +277,6 @@ const INTEGRATIONS_GROUP: SidebarItemGroup = {
       subtitleKey: "apiEndpointsSubtitle",
       icon: "api",
     },
-    {
-      id: "webhooks",
-      href: "/dashboard/webhooks",
-      i18nKey: "webhooks",
-      subtitleKey: "webhooksSubtitle",
-      icon: "webhook",
-    },
-    {
-      id: "log-export",
-      href: "/dashboard/log-export",
-      i18nKey: "logExport",
-      subtitleKey: "logExportSubtitle",
-      icon: "cloud_upload",
-      labelFallback: "Log export",
-      subtitleFallback: "Ship call logs out",
-    },
   ],
 };
 
@@ -512,29 +496,6 @@ const OTHER_FEATURES_ITEMS: readonly SidebarItemDefinition[] = [
   },
 ];
 
-const BATCH_GROUP: SidebarItemGroup = {
-  type: "group",
-  id: "batch",
-  titleKey: "batchGroup",
-  titleFallback: "Batch",
-  items: [
-    {
-      id: "batch",
-      href: "/dashboard/batch",
-      i18nKey: "batch",
-      subtitleKey: "batchSubtitle",
-      icon: "view_list",
-    },
-    {
-      id: "batch-files",
-      href: "/dashboard/batch/files",
-      i18nKey: "batchFiles",
-      subtitleKey: "batchFilesSubtitle",
-      icon: "folder",
-    },
-  ],
-};
-
 const CONFIGURATION_ITEMS: readonly SidebarItemDefinition[] = [
   {
     id: "settings-general",
@@ -699,7 +660,7 @@ export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
     id: "other-features",
     titleKey: "otherFeaturesSection",
     titleFallback: "Other Features",
-    children: [...OTHER_FEATURES_ITEMS, BATCH_GROUP],
+    children: [...OTHER_FEATURES_ITEMS],
   },
   {
     id: "configuration",

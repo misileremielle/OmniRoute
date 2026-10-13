@@ -2,17 +2,17 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useApiKey } from "../../providers/hooks/useApiKey";
-import { useProviderModels } from "../../providers/hooks/useProviderModels";
-import { buildCurl } from "../../providers/utils/buildCurl";
-import { PLAYGROUND_KEY_ID_HEADER, resolvePlaygroundKeyId } from "../../providers/utils/playgroundAuth";
+import { useApiKey } from "../../hooks/useApiKey";
+import { useProviderModels } from "../../hooks/useProviderModels";
+import { buildCurl } from "../../utils/buildCurl";
+import { PLAYGROUND_KEY_ID_HEADER, resolvePlaygroundKeyId } from "../../utils/playgroundAuth";
 import { PlaygroundCard } from "./PlaygroundCard";
 
 interface Props {
   providerId: string;
 }
 
-const ENDPOINT_PATH = "/api/v1/videos/generations";
+const ENDPOINT_PATH = "/api/v1/embeddings";
 
 function extractError(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
@@ -23,44 +23,21 @@ function extractError(data: unknown): string | null {
   return null;
 }
 
-function VideoResultRenderer(data: unknown, unsupportedText: string) {
-  if (!data || typeof data !== "object") {
-    return <pre className="text-xs p-3 text-text-main">{JSON.stringify(data, null, 2)}</pre>;
-  }
-  const d = data as Record<string, unknown>;
-  const items = Array.isArray(d.data) ? (d.data as Array<Record<string, unknown>>) : [];
-  const videoUrl =
-    items[0] && typeof items[0].url === "string"
-      ? items[0].url
-      : typeof d.url === "string"
-        ? d.url
-        : null;
-  if (videoUrl) {
-    return (
-      <div className="p-3">
-        <video controls src={videoUrl} className="max-w-full rounded-lg border border-border">
-          {unsupportedText}
-        </video>
-      </div>
-    );
-  }
-  return <pre className="text-xs p-3 text-text-main">{JSON.stringify(data, null, 2)}</pre>;
-}
-
-export function VideoExampleCard({ providerId }: Props) {
+export function EmbeddingExampleCard({ providerId }: Props) {
   const t = useTranslations("miniPlayground");
   const { apiKey, keys } = useApiKey();
   const { models } = useProviderModels(providerId);
 
   const firstModel = models[0]?.id ?? "";
   const [model, setModel] = useState<string>("");
-  const [prompt, setPrompt] = useState<string>(() => t("videoSample"));
+  const [inputText, setInputText] = useState<string>(() => t("embeddingSample"));
   const [running, setRunning] = useState<boolean>(false);
   const [result, setResult] = useState<{ data: unknown; latencyMs: number } | undefined>();
   const [error, setError] = useState<string | null>(null);
 
   const effectiveModel = model || firstModel;
-  const buildBody = () => ({ model: effectiveModel, prompt });
+
+  const buildBody = () => ({ model: effectiveModel, input: inputText });
 
   const curlSnippet = buildCurl({
     endpoint:
@@ -108,20 +85,19 @@ export function VideoExampleCard({ providerId }: Props) {
     }
   };
 
-  const modelOptions = models.length > 0 ? models : [{ id: "wan-2.1-t2v-14b" }];
+  const modelOptions = models.length > 0 ? models : [{ id: "text-embedding-3-small" }];
 
   return (
     <PlaygroundCard
-      kindLabel={t("video")}
+      kindLabel={t("embedding")}
       apiEndpoint={ENDPOINT_PATH}
       onRun={handleRun}
       curlSnippet={curlSnippet}
       running={running}
       result={result}
       error={error}
-      resultRenderer={(data) => VideoResultRenderer(data, t("browserVideoUnsupported"))}
     >
-      {/* Model */}
+      {/* Model select */}
       <div>
         <label className="block text-xs text-text-muted mb-1">{t("model")}</label>
         <select
@@ -136,15 +112,15 @@ export function VideoExampleCard({ providerId }: Props) {
           ))}
         </select>
       </div>
-      {/* Prompt */}
+      {/* Input text */}
       <div>
-        <label className="block text-xs text-text-muted mb-1">{t("prompt")}</label>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          rows={2}
-          placeholder={t("videoSample")}
-          className="w-full rounded-md border border-border bg-bg-subtle text-sm px-2 py-1.5 text-text-main focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+        <label className="block text-xs text-text-muted mb-1">{t("input")}</label>
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          placeholder={t("embeddingSample")}
+          className="w-full rounded-md border border-border bg-bg-subtle text-sm px-2 py-1.5 text-text-main focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
     </PlaygroundCard>

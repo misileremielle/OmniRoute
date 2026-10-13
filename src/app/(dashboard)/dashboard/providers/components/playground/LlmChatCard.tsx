@@ -10,13 +10,13 @@ import {
 } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/shared/utils/cn";
-import { useApiKey } from "../../providers/hooks/useApiKey";
-import { useProviderModels } from "../../providers/hooks/useProviderModels";
+import { useApiKey } from "../../hooks/useApiKey";
+import { useProviderModels } from "../../hooks/useProviderModels";
 import { getProviderAlias } from "@/shared/constants/providers";
 import {
   buildNativeCodexPlaygroundRequest,
   isNativeCodexPlaygroundModel,
-} from "../../playground/components/tabs/chatTabEndpointRequest";
+} from "../../../playground/components/tabs/chatTabEndpointRequest";
 
 const CHAT_COMPLETIONS_ENDPOINT = "/api/v1/chat/completions";
 const RESPONSES_ENDPOINT = "/api/v1/responses";

@@ -68,8 +68,6 @@ test("primary sidebar items place limits after cache", () => {
       "agent-bridge",
       "traffic-inspector",
       "api-endpoints",
-      "webhooks",
-      "log-export",
       "proxy",
     ]
   );
