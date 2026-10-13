@@ -154,6 +154,7 @@ import {
   isModelAdvertisedByConnection,
   isModelBlockedByCodexPlan,
 } from "@/domain/connectionModelRules";
+import { preferHighestClaudePlan } from "@/domain/claudePlanTier";
 import {
   getSyncedAvailableModelsByConnection,
   SYNCED_AVAILABLE_MODELS_MALFORMED,
@@ -1865,7 +1866,12 @@ export async function getProviderCredentials(
         : null;
     }
 
-    const orderedConnections = [...leasePolicy.connections].sort((a, b) => {
+    const tierPool = preferHighestClaudePlan(
+      resolvedId,
+      leasePolicy.connections,
+      leasePolicy.activeLease?.connectionId
+    );
+    const orderedConnections = [...tierPool].sort((a, b) => {
       if (a.authType !== "oauth" || b.authType !== "oauth") return 0;
       const priorityDelta = (a.priority || 999) - (b.priority || 999);
       if (priorityDelta !== 0) return priorityDelta;
