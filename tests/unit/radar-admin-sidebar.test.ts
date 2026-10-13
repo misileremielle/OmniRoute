@@ -36,15 +36,14 @@ test("G17: missing RADAR_ADMIN_URL has no public default", () => {
   );
 });
 
-test("G17: accepts an HTTPS tunnel URL and inserts owner link immediately after Radar", () => {
+test("G17: accepts an HTTPS tunnel URL and appends the owner link to the Costs section", () => {
   process.env.RADAR_ADMIN_URL = "https://radar-admin.example.test/ops";
 
   const url = getRadarAdminUrl();
   assert.equal(url, "https://radar-admin.example.test/ops");
 
   const items = runtimeCostsItems(url);
-  const radarIndex = items.findIndex((item) => item.id === "radar");
-  const adminItem = items[radarIndex + 1];
+  const adminItem = items[items.length - 1];
 
   assert.equal(adminItem.id, "radar-admin");
   assert.equal(adminItem.href, url);

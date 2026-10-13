@@ -249,15 +249,8 @@ export function resolveRuntimeSidebarSections(
     const children = section.children.filter(
       (child) => !("id" in child && child.id === RADAR_ADMIN_ITEM.id)
     );
-    const radarIndex = children.findIndex((child) => !("type" in child) && child.id === "radar");
-    const insertionIndex = radarIndex >= 0 ? radarIndex + 1 : children.length;
-    const resolvedChildren = [...children];
-    resolvedChildren.splice(insertionIndex, 0, {
-      ...RADAR_ADMIN_ITEM,
-      href: radarAdminUrl,
-    });
 
-    return { ...section, children: resolvedChildren };
+    return { ...section, children: [...children, { ...RADAR_ADMIN_ITEM, href: radarAdminUrl }] };
   });
 }
 

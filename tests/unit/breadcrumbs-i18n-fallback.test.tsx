@@ -16,7 +16,7 @@ const translate = Object.assign(
 );
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/dashboard/radar/setup",
+  usePathname: () => "/dashboard/costs/pricing",
 }));
 
 vi.mock("next-intl", () => ({
@@ -45,7 +45,7 @@ describe("Breadcrumbs missing translation fallback", () => {
     translate.has.mockClear();
   });
 
-  it("renders humanized Radar setup labels without asking next-intl for missing keys", async () => {
+  it("renders humanized Costs pricing labels without asking next-intl for missing keys", async () => {
     const container = document.createElement("div");
     document.body.appendChild(container);
     const root = createRoot(container);
@@ -53,14 +53,14 @@ describe("Breadcrumbs missing translation fallback", () => {
     await act(async () => root.render(<Breadcrumbs />));
 
     expect(container.textContent).toContain("Dashboard");
-    expect(container.textContent).toContain("Radar");
-    expect(container.textContent).toContain("Setup");
-    expect(translate).not.toHaveBeenCalledWith("radar");
-    expect(translate).not.toHaveBeenCalledWith("setup");
+    expect(container.textContent).toContain("Costs");
+    expect(container.textContent).toContain("Pricing");
+    expect(translate).not.toHaveBeenCalledWith("costs");
+    expect(translate).not.toHaveBeenCalledWith("pricing");
     act(() => root.unmount());
   });
 
-  it("uses localized breadcrumb labels when Radar and setup translations exist", async () => {
+  it("uses localized breadcrumb labels when Costs and pricing translations exist", async () => {
     labels = ptBrMessages.breadcrumbs;
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -69,10 +69,10 @@ describe("Breadcrumbs missing translation fallback", () => {
     await act(async () => root.render(<Breadcrumbs />));
 
     expect(container.textContent).toContain("Painel");
-    expect(container.textContent).toContain("Radar");
-    expect(container.textContent).toContain("Configuração");
-    expect(translate).toHaveBeenCalledWith("radar");
-    expect(translate).toHaveBeenCalledWith("setup");
+    expect(container.textContent).toContain("Custos");
+    expect(container.textContent).toContain("Preços");
+    expect(translate).toHaveBeenCalledWith("costs");
+    expect(translate).toHaveBeenCalledWith("pricing");
     act(() => root.unmount());
   });
 });

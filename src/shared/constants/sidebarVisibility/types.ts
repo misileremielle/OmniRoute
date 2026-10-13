@@ -34,7 +34,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "orchestration",
   "agent-bridge",
   "traffic-inspector",
-  "discovery",
   // OmniProxy > Integrations
   "api-endpoints",
   "webhooks",
@@ -67,10 +66,7 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   // Costs section
   "costs-pricing",
   "costs-budget",
-  "costs-free-tiers",
   "costs-quota-share",
-  "free-provider-rankings",
-  "radar",
   "radar-admin",
   // Monitoring > Audit
   "audit",

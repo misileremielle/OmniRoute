@@ -282,13 +282,6 @@ const TOOLS_GROUP: SidebarItemGroup = {
       subtitleKey: "trafficInspectorSubtitle",
       icon: "network_check",
     },
-    {
-      id: "discovery",
-      href: "/dashboard/discovery",
-      i18nKey: "discovery",
-      subtitleKey: "discoverySubtitle",
-      icon: "travel_explore",
-    },
   ],
 };
 
@@ -503,28 +496,6 @@ const COSTS_ITEMS: readonly SidebarItemDefinition[] = [
     i18nKey: "costsBudget",
     subtitleKey: "costsBudgetSubtitle",
     icon: "savings",
-  },
-  {
-    id: "costs-free-tiers",
-    href: "/dashboard/free-tiers",
-    i18nKey: "costsFreeTiers",
-    subtitleKey: "costsFreeTiersSubtitle",
-    icon: "request_quote",
-  },
-  {
-    id: "free-provider-rankings",
-    href: "/dashboard/free-provider-rankings",
-    i18nKey: "freeProviderRankings",
-    subtitleKey: "freeProviderRankingsSubtitle",
-    icon: "leaderboard",
-  },
-  {
-    id: "radar",
-    href: "/dashboard/radar",
-    i18nKey: "radar",
-    subtitleKey: "radarSubtitle",
-    icon: "radar",
-    featureFlagKey: "RADAR_ENABLED",
   },
 ];
 

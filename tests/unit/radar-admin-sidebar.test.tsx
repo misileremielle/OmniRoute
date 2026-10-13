@@ -15,7 +15,7 @@ vi.mock("next-intl", () => ({
 }));
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/dashboard/radar",
+  usePathname: () => "/dashboard/costs",
 }));
 
 function jsonResponse(body: unknown) {
