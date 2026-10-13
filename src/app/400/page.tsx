@@ -16,10 +16,6 @@ export default function BadRequestPage() {
         t("statusPages.400.suggestion3"),
       ]}
       primaryAction={{ href: "/docs", label: t("statusPages.400.primaryAction") }}
-      secondaryAction={{
-        href: "/dashboard/translator",
-        label: t("statusPages.400.secondaryAction"),
-      }}
     />
   );
 }

@@ -1,4 +1,4 @@
-// src/app/(dashboard)/dashboard/playground/components/tabs/chatTabEndpointRequest.ts
+// src/app/(dashboard)/dashboard/providers/components/playground/chatTabEndpointRequest.ts
 //
 // #10592 — ChatTab.tsx hardcoded every "Send" click to POST /api/v1/chat/completions,
 // ignoring configState.endpoint entirely. Selecting a search-only provider (exa-search,

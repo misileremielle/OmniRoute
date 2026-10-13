@@ -133,7 +133,7 @@ test("SIDEBAR_PRESETS includes essentials as the beginner path", () => {
   ]) {
     assert.equal(hidden.has(id as never), false, `${id} should stay visible in essentials`);
   }
-  assert.equal(hidden.has("playground"), true);
+  assert.equal(hidden.has("search-tools"), true);
   assert.equal(hidden.has("logs"), true);
 });
 

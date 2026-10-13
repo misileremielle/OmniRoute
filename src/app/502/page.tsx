@@ -16,10 +16,6 @@ export default function BadGatewayPage() {
         t("statusPages.502.suggestion3"),
       ]}
       primaryAction={{ href: "/dashboard/providers", label: t("statusPages.502.primaryAction") }}
-      secondaryAction={{
-        href: "/dashboard/translator",
-        label: t("statusPages.502.secondaryAction"),
-      }}
     />
   );
 }

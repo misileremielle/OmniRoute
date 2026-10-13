@@ -16,7 +16,7 @@ import { getProviderAlias } from "@/shared/constants/providers";
 import {
   buildNativeCodexPlaygroundRequest,
   isNativeCodexPlaygroundModel,
-} from "../../../playground/components/tabs/chatTabEndpointRequest";
+} from "./chatTabEndpointRequest";
 
 const CHAT_COMPLETIONS_ENDPOINT = "/api/v1/chat/completions";
 const RESPONSES_ENDPOINT = "/api/v1/responses";

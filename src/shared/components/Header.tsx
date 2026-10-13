@@ -55,8 +55,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId, string>> = {
   "context-caveman": "contextCavemanDescription",
   "context-rtk": "contextRtkDescription",
   "context-combos": "contextCombosDescription",
-  translator: "translatorDescription",
-  playground: "playgroundDescription",
   "search-tools": "searchToolsDescription",
   logs: "logsDescription",
   health: "healthDescription",

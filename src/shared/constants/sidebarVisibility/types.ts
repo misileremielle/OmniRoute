@@ -65,8 +65,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "costs-quota-share",
   "radar-admin",
   // Dev Tools
-  "translator",
-  "playground",
   "search-tools",
   // Other Features — flat
   "media",

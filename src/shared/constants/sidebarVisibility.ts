@@ -51,8 +51,6 @@ export const SIDEBAR_ICON_ACCENTS: Partial<Record<SidebarItemId, string>> = {
   "costs-budget": "#22C55E",
   "costs-quota-share": "#06B6D4",
   "radar-admin": "#F59E0B",
-  translator: "#3B82F6",
-  playground: "#EAB308",
   "search-tools": "#0891B2",
   media: "#D946EF",
   "settings-general": "#64748B",
@@ -264,9 +262,7 @@ const ESSENTIALS_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
 
 /** Hidden in Essentials sidebar but kept searchable in Command Palette. */
 export const ESSENTIALS_ADVANCED_TOOL_IDS: ReadonlySet<HideableSidebarItemId> = new Set([
-  "playground",
   "logs",
-  "translator",
   "combos",
   "quota",
   "analytics",
@@ -314,8 +310,6 @@ const DEVELOPER_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
   "health",
   "runtime",
   "resilience-connections",
-  "translator",
-  "playground",
   "settings-general",
   "settings-modality-bridge",
   "settings-routing",

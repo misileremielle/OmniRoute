@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import ExportCodeModal from "@/app/(dashboard)/dashboard/playground/components/ExportCodeModal";
+import ExportCodeModal from "@/shared/components/ExportCodeModal";
 import type { PlaygroundState } from "@/lib/playground/codeExport";
 
 export type ActiveTab = "search" | "scrape" | "compare";
@@ -15,11 +15,12 @@ interface SearchToolsTopBarProps {
   exportState?: PlaygroundState;
 }
 
-const TABS: { id: ActiveTab; icon: string; labelKey: "tabSearch" | "tabScrape" | "tabCompare" }[] = [
-  { id: "search", icon: "🔍", labelKey: "tabSearch" },
-  { id: "scrape", icon: "📄", labelKey: "tabScrape" },
-  { id: "compare", icon: "⚖", labelKey: "tabCompare" },
-];
+const TABS: { id: ActiveTab; icon: string; labelKey: "tabSearch" | "tabScrape" | "tabCompare" }[] =
+  [
+    { id: "search", icon: "🔍", labelKey: "tabSearch" },
+    { id: "scrape", icon: "📄", labelKey: "tabScrape" },
+    { id: "compare", icon: "⚖", labelKey: "tabCompare" },
+  ];
 
 export default function SearchToolsTopBar({
   activeTab,
