@@ -39,7 +39,6 @@ test("sections without protected items are hideable", () => {
     "costs",
     "monitoring",
     "devtools",
-    "agentic-features",
     "other-features",
     "help",
   ]) {

@@ -1,16 +1,12 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Card, Button, Input, Modal, CardSkeleton, SegmentedControl } from "@/shared/components";
+import { Card, Button, Input, Modal, CardSkeleton } from "@/shared/components";
 import Toggle from "@/shared/components/Toggle";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import { isPublicDisplayBaseUrl, useDisplayBaseUrl } from "@/shared/hooks";
 import { extractApiErrorMessage } from "@/shared/http/apiErrorMessage";
 import { useTranslations } from "next-intl";
-import A2ADashboardPage from "./components/A2ADashboard";
-import McpDashboardPage from "./components/MCPDashboard";
-import NotionSourceCard from "./components/NotionSourceCard";
-import ObsidianSourceCard from "./components/ObsidianSourceCard";
 import VscodeTokenAliasCard from "./VscodeTokenAliasCard";
 
 const BUILD_TIME_CLOUD_URL = process.env.NEXT_PUBLIC_CLOUD_URL || null;
@@ -106,15 +102,6 @@ type EndpointTunnelVisibility = {
   showNgrokTunnel: boolean;
 };
 
-type EndpointTab = "apis" | "mcp" | "a2a" | "context-sources";
-
-const ENDPOINT_TABS: Array<{ value: EndpointTab; labelKey: string; icon: string }> = [
-  { value: "apis", labelKey: "tabApis", icon: "api" },
-  { value: "mcp", labelKey: "tabMcp", icon: "extension" },
-  { value: "a2a", labelKey: "tabA2a", icon: "hub" },
-  { value: "context-sources", labelKey: "tabContextSources", icon: "database" },
-];
-
 const DEFAULT_TUNNEL_VISIBILITY: EndpointTunnelVisibility = {
   showCloudflaredTunnel: true,
   showTailscaleFunnel: true,
@@ -149,8 +136,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
   const [selectedProvider, setSelectedProvider] = useState(null); // for provider models popup
   const [cloudBaseUrl, setCloudBaseUrl] = useState(BUILD_TIME_CLOUD_URL); // dynamic cloud URL from API response
   const [cloudConfigured, setCloudConfigured] = useState(Boolean(BUILD_TIME_CLOUD_URL));
-  const [_mcpStatus, setMcpStatus] = useState<any>(null);
-  const [_a2aStatus, setA2aStatus] = useState<any>(null);
   const [searchProviders, setSearchProviders] = useState<any[]>([]);
   const [cloudflaredStatus, setCloudflaredStatus] = useState<CloudflaredTunnelStatus | null>(null);
   const [cloudflaredBusy, setCloudflaredBusy] = useState(false);
@@ -175,7 +160,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
   );
   const [lanUrls, setLanUrls] = useState<string[]>([]);
   const [tailscaleIpUrl, setTailscaleIpUrl] = useState<string | null>(null);
-  const [activeEndpointTab, setActiveEndpointTab] = useState<EndpointTab>("apis");
   const [customSystemPromptEnabled, setCustomSystemPromptEnabled] = useState(false);
   const [customSystemPrompt, setCustomSystemPrompt] = useState("");
 
@@ -315,24 +299,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       console.log("Error fetching models:", e);
     } finally {
       setModelsLoading(false);
-    }
-  };
-
-  const fetchProtocolStatus = async () => {
-    try {
-      const [mcpRes, a2aRes] = await Promise.allSettled([
-        fetch("/api/mcp/status"),
-        fetch("/api/a2a/status"),
-      ]);
-
-      if (mcpRes.status === "fulfilled" && mcpRes.value.ok) {
-        setMcpStatus(await mcpRes.value.json());
-      }
-      if (a2aRes.status === "fulfilled" && a2aRes.value.ok) {
-        setA2aStatus(await a2aRes.value.json());
-      }
-    } catch {
-      // Ignore status failures; protocols panel has fallback text.
     }
   };
 
@@ -478,7 +444,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       setLoading(false);
 
       runEndpointBackgroundTask("models", fetchModels);
-      runEndpointBackgroundTask("protocol-status", fetchProtocolStatus);
       runEndpointBackgroundTask("search-providers", fetchSearchProviders);
       runEndpointBackgroundTask("network-info", async () => {
         try {
@@ -582,7 +547,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
 
   useEffect(() => {
     const interval = setInterval(() => {
-      void fetchProtocolStatus();
       if (showCloudflaredTunnel) {
         void fetchCloudflaredStatus(true);
       }
@@ -1249,7 +1213,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Guided connection header (#11228): /v1 URL + test action lead; advanced protocols demoted */}
+      {/* Guided connection header (#11228): /v1 URL + test action lead */}
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
         <p className="text-text-muted">{t("subtitle")}</p>
@@ -1261,26 +1225,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
             {t("testEndpoint")}
           </a>
         </div>
-        <div className="flex items-center gap-2 text-xs text-text-muted">
-          <span>{t("advancedProtocols")}</span>
-        </div>
       </div>
-      <SegmentedControl
-        options={ENDPOINT_TABS.map((tab) => ({ ...tab, label: t(tab.labelKey) }))}
-        value={activeEndpointTab}
-        onChange={(value) => setActiveEndpointTab(value as EndpointTab)}
-        aria-label={t("endpointSections")}
-        className="w-fit"
-      />
-
-      {activeEndpointTab === "mcp" ? <McpDashboardPage /> : null}
-      {activeEndpointTab === "a2a" ? <A2ADashboardPage /> : null}
-      {activeEndpointTab === "context-sources" ? (
-        <div className="flex flex-col gap-4">
-          <NotionSourceCard />
-          <ObsidianSourceCard />
-        </div>
-      ) : null}
 
       {/* Endpoint Card */}
       <Card>

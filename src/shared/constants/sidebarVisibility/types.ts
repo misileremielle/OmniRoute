@@ -70,13 +70,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "translator",
   "playground",
   "search-tools",
-  // Agentic Features
-  "memory",
-  "skills",
-  "agent-skills",
-  "mcp",
-  "a2a",
-  "plugins",
   // Other Features — flat
   "media",
   // Other Features > Batch
@@ -116,7 +109,6 @@ export type SidebarSectionId =
   | "costs"
   | "monitoring"
   | "devtools"
-  | "agentic-features"
   | "other-features"
   | "configuration"
   | "help";

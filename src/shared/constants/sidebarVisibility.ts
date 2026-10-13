@@ -55,11 +55,6 @@ export const SIDEBAR_ICON_ACCENTS: Partial<Record<SidebarItemId, string>> = {
   translator: "#3B82F6",
   playground: "#EAB308",
   "search-tools": "#0891B2",
-  memory: "#10B981",
-  skills: "#F43F5E",
-  "agent-skills": "#D946EF",
-  mcp: "#8B5CF6",
-  a2a: "#06B6D4",
   media: "#D946EF",
   batch: "#14B8A6",
   "batch-files": "#38BDF8",
@@ -283,10 +278,6 @@ export const ESSENTIALS_ADVANCED_TOOL_IDS: ReadonlySet<HideableSidebarItemId> = 
   "cache",
   "runtime",
   "resilience-connections",
-  "mcp",
-  "a2a",
-  "memory",
-  "skills",
 ]);
 
 const MINIMAL_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
@@ -329,10 +320,6 @@ const DEVELOPER_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
   "resilience-connections",
   "translator",
   "playground",
-  "memory",
-  "skills",
-  "mcp",
-  "a2a",
   "settings-general",
   "settings-modality-bridge",
   "settings-routing",

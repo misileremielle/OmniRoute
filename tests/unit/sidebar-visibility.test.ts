@@ -142,23 +142,6 @@ test("help sidebar exposes changelog after docs and issues", () => {
   assert.equal(sidebarVisibility.HIDEABLE_SIDEBAR_ITEM_IDS.includes("changelog"), true);
 });
 
-test("plugins has a discoverable sidebar entry (#3656 follow-up)", async () => {
-  const items = sectionItems("agentic-features");
-  const plugins = items.find((item) => item.id === "plugins");
-  assert.ok(plugins, "expected a plugins item in the agentic-features section");
-  assert.equal(plugins.href, "/dashboard/plugins");
-  assert.equal(sidebarVisibility.HIDEABLE_SIDEBAR_ITEM_IDS.includes("plugins"), true);
-
-  // It must be a real page (plugin manager), not a legacy redirect stub.
-  const pluginsPage = await readFile(
-    join(repoRoot, "src/app/(dashboard)/dashboard/plugins/page.tsx"),
-    "utf8"
-  );
-  assert.doesNotMatch(pluginsPage, /^\s*redirect\(/m);
-  // R0.2: marketplace tab removed (dead code) — verify the page still has plugin management UI.
-  assert.match(pluginsPage, /scanForPlugins|installedTab|fetchPlugins/i);
-});
-
 test("model catalog is available from the OmniProxy sidebar and can be hidden", () => {
   const item = sectionItems("omni-proxy").find((candidate) => candidate.id === "model-catalog");
   assert.ok(item, "expected the model catalog sidebar item to exist");
