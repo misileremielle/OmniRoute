@@ -789,8 +789,13 @@ export function openaiToClaudeResponse(chunk, state) {
       });
     }
 
-    // Override finish_reason to tool_use if XML tool calls were found
-    const overrideFinishReason = xmlToolCalls.length > 0 ? "tool_calls" : choice.finish_reason;
+    // Override finish_reason to tool_use if XML tool calls were found, or when an
+    // upstream finished a turn that made tool calls with "stop": as "end_turn",
+    // agent clients treat the turn as done and never run the pending tool call.
+    const overrideFinishReason =
+      xmlToolCalls.length > 0 || (state.toolCalls.size > 0 && choice.finish_reason === "stop")
+        ? "tool_calls"
+        : choice.finish_reason;
 
     // Mark finish for later usage injection in stream.js
     state.finishReason = overrideFinishReason;
