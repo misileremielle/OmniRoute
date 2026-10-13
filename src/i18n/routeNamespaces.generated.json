@@ -979,7 +979,6 @@
       "trafficInspector"
     ],
     "system": [
-      "agentBridge",
       "analytics",
       "breadcrumbs",
       "cache",

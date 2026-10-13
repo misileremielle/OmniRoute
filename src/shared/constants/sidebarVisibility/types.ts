@@ -31,12 +31,8 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "acp-agents",
   "cloud-agents",
   "agent-bridge",
-  "traffic-inspector",
   // OmniProxy > Integrations
   "api-endpoints",
-  // OmniProxy — proxy tools
-  "mitm-proxy",
-  "1proxy",
   // Analytics
   "analytics",
   "analytics-combo-health",

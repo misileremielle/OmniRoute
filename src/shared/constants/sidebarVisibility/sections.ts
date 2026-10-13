@@ -254,13 +254,6 @@ const TOOLS_GROUP: SidebarItemGroup = {
       subtitleKey: "agentBridgeSubtitle",
       icon: "link",
     },
-    {
-      id: "traffic-inspector",
-      href: "/dashboard/tools/traffic-inspector",
-      i18nKey: "trafficInspector",
-      subtitleKey: "trafficInspectorSubtitle",
-      icon: "network_check",
-    },
   ],
 };
 

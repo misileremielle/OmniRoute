@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { JsonViewer } from "../shared/JsonViewer";
+import { JsonViewer } from "./JsonViewer";
 import { shortCallId } from "@/shared/utils/formatting";
 
 interface ToolResultBlockProps {

@@ -29,8 +29,6 @@ export const SIDEBAR_ICON_ACCENTS: Partial<Record<SidebarItemId, string>> = {
   "cloud-agents": "#7DD3FC",
   "api-endpoints": "#14B8A6",
   proxy: "#A3E635",
-  "mitm-proxy": "#FB7185",
-  "1proxy": "#22D3EE",
   analytics: "#06B6D4",
   "analytics-combo-health": "#34D399",
   "analytics-utilization": "#FBBF24",

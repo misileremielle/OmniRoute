@@ -363,13 +363,6 @@ export default function AgentBridgePageClient({
                 <span className="material-symbols-outlined text-[14px]">dns</span>
                 {t("quickLinkProviders")}
               </Link>
-              <Link
-                href="/dashboard/tools/traffic-inspector"
-                className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
-              >
-                <span className="material-symbols-outlined text-[14px]">network_check</span>
-                {t("quickLinkInspector")}
-              </Link>
             </div>
           </div>
         </>

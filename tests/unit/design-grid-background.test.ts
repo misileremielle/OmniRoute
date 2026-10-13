@@ -361,10 +361,6 @@ test("card-less data tables wrap their table in an opaque surface", () => {
       "../../src/app/(dashboard)/dashboard/tools/agent-bridge/components/ModelMappingTable.tsx",
       "overflow-hidden bg-surface",
     ],
-    [
-      "../../src/app/(dashboard)/dashboard/tools/traffic-inspector/components/shared/HeaderTable.tsx",
-      "bg-surface",
-    ],
   ];
   for (const [p, needle] of expect) {
     const src = read(p);

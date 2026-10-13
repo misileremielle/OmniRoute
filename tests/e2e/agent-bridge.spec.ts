@@ -55,7 +55,9 @@ test.describe("AgentBridge page", () => {
     // Either: 9 agent cards are visible
     // OR: empty-providers state is shown (no providers configured yet)
     const agentCards = page.locator("[data-testid='agent-card']");
-    const emptyState = page.locator("[data-testid='empty-providers-state'], [data-testid='agent-bridge-empty']");
+    const emptyState = page.locator(
+      "[data-testid='empty-providers-state'], [data-testid='agent-bridge-empty']"
+    );
 
     const cardCount = await agentCards.count();
     const emptyVisible = await emptyState.isVisible().catch(() => false);
@@ -80,10 +82,12 @@ test.describe("AgentBridge page", () => {
     expect(count).toBe(9);
     // Spot-check: Antigravity and GitHub Copilot cards exist
     await expect(page.locator("text=Antigravity").first()).toBeVisible();
-    await expect(page.locator("text=Copilot, text=GitHub Copilot").first()).toBeVisible().catch(async () => {
-      // Accept either name variant
-      await expect(page.locator("text=Copilot").first()).toBeVisible();
-    });
+    await expect(page.locator("text=Copilot, text=GitHub Copilot").first())
+      .toBeVisible()
+      .catch(async () => {
+        // Accept either name variant
+        await expect(page.locator("text=Copilot").first()).toBeVisible();
+      });
   });
 
   test("AgentBridge Server Card is visible", async ({ page }) => {
@@ -113,7 +117,9 @@ test.describe("AgentBridge page", () => {
       return;
     }
     // Click "Setup wizard" on the first card that has one visible
-    const setupButton = page.locator("[data-testid='setup-wizard-btn'], button:has-text('Setup wizard')").first();
+    const setupButton = page
+      .locator("[data-testid='setup-wizard-btn'], button:has-text('Setup wizard')")
+      .first();
     const isVisible = await setupButton.isVisible().catch(() => false);
     if (!isVisible) {
       // All agents already set up — skip wizard open test
@@ -145,16 +151,5 @@ test.describe("AgentBridge page", () => {
     await expect(page.locator("[data-testid='error-boundary']")).not.toBeVisible();
     await page.waitForTimeout(500);
     await expect(page.locator("body")).toBeVisible();
-  });
-
-  test("redirect from /dashboard/system/mitm-proxy to agent-bridge", async ({ page }) => {
-    // Old mitm-proxy URL should redirect or show moved notice
-    await page.goto("/dashboard/system/mitm-proxy");
-    await page.waitForLoadState("networkidle");
-    const url = page.url();
-    // Should redirect to agent-bridge or show a moved banner
-    const isRedirected = url.includes("agent-bridge");
-    const hasBanner = await page.locator("text=moved, text=AgentBridge").first().isVisible().catch(() => false);
-    expect(isRedirected || hasBanner).toBe(true);
   });
 });

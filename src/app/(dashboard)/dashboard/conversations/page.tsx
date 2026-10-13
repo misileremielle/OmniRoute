@@ -7,7 +7,7 @@ import { formatTime } from "@/shared/utils/formatting";
 import { copyToClipboard } from "@/shared/utils/clipboard";
 import RequestLoggerDetail from "@/shared/components/RequestLoggerDetail";
 import useEmailPrivacyStore from "@/store/emailPrivacyStore";
-import { ChatBubble } from "@/app/(dashboard)/dashboard/tools/traffic-inspector/components/chat/ChatBubble";
+import { ChatBubble } from "@/shared/components/chat/ChatBubble";
 import { toTurn, type ConversationTurn } from "./toTurn";
 
 interface ConversationRow {

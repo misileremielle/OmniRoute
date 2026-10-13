@@ -83,9 +83,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId, string>> = {
   "settings-resilience": "settingsResilienceDescription",
   "settings-cache": "settingsCacheDescription",
   "settings-advanced": "settingsAdvancedDescription",
-  // Proxy sub-pages
-  "mitm-proxy": "mitmProxyDescription",
-  "1proxy": "oneProxyDescription",
 };
 
 // Build href → sidebar item lookup (non-external items only)
