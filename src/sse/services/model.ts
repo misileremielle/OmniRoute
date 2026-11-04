@@ -2,7 +2,11 @@
 import { getModelAliases, getCustomModels } from "@/lib/db/models";
 import { getComboById, getComboByNameInsensitive } from "@/lib/db/combos";
 import { getCachedComboByName, getCachedComboForModel } from "@/lib/db/readCache";
-import { getCachedProviderNodes, getCachedSettings } from "@/lib/db/readCache";
+import {
+  getCachedProviderNodes,
+  getCachedSettings,
+  getModelCatalogCacheVersion,
+} from "@/lib/db/readCache";
 
 import { getSyncedAutoAliases } from "@/lib/providerModels/syncedAutoAliases.ts";
 import { getActiveSyncedCatalog } from "@/lib/db/models/activeSyncedCatalog";
@@ -336,7 +340,8 @@ function copySyncedThinkingMetadata(metadata: RuntimeModelMeta, syncedMatch: any
     Array.isArray(syncedMatch?.supportedThinkingEfforts) &&
     syncedMatch.supportedThinkingEfforts.length > 0
   ) {
-    metadata.supportedThinkingEfforts = syncedMatch.supportedThinkingEfforts;
+    // Copy: syncedMatch can be a row of the memoized catalog (loadModelMetaInputs).
+    metadata.supportedThinkingEfforts = [...syncedMatch.supportedThinkingEfforts];
   }
   if (typeof syncedMatch?.defaultThinkingEffort === "string") {
     metadata.defaultThinkingEffort = syncedMatch.defaultThinkingEffort;
@@ -400,6 +405,72 @@ function resolveSyncedMatch(
   return { match: undefined, modelId: resolvedModelId };
 }
 
+type ModelMetaInputs = {
+  customModels: Awaited<ReturnType<typeof getCustomModels>>;
+  liveCatalog: Awaited<ReturnType<typeof getActiveSyncedCatalog>>;
+  compatOverrides: ReturnType<typeof getModelCompatOverrides>;
+};
+
+// lookupModelMeta() runs for every request and once per combo target. Its inputs
+// cost a connections query plus a JSON.parse + normalize of the provider's whole
+// synced catalog and customModels (twice) — hundreds of rows for gateway providers.
+// Memoize them per provider, keyed by the model-catalog version that every
+// customModels / synced-catalog / compat / structural connection write bumps (and
+// that resetDbInstance() bumps), with a short TTL as a backstop for writes that
+// bypass the signal (another process, synced_models_at freshness). Consumers only
+// read these rows; buildRuntimeModelMeta() copies what it keeps.
+const MODEL_META_INPUTS_TTL_MS = 5_000;
+const MODEL_META_INPUTS_MAX_ENTRIES = 500;
+const modelMetaInputsCache = new Map<
+  string,
+  { version: number; expiresAt: number; value: Promise<ModelMetaInputs> }
+>();
+
+function loadModelMetaInputs(providerId: string): Promise<ModelMetaInputs> {
+  const version = getModelCatalogCacheVersion();
+  const now = Date.now();
+  const cached = modelMetaInputsCache.get(providerId);
+  if (cached && cached.version === version && cached.expiresAt > now) return cached.value;
+
+  const value = Promise.all([
+    getCustomModels(providerId),
+    getActiveSyncedCatalog(providerId),
+    // #10898 / #7620: model-compat overrides (apiFormat/targetFormat/
+    // supportsVision, isHidden, ...) are stored keyed on the id the operator
+    // wrote them under. For a no-auth alias the model prefix can resolve to an
+    // APIKEY gateway id while the override was written on the sibling no-auth
+    // row (see noAuthProviderSiblings.ts). Merge overrides
+    // across the provider AND its no-auth sibling ids (requested id first)
+    // instead of canonicalizing the low-level compat key, which would break
+    // paths that legitimately key on the raw id (e.g. getHiddenModelsByProvider).
+    Promise.resolve(
+      getNoAuthHydrationProviderIds(providerId).flatMap((id) => getModelCompatOverrides(id))
+    ),
+  ]).then(([customModels, liveCatalog, compatOverrides]) => ({
+    customModels,
+    liveCatalog,
+    compatOverrides,
+  }));
+
+  if (modelMetaInputsCache.size >= MODEL_META_INPUTS_MAX_ENTRIES) {
+    const oldest = modelMetaInputsCache.keys().next().value;
+    if (oldest !== undefined) modelMetaInputsCache.delete(oldest);
+  }
+  modelMetaInputsCache.delete(providerId);
+  modelMetaInputsCache.set(providerId, {
+    version,
+    expiresAt: now + MODEL_META_INPUTS_TTL_MS,
+    value,
+  });
+  // Never cache a failure: lookupModelMeta() fails open and the next call retries.
+  value.catch(() => {
+    if (modelMetaInputsCache.get(providerId)?.value === value) {
+      modelMetaInputsCache.delete(providerId);
+    }
+  });
+  return value;
+}
+
 async function lookupModelMeta(
   providerId: string,
   modelId: string,
@@ -410,21 +481,7 @@ async function lookupModelMeta(
   available: boolean;
 }> {
   try {
-    const [customModels, liveCatalog, compatOverrides] = await Promise.all([
-      getCustomModels(providerId),
-      getActiveSyncedCatalog(providerId),
-      // #10898 / #7620: model-compat overrides (apiFormat/targetFormat/
-      // supportsVision, isHidden, ...) are stored keyed on the id the operator
-      // wrote them under. For a no-auth alias the model prefix can resolve to an
-      // APIKEY gateway id while the override was written on the sibling no-auth
-      // row (see noAuthProviderSiblings.ts). Merge overrides
-      // across the provider AND its no-auth sibling ids (requested id first)
-      // instead of canonicalizing the low-level compat key, which would break
-      // paths that legitimately key on the raw id (e.g. getHiddenModelsByProvider).
-      Promise.resolve(
-        getNoAuthHydrationProviderIds(providerId).flatMap((id) => getModelCompatOverrides(id))
-      ),
-    ]);
+    const { customModels, liveCatalog, compatOverrides } = await loadModelMetaInputs(providerId);
     const syncedModels = liveCatalog.models;
 
     // A declared effort suffix folds even when the live catalog lists that
