@@ -3738,7 +3738,7 @@
   },
   "tests/unit/models-catalog-route.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 79
+      "count": 78
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 3

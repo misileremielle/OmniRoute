@@ -86,6 +86,7 @@ const ENV_VAR_ALLOWLIST = new Set([
   "NODE_PATH",
   "NODE_OPTIONS",
   "NODE_EXTRA_CA_CERTS", // Node runtime CA var: read by Node itself + passed to a spawned subprocess (src/lib/logExport/childEnvironment.ts), not via process.env.X (AGENTBRIDGE.md)
+  "SSL_CERT_DIR", // OpenSSL CA dir: forwarded to the log-export child (src/lib/logExport/childEnvironment.ts), not read via process.env.X (LOG-EXPORT.md)
   "DEBUG",
   "VERBOSE",
   "LOG_LEVEL",
