@@ -202,7 +202,6 @@ Release, deployment, proxies, tunnels, coverage, database, monitoring.
 - [FLY_IO_DEPLOYMENT_GUIDE.md](ops/FLY_IO_DEPLOYMENT_GUIDE.md) — Fly.io deployment.
 - [VM_DEPLOYMENT_GUIDE.md](ops/VM_DEPLOYMENT_GUIDE.md) — generic VM deployment.
 - [PROXY_GUIDE.md](ops/PROXY_GUIDE.md) — upstream proxy configuration.
-- [TUNNELS_GUIDE.md](ops/TUNNELS_GUIDE.md) — Cloudflare tunnel and friends.
 
 ## diagrams/
 

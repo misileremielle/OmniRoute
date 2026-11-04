@@ -51,15 +51,6 @@ test("provider-store.mjs exporta removeProviderConnectionByProvider", async () =
   assert.equal(typeof mod.removeProviderConnectionByProvider, "function");
 });
 
-test("tunnel.mjs exporta subcomandos status/logs/info/rotate", async () => {
-  const mod = await import("../../bin/cli/commands/tunnel.mjs");
-  assert.equal(typeof mod.registerTunnel, "function");
-  assert.equal(typeof mod.runTunnelStatusCommand, "function");
-  assert.equal(typeof mod.runTunnelLogsCommand, "function");
-  assert.equal(typeof mod.runTunnelInfoCommand, "function");
-  assert.equal(typeof mod.runTunnelRotateCommand, "function");
-});
-
 test("backup.mjs exporta runBackupAutoEnableCommand/Disable/Status", async () => {
   const mod = await import("../../bin/cli/commands/backup.mjs");
   assert.equal(typeof mod.registerBackup, "function");
@@ -190,19 +181,6 @@ test("backup — sem subcomando ainda cria um backup (uso legado documentado)", 
     if (origDataDir === undefined) delete process.env.DATA_DIR;
     else process.env.DATA_DIR = origDataDir;
     rmSync(dataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-  }
-});
-
-test("tunnel — registerTunnel registra list/create/stop/status/logs/info/rotate", async () => {
-  const { registerTunnel } = await import("../../bin/cli/commands/tunnel.mjs");
-  const { Command } = await import("commander");
-  const prog = new Command().exitOverride();
-  registerTunnel(prog);
-  const tunnelCmd = prog.commands.find((c) => c.name() === "tunnel");
-  assert.ok(tunnelCmd, "tunnel command deve existir");
-  const names = tunnelCmd.commands.map((c) => c.name());
-  for (const sub of ["list", "create", "stop", "status", "logs", "info", "rotate"]) {
-    assert.ok(names.includes(sub), `tunnel ${sub} deve existir`);
   }
 });
 

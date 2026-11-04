@@ -593,7 +593,6 @@
     "src/lib/db/core.ts": 2163,
     "src/lib/db/migrationRunner.ts": 1445,
     "src/lib/db/providers.ts": 1480,
-    "src/lib/tailscaleTunnel.ts": 1450,
     "src/lib/tokenHealthCheck.ts": 1492,
     "src/lib/usage/usageHistory.ts": 1473,
     "src/shared/components/RequestLoggerDetail.tsx": 1490,

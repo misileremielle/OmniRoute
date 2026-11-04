@@ -19,25 +19,25 @@ const agentSkillsConstants = await import("../../src/shared/constants/agentSkill
 test("getCatalog() returns exactly 45 entries", () => {
   refreshCatalog();
   const catalog = getCatalog();
-  assert.equal(catalog.length, 46, `Expected 46 but got ${catalog.length}`);
+  assert.equal(catalog.length, 44, `Expected 44 but got ${catalog.length}`);
 });
 
-test("API_SKILL_IDS has exactly 23 entries", () => {
-  assert.equal(API_SKILL_IDS.length, 23);
+test("API_SKILL_IDS has exactly 22 entries", () => {
+  assert.equal(API_SKILL_IDS.length, 22);
 });
 
-test("CLI_SKILL_IDS has exactly 21 entries", () => {
-  assert.equal(CLI_SKILL_IDS.length, 21);
+test("CLI_SKILL_IDS has exactly 20 entries", () => {
+  assert.equal(CLI_SKILL_IDS.length, 20);
 });
 
-test("getCatalog() contains exactly 23 api skills", () => {
+test("getCatalog() contains exactly 22 api skills", () => {
   const apiSkills = getCatalog().filter((s) => s.category === "api");
-  assert.equal(apiSkills.length, 23);
+  assert.equal(apiSkills.length, 22);
 });
 
-test("getCatalog() contains exactly 21 cli skills", () => {
+test("getCatalog() contains exactly 20 cli skills", () => {
   const cliSkills = getCatalog().filter((s) => s.category === "cli");
-  assert.equal(cliSkills.length, 21);
+  assert.equal(cliSkills.length, 20);
 });
 
 test("CONFIG_SKILL_IDS has exactly 1 entry", () => {
@@ -162,17 +162,17 @@ test("getSkillById('') returns null", () => {
 
 // ─── filterCatalog ────────────────────────────────────────────────────────────
 
-test("filterCatalog({ category: 'api' }) returns 23 api skills", () => {
+test("filterCatalog({ category: 'api' }) returns 22 api skills", () => {
   const skills = filterCatalog({ category: "api" });
-  assert.equal(skills.length, 23);
+  assert.equal(skills.length, 22);
   for (const s of skills) {
     assert.equal(s.category, "api");
   }
 });
 
-test("filterCatalog({ category: 'cli' }) returns 21 cli skills", () => {
+test("filterCatalog({ category: 'cli' }) returns 20 cli skills", () => {
   const skills = filterCatalog({ category: "cli" });
-  assert.equal(skills.length, 21);
+  assert.equal(skills.length, 20);
   for (const s of skills) {
     assert.equal(s.category, "cli");
   }
@@ -195,9 +195,9 @@ test("filterCatalog({ area: 'nonexistent' }) returns empty array", () => {
   assert.equal(skills.length, 0);
 });
 
-test("filterCatalog({}) returns full catalog (46 entries)", () => {
+test("filterCatalog({}) returns full catalog (44 entries)", () => {
   const skills = filterCatalog({});
-  assert.equal(skills.length, 46);
+  assert.equal(skills.length, 44);
 });
 
 // ─── refreshCatalog ───────────────────────────────────────────────────────────
@@ -219,14 +219,14 @@ test("computeCoverage() returns valid SkillCoverage shape", () => {
   const cov = computeCoverage();
 
   assert.ok(typeof cov.api === "object");
-  assert.equal(cov.api.total, 23);
+  assert.equal(cov.api.total, 22);
   assert.ok(typeof cov.api.have === "number");
-  assert.ok(cov.api.have >= 0 && cov.api.have <= 23);
+  assert.ok(cov.api.have >= 0 && cov.api.have <= 22);
 
   assert.ok(typeof cov.cli === "object");
-  assert.equal(cov.cli.total, 21);
+  assert.equal(cov.cli.total, 20);
   assert.ok(typeof cov.cli.have === "number");
-  assert.ok(cov.cli.have >= 0 && cov.cli.have <= 21);
+  assert.ok(cov.cli.have >= 0 && cov.cli.have <= 20);
 
   assert.ok(typeof cov.config === "object");
   assert.equal(cov.config.total, 1);

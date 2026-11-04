@@ -101,15 +101,6 @@ beforeEach(() => {
         })
       );
     }
-    if (url === "/api/tunnels/cloudflared") {
-      return Promise.resolve(response({ apiUrl: "https://cf.example/v1" }));
-    }
-    if (url === "/api/tunnels/tailscale") {
-      return Promise.resolve(response({ tunnelUrl: "https://tail.example" }));
-    }
-    if (url === "/api/tunnels/ngrok") {
-      return Promise.resolve(response({ publicUrl: "https://ngrok.example" }));
-    }
     if (url === "/api/cli-tools/backups?tool=grok-build") {
       return Promise.resolve(response({ backups: [] }));
     }
@@ -124,14 +115,11 @@ afterEach(() => {
 });
 
 describe("GrokBuildToolCard", () => {
-  it("loads local, cloud, tunnel, saved, and custom endpoint choices", async () => {
+  it("loads local, cloud, saved, and custom endpoint choices", async () => {
     await renderCard();
     const text = container.textContent ?? "";
     expect(text).toContain("http://127.0.0.1:30200/v1");
     expect(text).toContain("https://cloud.example/machine-1/v1");
-    expect(text).toContain("https://cf.example/v1");
-    expect(text).toContain("https://tail.example/v1");
-    expect(text).toContain("https://ngrok.example/v1");
     expect(text).toContain("Saved office");
     expect(text).toContain("Custom");
   });

@@ -318,7 +318,6 @@ const nextConfig = {
     // (observed as "Class extends value undefined" during Vertex metadata sync). Keep the native
     // package boundary; standalone file tracing still copies the runtime dependency.
     "jsdom",
-    "@ngrok/ngrok",
     "@huggingface/transformers",
     // copilot-m365-web.ts imports 'ws' as a client-side WebSocket. When bundled,
     // ws cannot resolve its 'bufferutil' native addon (frame masking) and throws

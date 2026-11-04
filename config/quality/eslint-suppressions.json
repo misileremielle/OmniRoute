@@ -1323,11 +1323,6 @@
       "count": 1
     }
   },
-  "src/lib/ngrokTunnel.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/lib/notion/api.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -1439,11 +1434,6 @@
     }
   },
   "src/lib/streamingPiiTransform.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/tailscaleTunnel.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -2813,14 +2803,6 @@
   "tests/unit/cloudflare-models-uuid-4259.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 3
-    }
-  },
-  "tests/unit/cloudflaredTunnel-extended.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/codex-banked-reset-credits-5199.test.ts": {
@@ -4603,11 +4585,6 @@
   },
   "tests/unit/tag-routing.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/tailscaleTunnel-anti-fold-10293.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
   },

@@ -1,29 +1,14 @@
 /**
- * Public-safe error bodies for the tunnel and MITM management routes.
+ * Public-safe error bodies for the MITM management route.
  *
  * Hard Rule #12 forbids returning a raw `err.message` in an HTTP body, and
  * `sanitizeErrorMessage()` is the repo's general answer. It is not enough here:
  * it only rewrites tokens that look like an absolute path ending in a *source*
  * extension (`ts|tsx|js|jsx|mjs|cjs` — see `SOURCE_EXT` in
- * open-sse/utils/error.ts), so the three leak shapes these routes actually
- * produce all survive it verbatim:
- *
- *   - config/state paths:  `ENOENT ... open '/home/<user>/.omniroute/data/tunnels.json'`
- *   - binary paths:        `spawn /usr/local/bin/cloudflared ENOENT`
- *   - Tailscale auth keys: `invalid key tskey-auth-kMn3Qz7RtY-9fVbXsPq2LdWc`
- *
- * These come from child processes (`cloudflared`, `tailscale`, `tailscaled`,
- * `ngrok`) and from filesystem I/O on the operator's home directory, so the raw
- * message discloses the host layout, the install location, the OS account name
- * and — for Tailscale — a live credential.
- *
- * Reachability is not uniform. `/api/tunnels/ngrok` (both methods),
- * `/api/tunnels/tailscale` and `/api/tunnels/tailscale/check` are NOT in
- * `LOCAL_ONLY_API_PREFIXES`, and `GET /api/tunnels/cloudflared` is explicitly
- * exempted through `LOCAL_ONLY_API_GET_EXEMPTIONS` (#11531), so those bodies can
- * reach a non-loopback caller. The remaining tunnel routes and
- * `/api/settings/mitm` are loopback-gated; they are covered here for one
- * consistent contract, not because they are remotely reachable.
+ * open-sse/utils/error.ts), so the leak shapes child-process and filesystem
+ * errors produce (config/state paths, binary paths, auth keys) survive it
+ * verbatim and would disclose the host layout, the install location, the OS
+ * account name and possibly a live credential.
  *
  * The contract deliberately does NOT try to scrub the upstream text. It returns
  * a fixed operator-facing sentence plus a coarse machine-readable `reason`, and

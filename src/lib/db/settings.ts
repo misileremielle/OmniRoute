@@ -189,8 +189,6 @@ export async function getSettings() {
   const rows = db.prepare("SELECT key, value FROM key_value WHERE namespace = 'settings'").all();
   const settings: Record<string, unknown> = {
     cloudEnabled: false,
-    tailscaleEnabled: false,
-    tailscaleUrl: "",
     stickyRoundRobinLimit: 3,
     disableSessionStickiness: false,
     // Global connection-aware expansion fallback for group-B combo strategies is opt-in.
@@ -244,9 +242,6 @@ export async function getSettings() {
     sidebarSectionOrder: [],
     sidebarItemOrder: {},
     sidebarActivePreset: null,
-    hideEndpointCloudflaredTunnel: false,
-    hideEndpointTailscaleFunnel: false,
-    hideEndpointNgrokTunnel: false,
     preferClaudeCodeForUnprefixedClaudeModels: isTruthyEnvFlag(
       process.env.OMNIROUTE_PREFER_CLAUDE_CODE_FOR_UNPREFIXED_CLAUDE_MODELS
     ),

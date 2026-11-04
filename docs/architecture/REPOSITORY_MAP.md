@@ -201,7 +201,6 @@ src/
 | `skills/`                                | Skills framework (built-in + marketplace + SkillsSH) — see `docs/frameworks/SKILLS.md`                                                                                                                                                                                                                                  |
 | `playground/`                            | Playground Studio shared helpers: `codeExport.ts` (curl/Python/TS generator), `promptImprover.ts` (meta-prompt builder), `streamMetrics.ts` (pure TTFT/TPS), `types.ts` (pricing table) — see `docs/frameworks/PLAYGROUND_STUDIO.md`                                                                                    |
 | `webhookDispatcher.ts`                   | HMAC webhook delivery — see `docs/frameworks/WEBHOOKS.md`                                                                                                                                                                                                                                                               |
-| `cloudflaredTunnel.ts`, `ngrokTunnel.ts` | Tunnel managers — see `docs/ops/TUNNELS_GUIDE.md`                                                                                                                                                                                                                                                                       |
 | `cloudSync.ts`, `initCloudSync.ts`       | Optional cloud sync of state                                                                                                                                                                                                                                                                                            |
 | `localDb.ts`                             | Re-export barrel for db modules (no logic — re-exports only)                                                                                                                                                                                                                                                            |
 | `cacheLayer.ts`, `idempotencyLayer.ts`   | Request caching + idempotency                                                                                                                                                                                                                                                                                           |
@@ -457,7 +456,6 @@ open-sse/
 | `TERMUX_GUIDE.md`            | Android headless via Termux                                       |
 | `PWA_GUIDE.md`               | Progressive Web App install + service worker                      |
 | `ELECTRON_GUIDE.md`          | Desktop app build + sign + distribute                             |
-| `TUNNELS_GUIDE.md`           | Cloudflared + ngrok + Tailscale Funnel                            |
 | `PROXY_GUIDE.md`             | 4-level outbound proxy + 1proxy marketplace                       |
 
 ### Subdirectories

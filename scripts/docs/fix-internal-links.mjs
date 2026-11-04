@@ -92,7 +92,6 @@ const DOC_TO_SUBFOLDER = {
   "FLY_IO_DEPLOYMENT_GUIDE.md": "ops",
   "VM_DEPLOYMENT_GUIDE.md": "ops",
   "PROXY_GUIDE.md": "ops",
-  "TUNNELS_GUIDE.md": "ops",
 };
 
 // Build alternation regex (longest-first) of file basenames we know about.

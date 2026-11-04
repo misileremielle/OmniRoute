@@ -165,9 +165,6 @@ describe("EndpointPageClient", () => {
             cloudEnabled: false,
             cloudConfigured: true,
             cloudUrl: "https://cloud.example",
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       return Promise.resolve(jsonResponse({ data: [], providers: [], keys: [] }));
@@ -224,9 +221,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             cloudEnabled: false,
             cloudConfigured: false,
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       }
@@ -235,7 +229,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             localUrl: "http://localhost:20131/v1",
             lanUrls: [],
-            tailscaleIpUrl: null,
           })
         );
       }
@@ -275,9 +268,6 @@ describe("EndpointPageClient", () => {
             cloudEnabled: false,
             cloudConfigured: true,
             cloudUrl: "https://cloud.example",
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       return Promise.resolve(jsonResponse({ data: [], providers: [], keys: [] }));
@@ -299,9 +289,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             cloudEnabled: false,
             cloudConfigured: false,
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       return Promise.resolve(jsonResponse({ data: [], providers: [], keys: [] }));
@@ -318,7 +305,7 @@ describe("EndpointPageClient", () => {
     expect(line.querySelector(".break-all")).toBeNull();
   });
 
-  it("renders the endpoint shell before models finish and skips hidden tunnel probes", async () => {
+  it("renders the endpoint shell before models finish", async () => {
     const modelsDeferred = createDeferred<Response>();
 
     fetchMock.mockImplementation((input: RequestInfo | URL) => {
@@ -328,9 +315,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             cloudEnabled: false,
             cloudConfigured: false,
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
             machineId: "machine-12345678",
           })
         );
@@ -379,9 +363,6 @@ describe("EndpointPageClient", () => {
     await waitForText("Endpoint");
     expect(document.body.textContent).toContain("Loading available models...");
     expect(fetchMock).toHaveBeenCalledWith("/v1/models");
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/tunnels/cloudflared", expect.anything());
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/tunnels/tailscale", expect.anything());
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/tunnels/ngrok", expect.anything());
 
     modelsDeferred.resolve(
       jsonResponse({
@@ -422,9 +403,6 @@ describe("EndpointPageClient", () => {
         jsonResponse({
           cloudEnabled: false,
           cloudConfigured: false,
-          hideEndpointCloudflaredTunnel: false,
-          hideEndpointTailscaleFunnel: false,
-          hideEndpointNgrokTunnel: false,
         })
       );
       await settingsDeferred.promise;
@@ -443,9 +421,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             cloudEnabled: false,
             cloudConfigured: false,
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       }

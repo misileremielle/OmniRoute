@@ -36,7 +36,6 @@ Objective feature comparison vs popular open-source AI routers.
 | **Dashboard**                                      |                 Next.js 16                  |     basic      |    proprietary    | proprietary |
 | **i18n**                                           |               **67 locales**                |       ❌       |        ❌         |      ⚠      |
 | **Public agent skills (SKILL.md)**                 |                    ✅ 45                    |       ❌       |        ❌         |     ❌      |
-| **Tunnel support (Cloudflared, Tailscale, Ngrok)** |                     ✅                      |       ❌       |        n/a        |     n/a     |
 | **License**                                        |                     MIT                     |      MIT       |    proprietary    | proprietary |
 
 ## When to choose OmniRoute

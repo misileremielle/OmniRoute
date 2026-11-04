@@ -79,7 +79,7 @@ const IGNORE_FROM_CODE = new Set([
   "PREFIX",
   // X11 display server — set by the OS/session manager, not OmniRoute config.
   "DISPLAY",
-  // POSIX session vars surfaced by cloudflaredTunnel.ts (env passthrough).
+  // POSIX session vars read by the tray autostart helper (bin/cli/tray/autostart.mjs).
   "LOGNAME",
   "XDG_CURRENT_DESKTOP",
   // Next.js / Node test runners — these are framework-managed.

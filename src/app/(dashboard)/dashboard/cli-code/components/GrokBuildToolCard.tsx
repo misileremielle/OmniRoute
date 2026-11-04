@@ -98,15 +98,6 @@ const readPresets = (): SavedEndpoint[] => {
   }
 };
 
-const getTunnelUrl = (body: unknown): string => {
-  if (!body || typeof body !== "object") return "";
-  const record = body as Record<string, unknown>;
-  for (const key of ["apiUrl", "publicUrl", "tunnelUrl"]) {
-    if (typeof record[key] === "string" && record[key]) return ensureV1(record[key]);
-  }
-  return "";
-};
-
 const modelLabel = (type: SubagentType): string =>
   type === "general-purpose" ? "General purpose" : `${type[0].toUpperCase()}${type.slice(1)}`;
 
@@ -173,38 +164,24 @@ export default function GrokBuildToolCard({
   }, [hydrateStatus]);
 
   const refreshEndpoints = useCallback(async () => {
-    const requests = [
-      fetch("/api/settings"),
-      fetch("/api/tunnels/cloudflared"),
-      fetch("/api/tunnels/tailscale"),
-      fetch("/api/tunnels/ngrok"),
-    ];
-    const results = await Promise.allSettled(requests);
-    const bodies = await Promise.all(
-      results.map(async (result) =>
-        result.status === "fulfilled" && result.value.ok ? result.value.json() : null
-      )
-    );
-    const settings = (bodies[0] ?? {}) as Record<string, unknown>;
+    const settings = (await fetch("/api/settings")
+      .then((response) => (response.ok ? response.json() : null))
+      .catch(() => null)) as Record<string, unknown> | null;
     const next: EndpointOption[] = [];
-    if (typeof settings.apiPort === "number") {
+    if (typeof settings?.apiPort === "number") {
       next.push({
         id: "local",
         label: "Local",
         url: `http://127.0.0.1:${settings.apiPort}/v1`,
       });
     }
-    if (typeof settings.cloudUrl === "string" && typeof settings.machineId === "string") {
+    if (typeof settings?.cloudUrl === "string" && typeof settings?.machineId === "string") {
       next.push({
         id: "cloud",
         label: "Cloud",
         url: ensureV1(`${settings.cloudUrl.replace(/\/+$/, "")}/${settings.machineId}`),
       });
     }
-    ["cloudflared", "tailscale", "ngrok"].forEach((name, index) => {
-      const url = getTunnelUrl(bodies[index + 1]);
-      if (url) next.push({ id: name, label: name, url });
-    });
     readPresets().forEach((preset, index) => {
       next.push({ id: `saved-${index}`, label: preset.name, url: ensureV1(preset.baseUrl) });
     });

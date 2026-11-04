@@ -172,7 +172,7 @@ test("patchTurbopackChunks restores canonical external package names in a custom
   fs.mkdirSync(chunkDir, { recursive: true });
   fs.writeFileSync(
     chunkPath,
-    'require("ws-a972e7ffa40ff725"); require("@ngrok/ngrok-0f98e1294a0b09d5");'
+    'require("ws-a972e7ffa40ff725"); require("@huggingface/transformers-0f98e1294a0b09d5");'
   );
 
   const result = patchTurbopackChunks(tmp, ".build/next");
@@ -180,7 +180,7 @@ test("patchTurbopackChunks restores canonical external package names in a custom
 
   assert.deepEqual(result, { patchedFiles: 1, patchedMatches: 2 });
   assert.match(patched, /require\("ws"\)/);
-  assert.match(patched, /require\("@ngrok\/ngrok"\)/);
+  assert.match(patched, /require\("@huggingface\/transformers"\)/);
   assert.doesNotMatch(patched, /-[0-9a-f]{16}/);
   fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });

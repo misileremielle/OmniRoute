@@ -1,5 +1,5 @@
 /**
- * catalog.ts — single source of truth for the 46-entry Agent Skills catalog.
+ * catalog.ts — single source of truth for the 44-entry Agent Skills catalog.
  *
  * Consumers: REST routes (/api/agent-skills/*), MCP tools, A2A skill, Generator.
  * Do NOT import this from UI components directly — use the REST API instead.
@@ -16,7 +16,7 @@ import {
 
 // ── Canonical ID lists (D28) ────────────────────────────────────────────────
 
-/** 23 canonical API skill IDs, in spec order. */
+/** 22 canonical API skill IDs, in spec order. */
 export const API_SKILL_IDS: readonly string[] = [
   "omni-auth",
   "omni-providers",
@@ -32,7 +32,6 @@ export const API_SKILL_IDS: readonly string[] = [
   "omni-context-rtk",
   "omni-resilience",
   "omni-cli-tools",
-  "omni-tunnels",
   "omni-sync-cloud",
   "omni-db-backups",
   "omni-webhooks",
@@ -46,7 +45,7 @@ export const API_SKILL_IDS: readonly string[] = [
 /** Config skill IDs. */
 export const CONFIG_SKILL_IDS: readonly string[] = ["config-codex-cli"] as const;
 
-/** 21 canonical CLI skill IDs, in spec order. */
+/** 20 canonical CLI skill IDs, in spec order. */
 export const CLI_SKILL_IDS: readonly string[] = [
   "cli-serve",
   "cli-health",
@@ -61,7 +60,6 @@ export const CLI_SKILL_IDS: readonly string[] = [
   "cli-cost-usage",
   "cli-mcp",
   "cli-a2a",
-  "cli-tunnel",
   "cli-backup-sync",
   "cli-policy-audit",
   "cli-batches",
@@ -94,7 +92,7 @@ function deriveCatalog(): AgentSkill[] {
 // ── Public API ───────────────────────────────────────────────────────────────
 
 /**
- * Returns the full catalog (46 entries). Cached in module scope after first call.
+ * Returns the full catalog (44 entries). Cached in module scope after first call.
  * Safe to call multiple times — re-derives only after `refreshCatalog()`.
  */
 export function getCatalog(): AgentSkill[] {
@@ -125,7 +123,7 @@ export function filterCatalog(opts: {
 }
 
 /**
- * Computes coverage stats: filesystem has SKILL.md vs the 46-entry catalog.
+ * Computes coverage stats: filesystem has SKILL.md vs the 44-entry catalog.
  * Reads `skills/` relative to the project root (CWD).
  */
 export function computeCoverage(): SkillCoverage {

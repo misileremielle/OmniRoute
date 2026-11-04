@@ -119,9 +119,6 @@ describe("isLocalOnlyPath - GET exemption for /api/system/version (#5083)", () =
   // in the same change, with the reason it is safe for a read-only method.
   //
   //   /api/system/version    - GET only reads package.json + the npm registry (#5083)
-  //   /api/tunnels/cloudflared - GET is tunnel status; POST still spawns cloudflared
-  //                              and stays local-only (#11531, and see
-  //                              route-guard-tunnel-processes-local-only.test.ts)
   //   /api/mcp/audit         - GET is a read-only mcp_tool_audit query behind
   //   /api/mcp/audit/stats     requireManagementAuth (no spawn); the rest of
   //                              /api/mcp/* (sse/stream) stays local-only (#13941)
@@ -137,7 +134,6 @@ describe("isLocalOnlyPath - GET exemption for /api/system/version (#5083)", () =
       "/api/mcp/audit/stats",
       "/api/services/cliproxy/status",
       "/api/system/version",
-      "/api/tunnels/cloudflared",
       "/api/version-manager/check-update",
       "/api/version-manager/status",
     ]);

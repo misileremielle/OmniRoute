@@ -18,8 +18,8 @@ export const AgentSkillSchema = z.object({
 });
 
 export const SkillCoverageSchema = z.object({
-  api: z.object({ have: z.number().int().nonnegative(), total: z.literal(23) }),
-  cli: z.object({ have: z.number().int().nonnegative(), total: z.literal(21) }),
+  api: z.object({ have: z.number().int().nonnegative(), total: z.literal(22) }),
+  cli: z.object({ have: z.number().int().nonnegative(), total: z.literal(20) }),
   config: z.object({ have: z.number().int().nonnegative(), total: z.literal(1) }),
   totalSkills: z.number().int().nonnegative(),
   generatedAt: z.string().datetime(),

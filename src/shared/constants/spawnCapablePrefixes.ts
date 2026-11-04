@@ -46,12 +46,6 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/cli-tools/whycodes-settings", // GET probes the `whycodes` binary via getCliRuntimeStatus()
   "/api/services/", // T-10: can run npm install + spawn node processes
   "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #17)
-  "/api/tunnels/cloudflared", // POST installs/starts/stops cloudflared; safe methods are exempt and only probe the binary for loopback/LAN callers
-  "/api/tunnels/tailscale/disable", // stops Funnel and may stop tailscaled/Tailscale service
-  "/api/tunnels/tailscale/enable", // starts tailscaled/login/funnel subprocesses
-  "/api/tunnels/tailscale/install", // downloads/installs Tailscale and starts its daemon
-  "/api/tunnels/tailscale/login", // spawns `tailscale up`
-  "/api/tunnels/tailscale/start-daemon", // starts tailscaled/Tailscale service
   "/api/tools/agent-bridge/", // start/stop MITM server + DNS edits (Hard Rules #15 + #17)
   "/api/settings/mitm", // installs a system trusted root CA + /etc/hosts DNS overrides via src/mitm/* — must never be whitelistable via manage-scope bypass (GHSA-x7vm-hp44-9p79, Hard Rules #15 + #17)
   "/api/cli-tools/antigravity-mitm", // same privileged CA-trust + DNS surface as /api/settings/mitm (GHSA-x7vm-hp44-9p79, Hard Rules #15 + #17)

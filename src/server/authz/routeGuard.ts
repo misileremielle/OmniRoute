@@ -65,12 +65,6 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
   "/api/cli-tools/whycodes-settings", // spawns via getCliRuntimeStatus() to detect the `whycodes` CLI install (Hard Rules #15 + #17, #14107)
   "/api/services/", // T-10: embedded service lifecycle (spawn child processes)
   "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary, the same work as /api/services/cliproxy/ (Hard Rules #15 + #17); read-only GETs exempted below
-  "/api/tunnels/cloudflared", // POST installs/starts/stops cloudflared; safe methods are exempted below
-  "/api/tunnels/tailscale/disable", // stops Funnel and may stop tailscaled/Tailscale service
-  "/api/tunnels/tailscale/enable", // starts tailscaled/login/funnel subprocesses
-  "/api/tunnels/tailscale/install", // downloads/installs Tailscale and starts its daemon
-  "/api/tunnels/tailscale/login", // spawns `tailscale up`
-  "/api/tunnels/tailscale/start-daemon", // starts tailscaled/Tailscale service
   "/dashboard/providers/services/", // T-07: reverse proxy to embedded service UIs
   "/api/copilot/", // unauthenticated LLM driver — CLI-only by default; admins can opt-in to remote access via manage-scope bypass
   "/api/tools/agent-bridge/", // AgentBridge: spawns MITM server + DNS edits (Hard Rules #15 + #17)
@@ -365,11 +359,6 @@ export function isPrivateLanHost(hostHeader: string | null): boolean {
  *   /api/system/version — GET reads package.json + npm registry; only POST
  *   triggers the auto-update flow (spawns git checkout + npm install + pm2).
  *   Hard Rules #15/#17 still apply to POST.
- *   /api/tunnels/cloudflared — GET reports tunnel status; only POST starts/stops
- *   the cloudflared process (#11531). The status read resolves the binary with a
- *   PATH lookup (`which cloudflared`), which runs only for loopback/LAN callers:
- *   a remote caller gets the unprobed status (`probed: false`) with no spawn
- *   (GHSA-35fw-cv32-2373 class, GHSA-jmq6-8j86-8xqj call-site gate).
  *   /api/services/cliproxy/status — GET returns lifecycle/version metadata only;
  *   its latest-version lookup is an HTTPS release query, never a child process.
  *   Lifecycle mutations remain LOCAL_ONLY through the parent /api/services/
@@ -384,7 +373,6 @@ export const LOCAL_ONLY_API_GET_EXEMPTIONS: ReadonlySet<string> = new Set([
   // /api/version-manager/ installs or spawns the CLIProxyAPI binary.
   "/api/version-manager/status",
   "/api/version-manager/check-update",
-  "/api/tunnels/cloudflared",
   // GET /api/mcp/audit and /stats are read-only SQLite queries behind
   // requireManagementAuth. The rest of /api/mcp/* stays local-only because
   // SSE/stream can spawn. Without this exemption a tunnel-served dashboard

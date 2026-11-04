@@ -45,7 +45,6 @@
     "@lobehub/icons",
     "@modelcontextprotocol/sdk",
     "@monaco-editor/react",
-    "@ngrok/ngrok",
     "@opencode-ai/plugin",
     "@opencode/plugin",
     "@playwright/test",

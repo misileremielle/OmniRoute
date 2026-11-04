@@ -217,9 +217,6 @@ export const updateSettingsSchema = z.object({
     })
     .optional(),
   hideHealthCheckLogs: z.boolean().optional(),
-  hideEndpointCloudflaredTunnel: z.boolean().optional(),
-  hideEndpointTailscaleFunnel: z.boolean().optional(),
-  hideEndpointNgrokTunnel: z.boolean().optional(),
   preferClaudeCodeForUnprefixedClaudeModels: z.boolean().optional(),
   // Opt-in (default "off"): short-circuits Claude Code's `--permission-mode auto`
   // internal security-classifier request with a synthetic ALLOW response instead of

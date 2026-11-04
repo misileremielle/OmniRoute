@@ -72,7 +72,6 @@ const FILE_FAMILY_MAP: Record<string, SkillArea> = {
   pricing: "cli-cost-usage",
   mcp: "cli-mcp",
   a2a: "cli-a2a",
-  tunnel: "cli-tunnel",
   backup: "cli-backup-sync",
   sync: "cli-backup-sync",
   cloud: "cli-backup-sync",
