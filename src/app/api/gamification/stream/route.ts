@@ -9,6 +9,7 @@ import { NextRequest } from "next/server";
 import { type LeaderboardScope, getTopN } from "@/lib/gamification/leaderboard";
 import { CORS_HEADERS } from "@/shared/utils/cors";
 import { requireManagementAuth } from "@/lib/api/requireManagementAuth";
+import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error.ts";
 
 const VALID_SCOPES: ReadonlySet<string> = new Set([
   "global",
@@ -34,39 +35,73 @@ export async function GET(request: NextRequest) {
     ? (rawScope as LeaderboardScope)
     : "global";
 
-  const stream = new ReadableStream({
-    start(controller) {
-      const encoder = new TextEncoder();
+  const encoder = new TextEncoder();
+  let closed = false;
+  let heartbeat: ReturnType<typeof setInterval> | null = null;
+  let updater: ReturnType<typeof setInterval> | null = null;
+  let streamController: ReadableStreamDefaultController<Uint8Array> | null = null;
 
-      const sendUpdate = async () => {
-        try {
-          const entries = await getTopN(scope, 50);
-          const data = JSON.stringify({ type: "leaderboard", scope, entries });
-          controller.enqueue(encoder.encode(`data: ${data}\n\n`));
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          controller.enqueue(
-            encoder.encode(`event: error\ndata: ${JSON.stringify({ error: msg })}\n\n`)
-          );
-        }
-      };
+  // Idempotent teardown shared by client abort and stream cancel(). Without it a
+  // client that disconnected while auth was still pending (signal already aborted,
+  // "abort" never fires again) kept a 5s leaderboard query + 15s heartbeat running
+  // for the life of the process, and a late enqueue on the closed controller threw.
+  const cleanup = () => {
+    if (closed) return;
+    closed = true;
+    if (heartbeat) clearInterval(heartbeat);
+    if (updater) clearInterval(updater);
+    heartbeat = null;
+    updater = null;
+    request.signal.removeEventListener("abort", cleanup);
+    try {
+      streamController?.close();
+    } catch {
+      /* already closed */
+    }
+  };
+
+  const safeEnqueue = (chunk: string) => {
+    if (closed || !streamController) return;
+    try {
+      streamController.enqueue(encoder.encode(chunk));
+    } catch {
+      cleanup();
+    }
+  };
+
+  const sendUpdate = async () => {
+    if (closed) return;
+    try {
+      const entries = await getTopN(scope, 50);
+      safeEnqueue(`data: ${JSON.stringify({ type: "leaderboard", scope, entries })}\n\n`);
+    } catch (err) {
+      const msg = sanitizeErrorMessage(err instanceof Error ? err.message : String(err));
+      safeEnqueue(`event: error\ndata: ${JSON.stringify({ error: msg })}\n\n`);
+    }
+  };
+
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      streamController = controller;
+      if (request.signal.aborted) {
+        cleanup();
+        return;
+      }
+      request.signal.addEventListener("abort", cleanup, { once: true });
 
       // Send initial state
-      sendUpdate();
+      void sendUpdate();
 
       // Heartbeat every 15s
-      const heartbeat = setInterval(() => {
-        controller.enqueue(encoder.encode(`: heartbeat ${Date.now()}\n\n`));
+      heartbeat = setInterval(() => {
+        safeEnqueue(`: heartbeat ${Date.now()}\n\n`);
       }, 15_000);
 
       // Update every 5s
-      const updater = setInterval(sendUpdate, 5_000);
-
-      request.signal.addEventListener("abort", () => {
-        clearInterval(heartbeat);
-        clearInterval(updater);
-        controller.close();
-      });
+      updater = setInterval(() => void sendUpdate(), 5_000);
+    },
+    cancel() {
+      cleanup();
     },
   });
 
