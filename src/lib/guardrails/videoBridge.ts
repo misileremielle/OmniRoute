@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { getSettings as defaultGetSettings } from "@/lib/db/settings";
+import { getCachedSettings as defaultGetSettings } from "@/lib/db/readCache";
 import { getResolvedModelCapabilities } from "@/lib/modelCapabilities";
 import {
   resolveVideoBridgeRuntimeSettings,

@@ -1,5 +1,5 @@
 import { CREDENTIAL_PATTERNS } from "@omniroute/open-sse/utils/credentialPatterns.ts";
-import { getSettings } from "@/lib/db/settings";
+import { getCachedSettings } from "@/lib/db/readCache";
 import { BaseGuardrail, type GuardrailContext, type GuardrailResult } from "./base";
 
 export { CREDENTIAL_PATTERNS };
@@ -139,7 +139,7 @@ export class CredentialMaskerGuardrail extends BaseGuardrail {
     payload: unknown,
     _context: GuardrailContext
   ): Promise<GuardrailResult<unknown> | void> {
-    const _s = await getSettings();
+    const _s = await getCachedSettings();
     if (!(
       _s.credentialRedactionEnabled === true || process.env.CREDENTIAL_REDACTION_ENABLED === "true"
     ))
@@ -158,7 +158,7 @@ export class CredentialMaskerGuardrail extends BaseGuardrail {
     response: unknown,
     _context: GuardrailContext
   ): Promise<GuardrailResult<unknown> | void> {
-    const _s = await getSettings();
+    const _s = await getCachedSettings();
     if (!(
       _s.credentialRedactionEnabled === true || process.env.CREDENTIAL_REDACTION_ENABLED === "true"
     ))

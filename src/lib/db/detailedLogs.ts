@@ -7,7 +7,7 @@
  */
 import { v4 as uuidv4 } from "uuid";
 import { getDbInstance } from "./core";
-import { getSettings } from "./settings";
+import { getCachedSettings } from "./readCache";
 import { isNoLog } from "../compliance/noLog";
 import {
   protectPayloadForLog,
@@ -60,7 +60,7 @@ export async function isDetailedLoggingEnabled(): Promise<boolean> {
   }
 
   try {
-    const settings = await getSettings();
+    const settings = await getCachedSettings();
     const val = settings.call_log_pipeline_enabled;
     return val === true || val === "1" || val === "true";
   } catch {

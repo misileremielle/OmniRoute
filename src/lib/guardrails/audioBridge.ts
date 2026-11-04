@@ -1,4 +1,4 @@
-import { getSettings as defaultGetSettings } from "@/lib/db/settings";
+import { getCachedSettings as defaultGetSettings } from "@/lib/db/readCache";
 import { getResolvedModelCapabilities } from "@/lib/modelCapabilities";
 import { resolveAudioBridgeRuntimeSettings } from "@/shared/constants/modalityBridgeDefaults";
 

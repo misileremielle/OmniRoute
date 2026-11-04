@@ -9,7 +9,7 @@
  */
 
 import { BaseGuardrail, type GuardrailContext, type GuardrailResult } from "./base";
-import { getSettings as defaultGetSettings } from "@/lib/db/settings";
+import { getCachedSettings as defaultGetSettings } from "@/lib/db/readCache";
 import { getResolvedModelCapabilities } from "@/lib/modelCapabilities";
 import { getProviderNodePrefixSync } from "@/lib/db/providers/nodePrefix";
 import { isCompatibleProviderConnectionId } from "@/shared/utils/compatibleProviderId";
