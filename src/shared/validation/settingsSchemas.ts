@@ -482,10 +482,6 @@ export const updateSettingsSchema = z.object({
   // Usage token buffer — safety margin added to reported prompt/input token counts.
   // Prevents CLI tools from overrunning context windows. Set to 0 to disable.
   usageTokenBuffer: z.number().int().min(0).max(50000).optional(),
-  // SkillsMP marketplace API key
-  skillsmpApiKey: z.string().max(200).optional(),
-  // Active skills provider (single source of truth for skills page)
-  skillsProvider: z.enum(["skillsmp", "skillssh"]).optional(),
   // models.dev sync settings
   modelsDevSyncEnabled: z.boolean().optional(),
   modelsDevSyncInterval: z.number().int().min(3600000).max(604800000).optional(),

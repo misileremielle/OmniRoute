@@ -13,7 +13,6 @@ const EVENT_TYPES = [
   "combo.switched",
   "circuit.opened",
   "circuit.closed",
-  "skill.executed",
   "memory.added",
   "audit.created",
 ];

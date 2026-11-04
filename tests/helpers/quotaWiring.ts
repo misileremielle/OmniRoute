@@ -1,6 +1,4 @@
-import type { A2ATask } from "../../src/lib/a2a/taskManager.ts";
-
-// Mock only the management HTTP boundary. A2A normalization, MCP registration,
+// Mock only the management HTTP boundary. MCP registration,
 // schemas, dispatch, internal fetch, and response serialization remain real.
 export async function exerciseQuotaWiring(quotaStatus = 200) {
   const envKeys = [
@@ -71,7 +69,6 @@ export async function exerciseQuotaWiring(quotaStatus = 200) {
     const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
     const { InMemoryTransport } = await import("@modelcontextprotocol/sdk/inMemory.js");
     const { createMcpServer } = await import("../../open-sse/mcp-server/server.ts");
-    const { executeQuotaManagement } = await import("../../src/lib/a2a/skills/quotaManagement.ts");
     ({ resetDbInstance: resetDb } = await import("../../src/lib/db/core.ts"));
     ({ closeAuditDb: closeAudit } = await import("../../open-sse/mcp-server/audit.ts"));
     globalThis.fetch = fixtureFetch;
@@ -81,20 +78,6 @@ export async function exerciseQuotaWiring(quotaStatus = 200) {
     client = new Client({ name: "quota-wiring-test", version: "1.0.0" });
     await server.connect(serverTransport);
     await client.connect(clientTransport);
-    const now = "2026-10-10T00:00:00Z";
-    const task: A2ATask = {
-      id: "quota-wiring",
-      skill: "quota-management",
-      state: "working",
-      input: { skill: "quota-management", messages: [{ role: "user", content: "quota summary" }] },
-      artifacts: [],
-      events: [],
-      metadata: {},
-      createdAt: now,
-      updatedAt: now,
-      expiresAt: now,
-    };
-    const a2a = await executeQuotaManagement(task);
     const quota = await client.callTool({
       name: "omniroute_check_quota",
       arguments: { provider: "quota-fixture" },
@@ -103,7 +86,7 @@ export async function exerciseQuotaWiring(quotaStatus = 200) {
       name: "omniroute_get_provider_metrics",
       arguments: { provider: "quota-fixture" },
     });
-    return { a2a, quota, metrics, requests };
+    return { quota, metrics, requests };
   } finally {
     try {
       await client?.close();

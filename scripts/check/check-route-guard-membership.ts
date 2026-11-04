@@ -53,7 +53,7 @@ export const SPAWN_CAPABLE_ROUTE_ROOTS: ReadonlyArray<string> = [
   "src/app/api/mcp",
   "src/app/api/cli-tools/runtime",
   "src/app/api/local", // T-12: 1-click local service launchers (Redis today) — every child here spawns podman/docker (Hard Rules #15 + #17)
-  "src/app/api/skills/collect", // Skill Collector CLI detection: GET .../detect spawns a child process per CLI_TOOL_IDS entry via getCliRuntimeStatus() (Hard Rules #15 + #17, PR #6294 review)
+  "src/app/api/skills/collect", // Chaos Mode dispatch route, kept loopback-only apart from its exact public entry
   "src/app/api/cli-tools/forge-settings", // GET calls getCliRuntimeStatus() to detect the `forge` CLI install (Hard Rules #15 + #17, #7263)
   "src/app/api/cli-tools/jcode-settings", // GET calls getCliRuntimeStatus() to detect the `jcode` CLI install (Hard Rules #15 + #17, #7263)
   "src/app/api/cli-tools/qwen-settings", // GET calls getCliRuntimeStatus("qwen") and writes local ~/.qwen config files (Hard Rules #15 + #17)
@@ -74,10 +74,7 @@ export const SPAWN_CAPABLE_ROUTE_ROOTS: ReadonlyArray<string> = [
   "src/app/api/cli-tools/smelt-settings", // GET calls getCliRuntimeStatus() to detect the `smelt` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
   "src/app/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
   "src/app/api/cli-tools/whycodes-settings", // GET calls getCliRuntimeStatus() to detect the `whycodes` CLI install (Hard Rules #15 + #17, #14107)
-  // GHSA-jx89-f37j-pq89: skills install + execute reach childProcess.spawn transitively
   // (executor.ts -> builtins.ts -> sandbox.ts) — invisible to the source-scan subcheck.
-  "src/app/api/skills/install", // POST stores handlerCode verbatim; a built-in name aliases execute_command / eval_code (Hard Rules #15 + #17, GHSA-jx89-f37j-pq89)
-  "src/app/api/skills/executions", // POST runs skillExecutor.execute() -> sandbox container spawn (Hard Rules #15 + #17, GHSA-jx89-f37j-pq89)
   // install / start / restart / stop reach the CLIProxyAPI download + ServiceSupervisor spawn
   // transitively, which the source-scan subcheck cannot see.
   "src/app/api/version-manager", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #17)
@@ -285,8 +282,6 @@ export const KNOWN_TRANSITIVE_SPAWN_SINKS: Record<string, string> = {
   "src/lib/providers/validation/webProvidersB.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/proxySubscription/coreConfig/apply.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/proxySubscription/coreConfig/reload.ts": `${G09_BASELINE} (child_process)`,
-  "src/lib/skills/containerProvider.ts": `${G09_BASELINE} (child_process)`,
-  "src/lib/skills/sandbox.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/versionManager/binaryManager.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/vncSession/service.ts": `${G09_BASELINE} (child_process)`,
   "src/shared/services/cliRuntime.ts": `${G09_BASELINE} (child_process)`,

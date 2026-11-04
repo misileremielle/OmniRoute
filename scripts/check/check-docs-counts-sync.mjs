@@ -12,8 +12,6 @@
 //       - executors count in open-sse/executors/
 //       - routing strategies in src/shared/constants/routingStrategies.ts
 //       - OAuth providers in src/lib/oauth/providers/
-//       - A2A skills in src/lib/a2a/skills/
-//       - Cloud agents in src/lib/cloudAgent/agents/
 //
 // Exits 0 on success, 1 on STRICT drift (or any drift with --strict).
 // Run: node scripts/check/check-docs-counts-sync.mjs
@@ -237,10 +235,6 @@ function readCodeFacts() {
     'import {CLI_TOOLS} from "./src/shared/constants/cliTools.ts";',
     'import {countUniqueMcpTools} from "./open-sse/mcp-server/toolCount.ts";',
     'import {MCP_TOOLS} from "./open-sse/mcp-server/schemas/tools.ts";',
-    'import {memoryTools} from "./open-sse/mcp-server/tools/memoryTools.ts";',
-    'import {skillTools} from "./open-sse/mcp-server/tools/skillTools.ts";',
-    'import {agentSkillTools} from "./open-sse/mcp-server/tools/agentSkillTools.ts";',
-    'import {githubSkillTools} from "./open-sse/mcp-server/tools/githubSkillTools.ts";',
     'import {poolTools} from "./open-sse/mcp-server/tools/poolTools.ts";',
     'import {gamificationTools} from "./open-sse/mcp-server/tools/gamificationTools.ts";',
     'import {pluginTools} from "./open-sse/mcp-server/tools/pluginTools.ts";',
@@ -257,7 +251,7 @@ function readCodeFacts() {
     "PROV.SYSTEM_PROVIDERS];",
     "const pids=new Set();",
     "for(const c of provCols)for(const p of Object.values(c||{}))if(p&&p.id)pids.add(p.id);",
-    "const cols={MCP_TOOLS,memoryTools,skillTools,agentSkillTools,githubSkillTools,poolTools,",
+    "const cols={MCP_TOOLS,poolTools,",
     "gamificationTools,pluginTools,notionTools,obsidianTools,localCorpusTools,compressionTools};",
     "const sc=new Set();",
     "for(const col of Object.values(cols))for(const t of Object.values(col))",
@@ -744,7 +738,7 @@ export function buildChecks() {
       validate: makeProviderCountValidator(readProviderTotal(), true),
     },
     {
-      label: "Provider count (secondary docs and skills)",
+      label: "Provider count (secondary docs)",
       actual: readProviderTotal(),
       docKey: "providers",
       strict: true,
@@ -752,16 +746,10 @@ export function buildChecks() {
         "docs/architecture/ARCHITECTURE.md",
         "docs/architecture/CODEBASE_DOCUMENTATION.md",
         "docs/architecture/REPOSITORY_MAP.md",
-        "docs/frameworks/A2A-SERVER.md",
-        "docs/frameworks/ACP.md",
         "docs/frameworks/OPEN_SSE_ARCHITECTURE.md",
         "docs/getting-started/FREE-TIERS-GUIDE.md",
         "docs/comparison/OMNIROUTE_VS_ALTERNATIVES.md",
         "docs/guides/FREE_PROVIDER_RANKINGS.md",
-        "src/shared/constants/agentSkills.ts",
-        "skills/README.md",
-        "skills/omni-auth/SKILL.md",
-        "skills/omni-providers/SKILL.md",
       ],
       validate: makeProviderCountValidator(readProviderTotal()),
     },
@@ -980,14 +968,12 @@ export function buildChecks() {
             "docs/frameworks/MCP-SERVER.md",
             "llm.txt",
             "open-sse/mcp-server/README.md",
-            "skills/omni-mcp/SKILL.md",
           ]
         ),
         claim(f.mcpScopes, "MCP scopes", { pattern: /(\d+) scopes/gi }, [
           "README.md",
           "AGENTS.md",
           "llm.txt",
-          "skills/omni-mcp/SKILL.md",
         ]),
         claim(f.cliTotal, "CLI tools", { pattern: /(\d+) tools(?=\s*\(\d+ CLI)/gi }, ["README.md"]),
         claim(
@@ -1144,7 +1130,6 @@ export function buildChecks() {
         "docs/architecture/RESILIENCE_GUIDE.md",
         "docs/frameworks/OPEN_SSE_ARCHITECTURE.md",
         "docs/getting-started/AUTO-COMBO-GUIDE.md",
-        "skills/omni-combos-routing/SKILL.md",
         "open-sse/services/autoCombo/routerStrategy.ts",
         "open-sse/services/taskAwareRouter.ts",
         "tests/unit/lkgp-enabled-context-11181.test.ts",
@@ -1168,20 +1153,6 @@ export function buildChecks() {
       docKey: "OAuth providers",
       strict: false,
       files: ["docs/architecture/ARCHITECTURE.md"],
-    },
-    {
-      label: "A2A skills count",
-      actual: countFiles("src/lib/a2a/skills"),
-      docKey: "A2A skills",
-      strict: false,
-      files: ["docs/frameworks/A2A-SERVER.md"],
-    },
-    {
-      label: "Cloud agents count",
-      actual: countFiles("src/lib/cloudAgent/agents"),
-      docKey: "cloud agents",
-      strict: false,
-      files: ["docs/frameworks/CLOUD_AGENT.md", "docs/frameworks/AGENT_PROTOCOLS_GUIDE.md"],
     },
   ];
 }

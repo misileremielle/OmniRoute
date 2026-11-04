@@ -301,8 +301,6 @@ const DOC_ONLY_ALLOWLIST = new Set([
   // Future-supported hooks: documented but currently hardcoded constants.
   "MAX_RETRY_INTERVAL_SEC",
   "REQUEST_RETRY",
-  "SKILLS_EXECUTION_TIMEOUT_MS",
-  "SKILLS_SANDBOX_DOCKER_IMAGE",
   // Source-code constants referenced in the docs narrative for the local
   // endpoints / route-guard classification (PR-3 in #3932).
   "LOCAL_ONLY_API_PREFIXES",

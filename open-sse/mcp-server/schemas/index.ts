@@ -93,40 +93,6 @@ export {
 
 export { radarCatalogInput, radarCatalogOutput, radarCatalogTool } from "./radarCatalog.ts";
 
-// A2A schemas
-export {
-  AgentCardSchema,
-  AgentSkillSchema,
-  TaskStateEnum,
-  TaskInputSchema,
-  TaskOutputSchema,
-  TaskSchema,
-  CostEnvelopeSchema,
-  ResilienceTraceEventSchema,
-  PolicyVerdictSchema,
-  JsonRpcRequestSchema,
-  JsonRpcResponseSchema,
-  MessageSendParamsSchema,
-  TasksGetParamsSchema,
-  TasksCancelParamsSchema,
-  A2A_SSE_EVENTS,
-  A2A_ERROR_CODES,
-  type AgentCard,
-  type AgentSkill,
-  type Task,
-  type TaskState,
-  type TaskInput,
-  type TaskOutput,
-  type CostEnvelope,
-  type ResilienceTraceEvent,
-  type PolicyVerdict,
-  type JsonRpcRequest,
-  type JsonRpcResponse,
-  type MessageSendParams,
-  type TasksGetParams,
-  type TasksCancelParams,
-} from "./a2a.ts";
-
 // Audit types
 export {
   type McpAuditEntry,

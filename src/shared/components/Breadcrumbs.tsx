@@ -61,7 +61,6 @@ const PATH_LABELS = {
   webhooks: "webhooks",
   home: "home",
   activity: "activity",
-  "agent-skills": "agentSkills",
   "combo-health": "comboHealth",
   evals: "evals",
   search: "search",

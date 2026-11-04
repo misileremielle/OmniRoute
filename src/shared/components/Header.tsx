@@ -66,12 +66,9 @@ import Icon from "./Icon";
 const isE2EMode = process.env.NEXT_PUBLIC_OMNIROUTE_E2E_MODE === "1";
 
 // Map sidebar item id → header description i18n key
-// "omni-skills" is an extended key for the /dashboard/omni-skills route (graceful fallback during deploy)
 // `proxy` is a live (non-hideable) item id with its own description, so the key type names it;
 // the dead `settings` key (no item has that id) was dropped.
-const HEADER_DESCRIPTIONS: Partial<
-  Record<HideableSidebarItemId | "omni-skills" | "proxy", string>
-> = {
+const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", string>> = {
   home: "homeDescription",
   endpoints: "endpointDescription",
   "api-manager": "apiManagerDescription",
@@ -87,9 +84,6 @@ const HEADER_DESCRIPTIONS: Partial<
   media: "mediaDescription",
   "cli-code": "cliToolsDescription",
   "cli-agents": "agentsDescription",
-  skills: "skillsDescription",
-  "agent-skills": "agentSkillsDescription",
-  "omni-skills": "omniSkillsDescription",
   "context-caveman": "contextCavemanDescription",
   "context-rtk": "contextRtkDescription",
   "context-combos": "contextCombosDescription",

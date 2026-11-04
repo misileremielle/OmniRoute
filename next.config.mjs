@@ -569,7 +569,6 @@ const nextConfig = {
       },
       { source: "/docs/mcp-server", destination: "/docs/frameworks/mcp-server", permanent: true },
       { source: "/docs/opencode", destination: "/docs/frameworks/opencode", permanent: true },
-      { source: "/docs/skills", destination: "/docs/frameworks/skills", permanent: true },
       { source: "/docs/webhooks", destination: "/docs/frameworks/webhooks", permanent: true },
       // Routing
       { source: "/docs/auto-combo", destination: "/docs/routing/auto-combo", permanent: true },

@@ -130,7 +130,7 @@ export function projectToolOutputForBoundary(
       const projected = sanitizeUpstreamDetails(output);
       return projected && typeof projected === "object" && !Array.isArray(projected)
         ? (projected as Record<string, unknown>)
-        : { success: false, error: "Skill execution failed" };
+        : { success: false, error: "Tool execution failed" };
     }
 
     const sensitive: SensitiveToolReferences = {
@@ -144,6 +144,6 @@ export function projectToolOutputForBoundary(
       sensitive,
     }) as Record<string, unknown>;
   } catch {
-    return { success: false, error: "Skill execution failed" };
+    return { success: false, error: "Tool execution failed" };
   }
 }

@@ -36,7 +36,6 @@ import {
 } from "./schemas/tools.ts";
 import { startMcpHeartbeat } from "./runtimeHeartbeat.ts";
 import { countUniqueMcpTools } from "./toolCount.ts";
-import { z } from "zod";
 import { closeAuditDb, logToolCall } from "./audit.ts";
 import {
   buildScopeDenialMessage,
@@ -45,7 +44,6 @@ import {
   shouldForceScopeEnforcement,
   type McpToolExtraLike,
 } from "./scopeEnforcement.ts";
-import { resolveMcpToolOwnerId } from "./mcpCallerIdentity.ts";
 import {
   handleSimulateRoute,
   handleSetBudgetGuard,
@@ -87,11 +85,6 @@ import {
 } from "./tools/inferenceTools.ts";
 import { handleWebFetch, handleWebSearch, handleXSearch } from "./tools/webTools.ts";
 import { toRecord } from "./coercions.ts";
-import { skillTools } from "./tools/skillTools.ts";
-import { agentSkillTools } from "./tools/agentSkillTools.ts";
-import { githubSkillTools } from "./tools/githubSkillTools.ts";
-import { skillRegistry } from "../../src/lib/skills/registry.ts";
-import { skillExecutor } from "../../src/lib/skills/executor.ts";
 import { pluginTools } from "./tools/pluginTools.ts";
 import { compressionTools } from "./tools/compressionTools.ts";
 import { poolTools } from "./tools/poolTools.ts";
@@ -122,9 +115,6 @@ const MCP_ALLOWED_SCOPES = new Set(
 );
 const TOTAL_MCP_TOOL_COUNT = countUniqueMcpTools({
   MCP_TOOLS,
-  skillTools,
-  agentSkillTools,
-  githubSkillTools,
   poolTools,
   gamificationTools,
   pluginTools,
@@ -300,18 +290,6 @@ export function createMcpServer(options?: CreateMcpServerOptions): McpServer {
     });
     return registerResource(name, uriOrTemplate as never, metadata as never, readCallback as never);
   }) as typeof server.registerResource;
-
-  const RESERVED_MCP_NAMES = new Set([
-    ...MCP_TOOLS.map((t) => t.name),
-    ...Object.keys(skillTools),
-    ...Object.keys(compressionTools),
-    ...Object.keys(poolTools),
-    ...pluginTools.map((t) => t.name),
-    ...gamificationTools.map((t) => t.name),
-    ...obsidianTools.map((t) => t.name),
-    ...notionTools.map((t) => t.name),
-    ...localCorpusTools.map((t) => t.name),
-  ]);
 
   server.registerTool(
     "omniroute_get_health",
@@ -658,87 +636,6 @@ export function createMcpServer(options?: CreateMcpServerOptions): McpServer {
 
   registerToolSearchTool(server, withScopeEnforcement);
 
-  // ── Skill Tools ──────────────────────────────
-  Object.values(skillTools).forEach((toolDef: any) => {
-    server.registerTool(
-      toolDef.name,
-      {
-        description: toolDef.description,
-        // @ts-ignore: dynamic zod access
-        inputSchema: toolDef.inputSchema,
-      },
-      withScopeEnforcement(
-        toolDef.name,
-        async (args, extra) => {
-          try {
-            const parsedArgs = toolDef.inputSchema.parse(args ?? {});
-            // @ts-ignore - handler type lost through dynamic Object.values() access
-            const result = await toolDef.handler(parsedArgs, extra);
-            return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-          } catch (err) {
-            const msg = toSafeMcpErrorMessage(err, "Skill tool execution failed");
-            return { content: [{ type: "text" as const, text: `Error: ${msg}` }], isError: true };
-          }
-        },
-        toolDef.scopes
-      )
-    );
-  });
-
-  // ── Agent Skill Tools ─────────────────────────
-  Object.values(agentSkillTools).forEach((toolDef) => {
-    server.registerTool(
-      toolDef.name,
-      {
-        description: toolDef.description,
-        // @ts-ignore: dynamic zod access
-        inputSchema: toolDef.inputSchema,
-      },
-      withScopeEnforcement(
-        toolDef.name,
-        async (args, extra) => {
-          try {
-            const parsedArgs = toolDef.inputSchema.parse(args ?? {});
-            // @ts-expect-error - handler type lost through dynamic Object.values() access
-            const result = await toolDef.handler(parsedArgs, extra);
-            return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-          } catch (err) {
-            const msg = toSafeMcpErrorMessage(err, "Agent skill tool execution failed");
-            return { content: [{ type: "text" as const, text: `Error: ${msg}` }], isError: true };
-          }
-        },
-        toolDef.scopes
-      )
-    );
-  });
-
-  // ── GitHub Skill Tools ──────────────────────────
-  Object.values(githubSkillTools).forEach((toolDef) => {
-    server.registerTool(
-      toolDef.name,
-      {
-        description: toolDef.description,
-        // @ts-ignore: dynamic zod access
-        inputSchema: toolDef.inputSchema,
-      },
-      withScopeEnforcement(
-        toolDef.name,
-        async (args) => {
-          try {
-            const parsedArgs = toolDef.inputSchema.parse(args ?? {});
-            // @ts-expect-error - handler type lost through dynamic Object.values() access
-            const result = await toolDef.handler(parsedArgs);
-            return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-          } catch (err) {
-            const msg = toSafeMcpErrorMessage(err, "GitHub skill tool execution failed");
-            return { content: [{ type: "text" as const, text: `Error: ${msg}` }], isError: true };
-          }
-        },
-        toolDef.scopes
-      )
-    );
-  });
-
   // ── Plugin Tools ──────────────────────────────
   pluginTools.forEach((toolDef) => {
     server.registerTool(
@@ -941,52 +838,6 @@ export function createMcpServer(options?: CreateMcpServerOptions): McpServer {
       )
     );
   });
-
-  // ── Dynamic Skill Tools (from skills table) ──
-  const skillToMcpToolName = (skill: { name: string }) =>
-    `skill_${skill.name.replace(/[^a-z0-9_-]/gi, "_")}`;
-  try {
-    const enabledSkills = skillRegistry.list().filter((s) => s.enabled);
-    for (const skill of enabledSkills) {
-      const toolName = skillToMcpToolName(skill);
-      if (RESERVED_MCP_NAMES.has(toolName)) continue;
-
-      server.registerTool(
-        toolName,
-        {
-          description: skill.description,
-          inputSchema: z.object({}).passthrough(),
-        },
-        withScopeEnforcement(
-          toolName,
-          async (args, extra) => {
-            const apiKeyId = (await resolveMcpToolOwnerId(extra)) ?? "mcp";
-            try {
-              const execution = await skillExecutor.execute(
-                skill.name,
-                (args ?? {}) as Record<string, unknown>,
-                { apiKeyId }
-              );
-              return {
-                content: [
-                  { type: "text" as const, text: JSON.stringify(execution.output, null, 2) },
-                ],
-              };
-            } catch (err) {
-              const msg = toSafeMcpErrorMessage(err, "Skill execution failed");
-              return {
-                content: [{ type: "text" as const, text: `Error: ${msg}` }],
-                isError: true,
-              };
-            }
-          },
-          ["execute:skills"]
-        )
-      );
-    }
-  } catch {
-    // Skills not loaded yet — skip dynamic registration until next reconnect
-  }
 
   return server;
 }

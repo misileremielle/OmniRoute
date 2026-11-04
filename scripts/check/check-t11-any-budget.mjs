@@ -29,10 +29,10 @@ const budget = [
   { file: "open-sse/config/providerRegistry.ts", maxAny: 0 },
   { file: "open-sse/config/providerModels.ts", maxAny: 0 },
   { file: "open-sse/mcp-server/audit.ts", maxAny: 0 },
-  // 3 `(toolDef: any)` in the dynamic memory/skill/compression tool-registration
-  // loops (#3077) — heterogeneous tool defs accessed via existing `@ts-ignore`
+  // `(toolDef: any)` in the dynamic compression tool-registration loop (#3077) —
+  // heterogeneous tool defs accessed via existing `@ts-ignore`
   // dynamic-zod paths; pragmatic dynamic dispatch, not a type-safety regression.
-  { file: "open-sse/mcp-server/server.ts", maxAny: 3 },
+  { file: "open-sse/mcp-server/server.ts", maxAny: 1 },
   { file: "open-sse/mcp-server/tools/advancedTools.ts", maxAny: 0 },
   { file: "open-sse/services/signatureCache.ts", maxAny: 0 },
   { file: "open-sse/services/comboMetrics.ts", maxAny: 0 },

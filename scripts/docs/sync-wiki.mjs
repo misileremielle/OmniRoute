@@ -60,7 +60,6 @@ export const NEW_PAGE_EXCLUDE = new Set([
 const ACRONYMS = new Set([
   "api",
   "mcp",
-  "a2a",
   "acp",
   "cli",
   "sse",

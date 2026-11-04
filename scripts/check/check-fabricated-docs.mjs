@@ -232,8 +232,6 @@ const ENV_VAR_DENYLIST = new Set([
   "TASK_MANAGER",
   "AGENT_BASE",
   "AGENT_BUILDER",
-  "AGENT_SKILL",
-  "AGENT_SKILLS",
   "AGENT_BRIDGE",
   "MENU_ITEM",
   "MENU_ITEMS",
@@ -347,17 +345,11 @@ const ENDPOINT_ALLOWLIST = new Set([
   "/api/v1/rerank",
   "/api/v1/search",
   "/api/v1/messages",
-  "/api/v1/agents/tasks",
-  "/api/v1/agents/tasks/{id}",
-  "/api/v1/agents/credentials",
-  "/api/v1/agents/health",
-  "/.well-known/agent.json",
   "/v1/models",
   "/v1/chat/completions",
   "/v1/embeddings",
   "/v1/responses",
   "/v1/ws", // WebSocket bridge, not standard route.ts
-  "/a2a", // JSON-RPC 2.0 entry
   "/api/mcp/stream", // Streamable HTTP MCP transport
   "/api/mcp/sse", // SSE MCP transport
   "/api/health",

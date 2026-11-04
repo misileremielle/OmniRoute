@@ -548,13 +548,6 @@ const MCP_ITEM: SidebarItemDefinition = {
 
 const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
   {
-    id: "agent-skills",
-    href: "/dashboard/agent-skills",
-    i18nKey: "agentSkills",
-    subtitleKey: "agentSkillsSubtitle",
-    icon: "share",
-  },
-  {
     id: "chaos-config",
     href: "/dashboard/chaos",
     i18nKey: "chaosConfig",
@@ -562,13 +555,6 @@ const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
     subtitleKey: "chaosConfigSubtitle",
     subtitleFallback: "Multi-model parallel execution",
     icon: "blender",
-  },
-  {
-    id: "skills",
-    href: "/dashboard/omni-skills",
-    i18nKey: "omniSkills",
-    subtitleKey: "omniSkillsSubtitle",
-    icon: "auto_fix_high",
   },
   MCP_ITEM,
   {

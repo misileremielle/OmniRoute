@@ -17,7 +17,6 @@ const callLogsDb = await import("../../src/lib/usage/callLogs.ts");
 const quotaCache = await import("../../src/domain/quotaCache.ts");
 const { normalizeClaudeUsageQuotas } = await import("../../open-sse/services/usage/claudeQuota.ts");
 const accountFallback = await import("../../open-sse/services/accountFallback.ts");
-const { invalidateMemorySettingsCache } = await import("../../src/lib/memory/settings.ts");
 const { handleChat } = await import("../../src/sse/handlers/chat.ts");
 const { initTranslators } = await import("../../open-sse/translator/index.ts");
 const { clearInflight } = await import("../../open-sse/services/requestDedup.ts");
@@ -36,7 +35,6 @@ async function resetStorage() {
   accountFallback.clearAllModelLockouts();
   quotaCache.__clearForTests();
   readCacheDb.invalidateDbCache();
-  invalidateMemorySettingsCache();
   await callLogsDb.waitForCallLogSaves(10_000);
   core.resetDbInstance();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });

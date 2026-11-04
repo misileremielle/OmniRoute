@@ -260,7 +260,7 @@
   },
   "open-sse/mcp-server/server.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 2
+      "count": 1
     }
   },
   "open-sse/mcp-server/tools/advancedTools.ts": {
@@ -276,11 +276,6 @@
   "open-sse/mcp-server/tools/gamificationTools.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 2
-    }
-  },
-  "open-sse/mcp-server/tools/githubSkillTools.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "open-sse/mcp-server/tools/pickFastestModel.ts": {
@@ -868,11 +863,6 @@
       "count": 1
     }
   },
-  "src/app/api/github-skills/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/api/internal/codex-responses-ws/route.ts": {
     "no-restricted-imports": {
       "count": 1
@@ -1328,31 +1318,6 @@
       "count": 1
     }
   },
-  "src/lib/skills/a2a.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "src/lib/skills/builtin/browser.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/skills/githubCollector.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/skills/hybrid.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 7
-    }
-  },
-  "src/lib/skills/schemas.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/lib/sseTextTransform.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1447,11 +1412,6 @@
     }
   },
   "src/shared/components/analytics/rechartsUsageCharts.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/shared/constants/agentSkills.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -1651,11 +1611,6 @@
       "count": 1
     }
   },
-  "tests/e2e/skills-marketplace.spec.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/e2e/system-failover.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 2
@@ -1689,11 +1644,6 @@
       "count": 1
     }
   },
-  "tests/integration/agent-skills-content.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
-    }
-  },
   "tests/integration/all-statuses-route.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1714,10 +1664,7 @@
   },
   "tests/integration/chat-pipeline.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 20
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
+      "count": 18
     }
   },
   "tests/integration/chatcore-compression-integration.test.ts": {
@@ -1831,35 +1778,6 @@
       "count": 2
     }
   },
-  "tests/integration/memory-pipeline.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/integration/memory-reindex.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/integration/memory-route-put.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 5
-    }
-  },
-  "tests/integration/memory-summarize.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/integration/modelsDevSync.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1871,14 +1789,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 3
-    }
-  },
-  "tests/integration/performance-regression.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/integration/pipeline-combo.test.ts": {
@@ -1896,11 +1806,6 @@
       "count": 9
     }
   },
-  "tests/integration/qdrant-routes.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    }
-  },
   "tests/integration/quota-pools-usage.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1914,14 +1819,6 @@
   "tests/integration/services/cliproxy-coexistence.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    }
-  },
-  "tests/integration/skills-pipeline.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 15
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/integration/upstream-cli-smoke.int.test.ts": {
@@ -2003,11 +1900,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 3
-    }
-  },
-  "tests/unit/agent-skills-page.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/agentrouter-quota-visibility.test.ts": {
@@ -2396,14 +2288,6 @@
       "count": 3
     }
   },
-  "tests/unit/cli-cloud-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 18
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 6
-    }
-  },
   "tests/unit/cli-combo-suggest-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 14
@@ -2477,11 +2361,6 @@
   "tests/unit/cli-mcp-call-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 5
-    }
-  },
-  "tests/unit/cli-memory-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 18
     }
   },
   "tests/unit/cli-memory-types.test.mjs": {
@@ -2605,11 +2484,6 @@
   "tests/unit/cli-simulate.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 13
-    }
-  },
-  "tests/unit/cli-skills-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 16
     }
   },
   "tests/unit/cli-stop-supervisor-respawn-9455.test.ts": {
@@ -3468,46 +3342,6 @@
       "count": 4
     }
   },
-  "tests/unit/memory-cache-safe-injection.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 4
-    }
-  },
-  "tests/unit/memory-embedding-remote.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "tests/unit/memory-extraction.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/memory-glm-injection.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/memory-retrieve-preview.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/memory-route.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "tests/unit/memory-store.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/memory-summarization.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
   "tests/unit/minimax-tts-1043.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 6
@@ -4289,26 +4123,6 @@
       "count": 1
     }
   },
-  "tests/unit/skills-collect-routes.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/skills-registry.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "tests/unit/skills-routes.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 9
-    }
-  },
-  "tests/unit/skills-skillssh.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 7
-    }
-  },
   "tests/unit/spend-batch-writer.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
@@ -4601,19 +4415,9 @@
       "count": 1
     }
   },
-  "tests/unit/ui/engine-tab.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/ui/fleetAggregation.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 3
-    }
-  },
-  "tests/unit/ui/memories-tab.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/ui/model-alias-edit.test.tsx": {

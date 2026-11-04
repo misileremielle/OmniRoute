@@ -9,7 +9,6 @@ const RESOURCES = {
   agents: "/dashboard/agents",
   settings: "/dashboard/settings",
   logs: "/dashboard/logs",
-  skills: "/dashboard/skills",
   evals: "/dashboard/evals",
   audit: "/dashboard/audit",
   cost: "/dashboard/cost",

@@ -17,7 +17,7 @@ import {
   claimServerToolExecution,
   finalizeServerToolExecution,
 } from "../../src/lib/db/skillExecutionFence";
-import { runWithServerToolFence } from "../../src/lib/skills/toolExecutionFence";
+import { runWithServerToolFence } from "../../src/lib/serverTools/toolExecutionFence";
 
 // Minimal fixture schema — only what tests need; no SCHEMA_SQL import from core.ts
 const FIXTURE_SCHEMA = `

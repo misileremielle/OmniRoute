@@ -25,15 +25,7 @@ export async function createChatPipelineHarness(prefix) {
   const callLogsDb = await import("../../src/lib/usage/callLogs.ts");
   const modelComboMappingsDb = await import("../../src/lib/db/modelComboMappings.ts");
   const readCacheDb = await import("../../src/lib/db/readCache.ts");
-  const memoryStore = await import("../../src/lib/memory/store.ts");
-  const memoryToolsModule = await import("../../open-sse/mcp-server/tools/memoryTools.ts");
-  const { invalidateMemorySettingsCache } = await import("../../src/lib/memory/settings.ts");
-  const { skillRegistry } = await import("../../src/lib/skills/registry.ts");
-  const { skillExecutor } = await import("../../src/lib/skills/executor.ts");
-  const builtinsModule = await import("../../src/lib/skills/builtins.ts");
-  const sandboxModule = await import("../../src/lib/skills/sandbox.ts");
-  const skillsRouteModule = await import("../../src/app/api/skills/route.ts");
-  const skillByIdRouteModule = await import("../../src/app/api/skills/[id]/route.ts");
+  const serverToolBuiltins = await import("../../src/lib/serverTools/builtins.ts");
   const idempotencyLayerModule = await import("../../src/lib/idempotencyLayer.ts");
   const semanticCacheModule = await import("../../src/lib/semanticCache.ts");
   const { handleChat } = await import("../../src/sse/handlers/chat.ts");
@@ -44,15 +36,6 @@ export async function createChatPipelineHarness(prefix) {
 
   const originalFetch = globalThis.fetch;
   const originalRetryDelayMs = BaseExecutor.RETRY_CONFIG.delayMs;
-
-  type SkillRegistryState = {
-    registeredSkills?: Map<unknown, unknown>;
-    versionCache?: Map<unknown, unknown>;
-  };
-
-  type SkillExecutorState = {
-    handlers?: Map<unknown, unknown>;
-  };
 
   type SeedConnectionOverrides = {
     name?: string;
@@ -78,14 +61,6 @@ export async function createChatPipelineHarness(prefix) {
     allowedCombos?: string[];
     allowedModels?: string[];
   };
-
-  function clearSkillState() {
-    const registryState = skillRegistry as unknown as SkillRegistryState;
-    const executorState = skillExecutor as unknown as SkillExecutorState;
-    registryState.registeredSkills?.clear();
-    registryState.versionCache?.clear();
-    executorState.handlers?.clear();
-  }
 
   function toPlainHeaders(headers) {
     if (!headers) return {};
@@ -282,8 +257,6 @@ export async function createChatPipelineHarness(prefix) {
     apiKeysDb.resetApiKeyState();
     readCacheDb.invalidateDbCache();
     reasoningRulesDb.invalidateReasoningRoutingRuleCache();
-    invalidateMemorySettingsCache();
-    clearSkillState();
     await new Promise((resolve) => setTimeout(resolve, 20));
     // Call-log persistence is fire-and-forget and the first cold artifact-worker
     // spawn can take ~2.4s, so the previous test's saves may still be in flight.
@@ -307,7 +280,6 @@ export async function createChatPipelineHarness(prefix) {
     clearInflight();
     idempotencyLayerModule.clearIdempotency();
     semanticCacheModule.clearCache();
-    clearSkillState();
     resetAllCircuitBreakers();
     await callLogsDb.waitForCallLogSaves(10_000);
     core.resetDbInstance();
@@ -370,29 +342,22 @@ export async function createChatPipelineHarness(prefix) {
     buildOpenAIResponse,
     buildOpenAIToolCallResponse,
     buildRequest,
-    builtinsModule,
     cleanup,
     combosDb,
     core,
     handleChat,
-    memoryStore,
-    memoryTools: memoryToolsModule.memoryTools,
     modelComboMappingsDb,
     originalRetryDelayMs,
     getLatestCallLog,
     getResponsesCallLogs,
     resetStorage,
-    sandboxModule,
     idempotencyLayerModule,
     semanticCacheModule,
     seedApiKey,
     seedConnection,
     settingsDb,
+    serverToolBuiltins,
     reasoningRulesDb,
-    skillByIdRouteModule,
-    skillExecutor,
-    skillRegistry,
-    skillsRouteModule,
     toPlainHeaders,
     waitFor,
   };

@@ -26,7 +26,6 @@ const SLASH_COMMANDS = [
   "temperature",
   "max-tokens",
   "reasoning",
-  "skill",
   "help",
   "exit",
   "quit",
@@ -47,7 +46,6 @@ const HELP_TEXT = `Available commands:
   /temperature <t>   Adjust temperature (0-2)
   /max-tokens <n>    Adjust max tokens
   /reasoning <level> Adjust reasoning level
-  /skill execute <id> '<args>'  Run a skill
   /help              Show this help
   /exit, /quit       Exit REPL`;
 
@@ -342,9 +340,6 @@ function ReplApp({ initialOptions, onExit }) {
       case "max-tokens":
       case "reasoning":
         setStatusMsg(`✓ ${cmd} set to ${args[0]} (applied to next request)`);
-        break;
-      case "skill":
-        await sendMessage(line);
         break;
       case "help":
         setSession((s) => ({

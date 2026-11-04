@@ -65,11 +65,6 @@ const DOC_TO_SUBFOLDER = {
   "FREE_TIERS.md": "reference",
   // frameworks
   "MCP-SERVER.md": "frameworks",
-  "A2A-SERVER.md": "frameworks",
-  "AGENT_PROTOCOLS_GUIDE.md": "frameworks",
-  "CLOUD_AGENT.md": "frameworks",
-  "SKILLS.md": "frameworks",
-  "MEMORY.md": "frameworks",
   "WEBHOOKS.md": "frameworks",
   "EVALS.md": "frameworks",
   // routing

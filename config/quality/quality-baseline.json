@@ -338,11 +338,6 @@
       "direction": "up",
       "dedicatedGate": true
     },
-    "mutationScore.open-sse/handlers/chatCore/memoryExtraction.ts": {
-      "value": 51.72,
-      "direction": "up",
-      "dedicatedGate": true
-    },
     "mutationScore.open-sse/handlers/chatCore/nonStreamingSse.ts": {
       "value": 60.68,
       "direction": "up",
@@ -360,11 +355,6 @@
     },
     "mutationScore.open-sse/handlers/chatCore/logTruncation.ts": {
       "value": 64.7,
-      "direction": "up",
-      "dedicatedGate": true
-    },
-    "mutationScore.open-sse/handlers/chatCore/memorySkillsInjection.ts": {
-      "value": 11.24,
       "direction": "up",
       "dedicatedGate": true
     },

@@ -33,7 +33,6 @@ DeepSeek, Groq, xAI, Mistral, and many more). It supports:
 - **Dashboard**: Web UI for monitoring and configuration
 - **CLI**: Full command-line interface for headless operations
 - **Webhooks**: HMAC-signed delivery with exponential backoff
-- **Skills system**: Extensible skill framework with sandbox execution
 
 ---
 

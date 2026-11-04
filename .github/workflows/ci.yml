@@ -210,17 +210,6 @@ jobs:
       # finally measured (#13204). This gate requires every exclusion to name a tracker and
       # to appear in config/quality/vitest-exclusions.json, so the debt stays reviewable.
       - run: npm run check:vitest-exclusions
-      # (gap 30) Also lives in quality.yml's PR-only "Merge integrity" job — because the
-      # CHANGELOG half of that job needs a base to diff against. This half does NOT: the
-      # generator either reproduces the committed SKILL.md files or it does not.
-      #
-      # Keeping it PR-only left a real hole. This cycle's merge trains landed in batches with
-      # `--admin`, which bypasses required checks, so three SKILL.md files drifted from the route
-      # catalog, rode the release squash into `main`, and the next cycle's sync-back turned them
-      # into a base-red that blocked EVERY PR into release/v3.8.50 until #8954. Running it here
-      # means a push to `main` catches the drift at the source instead of the next cycle
-      # inheriting it.
-      - run: npm run check:agent-skills-sync
       # WS1.7 (v3.8.49 plan): Dockerfile lint (hadolint, pinned by digest).
       # failure-threshold=error keeps the 5 pre-existing warnings (DL3008/DL3003/
       # DL3016 version pinning / WORKDIR) visible without blocking; any ERROR fails.

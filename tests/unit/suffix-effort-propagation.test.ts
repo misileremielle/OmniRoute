@@ -275,21 +275,9 @@ for (const failure of ["empty"]) {
 
 test("server tool follow-up materializes suffix effort on the fresh translated transcript", async () => {
   const apiKey = await harness.seedApiKey();
-  await harness.settingsDb.updateSettings({ skillsEnabled: true });
-  const { encodeSkillToolName } = await import("../../src/lib/skills/injection.ts");
-  harness.skillExecutor.registerHandler("attempt-weather", async () => ({ forecast: "sunny" }));
-  await harness.skillRegistry.register({
-    apiKeyId: apiKey.id,
-    name: "lookupWeather",
-    version: "1.0.0",
-    description: "Weather fixture",
-    schema: {
-      input: { type: "object", properties: { location: { type: "string" } } },
-      output: { type: "object" },
-    },
-    handler: "attempt-weather",
-    enabled: true,
-  });
+  const { builtinServerTools } = harness.serverToolBuiltins;
+  const originalWebSearch = builtinServerTools.web_search;
+  builtinServerTools.web_search = async () => ({ success: true, forecast: "sunny" });
   const previous = process.env.SERVER_OWNED_TOOL_LOOP_ENABLED;
   process.env.SERVER_OWNED_TOOL_LOOP_ENABLED = "true";
   const bodies: Record<string, unknown>[] = [];
@@ -300,7 +288,7 @@ test("server tool follow-up materializes suffix effort on the fresh translated t
       return harness.buildOpenAIToolCallResponse({
         model: MODEL,
         toolCallId: "attempt-weather-call",
-        toolName: encodeSkillToolName("lookupWeather", "1.0.0"),
+        toolName: "omniroute_web_search",
         argumentsObject: { location: "Tokyo" },
       });
     return buildOpenAIResponse("The weather is sunny.", MODEL);
@@ -312,7 +300,8 @@ test("server tool follow-up materializes suffix effort on the fresh translated t
         body: {
           model: `agnes/${MODEL}-high`,
           stream: false,
-          messages: [{ role: "user", content: "Use lookupWeather for Tokyo." }],
+          tools: [{ type: "web_search" }],
+          messages: [{ role: "user", content: "Search the weather for Tokyo." }],
         },
       })
     );
@@ -329,6 +318,7 @@ test("server tool follow-up materializes suffix effort on the fresh translated t
       )
     );
   } finally {
+    builtinServerTools.web_search = originalWebSearch;
     if (previous === undefined) delete process.env.SERVER_OWNED_TOOL_LOOP_ENABLED;
     else process.env.SERVER_OWNED_TOOL_LOOP_ENABLED = previous;
   }

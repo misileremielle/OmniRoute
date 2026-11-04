@@ -21,8 +21,6 @@ export default defineConfig({
       "src/app/**/dashboard/webhooks/__tests__/**/*.test.tsx",
       "src/app/**/dashboard/discovery/__tests__/**/*.test.tsx",
       "src/shared/hooks/__tests__/**/*.test.tsx",
-      "src/lib/memory/__tests__/**/*.test.ts",
-      "src/lib/skills/__tests__/**/*.test.ts",
       "tests/unit/encryption.test.ts",
       "tests/unit/**/*.test.tsx",
       "open-sse/**/__tests__/**/*.test.ts",
