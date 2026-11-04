@@ -1481,6 +1481,230 @@
     "tests/unit/usage-history-reset-token-ledger.test.ts": {
       "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
       "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "open-sse/mcp-server/__tests__/radarCatalogTool.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/e2e/radar-guided-setup.spec.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/cli-radar-commands.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/dashboard/radar-catalog-table-limits-training.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/free-tier-summary-radar-overlay.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/free-verdict-no-radar-resolution.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/provider-header-referral-link.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-admin-sidebar.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-admin-sidebar.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-api-routes.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-apply-feed.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-auto-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-bounded-bytes.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-catalog-capabilities.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-claim-buttons.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-combo-suggestions.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-combos-page.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-db.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-export.test.mjs": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-feed-cache-generated-at.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-feed-eligibility-gate.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-flag-default.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-guided-setup-action.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-inertia.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-intel-db.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-intel-page.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-intel-routes.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-intel-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-key-input.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-links.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-local-state-db.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-local-state-route.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-local-state-ui.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-localized-feed.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-accessor.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-contract.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-db.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-page.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-routes.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-optin-page.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-optin-rules-copy.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-page-state.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-referrals-page-tab.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-referrals-route.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-referrals-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-referrals.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-scheduler.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-setup-connections.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-supporter-key-format.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-sync-request.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-sync-response-limit.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/ui/free-provider-rankings-page-authtype-6915.test.tsx": {
+      "sourceRemoved": ["src/app/(dashboard)/dashboard/free-provider-rankings/page.tsx"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/ui/free-provider-rankings-page-usage.test.tsx": {
+      "sourceRemoved": ["src/app/(dashboard)/dashboard/free-provider-rankings/page.tsx"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/ui/providerPageHeaderPartnerLink.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -1559,5 +1783,9 @@
   "tests/unit/sync-bundle.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the reasoningRoutingRules bundle field); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
   "tests/unit/ui/flow-routing-kit-controls.test.tsx": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the RoutingEntryLink component); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
   "tests/unit/update-routes-keep-omitted-fields.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (PATCH of a reasoning rule); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
-  "tests/unit/telemetry-auto-cleanup-6848.test.ts": "Gamification removal (refactor: remove gamification): the removed asserts pinned cleanupXpAuditLog() and the xpAuditLog retention key; that source no longer exists. The other telemetry cleanups keep their asserts."
+  "tests/unit/telemetry-auto-cleanup-6848.test.ts": "Gamification removal (refactor: remove gamification): the removed asserts pinned cleanupXpAuditLog() and the xpAuditLog retention key; that source no longer exists. The other telemetry cleanups keep their asserts.",
+  "tests/unit/db/migration-163.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts read the row back through src/lib/db/radar.ts, which no longer exists. The migration itself is kept and its schema assert stays.",
+  "tests/unit/news-feed-contract.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned the radar-launch news item, which no longer exists. The feed-schema and banner asserts stay.",
+  "tests/unit/settings-cas-7784.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned radarAdminUrl exposure on GET /api/settings; that source no longer exists. The settings CAS asserts are unchanged.",
+  "tests/unit/sidebar-costs-section.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned the radar item, its RADAR_ENABLED gate and isSidebarItemVisibleForFlags(); that source no longer exists."
 }

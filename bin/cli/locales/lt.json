@@ -935,11 +935,6 @@
       "model": "Filtruoti pagal modelį"
     }
   },
-  "radar": {
-    "description": "Tikrinti ir sinchronizuoti vietinius Radar katalogo kanalus",
-    "status": "Rodyti vietinius Radar nustatymus ir kanalų podėlio būseną",
-    "sync": "Sinchronizuoti katalogą, rekomendacijas, pasiūlymus ir Intel per vietinį serverį"
-  },
   "resilience": {
     "description": "Tikrinti ir valdyti atsparumo mechanizmus",
     "status": {

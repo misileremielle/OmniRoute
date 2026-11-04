@@ -7,9 +7,9 @@ lastUpdated: 2026-08-02
 # Free Provider Rankings (Arena ELO)
 
 > **TL;DR**: OmniRoute ranks its **free** providers by model quality using **Arena AI
-> (LMArena-style) ELO scores**. Open the **Free Provider Rankings** page in the
-> dashboard to see which free providers ship the strongest models for your task —
-> overall, or filtered by category (coding, review, documentation, debugging).
+> (LMArena-style) ELO scores**. Query the rankings API to see which free providers ship
+> the strongest models for your task — overall, or filtered by category (coding, review,
+> documentation, debugging). The combo editor's "sort by score" uses the same data.
 
 ---
 
@@ -44,37 +44,9 @@ The join logic lives in `src/lib/freeProviderRankings.ts`.
 
 ## How to Access
 
-### Dashboard page
-
-Open the dashboard and go to **Costs → Free Provider Rankings**, or navigate directly to:
-
-```
-/dashboard/free-provider-rankings
-```
-
-The page (`src/app/(dashboard)/dashboard/free-provider-rankings/page.tsx`) shows:
-
-- A **top-3 podium** (🥇 🥈 🥉) of the best-ranked free providers.
-- A full **ranking table** with columns: **Rank**, **Provider**, **Top Model**,
-  **Score**, **Avg Score**, **Models**, **Type**.
-- **Category filter buttons**: _All Categories_, _Default_, _Coding_, _Review_,
-  _Documentation_, _Debugging_.
-
-Each provider's **Type** badge tells you how it is free:
-
-| Badge    | Meaning                                       |
-| -------- | --------------------------------------------- |
-| `NOAUTH` | Always free, no credentials needed            |
-| `OAUTH`  | OAuth provider with a free tier (`hasFree`)   |
-| `APIKEY` | API-key provider with a free tier (`hasFree`) |
-
-Scores are shown as human-readable labels (e.g. _Elite_, _Excellent_, _Very Good_,
-_Good_, _Average_) rather than raw numbers, because the underlying value is a relative
-ranking quality, not a percentage.
-
 ### API endpoint
 
-The page is backed by a public read endpoint
+Rankings are served by a public read endpoint
 (`src/app/api/free-provider-rankings/route.ts`):
 
 ```
@@ -151,7 +123,7 @@ taskFit = 0.4 + 0.58 * ((elo - minElo) / (maxElo - minElo))
 ```
 
 The score never reaches `0` or `1`, leaving headroom for user overrides. This is the
-`score` field you see in the API response and the label shown on the dashboard.
+`score` field you see in the API response.
 
 ### Confidence
 

@@ -935,11 +935,6 @@
       "model": "Modele göre filtrele"
     }
   },
-  "radar": {
-    "description": "Yerel Radar katalog akışlarını incele ve senkronize et",
-    "status": "Yerel Radar ayarlarını ve akış önbelleği durumunu göster",
-    "sync": "Kataloğu, yönlendirmeleri, teklifleri ve Intel'i yerel sunucu üzerinden senkronize et"
-  },
   "resilience": {
     "description": "Dayanıklılık mekanizmalarını incele ve yönet",
     "status": {

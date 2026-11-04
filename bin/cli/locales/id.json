@@ -935,11 +935,6 @@
       "model": "Filter berdasarkan model"
     }
   },
-  "radar": {
-    "description": "Periksa dan sinkronkan feed katalog Radar lokal",
-    "status": "Tampilkan pengaturan Radar lokal dan status cache feed",
-    "sync": "Sinkronkan katalog, rujukan, penawaran, dan Intel melalui server lokal"
-  },
   "resilience": {
     "description": "Periksa dan kelola mekanisme ketahanan",
     "status": {

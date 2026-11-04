@@ -935,11 +935,6 @@
       "model": "按模型筛选"
     }
   },
-  "radar": {
-    "description": "检查并同步本地 Radar 目录订阅源",
-    "status": "显示本地 Radar 设置和订阅源缓存状态",
-    "sync": "通过本地服务器同步目录、推荐、优惠和 Intel"
-  },
   "resilience": {
     "description": "检查和管理弹性机制",
     "status": {

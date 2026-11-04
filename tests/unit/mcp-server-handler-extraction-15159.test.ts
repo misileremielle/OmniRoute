@@ -2,12 +2,12 @@
 //
 // The catalog's prescription for M-01 was three parts:
 //
-//   1. cycles 193/194 — server.ts -> catalog.ts, server.ts -> radarCatalog.ts
+//   1. cycle 193 — server.ts -> catalog.ts
 //   2. the internal hop -> its own leaf module
 //   3. "file = register + wrap. handle* -> tools/canonical/*.ts"
 //
 // Parts 1 and 2 already landed with M-06 (#15468): the hop is `internalFetch.ts`
-// and both catalogs import it directly instead of reaching back through
+// and the catalog imports it directly instead of reaching back through
 // `import("./server.ts")`. This file pins part 3 — the one still outstanding —
 // and the two invariants that make it safe to keep doing.
 //
@@ -18,7 +18,7 @@
 //
 // What is deliberately NOT asserted here:
 //   - the handlers' runtime behaviour. That is covered by the vitest MCP suite
-//     (essentialTools, createComboTool, dbHealthTool, radarCatalogTool, ...),
+//     (essentialTools, createComboTool, dbHealthTool, ...),
 //     which drives the real registered tools. Duplicating it here would assert
 //     implementation details at a seam that already has 493 green tests.
 //   - line counts. A count-based guard makes every unrelated edit to server.ts a

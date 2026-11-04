@@ -100,7 +100,7 @@ different sources:
 
 | Regime                    | Source of truth                                                                                                                                                        | Surfaces                                                                                                                       |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Counting / displaying** | Resolved catalog — the shipped baseline overlaid by the Radar feed (`getRadarCatalog`)                                                                                 | Free-tier totals, budget card, dashboards                                                                                      |
+| **Counting / displaying** | Shipped catalog (`FREE_MODEL_BUDGETS`)                                                                                                                                 | Free-tier totals, budget card, dashboards                                                                                      |
 | **Deciding**              | Shipped catalog only (`FREE_MODEL_BUDGETS` in `open-sse/config/freeModelCatalog.data.ts`) plus the local heuristics (`:free` suffix, zero pricing, `grantsFreeAccess`) | Every consumer of `src/shared/utils/freeModels.ts`: model import, `auto/*` routing, `GET /v1/models`, and the browser previews |
 
 Counting can improve whenever a feed is available. Deciding stays on the

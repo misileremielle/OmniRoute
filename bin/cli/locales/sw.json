@@ -935,11 +935,6 @@
       "model": "Chuja kwa modeli"
     }
   },
-  "radar": {
-    "description": "Kagua na usawazishe milisho ya katalogi ya Radar ya ndani",
-    "status": "Onyesha mipangilio ya Radar ya ndani na hali ya akiba ya milisho",
-    "sync": "Sawazisha katalogi, marejeleo, ofa na Intel kupitia seva ya ndani"
-  },
   "resilience": {
     "description": "Kagua na udhibiti mbinu za ustahimilivu",
     "status": {

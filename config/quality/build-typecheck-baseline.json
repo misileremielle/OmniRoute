@@ -220,9 +220,6 @@
   "src/app/api/providers/volcengine-plan/connect/route.ts": {
     "TS2739": 1
   },
-  "src/app/api/radar/local-model-state/route.ts": {
-    "TS2339": 4
-  },
   "src/app/api/resilience/model-cooldowns/route.ts": {
     "TS2339": 1
   },

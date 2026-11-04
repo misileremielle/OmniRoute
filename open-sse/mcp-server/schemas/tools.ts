@@ -14,7 +14,6 @@ import { toolSearchTool } from "./toolSearch.ts";
 import { pickFastestModelTool } from "./pickFastestModel.ts";
 import { getActiveSearchProviders } from "./providerEnums";
 import { CCR_MCP_TOOLS } from "./ccrTools.ts";
-import { radarCatalogTool } from "./radarCatalog.ts";
 import { listModelsCatalogTool } from "./listModelsCatalog.ts";
 import {
   AUTO_ROUTING_STRATEGY_VALUES,
@@ -1552,7 +1551,6 @@ export const MCP_TOOLS = [
   routeRequestTool,
   costReportTool,
   listModelsCatalogTool,
-  radarCatalogTool,
   webSearchTool,
   xSearchTool,
   webFetchTool,

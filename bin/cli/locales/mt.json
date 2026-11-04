@@ -935,11 +935,6 @@
       "model": "Filtrar skont il-mudell"
     }
   },
-  "radar": {
-    "description": "Ispezzjona u sunkronizza l-alimentazzjonijiet tal-katalgu Radar lokali",
-    "status": "Uri l-istatus tal-settings lokali u l-cache tal-alimentazzjonijiet",
-    "sync": "Sınkraniżizza katalgu, referenzi, offerti, u Intel permezz tal-server lokali"
-  },
   "resilience": {
     "description": "Ispezzjona u immaniġġa l-mekkaniżmi tal-resiljenza",
     "status": {

@@ -935,11 +935,6 @@
       "model": "Tace ta model"
     }
   },
-  "radar": {
-    "description": "Bincika kuma daidaita feeds na katalogin Radar na cikin gida",
-    "status": "Nuna saitunan Radar na cikin gida da matsayin cache na feed",
-    "sync": "Daidaita katalogi, referrals, offers, da Intel ta hanyar sabar cikin gida"
-  },
   "resilience": {
     "description": "Bincika kuma sarrafa hanyoyin jure matsala",
     "status": {

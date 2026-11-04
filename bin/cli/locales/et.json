@@ -935,11 +935,6 @@
       "model": "Filtreeri mudeli järgi"
     }
   },
-  "radar": {
-    "description": "Uuri ja sünkroonib kohalikku Radar-kataloogi vooge",
-    "status": "Näita kohalikke Radar-seadeid ja voo vahemälu olekut",
-    "sync": "Sünkroonib kataloogi, suunamised, pakkumised ja Intel kohaliku serveri kaudu"
-  },
   "resilience": {
     "description": "Uuri ja halda vastupidavusmehhanisme",
     "status": {

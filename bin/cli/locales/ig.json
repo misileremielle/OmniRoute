@@ -935,11 +935,6 @@
       "model": "Jiri model nyochaa"
     }
   },
-  "radar": {
-    "description": "Nyochaa ma mekọrịta ndepụta feed Radar mpaghara",
-    "status": "Gosi ntọala Radar mpaghara na ọnọdụ cache feed",
-    "sync": "Mekọrịta catalog, referrals, offers, na Intel site na sava mpaghara"
-  },
   "resilience": {
     "description": "Nyochaa ma jikwaa usoro nkwụsi ike",
     "status": {

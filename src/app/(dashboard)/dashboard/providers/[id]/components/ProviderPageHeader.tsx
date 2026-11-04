@@ -7,7 +7,7 @@ import Link from "next/link";
 import { PageHeader } from "@omniroute/ui-kit/page-header";
 import { Button } from "@/shared/components";
 import ProviderIcon from "@/shared/components/ProviderIcon";
-import { getHeaderIconProviderId, providerText } from "../providerPageHelpers";
+import { getHeaderIconProviderId } from "../providerPageHelpers";
 import type { ProviderMessageTranslator } from "../providerPageHelpers";
 import type { ProviderNotice } from "@/lib/providers/catalog";
 
@@ -33,13 +33,6 @@ interface ProviderPageHeaderProps {
   isAnthropicProtocolCompatible: boolean;
   onOpenTutorial: () => void;
   t: ProviderMessageTranslator;
-  /**
-   * True when `providerInfo.website` was overridden with a Radar default
-   * referral link (D28 — referral links / free credits), rather than the
-   * static catalog `website`. Flagged with a discreet "Partner link" note —
-   * a "this link supports OmniRoute" disclosure.
-   */
-  isReferralLink?: boolean;
 }
 
 export default function ProviderPageHeader({
@@ -50,17 +43,7 @@ export default function ProviderPageHeader({
   isAnthropicProtocolCompatible,
   onOpenTutorial,
   t,
-  isReferralLink = false,
 }: ProviderPageHeaderProps) {
-  // D28: a Radar-driven default referral gets a discreet disclosure note so it
-  // reads as a monetized link, not just "visit provider website".
-  const showPartnerNote = isReferralLink;
-  const partnerLinkNote = providerText(
-    t,
-    "kimiPartnerLinkNote",
-    "Partner link — supports OmniRoute at no extra cost to you"
-  );
-
   // Resolve the API-key registration link: prefer apiKeyUrl, fall back to
   // signupUrl, hide when neither is set (#9270).
   const noticeUrl = providerInfo.notice?.apiKeyUrl || providerInfo.notice?.signupUrl;
@@ -117,8 +100,6 @@ export default function ProviderPageHeader({
               rel="noopener noreferrer"
               className="hover:underline inline-flex items-center gap-2"
               style={{ color: providerInfo.color }}
-              title={showPartnerNote ? partnerLinkNote : undefined}
-              aria-label={showPartnerNote ? `${providerInfo.name} — ${partnerLinkNote}` : undefined}
             >
               {providerInfo.name}
               <Icon name="open_in_new" size={18} className="opacity-60" />
@@ -131,11 +112,6 @@ export default function ProviderPageHeader({
       description={
         <span className="flex flex-wrap items-center gap-2">
           <span>{t("connectionCountLabel", { count: connectionsCount })}</span>
-          {showPartnerNote && providerInfo.website && (
-            <span className="text-[10px] font-medium uppercase tracking-wide text-text-muted/70">
-              {partnerLinkNote}
-            </span>
-          )}
           {apiKeyLink}
           {providerId === "adapta-web" && (
             <Button

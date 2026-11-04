@@ -935,11 +935,6 @@
       "model": "Tapis mengikut model"
     }
   },
-  "radar": {
-    "description": "Periksa dan segerakkan suapan katalog Radar setempat",
-    "status": "Tunjukkan tetapan Radar setempat dan status cache suapan",
-    "sync": "Segerakkan katalog, rujukan, tawaran dan Intel melalui pelayan setempat"
-  },
   "resilience": {
     "description": "Periksa dan urus mekanisme daya tahan",
     "status": {

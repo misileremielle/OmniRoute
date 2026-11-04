@@ -935,11 +935,6 @@
       "model": "Filtrovať podľa modelu"
     }
   },
-  "radar": {
-    "description": "Skontrolovať a synchronizovať lokálne kanály katalógu Radar",
-    "status": "Zobraziť lokálne nastavenia Radar a stav vyrovnávacej pamäte kanálov",
-    "sync": "Synchronizovať katalóg, odporúčania, ponuky a Intel prostredníctvom lokálneho servera"
-  },
   "resilience": {
     "description": "Skontrolovať a spravovať mechanizmy odolnosti",
     "status": {

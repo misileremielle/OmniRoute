@@ -935,11 +935,6 @@
       "model": "Filtriraj po modelu"
     }
   },
-  "radar": {
-    "description": "Pregledajte i sinhronizujte lokalne Radar katalog feedove",
-    "status": "Prikaži lokalna Radar podešavanja i status keša feeda",
-    "sync": "Sinhronizirajte katalog, preporuke, ponude i Intel putem lokalnog servera"
-  },
   "resilience": {
     "description": "Pregledajte i upravljajte mehanizmima otpornosti",
     "status": {

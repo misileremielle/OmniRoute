@@ -935,11 +935,6 @@
       "model": "Filtrēt pēc modeļa"
     }
   },
-  "radar": {
-    "description": "Pārbaudīt un sinhronizēt lokālos Radar katalogu plūsmas",
-    "status": "Rādīt lokālos Radar iestatījumus un plūsmas kešatmiņas statusu",
-    "sync": "Sinhronizēt katalogu, ieteikumus, piedāvājumus un Intel caur lokālo serveri"
-  },
   "resilience": {
     "description": "Pārbaudīt un pārvaldīt noturības mehānismus",
     "status": {

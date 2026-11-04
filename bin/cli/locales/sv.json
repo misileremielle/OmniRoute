@@ -935,11 +935,6 @@
       "model": "Filtrera efter modell"
     }
   },
-  "radar": {
-    "description": "Inspektera och synkronisera de lokala Radar-katalogflödena",
-    "status": "Visa lokala Radar-inställningar och status för flödescachen",
-    "sync": "Synkronisera katalog, hänvisningar, erbjudanden och Intel via den lokala servern"
-  },
   "resilience": {
     "description": "Inspektera och hantera resiliensmekanismer",
     "status": {

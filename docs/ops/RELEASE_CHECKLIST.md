@@ -290,22 +290,6 @@ Deploy skills use the light rsync flow — no `npm pack`, no `npm i -g`:
 - [ ] Open milestone for next version
 - [ ] If critical: pin discussion or post in `news.json` for in-app banner
 
-### Radar public-launch gate
-
-The Radar announcement is intentionally committed with `active: false`. Activation is a separate
-change after every item below is evidenced:
-
-- [ ] All stacked Radar PRs are merged and the release-tip CI is green
-- [ ] Deploy and smoke the OSS Radar routes with `RADAR_ENABLED` still off by default
-- [ ] Smoke `GET /planos`, `/termos`, `/privacidade`, and `/reembolso` on the named Radar host
-- [ ] Record operator identity/contact/address and owner-approved legal review in the private service
-- [ ] Exercise Stripe Checkout and the signed webhook in test mode only
-- [ ] Exercise one encrypted transactional-email delivery with the approved sender/domain
-- [ ] Prove backup restore and one supervised, budget-capped research run
-- [ ] Approve the BRL/PIX review policy before accepting donation evidence
-- [ ] Enable public Checkout only after the preceding gates, then activate the new `news.json` ID
-- [ ] Verify the Home banner uses localized copy and a new ID reappears after an older ID is dismissed
-
 ## Embedded Services smoke (v3.8.4+)
 
 Before shipping any release that includes embedded services changes, verify:

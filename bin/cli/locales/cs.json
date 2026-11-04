@@ -935,11 +935,6 @@
       "model": "Filtrovat podle modelu"
     }
   },
-  "radar": {
-    "description": "Zkontrolovat a synchronizovat místní zdroje katalogu Radar",
-    "status": "Zobrazit místní nastavení Radar a stav mezipaměti zdrojů",
-    "sync": "Synchronizovat katalog, doporučení, nabídky a Intel prostřednictvím místního serveru"
-  },
   "resilience": {
     "description": "Kontrolovat a spravovat mechanismy odolnosti",
     "status": {

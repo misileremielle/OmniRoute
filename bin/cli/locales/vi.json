@@ -935,11 +935,6 @@
       "model": "Lọc theo mô hình"
     }
   },
-  "radar": {
-    "description": "Kiểm tra và đồng bộ hóa các nguồn cấp danh mục Radar cục bộ",
-    "status": "Hiển thị cài đặt Radar cục bộ và trạng thái bộ nhớ đệm nguồn cấp",
-    "sync": "Đồng bộ hóa danh mục, giới thiệu, ưu đãi và Intel thông qua máy chủ cục bộ"
-  },
   "resilience": {
     "description": "Kiểm tra và quản lý các cơ chế phục hồi",
     "status": {

@@ -504,21 +504,6 @@ const COSTS_ITEMS: readonly SidebarItemDefinition[] = [
     subtitleKey: "costsFreeTiersSubtitle",
     icon: "request_quote",
   },
-  {
-    id: "free-provider-rankings",
-    href: "/dashboard/free-provider-rankings",
-    i18nKey: "freeProviderRankings",
-    subtitleKey: "freeProviderRankingsSubtitle",
-    icon: "leaderboard",
-  },
-  {
-    id: "radar",
-    href: "/dashboard/radar",
-    i18nKey: "radar",
-    subtitleKey: "radarSubtitle",
-    icon: "radar",
-    featureFlagKey: "RADAR_ENABLED",
-  },
 ];
 
 const AUDIT_GROUP: SidebarItemGroup = {

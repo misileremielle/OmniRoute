@@ -935,11 +935,6 @@
       "model": "Filtrează după model"
     }
   },
-  "radar": {
-    "description": "Inspectează și sincronizează fluxurile catalogului Radar local",
-    "status": "Afișează setările Radar locale și starea cache-ului fluxurilor",
-    "sync": "Sincronizează catalogul, recomandările, ofertele și Intel prin serverul local"
-  },
   "resilience": {
     "description": "Inspectează și gestionează mecanismele de reziliență",
     "status": {

@@ -935,11 +935,6 @@
       "model": "Scag de réir samhla"
     }
   },
-  "radar": {
-    "description": "Déan iniúch agus sioncronaigh na beathaí áitiúla de chatalog Radar",
-    "status": "Taispeáin socruithe áitiúla Radar agus stádas taisce beatha",
-    "sync": "Sioncronaigh an chatalog, moltaí, tairiscintí, agus faisnéis trí an freastalaí áitiúil"
-  },
   "resilience": {
     "description": "Déan iniúch agus bainistigh meicníochtaí athléimneachta",
     "status": {

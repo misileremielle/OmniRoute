@@ -935,11 +935,6 @@
       "model": "Filtriraj po modelu"
     }
   },
-  "radar": {
-    "description": "Preglej in sinhroniziraj vire lokalnega kataloga Radar",
-    "status": "Prikaži lokalne nastavitve Radar in stanje predpomnilnika virov",
-    "sync": "Sinhroniziraj katalog, napotitve, ponudbe in Intel prek lokalnega strežnika"
-  },
   "resilience": {
     "description": "Preglej in upravljaj mehanizme odpornosti",
     "status": {

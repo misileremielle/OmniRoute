@@ -935,11 +935,6 @@
       "model": "Filtra per modello"
     }
   },
-  "radar": {
-    "description": "Esamina e sincronizza i feed del catalogo Radar locale",
-    "status": "Mostra le impostazioni di Radar locale e lo stato della cache dei feed",
-    "sync": "Sincronizza catalogo, referral, offerte e Intel tramite il server locale"
-  },
   "resilience": {
     "description": "Esamina e gestisci i meccanismi di resilienza",
     "status": {

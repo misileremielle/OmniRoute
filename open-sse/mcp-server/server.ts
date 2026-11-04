@@ -110,7 +110,6 @@ import {
 import { getDbInstance, ensureDbInitialized } from "../../src/lib/db/core.ts";
 import { isMcpScopeEnforcementEnabled } from "../../src/shared/utils/featureFlags.ts";
 import { toSafeMcpErrorMessage } from "./errorMessage.ts";
-import { registerRadarCatalogTool } from "./radarCatalog.ts";
 import type { TextToolResult } from "./toolResult.ts";
 export { getMcpModelsCatalog } from "./catalog.ts";
 
@@ -170,9 +169,9 @@ function readMcpAccessibilityConfig(): McpAccessibilityConfig {
  * Re-exported rather than defined here, and imported (not just re-exported) because the
  * tool handlers below call it by name — a bare `export … from` creates no local binding.
  *
- * #15159 M-06: the hop moved to its own leaf module so that `catalog.ts` and
- * `radarCatalog.ts` can import it directly instead of reaching back into this file
- * through `import("./server.ts")`, which closed two cycles in the dependency graph.
+ * #15159 M-06: the hop moved to its own leaf module so that `catalog.ts` can import it
+ * directly instead of reaching back into this file through `import("./server.ts")`, which
+ * closed a cycle in the dependency graph.
  */
 import { omniRouteFetch } from "./internalFetch.ts";
 
@@ -414,8 +413,6 @@ export function createMcpServer(options?: CreateMcpServerOptions): McpServer {
       handleListModelsCatalog(listModelsCatalogInput.parse(args))
     )
   );
-
-  registerRadarCatalogTool(server, withScopeEnforcement);
 
   server.registerTool(
     "omniroute_simulate_route",

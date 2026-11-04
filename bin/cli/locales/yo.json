@@ -935,11 +935,6 @@
       "model": "Ṣe àsẹ̀ nípa model"
     }
   },
-  "radar": {
-    "description": "Ṣàyẹ̀wò kí o sì mú àwọn feed katalọ́ọ̀gù Radar agbègbè bá ara wọn mu",
-    "status": "Ṣàfihàn àwọn ààtò Radar agbègbè àti ipò cache feed",
-    "sync": "Mú katalọ́ọ̀gù, àwọn referral, àwọn offer, àti Intel bá ara wọn mu nípasẹ̀ server agbègbè"
-  },
   "resilience": {
     "description": "Ṣàyẹ̀wò kí o sì ṣàkóso àwọn ọ̀nà ìfaradà",
     "status": {

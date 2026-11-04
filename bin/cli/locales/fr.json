@@ -935,11 +935,6 @@
       "model": "Filtrer par modèle"
     }
   },
-  "radar": {
-    "description": "Inspecter et synchroniser les flux du catalogue Radar local",
-    "status": "Afficher les paramètres Radar locaux et l’état du cache des flux",
-    "sync": "Synchroniser le catalogue, les parrainages, les offres et Intel via le serveur local"
-  },
   "resilience": {
     "description": "Inspecter et gérer les mécanismes de résilience",
     "status": {

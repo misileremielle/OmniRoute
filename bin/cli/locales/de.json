@@ -935,11 +935,6 @@
       "model": "Nach Modell filtern"
     }
   },
-  "radar": {
-    "description": "Lokale Radar-Katalog-Feeds prüfen und synchronisieren",
-    "status": "Lokale Radar-Einstellungen und Feed-Cache-Status anzeigen",
-    "sync": "Katalog, Empfehlungen, Angebote und Intel über den lokalen Server synchronisieren"
-  },
   "resilience": {
     "description": "Resilienzmechanismen prüfen und verwalten",
     "status": {

@@ -935,11 +935,6 @@
       "model": "Filteren op model"
     }
   },
-  "radar": {
-    "description": "Lokale Radar-catalogusfeeds inspecteren en synchroniseren",
-    "status": "Lokale Radar-instellingen en cachestatus van feeds tonen",
-    "sync": "Catalogus, verwijzingen, aanbiedingen en Intel synchroniseren via de lokale server"
-  },
   "resilience": {
     "description": "Veerkrachtmechanismen inspecteren en beheren",
     "status": {

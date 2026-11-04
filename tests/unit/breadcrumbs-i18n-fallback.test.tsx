@@ -16,7 +16,7 @@ const translate = Object.assign(
 );
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/dashboard/radar/setup",
+  usePathname: () => "/dashboard/relay/setup",
 }));
 
 vi.mock("next-intl", () => ({

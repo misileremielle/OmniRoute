@@ -935,11 +935,6 @@
       "model": "按模型篩選"
     }
   },
-  "radar": {
-    "description": "檢查並同步本機 Radar 目錄訂閱來源",
-    "status": "顯示本機 Radar 設定和訂閱來源快取狀態",
-    "sync": "透過本機伺服器同步目錄、推薦、優惠和 Intel"
-  },
   "resilience": {
     "description": "檢查和管理彈性機制",
     "status": {

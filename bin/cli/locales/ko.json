@@ -935,11 +935,6 @@
       "model": "모델로 필터링"
     }
   },
-  "radar": {
-    "description": "로컬 Radar 카탈로그 피드 검사 및 동기화",
-    "status": "로컬 Radar 설정 및 피드 캐시 상태 표시",
-    "sync": "로컬 서버를 통해 카탈로그, 추천, 혜택 및 Intel 동기화"
-  },
   "resilience": {
     "description": "복원력 메커니즘 검사 및 관리",
     "status": {

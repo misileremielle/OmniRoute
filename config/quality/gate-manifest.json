@@ -344,11 +344,6 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:radar-sentinels",
-      "command": "node scripts/check/check-radar-sentinels.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:ratchet-bank",
       "command": "node scripts/quality/verify-ratchet-bank.mjs",
       "disposition": "separately-invoked"

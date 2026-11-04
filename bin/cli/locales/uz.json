@@ -935,11 +935,6 @@
       "model": "Model boʻyicha filtrlash"
     }
   },
-  "radar": {
-    "description": "Mahalliy Radar katalog tasmalarini tekshirish va sinxronlash",
-    "status": "Mahalliy Radar sozlamalari va tasma keshi holatini koʻrsatish",
-    "sync": "Katalog, yoʻnaltirmalar, takliflar va Intel maʼlumotlarini mahalliy server orqali sinxronlash"
-  },
   "resilience": {
     "description": "Barqarorlik mexanizmlarini tekshirish va boshqarish",
     "status": {

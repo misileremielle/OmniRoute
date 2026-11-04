@@ -14,10 +14,10 @@
  *     process that sets its environment late — was silently dropped and the hop went out
  *     unauthenticated instead of failing loudly. Every read here is per-call.
  *
- *  2. The two catalogs reached the hop through `import("./server.ts")`, because the hop
- *     lived in the same file that registers the tools. That dynamic import closed the
- *     `server.ts -> catalog.ts` and `server.ts -> radarCatalog.ts` edges in the dependency
- *     graph (cycles 194 and 195). The hop is now a leaf both can import directly.
+ *  2. The catalog reached the hop through `import("./server.ts")`, because the hop lived
+ *     in the same file that registers the tools. That dynamic import closed the
+ *     `server.ts -> catalog.ts` edge in the dependency graph. The hop is now a leaf it can
+ *     import directly.
  *
  *  3. The copies hardcoded `AbortSignal.timeout(30000)` while server.ts used
  *     `mcpFetchTimeoutSignal("management")`, so the documented OMNIROUTE_MCP_FETCH_TIMEOUT_MS

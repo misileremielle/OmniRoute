@@ -70,7 +70,6 @@
 | 🌐 Providers              |            352            |   **358**   |          380          |
 | 🧠 Unique chat model IDs  |           1320            |  **1374**   |         1491          |
 | 🖼️ Modality Bridge        | 🆕 vision + audio + video |      ✓      |           ✓           |
-| 📡 Radar free catalog     |         🆕 opt-in         |      ✓      |           ✓           |
 | ⚖️ Quota-aware scheduling |      🆕 Quota-Share       |      ✓      |           ✓           |
 | 📊 Quota telemetry        |          🆕 live          |      ✓      |           ✓           |
 | 🧰 Headless mode          |             —             |      —      | 🆕 `serve --headless` |
@@ -504,23 +503,6 @@ Pix copia-e-cola:
 <br/>
 
 <p><strong>Developer notes:</strong> The project may generate a local <code>.env</code> file during npm install/postinstall for developer convenience. This file is intentionally ignored via <code>.gitignore</code> (see <code>.gitignore</code>) and must never be committed — if accidentally committed, rotate any exposed secrets and remove the file from history. See <a href="docs/DEVELOPER-ENVIRONMENT.md">docs/DEVELOPER-ENVIRONMENT.md</a> for guidance on managing local environment files and secrets.</p>
-
-## 📡 OmniRoute Radar
-
-The main free-tier headline remains **~1.62B tokens/month** from the documented,
-pool-deduplicated catalog above. Temporary provider signup credits can separately lift the first
-month to **~2.22B**. Radar is an optional, signed catalog overlay for people who want fresher
-free-model availability between OmniRoute releases; the community catalog and every existing free
-feature remain free.
-
-Supporters can receive the live catalog and additional provider opportunities. Its separate,
-mutable ceiling is **approximately 3B tokens/month at most**, depending on provider availability.
-That ceiling is not a guarantee: providers can change quotas, eligibility, models, or regions at
-any time.
-
-Radar is opt-in and GET-only. The OmniRoute client does not upload prompts, traffic, provider
-configuration, usage telemetry, or local announcement-dismiss state. Learn about eligibility and
-the current catalog at **[radar.omniroute.online/planos](https://radar.omniroute.online/planos)**.
 
 <br/>
 

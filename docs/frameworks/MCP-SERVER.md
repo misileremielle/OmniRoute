@@ -6,9 +6,9 @@ lastUpdated: 2026-09-22
 
 # OmniRoute MCP Server Documentation
 
-> Model Context Protocol server with 110 tools across routing, cache, compression, memory, skills, proxy, pool, Radar, and context source operations.
+> Model Context Protocol server with 110 tools across routing, cache, compression, memory, skills, proxy, pool, and context source operations.
 >
-> Source of truth: `open-sse/mcp-server/server.ts` computes **110 unique tools** with `countUniqueMcpTools()`: 45 canonical definitions (including the six CCR lifecycle tools, the agent-skills trio, `omniroute_radar_catalog`, and `omniroute_x_search`), plus memory (3), skills (4), GitHub skills (3), pool (6), plugins (8), Notion (6), Obsidian (22), local corpus (3), and two RTK-only compression tools.
+> Source of truth: `open-sse/mcp-server/server.ts` computes **110 unique tools** with `countUniqueMcpTools()`: 45 canonical definitions (including the six CCR lifecycle tools, the agent-skills trio, and `omniroute_x_search`), plus memory (3), skills (4), GitHub skills (3), pool (6), plugins (8), Notion (6), Obsidian (22), local corpus (3), and two RTK-only compression tools.
 
 ## Installation
 
@@ -104,7 +104,6 @@ Cursor, Cline, and compatible MCP client setup.
 | `omniroute_route_request`       | `execute:completions` | Send a chat completion through OmniRoute routing                                                                               |
 | `omniroute_cost_report`         | `read:usage`          | Cost report by period (session/day/week/month)                                                                                 |
 | `omniroute_list_models_catalog` | `read:models`         | Full model catalog with capabilities, status, pricing                                                                          |
-| `omniroute_radar_catalog`       | `read:radar`          | Local signed Radar catalog; optional provider/family filters                                                                   |
 | `omniroute_tool_search`         | `read:tools`          | Discover tools from the registered MCP catalog                                                                                 |
 | `omniroute_web_search`          | `execute:search`      | Web search through the configured search providers. Not X/Twitter.                                                             |
 | `omniroute_x_search`            | `execute:search`      | Search X through xAI/SuperGrok, or choose `xquik-search` for Xquik API results. Requires credentials for the selected backend. |
@@ -438,7 +437,6 @@ Each tool requires specific scopes:
 | `execute:skills`      | `skills_execute`                                                                                                                                                             |
 | `read:catalog`        | `agent_skills_list`, `agent_skills_get`, `agent_skills_coverage`                                                                                                             |
 | `read:tools`          | `omniroute_tool_search`                                                                                                                                                      |
-| `read:radar`          | `omniroute_radar_catalog`                                                                                                                                                    |
 | `read:plugins`        | `plugin_list`, `plugin_executions`                                                                                                                                           |
 | `write:plugins`       | `plugin_scan`, `plugin_install`, `plugin_uninstall`, `plugin_activate`, `plugin_deactivate`, `plugin_configure`                                                              |
 | `read:obsidian`       | 13 read tools — `obsidian_list_vault`, `obsidian_read_note`, `obsidian_search_simple`, `obsidian_search_structured`, `obsidian_get_periodic_note`, `obsidian_sync_status`, … |

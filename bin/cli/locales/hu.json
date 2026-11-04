@@ -935,11 +935,6 @@
       "model": "Szűrés modell szerint"
     }
   },
-  "radar": {
-    "description": "A helyi Radar-katalógusforrások vizsgálata és szinkronizálása",
-    "status": "A helyi Radar-beállítások és a forrásgyorsítótár állapotának megjelenítése",
-    "sync": "A katalógus, az ajánlások, az ajánlatok és az Intel szinkronizálása a helyi szerveren keresztül"
-  },
   "resilience": {
     "description": "Ellenálló képességi mechanizmusok vizsgálata és kezelése",
     "status": {

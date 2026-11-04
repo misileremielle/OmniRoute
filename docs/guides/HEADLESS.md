@@ -70,7 +70,6 @@ headless mode too.
 | `embed-ws-proxy`            | WebSocket proxy for embedded service UIs                               |
 | `conductor-bridge`          | Mirrors OmniConductor hub tasks into A2A (opt-in, `CONDUCTOR_HUB_URL`) |
 | `arena-elo-sync`            | Arena ELO leaderboard sync for the Free Provider Rankings page         |
-| `radar-sync`                | Radar daily feed sync (opt-in)                                         |
 | `pricing-sync`              | External pricing data sync (opt-in, `PRICING_SYNC_ENABLED`)            |
 | `openrouter-provider-stats` | Provider directory / popularity enrichment for the dashboard           |
 | `models-dev-sync`           | models.dev capability sync (opt-in in settings)                        |

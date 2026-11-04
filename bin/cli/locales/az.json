@@ -935,11 +935,6 @@
       "model": "Modelə görə filtrlə"
     }
   },
-  "radar": {
-    "description": "Lokal Radar kataloq lentlərini yoxla və sinxronlaşdır",
-    "status": "Lokal Radar parametrlərini və lent keşinin vəziyyətini göstər",
-    "sync": "Kataloqu, yönləndirmələri, təklifləri və Intel-i lokal server vasitəsilə sinxronlaşdır"
-  },
   "resilience": {
     "description": "Dayanıqlılıq mexanizmlərini yoxla və idarə et",
     "status": {

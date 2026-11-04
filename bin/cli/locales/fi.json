@@ -935,11 +935,6 @@
       "model": "Suodata mallin mukaan"
     }
   },
-  "radar": {
-    "description": "Tarkastele ja synkronoi paikallisia Radar-luettelosyötteitä",
-    "status": "Näytä paikalliset Radar-asetukset ja syötevälimuistin tila",
-    "sync": "Synkronoi luettelo, suosittelut, tarjoukset ja Intel paikallisen palvelimen kautta"
-  },
   "resilience": {
     "description": "Tarkastele ja hallitse vikasietoisuusmekanismeja",
     "status": {

@@ -935,11 +935,6 @@
       "model": "Filtrer etter modell"
     }
   },
-  "radar": {
-    "description": "Inspiser og synkroniser de lokale Radar-katalogfeedene",
-    "status": "Vis lokale Radar-innstillinger og status for feedhurtigbuffer",
-    "sync": "Synkroniser katalog, henvisninger, tilbud og Intel via den lokale serveren"
-  },
   "resilience": {
     "description": "Inspiser og administrer robusthetsmekanismer",
     "status": {

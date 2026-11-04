@@ -935,11 +935,6 @@
       "model": "モデルで絞り込む"
     }
   },
-  "radar": {
-    "description": "ローカルのRadarカタログフィードを確認して同期",
-    "status": "ローカルのRadar設定とフィードキャッシュの状態を表示",
-    "sync": "ローカルサーバー経由でカタログ、紹介、オファー、Intelを同期"
-  },
   "resilience": {
     "description": "レジリエンス機構を確認・管理",
     "status": {

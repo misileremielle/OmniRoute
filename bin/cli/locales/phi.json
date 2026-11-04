@@ -935,11 +935,6 @@
       "model": "I-filter ayon sa modelo"
     }
   },
-  "radar": {
-    "description": "Suriin at i-synchronize ang mga lokal na feed ng catalog ng Radar",
-    "status": "Ipakita ang mga lokal na setting ng Radar at status ng feed cache",
-    "sync": "I-synchronize ang catalog, mga referral, mga alok, at Intel sa pamamagitan ng lokal na server"
-  },
   "resilience": {
     "description": "Suriin at pamahalaan ang mga mekanismo ng resilience",
     "status": {

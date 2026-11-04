@@ -935,11 +935,6 @@
       "model": "Filtruj według modelu"
     }
   },
-  "radar": {
-    "description": "Sprawdź i zsynchronizuj lokalne źródła katalogu Radar",
-    "status": "Pokaż lokalne ustawienia Radar i stan pamięci podręcznej źródeł",
-    "sync": "Zsynchronizuj katalog, polecenia, oferty i Intel za pośrednictwem lokalnego serwera"
-  },
   "resilience": {
     "description": "Sprawdź mechanizmy odporności i zarządzaj nimi",
     "status": {
