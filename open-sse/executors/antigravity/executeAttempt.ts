@@ -33,6 +33,7 @@ import {
 } from "./streamingPassthrough.ts";
 import { ensureStreamReadiness } from "../../utils/streamReadiness.ts";
 import type { AntigravityCredentials } from "../antigravity.ts";
+import { cloneRequestBody } from "../../utils/cloneRequestBody.ts";
 
 const LONG_RETRY_THRESHOLD_MS = 60_000;
 const CREDITS_EXHAUSTED_TTL_MS = 5 * 60 * 60 * 1000; // 5 hours
@@ -232,7 +233,7 @@ function cloneAntigravityRequestBody(body: unknown): unknown {
 
   let clone: unknown;
   try {
-    clone = structuredClone(body);
+    clone = cloneRequestBody(body);
   } catch {
     clone = JSON.parse(JSON.stringify(body));
   }

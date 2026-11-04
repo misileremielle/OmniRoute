@@ -870,3 +870,34 @@ test("injects prompt_cache_key for Kimi Code's OpenAI protocol", async () => {
   });
   assert.match(String(out.prompt_cache_key), /^omni-[0-9a-f]{32}$/);
 });
+
+// prepareUpstreamBody() runs once per upstream attempt over the SAME translated body and
+// its normalizers mutate in place. The per-attempt copy (cloneRequestBody, which shares
+// immutable strings instead of re-copying them like structuredClone) must keep every
+// attempt isolated from the original and from each other.
+test("prepareUpstreamBody never mutates the translated body across attempts", async () => {
+  const image = `data:image/png;base64,${"Q".repeat(4096)}`;
+  const translatedBody = {
+    model: "client-model",
+    _omniroute_internal_marker: true,
+    messages: [{ role: "user", content: [{ type: "image_url", image_url: { url: image } }] }],
+  };
+  const snapshot = structuredClone(translatedBody);
+  const options = {
+    translatedBody,
+    provider: "openai",
+    targetFormat: FORMATS.OPENAI,
+    credentials: null,
+    isOpencodeClient: true,
+  };
+  const first = await prepareUpstreamBody({ ...options, modelToCall: "gpt-4o" });
+  const second = await prepareUpstreamBody({ ...options, modelToCall: "gpt-4o-mini" });
+  assert.deepEqual(translatedBody, snapshot);
+  assert.equal(first.model, "gpt-4o");
+  assert.equal(second.model, "gpt-4o-mini");
+  assert.notEqual(first.messages, second.messages);
+  const firstPart = (
+    first.messages as Array<{ content: Array<{ image_url: { detail?: string } }> }>
+  )[0].content[0];
+  assert.equal(firstPart.image_url.detail, "high");
+});

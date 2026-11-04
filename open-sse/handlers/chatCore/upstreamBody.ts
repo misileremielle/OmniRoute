@@ -43,6 +43,7 @@ import {
   stripGpt5ReasoningWhenTools,
 } from "../../services/gpt5SamplingGuard.ts";
 import { wireAdaptiveEffort } from "./adaptiveEffortWiring.ts";
+import { cloneRequestBody } from "../../utils/cloneRequestBody.ts";
 
 type LoggerLike =
   | { debug?: (...args: unknown[]) => void; warn?: (tag: string, message: string) => void }
@@ -377,7 +378,10 @@ function normalizeAttemptBody(opts: PrepareUpstreamBodyOptions): Body {
     translatedBody.reasoning !== undefined ||
     translatedBody.thinking !== undefined ||
     hasExplicitTemplateReasoning;
-  let bodyToSend: Body = { ...structuredClone(translatedBody), model: modelToCall };
+  // Fresh containers per attempt (the normalizers below mutate nested fields in
+  // place), but shared immutable strings: structuredClone() re-copied every base64
+  // image / long history string on every attempt and fallback.
+  let bodyToSend: Body = { ...cloneRequestBody(translatedBody), model: modelToCall };
   bodyToSend = normalizeThinkingForModel(bodyToSend, modelToCall);
   bodyToSend = normalizeClaudeAdaptiveThinking(bodyToSend, modelToCall);
   bodyToSend = normalizeClaudeDisabledThinkingEffort(bodyToSend, modelToCall, provider);
