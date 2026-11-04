@@ -85,8 +85,7 @@ function mutableVideoLogMessage(
  * (`entry.fullText === part.text`), never by `entry.messageIndex`/
  * `entry.partIndex`. Those positions are computed by the guardrail's preCall,
  * but request-mutation stages that run AFTER it and BEFORE this log write —
- * `injectSystemPrompt` (prepends a message when no system/developer message
- * exists), context-relay handoff injection, reasoning-rule body rewrites —
+ * context-relay handoff injection, reasoning-rule body rewrites —
  * can prepend or splice the message array, silently invalidating any
  * positional index. A stale index either misses the real part (the
  * transcript is logged unredacted) or, worse, lands on and overwrites an

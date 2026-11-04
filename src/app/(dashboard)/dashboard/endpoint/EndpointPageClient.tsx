@@ -8,11 +8,9 @@ import { Checkbox } from "@omniroute/ui-kit/checkbox";
 import { PageHeader } from "@omniroute/ui-kit/page-header";
 import Button from "@/shared/components/Button";
 import Card from "@/shared/components/Card";
-import Input from "@/shared/components/Input";
 import { CardSkeleton } from "@/shared/components/Loading";
 import Modal from "@/shared/components/Modal";
 import SegmentedControl from "@/shared/components/SegmentedControl";
-import Toggle from "@/shared/components/Toggle";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import { isPublicDisplayBaseUrl, useDisplayBaseUrl } from "@/shared/hooks";
 import { useTranslations } from "next-intl";
@@ -98,8 +96,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
   );
   const [lanUrls, setLanUrls] = useState<string[]>([]);
   const [activeEndpointTab, setActiveEndpointTab] = useState<EndpointTab>("apis");
-  const [customSystemPromptEnabled, setCustomSystemPromptEnabled] = useState(false);
-  const [customSystemPrompt, setCustomSystemPrompt] = useState("");
 
   const { copied, copy } = useCopyToClipboard();
 
@@ -259,8 +255,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
         if (data.machineId) {
           setResolvedMachineId(data.machineId);
         }
-        setCustomSystemPromptEnabled(!!data.customSystemPromptEnabled);
-        setCustomSystemPrompt(data.customSystemPrompt || "");
       }
     } catch (error) {
       console.log("Error loading cloud settings:", error);
@@ -301,24 +295,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       mounted = false;
     };
   }, []);
-
-  const handleCustomSystemPromptEnabledChange = (value: boolean) => {
-    setCustomSystemPromptEnabled(value);
-    void fetch("/api/settings", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ customSystemPromptEnabled: value }),
-    });
-  };
-
-  const handleCustomSystemPromptChange = (value: string) => {
-    setCustomSystemPrompt(value);
-    void fetch("/api/settings", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ customSystemPrompt: value }),
-    });
-  };
 
   const handleCloudToggle = (checked) => {
     if (checked) {
@@ -687,31 +663,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
                 {tc("notConfigured")}
               </span>
             )}
-          </div>
-        </div>
-
-        {/* Custom System Prompt */}
-        <div className="flex items-center justify-between pt-4 mt-4 border-t border-border gap-4 flex-wrap">
-          <div className="min-w-0 flex-1">
-            <p className="font-medium text-sm">{t("customSystemPromptTitle")}</p>
-            <p className="text-sm text-text-muted">{t("customSystemPromptDescription")}</p>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
-            {customSystemPromptEnabled && (
-              <Input
-                type="text"
-                value={customSystemPrompt}
-                onChange={(e) => handleCustomSystemPromptChange(e.target.value)}
-                placeholder={t("customSystemPromptPlaceholder")}
-                className="w-64 text-xs"
-              />
-            )}
-            <Toggle
-              checked={customSystemPromptEnabled}
-              onChange={handleCustomSystemPromptEnabledChange}
-              ariaLabel={t("customSystemPromptTitle")}
-              size="sm"
-            />
           </div>
         </div>
       </Card>

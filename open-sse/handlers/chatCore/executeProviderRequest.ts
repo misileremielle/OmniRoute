@@ -63,7 +63,6 @@ import { shouldIsolateProbeFailures } from "@/shared/utils/probeOrigin";
 import { resolveProviderId } from "@/shared/constants/providers";
 import { buildContinuationLogHooks } from "./recoveryTraceLogging.ts";
 import { formatStreamRecoveryRetryWarning } from "./streamErrorResult.ts";
-import { injectSystemPromptPostTranslation } from "../../services/systemPrompt.ts";
 import type { ToolDisclosureConfig } from "../../utils/toolDisclosure.ts";
 
 export type ChatCoreExecutorResult = {
@@ -203,7 +202,7 @@ export async function executeProviderRequest(
     // Upstream body preparation extracted to chatCore/upstreamBody.ts (#3501 — first internal
     // sub-slice of executeProviderRequest); produces the body sent upstream (payload rules +
     // tool-limit truncation + prompt_cache_key injection).
-    let bodyToSend = await prepareUpstreamBody({
+    const bodyToSend = await prepareUpstreamBody({
       translatedBody,
       modelToCall,
       ...trustedEffortContext,
@@ -217,19 +216,6 @@ export async function executeProviderRequest(
       clientRawRequest,
       toolDisclosure,
     });
-
-    // Global System Prompt — SINGLE injection point (post-translation) for
-    // carrier-ful targets. The old unconditional pre-translation pass
-    // (former chatCore injectSystemPrompt call) was removed: it chained
-    // with this pass to inject prefix/suffix 2-3x and dual-wrote
-    // body.system + messages[] on the claude path, which strict upstreams
-    // (HCP-Vision vLLM: "System message must be at the beginning") reject
-    // with 400. Format-aware via targetFormat: messages[] (openai/codex —
-    // prefix FIRST system, suffix LAST), claude `system` field, gemini
-    // `systemInstruction`, responses `instructions`. Carrier-less targets
-    // (kiro user-fold, antigravity Cloud Code envelope) are covered by the
-    // gated PRE-translation pass before translateRequest instead.
-    bodyToSend = injectSystemPromptPostTranslation(bodyToSend, { targetFormat, provider });
 
     updatePendingScope(pendingScope, {
       providerRequest: bodyToSend,

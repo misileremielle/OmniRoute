@@ -131,8 +131,8 @@ export const DEFAULT_THINKING_CONFIG = {
 // hydrateThinkingBudgetConfig) and the app-route / open-sse executors (per-request
 // reads in base.ts). A plain module-level `let` is DUPLICATED per graph, so the
 // boot hydration would land on the instrumentation graph's copy and never reach
-// base.ts — exactly the #5312 fix-A break proven on the VPS. Mirrors the same
-// globalThis pattern systemPrompt.ts already uses for the Global System Prompt (#2470).
+// base.ts — exactly the #5312 fix-A break proven on the VPS. Uses the same
+// globalThis pattern as the other boot-hydrated runtime configs (#2470).
 const GLOBAL_KEY = "__omniroute_thinkingBudget_config__";
 const _store = globalThis as unknown as Record<string, ThinkingBudgetConfig | undefined>;
 

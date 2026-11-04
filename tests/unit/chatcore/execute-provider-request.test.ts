@@ -25,7 +25,6 @@ test("executeProviderRequest lives in its own leaf", () => {
 test("the leaf keeps the tip send shape", () => {
   const leaf = read(LEAF);
   assert.match(leaf, /prepareUpstreamBody\(/);
-  assert.match(leaf, /injectSystemPromptPostTranslation\(/);
   assert.equal(
     leaf.includes("isClaudePassthrough"),
     false,

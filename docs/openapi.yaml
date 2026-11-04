@@ -3830,32 +3830,6 @@ paths:
         "400":
           description: Invalid body, oversized sample or unsafe pattern
 
-  /api/settings/system-prompt:
-    get:
-      tags: [Settings]
-      summary: Get system prompt configuration
-      description: Returns the current system prompt injection settings.
-      responses:
-        "200":
-          description: System prompt configuration
-    put:
-      tags: [Settings]
-      summary: Update system prompt configuration
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                prompt:
-                  type: string
-                enabled:
-                  type: boolean
-      responses:
-        "200":
-          description: Updated system prompt configuration
-
   /api/settings/thinking-budget:
     get:
       tags: [Settings]

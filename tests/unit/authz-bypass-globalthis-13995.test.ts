@@ -9,7 +9,6 @@
  * its own state, so a manage-scope-configured bypass prefix written by the
  * settings-PATCH bundle was invisible to the route-guard bundle (#13995) — the
  * exact previously-fixed defect class documented for
- * open-sse/services/systemPrompt.ts (#2470) and
  * open-sse/services/modelDeprecation.ts (#5777).
  *
  * These tests fail on the old plain-`let` implementation: it never touches

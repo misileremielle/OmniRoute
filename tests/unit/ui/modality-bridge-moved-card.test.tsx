@@ -21,9 +21,6 @@ vi.mock("@/shared/components", () => ({
 vi.mock("@/app/(dashboard)/dashboard/settings/components/ThinkingBudgetTab", () => ({
   default: () => null,
 }));
-vi.mock("@/app/(dashboard)/dashboard/settings/components/SystemPromptTab", () => ({
-  default: () => null,
-}));
 vi.mock("@/app/(dashboard)/dashboard/settings/components/ResponsesStatePolicyTab", () => ({
   default: () => null,
 }));

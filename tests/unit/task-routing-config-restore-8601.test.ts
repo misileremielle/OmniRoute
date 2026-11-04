@@ -8,8 +8,7 @@
  *
  *  A. No hydration entry point existed at all. `hydrateTaskRoutingConfig(settings)`
  *     must parse the persisted value (a JSON *string*, as the route writes it) and
- *     apply it, mirroring `hydrateThinkingBudgetConfig` (#5312) and
- *     `setSystemPromptConfig` (#2470).
+ *     apply it, mirroring `hydrateThinkingBudgetConfig` (#5312).
  *
  *  B. The config lived in a plain module-level `let`, which is DUPLICATED per module
  *     graph — so a boot hydration on the instrumentation graph would never reach the

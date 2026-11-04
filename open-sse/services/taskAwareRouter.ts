@@ -249,7 +249,7 @@ export function resetTaskRoutingStats(): void {
  * JSON string, but nothing ever read it back — so the feature silently reverted to
  * `enabled: false` + the default model map on every restart. `applyRuntimeSettings`
  * does not cover this key, so it needs an explicit hydration step, same as the
- * Global System Prompt (#2470) and the Thinking-Budget config (#5312).
+ * Thinking-Budget config (#5312).
  *
  * Accepts either the JSON string the route persists or an already-parsed object.
  * Returns true when a config was applied, false for missing/malformed values

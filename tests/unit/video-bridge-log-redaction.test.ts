@@ -14,8 +14,7 @@
 //
 // #12150 fix round 1 (adversarial review, CRITICAL): also proves the
 // content-address fix for the positional-drift bug — real request-mutation
-// stages (injectSystemPrompt's "no existing system message" branch,
-// context-relay handoff injection, reasoning-rule body rewrites) can
+// stages (context-relay handoff injection, reasoning-rule body rewrites) can
 // prepend/splice messages between the guardrail's preCall and this log
 // write, making a stale (messageIndex, partIndex) point at the wrong message
 // or an out-of-bounds slot. applyVideoBridgeLogRedaction must locate the
@@ -422,8 +421,8 @@ test("Scenario A (adversarial review): a message prepended AFTER the guardrail b
 
   // The body exactly as the video-bridge guardrail saw it when it computed
   // the redaction map: a single user message, no system message yet — this
-  // is precisely the shape that makes injectSystemPrompt's "no existing
-  // system message" branch (open-sse/services/systemPrompt.ts) fire.
+  // is precisely the shape where a later request-mutation stage prepends a
+  // brand-new system message.
   const userMessageWithVideo = {
     role: "user",
     content: [
@@ -443,7 +442,7 @@ test("Scenario A (adversarial review): a message prepended AFTER the guardrail b
     },
   ];
 
-  // Real production shape: AFTER the guardrail ran, injectSystemPrompt found
+  // Shape under test: AFTER the guardrail ran, a request-mutation stage found
   // no existing system/developer message and unshifted a brand-new one —
   // `result.messages = [{ role: "system", content: combined }, ...result.messages]`
   // — shifting the video message from index 0 to index 1. The map above is

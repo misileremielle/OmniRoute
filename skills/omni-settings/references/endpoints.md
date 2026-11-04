@@ -31,8 +31,6 @@
 - [`GET /api/settings/pii`](#get-apisettingspii)
 - [`PUT /api/settings/pii`](#put-apisettingspii)
 - [`POST /api/settings/pii/test`](#post-apisettingspiitest)
-- [`GET /api/settings/system-prompt`](#get-apisettingssystem-prompt)
-- [`PUT /api/settings/system-prompt`](#put-apisettingssystem-prompt)
 - [`GET /api/settings/thinking-budget`](#get-apisettingsthinking-budget)
 - [`PUT /api/settings/thinking-budget`](#put-apisettingsthinking-budget)
 - [`GET /api/settings/cli-versions`](#get-apisettingscli-versions)
@@ -468,28 +466,6 @@ Dry-runs one pattern against a sample of at most 8 KB. Nothing is stored.
 
 ```bash
 curl -X POST http://localhost:20128/api/settings/pii/test \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-### GET /api/settings/system-prompt
-
-Get system prompt configuration
-
-Returns the current system prompt injection settings.
-
-```bash
-curl http://localhost:20128/api/settings/system-prompt \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### PUT /api/settings/system-prompt
-
-Update system prompt configuration
-
-```bash
-curl -X PUT http://localhost:20128/api/settings/system-prompt \
   -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{}'

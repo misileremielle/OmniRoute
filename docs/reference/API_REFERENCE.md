@@ -1428,7 +1428,6 @@ curl -X PATCH "$OMNIROUTE_URL/api/keys/$KEY_ID" \
 | `/api/settings/proxy/test`            | POST          | Test proxy connection                                                                                                                                                                                                                                                |
 | `/api/settings/ip-filter`             | GET/PUT       | IP allowlist/blocklist                                                                                                                                                                                                                                               |
 | `/api/settings/thinking-budget`       | GET/PUT       | Thinking/reasoning **request** rewrite mode (passthrough / auto-strip / custom / adaptive). Independent of compression. See [THINKING_BUDGET.md](../guides/THINKING_BUDGET.md).                                                                                      |
-| `/api/settings/system-prompt`         | GET/PUT       | Global system prompt                                                                                                                                                                                                                                                 |
 | `/api/settings/compression`           | GET/PUT       | Global compression config                                                                                                                                                                                                                                            |
 | `/api/settings/purge-request-history` | POST          | Clear request log rows and local call-log artifacts                                                                                                                                                                                                                  |
 
@@ -1494,8 +1493,8 @@ a manual backup (`PUT`) keep ordinary management auth.
 
 ### Tunnels
 
-| Endpoint                   | Method | Description                                                             |
-| -------------------------- | ------ | ----------------------------------------------------------------------- |
+| Endpoint | Method | Description |
+| -------- | ------ | ----------- |
 
 ### CLI Tools
 

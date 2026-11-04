@@ -178,7 +178,7 @@ test("applyRuntimeSettings with a PARTIAL settings object leaves the store alone
   // Existing tests (and any future caller) pass a minimal shape. The field being
   // absent must mean "not carried", never "the operator cleared it" — otherwise
   // a live wire fingerprint silently reverts to the pin.
-  await runtime.applyRuntimeSettings({ systemPrompt: null }, { force: true, source: "test" });
+  await runtime.applyRuntimeSettings({ hideHealthCheckLogs: false }, { force: true, source: "test" });
   await runtime.applyRuntimeSettings({}, { source: "test" });
 
   assert.deepEqual(cliVersions.getCliVersionOverrides(), { claude: "2.1.260" });

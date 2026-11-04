@@ -16,8 +16,6 @@ import {
   CREDENTIAL_IMPORT_FORBIDDEN_MESSAGE,
   requireOperatorCredential,
 } from "@/lib/api/operatorCredential";
-import { getSettings } from "@/lib/db/settings";
-import { setSystemPromptConfig } from "@omniroute/open-sse/services/systemPrompt.ts";
 import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error";
 
 const DEFAULT_MAX_UPLOAD_MB = 100;
@@ -165,17 +163,6 @@ async function replaceLiveDatabase(tmpPath: string, fileName: string): Promise<R
   console.log(
     `[DB] Imported database from upload: ${connCount} connections, ${nodeCount} nodes, ${comboCount} combos, ${keyCount} API keys`
   );
-
-  // The DB was replaced wholesale — re-hydrate the in-memory Global System Prompt so it
-  // reflects the imported settings without requiring a restart (#2470).
-  try {
-    const importedSettings = await getSettings();
-    if (importedSettings.systemPrompt) {
-      setSystemPromptConfig(importedSettings.systemPrompt);
-    }
-  } catch {
-    // non-fatal: import succeeded; system prompt will hydrate on next restart
-  }
 
   return NextResponse.json({
     imported: true,
