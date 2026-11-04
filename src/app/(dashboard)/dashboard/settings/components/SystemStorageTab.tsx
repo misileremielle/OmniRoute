@@ -919,7 +919,6 @@ export default function SystemStorageTab() {
       ["conversationTurnNodes", t("retentionConversationTurnNodes"), 30],
       ["usageHistory", t("retentionUsageHistory"), 30],
       ["memoryEntries", t("retentionMemoryEntries"), 30],
-      ["xpAuditLog", t("retentionXpAuditLog"), 30],
     ];
 
     return (

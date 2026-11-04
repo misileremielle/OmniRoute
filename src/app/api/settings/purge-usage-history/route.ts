@@ -54,7 +54,6 @@ export async function POST(request: Request) {
         deletedCompressionRunTelemetry: result.deletedCompressionRunTelemetry,
         deletedRoutingDecisions: result.deletedRoutingDecisions,
         deletedQuotaConsumption: result.deletedQuotaConsumption,
-        deletedTokenLedger: result.deletedTokenLedger,
         deletedConversationTurnNodes: result.deletedConversationTurnNodes,
         deletedAgenticConversations: result.deletedAgenticConversations,
         errors: result.errors,

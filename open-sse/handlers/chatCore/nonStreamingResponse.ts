@@ -105,7 +105,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     echoModelInObject,
     effectiveModel,
     effectiveServiceTier: _effectiveServiceTier,
-    emitRequestGamificationEvent,
     endpointPath,
     executeProviderRequest,
     executeRefreshCredentials,
@@ -1036,9 +1035,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       log,
     });
     // === /Quota Share POST-hook ===
-
-    // ── Gamification event (fire-and-forget) ──
-    await emitRequestGamificationEvent({ apiKeyId: apiKeyInfo?.id, model, provider });
 
     finalizePendingScope(pendingScope, {
       providerResponse: responseBody,

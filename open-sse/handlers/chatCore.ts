@@ -231,7 +231,6 @@ import { recordCompressionCacheStats } from "./chatCore/compressionCacheStats.ts
 import { writeCavemanOutputAnalytics } from "./chatCore/cavemanOutputAnalytics.ts";
 import { scheduleQuotaShareConsumption } from "./chatCore/quotaShareConsumption.ts";
 import { runQuotaSharePreHook } from "./chatCore/quotaSharePreHook.ts";
-import { emitRequestGamificationEvent } from "./chatCore/gamificationEvent.ts";
 import { runPluginOnResponseHook } from "./chatCore/pluginOnResponse.ts";
 import { applyPostTranslationCompression } from "./chatCore/postTranslationCompression.ts";
 import { isJsonRecord } from "./chatCore/nonStreamingResponseParse.ts";
@@ -3214,7 +3213,6 @@ async function handleChatCoreInner({
       echoModelInObject,
       effectiveModel,
       effectiveServiceTier,
-      emitRequestGamificationEvent,
       endpointPath,
       executeProviderRequest,
       executeRefreshCredentials,

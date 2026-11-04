@@ -547,7 +547,7 @@ Highlights (full list under `open-sse/services/`):
 ### 4.6 `open-sse/mcp-server/`
 
 - **110 unique tools** wired in `server.ts` (45 canonical in `schemas/tools.ts` +
-  memory, skills, GitHub-skills, pool, gamification, plugin, Notion, Obsidian,
+  memory, skills, GitHub-skills, pool, plugin, Notion, Obsidian,
   local-corpus and compression modules — union counted by `countUniqueMcpTools`).
 - **3 transports**: stdio, HTTP Streamable, SSE.
 - **33 scopes** enforced at runtime — base list in `src/shared/constants/mcpScopes.ts`, full set is the union of the scopes declared by each tool module.

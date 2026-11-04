@@ -1293,6 +1293,194 @@
         "src/app/(dashboard)/dashboard/api-manager/routing/page.tsx"
       ],
       "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/badge-sse-aborted-signal-13103.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/characterization-gamification.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/chatcore-gamification-event.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/db-cleanup-xp-audit-log.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/db-gamification-federation-3500.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification-admin-sidebar-i18n.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification-display-contract.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/action-count-durable-12546.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/aggregate-profile-3484.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/anti-cheat-invalid-amount.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/antiCheat.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/badge-criteria-recovery-16195.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/badge-rank-criteria.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/badge-unlock-once-3472.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/badges.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/db-gamification.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/early-adopter-utc.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/events.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/federation-auth.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/invite-max-uses.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/invites.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/leaderboard-limit-validation.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/leaderboard-route-names.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/leaderboard-stream-cleanup.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/leaderboard.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/level-route-streak.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/malformed-json-400.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/sharing.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/streak-badge-xp.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/streak-concurrent-advance.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/streak-day-counts.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/streaks.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/transfer-history-order.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/transfer-validation-16198.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/xp-progress-inputs-16202.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/xp.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/zero-reward-leaderboard-16200.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/radar-supporter-gamification.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/gamification-admin-page.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/leaderboard-api-key-names.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-accessibility-semantics.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-badge-dialog.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-hidden-badge-confidentiality.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-locked-badge-contrast.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-streak.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-xp-locale.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/usage-history-reset-token-ledger.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -1370,5 +1558,6 @@
   "tests/unit/release-green-docs-drift-7253.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the deleted REASONING_ROUTING.md page); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
   "tests/unit/sync-bundle.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the reasoningRoutingRules bundle field); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
   "tests/unit/ui/flow-routing-kit-controls.test.tsx": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the RoutingEntryLink component); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
-  "tests/unit/update-routes-keep-omitted-fields.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (PATCH of a reasoning rule); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts."
+  "tests/unit/update-routes-keep-omitted-fields.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (PATCH of a reasoning rule); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/telemetry-auto-cleanup-6848.test.ts": "Gamification removal (refactor: remove gamification): the removed asserts pinned cleanupXpAuditLog() and the xpAuditLog retention key; that source no longer exists. The other telemetry cleanups keep their asserts."
 }

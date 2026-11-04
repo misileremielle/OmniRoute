@@ -676,7 +676,6 @@ export const databaseSettingsSchema = z
       memoryEntries: z.number().int().min(1).max(3650),
       domainCostHistory: z.number().int().min(1).max(365).optional(),
       compressionCacheStats: z.number().int().min(1).max(365).optional(),
-      xpAuditLog: z.number().int().min(1).max(365),
       compressionRunTelemetry: z.number().int().min(1).max(365).optional(),
       autoCleanupEnabled: z.boolean(),
     }),
