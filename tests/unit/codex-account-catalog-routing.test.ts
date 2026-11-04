@@ -26,7 +26,14 @@ test.after(() => {
 });
 
 async function createConnection(data: Record<string, unknown>): Promise<string> {
-  const created = (await providersDb.createProviderConnection(data)) as { id: string };
+  // Astra/Sol Codex models are limited to paid plans (codexPlanModelGate).
+  const created = (await providersDb.createProviderConnection({
+    ...data,
+    providerSpecificData: {
+      workspacePlanType: "pro",
+      ...((data.providerSpecificData as Record<string, unknown>) || {}),
+    },
+  })) as { id: string };
   return created.id;
 }
 

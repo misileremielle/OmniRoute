@@ -94,7 +94,10 @@ async function seedConnection(
     expiresAt: new Date(Date.now() + 3_600_000).toISOString(),
     isActive: true,
     testStatus: "active",
-    providerSpecificData: provider === "codex" ? { workspaceId: `workspace-${name}` } : undefined,
+    providerSpecificData:
+      provider === "codex"
+        ? { workspaceId: `workspace-${name}`, workspacePlanType: "pro" }
+        : undefined,
   });
   return { id: row.id, token };
 }

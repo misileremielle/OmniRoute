@@ -179,7 +179,11 @@ test("quota-preflight wrapper claims before returning even when live preflight i
 });
 
 test("lifecycle pre-acquire disables request-scoped OAuth occupancy reservation", async () => {
-  const connection = await seedConnection(1, { provider: "codex" });
+  // Pro plan: gpt-*-sol is limited to paid Codex plans (codexPlanModelGate).
+  const connection = await seedConnection(1, {
+    provider: "codex",
+    providerSpecificData: { workspacePlanType: "pro" },
+  });
   const key = await seedManagedKey([connection.id]);
   const selected = await auth.getProviderCredentialsWithQuotaPreflight(
     "codex",

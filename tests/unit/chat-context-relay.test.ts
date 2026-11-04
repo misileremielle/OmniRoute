@@ -52,7 +52,7 @@ async function seedCodexOAuthConnection({
     isActive: true,
     testStatus: "active",
     priority,
-    providerSpecificData: { workspaceId },
+    providerSpecificData: { workspaceId, workspacePlanType: "pro" },
   });
 }
 

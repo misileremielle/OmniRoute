@@ -145,7 +145,7 @@ test("chatCore persists child cooldown for each rotated Codex attempt", async ()
     email: "codex-rotation-first@example.com",
     accessToken: "codex-rotation-first",
     isActive: true,
-    providerSpecificData: {},
+    providerSpecificData: { workspacePlanType: "pro" },
   });
   const second = await providersDb.createProviderConnection({
     provider: "codex",
@@ -153,12 +153,12 @@ test("chatCore persists child cooldown for each rotated Codex attempt", async ()
     email: "codex-rotation-second@example.com",
     accessToken: "codex-rotation-second",
     isActive: true,
-    providerSpecificData: {},
+    providerSpecificData: { workspacePlanType: "pro" },
   });
   const liveCredentials = {
     accessToken: "codex-rotation-first",
     connectionId: first.id,
-    providerSpecificData: {},
+    providerSpecificData: { workspacePlanType: "pro" },
   };
 
   const { result } = await invokeChatCore({
@@ -202,7 +202,7 @@ test("chatCore retains exact quota resets from intermediate rotated Codex 429s",
     email: "codex-exact-reset-first@example.com",
     accessToken: "codex-exact-reset-first",
     isActive: true,
-    providerSpecificData: {},
+    providerSpecificData: { workspacePlanType: "pro" },
   });
   await providersDb.createProviderConnection({
     provider: "codex",
@@ -210,7 +210,7 @@ test("chatCore retains exact quota resets from intermediate rotated Codex 429s",
     email: "codex-exact-reset-second@example.com",
     accessToken: "codex-exact-reset-second",
     isActive: true,
-    providerSpecificData: {},
+    providerSpecificData: { workspacePlanType: "pro" },
   });
   const exactReset = new Date(Date.now() + 300_000).toISOString();
   const weeklyReset = new Date(Date.now() + 3_600_000).toISOString();
@@ -223,7 +223,7 @@ test("chatCore retains exact quota resets from intermediate rotated Codex 429s",
     credentials: {
       accessToken: "codex-exact-reset-first",
       connectionId: first.id,
-      providerSpecificData: {},
+      providerSpecificData: { workspacePlanType: "pro" },
     },
     body: {
       model: "gpt-5.3-codex-spark",
@@ -270,7 +270,7 @@ test("chatCore keeps a Codex Spark 429 scoped so Sol remains selectable", async 
     email: "codex-scope@example.com",
     accessToken: "codex-scope-token",
     isActive: true,
-    providerSpecificData: {},
+    providerSpecificData: { workspacePlanType: "pro" },
   });
 
   const { result } = await invokeChatCore({
@@ -281,7 +281,7 @@ test("chatCore keeps a Codex Spark 429 scoped so Sol remains selectable", async 
     credentials: {
       accessToken: "codex-scope-token",
       connectionId: connection.id,
-      providerSpecificData: {},
+      providerSpecificData: { workspacePlanType: "pro" },
     },
     body: {
       model: "gpt-5.3-codex-spark",

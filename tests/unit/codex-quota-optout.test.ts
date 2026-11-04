@@ -16,7 +16,12 @@ const { evaluateQuotaCutoff, registerQuotaFetcher } =
 const { getProviderCredentialsWithQuotaPreflight } = await import("../../src/sse/services/auth.ts");
 const { invalidateDbCache } = await import("../../src/lib/db/readCache.ts");
 
-const optedOut = { limitPolicy: { enabled: false }, quotaPreflightEnabled: false };
+// workspacePlanType: Astra/Sol Codex models are limited to paid plans (codexPlanModelGate).
+const optedOut = {
+  workspacePlanType: "pro",
+  limitPolicy: { enabled: false },
+  quotaPreflightEnabled: false,
+};
 function metadata(connection: Record<string, unknown> | null): Record<string, unknown> {
   assert.ok(connection);
   const value = connection.providerSpecificData;
@@ -42,7 +47,7 @@ test.before(async () => {
     accessToken: "fixture-access",
     isActive: true,
     testStatus: "active",
-    providerSpecificData: {},
+    providerSpecificData: { workspacePlanType: "pro" },
   });
   assert.ok(typeof connection.id === "string");
   connectionId = connection.id;
@@ -142,7 +147,11 @@ test(
   { timeout: 5_000 },
   async () => {
     await providers.updateProviderConnection(connectionId, {
-      providerSpecificData: { limitPolicy: { enabled: true }, quotaPreflightEnabled: true },
+      providerSpecificData: {
+        workspacePlanType: "pro",
+        limitPolicy: { enabled: true },
+        quotaPreflightEnabled: true,
+      },
       testStatus: "active",
     });
     invalidateDbCache("connections", connectionId);

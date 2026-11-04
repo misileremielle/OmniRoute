@@ -73,6 +73,14 @@ export async function buildRequestTranslationErrorResult({
     // Hostile thrown values may expose throwing classification accessors.
   }
   const result = createTranslationFailureResult(statusCode, message, errorType);
-  log?.warn?.("TRANSLATE", `Request translation failed: ${result.error}`);
+  // Server log only (never the response body): keep the translator's stack so a
+  // failure can be traced. Guarded like the reads above — the thrown value may be hostile.
+  let stack = "";
+  try {
+    stack = error instanceof Error && typeof error.stack === "string" ? `\n${error.stack}` : "";
+  } catch {
+    stack = "";
+  }
+  log?.warn?.("TRANSLATE", `Request translation failed: ${result.error}${stack}`);
   return result;
 }

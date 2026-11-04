@@ -46,7 +46,7 @@ async function freshCodexAccount(name: string) {
     expiresAt,
     isActive: true,
     testStatus: "active",
-    providerSpecificData: {},
+    providerSpecificData: { workspacePlanType: "pro" },
   });
   return String(connection.id);
 }

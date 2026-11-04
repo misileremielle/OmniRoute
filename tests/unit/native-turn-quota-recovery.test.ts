@@ -183,11 +183,14 @@ test("persisted account cooldown plus exhausted sibling quota recovers without a
       testStatus: "active",
       accessToken: "synthetic-access",
       refreshToken: "synthetic-refresh",
+      // Astra/Sol models are limited to paid plans (codexPlanModelGate).
+      providerSpecificData: { workspacePlanType: "pro" },
     });
   const healthy = await createAccount("cooling-account");
   const exhausted = await createAccount("quota-account");
   await providers.updateProviderConnection(exhausted.id, {
     providerSpecificData: {
+      workspacePlanType: "pro",
       codexQuotaStateByScope: {
         codex: {
           usage5h: 100,

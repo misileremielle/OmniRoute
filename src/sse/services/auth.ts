@@ -161,6 +161,8 @@ import {
   WEB_COOKIE_PROVIDERS,
 } from "@/shared/constants/providers";
 import { isModelExcludedByConnection } from "@/domain/connectionModelRules";
+import { isCodexModelExcludedByPlan } from "@omniroute/open-sse/services/codexPlanModelGate.ts";
+import { narrowToPreferredClaudePlanTier } from "./claudePlanPreference";
 import {
   isRequestedModelAdvertised,
   loadAdvertisedModelsForConnections,
@@ -1246,7 +1248,11 @@ export async function getProviderCredentials(
         connectionFilterStatus.set(c.id, "excluded");
         return false;
       }
-      if (requestedModel && isModelExcludedByConnection(requestedModel, c.providerSpecificData)) {
+      if (
+        requestedModel &&
+        (isModelExcludedByConnection(requestedModel, c.providerSpecificData) ||
+          isCodexModelExcludedByPlan(c.provider, requestedModel, c.providerSpecificData))
+      ) {
         connectionFilterStatus.set(c.id, "modelExcluded");
         return false;
       }
@@ -1656,7 +1662,7 @@ export async function getProviderCredentials(
         : null;
     }
 
-    const orderedConnections = [...leasePolicy.connections].sort((a, b) => {
+    let orderedConnections = [...leasePolicy.connections].sort((a, b) => {
       if (a.authType !== "oauth" || b.authType !== "oauth") return 0;
       const priorityDelta = (a.priority || 999) - (b.priority || 999);
       if (priorityDelta !== 0) return priorityDelta;
@@ -1690,6 +1696,12 @@ export async function getProviderCredentials(
         selectedByApiKeyPreference = true;
         log.debug("AUTH", `${provider} api-key preference selected ${preferred.id.slice(0, 8)}...`);
       }
+    }
+    // Claude Code: Max accounts first, then Pro. Explicit pins above (active lease,
+    // API-key preference) still win; affinity and every strategy below pick within
+    // the best plan tier that has an available account.
+    if (!connection) {
+      orderedConnections = narrowToPreferredClaudePlanTier(resolvedId, orderedConnections);
     }
     // Redis lease planning can use a pin evicted after prefetch (accepted synchronous window).
     // After claim, rejected CAS keeps the claimed account; it never overwrites the shared winner.

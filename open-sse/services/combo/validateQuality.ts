@@ -576,6 +576,11 @@ export async function validateResponseQuality(
             controller.close();
           }
         },
+        // A discarded replay (client gone, or the combo moved on) must release the
+        // upstream reader too, or the provider keeps streaming into nothing.
+        cancel(reason) {
+          void readerToForward.cancel(reason).catch(() => {});
+        },
       });
       return new Response(stream, {
         status: response.status,

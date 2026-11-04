@@ -53,6 +53,8 @@ async function createConnection(provider = "openai", extra: Record<string, unkno
     apiKey: "sk-probe-gate", // pragma: allowlist secret
     isActive: true,
     testStatus: "active",
+    // Astra/Sol Codex models are limited to paid plans (codexPlanModelGate).
+    ...(provider === "codex" ? { providerSpecificData: { workspacePlanType: "pro" } } : {}),
     ...extra,
   });
   return String((conn as { id: string }).id);
