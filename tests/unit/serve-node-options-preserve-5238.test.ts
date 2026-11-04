@@ -5,8 +5,7 @@
  * user who exported `NODE_OPTIONS=--max-old-space-size=8192` still ran at the
  * calibrated/old default and OOM'd (reporter: set 8192, crashed at ~505 MB).
  *
- * The fix mirrors the Electron (electron/main.js) and standalone
- * (scripts/dev/run-standalone.mjs) launchers: preserve a user-set heap flag,
+ * The fix mirrors the standalone (scripts/dev/run-standalone.mjs) launcher: preserve a user-set heap flag,
  * otherwise APPEND the calibrated value (keeping unrelated flags intact). It
  * also gates the explicit `node --max-old-space-size` CLI arg so it never
  * shadows the user's NODE_OPTIONS value.

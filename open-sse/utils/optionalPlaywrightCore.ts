@@ -11,7 +11,7 @@ export async function loadPlaywrightCore(): Promise<PlaywrightCore> {
   const packRoot = packInstallDir("browser-runtime");
   const member = path.join(packRoot, "node_modules", "playwright-core", "package.json");
   if (existsSync(member)) {
-    // Installed packs take precedence over the bundled dependency, as in Electron.
+    // Installed packs take precedence over the bundled dependency.
     return createRequire(path.join(packRoot, "package.json"))("playwright-core") as PlaywrightCore;
   }
   try {
