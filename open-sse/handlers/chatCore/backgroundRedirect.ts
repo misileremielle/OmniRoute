@@ -22,7 +22,7 @@ export function resolveBackgroundTaskRedirect(opts: {
   model: string;
 }): {
   /** The background-task detection reason (truthy iff the request looks like a background task),
-   * threaded downstream into memory/skills injection — independent of whether a redirect happens. */
+   * independent of whether a redirect happens. */
   backgroundReason: string | null;
   /** The actual model redirect to apply, or null when there is none (disabled, not a background
    * task, or the model has no — or a self — degradation mapping). */

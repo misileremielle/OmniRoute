@@ -105,7 +105,6 @@ STATIC_GATES=(
 # Same class, but minutes each — FULL mode only, so an intra-day `--fast` train stays
 # fast. The daily FULL run (see the header) is where these earn their keep.
 FULL_ONLY_GATES=(
-  "npm run check:agent-skills-sync"       # ~76s  — generated SKILL.md out of date
   "npm run check:route-guard-membership"  # ~46s  — new local-only route left unclassified
   "npm run check:docs-counts"             # ~164s — README/AGENTS/llm.txt counts vs code
   "npm run check:dashboard-typecheck"     # minutes — TS errors under the dashboard tsconfig

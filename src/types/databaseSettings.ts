@@ -61,11 +61,9 @@ export interface DatabaseSettings {
     compressionAnalytics: number;
     mcpAudit: number;
     configAudit: number;
-    a2aEvents: number;
     callLogs: number;
     conversationTurnNodes: number;
     usageHistory: number;
-    memoryEntries: number;
     domainCostHistory: number;
     compressionCacheStats: number;
     xpAuditLog: number;
@@ -153,14 +151,12 @@ export const DEFAULT_DATABASE_SETTINGS: Omit<DatabaseSettings, "location" | "sta
     compressionAnalytics: 30,
     mcpAudit: 30,
     configAudit: 30,
-    a2aEvents: 30,
     callLogs: 30,
     // Default matches callLogs (30) so merging this knob changes no behavior for
     // existing installs — operators can lower it independently if they want a
     // shorter reconnect-anchor window than their call-log retention (#12453).
     conversationTurnNodes: 30,
     usageHistory: 30,
-    memoryEntries: 30,
     domainCostHistory: 30,
     compressionCacheStats: 30,
     xpAuditLog: 30,

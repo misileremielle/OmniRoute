@@ -28,10 +28,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   // OmniProxy > Tools
   "cli-code",
   "cli-agents",
-  "acp-agents",
-  "cloud-agents",
-  "conductor",
-  "orchestration",
   "discovery",
   // OmniProxy > Integrations
   "api-endpoints",
@@ -73,18 +69,13 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   // Monitoring > Audit
   "audit",
   "audit-mcp",
-  "audit-a2a",
   // Dev Tools
   "translator",
   "playground",
   "search-tools",
   // Agentic Features
-  "memory",
-  "skills",
-  "agent-skills",
   "chaos-config",
   "mcp",
-  "a2a",
   "plugins",
   // Gamification
   "leaderboard",

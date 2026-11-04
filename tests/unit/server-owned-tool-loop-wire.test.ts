@@ -8,7 +8,7 @@ import {
 import type {
   NonStreamingProviderLegResult,
   ProviderLegReceipt,
-} from "../../src/lib/skills/toolLoopTypes.ts";
+} from "../../src/lib/serverTools/toolLoopTypes.ts";
 import { FORMATS } from "../../open-sse/translator/formats.ts";
 
 function receipt(index: number): ProviderLegReceipt {

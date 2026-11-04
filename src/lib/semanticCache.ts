@@ -14,7 +14,7 @@
  */
 
 import crypto from "crypto";
-import { canonicalJson } from "./skills/stableJson";
+import { canonicalJson } from "./serverTools/stableJson";
 import { LRUCache } from "./cacheLayer";
 import { getDbInstance } from "./db/core";
 import { toNumber } from "@/shared/utils/numeric";

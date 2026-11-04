@@ -10,8 +10,6 @@ const VITEST_ONLY_DIRS = [
   "open-sse/mcp-server",
   "open-sse/services/__tests__",
   "open-sse/translator/helpers/__tests__",
-  "src/lib/memory/__tests__",
-  "src/lib/skills/__tests__",
 ];
 
 function walk(dir, root, out = []) {

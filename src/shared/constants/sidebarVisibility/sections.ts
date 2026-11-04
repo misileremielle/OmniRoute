@@ -239,36 +239,6 @@ const TOOLS_GROUP: SidebarItemGroup = {
       icon: "smart_toy",
     },
     {
-      id: "acp-agents",
-      href: "/dashboard/acp-agents",
-      i18nKey: "acpAgents",
-      subtitleKey: "acpAgentsSubtitle",
-      icon: "device_hub",
-    },
-    {
-      id: "cloud-agents",
-      href: "/dashboard/cloud-agents",
-      i18nKey: "cloudAgents",
-      subtitleKey: "cloudAgentsSubtitle",
-      icon: "cloud",
-    },
-    {
-      id: "conductor",
-      href: "/dashboard/conductor",
-      i18nKey: "conductor",
-      subtitleKey: "conductorSubtitle",
-      icon: "account_tree",
-      labelFallback: "Conductor",
-      subtitleFallback: "CLI-agent fleet",
-    },
-    {
-      id: "orchestration",
-      href: "/dashboard/orchestration",
-      i18nKey: "orchestration",
-      subtitleKey: "orchestrationSubtitle",
-      icon: "account_tree",
-    },
-    {
       id: "discovery",
       href: "/dashboard/discovery",
       i18nKey: "discovery",
@@ -541,13 +511,6 @@ const AUDIT_GROUP: SidebarItemGroup = {
       subtitleKey: "auditMcpSubtitle",
       icon: "security",
     },
-    {
-      id: "audit-a2a",
-      href: "/dashboard/audit/a2a",
-      i18nKey: "auditA2a",
-      subtitleKey: "auditA2aSubtitle",
-      icon: "device_hub",
-    },
   ],
 };
 
@@ -585,20 +548,6 @@ const MCP_ITEM: SidebarItemDefinition = {
 
 const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
   {
-    id: "memory",
-    href: "/dashboard/memory",
-    i18nKey: "memory",
-    subtitleKey: "memorySubtitle",
-    icon: "psychology",
-  },
-  {
-    id: "agent-skills",
-    href: "/dashboard/agent-skills",
-    i18nKey: "agentSkills",
-    subtitleKey: "agentSkillsSubtitle",
-    icon: "share",
-  },
-  {
     id: "chaos-config",
     href: "/dashboard/chaos",
     i18nKey: "chaosConfig",
@@ -607,21 +556,7 @@ const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
     subtitleFallback: "Multi-model parallel execution",
     icon: "blender",
   },
-  {
-    id: "skills",
-    href: "/dashboard/omni-skills",
-    i18nKey: "omniSkills",
-    subtitleKey: "omniSkillsSubtitle",
-    icon: "auto_fix_high",
-  },
   MCP_ITEM,
-  {
-    id: "a2a",
-    href: "/dashboard/a2a",
-    i18nKey: "a2a",
-    subtitleKey: "a2aSubtitle",
-    icon: "device_hub",
-  },
   {
     id: "plugins",
     href: "/dashboard/plugins",

@@ -214,7 +214,7 @@ let pinnedFetchTestOverride: PinnedFetchFactory | undefined;
 /**
  * Test-only: replace the pinned connection used by `pinDns` (same escape hatch as
  * `setPinnedFetchTestOverride` in remoteImageFetch.ts, #13883), for callers such as the built-in
- * HTTP skill that have no `fetchImpl` seam of their own. Production code never calls it.
+ * HTTP helpers that have no `fetchImpl` seam of their own. Production code never calls it.
  */
 export function setSafeOutboundPinnedFetchTestOverride(factory: PinnedFetchFactory | undefined) {
   pinnedFetchTestOverride = factory;

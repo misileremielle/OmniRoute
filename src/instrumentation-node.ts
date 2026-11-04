@@ -347,8 +347,7 @@ export interface OptionalBootSubsystem {
  * inside the background-services block. Headless mode (`OMNIROUTE_HEADLESS=1`,
  * see src/lib/system/headless.ts) skips the whole table. Proxy-engine
  * background work — token auto-refresh, connection-cooldown recovery,
- * context-window reconcile, the memory subsystems (cross-cutting: `/v1`
- * injects and queries memory) and the backup schedule — stays inline in
+ * context-window reconcile and the backup schedule — stays inline in
  * `registerNodejs()` and runs in both modes.
  */
 export const OPTIONAL_BOOT_SUBSYSTEMS: ReadonlyArray<OptionalBootSubsystem> = [
@@ -373,20 +372,6 @@ export const OPTIONAL_BOOT_SUBSYSTEMS: ReadonlyArray<OptionalBootSubsystem> = [
         .catch((err: unknown) => {
           const msg = err instanceof Error ? err.message : String(err);
           console.warn("[STARTUP] Embed WS proxy failed to start (non-fatal):", msg);
-        }),
-  },
-  // Conductor bridge (PRD Conductor RF1): mirrors OmniConductor hub tasks into the
-  // A2A TaskManager via the hub SSE. Opt-in — self-gated on CONDUCTOR_HUB_URL.
-  {
-    name: "conductor-bridge",
-    start: () =>
-      import("@/lib/conductor/boot")
-        .then((m) => {
-          if (m.initConductorBridge()) console.log("[STARTUP] Conductor bridge started");
-        })
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn("[STARTUP] Conductor bridge failed to start (non-fatal):", msg);
         }),
   },
   // Arena ELO sync: model intelligence from the Arena AI leaderboard, powering the
@@ -634,8 +619,6 @@ export async function registerNodejs(): Promise<void> {
     { startCleanupScheduler },
     { registerDefaultGuardrails },
     { ensurePersistentManagementPasswordHash },
-    { skillExecutor },
-    { registerBuiltinSkills },
   ] = await Promise.all([
     import("@/lib/gracefulShutdown"),
     import("@/lib/apiBridgeServer"),
@@ -649,8 +632,6 @@ export async function registerNodejs(): Promise<void> {
     import("@/lib/db/cleanup"),
     import("@/lib/guardrails"),
     import("@/lib/auth/managementPassword"),
-    import("@/lib/skills/executor"),
-    import("@/lib/skills/builtins"),
   ]);
 
   // Proxy health scheduler (auto-removes dead proxies on interval)
@@ -666,10 +647,8 @@ export async function registerNodejs(): Promise<void> {
   initApiBridgeServer();
   startSpendBatchWriter();
   registerDefaultGuardrails();
-  registerBuiltinSkills(skillExecutor);
   console.log("[STARTUP] Spend batch writer started");
   console.log("[STARTUP] Guardrail registry initialized");
-  console.log("[STARTUP] Builtin skill handlers registered");
   if (!isBackgroundServicesDisabled()) {
     startBackgroundRefresh();
     console.log("[STARTUP] Quota cache background refresh started");
@@ -884,28 +863,6 @@ export async function registerNodejs(): Promise<void> {
         .catch((err: unknown) => {
           const msg = err instanceof Error ? err.message : String(err);
           console.warn("[STARTUP] context-window reconcile failed to start (non-fatal):", msg);
-        }),
-
-      // TV6 typed memory decay: optional periodic sweep of decayed episodic memories.
-      // Doubly opt-in (no-op unless MEMORY_TYPED_DECAY_ENABLED=true AND
-      // MEMORY_TYPED_DECAY_SWEEP_INTERVAL>0). Never deletes by default. Never fatal.
-      import("@/lib/memory/typedDecay")
-        .then((m) => m.startMemoryDecaySweep())
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn("[STARTUP] memory decay sweep failed to start (non-fatal):", msg);
-        }),
-
-      // MemoryBackend provider pattern (PR #8752): initialize configured memory
-      // backends from settings (sqlite, obsidian, notion, custom HTTP, etc.).
-      // Reads the DB settings synchronously (non-blocking, never fatal). Must
-      // run after the DB is ready AND after getSettings/applyRuntimeSettings so
-      // memory backend config is hydrated.
-      import("@/lib/memory/index")
-        .then((m) => m.initMemoryBackends())
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn("[STARTUP] memory backend initialization failed (non-fatal):", msg);
         }),
 
       // Backup schedule (#8513): execute `backup-schedule.json` cron server-side.

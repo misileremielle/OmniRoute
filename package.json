@@ -1,7 +1,7 @@
 {
   "name": "omniroute",
   "version": "3.8.53",
-  "description": "Unified AI router with 380 providers, RTK+Caveman compression, auto fallback, MCP/A2A, PWA, and OpenAI-compatible APIs.",
+  "description": "Unified AI router with 380 providers, RTK+Caveman compression, auto fallback, MCP, PWA, and OpenAI-compatible APIs.",
   "type": "module",
   "bin": {
     "omniroute": "bin/omniroute.mjs",
@@ -211,7 +211,6 @@
     "check:changelog-integrity": "node scripts/check/check-changelog-integrity.mjs",
     "sweep:stale-fragments": "node scripts/release/sweep-stale-fragments.mjs",
     "changelog:aggregate": "node scripts/release/aggregate-changelog.mjs",
-    "check:agent-skills-sync": "node --import tsx/esm scripts/skills/generate-agent-skills.mjs",
     "check:build-scope": "node scripts/check/check-build-scope.mjs",
     "check:error-helper": "node scripts/check/check-error-helper.mjs",
     "check:routing-error-guard": "node scripts/check/check-routing-error-guard.mjs",
@@ -319,7 +318,6 @@
     "docs:readme-diagrams": "node --import tsx/esm scripts/docs/gen-readme-diagrams.mjs"
   },
   "dependencies": {
-    "@agentclientprotocol/sdk": "1.4.0",
     "@aws-sdk/client-bedrock-runtime": "^3.1120.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
@@ -428,7 +426,6 @@
     "js-tiktoken": "^1.0.20",
     "keytar": "^7.9.0",
     "onnxruntime-node": "1.30.0",
-    "sqlite-vec": "^0.1.9",
     "wreq-js": "3.2.0"
   },
   "devDependencies": {

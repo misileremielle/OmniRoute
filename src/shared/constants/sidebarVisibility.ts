@@ -180,9 +180,6 @@ export const ESSENTIALS_ADVANCED_TOOL_IDS: ReadonlySet<HideableSidebarItemId> = 
   "runtime",
   "resilience-connections",
   "mcp",
-  "a2a",
-  "memory",
-  "skills",
 ]);
 
 const MINIMAL_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
@@ -213,7 +210,6 @@ const DEVELOPER_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
   "context-combos",
   "cli-code",
   "cli-agents",
-  "acp-agents",
   "api-endpoints",
   "analytics",
   "analytics-combo-health",
@@ -225,10 +221,7 @@ const DEVELOPER_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
   "resilience-connections",
   "translator",
   "playground",
-  "memory",
-  "skills",
   "mcp",
-  "a2a",
   "settings-general",
   "settings-modality-bridge",
   "settings-routing",
@@ -262,7 +255,6 @@ const ADMIN_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
   "runtime",
   "audit",
   "audit-mcp",
-  "audit-a2a",
   "settings-general",
   "settings-modality-bridge",
   "settings-routing",

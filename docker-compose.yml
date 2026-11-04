@@ -8,7 +8,6 @@
 #    cli   → bundled CLIs installed inside the container (portable)
 #    host  → runner-base + host-mounted CLI binaries (Linux-first; Linux only)
 #    cliproxyapi → CLIProxyAPI sidecar on port 8317
-#    memory  → Qdrant sidecar on port 6333 (semantic memory offload)
 #    bifrost → Bifrost Go sidecar on port 8080 (Tier-1 LLM router)
 #
 #  Usage:
@@ -20,7 +19,6 @@
 #    docker compose --profile host up -d
 #    docker compose --profile cliproxyapi up -d
 #    docker compose --profile cli --profile cliproxyapi up -d
-#    docker compose --profile base --profile memory up -d   # adds Qdrant sidecar
 #    docker compose --profile base --profile bifrost up -d  # adds Bifrost sidecar
 #
 #  Docker Compose uses `--profile <name> <command>`; `load profile` is not a
@@ -28,7 +26,7 @@
 #  Windows Docker Desktop users who need the four bundled CLI packages should use `cli`.
 #
 #  See docs/architecture/cluster-decisions.md for the per-component rationale
-#  (Qdrant=opt-in, Bifrost=opt-in, Caddy=upstream LB, no Dragonfly/NATS/PG/Neo4j/MinIO).
+#  (Bifrost=opt-in, Caddy=upstream LB, no Dragonfly/NATS/PG/Neo4j/MinIO).
 #
 #  Before first run, copy .env.example → .env and edit your secrets.
 # ──────────────────────────────────────────────────────────────────────
@@ -168,7 +166,7 @@ services:
   # instead of the shared implicit default bridge — its cdp-proxy.mjs
   # sidecar republishes Chromium's CDP on 0.0.0.0:9223, and CDP grants full
   # control over a live browser session. Without this isolation, any
-  # compromised sibling container (redis, qdrant, bifrost, cliproxyapi,
+  # compromised sibling container (redis, bifrost, cliproxyapi,
   # codex-app-server, ...) on the default network could reach it.
   chatgpt-web-codex-browser:
     build:
@@ -266,33 +264,6 @@ services:
       - ~/.config/cursor:/host-home/.config/cursor:rw
     profiles:
       - host
-
-  # ── Profile: memory (Qdrant semantic-memory sidecar) ─────────────
-  # Off by default. SQLite + sqlite-vec + FTS5 (RRF) is the primary vector
-  # store (see src/lib/memory/vectorStore.ts). Enable only when you need
-  # cross-instance memory sharing or >1M points — at which point the
-  # QDRANT_ENABLED=true flag activates the dual-write path in
-  # src/lib/memory/qdrant.ts:37. See docs/architecture/cluster-decisions.md
-  # for the workload analysis behind this profile.
-  qdrant:
-    image: docker.io/qdrant/qdrant:v1.12.4
-    container_name: omniroute-qdrant
-    restart: unless-stopped
-    ports:
-      - "${QDRANT_BIND_HOST:-127.0.0.1}:${QDRANT_PORT:-6333}:6333"
-      - "${QDRANT_BIND_HOST:-127.0.0.1}:${QDRANT_GRPC_PORT:-6334}:6334"
-    volumes:
-      - qdrant-data:/qdrant/storage
-    environment:
-      - QDRANT__SERVICE__GRPC_PORT=6334
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:6333/readyz"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    profiles:
-      - memory
 
   # ── Profile: bifrost (Bifrost Go LLM-router sidecar) ─────────────
   # Off by default. Bifrost is the Tier-1 LLM router (per ADR-031 and
@@ -417,7 +388,7 @@ services:
 networks:
   # SECURITY (#13679): dedicated network for the unauthenticated-by-default
   # CDP proxy sidecar (docker/chatgpt-web-codex-browser/cdp-proxy.mjs) —
-  # shared only with omniroute-web, not with redis/qdrant/bifrost/cliproxyapi/
+  # shared only with omniroute-web, not with redis/bifrost/cliproxyapi/
   # codex-app-server or any other sibling on the implicit default network.
   chatgpt-web-codex-net: {}
 
@@ -430,8 +401,6 @@ volumes:
     name: cliproxyapi-data
   redis-data:
     name: omniroute-redis-data
-  qdrant-data:
-    name: omniroute-qdrant-data
   bifrost-data:
     name: omniroute-bifrost-data
   codex-appserver-token:

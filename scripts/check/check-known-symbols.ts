@@ -27,18 +27,9 @@
 //       novos não falham — apenas são reportados — para não bloquear adições legítimas.
 //
 //   (4) MCP TOOLS — todos os tools registrados em createMcpServer() (base MCP_TOOLS +
-//       memoryTools + skillTools + gamificationTools + pluginTools + notionTools +
-//       obsidianTools) DEVEM ter ao menos um escopo atribuído (scope-enforcement). Os
+//       gamificationTools + pluginTools + notionTools + obsidianTools) DEVEM ter ao menos um escopo atribuído (scope-enforcement). Os
 //       nomes são congelados em KNOWN_MCP_TOOL_NAMES. Catraca: tool removido = fail.
 //       Tool novo = report (não bloqueia adições legítimas).
-//
-//   (5) A2A SKILLS — chaves de A2A_SKILL_HANDLERS (src/lib/a2a/taskExecution.ts) DEVEM
-//       bater bidirecionalmente com skills[].id expostos no Agent Card
-//       (src/lib/a2a/agentCardMetadata.ts). Divergência em qualquer direção = fail.
-//
-//   (6) CLOUD AGENTS — entradas de AGENTS em src/lib/cloudAgent/registry.ts DEVEM bater
-//       bidirecionalmente com os arquivos de classe em src/lib/cloudAgent/agents/
-//       (basename sem extensão). Divergência = fail.
 //
 // Catraca: cada divergência pré-existente fica numa allowlist documentada e sai 0 hoje.
 // Padrão herdado de scripts/check/check-provider-consistency.ts (gate .ts via
@@ -54,9 +45,9 @@
 // uma entrada nelas exige que o par/tool continue VIVO no registry — o oposto de
 // supressão — então a semântica de stale-enforcement não se aplica a elas.
 
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { dirname, resolve as resolvePath, basename, extname } from "node:path";
+import { dirname, resolve as resolvePath } from "node:path";
 import { assertNoStale } from "./lib/allowlist.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -283,17 +274,15 @@ export function findNewMcpTools(frozen: readonly string[], live: Set<string>): s
  * the reason in the commit message.
  *
  * Sources:
- *   - MCP_TOOLS (34 base tools: omniroute_* + compression + agent_skills)
- *   - memoryTools (3): omniroute_memory_*
- *   - skillTools (4): omniroute_skills_*
+ *   - MCP_TOOLS (31 base tools: omniroute_* + compression)
  *   - gamificationTools (8): gamification_*
  *   - pluginTools (8): plugin_*
  *   - notionTools (6): notion_*
  *   - obsidianTools (22): obsidian_*
- * agentSkillTools and compressionTools are included in MCP_TOOLS (deduped by RESERVED_MCP_NAMES).
+ * compressionTools are included in MCP_TOOLS.
  */
 export const KNOWN_MCP_TOOL_NAMES: readonly string[] = [
-  // MCP_TOOLS base (34)
+  // MCP_TOOLS base (31)
   "omniroute_get_health",
   "omniroute_list_combos",
   "omniroute_get_combo_metrics",
@@ -325,18 +314,6 @@ export const KNOWN_MCP_TOOL_NAMES: readonly string[] = [
   "omniroute_oneproxy_fetch",
   "omniroute_oneproxy_rotate",
   "omniroute_oneproxy_stats",
-  "omniroute_agent_skills_list",
-  "omniroute_agent_skills_get",
-  "omniroute_agent_skills_coverage",
-  // memoryTools (3)
-  "omniroute_memory_search",
-  "omniroute_memory_add",
-  "omniroute_memory_clear",
-  // skillTools (4)
-  "omniroute_skills_list",
-  "omniroute_skills_enable",
-  "omniroute_skills_execute",
-  "omniroute_skills_executions",
   // gamificationTools (8)
   "gamification_leaderboard",
   "gamification_rank",
@@ -386,90 +363,6 @@ export const KNOWN_MCP_TOOL_NAMES: readonly string[] = [
   "obsidian_sync_conflicts",
   "obsidian_sync_resolve_conflict",
 ];
-
-// ───────────────────────────────────────────────────────────────────────────
-// (5) A2A SKILLS — bidirectional diff between handlers and agent card
-// ───────────────────────────────────────────────────────────────────────────
-
-export type A2ASkillDiff = {
-  /** Skills registered in A2A_SKILL_HANDLERS but not exposed in the Agent Card */
-  inHandlersNotCard: string[];
-  /** Skills exposed in the Agent Card but not registered in A2A_SKILL_HANDLERS */
-  inCardNotHandlers: string[];
-};
-
-/**
- * Bidirectionally diffs A2A skill handler keys against Agent Card skill IDs.
- * Both directions matter:
- *   - inHandlersNotCard: skill is routable but agents can't discover it
- *   - inCardNotHandlers: skill is advertised but calling it fails silently
- */
-export function diffA2ASkills(handlers: Set<string>, agentCard: Set<string>): A2ASkillDiff {
-  const inHandlersNotCard = [...handlers].filter((s) => !agentCard.has(s)).sort();
-  const inCardNotHandlers = [...agentCard].filter((s) => !handlers.has(s)).sort();
-  return { inHandlersNotCard, inCardNotHandlers };
-}
-
-// ───────────────────────────────────────────────────────────────────────────
-// (6) CLOUD AGENTS — registry keys vs agent class files
-// ───────────────────────────────────────────────────────────────────────────
-
-export type CloudAgentDiff = {
-  /** Registry keys with no corresponding agent file in agents/ */
-  inRegistryNotFiles: string[];
-  /** Agent files with no corresponding registry key */
-  inFilesNotRegistry: string[];
-};
-
-/**
- * Bidirectionally diffs cloud agent registry keys against agent file basenames
- * (filename without extension, e.g. "codex.ts" → "codex"). Note: registry key
- * "codex-cloud" maps to file "codex.ts" — this mapping is handled by the
- * caller (main) which reads the actual class-name-to-key binding from registry.ts.
- * The pure function here just diffs two already-normalised sets.
- */
-export function diffCloudAgents(
-  registryKeys: Set<string>,
-  agentFiles: Set<string>
-): CloudAgentDiff {
-  const inRegistryNotFiles = [...registryKeys].filter((k) => !agentFiles.has(k)).sort();
-  const inFilesNotRegistry = [...agentFiles].filter((f) => !registryKeys.has(f)).sort();
-  return { inRegistryNotFiles, inFilesNotRegistry };
-}
-
-/**
- * Reads the registry.ts source file and returns the set of provider IDs
- * (keys in the AGENTS object literal).
- */
-export function extractCloudAgentRegistryKeys(registrySource: string): Set<string> {
-  // Match the AGENTS object: find start, extract keys
-  const start = registrySource.indexOf("const AGENTS: Record<string, CloudAgentBase> = {");
-  if (start < 0) throw new Error("could not find `const AGENTS:` in cloudAgent/registry.ts");
-  const end = registrySource.indexOf("\n};", start);
-  if (end < 0) throw new Error("could not find end of AGENTS map");
-  const block = registrySource.slice(start, end);
-  // Match quoted or bare keys: "codex-cloud": or jules:
-  const keyRe = /^\s*(?:"([^"]+)"|([A-Za-z0-9_$-]+))\s*:/gm;
-  const keys = new Set<string>();
-  let match: RegExpExecArray | null;
-  while ((match = keyRe.exec(block)) !== null) {
-    const key = match[1] ?? match[2];
-    // Skip the TypeScript type annotation line
-    if (key && key !== "Record") keys.add(key);
-  }
-  return keys;
-}
-
-/**
- * Lists agent file basenames (without extension) from the agents/ directory.
- * Maps known filename→registryKey aliases (e.g. "codex" → "codex-cloud").
- */
-export const AGENT_FILE_TO_REGISTRY_KEY: Record<string, string> = {
-  codex: "codex-cloud",
-  // #4227: file agents/cursor.ts ↔ registry key "cursor-cloud" (distinct from the
-  // OAuth chat provider `cursor`).
-  cursor: "cursor-cloud",
-};
 
 // ───────────────────────────────────────────────────────────────────────────
 // main() — importa módulos reais, lê fontes, roda as seis sub-checagens
@@ -592,20 +485,15 @@ async function main(): Promise<void> {
 
   // ── (4) MCP tools scope + snapshot ───────────────────────────────────────
   const { MCP_TOOLS } = await import("@omniroute/open-sse/mcp-server/schemas/tools.ts");
-  const { memoryTools } = await import("@omniroute/open-sse/mcp-server/tools/memoryTools.ts");
-  const { skillTools } = await import("@omniroute/open-sse/mcp-server/tools/skillTools.ts");
   const { gamificationTools } =
     await import("@omniroute/open-sse/mcp-server/tools/gamificationTools.ts");
   const { pluginTools } = await import("@omniroute/open-sse/mcp-server/tools/pluginTools.ts");
   const { notionTools } = await import("@omniroute/open-sse/mcp-server/tools/notionTools.ts");
   const { obsidianTools } = await import("@omniroute/open-sse/mcp-server/tools/obsidianTools.ts");
 
-  // Build the full live set of registered tools (deduped by RESERVED_MCP_NAMES logic:
-  // agentSkillTools + compressionTools are already in MCP_TOOLS).
+  // Build the full live set of registered tools (compressionTools are already in MCP_TOOLS).
   const liveMcpTools: McpToolLike[] = [
     ...(MCP_TOOLS as unknown as McpToolLike[]),
-    ...Object.values(memoryTools as Record<string, McpToolLike>),
-    ...Object.values(skillTools as Record<string, McpToolLike>),
     ...(gamificationTools as unknown as McpToolLike[]),
     ...(pluginTools as unknown as McpToolLike[]),
     ...(notionTools as unknown as McpToolLike[]),
@@ -634,78 +522,6 @@ async function main(): Promise<void> {
   }
   const newMcpTools = findNewMcpTools(KNOWN_MCP_TOOL_NAMES, liveMcpToolNames);
 
-  // ── (5) A2A skills ───────────────────────────────────────────────────────
-  const { A2A_SKILL_HANDLERS } = await import("@/lib/a2a/taskExecution.ts");
-  const handlerKeys = new Set(Object.keys(A2A_SKILL_HANDLERS as Record<string, unknown>));
-
-  // Parse the Agent Card route statically (the skills array is a literal in the source).
-  const agentCardSource = readFileSync(
-    resolvePath(REPO_ROOT, "src/lib/a2a/agentCardMetadata.ts"),
-    "utf8"
-  );
-  // Extract skill IDs: `id: "..."` lines inside the skills array.
-  const skillIdRe = /\bid:\s*"([^"]+)"/g;
-  const agentCardSkills = new Set<string>();
-  let skillMatch: RegExpExecArray | null;
-  while ((skillMatch = skillIdRe.exec(agentCardSource)) !== null) {
-    agentCardSkills.add(skillMatch[1]);
-  }
-  if (agentCardSkills.size === 0) {
-    failures.push(
-      `[a2a-skills] parse do Agent Card não encontrou nenhum skill id (regex quebrada ou arquivo movido?)`
-    );
-  }
-
-  const { inHandlersNotCard, inCardNotHandlers } = diffA2ASkills(handlerKeys, agentCardSkills);
-  if (inHandlersNotCard.length) {
-    failures.push(
-      `[a2a-skills] ${inHandlersNotCard.length} skill(s) em A2A_SKILL_HANDLERS mas ausente(s) do Agent Card (agentes não conseguem descobrir):\n` +
-        inHandlersNotCard.map((s) => `    ✗ ${s}`).join("\n") +
-        `\n    → adicione o skill em src/lib/a2a/agentCardMetadata.ts (skills array).`
-    );
-  }
-  if (inCardNotHandlers.length) {
-    failures.push(
-      `[a2a-skills] ${inCardNotHandlers.length} skill(s) expostos no Agent Card mas ausente(s) de A2A_SKILL_HANDLERS (chamada silenciosamente falha):\n` +
-        inCardNotHandlers.map((s) => `    ✗ ${s}`).join("\n") +
-        `\n    → registre o handler em src/lib/a2a/taskExecution.ts (A2A_SKILL_HANDLERS).`
-    );
-  }
-
-  // ── (6) Cloud agents ─────────────────────────────────────────────────────
-  const registrySource = readFileSync(
-    resolvePath(REPO_ROOT, "src/lib/cloudAgent/registry.ts"),
-    "utf8"
-  );
-  const registryKeys = extractCloudAgentRegistryKeys(registrySource);
-
-  // Read agent file basenames from agents/ directory, applying the alias map.
-  const agentsDir = resolvePath(REPO_ROOT, "src/lib/cloudAgent/agents");
-  const agentFileBases = new Set(
-    readdirSync(agentsDir)
-      .filter((f) => /\.(ts|js)$/.test(f) && !f.endsWith(".d.ts") && !f.endsWith(".test.ts"))
-      .map((f) => {
-        const base = basename(f, extname(f));
-        return AGENT_FILE_TO_REGISTRY_KEY[base] ?? base;
-      })
-  );
-
-  const { inRegistryNotFiles, inFilesNotRegistry } = diffCloudAgents(registryKeys, agentFileBases);
-  if (inRegistryNotFiles.length) {
-    failures.push(
-      `[cloud-agents] ${inRegistryNotFiles.length} chave(s) no registry sem arquivo de classe em agents/:\n` +
-        inRegistryNotFiles.map((k) => `    ✗ ${k}`).join("\n") +
-        `\n    → crie o arquivo src/lib/cloudAgent/agents/<name>.ts ou atualize AGENT_FILE_TO_REGISTRY_KEY.`
-    );
-  }
-  if (inFilesNotRegistry.length) {
-    failures.push(
-      `[cloud-agents] ${inFilesNotRegistry.length} arquivo(s) em agents/ sem entrada no registry:\n` +
-        inFilesNotRegistry.map((f) => `    ✗ ${f}`).join("\n") +
-        `\n    → registre o agente em src/lib/cloudAgent/registry.ts ou adicione o alias em AGENT_FILE_TO_REGISTRY_KEY.`
-    );
-  }
-
   // ── Resultado ─────────────────────────────────────────────────────────────
   if (failures.length) {
     console.error(
@@ -728,9 +544,7 @@ async function main(): Promise<void> {
       `${aliases.length} executores conformes; ` +
       `${canonical.length} estratégias canônicas (${handled.size} via despacho + ${Object.keys(IMPLICIT_DEFAULT_STRATEGIES).length} default(s) implícito(s)); ` +
       `${livePairs.size} pares de tradutor vivos vs ${KNOWN_TRANSLATOR_PAIRS.length} congelados${newPairsNote}; ` +
-      `${liveMcpToolNames.size} tools MCP (${toolsWithoutScopes.length === 0 ? "todos com scope" : `${toolsWithoutScopes.length} sem scope`}) vs ${KNOWN_MCP_TOOL_NAMES.length} congelados${newMcpNote}; ` +
-      `${handlerKeys.size} A2A skills (handlers↔card OK); ` +
-      `${registryKeys.size} cloud agents (registry↔files OK)`
+      `${liveMcpToolNames.size} tools MCP (${toolsWithoutScopes.length === 0 ? "todos com scope" : `${toolsWithoutScopes.length} sem scope`}) vs ${KNOWN_MCP_TOOL_NAMES.length} congelados${newMcpNote}`
   );
 }
 

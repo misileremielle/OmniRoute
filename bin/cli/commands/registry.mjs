@@ -1,9 +1,6 @@
-import { registerMemory } from "./memory.mjs";
-import { registerSkills } from "./skills.mjs";
 import { registerAudit } from "./audit.mjs";
 import { registerOAuth } from "./oauth.mjs";
 import { registerLogin } from "./login.mjs";
-import { registerCloud } from "./cloud.mjs";
 import { registerEval } from "./eval.mjs";
 import { registerWebhooks } from "./webhooks.mjs";
 import { registerPolicy } from "./policy.mjs";
@@ -51,7 +48,6 @@ import { registerQuota } from "./quota.mjs";
 import { registerCache } from "./cache.mjs";
 import { registerRedis } from "./redis.mjs";
 import { registerMcp } from "./mcp.mjs";
-import { registerA2a } from "./a2a.mjs";
 import { registerEnv } from "./env.mjs";
 import { registerTestProvider } from "./test-provider.mjs";
 import { registerCompletion } from "./completion.mjs";
@@ -89,12 +85,9 @@ import { registerRadar } from "./radar.mjs";
 import { registerPacks } from "./packs.mjs";
 
 export function registerCommands(program) {
-  registerMemory(program);
-  registerSkills(program);
   registerAudit(program);
   registerOAuth(program);
   registerLogin(program);
-  registerCloud(program);
   registerEval(program);
   registerWebhooks(program);
   registerPolicy(program);
@@ -143,7 +136,6 @@ export function registerCommands(program) {
   registerCache(program);
   registerRedis(program);
   registerMcp(program);
-  registerA2a(program);
   registerEnv(program);
   registerTestProvider(program);
   registerCompletion(program);

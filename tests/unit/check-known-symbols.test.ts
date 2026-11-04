@@ -15,9 +15,7 @@ import {
   findNewMcpTools,
   KNOWN_MCP_TOOL_NAMES,
   // (5) A2A skills
-  diffA2ASkills,
   // (6) Cloud agents
-  diffCloudAgents,
   type ExecutorLike,
 } from "../../scripts/check/check-known-symbols.ts";
 import { reportStaleEntries } from "../../scripts/check/lib/allowlist.mjs";
@@ -364,54 +362,6 @@ test("KNOWN_MCP_TOOL_NAMES is a non-empty, well-formed, deduped snapshot", () =>
 // (5) A2A SKILLS — bidirectional diff
 // ───────────────────────────────────────────────────────────────────────────
 
-test("diffA2ASkills returns empty when handlers and agent card match exactly", () => {
-  const handlers = new Set(["smart-routing", "quota-management", "health-report"]);
-  const agentCard = new Set(["smart-routing", "quota-management", "health-report"]);
-  const result = diffA2ASkills(handlers, agentCard);
-  assert.deepEqual(result.inHandlersNotCard, []);
-  assert.deepEqual(result.inCardNotHandlers, []);
-});
-
-test("diffA2ASkills flags skill in handlers but missing from agent card", () => {
-  const handlers = new Set(["smart-routing", "ghost-skill"]);
-  const agentCard = new Set(["smart-routing"]);
-  const result = diffA2ASkills(handlers, agentCard);
-  assert.deepEqual(result.inHandlersNotCard, ["ghost-skill"]);
-  assert.deepEqual(result.inCardNotHandlers, []);
-});
-
-test("diffA2ASkills flags skill in agent card but missing from handlers", () => {
-  const handlers = new Set(["smart-routing"]);
-  const agentCard = new Set(["smart-routing", "orphan-skill"]);
-  const result = diffA2ASkills(handlers, agentCard);
-  assert.deepEqual(result.inHandlersNotCard, []);
-  assert.deepEqual(result.inCardNotHandlers, ["orphan-skill"]);
-});
-
 // ───────────────────────────────────────────────────────────────────────────
 // (6) CLOUD AGENTS — registry keys vs agent files
 // ───────────────────────────────────────────────────────────────────────────
-
-test("diffCloudAgents returns empty when registry and files match", () => {
-  const registryKeys = new Set(["jules", "devin", "codex-cloud"]);
-  const agentFiles = new Set(["jules", "devin", "codex-cloud"]);
-  const result = diffCloudAgents(registryKeys, agentFiles);
-  assert.deepEqual(result.inRegistryNotFiles, []);
-  assert.deepEqual(result.inFilesNotRegistry, []);
-});
-
-test("diffCloudAgents flags registry key with no corresponding agent file", () => {
-  const registryKeys = new Set(["jules", "ghost-agent"]);
-  const agentFiles = new Set(["jules"]);
-  const result = diffCloudAgents(registryKeys, agentFiles);
-  assert.deepEqual(result.inRegistryNotFiles, ["ghost-agent"]);
-  assert.deepEqual(result.inFilesNotRegistry, []);
-});
-
-test("diffCloudAgents flags agent file with no registry entry", () => {
-  const registryKeys = new Set(["jules"]);
-  const agentFiles = new Set(["jules", "orphan-agent"]);
-  const result = diffCloudAgents(registryKeys, agentFiles);
-  assert.deepEqual(result.inRegistryNotFiles, []);
-  assert.deepEqual(result.inFilesNotRegistry, ["orphan-agent"]);
-});

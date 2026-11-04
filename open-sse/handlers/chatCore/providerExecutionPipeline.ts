@@ -1,5 +1,5 @@
 import { isPassiveCodex, recordRejectedToken } from "../../services/tokenRefresh/passiveCodex.ts";
-import type { ChatCoreErrorResult, ProviderLegUsage } from "@/lib/skills/toolLoopTypes.ts";
+import type { ChatCoreErrorResult, ProviderLegUsage } from "@/lib/serverTools/toolLoopTypes.ts";
 import type { getProviderCredentials } from "@/sse/services/auth.ts";
 import type { updateFromHeaders, updateFromResponseBody } from "../../services/rateLimitManager.ts";
 import type { writeTerminalStatus } from "@/shared/utils/terminalStatus.ts";

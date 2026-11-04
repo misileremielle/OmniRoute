@@ -130,8 +130,6 @@ export const KNOWN_MISSING_ERROR_HELPER = new Set([
   // app-defined message, not upstream text) and is latent for the same reason as the
   // provider-auth block above; the sibling branch one line down already sanitizes.
   "src/app/api/cli-tools/grok-build-settings/route.ts",
-  "src/app/api/github-skills/route.ts", // inner per-target catch in a results map
-  "src/app/api/skills/collect/install/route.ts", // inner per-target catch
   "src/app/api/webhooks/[id]/test/route.ts",
 ]);
 

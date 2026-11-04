@@ -7,8 +7,6 @@ import path from "node:path";
 const DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omni-18120-"));
 process.env.DATA_DIR = DIR;
 
-const { injectMemoryAndSkills } =
-  await import("../../open-sse/handlers/chatCore/memorySkillsInjection.ts");
 const { prepareUpstreamBody } = await import("../../open-sse/handlers/chatCore/upstreamBody.ts");
 const { setDetectedToolLimit } = await import("../../open-sse/services/toolLimitDetector.ts");
 const core = await import("../../src/lib/db/core.ts");
@@ -45,18 +43,8 @@ const mcpNames = (n: number) =>
   Array.from({ length: n }, (_, i) => `mcp__ctx__ctx_tool_${String(i).padStart(3, "0")}`);
 
 async function run(tools: unknown[], provider: string, targetFormat: string, warns?: string[]) {
-  const injected = await injectMemoryAndSkills({
-    body: { model: "m", messages: [], tools },
-    memoryOwnerId: null,
-    provider,
-    effectiveModel: "m",
-    sourceFormat: targetFormat,
-    targetFormat,
-    backgroundReason: null,
-    log: null,
-  });
   return (await prepareUpstreamBody({
-    translatedBody: injected.body,
+    translatedBody: { model: "m", messages: [], tools },
     modelToCall: "m",
     provider,
     targetFormat,
@@ -72,7 +60,7 @@ async function run(tools: unknown[], provider: string, targetFormat: string, war
   };
 }
 
-test("#18120: Claude Code core tools survive injection + default cap on provider claude", async () => {
+test("#18120: Claude Code core tools survive the default cap on provider claude", async () => {
   const clientTools = [...CORE.map(mk), ...mcpNames(130).map(mk)];
   assert.equal(clientTools.length, 143);
   const out = await run(clientTools, "claude", "claude");
@@ -126,13 +114,4 @@ test("#18120: capped providers keep the client's order (not alphabetical) and wa
   assert.match(warns[0], /TOOL_LIMIT/);
   assert.match(warns[0], /a_mcp_139/);
   assert.equal(warns[0].includes("\n"), false);
-});
-
-test("#18120: tools injected by the gateway are still sorted deterministically after client tools", async () => {
-  const { sortToolsByName } =
-    await import("../../open-sse/handlers/chatCore/memorySkillsInjection.ts");
-  assert.deepEqual(
-    sortToolsByName([mk("b"), mk("a")]).map((t) => t.name),
-    ["a", "b"]
-  );
 });

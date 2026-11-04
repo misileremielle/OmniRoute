@@ -6,7 +6,7 @@ import type {
   ProviderLegReceipt,
   ProviderLegUsage,
   ServerOwnedToolLoopResult,
-} from "../../src/lib/skills/toolLoopTypes.ts";
+} from "../../src/lib/serverTools/toolLoopTypes.ts";
 import {
   buildNonStreamingFinalizationPlan,
   finalizeNonStreamingRequest,

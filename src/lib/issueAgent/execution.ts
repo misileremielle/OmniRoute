@@ -92,7 +92,6 @@ export async function executeRecordedTriageChatCompletion(
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${resolveSelfLoopBearer()}`,
-          "x-omniroute-no-memory": "true",
           ...(routingPolicy ? { "X-OmniRoute-Mode": routingPolicy } : {}),
         },
         body: JSON.stringify({

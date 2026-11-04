@@ -313,17 +313,14 @@ describe("API Routes — dashboard and tool consumers", () => {
     assert.doesNotMatch(requestLogger, /\/api\/logs\/active/);
   });
 
-  it("keeps usage quota wired through A2A and MCP tools", () => {
-    const quotaSkill = readProjectFile("src/lib/a2a/skills/quotaManagement.ts");
+  it("keeps usage quota wired through MCP tools", () => {
     const mcpAdvancedTools = readProjectFile("open-sse/mcp-server/tools/advancedTools.ts");
     const mcpOpsTools = readProjectFile("open-sse/mcp-server/tools/opsTools.ts");
     const mcpServer = readProjectFile("open-sse/mcp-server/server.ts");
 
-    assert.ok(quotaSkill, "quotaManagement skill should exist");
     assert.ok(mcpAdvancedTools, "advanced MCP tools should exist");
     assert.ok(mcpOpsTools, "operational MCP tools should exist");
     assert.ok(mcpServer, "MCP server should exist");
-    assert.match(quotaSkill, /\/api\/usage\/quota/);
     assert.match(mcpAdvancedTools, /\/api\/usage\/quota/);
     // The quota handler moved out of the registration module in #15159.
     assert.match(mcpOpsTools, /["']\/api\/usage\/quota["']/);
@@ -496,18 +493,10 @@ describe("Page Integration — logs page wiring", () => {
 
 describe("Page Integration — settings page wiring", () => {
   const src = readProjectFile("src/app/(dashboard)/dashboard/settings/resilience/page.tsx");
-  const memorySkillsTab = readProjectFile(
-    "src/app/(dashboard)/dashboard/settings/components/MemorySkillsTab.tsx"
-  );
 
   it("should include resilience tab in advanced settings", () => {
     assert.ok(src, "src/app/(dashboard)/dashboard/settings/resilience/page.tsx should exist");
     assert.match(src, /ResilienceTab/);
-  });
-
-  it("should not label the active skills settings card as a placeholder", () => {
-    assert.ok(memorySkillsTab, "MemorySkillsTab should exist");
-    assert.doesNotMatch(memorySkillsTab, /Skills Settings \(placeholder\)/);
   });
 });
 

@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 
 /**
- * Derive the base URL for A2A agent card endpoints.
+ * Derive the public base URL of this instance.
  * Prefers OMNIROUTE_BASE_URL env var for admin override; falls back to the
  * request's dynamic origin so the gateway works behind any hostname without
  * hardcoded localhost:20128 (S2 security fix).

@@ -4,10 +4,10 @@ import type {
   ProviderLegUsage,
   ServerOwnedToolLoopResult,
   ToolCall,
-} from "@/lib/skills/toolLoopTypes.ts";
-import { executeServerOwned } from "@/lib/skills/interception";
-import { runServerOwnedToolLoop, LOOP_BUDGET_MS } from "@/lib/skills/serverOwnedToolLoop.ts";
-import { deriveToolRequestIdentity } from "@/lib/skills/stableJson.ts";
+} from "@/lib/serverTools/toolLoopTypes.ts";
+import { executeServerOwned } from "@/lib/serverTools/interception";
+import { runServerOwnedToolLoop, LOOP_BUDGET_MS } from "@/lib/serverTools/serverOwnedToolLoop.ts";
+import { deriveToolRequestIdentity } from "@/lib/serverTools/stableJson.ts";
 import { getIdempotencyKey } from "@/lib/idempotencyLayer";
 import { runNonStreamingProviderLeg } from "./nonStreamingProviderLeg.ts";
 import type { ProviderLegInput } from "./nonStreamingProviderLeg.ts";
@@ -42,7 +42,7 @@ export async function continueServerOwnedToolLoop(input: {
   executeServerOwned?: (
     calls: ToolCall[],
     context: ExecutionContext
-  ) => Promise<import("@/lib/skills/toolLoopTypes.ts").ExecutedToolResult[]>;
+  ) => Promise<import("@/lib/serverTools/toolLoopTypes.ts").ExecutedToolResult[]>;
 }): Promise<ServerOwnedToolLoopResult> {
   const runOwned = input.executeServerOwned ?? executeServerOwned;
   return runServerOwnedToolLoop({
@@ -103,8 +103,6 @@ export function mergeLoopIntoOkLeg(
   return {
     ...leg,
     response: loop.response ?? leg.response,
-    responseForMemoryExtraction:
-      loop.responseForMemoryExtraction ?? leg.responseForMemoryExtraction,
     providerBody: loop.finalProviderBody ?? leg.providerBody,
     providerRequest: loop.finalProviderRequest ?? leg.providerRequest,
     usage: loop.cumulativeUsage,
@@ -137,7 +135,7 @@ export async function applyServerOwnedToolLoopIfNeeded(input: {
   executeServerOwned?: (
     calls: ToolCall[],
     context: ExecutionContext
-  ) => Promise<import("@/lib/skills/toolLoopTypes.ts").ExecutedToolResult[]>;
+  ) => Promise<import("@/lib/serverTools/toolLoopTypes.ts").ExecutedToolResult[]>;
 }): Promise<ToolLoopApplyResult> {
   if (
     input.initialLeg.kind !== "ok" ||

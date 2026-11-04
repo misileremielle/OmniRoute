@@ -31,8 +31,6 @@ export function runtimeRequire(specifier: string): unknown {
         return req("bun:sqlite");
       case "sql.js":
         return req("sql.js");
-      case "sqlite-vec":
-        return req("sqlite-vec");
     }
   }
 

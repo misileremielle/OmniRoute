@@ -7,13 +7,6 @@ import {
 } from "@/lib/logEnv";
 import { estimateSizeFast } from "../../utils/estimateSize.ts";
 
-export const MEMORY_EXTRACTION_TEXT_LIMIT = 64 * 1024;
-
-export function capMemoryExtractionText(value: string): string {
-  if (value.length <= MEMORY_EXTRACTION_TEXT_LIMIT) return value;
-  return value.slice(-MEMORY_EXTRACTION_TEXT_LIMIT);
-}
-
 export function truncateChatLogText(value: string): string {
   const limit = getChatLogTextLimit();
   if (value.length <= limit) return value;

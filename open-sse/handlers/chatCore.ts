@@ -1,9 +1,5 @@
 import { finalizeTranslatedRequest } from "./chatCore/translatedRequestFinalize.ts";
 import { isPassiveCodex } from "../services/tokenRefresh/passiveCodex.ts";
-import {
-  injectMemoryAndSkills,
-  mergeInjectedFallbackOwnerNames,
-} from "./chatCore/memorySkillsInjection.ts";
 import { resolveChatCoreRequestSetup } from "./chatCore/requestSetup.ts";
 import { shouldSkipNativeCodexReactiveCompaction } from "./chatCore/nativeCodexCompaction.ts";
 import {
@@ -57,7 +53,11 @@ import {
   buildRegisteredProviderRequest,
   countTranslatedMessages,
 } from "./chatCore/providerRequestRegistration.ts";
-import { collectPreConversionClientToolNames } from "./chatCore/clientToolNames.ts";
+import {
+  collectPreConversionClientToolNames,
+  mergeInjectedFallbackOwnerNames,
+  resolveToolOwnerId,
+} from "./chatCore/clientToolNames.ts";
 export { clearCombosCache, clearUpstreamProxyConfigCache } from "./chatCore/comboContextCache.ts";
 import { resolveAccountSemaphoreKey } from "./chatCore/executorHelpers.ts";
 import {
@@ -87,10 +87,6 @@ export {
   buildStreamingResponseHeaders,
   stripStaleForwardingHeaders,
 };
-import {
-  resolveRequestMemoryOwnerId,
-  runMemoryExtractionGate,
-} from "./chatCore/memoryExtraction.ts";
 import { checkResourcePressureGuard } from "../utils/resourcePressure.ts";
 import { normalizeHeaders } from "../utils/headers.ts";
 import { resolveChatCoreRequestFormat } from "./chatCore/requestFormat.ts";
@@ -308,7 +304,7 @@ import { generateRequestId } from "@/shared/utils/requestId";
 import { isLocalStreamLifecycleError } from "@/shared/utils/circuitBreaker";
 import { shouldIsolateProbeFailures } from "@/shared/utils/probeOrigin";
 import { writeTerminalStatus } from "@/shared/utils/terminalStatus";
-import { handleToolCallExecution } from "@/lib/skills/interception";
+import { handleToolCallExecution } from "@/lib/serverTools/interception";
 import { buildClaudeCodeBridgeBody } from "./chatCore/claudeCodeBridgeBody.ts";
 import { setGeminiThoughtSignatureMode } from "../services/geminiThoughtSignatureStore.ts";
 import { classifyModelScope429, isModelScopeProvider } from "../services/modelscopePolicy.ts";
@@ -652,9 +648,8 @@ async function handleChatCoreInner({
   // Model-specific targetFormat takes priority over provider default
 
   // ── Background Task Redirection (T41) — decision extracted to chatCore/backgroundRedirect.ts (#3501)
-  // backgroundReason is the detection signal (threaded into memory/skills injection below); redirect
-  // is the actual model downgrade to apply, if any.
-  const { backgroundReason, redirect: bgRedirect } = resolveBackgroundTaskRedirect({
+  // redirect is the actual model downgrade to apply, if any.
+  const { redirect: bgRedirect } = resolveBackgroundTaskRedirect({
     body,
     headers: clientRawRequest?.headers,
     model,
@@ -1109,7 +1104,7 @@ async function handleChatCoreInner({
   }
 
   // Preserve original body for cache signature — the body variable is mutated
-  // multiple times below (sanitization, memory/skills injection) before the
+  // multiple times below (sanitization, tool injection) before the
   // cache store path runs at Phase 9.1 (non-streaming) / Phase 9.2 (streaming).
   // Without this snapshot, the write-time signature differs from the read-time
   // one, producing 0% hit rate. (#cache-signature-asymmetry)
@@ -1161,38 +1156,16 @@ async function handleChatCoreInner({
   }
 
   body = sanitizeChatRequestBody(body, sourceFormat, targetFormat);
-  // Clients that manage their own context send `x-omniroute-no-memory: true`, and Claude
-  // Code's classifier turns are excluded (a null owner disables both branches in
-  // injectMemoryAndSkills plus extraction). See PRD-2026-06-19-no-memory-header.
-  const memoryOwnerId = resolveRequestMemoryOwnerId({
-    apiKeyInfo: apiKeyInfo as Record<string, unknown> | null,
-    headers: clientRawRequest?.headers ?? null,
-    sourceFormat,
-    body: body as Record<string, unknown>,
-  });
-  const injectionResult = await injectMemoryAndSkills({
-    body,
-    memoryOwnerId,
-    provider,
-    effectiveModel,
-    sourceFormat,
-    targetFormat,
-    backgroundReason,
-    log,
-  });
-  body = injectionResult.body;
-  const memorySettings = injectionResult.memorySettings;
+  const toolOwnerId = resolveToolOwnerId(apiKeyInfo as Record<string, unknown> | null);
 
-  // Merge web-search/web-fetch fallback tool names into the builtin owner set.
-  // injectMemoryAndSkills only tracks memory tools; the fallback names were
-  // injected into body.tools by prepareWebSearchFallbackBody/prepareWebFetchFallbackBody
-  // above, so they must be carried into the owner provenance chain here.
-  const mergedOwnerNames = mergeInjectedFallbackOwnerNames(
-    injectionResult,
+  // Fallback tool names were injected into body.tools by
+  // prepareWebSearchFallbackBody/prepareWebFetchFallbackBody above, so they must be carried
+  // into the owner provenance chain here.
+  const injectionResult = mergeInjectedFallbackOwnerNames(
+    { builtinToolNames: [] },
     [webSearchFallbackPlan, webFetchFallbackPlan],
     preConversionClientToolNames
   );
-  injectionResult.builtinToolNames = mergedOwnerNames.builtinToolNames;
 
   // Translate request (pass reqLogger for intermediate logging)
   // ── Proactive Context Compression (Phase 4) ──
@@ -3283,8 +3256,7 @@ async function handleChatCoreInner({
       managedLease,
       managedLeaseFenceErrorResult,
       markAccountSemaphoreBlocked,
-      memoryOwnerId,
-      memorySettings,
+      toolOwnerId,
       model,
       normalizeHeaders,
       normalizeUsage,
@@ -3311,7 +3283,6 @@ async function handleChatCoreInner({
       reqLogger,
       requestToolIdentityMap,
       resolveReportedServiceTier,
-      runMemoryExtractionGate,
       runPluginOnResponseHook,
       sanitizeErrorMessage,
       sanitizeUpstreamDetails,
@@ -3401,8 +3372,6 @@ async function handleChatCoreInner({
     isResponsesEndpoint,
     log,
     managedLease,
-    memoryOwnerId,
-    memorySettings,
     model,
     onRequestSuccess,
     onStreamFailure,
@@ -3411,7 +3380,6 @@ async function handleChatCoreInner({
     pendingRequestOwner,
     persistAttemptLogs,
     persistFailureUsage,
-    pipelineSessionId,
     provider,
     providerHeaders,
     providerRequestCapture,

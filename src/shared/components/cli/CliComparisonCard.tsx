@@ -14,13 +14,12 @@ export interface CliComparisonCardProps {
 const TYPE_HREFS: Record<CliConceptType, string> = {
   code: "/dashboard/cli-code",
   agent: "/dashboard/cli-agents",
-  acp: "/dashboard/acp-agents",
 };
 
 export default function CliComparisonCard({ currentType }: CliComparisonCardProps) {
   const t = useTranslations("cliCommon");
 
-  const types: CliConceptType[] = ["code", "agent", "acp"];
+  const types: CliConceptType[] = ["code", "agent"];
 
   return (
     <Card padding="sm">

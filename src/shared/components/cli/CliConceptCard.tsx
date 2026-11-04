@@ -3,11 +3,10 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import Badge from "@/shared/components/Badge";
 import Card from "@/shared/components/Card";
 import { cn } from "@/shared/utils/cn";
 
-export type CliConceptType = "code" | "agent" | "acp";
+export type CliConceptType = "code" | "agent";
 
 export interface CliConceptCardProps {
   currentType: CliConceptType;
@@ -16,13 +15,12 @@ export interface CliConceptCardProps {
 const TYPE_HREFS: Record<CliConceptType, string> = {
   code: "/dashboard/cli-code",
   agent: "/dashboard/cli-agents",
-  acp: "/dashboard/acp-agents",
 };
 
 export default function CliConceptCard({ currentType }: CliConceptCardProps) {
   const t = useTranslations("cliCommon");
 
-  const types: CliConceptType[] = ["code", "agent", "acp"];
+  const types: CliConceptType[] = ["code", "agent"];
 
   return (
     <Card padding="sm" className={cn("border-primary/30 bg-primary/5")}>
@@ -33,11 +31,6 @@ export default function CliConceptCard({ currentType }: CliConceptCardProps) {
             <span className="text-xs font-semibold uppercase tracking-wider text-primary">
               {t(`concept.${currentType}.title`)}
             </span>
-            {currentType === "acp" && (
-              <Badge variant="warning" size="sm">
-                {t("concept.acp.warning")}
-              </Badge>
-            )}
           </div>
           <p className="text-sm text-text-muted">{t(`concept.${currentType}.phrase`)}</p>
           <p className="text-[11px] text-text-muted font-mono">

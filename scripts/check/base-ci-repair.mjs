@@ -145,13 +145,6 @@ async function main() {
     20_000
   );
   await run(
-    "generated artifacts",
-    process.execPath,
-    ["--import", "tsx/esm", "scripts/skills/generate-agent-skills.mjs"],
-    30_000,
-    15_000
-  );
-  await run(
     "translation evidence",
     process.execPath,
     ["scripts/i18n/check-translation-drift.mjs"],

@@ -2,13 +2,11 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 // Complements the structural extraction checks in integration-wiring.test.ts.
-// Exercise registered MCP RPC tools and the exported A2A skill, not private handlers.
-describe("Quota — public A2A and MCP consumers", () => {
+// Exercise registered MCP RPC tools, not private handlers.
+describe("Quota — public MCP consumers", () => {
   it("serializes the quota API response through the real consumers", async () => {
     const { exerciseQuotaWiring } = await import("../helpers/quotaWiring.ts");
-    const { a2a, quota, metrics, requests } = await exerciseQuotaWiring();
-    assert.equal(a2a.metadata.providerCount, 1);
-    assert.match(a2a.artifacts[0].content, /\*\*quota-fixture:\*\* 20 \/ 100 \(valid\)/);
+    const { quota, metrics, requests } = await exerciseQuotaWiring();
     assert.notEqual(quota.isError, true);
     const quotaContent = quota.content as Array<{ type: string; text: string }>;
     assert.equal(quotaContent[0].type, "text");
@@ -26,8 +24,6 @@ describe("Quota — public A2A and MCP consumers", () => {
       resetAt: "2026-10-11T00:00:00Z",
     });
     assert.deepEqual(requests, [
-      "/api/usage/quota",
-      "/api/combos",
       "/api/usage/quota?provider=quota-fixture",
       "/api/monitoring/health",
       "/api/usage/quota?provider=quota-fixture",

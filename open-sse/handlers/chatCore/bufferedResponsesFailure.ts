@@ -8,7 +8,7 @@ import type {
   NonStreamingProviderLegResult,
   ProviderLegReceipt,
   ProviderLegUsage,
-} from "@/lib/skills/toolLoopTypes.ts";
+} from "@/lib/serverTools/toolLoopTypes.ts";
 import { normalizeStreamFailurePayload } from "../../utils/streamErrorFormat.ts";
 
 interface BufferedResponsesFailureParams {

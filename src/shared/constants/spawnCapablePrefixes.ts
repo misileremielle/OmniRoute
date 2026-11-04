@@ -48,9 +48,7 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #17)
   "/api/plugins/", // plugins: load/execute via worker_threads + child_process (Hard Rules #15 + #17)
   "/api/local/", // T-12: 1-click local service launchers (Redis today) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17)
-  "/api/skills/collect/", // Skill Collector CLI detection: GET .../detect spawns a child process per CLI_TOOL_IDS entry — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17, PR #6294 review)
-  "/api/skills/install", // POST registers a handler string that can alias the built-in execute_command / eval_code (src/lib/skills/executor.ts -> builtins.ts -> sandbox.ts childProcess.spawn) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17, GHSA-jx89-f37j-pq89)
-  "/api/skills/executions", // POST runs skillExecutor.execute() -> container spawn in src/lib/skills/sandbox.ts — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17, GHSA-jx89-f37j-pq89)
+  "/api/skills/collect/", // Chaos Mode dispatch prefix — must never be whitelistable via manage-scope bypass
   "/api/headroom/start", // spawns headroom-ai python CLI — must never be bypassable (Hard Rules #15 + #17)
   "/api/headroom/stop", // kills tracked PID — must never be bypassable (Hard Rules #15 + #17)
   "/api/vnc-session", // #7892: spawns Docker containers via child_process.spawn (src/lib/vncSession/service.ts) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17)
@@ -60,7 +58,6 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   // either listed here or reviewed as bypass-eligible — drift guard:
   // tests/unit/authz/local-only-bypass-spawn-denylist.test.ts (Hard Rules #15 + #17).
   "/api/middleware/", // middleware hooks compile + run caller-supplied JS via new vm.Script (src/lib/middleware/registry.ts)
-  "/api/acp/agents", // detectInstalledAgents() -> execFileSync(probe.command, probe.args, { shell }) (src/lib/acp/registry.ts)
   "/api/system/version", // POST auto-update spawns git checkout + npm install
   "/api/db-backups/exportAll", // spawns tar for the export archive
   "/api/db/health", // runManagedDbHealthCheck() forks native diagnostics (healthCheckRunner.ts)

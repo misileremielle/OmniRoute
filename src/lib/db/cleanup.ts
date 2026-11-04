@@ -271,77 +271,6 @@ export async function cleanupConfigAudit(
 }
 
 /**
- * Clean up old a2a_task_events based on retention settings.
- */
-export async function cleanupA2aEvents(): Promise<CleanupResult> {
-  const db = getDbInstance();
-  const retention = getRetentionSettings();
-
-  const retentionDays = retention.a2aEvents;
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
-  const cutoffISO = cutoffDate.toISOString();
-
-  const result: CleanupResult = { deleted: 0, errors: 0 };
-
-  try {
-    const stmt = db.prepare("DELETE FROM a2a_task_events WHERE created_at < ?");
-    const runResult = stmt.run(cutoffISO);
-    result.deleted = runResult.changes;
-
-    console.log(
-      `[Cleanup] Deleted ${result.deleted} a2a_task_events older than ${retentionDays} days`
-    );
-  } catch (err: unknown) {
-    console.error("[Cleanup] Error cleaning a2a_task_events:", err);
-    result.errors++;
-  }
-
-  return result;
-}
-
-/**
- * Clean up old memory_entries based on retention settings.
- */
-export async function cleanupMemoryEntries(): Promise<CleanupResult> {
-  const db = getDbInstance();
-  const retention = getRetentionSettings();
-
-  const retentionDays = retention.memoryEntries;
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
-  const cutoffISO = cutoffDate.toISOString();
-
-  const result: CleanupResult = { deleted: 0, errors: 0 };
-
-  try {
-    const stmt = db.prepare("DELETE FROM memories WHERE created_at < ?");
-    const runResult = stmt.run(cutoffISO);
-    result.deleted = runResult.changes;
-
-    // Compact FTS5 segments to reclaim space from tombstoned rows left
-    // by the DELETE trigger (memory_fts_ad). Without this, orphaned FTS
-    // data/docsize rows grow without bound after retention deletes.
-    if (result.deleted > 0) {
-      try {
-        db.prepare("INSERT INTO memory_fts(memory_fts) VALUES('optimize')").run();
-      } catch {
-        // Best-effort; FTS compaction failure is non-fatal.
-      }
-    }
-
-    console.log(
-      `[Cleanup] Deleted ${result.deleted} memory_entries older than ${retentionDays} days`
-    );
-  } catch (err: unknown) {
-    console.error("[Cleanup] Error cleaning memory_entries:", err);
-    result.errors++;
-  }
-
-  return result;
-}
-
-/**
  * Clean up old domain_cost_history based on retention settings. (#6848)
  * The `timestamp` column stores epoch milliseconds (saveCostEntry default
  * is Date.now()), so the cutoff must be in milliseconds to match. (#9625)
@@ -695,8 +624,6 @@ export async function runAutoCleanup(): Promise<{
     compressionEngineBreakdown: await cleanupCompressionEngineBreakdown(),
     mcpAudit: await cleanupMcpAudit(),
     configAudit: await cleanupConfigAudit(),
-    a2aEvents: await cleanupA2aEvents(),
-    memoryEntries: await cleanupMemoryEntries(),
     domainCostHistory: await cleanupDomainCostHistory(),
     compressionCacheStats: await cleanupCompressionCacheStats(),
     xpAuditLog: await cleanupXpAuditLog(),

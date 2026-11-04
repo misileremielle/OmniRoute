@@ -55,12 +55,11 @@ import {
   modelAfterFamilyFallback,
 } from "../../services/modelFamilyFallbackPolicy.ts";
 import { runNonStreamingProviderLeg } from "../chatCore/nonStreamingProviderLeg.ts";
-import type { NonStreamingProviderLegResult } from "@/lib/skills/toolLoopTypes.ts";
+import type { NonStreamingProviderLegResult } from "@/lib/serverTools/toolLoopTypes.ts";
 import { finalizeToolLoopError } from "../chatCore/nonStreamingFinalization.ts";
 import { markCodexScopeRateLimited } from "../chatCore/codexFailover.ts";
 import { deleteSessionAccountAffinityBestEffort } from "@/lib/db/sessionAccountAffinity";
 import { writeTerminalStatus } from "@/shared/utils/terminalStatus";
-import { MEMORY_BUILTIN_TOOL_NAMES } from "@/lib/skills/memoryBuiltins";
 
 import { storeSemanticCacheResponse } from "../chatCore/semanticCacheStore.ts";
 import {
@@ -70,7 +69,6 @@ import {
 import { routingFinishReason } from "../chatCore/routingFinishReason.ts";
 import { hasTrustedEmptyTurn, inheritEmptyTurnPolicy } from "../../utils/emptyTurnPolicy.ts";
 import { getProviderCredentials } from "@/sse/services/auth";
-import { extractFacts } from "@/lib/memory/extraction";
 // The leaf body is unchanged from the barrel, so its closed-over values keep
 // the barrel's types. This alias only exists so the deps bag type-checks.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -137,8 +135,7 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     managedLease,
     managedLeaseFenceErrorResult,
     markAccountSemaphoreBlocked,
-    memoryOwnerId,
-    memorySettings,
+    toolOwnerId,
     model,
     normalizeHeaders,
     normalizeUsage,
@@ -162,7 +159,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     reportMalformed200,
     reqLogger,
     resolveReportedServiceTier,
-    runMemoryExtractionGate,
     runPluginOnResponseHook,
     sanitizeErrorMessage,
     sanitizeUpstreamDetails,
@@ -479,7 +475,7 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     if (toolLoopEnabled) {
       try {
         postInjectionRequestIdentity = derivePostInjectionRequestIdentity({
-          apiKeyId: memoryOwnerId || "local",
+          apiKeyId: toolOwnerId || "local",
           headers: clientRawRequest?.headers ?? null,
           skillRequestId,
           postInjectionBody: (body || {}) as Record<string, unknown>,
@@ -503,14 +499,11 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       sourceBody: (body || {}) as Record<string, unknown>,
       skillsModelId: getSkillsModelIdForFormat(sourceFormat),
       executionContext: {
-        apiKeyId: memoryOwnerId || "local",
+        apiKeyId: toolOwnerId || "local",
         sessionId: pipelineSessionId,
         requestId: skillRequestId,
         requestIdentity: postInjectionRequestIdentity,
         builtinToolNames: injectionResult.builtinToolNames,
-        injectedCustomSkillNames: injectionResult.injectedCustomSkillNames,
-        customSkillExecutionEnabled:
-          Boolean(memoryOwnerId) && memorySettings?.skillsEnabled === true,
         executionFenceEnabled: true,
         provider,
         model: effectiveModel,
@@ -658,7 +651,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     const responsePayloadFormat = okLeg.responsePayloadFormat;
     const looksLikeSSE = okLeg.looksLikeSSE;
     let translatedResponse = okLeg.response;
-    const memoryExtractionResponse = okLeg.responseForMemoryExtraction;
     reqLogger.logProviderResponse(
       200,
       "OK",
@@ -732,42 +724,18 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       cpaAuthIndex: readCpaAuthIndex(providerResponse),
     });
 
-    // #12150 P1b surface 3 (fix round 1): a video-bridge-observed request's
-    // request- AND response-derived text both carry the full transcript (the
-    // flattened description on the request side, the model's own reply on
-    // the response side) — neither may populate durable Memory. See
-    // runMemoryExtractionGate for the shared gate + extraction wiring, unit
-    // tested directly in tests/unit/video-bridge-memory-suppression.test.ts.
-    runMemoryExtractionGate({
-      memoryOwnerId,
-      memorySettings,
-      videoBridgeObserved,
-      pipelineSessionId,
-      requestBody: body as Record<string, unknown>,
-      responseBody: memoryExtractionResponse as Record<string, unknown> | null,
-      extractFacts,
-      log,
-    });
-
-    const customSkillExecutionEnabled =
-      Boolean(memoryOwnerId) && memorySettings?.skillsEnabled === true;
-    const builtinToolNames = [
-      webSearchFallbackPlan.toolName,
-      webFetchFallbackPlan.toolName,
-      ...(memoryOwnerId && memorySettings?.enabled ? MEMORY_BUILTIN_TOOL_NAMES : []),
-    ].filter((name): name is string => Boolean(name));
-    if (!toolLoopRan && (customSkillExecutionEnabled || builtinToolNames.length > 0)) {
-      const skillSessionId = pipelineSessionId;
-
+    const builtinToolNames = [webSearchFallbackPlan.toolName, webFetchFallbackPlan.toolName].filter(
+      (name): name is string => Boolean(name)
+    );
+    if (!toolLoopRan && builtinToolNames.length > 0) {
       translatedResponse = await handleToolCallExecution(
         translatedResponse,
         getSkillsModelIdForFormat(sourceFormat),
         {
-          apiKeyId: memoryOwnerId || "local",
-          sessionId: skillSessionId,
+          apiKeyId: toolOwnerId || "local",
+          sessionId: pipelineSessionId,
           requestId: skillRequestId,
           builtinToolNames,
-          customSkillExecutionEnabled,
           provider,
           model: effectiveModel,
         }

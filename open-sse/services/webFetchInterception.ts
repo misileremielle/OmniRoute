@@ -5,7 +5,7 @@
  * handling here. Rewrites a provider-native `web_fetch` tool declaration into a
  * synthetic `omniroute_web_fetch` function tool; the actual `/v1/web/fetch` call
  * happens later, once the model emits that synthetic tool call, through the existing
- * generic tool-call execution path (@/lib/skills/interception::handleToolCallExecution).
+ * generic tool-call execution path (@/lib/serverTools/interception::handleToolCallExecution).
  */
 
 import { FORMATS } from "../translator/formats.ts";

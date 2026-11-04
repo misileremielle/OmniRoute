@@ -769,7 +769,7 @@ function purifyHistory(messages: Record<string, unknown>[], targetTokens: number
   // Add summary of dropped messages. Merge the notice INTO the leading
   // system/developer message instead of splicing a second system-role message
   // mid-array: strict gateways (TokenRouter confirmed live 2026-08-22, see the
-  // PROVIDERS_SYSTEM_MUST_BE_FIRST list in src/lib/memory/injection.ts) reject
+  // BUILTIN_PROVIDERS_SYSTEM_MUST_BE_FIRST list in open-sse/translator/helpers/strictSystemHoist.ts) reject
   // any system message at index > 0 with HTTP 400 "System message must be at
   // the beginning". When there is no leading system message, prepend one --
   // index 0 is accepted by every provider (same slot the old splice used when

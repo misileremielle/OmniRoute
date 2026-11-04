@@ -197,9 +197,6 @@ export function buildInternalChatRequest(
       // on their own (#16403). Present the per-process self-loop bearer so the test keeps
       // working under REQUIRE_API_KEY=true for callers without a dashboard cookie.
       Authorization: `Bearer ${resolveSelfLoopBearer()}`,
-      // The bearer gives the request a memory owner; a connection test must not receive
-      // injected memory/skills or feed memory extraction (same opt-out as #13139).
-      "x-omniroute-no-memory": "true",
       // Reuse the existing strict-mode internal bypass for live health checks.
       "X-Internal-Test": "combo-health-check",
       "X-OmniRoute-No-Cache": "true",
@@ -223,9 +220,8 @@ export function buildInternalResponsesRequest(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // Same in-process authentication and memory opt-out as buildInternalChatRequest.
+      // Same in-process authentication as buildInternalChatRequest.
       Authorization: `Bearer ${resolveSelfLoopBearer()}`,
-      "x-omniroute-no-memory": "true",
       "X-Internal-Test": "combo-health-check",
       "X-OmniRoute-No-Cache": "true",
       "X-OmniRoute-Compression": "off",

@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-const { normalizeWebFetchCredentials } = await import("../../src/lib/skills/webFetchExecution.ts");
+const { normalizeWebFetchCredentials } =
+  await import("../../src/lib/serverTools/webFetchExecution.ts");
 
 test("web-fetch skills reject unavailable credential sentinels", () => {
   assert.equal(
