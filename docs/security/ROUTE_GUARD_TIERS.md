@@ -46,7 +46,6 @@ spawn-capable prefixes and fails CI if any is not classified local-only.
 | `/api/cli-tools/{omp,letta,grok-build,forge,jcode,qwen}-settings`                                        | Per-tool settings writers that can touch tool binaries/config on the host                       |
 | `/api/cli-tools/{claude,cline,codewhale,codex,crush,deepseek-tui,droid,kilo,openclaw,pi,smelt}-settings` | Same `getCliRuntimeStatus()` spawn as the six siblings above (GHSA-35fw-cv32-2373)              |
 | `/api/cli-tools/{all-statuses,status,detect}`                                                            | CLI inventory probes — spawn `command -v` / `--version` per tool (GHSA-35fw-cv32-2373)          |
-| `/api/modality-bridge/video/`                                                                            | Strict trusted-loopback Video Bridge runtime probe and internal extraction bridge               |
 | `/api/services/`                                                                                         | Embedded services (9Router / CLIProxy / Bifrost / Mux / Dario) — `npm install` + spawn          |
 | `/dashboard/providers/services/`                                                                         | Reverse proxy to embedded-service UIs                                                           |
 | `/api/copilot/`                                                                                          | Unauthenticated LLM driver — CLI-only by default                                                |
@@ -162,10 +161,10 @@ with `getRequestPeerLocality()` (`src/shared/utils/apiAuth.ts`) and only runs th
 for `loopback` / `lan` callers. A `remote` caller gets the same response shape built from
 non-spawning sources (persisted state, settings, fs checks), flagged `probed: false`.
 
-| Route                                                            | Probe skipped for remote callers                                    |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `POST /api/providers/{id}/test`, `/api/providers/test-batch`     | CLI runtime probe (`allowLocalRuntimeProbe`) and CLI-fallback spawn |
-| `GET /api/headroom/status`                                       | `which headroom` and the python `--version` probes                  |
+| Route                                                        | Probe skipped for remote callers                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `POST /api/providers/{id}/test`, `/api/providers/test-batch` | CLI runtime probe (`allowLocalRuntimeProbe`) and CLI-fallback spawn |
+| `GET /api/headroom/status`                                   | `which headroom` and the python `--version` probes                  |
 
 A new read route that probes the host follows the same pattern, or is classified
 LOCAL_ONLY outright.

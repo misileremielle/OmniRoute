@@ -77,10 +77,9 @@ function extractContinuationState(
   videoContentRemoved: boolean
 ): ResponsesContinuationState | null {
   if (!pipeline) return null;
-  // #12150 P2 surface 2: the persisted clientRawRequest snapshot on this row had
-  // its video transcript cues structurally redacted to [redacted-video-transcript]
-  // before storage (videoBridgeSnapshotRedaction, marker written by the call-log
-  // path). The stored input therefore no longer carries the client's real cue
+  // Rows written while the (since removed) video bridge was active can carry
+  // `video_content_removed = 1`: their client snapshot had its transcript cues
+  // redacted to [redacted-video-transcript] before storage. The stored input therefore no longer carries the client's real cue
   // text -- reconstructing a continuation off it would forward the placeholder
   // upstream as if it were genuine history. Fail closed so the client resends
   // full history, exactly like a real previous_response_not_found.
@@ -173,11 +172,10 @@ const pendingContinuationStates = new Map<string, PendingContinuationEntry>();
 export function seedPendingContinuationState(
   responseId: string,
   apiKeyId: string | null,
-  pipeline: ContinuationPipeline | null | undefined,
-  videoContentRemoved: boolean
+  pipeline: ContinuationPipeline | null | undefined
 ): void {
   if (!responseId) return;
-  const state = extractContinuationState(pipeline, videoContentRemoved);
+  const state = extractContinuationState(pipeline, false);
   if (!state) return;
   pendingContinuationStates.set(responseId, {
     apiKeyId,
@@ -414,7 +412,8 @@ export function resolveTurnCompletionState(
   // Same dual-shape concern as resolvePreviousResponseState above: a
   // streaming reply nests status/output under `.summary`, a non-streaming
   // one carries them at the top level.
-  const status = clientResponse?.summary?.status ?? (clientResponse as { status?: unknown })?.status;
+  const status =
+    clientResponse?.summary?.status ?? (clientResponse as { status?: unknown })?.status;
   if (typeof status === "string" && status !== "completed") {
     return cacheTurnCompletion(artifactRelPath, "incomplete");
   }
@@ -431,7 +430,10 @@ export function resolveTurnCompletionState(
   const hasPendingFunctionCall = output.some(
     (item) => isPlainRecord(item) && item.type === "function_call"
   );
-  return cacheTurnCompletion(artifactRelPath, hasPendingFunctionCall ? "tool_call_pending" : "stop");
+  return cacheTurnCompletion(
+    artifactRelPath,
+    hasPendingFunctionCall ? "tool_call_pending" : "stop"
+  );
 }
 
 /** Grace period before a still-unanswered tool call counts as a stall, not a

@@ -31,9 +31,6 @@ export const MAX_BODY_BYTES_FILE = 500 * 1024 * 1024;
 /** Larger limit for LLM request payloads: 50 MB */
 export const MAX_BODY_BYTES_LLM_API = 50 * 1024 * 1024;
 
-/** Fixed limit for the loopback-only Video Bridge extraction broker: 50 MB. */
-export const MAX_BODY_BYTES_VIDEO_BRIDGE_BROKER = 50 * 1024 * 1024;
-
 /**
  * Media (image generate / edit / upscale / video) is not capped by OmniRoute.
  * JSON + base64 inflates payloads by roughly 33%, and provider limits vary by model,
@@ -55,12 +52,6 @@ type BodySizeRule = {
 };
 
 const ROUTE_LIMITS: BodySizeRule[] = [
-  {
-    prefix: "/api/modality-bridge/video/extract",
-    limit: MAX_BODY_BYTES_VIDEO_BRIDGE_BROKER,
-    exactPath: true,
-    fixedLimit: true,
-  },
   { prefix: "/api/db-backups/import", limit: MAX_BODY_BYTES_IMPORT },
   { prefix: "/api/v1/chat/completions", limit: MAX_BODY_BYTES_LLM_API },
   { prefix: "/api/v1/responses", limit: MAX_BODY_BYTES_LLM_API },

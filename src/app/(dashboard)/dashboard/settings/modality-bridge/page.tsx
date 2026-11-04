@@ -6,16 +6,12 @@ import { useTranslations } from "next-intl";
 import { PageHeader } from "@omniroute/ui-kit/page-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@omniroute/ui-kit/tabs";
 
-import ModalityBridgeAudioTab from "@/app/(dashboard)/dashboard/settings/components/modalityBridge/ModalityBridgeAudioTab";
-import ModalityBridgeVideoTab from "@/app/(dashboard)/dashboard/settings/components/modalityBridge/ModalityBridgeVideoTab";
 import ModalityBridgeVisionTab from "@/app/(dashboard)/dashboard/settings/components/modalityBridge/ModalityBridgeVisionTab";
 
-type TabId = "vision" | "audio" | "video";
+type TabId = "vision";
 
 const TABS: ReadonlyArray<{ id: TabId; labelKey: string }> = [
   { id: "vision", labelKey: "modalityBridgeVisionTab" },
-  { id: "audio", labelKey: "modalityBridgeAudioTab" },
-  { id: "video", labelKey: "modalityBridgeVideoTab" },
 ];
 
 function ModalityBridgePageContent() {
@@ -61,8 +57,6 @@ function ModalityBridgePageContent() {
         {TABS.map((tab) => (
           <TabsContent key={tab.id} value={tab.id} className="pt-4">
             {tab.id === "vision" && <ModalityBridgeVisionTab />}
-            {tab.id === "audio" && <ModalityBridgeAudioTab />}
-            {tab.id === "video" && <ModalityBridgeVideoTab />}
           </TabsContent>
         ))}
       </Tabs>

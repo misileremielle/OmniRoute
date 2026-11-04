@@ -37,7 +37,6 @@ export function buildClaudeCodeBridgeBody({
   preserveCacheControl,
   copilotCompatibleReasoning,
   reasoningCacheScope,
-  videoBridgeObserved,
   normalizeClaudeUpstreamMessages,
   applyReasoningRuleDirective,
   getModelNormalizeToolCallId,
@@ -58,7 +57,6 @@ export function buildClaudeCodeBridgeBody({
   preserveCacheControl: boolean;
   copilotCompatibleReasoning: boolean;
   reasoningCacheScope: string | null;
-  videoBridgeObserved: boolean;
   normalizeClaudeUpstreamMessages: (
     payload: Record<string, unknown>,
     options?: { preserveToolResultBlocks?: boolean }
@@ -112,7 +110,6 @@ export function buildClaudeCodeBridgeBody({
         preserveCacheControl,
         copilotClient: copilotCompatibleReasoning,
         reasoningCacheScope,
-        videoTranscriptSensitive: videoBridgeObserved,
       }
     );
   }

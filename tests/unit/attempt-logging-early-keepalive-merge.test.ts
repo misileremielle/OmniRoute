@@ -54,7 +54,6 @@ function baseCtx(overrides: Record<string, unknown> = {}) {
 
 // Wall-clock deadline instead of 120 tries x 20ms (2.4s): on a loaded runner the
 // async SQLite write routinely outlasts that ceiling and the row reads as missing.
-// Same budget and rationale as tests/unit/video-bridge-log-redaction.test.ts.
 const POLL_DEADLINE_MS = 30_000;
 
 async function pollForCallLog(traceId: string, deadlineMs = POLL_DEADLINE_MS) {

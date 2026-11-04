@@ -154,29 +154,18 @@ export function resolveRequestMemoryOwnerId(input: {
 
 /**
  * Pure decision for whether durable Memory should be extracted from this
- * request at all (#12150 P1b, surface 3). Wraps chatCore.ts's original inline
- * `memoryOwnerId && memorySettings?.enabled && memorySettings.maxTokens > 0`
- * check (unchanged) plus one new condition: a video-bridge-observed request
- * must never populate durable Memory — not from its request-derived text (a
- * flattened transcript description, not user-authored conversation) and, per
- * fix round 1 (adversarial review), not from its response-derived text
- * either, since the model's own reply also received the full transcript and
- * can echo it back. `videoBridgeObserved` is optional and defaults to falsy,
- * so every existing non-video caller (which never passes it) keeps today's
- * exact behavior. See `runMemoryExtractionGate` below for the call-site
- * wiring that applies this decision to both extraction sources at once.
+ * request at all. See `runMemoryExtractionGate` below for the call-site wiring that applies
+ * this decision to both extraction sources at once.
  */
 export function shouldExtractMemory(input: {
   enabled: boolean | null | undefined;
   maxTokens: number | null | undefined;
   memoryOwnerId: string | null | undefined;
-  videoBridgeObserved?: boolean | null;
 }): boolean {
-  const { enabled, maxTokens, memoryOwnerId, videoBridgeObserved } = input;
+  const { enabled, maxTokens, memoryOwnerId } = input;
   if (!memoryOwnerId) return false;
   if (!enabled) return false;
   if (!(typeof maxTokens === "number" && maxTokens > 0)) return false;
-  if (videoBridgeObserved) return false;
   return true;
 }
 
@@ -190,30 +179,25 @@ export function shouldExtractMemory(input: {
  *
  * `extractFacts` is injected (not imported directly) purely for testability —
  * production callers pass the real `@/lib/memory/extraction` one. When
- * `shouldExtractMemory` says no (memory disabled/unconfigured, OR a
- * video-bridge-observed request), this is a complete no-op: neither the
- * request- nor the response-derived text is extracted, so an observed
- * request populates NO durable memory from either source.
+ * `shouldExtractMemory` says no (memory disabled/unconfigured), this is a
+ * complete no-op: neither the request- nor the response-derived text is
+ * extracted.
  */
 export function runMemoryExtractionGate(input: {
   memoryOwnerId: string | null | undefined;
   memorySettings: { enabled?: boolean | null; maxTokens?: number | null } | null | undefined;
-  videoBridgeObserved: boolean;
   pipelineSessionId: string;
   requestBody: Record<string, unknown> | null | undefined;
   responseBody: Record<string, unknown> | null | undefined;
   extractFacts: (text: string, memoryOwnerId: string, sessionId: string) => void;
-  log?: { debug?: (tag: string, message: string) => void } | null;
 }): void {
   const {
     memoryOwnerId,
     memorySettings,
-    videoBridgeObserved,
     pipelineSessionId,
     requestBody,
     responseBody,
     extractFacts,
-    log,
   } = input;
   if (!memoryOwnerId) return;
 
@@ -221,19 +205,8 @@ export function runMemoryExtractionGate(input: {
     enabled: memorySettings?.enabled,
     maxTokens: memorySettings?.maxTokens,
     memoryOwnerId,
-    videoBridgeObserved,
   });
-  if (!allowed) {
-    // Only worth a log line for the video-bridge case — memory being
-    // disabled/unconfigured entirely is the normal, silent, non-video path.
-    if (videoBridgeObserved && memorySettings?.enabled) {
-      log?.debug?.(
-        "MEMORY",
-        "Skipping request+response memory extraction: video-bridge transcript observed"
-      );
-    }
-    return;
-  }
+  if (!allowed) return;
 
   const requestMemoryText = extractMemoryTextFromRequestBody(requestBody ?? null);
   if (requestMemoryText) {

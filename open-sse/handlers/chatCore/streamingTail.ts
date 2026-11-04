@@ -13,7 +13,6 @@ import {
   STREAM_RECOVERY,
 } from "../../config/constants.ts";
 import { incrementTokenUsage } from "../../services/geminiRateLimitTracker.ts";
-import { forgetClaudeThinkingForClientResponse } from "../../services/claudeThinkingStore.ts";
 import { requestTtftMs, streamEmittedOutput } from "../../utils/streamTiming.ts";
 import { readStreamPartialUsage } from "../../utils/streamPartialUsage.ts";
 import { clearPostOutputFailureStreak } from "../../services/accountFallback/postOutputFailureStreak.ts";
@@ -153,7 +152,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     toolNameMap,
     traceId,
     translatedBody,
-    videoBridgeObserved,
   } = deps;
   let providerResponse, finalBody, effectiveServiceTier;
   providerResponse = deps.providerResponse;
@@ -433,12 +431,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
         });
       }
 
-      // The stream translator stores Claude signed thinking per tool call as it goes;
-      // a turn that may echo video transcript cues must not be retained at all.
-      if (videoBridgeObserved && streamResponseBody) {
-        forgetClaudeThinkingForClientResponse(streamResponseBody);
-      }
-
       if (normalizedStreamStatus === 200 && streamResponseBody) {
         captureStreamReasoningForReplay({
           streamResponseBody,
@@ -450,7 +442,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
           provider,
           model,
           reasoningCacheScope,
-          videoTranscriptSensitive: videoBridgeObserved,
         });
       }
       effectiveServiceTier = resolveReportedServiceTier(streamResponseBody) ?? effectiveServiceTier;
@@ -604,18 +595,13 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     // === /Quota Share POST-hook streaming ===
 
     if (streamStatus === 200) {
-      // #12150 P1b surface 3 (fix round 1): see the matching non-streaming
-      // gate above — an observed request populates NO durable memory from
-      // either the request-derived text or this streamed response.
       runMemoryExtractionGate({
         memoryOwnerId,
         memorySettings,
-        videoBridgeObserved,
         pipelineSessionId,
         requestBody: body as Record<string, unknown>,
         responseBody: (streamResponseBody ?? null) as Record<string, unknown> | null,
         extractFacts,
-        log,
       });
     }
 
@@ -631,7 +617,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
       apiKeyId: apiKeyInfo?.id ?? undefined,
       streamUsage,
       log,
-      videoTranscriptSensitive: videoBridgeObserved,
     });
 
     // Plugin onStreamComplete hook — fire-and-forget, fail-open (#9571)

@@ -202,7 +202,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     toolNameMap,
     tokensCompressed,
     traceEnabled,
-    videoBridgeObserved,
   } = deps;
   const familyFallback = createRequestFamilyFallback(provider, {
     headers: clientRawRequest?.headers,
@@ -367,7 +366,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       requestToolIdentityMap,
       reasoningCacheScope,
       reasoningReplayHistory,
-      videoTranscriptSensitive: videoBridgeObserved,
       clientHeaders: clientRawRequest?.headers ?? null,
       isClaudeCodeCompatible,
       log,
@@ -574,7 +572,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
               requestToolIdentityMap,
               reasoningCacheScope,
               reasoningReplayHistory,
-              videoTranscriptSensitive: videoBridgeObserved,
               clientHeaders: clientRawRequest?.headers ?? null,
               isClaudeCodeCompatible,
               log,
@@ -732,21 +729,13 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       cpaAuthIndex: readCpaAuthIndex(providerResponse),
     });
 
-    // #12150 P1b surface 3 (fix round 1): a video-bridge-observed request's
-    // request- AND response-derived text both carry the full transcript (the
-    // flattened description on the request side, the model's own reply on
-    // the response side) — neither may populate durable Memory. See
-    // runMemoryExtractionGate for the shared gate + extraction wiring, unit
-    // tested directly in tests/unit/video-bridge-memory-suppression.test.ts.
     runMemoryExtractionGate({
       memoryOwnerId,
       memorySettings,
-      videoBridgeObserved,
       pipelineSessionId,
       requestBody: body as Record<string, unknown>,
       responseBody: memoryExtractionResponse as Record<string, unknown> | null,
       extractFacts,
-      log,
     });
 
     const customSkillExecutionEnabled =
@@ -991,7 +980,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       apiKeyId: apiKeyInfo?.id ?? undefined,
       usage,
       log,
-      videoTranscriptSensitive: videoBridgeObserved,
     });
 
     // ── Phase 9.2: Save for idempotency ──

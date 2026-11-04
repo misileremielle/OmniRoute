@@ -43,7 +43,6 @@ function runGate(responseBody: Record<string, unknown>, requestBody?: Record<str
   runMemoryExtractionGate({
     memoryOwnerId: "key-1",
     memorySettings: { enabled: true, maxTokens: 2000 },
-    videoBridgeObserved: false,
     pipelineSessionId: "session-1",
     requestBody: requestBody ?? { messages: [] },
     responseBody,

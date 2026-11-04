@@ -83,12 +83,7 @@ export function translateNonStreamingClientResponse(
   // ── Claude signed-thinking continuity ─────────────────────────────────────
   // A non-Claude client never holds the signed thinking blocks of this tool turn;
   // keep them server-side so openai-to-claude can restore them next turn.
-  // Never retained for a response that may echo video transcript cues.
-  if (
-    responsePayloadFormat === FORMATS.CLAUDE &&
-    clientResponseFormat !== FORMATS.CLAUDE &&
-    !input.videoTranscriptSensitive
-  ) {
+  if (responsePayloadFormat === FORMATS.CLAUDE && clientResponseFormat !== FORMATS.CLAUDE) {
     try {
       storeClaudeThinkingFromResponse(responseBody, {
         provider,
@@ -147,7 +142,6 @@ export function translateNonStreamingClientResponse(
       cacheReasoningFromAssistantMessage(msg, provider, model, {
         scope: reasoningCacheScope,
         historyMessages: Array.isArray(historyMessages) ? historyMessages : [],
-        videoTranscriptSensitive: input.videoTranscriptSensitive,
       });
     }
   } catch {

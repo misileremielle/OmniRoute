@@ -45,7 +45,6 @@ function clientTranslate(signatureNamespace?: string | null) {
     clientRequestBody: {},
     responseToolNameMap: null,
     reasoningCacheScope: null,
-    videoTranscriptSensitive: false,
     signatureNamespace,
   } as unknown as Parameters<typeof translateNonStreamingClientResponse>[0]) as unknown as Record<
     string,

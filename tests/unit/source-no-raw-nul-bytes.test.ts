@@ -75,21 +75,3 @@ test("serviceKindIndex memo key keeps (providerId, declared) pairs distinct that
   assert.ok(!unknown.includes("llm"), "memo entry leaked across a colliding key");
   assert.notDeepEqual(openai, unknown);
 });
-
-test("videoBridgePromotionAggregator groups (caseId, model) pairs distinct that plain concatenation would merge", async () => {
-  const { aggregatePromotionObservations } =
-    await import("../../src/lib/guardrails/videoBridgePromotionAggregator.ts");
-  const aggregates = aggregatePromotionObservations([
-    { caseId: "c1", metrics: { latencyMs: 100 }, model: "m1" },
-    { caseId: "c", metrics: { latencyMs: 200 }, model: "1m1" },
-  ]);
-  assert.equal(
-    aggregates.length,
-    2,
-    "two observations with colliding concatenated keys must form two groups"
-  );
-  assert.deepEqual(aggregates.map((a) => [a.caseId, a.model, a.sampleCount]).sort(), [
-    ["c", "1m1", 1],
-    ["c1", "m1", 1],
-  ]);
-});

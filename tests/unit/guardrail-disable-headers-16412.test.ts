@@ -7,29 +7,29 @@ test("both disable headers join key, body and metadata channels without duplicat
   for (const headers of [
     new Headers({
       "x-omniroute-disabled-guardrails": "vision-bridge,PII_Masker",
-      "x-disabled-guardrails": "audio-bridge,pii-masker",
+      "x-disabled-guardrails": "other-guardrail,pii-masker",
     }),
     {
       "X-OmniRoute-Disabled-Guardrails": "vision-bridge,PII_Masker",
-      "X-Disabled-Guardrails": "audio-bridge,pii-masker",
+      "X-Disabled-Guardrails": "other-guardrail,pii-masker",
     },
   ]) {
     assert.deepEqual(
       resolveDisabledGuardrails({
         apiKeyInfo: { disabledGuardrails: ["credential-masker"] },
         body: {
-          disabledGuardrails: ["video-bridge"],
+          disabledGuardrails: ["custom-guardrail"],
           metadata: { disabledGuardrails: ["prompt-injection"] },
         },
         headers,
       }),
       [
         "credential-masker",
-        "video-bridge",
+        "custom-guardrail",
         "prompt-injection",
         "vision-bridge",
         "pii-masker",
-        "audio-bridge",
+        "other-guardrail",
       ]
     );
   }

@@ -530,8 +530,8 @@ async function buildCallLogRow(entry: any): Promise<PreparedCallLogRow> {
   // turn immediately -- normal in a tight tool-calling loop -- can reach
   // resolvePreviousResponseState before that write exists at all. Seeded
   // synchronously, before any await, from the same protected pipeline
-  // payload the artifact will eventually hold (and the same
-  // videoContentRemoved/fail-closed rules), so it is available the instant
+  // payload the artifact will eventually hold (and the same fail-closed
+  // rules), so it is available the instant
   // this function is called. See responsesContinuationStore.ts.
   if (typeof entry.responseId === "string" && entry.responseId.length > 0) {
     seedPendingContinuationState(
@@ -540,8 +540,7 @@ async function buildCallLogRow(entry: any): Promise<PreparedCallLogRow> {
       // The store's own contract, not a looser restatement of it: the inline shape
       // widened both fields to `unknown`, which does not assign to
       // ContinuationPipeline's typed members (TS2345 under typecheck:core).
-      protectedPipelinePayloads as ContinuationPipeline | null,
-      Boolean(entry.videoContentRemoved)
+      protectedPipelinePayloads as ContinuationPipeline | null
     );
   }
 
@@ -696,7 +695,6 @@ async function buildCallLogRow(entry: any): Promise<PreparedCallLogRow> {
     // its video transcript cues structurally redacted, so
     // resolvePreviousResponseState refuses to rehydrate it as continuation
     // history. See src/lib/db/responsesContinuationStore.ts.
-    videoContentRemoved: entry.videoContentRemoved ? 1 : 0,
     hasContent,
     usageProvenance,
   };
@@ -773,7 +771,7 @@ function insertCallLogRow(prepared: PreparedCallLogRow): void {
         detail_pending_until, artifact_relpath, artifact_size_bytes, artifact_sha256,
         has_request_body, has_response_body, has_pipeline_details, request_summary,
         correlation_id, model_pinned, session_tag, client_session_id, response_id, error_type,
-        video_content_removed, has_content, usage_provenance,
+        has_content, usage_provenance,
         added_wait_ms, added_wait_cause, queue_wait_ms${resilienceCol}
       )
       VALUES (
@@ -788,7 +786,7 @@ function insertCallLogRow(prepared: PreparedCallLogRow): void {
         @detailPendingUntil, @artifactRelPath, @artifactSizeBytes, @artifactSha256,
         @hasRequestBody, @hasResponseBody, @hasPipelineDetails, @requestSummary,
         @correlationId, @modelPinned, @sessionTag, @clientSessionId, @responseId, @errorType,
-        @videoContentRemoved, @hasContent, @usageProvenance,
+        @hasContent, @usageProvenance,
         @addedWaitMs, @addedWaitCause, @queueWaitMs${resilienceParam}
       )
     `

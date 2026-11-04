@@ -54,7 +54,6 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/headroom/start", // spawns headroom-ai python CLI — must never be bypassable (Hard Rules #15 + #17)
   "/api/headroom/stop", // kills tracked PID — must never be bypassable (Hard Rules #15 + #17)
   "/api/vnc-session", // #7892: spawns Docker containers via child_process.spawn (src/lib/vncSession/service.ts) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17)
-  "/api/modality-bridge/video/", // fixed ffmpeg/ffprobe status + extraction broker (Hard Rules #15 + #17)
   // LOCAL_ONLY routes that reach a spawn / code-exec sink but were never mirrored here, so
   // both enforcement layers treated them as whitelistable. Every LOCAL_ONLY prefix must now be
   // either listed here or reviewed as bypass-eligible — drift guard:

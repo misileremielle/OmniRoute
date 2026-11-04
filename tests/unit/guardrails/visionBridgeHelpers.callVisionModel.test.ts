@@ -118,7 +118,7 @@ test("callVisionModel can route a catalog model through the OmniRoute self-loop"
   assert.equal(url.pathname, "/v1/chat/completions");
   assert.equal(capturedBody.model, "openai/gpt-4o-mini");
   assert.equal(capturedHeaders["x-omniroute-admission-bypass"], "internal");
-  assert.match(capturedHeaders["x-omniroute-disabled-guardrails"], /video-bridge/);
+  assert.equal(capturedHeaders["x-omniroute-disabled-guardrails"], "vision-bridge");
   assert.equal(result, "GREEN_SCENE_2");
 });
 

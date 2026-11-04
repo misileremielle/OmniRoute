@@ -14,57 +14,18 @@ export type PendingRequestScope = {
   model: string;
   provider: string;
   connectionId: string | null;
-  videoTranscriptSensitive?: boolean;
 };
 
-const OMITTED_VIDEO_TRANSCRIPT = "[omitted: video transcript]";
-const PENDING_PAYLOAD_KEYS = [
-  "clientRequest",
-  "providerRequest",
-  "providerResponse",
-  "clientResponse",
-] as const;
-
-function omitVideoSensitivePendingPayload(payload: unknown, sensitive: boolean): unknown {
-  return sensitive ? { _omniroute_omitted: "video-transcript" } : payload;
-}
-
-export function initialPendingBody(
-  body: unknown,
-  effectiveModel: string,
-  sensitive: boolean
-): unknown {
-  const initial =
-    body && typeof body === "object" && !Array.isArray(body)
-      ? {
-          ...(body as Record<string, unknown>),
-          model:
-            typeof (body as Record<string, unknown>).model === "string"
-              ? (body as Record<string, unknown>).model
-              : effectiveModel,
-        }
-      : body;
-  return omitVideoSensitivePendingPayload(initial, sensitive);
-}
-
-function protectPendingMetadata(
-  scope: PendingRequestScope,
-  metadata: PendingRequestMetadata
-): PendingRequestMetadata {
-  if (!scope.videoTranscriptSensitive) return metadata;
-
-  // A provider request or reply may contain rendered transcript prose without
-  // any structured cue boundary. Omit only the retained preview; callers keep
-  // their original values for dispatch, response handling and classification.
-  const protectedMetadata = { ...metadata };
-  for (const key of PENDING_PAYLOAD_KEYS) {
-    protectedMetadata[key] = omitVideoSensitivePendingPayload(metadata[key], true);
-  }
-  if (metadata.providerUrl !== undefined) protectedMetadata.providerUrl = OMITTED_VIDEO_TRANSCRIPT;
-  if (metadata.error !== undefined) protectedMetadata.error = OMITTED_VIDEO_TRANSCRIPT;
-  if (metadata.errorCode !== undefined) protectedMetadata.errorCode = OMITTED_VIDEO_TRANSCRIPT;
-  if (metadata.sessionTag !== undefined) protectedMetadata.sessionTag = OMITTED_VIDEO_TRANSCRIPT;
-  return protectedMetadata;
+export function initialPendingBody(body: unknown, effectiveModel: string): unknown {
+  return body && typeof body === "object" && !Array.isArray(body)
+    ? {
+        ...(body as Record<string, unknown>),
+        model:
+          typeof (body as Record<string, unknown>).model === "string"
+            ? (body as Record<string, unknown>).model
+            : effectiveModel,
+      }
+    : body;
 }
 
 /**
@@ -77,21 +38,19 @@ function pendingScopeIdentity(scope: PendingRequestScope): PendingRequestIdentit
 }
 
 export function updatePendingScope(scope: PendingRequestScope, metadata: PendingRequestMetadata) {
-  const retainedMetadata = protectPendingMetadata(scope, metadata);
   const identity = pendingScopeIdentity(scope);
   if (identity) {
-    updatePendingRequestById(identity, retainedMetadata);
+    updatePendingRequestById(identity, metadata);
   } else {
-    updatePendingRequest(scope.model, scope.provider, scope.connectionId, retainedMetadata);
+    updatePendingRequest(scope.model, scope.provider, scope.connectionId, metadata);
   }
 }
 
 export function finalizePendingScope(scope: PendingRequestScope, metadata: PendingRequestMetadata) {
-  const retainedMetadata = protectPendingMetadata(scope, metadata);
   const identity = pendingScopeIdentity(scope);
   if (identity) {
-    finalizePendingRequestById(identity, retainedMetadata);
+    finalizePendingRequestById(identity, metadata);
   } else {
-    finalizePendingRequest(scope.model, scope.provider, scope.connectionId, retainedMetadata);
+    finalizePendingRequest(scope.model, scope.provider, scope.connectionId, metadata);
   }
 }

@@ -111,8 +111,6 @@
 - [`POST /api/v1/segment`](#post-apiv1segment)
 - [`GET /api/v1/systemone`](#get-apiv1systemone)
 - [`POST /api/v1/systemone`](#post-apiv1systemone)
-- [`GET /api/v1/video-bridge/drilldown`](#get-apiv1video-bridgedrilldown)
-- [`DELETE /api/v1/video-bridge/drilldown`](#delete-apiv1video-bridgedrilldown)
 - [`GET /api/v1/videos/generations`](#get-apiv1videosgenerations)
 - [`POST /api/v1/videos/generations`](#post-apiv1videosgenerations)
 - [`POST /api/v1/web/fetch`](#post-apiv1webfetch)
@@ -1292,24 +1290,6 @@ curl -X POST http://localhost:20128/api/v1/systemone \
   -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{}'
-```
-
-### GET /api/v1/video-bridge/drilldown
-
-GET video bridge › drilldown
-
-```bash
-curl http://localhost:20128/api/v1/video-bridge/drilldown \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### DELETE /api/v1/video-bridge/drilldown
-
-DELETE video bridge › drilldown
-
-```bash
-curl -X DELETE http://localhost:20128/api/v1/video-bridge/drilldown \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN"
 ```
 
 ### GET /api/v1/videos/generations

@@ -124,7 +124,6 @@ import {
   withConversationId,
 } from "./chatHelpers";
 import { buildModalityBridgeHeader } from "@/lib/guardrails/modalityBridge/bridgeStats";
-import { type VideoBridgeLog, deriveVideoBridgeLog } from "./chat/videoBridgeLog.ts";
 import {
   resolveClientSessionId,
   resolveConversationId,
@@ -895,10 +894,6 @@ async function handleChatImplementation(
   // guardrail transformed the payload (describe path) — stamped on the main
   // success exits below via withModalityBridgeHeader().
   const modalityBridgeHeader = buildModalityBridgeHeader(preCallGuardrails.results);
-  // #12150 P1b: video-bridge log/Memory shadow — undefined on every
-  // non-video request. Threaded through handleSingleModelChat's
-  // runtimeOptions -> executeChatWithBreaker -> handleChatCore.
-  const videoBridgeLog = deriveVideoBridgeLog(preCallGuardrails.results, body);
   telemetry.endPhase();
 
   // Agentic conversation tracking (X-ConversationId): resolved once per
@@ -1263,7 +1258,6 @@ async function handleChatImplementation(
             reasoningIntent,
             reasoningRequestTags: requestRoutingTags.tags,
             managedLease,
-            videoBridgeLog,
             // #7360 follow-up: without this, a target dispatch abandoned by
             // targetTimeoutRunner.ts's per-target timeout (comboTargetTimeoutMs)
             // never learns it was abandoned — it only watches the ORIGINAL
@@ -1337,7 +1331,6 @@ async function handleChatImplementation(
                 forceLiveComboTest: isComboLiveTest,
                 conversationId,
                 managedLease,
-                videoBridgeLog,
               },
               combo.strategy,
               true
@@ -1433,7 +1426,6 @@ async function handleChatImplementation(
       reasoningIntent,
       reasoningRequestTags: requestRoutingTags.tags,
       managedLease,
-      videoBridgeLog,
       previousResponseResumed:
         (body as { _omniroutePreviousResponseResumed?: unknown })
           ._omniroutePreviousResponseResumed === true || undefined,
@@ -1496,8 +1488,6 @@ async function handleSingleModelChat(
     authorizationContextModel?: string | null; // admitted combo/alias (resolvedModelPolicy.ts)
     comboGrantsTargets?: boolean; // server-computed allowedCombos grant (#14197)
     managedLease?: ManagedLeaseDispatchContext | null;
-    /** #12150 P1b: video-bridge log/Memory shadow — undefined on every non-video request. */
-    videoBridgeLog?: VideoBridgeLog;
     /**
      * rehydrated-continuation flag; noted under the attempt store in
      * handleChatCore. Optional plumbing, no semantics.
@@ -1582,7 +1572,6 @@ async function handleSingleModelChat(
               redirectCombo.config?.reasoningTransportFallback === "skip" ? "skip" : "drop",
             conversationId: runtimeOptions?.conversationId ?? null,
             managedLease: runtimeOptions.managedLease ?? null,
-            videoBridgeLog: runtimeOptions.videoBridgeLog,
             previousResponseResumed: runtimeOptions.previousResponseResumed,
             // #7360 follow-up — see the primary handleSingleModel closure above.
             modelAbortSignal: target?.modelAbortSignal ?? null,
@@ -2178,7 +2167,6 @@ async function handleSingleModelChat(
             sessionAffinityKey: runtimeOptions.sessionAffinityKey ?? null,
             reasoningTransportFallback: runtimeOptions.reasoningTransportFallback ?? "drop",
             managedLease: runtimeOptions.managedLease ?? null,
-            videoBridgeLog: runtimeOptions.videoBridgeLog,
             previousResponseResumed: runtimeOptions.previousResponseResumed,
             fallbackAttempts: runtimeOptions.fallbackAttempts,
             beforeUpstreamAttempt:

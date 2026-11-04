@@ -283,39 +283,6 @@ export function downgradeRestoredClaudeThinking(content: unknown): unknown[] | n
   return kept;
 }
 
-/**
- * Drop whatever the stream capture stored for the tool calls of a reconstructed
- * client response (Chat `choices[].message.tool_calls[].id` or Responses
- * `output[].call_id`). Used when the turn must not be retained at all, e.g. a
- * response that may echo video transcript cues.
- */
-export function forgetClaudeThinkingForClientResponse(responseBody: unknown): void {
-  if (!responseBody || typeof responseBody !== "object" || entries.size === 0) return;
-  const root = responseBody as Record<string, unknown>;
-  const ids: string[] = [];
-  if (Array.isArray(root.choices)) {
-    for (const choice of root.choices) {
-      const toolCalls = (choice as { message?: { tool_calls?: unknown } } | null)?.message
-        ?.tool_calls;
-      if (!Array.isArray(toolCalls)) continue;
-      for (const toolCall of toolCalls) {
-        const id = (toolCall as { id?: unknown } | null)?.id;
-        if (typeof id === "string") ids.push(id);
-      }
-    }
-  }
-  const output = Array.isArray(root.output)
-    ? root.output
-    : Array.isArray((root.response as { output?: unknown } | undefined)?.output)
-      ? ((root.response as { output: unknown[] }).output as unknown[])
-      : [];
-  for (const item of output) {
-    const callId = (item as { call_id?: unknown } | null)?.call_id;
-    if (typeof callId === "string") ids.push(callId);
-  }
-  for (const id of ids) deleteKey(id);
-}
-
 export function clearClaudeThinkingStore() {
   entries.clear();
   totalChars = 0;

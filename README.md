@@ -65,17 +65,17 @@
 
 <div align="center">
 
-|                           |          v3.8.50          | **v3.8.51** |      `v3.8.53+`       |
-| ------------------------- | :-----------------------: | :---------: | :-------------------: |
-| 🌐 Providers              |            352            |   **358**   |          380          |
-| 🧠 Unique chat model IDs  |           1320            |  **1374**   |         1491          |
-| 🖼️ Modality Bridge        | 🆕 vision + audio + video |      ✓      |           ✓           |
-| 📡 Radar free catalog     |         🆕 opt-in         |      ✓      |           ✓           |
-| ⚖️ Quota-aware scheduling |      🆕 Quota-Share       |      ✓      |           ✓           |
-| 📊 Quota telemetry        |          🆕 live          |      ✓      |           ✓           |
-| 🧰 Headless mode          |             —             |      —      | 🆕 `serve --headless` |
-| 🛤️ LTS rail infra         |             —             |      —      |  🆕 release channels  |
-| 🔎 Model discovery API    |             —             |      —      | 🆕 `/v1/models/query` |
+|                           |    v3.8.50     | **v3.8.51** |      `v3.8.53+`       |
+| ------------------------- | :------------: | :---------: | :-------------------: |
+| 🌐 Providers              |      352       |   **358**   |          380          |
+| 🧠 Unique chat model IDs  |      1320      |  **1374**   |         1491          |
+| 🖼️ Vision Bridge          |   🆕 vision    |      ✓      |           ✓           |
+| 📡 Radar free catalog     |   🆕 opt-in    |      ✓      |           ✓           |
+| ⚖️ Quota-aware scheduling | 🆕 Quota-Share |      ✓      |           ✓           |
+| 📊 Quota telemetry        |    🆕 live     |      ✓      |           ✓           |
+| 🧰 Headless mode          |       —        |      —      | 🆕 `serve --headless` |
+| 🛤️ LTS rail infra         |       —        |      —      |  🆕 release channels  |
+| 🔎 Model discovery API    |       —        |      —      | 🆕 `/v1/models/query` |
 
 **→ [Roadmap](ROADMAP.md) — riding the rail to `v3.9.0 LTS`**
 

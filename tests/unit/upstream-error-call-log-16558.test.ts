@@ -101,17 +101,12 @@ test("keeps explicit response bodies and successful response behavior", async ()
   );
 });
 
-test("honors no-log and video transcript omission for upstream errors", async () => {
+test("honors no-log for upstream errors", async () => {
   assert.equal(
     (await logFailure({ providerResponse: { secret: "never persist" } }, { noLogEnabled: true }))
       .responseBody,
     null
   );
-  const row = await logFailure(
-    { providerResponse: { message: "private transcript" } },
-    { videoContentRemoved: true }
-  );
-  assert.ok(!JSON.stringify(row).includes("private transcript"));
 });
 
 test("retains an explicit truncation marker for oversized upstream errors", async () => {

@@ -244,11 +244,6 @@ import { createManagedLeaseFence } from "./chatCore/managedLeaseFence.ts";
 
 import { getCacheControlSettings } from "@/lib/cacheControlSettings";
 import { guardrailRegistry } from "@/lib/guardrails";
-import type { VideoBridgeLogRedactionEntry } from "@/lib/guardrails/videoBridge";
-import {
-  logClientRawRequestRedacted,
-  redactPendingBody,
-} from "@/lib/guardrails/videoBridgeSnapshotRedaction";
 import {
   shouldPreserveCacheControl,
   resolveConnectionCacheOverride,
@@ -315,15 +310,6 @@ import { classifyModelScope429, isModelScopeProvider } from "../services/modelsc
 import { incrementTokenUsage, isTpmExhausted } from "../services/geminiRateLimitTracker.ts";
 
 /**
- * #12150 P1b: shape of handleChatCore's optional `videoBridgeLog` param — see
- * its destructure default below. `handleChatCore`'s own params object has no
- * type annotation (pre-existing convention for this god-function), so this
- * alias is applied via a local cast at each read site instead of widening
- * the whole destructure to a typed object.
- */
-type VideoBridgeLogParam = { observed: boolean; redaction: VideoBridgeLogRedactionEntry[] } | null;
-
-/**
  * Core chat handler - shared between SSE and Worker
  * Returns { success, response, status, error } for caller to handle fallback
  * @param {object} options
@@ -382,15 +368,6 @@ async function handleChatCoreInner({
   // Trusted management validation only; never populated from request body/headers.
   validationExecutorFence = null,
   beforeUpstreamAttempt = undefined,
-  // #12150 P1b: additive, optional video-bridge log/Memory shadow — shape is
-  // VideoBridgeLogParam (defined near the top of this file). Built once in chat.ts from
-  // preCallGuardrails.results (video-bridge guardrail meta) and threaded here
-  // through executeChatWithBreaker. `undefined` for every non-video request,
-  // so this parameter changes nothing on the byte-identical default path.
-  // `observed` gates durable Memory extraction (surface 3); `redaction` is
-  // applied to a CLONE of `body` at the persistAttemptLogs sink (surface 1) —
-  // the model-bound `body` itself is never touched.
-  videoBridgeLog = undefined,
   fallbackAttempts = undefined,
   forcedConnectionId = null, // #14116: caller's pinned/requested connection, vs credentials.connectionId below
   allowedConnections = null, // routing allowlist; in-request account rotation must stay inside it
@@ -416,12 +393,6 @@ async function handleChatCoreInner({
   // Keep the selected rule across format conversion, retries and refreshed credentials.
   // Each combo leg gets its own execution context; nothing is written to shared accounts.
   const reasoningRuleDirective = body?._omnirouteReasoningRule;
-  // #12150 P1b: true iff the video-bridge guardrail rendered >=1 transcript
-  // cue into a replaced part of this request. Gates both request- and
-  // response-derived Memory extraction
-  // (chatCore/memoryExtraction.ts::runMemoryExtractionGate).
-  const videoBridgeObserved: boolean =
-    (videoBridgeLog as VideoBridgeLogParam | undefined)?.observed === true;
   // resume flag from chat.ts, noted under the attempt store opened above.
   notePreviousResponseResumed(previousResponseResumed);
   const resilienceSettings = resolveResilienceSettings(cachedSettings);
@@ -571,7 +542,6 @@ async function handleChatCoreInner({
     effectiveServiceTier,
     startTime,
     log,
-    videoTranscriptSensitive: videoBridgeObserved,
   });
   if (idempotencyHit) {
     return idempotencyHit;
@@ -752,8 +722,8 @@ async function handleChatCoreInner({
   const pendingRequestId =
     trackPendingRequest(model, provider, pendingConnId, true, {
       clientEndpoint: clientRawRequest?.endpoint || "/v1/chat/completions",
-      clientRequest: redactPendingBody(clientRawRequest?.body ?? body, videoBridgeObserved),
-      providerRequest: initialPendingBody(body, effectiveModel, videoBridgeObserved),
+      clientRequest: clientRawRequest?.body ?? body,
+      providerRequest: initialPendingBody(body, effectiveModel),
       stage: "registered",
       correlationId,
       sessionTag: conversationId || null,
@@ -950,13 +920,6 @@ async function handleChatCoreInner({
       // client explicitly sent x-omniroute-session-id. The raw header remains a
       // fallback for any caller that somehow bypassed conversationId resolution.
       sessionTag: conversationId || explicitSessionIdHeader,
-      // #12150 P1b surface 1: undefined for every non-video request (byte-identical
-      // to before this param existed) — see applyVideoBridgeLogRedaction.
-      videoBridgeLogRedaction: (videoBridgeLog as VideoBridgeLogParam | undefined)?.redaction,
-      // #12150 P2 surface 2: mark the persisted call_logs row so
-      // resolvePreviousResponseState refuses to rehydrate a snapshot whose video
-      // transcript was redacted. false for every non-video request.
-      videoContentRemoved: videoBridgeObserved,
     });
   };
 
@@ -1060,8 +1023,8 @@ async function handleChatCoreInner({
   const semanticCacheEnabled = isSemanticCacheEnabled(settings, apiKeyInfo);
 
   const reqLogger = await createRequestLogger(sourceFormat, targetFormat, model, {
-    enabled: detailedLoggingEnabled && !videoBridgeObserved,
-    captureStreamChunks: capturePipelineStreamChunks && !videoBridgeObserved,
+    enabled: detailedLoggingEnabled,
+    captureStreamChunks: capturePipelineStreamChunks,
     maxStreamChunkBytes: getCallLogPipelineMaxSizeBytes(),
     requestId: pendingRequestId,
     model,
@@ -1074,12 +1037,17 @@ async function handleChatCoreInner({
     model,
     provider,
     connectionId: pendingConnId,
-    videoTranscriptSensitive: videoBridgeObserved,
   };
   const providerRequestCapture = createPreparedRequestLogger(reqLogger, pendingScope);
-  // 0. Log client raw request (before format conversion) — redacts video transcript
-  // cues in the logged copy only; see videoBridgeSnapshotRedaction.ts.
-  logClientRawRequestRedacted(reqLogger, clientRawRequest, videoBridgeObserved);
+  // 0. Log client raw request (before format conversion)
+  if (clientRawRequest) {
+    reqLogger.logClientRawRequest(
+      clientRawRequest.endpoint,
+      clientRawRequest.body,
+      clientRawRequest.headers,
+      clientRawRequest.effectiveInput
+    );
+  }
   const reasoningRouteDecision =
     body && typeof body === "object"
       ? (body as Record<string, unknown>)._omnirouteReasoningRouteTrace
@@ -1132,7 +1100,6 @@ async function handleChatCoreInner({
     apiKeyId: apiKeyInfo?.id ?? undefined,
     cacheDefaultMode: (apiKeyInfo as { cacheDefaultMode?: "legacy" | "bypass" } | null)
       ?.cacheDefaultMode,
-    videoTranscriptSensitive: videoBridgeObserved,
   });
   if (cacheHit) {
     return cacheHit;
@@ -2196,7 +2163,6 @@ async function handleChatCoreInner({
         preserveCacheControl,
         copilotCompatibleReasoning,
         reasoningCacheScope,
-        videoBridgeObserved,
         normalizeClaudeUpstreamMessages,
         applyReasoningRuleDirective,
         getModelNormalizeToolCallId,
@@ -2299,7 +2265,6 @@ async function handleChatCoreInner({
           signatureNamespace: connectionId,
           copilotClient: copilotCompatibleReasoning,
           reasoningCacheScope,
-          videoTranscriptSensitive: videoBridgeObserved,
           onReasoningReplayHistory: (messages) => {
             reasoningReplayHistory = messages;
           },
@@ -2787,7 +2752,7 @@ async function handleChatCoreInner({
         `${decision.kind} (model remaining: ${decision.snapshot.modelRemaining ?? "unknown"}, total remaining: ${decision.snapshot.totalRemaining ?? "unknown"})`
       );
     }
-    const persistentMessage = projectRetainedProviderFailureMessage(message, videoBridgeObserved);
+    const persistentMessage = projectRetainedProviderFailureMessage(message);
     const errorConnectionId = getCurrentConnectionId() || connectionId;
     if (errorConnectionId && errorType) {
       try {
@@ -3336,7 +3301,6 @@ async function handleChatCoreInner({
       updateFromResponseBody,
       updatePendingScope,
       updateProviderConnection,
-      videoBridgeObserved,
       webFetchFallbackPlan,
       webSearchFallbackPlan,
       syncExecuteTranslatedBody,
@@ -3434,7 +3398,6 @@ async function handleChatCoreInner({
     toolNameMap,
     traceId,
     translatedBody,
-    videoBridgeObserved,
   });
   onPipelineStreamError = streamingTailOutcome.carry.onPipelineStreamError;
   onClientDisconnectFinalize = streamingTailOutcome.carry.onClientDisconnectFinalize;

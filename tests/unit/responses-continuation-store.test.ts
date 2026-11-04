@@ -535,7 +535,10 @@ test("resolvePreviousResponseState never lets the pending bridge cross tenants",
     responseId: "resp_gen-tenant-bridge",
     pipeline: {
       clientRawRequest: { body: { input: [{ role: "user", content: "secret" }] } },
-      clientResponse: { id: "resp_gen-tenant-bridge", output: [{ role: "assistant", content: "reply" }] },
+      clientResponse: {
+        id: "resp_gen-tenant-bridge",
+        output: [{ role: "assistant", content: "reply" }],
+      },
     },
   });
 
@@ -577,33 +580,6 @@ test("resolvePreviousResponseState does not bridge a response id that saveCallLo
   assert.equal(store.resolvePreviousResponseState("resp_gen-no-pipeline", "key-1"), null);
 });
 
-test("the pending bridge shares the durable path's fail-closed rules (video-redacted turns never bridge)", async () => {
-  const save = callLogs.saveCallLog({
-    method: "POST",
-    path: "/v1/responses",
-    status: 200,
-    model: "gpt-5.4-pro",
-    provider: "openai",
-    apiKeyId: "key-1",
-    duration: 100,
-    responseId: "resp_gen-video-bridge",
-    videoContentRemoved: true,
-    pipeline: {
-      clientRawRequest: { body: { input: [{ role: "user", content: "[redacted-video-transcript]" }] } },
-      clientResponse: { id: "resp_gen-video-bridge", output: [{ role: "assistant", content: "ok" }] },
-    },
-  });
-
-  // Even mid-flight (bridge-only, durable row not yet written), a
-  // video-redacted turn must fail closed exactly like the durable path does.
-  assert.equal(store.resolvePreviousResponseState("resp_gen-video-bridge", "key-1"), null);
-
-  await save;
-
-  assert.equal(store.resolvePreviousResponseState("resp_gen-video-bridge", "key-1"), null);
-});
-
-
 // resolveTurnCompletionState / resolveConversationStalledState -- backs the
 // /dashboard/conversations "stalled" badge (live incident 2026-09-04: a
 // reasoning-heavy stream blew past the SSE collector's cap mid-stream,
@@ -636,7 +612,10 @@ test("resolveTurnCompletionState returns 'tool_call_pending' for a completed str
     },
   });
 
-  assert.equal(store.resolveTurnCompletionState("2026-01-01/turn-tool-call.json"), "tool_call_pending");
+  assert.equal(
+    store.resolveTurnCompletionState("2026-01-01/turn-tool-call.json"),
+    "tool_call_pending"
+  );
 });
 
 test("resolveTurnCompletionState returns 'incomplete' for a collector-truncated stream (_truncated: true)", () => {
@@ -662,7 +641,10 @@ test("resolveTurnCompletionState returns 'incomplete' for a non-'completed' stat
     clientResponse: { summary: { status: "failed", output: [] } },
   });
 
-  assert.equal(store.resolveTurnCompletionState("2026-01-01/turn-failed-status.json"), "incomplete");
+  assert.equal(
+    store.resolveTurnCompletionState("2026-01-01/turn-failed-status.json"),
+    "incomplete"
+  );
 });
 
 test("resolveTurnCompletionState returns 'unknown' for a missing artifact", () => {

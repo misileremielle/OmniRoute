@@ -91,7 +91,6 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
   // Dashboard HTML stays out of this list: a reverse proxy is not loopback, so
   // gating the page logged the session out. The JSON API above stays local-only.
   "/api/providers/cursor/agent-availability", // credential-free dashboard-nudge check: spawns `cursor-agent status --format json` via checkCursorAgentAvailability()/getCachedCursorAgentAvailability() (src/lib/cursor/renewal.ts) — RCE-via-tunnel surface (Hard Rules #15 + #17). Narrow-scoped like /login and /refresh-cursor, not the whole /api/providers/ tree. Placed under /api/providers/ rather than /api/oauth/ because /api/oauth/ is PUBLIC-classified and never reaches this LOCAL_ONLY gate.
-  "/api/modality-bridge/video/", // Video Bridge status + extraction broker; fixed ffmpeg/ffprobe subprocesses, strict loopback only (Hard Rules #15 + #17)
 ];
 
 /**

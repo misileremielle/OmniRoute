@@ -79,7 +79,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
     "/api/headroom/start",
     "/api/headroom/stop",
     "/api/vnc-session",
-    "/api/modality-bridge/video/",
     // GHSA-35fw-cv32-2373: the 14 cli-tools routes that reach the same
     // getCliRuntimeStatus() / detectAllTools() spawn as their gated siblings.
     "/api/cli-tools/all-statuses",

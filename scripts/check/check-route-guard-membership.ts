@@ -276,7 +276,6 @@ export const KNOWN_TRANSITIVE_SPAWN_SINKS: Record<string, string> = {
   "open-sse/vendor/codex-chatgpt-web/browser-login.ts": `${G09_BASELINE} (child_process)`,
   "open-sse/vendor/codex-chatgpt-web/process.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/cursor/tokenExtractor.ts": `${G09_BASELINE} (child_process)`,
-  "src/lib/guardrails/videoBridgeRuntime.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/headroom/detect.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/headroom/process.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/logExport/childRunner.ts": `${G09_BASELINE} (child_process)`,
