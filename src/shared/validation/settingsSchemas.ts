@@ -229,7 +229,6 @@ export const updateSettingsSchema = z.object({
   autoRefreshProviderQuota: z.boolean().optional(),
   autoRefreshProviderQuotaInterval: z.number().int().min(10).max(3600).optional(),
   pinProviderQuotaToHome: z.boolean().optional(),
-  showQuickStartOnHome: z.boolean().optional(),
   showProviderTopologyOnHome: z.boolean().optional(),
   localOnlyManageScopeBypassEnabled: z.boolean().optional(),
   // Layer 1 of the spawn-capable guard (Hard Rules #15/#17): reject any bypass

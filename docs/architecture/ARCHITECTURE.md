@@ -120,7 +120,7 @@ the rest are linked from their domain-specific guides.
 
 Main pages under `src/app/(dashboard)/dashboard/`:
 
-- `/dashboard` — quick start + provider overview
+- `/dashboard` — provider overview
 - `/dashboard/endpoint` — endpoint proxy + MCP + A2A + API endpoint tabs
 - `/dashboard/providers` — provider connections and credentials
 - `/dashboard/combos` — combo strategies, templates, step-based builder, model routing rules, manual persisted ordering

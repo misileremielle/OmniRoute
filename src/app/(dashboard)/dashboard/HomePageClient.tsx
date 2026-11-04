@@ -2,11 +2,8 @@
 
 import { useTranslations } from "next-intl";
 
-import { useState, useEffect, useMemo, useCallback, useRef, useSyncExternalStore } from "react";
-import Link from "next/link";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { SectionHeader } from "@omniroute/ui-kit/page-header";
-import { WorkflowGuide } from "@omniroute/ui-kit/workflow-guide";
 import EmptyState from "@/shared/components/EmptyState";
 import Icon from "@/shared/components/Icon";
 import { CardSkeleton, Button, Modal } from "@/shared/components";
@@ -106,20 +103,6 @@ function mergeUpdateStep(steps: UpdateStep[], nextStep: UpdateStep) {
   return next;
 }
 
-// Quick-start link classes, extracted so each <Link> still fits on one line with
-// prefetch={false} (#8281) — this file is size-frozen.
-const INLINE_LINK = "text-primary hover:underline";
-// The kit WorkflowGuide numbers its steps itself; the step titles carry a "1. " prefix.
-const stripStepNumber = (title: string) => title.replace(/^\s*\d+[.)]\s*/, "");
-const DOCS_LINK =
-  "hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-main hover:bg-bg-subtle transition-colors";
-
-// Stable no-op subscription for useSyncExternalStore reads of never-changing
-// browser globals (location.origin does not change without a full navigation).
-function emptySubscribe() {
-  return () => {};
-}
-
 export default function HomePageClient({ machineId }: HomePageClientProps) {
   const router = useRouter();
   const isElectron = useIsElectron();
@@ -129,13 +112,6 @@ export default function HomePageClient({ machineId }: HomePageClientProps) {
   const [providerConnections, setProviderConnections] = useState([]);
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
-  // useSyncExternalStore keeps SSR/hydration consistent ("/v1" on the server,
-  // the real origin after hydration) without a setState-in-effect round-trip.
-  const baseUrl = useSyncExternalStore(
-    emptySubscribe,
-    () => `${globalThis.location.origin}/v1`,
-    () => "/v1"
-  );
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [providerMetrics, setProviderMetrics] = useState<Record<string, ProviderMetricSummary>>({});
   const [providerTopology, setProviderTopology] = useState({ lastProvider: "", errorProvider: "" });
@@ -223,7 +199,6 @@ export default function HomePageClient({ machineId }: HomePageClientProps) {
   const [updatePhase, setUpdatePhase] = useState<"idle" | "running" | "done" | "failed">("idle");
 
   // Appearance settings for home page pinning
-  const [showQuickStartOnHome, setShowQuickStartOnHome] = useState(true); // default on
   // #4596: default hidden until appearance settings load, so the live-WS
   // topology connection is never opened before we know the user wants it.
   const [showProviderTopologyOnHome, setShowProviderTopologyOnHome] = useState(false);
@@ -235,9 +210,6 @@ export default function HomePageClient({ machineId }: HomePageClientProps) {
       .then((r) => (r.ok ? r.json() : {}))
       .then((data: Record<string, unknown> | null) => {
         if (data) {
-          if (typeof data.showQuickStartOnHome === "boolean") {
-            setShowQuickStartOnHome(data.showQuickStartOnHome);
-          }
           // #4596 regression fix: the topology card defaults ON (matches the
           // AppearanceTab toggle's `!== false`). Honoring only an explicit boolean
           // left the card hidden whenever the setting was never persisted
@@ -797,8 +769,6 @@ export default function HomePageClient({ machineId }: HomePageClientProps) {
     );
   }
 
-  const currentEndpoint = baseUrl;
-
   return (
     <div className="flex flex-col gap-8">
       {/* Update Progress Overlay */}
@@ -1056,90 +1026,6 @@ export default function HomePageClient({ machineId }: HomePageClientProps) {
               )}
           </div>
         </div>
-      )}
-
-      {/* Quick Start (controlled by Appearance setting, default on) */}
-      {showQuickStartOnHome && (
-        <section className="flex flex-col gap-3">
-          <SectionHeader
-            title={t("quickStart")}
-            description={t("quickStartDesc")}
-            actions={
-              <Link href="/docs" prefetch={false} className={DOCS_LINK}>
-                <Icon name="menu_book" size={14} />
-                {t("fullDocs")}
-              </Link>
-            }
-          />
-          <WorkflowGuide
-            label={t("quickStart")}
-            items={[
-              {
-                id: "step1",
-                icon: <Icon name="key" size={18} />,
-                title: stripStepNumber(t("step1Title")),
-                description: (
-                  <>
-                    {t.rich("step1Desc", {
-                      endpoint: (chunks) => (
-                        <Link
-                          href="/dashboard/api-manager"
-                          prefetch={false}
-                          className={INLINE_LINK}
-                        >
-                          {chunks}
-                        </Link>
-                      ),
-                    })}
-                  </>
-                ),
-              },
-              {
-                id: "step2",
-                icon: <Icon name="dns" size={18} />,
-                title: stripStepNumber(t("step2Title")),
-                description: (
-                  <>
-                    {t.rich("step2Desc", {
-                      providers: (chunks) => (
-                        <Link href="/dashboard/providers" prefetch={false} className={INLINE_LINK}>
-                          {chunks}
-                        </Link>
-                      ),
-                    })}
-                  </>
-                ),
-              },
-              {
-                id: "step3",
-                icon: <Icon name="link" size={18} />,
-                title: stripStepNumber(t("step3Title")),
-                description: <>{t("step3Desc", { url: currentEndpoint })}</>,
-              },
-              {
-                id: "step4",
-                icon: <Icon name="analytics" size={18} />,
-                title: stripStepNumber(t("step4Title")),
-                description: (
-                  <>
-                    {t.rich("step4Desc", {
-                      logs: (chunks) => (
-                        <Link href="/dashboard/logs" prefetch={false} className={INLINE_LINK}>
-                          {chunks}
-                        </Link>
-                      ),
-                      analytics: (chunks) => (
-                        <Link href="/dashboard/analytics" prefetch={false} className={INLINE_LINK}>
-                          {chunks}
-                        </Link>
-                      ),
-                    })}
-                  </>
-                ),
-              },
-            ]}
-          />
-        </section>
       )}
 
       {showProviderTopologyOnHome && (
