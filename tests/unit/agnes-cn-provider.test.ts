@@ -5,7 +5,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
 import DefaultExecutor from "../../open-sse/executors/default.ts";
-import { VIDEO_PROVIDER_IDS } from "../../src/shared/constants/providers.ts";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -18,7 +17,6 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 
 const { REGISTRY } = await import("../../open-sse/config/providerRegistry.ts");
 const { APIKEY_PROVIDERS } = await import("../../src/shared/constants/providers.ts");
-const { IMAGE_PROVIDERS } = await import("../../open-sse/config/imageRegistry.ts");
 const { FREE_MODEL_BUDGETS } = await import("../../open-sse/config/freeModelCatalog.ts");
 const { resolveProviderAlias, parseModel } = await import("../../open-sse/services/model.ts");
 const { sanitizeReasoningEffortForProvider } =
@@ -144,32 +142,6 @@ test("getProviderCredentials does not return the other Agnes region's connection
   assert.ok(intlCreds, "agnes must resolve a credential");
   assert.equal(intlCreds.provider, "agnes");
   assert.notEqual(intlCreds.apiKey, "agnes-cn-fixture-key");
-});
-
-test("agnes-cn is absent from image and video registries", () => {
-  assert.equal(IMAGE_PROVIDERS["agnes-cn"], undefined);
-  assert.equal(VIDEO_PROVIDER_IDS.has("agnes-cn"), false);
-});
-
-test("IMAGE_PROVIDERS agnes-cn absence lock can go red", () => {
-  assert.equal(IMAGE_PROVIDERS["agnes-cn"], undefined);
-  const stub = { id: "agnes-cn", models: [] };
-  IMAGE_PROVIDERS["agnes-cn"] = stub as (typeof IMAGE_PROVIDERS)[string];
-  try {
-    assert.ok(IMAGE_PROVIDERS["agnes-cn"], "injected agnes-cn image entry must be defined");
-  } finally {
-    delete IMAGE_PROVIDERS["agnes-cn"];
-  }
-  assert.equal(IMAGE_PROVIDERS["agnes-cn"], undefined);
-
-  assert.equal(VIDEO_PROVIDER_IDS.has("agnes-cn"), false);
-  VIDEO_PROVIDER_IDS.add("agnes-cn");
-  try {
-    assert.equal(VIDEO_PROVIDER_IDS.has("agnes-cn"), true);
-  } finally {
-    VIDEO_PROVIDER_IDS.delete("agnes-cn");
-  }
-  assert.equal(VIDEO_PROVIDER_IDS.has("agnes-cn"), false);
 });
 
 test("agnes-cn free catalog three rows agnes-cn-free pool with agnes-3.0-flash", () => {

@@ -162,35 +162,6 @@ test("call_logs table has video_content_removed column", () => {
   );
 });
 
-test("saveCallLog persists videoContentRemoved=true as 1 (#12150 P2)", async () => {
-  const db = getDbInstance();
-  const testId = `test-videoremoved-${Date.now()}`;
-
-  await saveCallLog({
-    id: testId,
-    method: "POST",
-    path: "/v1/responses",
-    status: 200,
-    model: "video-model",
-    provider: "test-provider",
-    duration: 500,
-    tokens: { in: 10, out: 5 },
-    videoContentRemoved: true,
-  });
-
-  const row = db
-    .prepare("SELECT id, video_content_removed FROM call_logs WHERE id = ?")
-    .get(testId) as Record<string, unknown>;
-  assert.ok(row, "row should exist");
-  assert.equal(
-    row.video_content_removed,
-    1,
-    "video_content_removed should be 1 when videoContentRemoved=true"
-  );
-
-  db.prepare("DELETE FROM call_logs WHERE id = ?").run(testId);
-});
-
 test("saveCallLog defaults video_content_removed to 0 when absent (#12150 P2)", async () => {
   const db = getDbInstance();
   const testId = `test-novideoremoved-${Date.now()}`;

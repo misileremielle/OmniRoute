@@ -76,7 +76,6 @@ test("the chat handler is imported by exactly these modules (the chat-family rou
     "src/app/api/v1/antigravity/route.ts",
     "src/app/api/v1/api/chat/route.ts",
     "src/app/api/v1/chat/completions/route.ts",
-    "src/app/api/v1/completions/route.ts",
     "src/app/api/v1/messages/route.ts",
     "src/app/api/v1/providers/[provider]/chat/completions/route.ts",
     "src/app/api/v1/relay/chat/completions/route.ts",
@@ -87,11 +86,11 @@ test("the chat handler is imported by exactly these modules (the chat-family rou
   ]);
 });
 
-test("image, embeddings and audio routes never reach the guardrail registry", () => {
+test("embeddings routes never reach the guardrail registry", () => {
   const routes = SOURCE_FILES.filter((file) =>
-    /^src\/app\/api\/v1\/(images|embeddings|audio)\/.*route\.ts$/.test(file)
+    /^src\/app\/api\/v1\/(embeddings|multimodal-embeddings)\/.*route\.ts$/.test(file)
   );
-  assert.ok(routes.length >= 6, `expected the image/embeddings/audio routes, got ${routes}`);
+  assert.ok(routes.length >= 1, `expected the embeddings routes, got ${routes}`);
   for (const route of routes) {
     const source = read(route);
     assert.ok(!/sse\/handlers\/chat["']/.test(source), `${route} imports the chat handler`);
@@ -99,12 +98,7 @@ test("image, embeddings and audio routes never reach the guardrail registry", ()
   }
   // The only injection check those routes get is the legacy middleware facade (prompt
   // injection only; see the disable-channel characterization in the behavioral file).
-  for (const route of [
-    "src/app/api/v1/embeddings/route.ts",
-    "src/app/api/v1/images/generations/route.ts",
-    "src/app/api/v1/images/edits/route.ts",
-    "src/app/api/v1/audio/speech/route.ts",
-  ]) {
+  for (const route of ["src/app/api/v1/embeddings/route.ts"]) {
     assert.ok(/(?:withInjectionGuard|createInjectionGuard)\(/.test(read(route)), route);
   }
 });
@@ -139,10 +133,9 @@ test("post-call runs only on the non-streaming branch of handleChatCore", () => 
 
 // ─── 4. Ordering inside nonStreamingResponse.ts ──────────────────────────────
 
-test("non-streaming order: memory extraction → tool execution → post-call → block exit → cache store", () => {
+test("non-streaming order: tool execution → post-call → block exit → cache store", () => {
   const leaf = read("open-sse/handlers/chatCore/nonStreamingResponse.ts");
-  const memory = indexOrFail(leaf, "runMemoryExtractionGate({");
-  const tools = indexOrFail(leaf, "translatedResponse = await handleToolCallExecution(", memory);
+  const tools = indexOrFail(leaf, "translatedResponse = await handleToolCallExecution(");
   const context = indexOrFail(leaf, "buildPostCallGuardrailContext({", tools);
   const postCall = indexOrFail(leaf, "guardrailRegistry.runPostCallHooks(", context);
   const apply = indexOrFail(leaf, "translatedResponse = postCallGuardrails.response;", postCall);
@@ -154,19 +147,12 @@ test("non-streaming order: memory extraction → tool execution → post-call �
   );
   const cacheStore = indexOrFail(leaf, "storeSemanticCacheResponse({", blockedExit);
   const idempotency = indexOrFail(leaf, "await saveIdempotency(", cacheStore);
-  assert.ok(memory < tools && tools < postCall && postCall < blocked);
+  assert.ok(tools < postCall && postCall < blocked);
   assert.ok(blocked < blockedExit && blockedExit < cacheStore && cacheStore < idempotency);
   // Each anchor appears once, so the order above is unambiguous.
-  for (const anchor of [
-    "runMemoryExtractionGate({",
-    "guardrailRegistry.runPostCallHooks(",
-    "storeSemanticCacheResponse({",
-  ]) {
+  for (const anchor of ["guardrailRegistry.runPostCallHooks(", "storeSemanticCacheResponse({"]) {
     assert.equal(leaf.split(anchor).length - 1, 1, anchor);
   }
-  // characterization: memory extraction and tool execution see the response BEFORE the
-  // post-call guardrails, so a response later blocked (or rewritten) by a post-call
-  // guardrail has already been offered to memory extraction / built-in tool execution.
 });
 
 test("the post-call verdict is applied to what is cached, and the cache write is keyed per API key", () => {
@@ -206,5 +192,5 @@ test("characterization: the vision-bridge describe call uses undici fetch, bypas
   );
   const helpers = read("src/lib/guardrails/visionBridgeHelpers.ts");
   assert.doesNotMatch(helpers, /self-hop|selfHop/);
-  assert.match(helpers, /headers\["x-omniroute-disabled-guardrails"\] = routeThroughOmniRoute/);
+  assert.match(helpers, /headers\["x-omniroute-disabled-guardrails"\] = "vision-bridge"/);
 });

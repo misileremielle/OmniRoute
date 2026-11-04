@@ -1,5 +1,4 @@
 import { splitCodexReasoningSuffix } from "@omniroute/open-sse/executors/codex/reasoningSuffix.ts";
-import { isRegisteredImageModel } from "@omniroute/open-sse/config/imageRegistry";
 import { isModelAdvertisedByConnection } from "@/domain/connectionModelRules";
 import { isSelfHostedChatProvider } from "@/shared/constants/providers";
 import { type ProviderConnectionView } from "@/lib/db/providers/lazyConnectionView";
@@ -18,11 +17,6 @@ import {
  * Hosted-tool image ids (`gpt-6.1-sol`, `gpt-5.6-*`) are chat models the inventory does
  * list, so they keep the filter (#18687).
  */
-function isCodexImageModel(requestedModel: string): boolean {
-  const rawModel = requestedModel.slice(requestedModel.lastIndexOf("/") + 1);
-  return /^gpt-image-/i.test(rawModel) && isRegisteredImageModel("codex", rawModel);
-}
-
 /**
  * Does this connection's synced inventory advertise the requested model?
  *
@@ -66,9 +60,7 @@ export async function loadAdvertisedModelsForConnections(
     connections
       .map((c) => c.provider)
       .filter(
-        (p): p is string =>
-          typeof p === "string" &&
-          (isSelfHostedChatProvider(p) || (p === "codex" && !isCodexImageModel(requestedModel)))
+        (p): p is string => typeof p === "string" && (isSelfHostedChatProvider(p) || p === "codex")
       )
   );
   if (inventoryProviders.size === 0) return advertised;

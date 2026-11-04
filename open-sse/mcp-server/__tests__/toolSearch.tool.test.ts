@@ -40,7 +40,7 @@ describe("omniroute_tool_search", () => {
     expect(typeof parsed.tools[0].signature).toBe("string");
   });
 
-  it("discovers all GitHub skill tools", async () => {
+  it("does not discover removed GitHub skill tools", async () => {
     const res = await client.callTool({
       name: "omniroute_tool_search",
       arguments: { query: "GitHub skills", limit: 25 },
@@ -49,8 +49,8 @@ describe("omniroute_tool_search", () => {
     const parsed = JSON.parse(text);
     const names = new Set(parsed.tools.map((tool: { name: string }) => tool.name));
 
-    expect(names.has("omniroute_github_skills_search")).toBe(true);
-    expect(names.has("omniroute_github_skills_scan")).toBe(true);
-    expect(names.has("omniroute_github_skills_install")).toBe(true);
+    expect(names.has("omniroute_github_skills_search")).toBe(false);
+    expect(names.has("omniroute_github_skills_scan")).toBe(false);
+    expect(names.has("omniroute_github_skills_install")).toBe(false);
   });
 });

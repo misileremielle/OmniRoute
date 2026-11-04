@@ -155,28 +155,8 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
   const endpointData = useMemo(() => {
     const chat = allModels.filter((m) => !m.type && !m.parent);
     const embeddings = allModels.filter((m) => m.type === "embedding" && !m.parent);
-    const images = allModels.filter((m) => m.type === "image" && !m.parent);
-    const video = allModels.filter((m) => m.type === "video" && !m.parent);
     const rerank = allModels.filter((m) => m.type === "rerank" && !m.parent);
-    const audioTranscription = allModels.filter(
-      (m) => m.type === "audio" && m.subtype === "transcription" && !m.parent
-    );
-    const audioSpeech = allModels.filter(
-      (m) => m.type === "audio" && m.subtype === "speech" && !m.parent
-    );
-    const moderation = allModels.filter((m) => m.type === "moderation" && !m.parent);
-    const music = allModels.filter((m) => m.type === "music" && !m.parent);
-    return {
-      chat,
-      embeddings,
-      images,
-      video,
-      rerank,
-      audioTranscription,
-      audioSpeech,
-      moderation,
-      music,
-    };
+    return { chat, embeddings, rerank };
   }, [allModels]);
 
   const totalEndpointModelCount = useMemo(
@@ -185,20 +165,12 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
   );
 
   const availableEndpointCount = useMemo(() => {
-    const chatCount = endpointData.chat.length > 0 ? 4 : 0; // chat + responses + completions + messages
-    const imageCount = endpointData.images.length > 0 ? 2 : 0; // image gen + image edits
-    const otherMedia = [
-      endpointData.embeddings,
-      endpointData.audioTranscription,
-      endpointData.audioSpeech,
-      endpointData.music,
-      endpointData.video,
-    ].filter((m) => m.length > 0).length;
+    const chatCount = endpointData.chat.length > 0 ? 3 : 0; // chat + responses + messages
+    const embeddingCount = endpointData.embeddings.length > 0 ? 1 : 0;
     const utilityFixed = 3; // batch + files + list models (always available)
-    const modelUtility =
-      (endpointData.rerank.length > 0 ? 1 : 0) + (endpointData.moderation.length > 0 ? 1 : 0);
+    const modelUtility = endpointData.rerank.length > 0 ? 1 : 0;
     const searchCount = searchProviders.length > 0 ? 1 : 0;
-    return chatCount + imageCount + otherMedia + utilityFixed + modelUtility + searchCount;
+    return chatCount + embeddingCount + utilityFixed + modelUtility + searchCount;
   }, [endpointData, searchProviders]);
 
   const postCloudAction = async (action, timeoutMs = CLOUD_ACTION_TIMEOUT_MS) => {
@@ -707,18 +679,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
               modelsLoading={modelsLoading}
             />
             <EndpointCard
-              icon="text_fields"
-              iconColor="text-warning"
-              iconBg="bg-warning/10"
-              title={t("completionsLegacy")}
-              path="/v1/completions"
-              models={endpointData.chat}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
               icon="psychology"
               iconColor="text-chart-3"
               iconBg="bg-chart-3/10"
@@ -733,12 +693,12 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
           </div>
         </div>
 
-        {/* Media & Multi-Modal */}
+        {/* Embeddings */}
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-3">
             <Icon name="perm_media" className="text-sm text-chart-3" />
             <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-              {t("categoryMedia")}
+              {t("embeddings")}
             </h3>
             <div className="flex-1 h-px bg-border/50" />
           </div>
@@ -750,78 +710,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
               title={t("embeddings")}
               path="/v1/embeddings"
               models={endpointData.embeddings}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="image"
-              iconColor="text-chart-3"
-              iconBg="bg-chart-3/10"
-              title={t("imageGeneration")}
-              path="/v1/images/generations"
-              models={endpointData.images}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="edit_square"
-              iconColor="text-chart-3"
-              iconBg="bg-chart-3/10"
-              title={t("imageEdits")}
-              path="/v1/images/edits"
-              models={endpointData.images}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="mic"
-              iconColor="text-error"
-              iconBg="bg-error/10"
-              title={t("audioTranscription")}
-              path="/v1/audio/transcriptions"
-              models={endpointData.audioTranscription}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="record_voice_over"
-              iconColor="text-info"
-              iconBg="bg-info/10"
-              title={t("textToSpeech")}
-              path="/v1/audio/speech"
-              models={endpointData.audioSpeech}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="music_note"
-              iconColor="text-chart-3"
-              iconBg="bg-chart-3/10"
-              title={t("musicGeneration")}
-              path="/v1/music/generations"
-              models={endpointData.music}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="videocam"
-              iconColor="text-error"
-              iconBg="bg-error/10"
-              title={t("videoGeneration")}
-              path="/v1/videos/generations"
-              models={endpointData.video}
               copy={copy}
               copied={copied}
               baseUrl={currentEndpoint}
@@ -873,18 +761,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
               title={t("rerank")}
               path="/v1/rerank"
               models={endpointData.rerank}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="shield"
-              iconColor="text-warning"
-              iconBg="bg-warning/10"
-              title={t("moderations")}
-              path="/v1/moderations"
-              models={endpointData.moderation}
               copy={copy}
               copied={copied}
               baseUrl={currentEndpoint}

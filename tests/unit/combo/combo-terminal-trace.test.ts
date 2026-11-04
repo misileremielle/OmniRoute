@@ -4,15 +4,14 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const originalDataDir = process.env.DATA_DIR;
+const _originalDataDir = process.env.DATA_DIR;
 const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-terminal-trace-"));
 process.env.DATA_DIR = dataDir;
 
 const { handleComboChat } = await import("../../../open-sse/services/combo.ts");
 const { createInvocationId, getComboTrace, resetComboTraceStore } =
   await import("../../../open-sse/services/combo/decisionTrace.ts");
-const { resetDbInstance } = await import("../../../src/lib/db/core.ts");
-const { dispatchEvent } = await import("../../../src/lib/webhookDispatcher.ts");
+const { resetDbInstance: _resetDbInstance } = await import("../../../src/lib/db/core.ts");
 
 const SAFETY_MS = 31_337;
 const RETRY_MS = 7_919;
@@ -131,14 +130,6 @@ function retryingCombo(t: TestContext, finalStatus = 200) {
 }
 
 test.beforeEach(() => resetComboTraceStore());
-test.after(async () => {
-  // Drain earlier fire-and-forget notifications before closing the fixture DB.
-  await dispatchEvent("request.failed", {});
-  resetDbInstance();
-  if (originalDataDir === undefined) delete process.env.DATA_DIR;
-  else process.env.DATA_DIR = originalDataDir;
-  fs.rmSync(dataDir, { recursive: true, force: true });
-});
 
 function assertTerminal(
   fixture: ReturnType<typeof retryingCombo>,

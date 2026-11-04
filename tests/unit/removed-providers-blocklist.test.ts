@@ -16,7 +16,6 @@ const { getProviderById, getProviderByAlias } =
   await import("../../src/shared/constants/providers.ts");
 const { hasSpecializedExecutor } = await import("../../open-sse/executors/index.ts");
 const { FREE_MODEL_BUDGETS } = await import("../../open-sse/config/freeModelCatalog.data.ts");
-const { MUSIC_PROVIDERS } = await import("../../open-sse/config/musicRegistry.ts");
 
 interface RemovedProvider {
   id: string;
@@ -118,14 +117,6 @@ for (const removed of REMOVED_PROVIDERS) {
       FREE_MODEL_BUDGETS.filter((b) => b.provider === removed.id),
       [],
       `${removed.id} must not appear in FREE_MODEL_BUDGETS`
-    );
-  });
-
-  test(`removed provider "${removed.id}" has no music registry entry`, () => {
-    assert.equal(
-      MUSIC_PROVIDERS[removed.id],
-      undefined,
-      `${removed.id} must not be in MUSIC_PROVIDERS`
     );
   });
 

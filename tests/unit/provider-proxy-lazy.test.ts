@@ -13,16 +13,7 @@ const {
   WEB_COOKIE_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
-  AUDIO_ONLY_PROVIDERS,
 } = await import("../../src/shared/constants/providers.ts");
-
-const { IMAGE_PROVIDERS, getImageProvider } = await import(
-  "../../open-sse/config/imageRegistry.ts"
-);
-
-function getImageProviders() {
-  return IMAGE_PROVIDERS;
-}
 
 const ALL_SECTIONS = [
   FREE_PROVIDERS,
@@ -31,7 +22,6 @@ const ALL_SECTIONS = [
   WEB_COOKIE_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
-  AUDIO_ONLY_PROVIDERS,
 ];
 
 test("AI_PROVIDERS: Object.keys returns all provider IDs", () => {
@@ -129,33 +119,6 @@ test("getProviderByAlias: also matches by ID", () => {
   const provider = getProviderByAlias("openai");
   assert.ok(provider);
   assert.equal(provider.id, "openai");
-});
-
-test("IMAGE_PROVIDERS (sub-registry): Object.keys works", () => {
-  const keys = Object.keys(IMAGE_PROVIDERS);
-  assert.ok(keys.length > 0, "IMAGE_PROVIDERS has no keys");
-  assert.ok(keys.includes("openai"));
-  assert.ok(keys.includes("together"));
-});
-
-test("IMAGE_PROVIDERS (sub-registry): bracket access works", () => {
-  const provider = IMAGE_PROVIDERS["openai"];
-  assert.ok(provider);
-  assert.equal(provider.id, "openai");
-  assert.ok(Array.isArray(provider.models));
-});
-
-test("IMAGE_PROVIDERS (sub-registry): 'in' operator works", () => {
-  assert.ok("openai" in IMAGE_PROVIDERS);
-  assert.ok(!("nonexistent" in IMAGE_PROVIDERS));
-});
-
-test("IMAGE_PROVIDERS: getImageProviders returns the same data", () => {
-  const fromFn = getImageProviders();
-  const keysFn = Object.keys(fromFn).sort();
-  const keysProxy = Object.keys(IMAGE_PROVIDERS).sort();
-  assert.deepEqual(keysFn, keysProxy);
-  assert.equal(fromFn["openai"].id, IMAGE_PROVIDERS["openai"].id);
 });
 
 test("provider count: total providers > 200 (all sections loaded)", () => {

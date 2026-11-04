@@ -234,8 +234,6 @@ export const TRANSITIVE_SPAWN_INFRA_MODULES: Record<string, string> = {
     "execFileSync of fixed OS commands to read the machine id; no request input.",
   "open-sse/utils/kimiDevice.ts":
     "execFileSync('/usr/bin/sw_vers', ['-productVersion']) for the device fingerprint; fixed argv.",
-  "open-sse/executors/geminiLiveTranscribe.ts":
-    "spawn('ffmpeg', FFMPEG_PCM16K_ARGS) module-constant argv (pipe:0 -> pipe:1, -protocol_whitelist pipe), no shell; upload only on stdin; timeout/abort SIGKILL.",
   "open-sse/utils/setupPolyfill.ts":
     "imports worker_threads only to polyfill markAsUncloneable; starts no worker.",
   "src/lib/usage/callLogArtifactWriter.ts":
@@ -262,7 +260,6 @@ export const KNOWN_TRANSITIVE_SPAWN_SINKS: Record<string, string> = {
   "open-sse/executors/devin-cli-agentic.ts": `${G09_BASELINE} (child_process)`,
   "open-sse/executors/devin-cli.ts": `${G09_BASELINE} (child_process)`,
   "open-sse/executors/zcodeProtocol.ts": `${G09_BASELINE} (child_process)`,
-  "open-sse/handlers/imageGeneration/providers/cursorAgentImage.ts": `${G09_BASELINE} (child_process)`,
   "open-sse/lib/deepseek-pow.ts": `${G09_BASELINE} (worker_threads)`,
   "open-sse/services/adobeFireflyBrowserLogin.ts": `${G09_BASELINE} (child_process)`,
   "open-sse/services/obscura.ts": `${G09_BASELINE} (child_process)`,
@@ -273,10 +270,8 @@ export const KNOWN_TRANSITIVE_SPAWN_SINKS: Record<string, string> = {
   "open-sse/vendor/codex-chatgpt-web/browser-login.ts": `${G09_BASELINE} (child_process)`,
   "open-sse/vendor/codex-chatgpt-web/process.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/cursor/tokenExtractor.ts": `${G09_BASELINE} (child_process)`,
-  "src/lib/guardrails/videoBridgeRuntime.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/headroom/detect.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/headroom/process.ts": `${G09_BASELINE} (child_process)`,
-  "src/lib/logExport/childRunner.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/providerModels/cursorAgent.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/providers/validation/webProvidersB.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/proxySubscription/coreConfig/apply.ts": `${G09_BASELINE} (child_process)`,

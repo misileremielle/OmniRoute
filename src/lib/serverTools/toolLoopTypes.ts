@@ -200,8 +200,6 @@ export interface NonStreamingClientTranslateInput {
   customToolNames?: ReadonlySet<string>;
   requestToolIdentityMap: Map<string, { namespace?: string; name: string }> | null;
   reasoningCacheScope: string | null;
-  /** Never retain reasoning from a response that may echo video transcript cues. */
-  videoTranscriptSensitive?: boolean;
   clientHeaders: Headers | Record<string, unknown> | null;
   isClaudeCodeCompatible: boolean;
   /** Serving connection id — the Claude thinking store binds entries on it (#17324). */

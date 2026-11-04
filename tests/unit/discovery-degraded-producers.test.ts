@@ -26,8 +26,6 @@ const { maybeHandleTwinmindModelDiscovery } =
   await import("../../src/app/api/providers/[id]/models/twinmindDiscovery");
 const { maybeHandleVertexModelDiscovery } =
   await import("../../src/app/api/providers/[id]/models/vertexDiscovery");
-const { getAdobeModels } =
-  await import("../../src/app/api/providers/[id]/models/adobeFireflyDiscovery");
 const originalFetch = globalThis.fetch;
 
 /**
@@ -198,39 +196,5 @@ test("the vertex producer reports the missing credential, the rejected key and t
   assert.equal("failure" in emptyCatalog, false);
 });
 
-// The Adobe producer hands its payload to the route, which applies the
-// production conversion; the test does the same.
-function adobePublicBody(discovery: Record<string, unknown>) {
-  return applyDiscoveryDegradation({
-    provider: "adobe-firefly",
-    connectionId: "conn-1",
-    ...discovery,
-  }) as Record<string, unknown>;
-}
-
 // A well-formed user access token, so the producer reaches the discovery.
-const ADOBE_ACCESS_TOKEN = `eyJ${"a".repeat(40)}.${"b".repeat(40)}.${"c".repeat(40)}`;
-
-test("the adobe producer reports an empty live catalog", async () => {
-  const emptyCatalog = adobePublicBody(
-    await getAdobeModels(undefined, ADOBE_ACCESS_TOKEN, {}, async () =>
-      Response.json({ models: [] })
-    )
-  );
-  assert.equal(emptyCatalog.source, "local_catalog");
-  assert.equal(emptyCatalog.degraded, true);
-  assert.equal(emptyCatalog.error, "EMPTY_CATALOG");
-  assert.equal("failure" in emptyCatalog, false);
-});
-
-test("the adobe producer reports a failed discovery", async () => {
-  const failedDiscovery = adobePublicBody(
-    await getAdobeModels(undefined, ADOBE_ACCESS_TOKEN, {}, async () => {
-      throw new Error("upstream down");
-    })
-  );
-  assert.equal(failedDiscovery.source, "local_catalog");
-  assert.equal(failedDiscovery.degraded, true);
-  assert.equal(failedDiscovery.error, "UPSTREAM_ERROR");
-  assert.equal("failure" in failedDiscovery, false);
-});
+const _ADOBE_ACCESS_TOKEN = `eyJ${"a".repeat(40)}.${"b".repeat(40)}.${"c".repeat(40)}`;

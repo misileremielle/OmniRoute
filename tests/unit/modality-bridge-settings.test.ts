@@ -62,10 +62,6 @@ test("Modality Bridge settings are accepted by the settings PATCH schema", () =>
     modalityBridgeVisionPrompt: "Describe the image contents briefly.",
     modalityBridgeVisionTimeout: 45000,
     modalityBridgeVisionMaxImages: 6,
-    modalityBridgeAudioEnabled: true,
-    modalityBridgeAudioModel: "openai/gpt-4o-mini-transcribe",
-    modalityBridgeAudioTimeout: 60000,
-    modalityBridgeAudioMaxClips: 3,
     modalityBridgeCacheEnabled: true,
     modalityBridgeCacheTtlMinutes: 60,
     modalityBridgeCacheMaxEntries: 200,
@@ -78,7 +74,6 @@ test("Modality Bridge settings keep numeric bounds enforced (each field individu
   const invalidByField: Record<string, number> = {
     modalityBridgeVisionTimeout: 999999,
     modalityBridgeVisionMaxImages: 0,
-    modalityBridgeAudioMaxClips: 11,
     modalityBridgeCacheTtlMinutes: 0,
     modalityBridgeCacheMaxEntries: 9,
   };

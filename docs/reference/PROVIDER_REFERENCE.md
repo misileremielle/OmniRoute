@@ -10,7 +10,7 @@ lastUpdated: 2026-11-04
 > Regenerate with: `npm run gen:provider-reference`
 > **Last generated:** 2026-11-04
 
-Total providers: **380**. See category breakdown below.
+Total providers: **355**. See category breakdown below.
 
 ## Categories
 
@@ -21,7 +21,6 @@ Total providers: **380**. See category breakdown below.
 - **API key** — paid provider configured via API key (free credits may apply)
 - **Local** — runs on the user's machine (Ollama, LM Studio, vLLM, etc.)
 - **Search** — web search providers
-- **Audio** — audio-only providers (TTS/STT)
 - **Upstream proxy** — providers that proxy to other providers
 - **Cloud agent** — long-running coding agents (Codex Cloud, Devin, Jules)
 - **System** — OmniRoute-internal providers (loopback, etc.)
@@ -34,7 +33,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 
 ---
 
-## No-auth Providers (no key required) (9)
+## No-auth Providers (no key required) (8)
 
 | ID | Alias | Name | Tags | Website | Notes | Tool calling |
 |----|-------|------|------|---------|-------|--------------|
@@ -45,7 +44,6 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `devin-cli-agentic` | `dva` | Devin CLI Agentic Bridge | No-auth | [link](https://docs.devin.ai/work-with-devin/devin-cli) | Authentication is owned by the official Devin CLI in its isolated bridge volume. | emulated |
 | `duckduckgo-web` | `ddgw` | DuckDuckGo AI Chat | No-auth | [link](https://duckduckgo.com/duckchat) | No credentials required — DuckDuckGo AI Chat is anonymous and free. | emulated |
 | `uncloseai` | `unc` | UncloseAI | No-auth | [link](https://uncloseai.com) | No auth required. API accepts any non-empty string as key for identification. If older built-in models return 404, use Available Models → Import from /models or Auto-Sync; verified live model: turboderp/Qwen3.8-27B-exl3. | emulated |
-| `veoaifree-web` | `veo-free` | Veo AI Free | No-auth, video | [link](https://veoaifree.com) | No auth required. Rate limited to 6 requests/hour per IP. | — |
 | `zcode` | `zc` | ZCode (GLM Coding Plan) | No-auth | [link](https://zcode.z.ai) | No API key stored by OmniRoute. The local ZCode app-server uses the existing builtin:zai-coding-plan login. | — |
 
 ## OAuth Providers (28)
@@ -81,7 +79,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `zed` | `zd` | Zed IDE | OAuth | [link](https://zed.dev) | Zed stores LLM provider credentials (OpenAI, Anthropic, Google, Mistral, xAI) in the OS keychain. Use the Import button below to discover and import them automatically. |
 | `zed-hosted` | — | Zed Hosted Models | OAuth | [link](https://zed.dev) | Sign in with your Zed account (native-app sign-in). OmniRoute generates a one-time RSA keypair and opens zed.dev to authorize it — on a remote/headless install, copy the resulting 127.0.0.1 callback URL from your browser's address bar and paste it back here. Distinct from the 'Zed IDE' credential-import entry above: this proxies chat completions through Zed's own hosted model aggregator (cloud.zed.dev), fronting Anthropic/OpenAI/Google/xAI models under your Zed plan. |
 
-## Web Cookie Providers (37)
+## Web Cookie Providers (38)
 
 | ID | Alias | Name | Tags | Website | Notes | Tool calling |
 |----|-------|------|------|---------|-------|--------------|
@@ -102,6 +100,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `huggingchat` | `huggingchat` | HuggingChat (Free) | Web cookie | [link](https://huggingface.co/chat) | Paste the full Cookie header from huggingface.co/chat (DevTools → Network → /chat/conversation → Request Headers → Cookie). It should include hf-chat and may also include token / aws-waf-token. | — |
 | `hyperagent` | `ha` | HyperAgent (Unofficial/Experimental) | Web cookie | [link](https://hyperagent.com) | Paste the full Cookie header from hyperagent.com (DevTools → Network → any request → Request Headers → Cookie). Session cookies power chat + billing usage. | — |
 | `inner-ai` | `in-ai` | Inner.ai (Subscription) | Web cookie | [link](https://app.innerai.com) | Paste your token cookie and email separated by a space: open DevTools → Application → Cookies → .innerai.com, copy the token value, then append a space and your Inner.ai login email. Example: eyJhbG... user@example.com | emulated |
+| `kagi-assistant` | `kagi` | Kagi Assistant (Subscription) | Web cookie | [link](https://kagi.com/assistant) | Paste your Session Link or its token from kagi.com/settings/user_details (Session Link). Each request appears as a thread in your Assistant history. | — |
 | `kimi-web` | `kimi-web` | Kimi Web | Web cookie | [link](https://www.kimi.ai) | Paste access_token from www.kimi.ai DevTools → Application → Local Storage. A legacy kimi-auth cookie is also accepted. | — |
 | `lmarena` | `lma` | Arena (Free) | Web cookie | [link](https://arena.ai) | Paste the full Cookie header from arena.ai (DevTools → Network → request → Cookie). Include arena-auth-prod-v1.0/.1… and cf_clearance/__cf_bm when present. OmniRoute uses Chrome TLS impersonation; if Arena still 403s, set providerSpecificData.recaptchaV3Token from a live browser session. | — |
 | `maxai` | `mx` | MaxAI | Web cookie | [link](https://www.maxai.co) | Sign in once (email code or browser) to mint a MaxAI access token. OmniRoute signs each request, routes it through residential egress, and refreshes the token browserlessly, so a connection stays valid for about a year without re-login. | emulated |
@@ -123,13 +122,13 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `zai-web` | `zw` | Z.ai Web | Web cookie | [link](https://chat.z.ai) | Copy the "token" value from chat.z.ai → DevTools → Application → Local Storage. Do not copy cookies; OmniRoute handles the per-request CAPTCHA through its browser transport. | — |
 | `zenmux-free` | `zmf` | ZenMux Free (Web) | Web cookie | [link](https://zenmux.ai) | Login at zenmux.ai, then export all cookies using EditThisCookie or Cookie-Editor and paste the full Cookie header string here. Refresh every ~30 days. | — |
 
-## API Key Providers (paid / paid-with-free-credits) (255)
+## API Key Providers (paid / paid-with-free-credits) (243)
 
 | ID | Alias | Name | Tags | Website | Notes |
 |----|-------|------|------|---------|-------|
 | `360ai` | `360ai` | 360 AI | API key | [link](https://ai.360.cn) | Get API key at ai.360.cn |
 | `agentrouter` | `agentrouter` | AgentRouter | API key, aggregator | [link](https://agentrouter.org) | $200 free credits on signup - multi-model routing gateway |
-| `agnes` | `agnes` | Agnes AI | API key, video | [link](https://agnes-ai.com) | Get API key at agnes-ai.com |
+| `agnes` | `agnes` | Agnes AI | API key | [link](https://agnes-ai.com) | Get API key at agnes-ai.com |
 | `agnes-cn` | `agnescn` | Agnes AI (China) | API key | [link](https://api.agnes-ai.cn) | Get API key from the Agnes CN site. |
 | `ai21` | `ai21` | AI21 Labs | API key | [link](https://www.ai21.com) | $10 trial credits on signup (valid 3 months), no credit card required |
 | `aimlapi` | `aiml` | AI/ML API | API key, aggregator | [link](https://aimlapi.com) | Free tier paused (2026) — AI/ML API is now pay-as-you-go only (min $20 top-up); no recurring free credits. |
@@ -156,7 +155,6 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `beatapi` | `beatapi` | BeatAPI | API key, aggregator | [link](https://beatapi.io) | Create an API key at https://beatapi.io/dashboard/apikeys, then paste it here. |
 | `bedrock` | `bedrock` | Amazon Bedrock | API key, enterprise | [link](https://aws.amazon.com/bedrock) | Use your Amazon Bedrock API key and configure the AWS region where your models are enabled (for example eu-west-2). OmniRoute calls Bedrock's native Converse API directly. |
 | `bigmodel` | `bigmodel` | BigModel.cn (Zhipu) | API key | [link](https://open.bigmodel.cn) | — |
-| `black-forest-labs` | `bfl` | Black Forest Labs | API key, image | [link](https://blackforestlabs.ai) | — |
 | `blackbox` | `bb` | Blackbox AI | API key | [link](https://blackbox.ai) | ⚠️ **DEPRECATED.** api.blackbox.ai returns HTTP 404 on every path variant (sweep 2026-08-21); the public inference surface has moved to the gated enterprise.blackbox.ai/v1 endpoint. |
 | `bluesminds` | `bm` | BluesMinds | API key | [link](https://www.bluesminds.com) | Free daily pi credits — supports 200+ models including GPT-4o, GPT-4.1, Claude Sonnet 4.5, Gemini 2.0 Flash, DeepSeek V4, Qwen, Kimi K2 |
 | `byteplus` | `bpm` | BytePlus ModelArk | API key | [link](https://console.byteplus.com/ark) | — |
@@ -196,7 +194,6 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `empower` | `empower` | Empower | API key, aggregator | [link](https://docs.empower.dev) | Bearer API key for the Empower OpenAI-compatible endpoint. |
 | `eurouter` | `eurouter` | EURouter | API key, aggregator | [link](https://eurouter.ai) | — |
 | `factory` | `factory` | Factory | API key | [link](https://factory.ai) | Bearer API key for the Factory OpenAI-compatible gateway. |
-| `fal-ai` | `fal` | Fal.ai | API key, image | [link](https://fal.ai) | — |
 | `fastrouter` | `fastrouter` | FastRouter | API key, aggregator | [link](https://fastrouter.ai) | Models with the :free suffix allow 10 requests/day per organization and model; availability may change. |
 | `featherless-ai` | `featherless` | Featherless AI | API key | [link](https://featherless.ai) | Free tier available — no credit card required |
 | `fenayai` | `fenayai` | FenayAI | API key, aggregator | [link](https://fenayai.com) | Bearer API key for the FenayAI OpenAI-compatible gateway. |
@@ -225,14 +222,12 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `glmt` | `glmt` | GLM Thinking | API key | [link](https://open.bigmodel.cn) | — |
 | `greenpt` | `greenpt` | GreenPT | API key | [link](https://greenpt.com) | API subscription is free to create; inference is billed per token. No free inference allowance is published. |
 | `groq` | `groq` | Groq | API key | [link](https://groq.com) | Free plan: per-model caps (200K tokens/day per chat model; see console.groq.com/docs/rate-limits for RPM/RPD) — no payment method on file. |
-| `haiper` | `hp` | Haiper | API key, video | [link](https://haiper.ai) | Get API key at haiper.ai/haiper-api |
 | `hcnsec` | `hcnsec` | Huancheng Public API | API key | [link](https://api.hcnsec.cn) | Get API key at api.hcnsec.cn |
 | `helixmind` | `helixmind` | HelixMind | API key, aggregator | [link](https://helixmind.online) | Previously circulated 3 RPM/50 RPD and no-card claims were not confirmed during the 2026-08-02 audit; current quota and billing require account verification. |
 | `helyxai` | `helyxai` | Helyx AI | API key, aggregator | [link](https://helyxai.space) | Operational Free plan documents 100,000 tokens/day; the site's separate 2M+ marketing claim conflicts and is not treated as a quota guarantee. |
 | `heroku` | `heroku` | Heroku AI | API key, enterprise | [link](https://www.heroku.com) | — |
 | `huggingface` | `hf` | HuggingFace | API key | [link](https://huggingface.co) | Free Inference API for thousands of models (Whisper, VITS, SDXL…) |
 | `hyperbolic` | `hyp` | Hyperbolic | API key | [link](https://hyperbolic.xyz) | $1-5 trial credits on signup for serverless inference |
-| `ideogram` | `ideo` | Ideogram | API key | [link](https://ideogram.ai) | Get API key at ideogram.ai/docs/api |
 | `iflytek` | `iflytek` | iFlytek Spark | API key | [link](https://xinghuo.xfyun.cn) | Get API key at console.xfyun.cn |
 | `inception` | `inception` | Inception | API key | [link](https://docs.inceptionlabs.ai) | 10M free tokens on signup, no credit card required. |
 | `inference-net` | `inet` | Inference.net | API key | [link](https://inference.net) | $25 free credits on signup plus research grants available |
@@ -246,7 +241,6 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `kimi-coding-apikey` | `kmca` | Kimi Code API Key | API key | [link](https://www.kimi.ai/code) | — |
 | `lambda-ai` | `lambda` | Lambda AI | API key | [link](https://lambda.ai) | — |
 | `laozhang` | `lz` | LaoZhang AI | API key, aggregator | [link](https://api.laozhang.ai) | — |
-| `leonardo` | `leo` | Leonardo AI | API key, video | [link](https://leonardo.ai) | Get API key at leonardo.ai/developer |
 | `liquid` | `liquid` | Liquid AI | API key | [link](https://liquid.ai) | Get API key at liquid.ai |
 | `literouter` | `literouter` | LiteRouter | API key, aggregator | [link](https://literouter.com) | Free model variants use the :free suffix; daily credit limits vary by model and free input is capped at 5,000 tokens. |
 | `llamagate` | `llamagate` | LlamaGate | API key | [link](https://llamagate.ai) | — |
@@ -256,11 +250,10 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `logfare` | `logfare` | Logfare | API key, aggregator | [link](https://logfare.ai) | Create a free account at https://logfare.ai/register (username/password, no email verification) to get an instant API key, then paste it here as a Bearer token. |
 | `longcat` | `lc` | LongCat AI | API key | [link](https://longcat.chat/platform/docs) | Free: one-time 10M-token grant after account signup + KYC verification (LongCat-2.0). One-time only — not a recurring daily/monthly allowance. |
 | `lyceum` | `lyceum` | Lyceum | API key, aggregator | [link](https://lyceum.technology) | Includes monthly free credits toward serverless inference usage. |
-| `magnific` | `freepik` | Magnific | API key, image | [link](https://www.magnific.com) | Get an API key at magnific.com/user/api-keys (header x-magnific-api-key). Legacy Freepik developer keys still work. |
 | `maritalk` | `maritalk` | Maritalk | API key | [link](https://www.maritaca.ai) | — |
 | `meganova-ai` | `meganova-ai` | MegaNova AI | API key, aggregator | [link](https://meganova.ai) | Free signup without a card. Published Tier 1 per-model quotas total 550 requests/day; they are not a shared global pool, and paid overage can apply if enabled. |
 | `meta-llama` | `meta` | Meta Llama API | API key | [link](https://llama.developer.meta.com) | — |
-| `minimax` | `minimax` | Minimax Coding | API key, video | [link](https://www.minimax.io) | — |
+| `minimax` | `minimax` | Minimax Coding | API key | [link](https://www.minimax.io) | — |
 | `minimax-cn` | `minimax-cn` | Minimax (China) | API key | [link](https://www.minimaxi.com) | — |
 | `mistral` | `mistral` | Mistral | API key | [link](https://mistral.ai) | Free Experiment tier: rate-limited access to all models, no credit card required |
 | `mixedbread` | `mxbai` | Mixedbread AI | API key | [link](https://www.mixedbread.com) | Bearer API key for the Mixedbread embeddings API. |
@@ -281,7 +274,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `nlpcloud` | `nlpc` | NLP Cloud | API key | [link](https://docs.nlpcloud.com) | Use your NLP Cloud API key in Authorization: Token <key>. OmniRoute targets the chatbot endpoint on https://api.nlpcloud.io/v1/gpu/<model>/chatbot by default. |
 | `nomic` | `nomic` | Nomic | API key | [link](https://nomic.ai) | Get API key at atlas.nomic.ai |
 | `nous-research` | `nous` | Nous Research | API key | [link](https://portal.nousresearch.com/help) | Use your Nous Portal API key. OmniRoute targets the official OpenAI-compatible inference endpoint at https://inference-api.nousresearch.com/v1. |
-| `novita` | `novita` | Novita AI | API key, video, aggregator | [link](https://novita.ai) | $0.50 trial credits on signup (valid about 1 year) |
+| `novita` | `novita` | Novita AI | API key, aggregator | [link](https://novita.ai) | $0.50 trial credits on signup (valid about 1 year) |
 | `nscale` | `nscale` | nScale | API key | [link](https://nscale.com) | $5 free credits on signup for inference testing |
 | `nube` | `nube` | Nube.sh | API key | [link](https://nube.sh) | — |
 | `nvidia` | `nvidia` | NVIDIA NIM | API key | [link](https://build.nvidia.com) | Free dev access: ~40 RPM, 70+ models (Kimi K2.5, GLM 4.7, DeepSeek V3.2...) |
@@ -307,7 +300,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `plamo` | `plamo` | PLaMo | API key | [link](https://plamo.preferredai.jp/api) | — |
 | `poe` | `poe` | Poe | API key, aggregator | [link](https://creator.poe.com/api-reference) | Bearer API key for the Poe OpenAI-compatible API. |
 | `poixe-ai` | `poixe-ai` | Poixe AI | API key, aggregator | [link](https://poixe.com) | Current public free limits are small and model-group specific: 2 RPM/5 RPD for large-cup models and 20 RPM/50 RPD for small-cup models. |
-| `pollinations` | `pol` | Pollinations AI | API key, video | [link](https://pollinations.ai) | Anonymous/keyless access to the documented free models is best-effort. Local v3.8.50 verification (2026-07-31) returned 401 via OmniRoute and Cloudflare 1010 on direct upstream probes from the same network. Premium models still require a Pollinations API key from enter.pollinations.ai. |
+| `pollinations` | `pol` | Pollinations AI | API key | [link](https://pollinations.ai) | Anonymous/keyless access to the documented free models is best-effort. Local v3.8.50 verification (2026-07-31) returned 401 via OmniRoute and Cloudflare 1010 on direct upstream probes from the same network. Premium models still require a Pollinations API key from enter.pollinations.ai. |
 | `poolside` | `poolside` | Poolside | API key | [link](https://poolside.ai) | Preview ending: direct Poolside Platform inference shuts down on 2026-10-31. Laguna S 2.1 and XS 2.1 are free during Preview; no public numeric quota is published. |
 | `predibase` | `predibase` | Predibase | API key | [link](https://predibase.com) | ⚠️ **DEPRECATED.** serving.app.predibase.com no longer resolves (sweep 2026-06-19); the managed serving API appears discontinued. |
 | `publicai` | `publicai` | PublicAI | API key | [link](https://publicai.co) | Requires an API key — one-time signup credit, then paid |
@@ -315,26 +308,22 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `qiniu` | `qiniu` | Qiniu | API key | [link](https://www.qiniu.com) | — |
 | `qwen-cloud` | `qwc` | Qwen Cloud | API key | [link](https://www.qwencloud.com/) | — |
 | `qwen-cloud-token-plan` | `qct` | Qwen Cloud Token Plan | API key | [link](https://www.qwencloud.com/pricing/token-plan) | — |
-| `recraft` | `recraft` | Recraft | API key, image | [link](https://recraft.ai) | — |
 | `regolo` | `regolo` | Regolo AI | API key | [link](https://regolo.ai) | Get your Regolo API key from regolo.ai, then paste it here as a Bearer token. |
 | `reka` | `reka` | Reka | API key | [link](https://docs.reka.ai/chat/overview) | Use your Reka API key. OmniRoute supports the OpenAI-compatible base URL https://api.reka.ai/v1 and sends both Authorization and X-Api-Key headers for compatibility. |
 | `requesty` | `requesty` | Requesty | API key | [link](https://requesty.ai) | Free tier ~200 requests/day - multi-model routing gateway (300+ models) |
 | `routeway` | `routeway` | Routeway | API key | [link](https://routeway.ai) | Create a free API key at routeway.ai, then paste it here as a Bearer token. |
 | `runcrate` | `runcrate` | Runcrate | API key | [link](https://www.runcrate.ai) | Open models are free with your GitHub account |
-| `runwayml` | `runway` | Runway | API key, video | [link](https://docs.dev.runwayml.com) | Use your Runway API key in Authorization: Bearer <key>. OmniRoute targets the current Runway API at https://api.dev.runwayml.com/v1 and sends the required X-Runway-Version header automatically. |
 | `sambanova` | `samba` | SambaNova | API key | [link](https://sambanova.ai) | $5 free credits on signup (30-day validity), no credit card required |
 | `sap` | `sap` | SAP Generative AI Hub | API key, enterprise | [link](https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/generative-ai-hub-in-sap-ai-core) | Use your SAP AI Core bearer token. Base URL can be your AI_API_URL root or a deploymentUrl from Generative AI Hub. |
 | `sarvam` | `sarvam` | Sarvam AI | API key | [link](https://docs.sarvam.ai) | ₹1,000 in free signup credits — never expire |
 | `scaleway` | `scw` | Scaleway AI | API key | [link](https://www.scaleway.com/en/docs/ai-data/generative-apis/) | 1M free tokens for new accounts — EU/GDPR compliant (Paris), Qwen3 235B & Llama 70B |
 | `sealion` | `sealion` | SEA-LION | API key | [link](https://sea-lion.ai) | Sign in at sea-lion.ai with Google (no card, no region wall), create an API key, then paste it here. |
 | `seekai` | `ska` | SeekAi | API key, aggregator | [link](https://seekai.cc) | Create an API key at https://seekai.cc, then paste it here as a Bearer token. |
-| `segmind` | `segmind` | Segmind | API key, image, video | [link](https://segmind.com) | Use your Segmind API key in the x-api-key header. OmniRoute targets https://api.segmind.com/v1/<model> and returns the generated image/video bytes directly. |
 | `sensenova` | `sensenova` | SenseNova | API key | [link](https://platform.sensenova.cn) | Get API key at platform.sensenova.cn |
 | `siliconflow` | `siliconflow` | SiliconFlow | API key | [link](https://cloud.siliconflow.com) | $1 free credits plus currently listed $0 models after identity verification; availability and limits may change |
 | `snowflake` | `snowflake` | Snowflake Cortex | API key, enterprise | [link](https://www.snowflake.com) | — |
 | `sparkdesk` | `sparkdesk` | SparkDesk | API key | [link](https://xinghuo.xfyun.cn) | Get API key at console.xfyun.cn |
 | `speka` | `speka` | Speka AI | API key, aggregator | [link](https://speka.me) | Free plan: $1 monthly usage, 10 RPM, one API key and access to open models and the playground; no card required. |
-| `stability-ai` | `stability` | Stability AI | API key, image | [link](https://stability.ai) | — |
 | `stepfun` | `stepfun` | StepFun | API key | [link](https://stepfun.com) | Get API key at platform.stepfun.com |
 | `sumopod` | `sumopod` | SumoPod | API key | [link](https://ai.sumopod.com) | Use your SumoPod API key (sk-...) in Authorization: Bearer <key>. Fully OpenAI-compatible. API base URL: https://ai.sumopod.com/v1. |
 | `synthetic` | `synthetic` | Synthetic | API key, aggregator | [link](https://synthetic.new) | — |
@@ -342,17 +331,15 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `tencent` | `tencent` | Tencent Hunyuan | API key | [link](https://hunyuan.tencent.com) | Get API key at console.cloud.tencent.com |
 | `thebai` | `thebai` | TheB.AI | API key, aggregator | [link](https://theb.ai) | Bearer API key for the TheB.AI OpenAI-compatible gateway. |
 | `tinyfish` | `tf` | TinyFish Fetch | API key | [link](https://docs.tinyfish.ai/fetch-api) | X-API-Key from agent.tinyfish.ai/api-keys |
-| `together` | `together` | Together AI | API key, video | [link](https://www.together.ai) | — |
+| `together` | `together` | Together AI | API key | [link](https://www.together.ai) | — |
 | `token-kiosk` | `tk` | Token Kiosk | API key | [link](https://agent-router.gaib.ai) | Use your Token Kiosk API key in Authorization: Bearer <key>. Fully OpenAI-compatible gateway. API base URL: https://agent-router.gaib.ai/v1. |
 | `tokenharbor` | `tokenharbor` | Token Harbor | API key, aggregator | [link](https://tokenharbor.ai) | Create a Token Harbor account and copy your Universal Key from https://tokenharbor.ai/dashboard. |
 | `tokenmarket` | `tokenmarket` | Token Market | API key, aggregator | [link](https://www.tokensmarket.ai) | Create an API key in the Token Market console, then paste it here as a Bearer token. |
 | `tokenreply` | `tokenreply` | TokenReply | API key, aggregator | [link](https://www.tokenreply.com) | Free-tagged models have model- and campaign-specific daily limits; no fixed global free quota is published. |
 | `tokenrouter` | `trk` | TokenRouter | API key | [link](https://tokenrouter.com) | Use your TokenRouter API key in Authorization: Bearer <key>. Fully OpenAI-compatible. API base URL: https://api.tokenrouter.com/v1. |
-| `topaz` | `topaz` | Topaz | API key, image | [link](https://topazlabs.com) | — |
 | `typesafe` | `typesafe` | TypeSafe AI | API key | [link](https://docs.typesafe.ai) | Bearer API key for api.typesafe.ai. OmniRoute uses it for System One evaluation (Jev) — not chat completions. Store the key here; the jev combo strategy reads it at request time. |
 | `typhoon` | `typhoon` | Typhoon | API key | [link](https://docs.opentyphoon.ai) | Free API key with a 5 req/s and 200 req/m rate limit. |
 | `uc-direct` | `ucd` | UC Direct (uncensored.com) | API key | [link](https://uncensored.com) | Use your uncensored.com Developer API key (uai_sk_live_...). OmniRoute sends it as the X-api-key header to the OpenAI-compatible https://api.uncensored.com/api/v1 endpoint. The key never expires. This is the metered/credits surface; the un-metered subscription chat is the separate 'uc' provider. |
-| `udio` | `udio` | Udio | API key | [link](https://udio.com) | Paste session cookie from udio.com (Supabase auth) |
 | `unifically` | `unifically` | Unifically | API key, aggregator | [link](https://unifically.com) | — |
 | `unorouter` | `unorouter` | UnoRouter | API key, aggregator | [link](https://unorouter.ai) | Models with the :free suffix do not debit balance; limit is 1 request/minute per free model per user. |
 | `upstage` | `upstage` | Upstage | API key | [link](https://www.upstage.ai) | — |
@@ -383,11 +370,10 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `zerolimitai` | `zerolimitai` | ZeroLimitAI | API key, aggregator | [link](https://www.zerolimitai.com) | Temporary free trial is advertised, but official pages conflict between 3 and 7 days; a 100-calls/day claim is not treated as permanent. |
 | `zylo-api` | `zylo` | Zylo API | API key, aggregator | [link](https://zyloai.net) | Basic plan: 10 RPM, 7,200 requests/day and 200,000 tokens/day; limited to Basic text models. |
 
-## Local Providers (14)
+## Local Providers (12)
 
 | ID | Alias | Name | Tags | Website | Notes |
 |----|-------|------|------|---------|-------|
-| `comfyui` | `comfyui` | ComfyUI | Local | [link](https://github.com/comfyanonymous/ComfyUI) | No API key required. Configure the local ComfyUI base URL (default: http://localhost:8188). |
 | `docker-model-runner` | `dmr` | Docker Model Runner | Local, self-hosted | [link](https://docs.docker.com/ai/model-runner/) | API key optional. Configure the local Docker Model Runner OpenAI-compatible base URL (default: http://localhost:12434/v1). |
 | `lemonade` | `lemonade` | Lemonade Server | Local, self-hosted | [link](https://lemonade-server.ai) | API key optional. Configure the local Lemonade OpenAI-compatible base URL (default: http://localhost:13305/api/v1). |
 | `llama-cpp` | `llamacpp` | llama.cpp | Local, self-hosted | [link](https://github.com/ggml-org/llama.cpp) | API key optional (use any value, e.g. sk-no-key-required). Configure the llama-server OpenAI-compatible base URL (default: http://127.0.0.1:8080/v1). Note: if Llamafile is also installed, both default to port 8080 — run only one at a time or override the port. |
@@ -397,12 +383,11 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `mlx-qwen` | `mlx-qwen` | MLX Qwen 3.8 27B | Local, self-hosted | [link](https://github.com/ml-explore/mlx) | No API key required. Runs mlx-lm server locally on port 11436. Requires uv and mlx-lm installed. Model: maglun/Qwen3.8-27B-MLX-Mixed-3.80bpw (~13.1GB peak memory). |
 | `ollama-local` | `ollama` | Ollama | Local, self-hosted | [link](https://ollama.com) | No API key required. Ollama runs locally — configure its OpenAI-compatible base URL (default: http://localhost:11434/v1) and make sure Ollama is running before connecting. |
 | `oobabooga` | `ooba` | oobabooga | Local, self-hosted | [link](https://github.com/oobabooga/text-generation-webui) | API key optional. Configure the local oobabooga OpenAI-compatible base URL (default: http://localhost:5000/v1). |
-| `sdwebui` | `sdwebui` | SD WebUI | Local | [link](https://github.com/AUTOMATIC1111/stable-diffusion-webui) | No API key required. Configure the local WebUI base URL (default: http://localhost:7860). |
 | `triton` | `triton` | NVIDIA Triton | Local, self-hosted | [link](https://developer.nvidia.com/triton-inference-server) | API key optional. Configure the Triton OpenAI-compatible base URL (default: http://localhost:8000/v1). |
 | `vllm` | `vllm` | vLLM | Local, self-hosted | [link](https://github.com/vllm-project/vllm) | API key optional. Configure the local vLLM OpenAI-compatible base URL (default: http://localhost:8000/v1). |
 | `xinference` | `xinference` | XInference | Local, self-hosted | [link](https://inference.readthedocs.io) | API key optional. Configure the local XInference OpenAI-compatible base URL (default: http://localhost:9997/v1). |
 
-## Search Providers (19)
+## Search Providers (20)
 
 | ID | Alias | Name | Tags | Website | Notes |
 |----|-------|------|------|---------|-------|
@@ -412,6 +397,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `exa-search` | `exa-search` | Exa Search | Search | [link](https://exa.ai) | API key from dashboard.exa.ai |
 | `firecrawl` | `fc` | Firecrawl | Search | [link](https://firecrawl.dev) | API key from firecrawl.dev/app/api-keys (or set your self-hosted Firecrawl base URL) |
 | `google-pse-search` | `google-pse` | Google Programmable Search | Search | [link](https://developers.google.com/custom-search/v1/overview) | Requires a Google API key and your Programmable Search Engine ID (cx) |
+| `kagi-search` | `kagi-web-search` | Kagi Search | Search | [link](https://kagi.com/api/docs) | Bearer API key from kagi.com/api/keys |
 | `kimi-search` | `kimi-search` | Kimi Search | Search | [link](https://platform.kimi.ai/docs/api/tools-search) | Moonshot AI API key (MOONSHOT_API_KEY) from platform.kimi.ai |
 | `linkup-search` | `linkup` | Linkup Search | Search | [link](https://docs.linkup.so) | Bearer API key from the Linkup dashboard |
 | `nimble-search` | `nimble` | Nimble Search | Search | [link](https://docs.nimbleway.com/nimble-sdk/web-tools/search) | Bearer API key from the Nimble dashboard |
@@ -425,23 +411,6 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `x-search` | `x_search` | X Search (Grok) | Search | [link](https://docs.x.ai/developers/tools/x-search) | SuperGrok OAuth (xai-oauth) or xAI API key. This is Grok X Search, not the X Developer MCP. |
 | `xquik-search` | `xquik` | Xquik X Search | Search | [link](https://docs.xquik.com) | Xquik API key (xq_...). Search is metered per returned post; the catalog estimate uses 5 results. |
 | `youcom-search` | `youcom-search` | You.com Search | Search | [link](https://you.com/business/api/) | X-API-Key from the You.com platform dashboard |
-
-## Audio-only Providers (12)
-
-| ID | Alias | Name | Tags | Website | Notes |
-|----|-------|------|------|---------|-------|
-| `assemblyai` | `aai` | AssemblyAI | Audio | [link](https://assemblyai.com) | — |
-| `aws-polly` | `polly` | AWS Polly | Audio | [link](https://aws.amazon.com/polly/) | Use AWS Secret Access Key as API key; set providerSpecificData.accessKeyId and optional region. |
-| `cartesia` | `cartesia` | Cartesia | Audio | [link](https://cartesia.ai) | — |
-| `deepgram` | `dg` | Deepgram | Audio | [link](https://deepgram.com) | — |
-| `elevenlabs` | `el` | ElevenLabs | Audio | [link](https://elevenlabs.io) | — |
-| `fishaudio` | `fishaudio` | Fish Audio | Audio | [link](https://fish.audio) | — |
-| `gladia` | `gladia` | Gladia | Audio | [link](https://gladia.io) | — |
-| `inworld` | `inworld` | Inworld | Audio | [link](https://inworld.ai) | — |
-| `playht` | `playht` | PlayHT | Audio | [link](https://play.ht) | — |
-| `rev-ai` | `revai` | Rev AI | Audio | [link](https://www.rev.ai) | — |
-| `soniox` | `sx` | Soniox | Audio | [link](https://soniox.com) | — |
-| `speechmatics` | `sm` | Speechmatics | Audio | [link](https://www.speechmatics.com) | Free tier — 8 hours/month, no credit card required. Batch (async) mode only. |
 
 ## Upstream Proxy Providers (2)
 
@@ -468,7 +437,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 
 - Catalog: [`src/shared/constants/providers.ts`](../../src/shared/constants/providers.ts)
 - Registry (per-model details): [`open-sse/config/providerRegistry.ts`](../../open-sse/config/providerRegistry.ts)
-- Executors: [`open-sse/executors/`](../../open-sse/executors/) (159 implementations)
+- Executors: [`open-sse/executors/`](../../open-sse/executors/) (151 implementations)
 - Translators: [`open-sse/translator/`](../../open-sse/translator/)
 
 ## See Also

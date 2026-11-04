@@ -429,45 +429,6 @@ export const v1EmbeddingsSchema = z
   })
   .catchall(z.unknown());
 
-export const v1ImageGenerationSchema = z
-  .object({
-    model: modelIdSchema,
-    prompt: nonEmptyStringSchema.optional(),
-  })
-  .catchall(z.unknown());
-
-// POST /v1/images/upscale — image→image super-resolution. `prompt` is optional here
-// (only Stability conservative/creative need one, enforced by the route/handler), but a
-// resolvable source image is mandatory and validated by the route after extraction.
-export const v1ImageUpscaleSchema = z
-  .object({
-    model: modelIdSchema,
-    prompt: nonEmptyStringSchema.optional(),
-    factor: z.union([z.number(), z.string()]).optional(),
-    creativity: z.union([z.number(), z.string()]).optional(),
-    response_format: z.enum(["url", "b64_json"]).optional(),
-  })
-  .catchall(z.unknown());
-
-export const v1AudioSpeechSchema = z
-  .object({
-    model: modelIdSchema,
-    input: nonEmptyStringSchema,
-  })
-  .catchall(z.unknown());
-
-export const v1ModerationSchema = z
-  .object({
-    model: modelIdSchema.optional(),
-    input: z.unknown().refine((value) => {
-      if (value === undefined || value === null) return false;
-      if (typeof value === "string") return value.trim().length > 0;
-      if (Array.isArray(value)) return value.length > 0;
-      return true;
-    }, "Input is required"),
-  })
-  .catchall(z.unknown());
-
 // Mistral OCR: `document` is a { type, document_url | image_url } object.
 // Keep the schema permissive-but-typed — validate model + that a non-empty
 // `document` object (or a document_url/image_url string shorthand) is present.

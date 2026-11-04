@@ -35,14 +35,6 @@ test("no header for reroute or untouched requests", () => {
   assert.equal(buildModalityBridgeHeader([]), null);
 });
 
-test("audio-bridge meta produces the audio segment (PR-3 forward-compat)", () => {
-  const h = buildModalityBridgeHeader([
-    { guardrail: "vision-bridge", meta: { imagesProcessed: 1, visionModel: "m1" } },
-    { guardrail: "audio-bridge", meta: { clipsProcessed: 3, sttModel: "m2" } },
-  ]);
-  assert.equal(h, "image->text;model=m1;parts=1, audio->text;model=m2;parts=3");
-});
-
 test("stats counters accumulate", () => {
   recordBridgeUse("vision", { cacheHit: true });
   const s = getBridgeStats();

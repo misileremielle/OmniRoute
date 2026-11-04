@@ -18,7 +18,6 @@ Visual guide to every section of the OmniRoute dashboard.
 
 The v3.7.x → v3.8.0 cycle added zero-config auto routing, new providers, OAuth flows, deeper resilience, and a much richer CLI experience. Headline features below — full details further in the document and in linked specs.
 
-- 🤖 **Auto Combo / Zero-config auto-routing** — use prefixes `auto/coding`, `auto/fast`, `auto/cheap`, `auto/offline`, `auto/smart`, `auto/lkgp`, `auto/chaos`. Backed by a 16-factor scoring engine and 6 curated **mode packs** (ship-fast, cost-saver, quality-first, offline-friendly, reliability-first, chaos-mode)
 - 🆕 **Command Code provider** (#2199) — first-class registration with model catalog and quota tracking
 - 🆕 **Z.AI provider** — new free-tier provider with quota labels
 - 🎬 **KIE media expansion** — extended catalog including video generation models
@@ -43,8 +42,6 @@ The v3.7.x → v3.8.0 cycle added zero-config auto routing, new providers, OAuth
 - 🏥 **Combo target health analytics** + **structured combo builder** — per-target health & UI builder for assembling `(provider, model, connection)` steps
 - 🤝 **GitLab Duo OAuth provider** — login with GitLab credentials
 - 🧠 **Reasoning Replay Cache** — hybrid in-memory + SQLite persistence of reasoning traces
-
-📚 **Related docs:** [Skills Framework](../frameworks/SKILLS.md) · [Memory System](../frameworks/MEMORY.md) · [Cloud Agents](../frameworks/CLOUD_AGENT.md) · [Webhooks](../frameworks/WEBHOOKS.md) · [Reasoning Replay Cache](../routing/REASONING_REPLAY.md)
 
 ---
 
@@ -248,7 +245,7 @@ Real-time request logging with filtering by provider, model, account, and API ke
 
 ## 🌐 API Endpoint
 
-Your unified API endpoint with capability breakdown: Chat Completions, Responses API, Embeddings, Image Generation, Reranking, Audio Transcription, Text-to-Speech, Moderations, and registered API keys. Cloud proxy support is available for remote access.
+Your unified API endpoint with capability breakdown: Chat Completions, Responses API, Embeddings, Image Generation, Reranking, Audio Transcription, Text-to-Speech, and registered API keys. Cloud proxy support is available for remote access.
 
 ![Endpoint Dashboard](../screenshots/09-endpoint.png)
 
@@ -310,8 +307,6 @@ Guard violations surface as `URL_GUARD_BLOCKED` — HTTP 503 via `getSafeOutboun
 ---
 
 ## 🔄 Cooldown-Aware Retries _(v3.6.6+)_
-
-Chat requests now **automatically retry** when an upstream provider returns a model-scoped cooldown. Configurable via `REQUEST_RETRY` (default: 2) and `MAX_RETRY_INTERVAL_SEC` (default: 30 s). Rate-limit header learning improved across `x-ratelimit-reset-requests`, `x-ratelimit-reset-tokens`, and `Retry-After` — per-model cooldown state is visible in the Resilience dashboard.
 
 ---
 

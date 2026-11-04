@@ -72,12 +72,9 @@ without re-pasting.
 
 ## §3 — `execFile` / `spawn` (`21843.js`)
 
-**Source files**: `src/lib/system/systemCommands.ts`.
-
 **Why flagged**: the chunk re-exports `execFileWithPassword`. Socket.dev's AI
 classifier sees it as a generic "host execution + privilege elevation
 toolkit." Within OmniRoute it is only used by the Tailscale tunnel flow
-(`src/lib/tailscaleTunnel.ts`) for `sudo` command execution. The elevated
 PowerShell helpers and the MITM root-CA install path that the original finding
 covered were removed together with the MITM proxy.
 
@@ -189,9 +186,3 @@ sensitive code path.
 The resulting bundle is intended to be published as `omniroute-secure`.
 
 ---
-
-## Plugin split (tracked for v4)
-
-Long-term, we intend to split the npm package into separately auditable
-modules. See the v4 milestone in the GitHub issue tracker for the tracking
-issue.

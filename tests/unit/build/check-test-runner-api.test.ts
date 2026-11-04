@@ -36,12 +36,7 @@ test("accepts a vitest-only-dir test that imports vitest", () => {
 
 test("flags node:test imports in the Vitest-only config roots", () => {
   const root = tmpRepo();
-  const dirs = [
-    "open-sse/services/__tests__",
-    "open-sse/translator/helpers/__tests__",
-    "src/lib/memory/__tests__",
-    "src/lib/skills/__tests__",
-  ];
+  const dirs = ["open-sse/services/__tests__", "open-sse/translator/helpers/__tests__"];
 
   for (const dir of dirs) {
     fs.mkdirSync(path.join(root, dir), { recursive: true });

@@ -25,7 +25,6 @@ const MODALITY_BY_TYPE: Record<string, string> = {
   image: "images",
   rerank: "rerank",
   audio: "audio",
-  moderation: "moderation",
   video: "videos",
   music: "music",
 };

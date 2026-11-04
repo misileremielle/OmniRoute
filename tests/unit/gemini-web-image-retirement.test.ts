@@ -1,38 +1,11 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import test from "node:test";
-
-const { getAllImageModels, getImageProvider, parseImageModel } =
-  await import("../../open-sse/config/imageRegistry.ts");
-const { handleImageGeneration } = await import("../../open-sse/handlers/imageGeneration.ts");
 const geminiWebExecutorModule = await import("../../open-sse/executors/gemini-web.ts");
 const { GeminiWebExecutor } = geminiWebExecutorModule;
-const { getExecutor, hasSpecializedExecutor } = await import("../../open-sse/executors/index.ts");
-const { REGISTRY } = await import("../../open-sse/config/providerRegistry.ts");
-
-test("Gemini Web image generation is absent from the public image catalog and request path", async () => {
-  assert.equal(getImageProvider("gemini-web"), null);
-  assert.equal(getImageProvider("gweb"), null);
-  assert.equal(
-    getAllImageModels().some(
-      ({ provider, id }) => provider === "gemini-web" || id === "gemini-web/nano-banana-web"
-    ),
-    false
-  );
-
-  const result = await handleImageGeneration({
-    body: {
-      model: "gemini-web/nano-banana-web",
-      prompt: "a red panda eating bamboo",
-    },
-    credentials: { apiKey: "unused-cookie" },
-    log: null,
-  });
-
-  assert.equal(result.success, false);
-  assert.equal(result.status, 400);
-  assert.match(result.error, /Invalid image model/);
-});
+const { getExecutor: _getExecutor, hasSpecializedExecutor: _hasSpecializedExecutor } =
+  await import("../../open-sse/executors/index.ts");
+const { REGISTRY: _REGISTRY } = await import("../../open-sse/config/providerRegistry.ts");
 
 test("Gemini Web executor treats the retired image-mode extension as ordinary chat input", async () => {
   const playwright = await import("playwright");
@@ -109,23 +82,4 @@ test("Gemini Web image-only parser and handler artifacts are retired", () => {
     ),
     false
   );
-});
-
-test("Gemini Web chat and legitimate Gemini image providers remain available", async () => {
-  assert.equal(hasSpecializedExecutor("gemini-web"), true);
-  assert.equal((await getExecutor("gemini-web")).getProvider(), "gemini-web");
-  assert.equal(REGISTRY["gemini-web"]?.executor, "gemini-web");
-  assert.deepEqual(
-    REGISTRY["gemini-web"]?.models.map(({ id }) => id),
-    ["gemini-3.1-pro", "gemini-3.7-flash", "gemini-3.1-flash-lite"]
-  );
-
-  assert.deepEqual(parseImageModel("nano-banana"), {
-    provider: "adobe-firefly",
-    model: "nano-banana",
-  });
-  assert.deepEqual(parseImageModel("openrouter/google/gemini-3-pro-image-preview"), {
-    provider: "openrouter",
-    model: "google/gemini-3-pro-image-preview",
-  });
 });

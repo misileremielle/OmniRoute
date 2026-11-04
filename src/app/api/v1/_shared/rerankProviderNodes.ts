@@ -10,7 +10,7 @@
  *    from the original hardcoded filter;
  *  - remote nodes (a LAN box, a Tailscale peer, a public host) are eligible only when the
  *    operator opted in via `RERANK_REMOTE_PROVIDER_NODES` (default OFF, like
- *    `AUDIO_REMOTE_PROVIDER_NODES`, #3963) AND the base URL passes the provider outbound
+ *    #3963) AND the base URL passes the provider outbound
  *    URL policy (`getProviderOutboundGuard()`, #5066 / #9123) — so cloud-metadata hosts
  *    are never routed to, and strict `public-only` deployments never route to private hosts.
  */

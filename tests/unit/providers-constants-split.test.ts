@@ -63,7 +63,7 @@ const P = await import("../../src/shared/constants/providers.ts");
 // Token Harbor (#16315) adds one apikey/gateways entry — 253.
 // Runcrate (#18061) adds one apikey/inference-hosts entry — 254.
 // Gisoo (#18112) adds one apikey/gateways entry — 255.
-const APIKEY_PROVIDER_COUNT = 255;
+const APIKEY_PROVIDER_COUNT = 243;
 
 test("barrel still exports every catalog + key helpers", () => {
   for (const name of [
@@ -73,9 +73,7 @@ test("barrel still exports every catalog + key helpers", () => {
     "APIKEY_PROVIDERS",
     "LOCAL_PROVIDERS",
     "SEARCH_PROVIDERS",
-    "AUDIO_ONLY_PROVIDERS",
     "UPSTREAM_PROXY_PROVIDERS",
-    "CLOUD_AGENT_PROVIDERS",
     "SYSTEM_PROVIDERS",
     "AI_PROVIDERS",
     "ALIAS_TO_ID",
@@ -140,9 +138,7 @@ test("each extracted data module is importable on its own", async () => {
     ["web-cookie", "WEB_COOKIE_PROVIDERS"],
     ["local", "LOCAL_PROVIDERS"],
     ["search", "SEARCH_PROVIDERS"],
-    ["audio", "AUDIO_ONLY_PROVIDERS"],
     ["upstream-proxy", "UPSTREAM_PROXY_PROVIDERS"],
-    ["cloud-agent", "CLOUD_AGENT_PROVIDERS"],
     ["system", "SYSTEM_PROVIDERS"],
   ];
   for (const [file, name] of mods) {

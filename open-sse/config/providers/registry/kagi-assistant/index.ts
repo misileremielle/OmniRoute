@@ -31,5 +31,10 @@ export const kagi_assistantProvider: RegistryEntry = {
   authType: "apikey",
   authHeader: "bearer",
   passthroughModels: true,
-  models: MODELS.map(([id, name]) => ({ id, name, toolCalling: false })),
+  models: MODELS.map(([id, name]) => ({
+    id,
+    name,
+    toolCalling: false,
+    ...(id === "minimax-m3-1-flash" ? { supportsVision: true } : {}),
+  })),
 };

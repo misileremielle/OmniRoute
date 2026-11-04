@@ -128,9 +128,6 @@ export default function EditCompatibleNodeModal({
     { value: "chat", label: t("chatCompletions") },
     { value: "responses", label: t("responsesApi") },
     { value: "embeddings", label: t("embeddings") },
-    { value: "audio-transcriptions", label: t("audioTranscriptions") },
-    { value: "audio-speech", label: t("audioSpeech") },
-    { value: "images-generations", label: t("imagesGenerations") },
   ];
 
   const handleSubmit = async () => {

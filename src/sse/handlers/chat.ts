@@ -17,14 +17,12 @@ import {
   getProviderCredentialsWithQuotaPreflight,
   markAccountUnavailable,
   buildExhaustionOptions,
-  isValidApiKey,
   extractSessionAffinityKey,
 } from "../services/auth";
 import { resolveClientApiKey } from "../services/clientApiKeyResolver";
 import {
   getRuntimeProviderProfile,
   clearModelLock,
-  lockModel,
   recordModelLockoutFailure,
   isDailyQuotaExhausted,
 } from "@omniroute/open-sse/services/accountFallback.ts";
@@ -38,7 +36,6 @@ import { getCombo, getComboForModel, getModelInfo } from "../services/model";
 import { stripContextWindowSuffix } from "@omniroute/open-sse/services/model.ts";
 import { resolveBareModelToConnectionDefault } from "@omniroute/open-sse/services/model.ts";
 import { errorResponse } from "@omniroute/open-sse/utils/error.ts";
-import { getImageModelEntry, isImageOnlyModel } from "@omniroute/open-sse/config/imageRegistry.ts";
 import { acceptHeaderForcesStream } from "@omniroute/open-sse/utils/aiSdkCompat.ts";
 import {
   isAntigravityRefusalReplay,
@@ -48,7 +45,7 @@ import { applyNoThinkingAlias } from "@omniroute/open-sse/utils/noThinkingAlias.
 import { resolveCcDiscoveryAliasStrip } from "@/lib/ccDiscoveryAliasResolve";
 import { handleComboChat, shouldSkipConnDisable } from "@omniroute/open-sse/services/combo.ts";
 import type { ComboLike, SingleModelTarget } from "@omniroute/open-sse/services/combo/types.ts";
-import { mergeAbortSignals } from "@omniroute/open-sse/executors/base.ts";
+
 import { resolveRequestAutoControls } from "@omniroute/open-sse/services/autoCombo/requestControls.ts";
 import { isVerifiedNativeCodexRequest } from "@omniroute/open-sse/config/codexIdentity.ts";
 import { resolveCompressionSettings } from "@omniroute/open-sse/handlers/chatCore/compressionSettings.ts";
@@ -78,7 +75,7 @@ import { isRuntimeProviderRetirementError } from "@/shared/constants/providerRet
 import { isCommonChatGptWebRetirementError } from "@/shared/constants/chatgptWebRetirement";
 import { isChatGptWebCodexModel } from "@/shared/constants/chatgptWebCodex";
 import { deleteHandoff, getHandoff } from "@/lib/db/contextHandoffs";
-import { getComboByName, updateCombo } from "@/lib/db/combos";
+import { updateCombo } from "@/lib/db/combos";
 import { isModelAllowedForKey } from "@/lib/db/apiKeys";
 import { promoteSuccessfulComboModel } from "@/lib/combos/autoPromote";
 import {
@@ -108,7 +105,6 @@ import {
   comboTargetCredentialProviderId,
   checkPipelineGates,
   checkResourcePressureBeforeProviderWork,
-  executeChatWithBreaker,
   findShadowedCompatibleNode,
   handleNoCredentials,
   safeResolveProxy,
@@ -124,7 +120,6 @@ import {
   withConversationId,
 } from "./chatHelpers";
 import { buildModalityBridgeHeader } from "@/lib/guardrails/modalityBridge/bridgeStats";
-import { type VideoBridgeLog, deriveVideoBridgeLog } from "./chat/videoBridgeLog.ts";
 import {
   resolveClientSessionId,
   resolveConversationId,
@@ -151,6 +146,7 @@ import {
 } from "./admissionRejectionLog";
 
 // Pipeline integration — wired modules
+// Pipeline integration — wired modules
 import { classify429FromError, type FailureKind } from "@/shared/utils/classify429";
 import { isSubscriptionQuotaText } from "@omniroute/open-sse/services/quotaTextCooldowns.ts";
 import { resolveUseUpstream429BreakerHints } from "@/shared/utils/providerHints";
@@ -163,12 +159,12 @@ import { markQuotaHealthy } from "../../domain/quotaCache";
 import { resolveForcedConnectionForCredentialPool } from "../services/sessionAffinityPin.ts";
 import { RequestTelemetry, recordTelemetry } from "../../shared/utils/requestTelemetry";
 import { generateRequestId } from "../../shared/utils/requestId";
-import { logAuditEvent } from "../../lib/compliance/index";
+
 import { enforceApiKeyPolicy } from "../../shared/utils/apiKeyPolicy";
 import { rejectIfMeteredBudgetExceeded } from "@/lib/usage/meteredBudgetPolicy";
 import { hasProviderQuotaBypassScope } from "../../shared/constants/apiKeyPolicyScopes";
 import { isMicrosoftDesignerWebProviderRetiredError } from "../../shared/constants/designerWebRetirement";
-import { cloneBoundedForLog } from "@omniroute/open-sse/utils/requestLogger.ts";
+
 import { handleInternalUsageCommand } from "@/lib/usage/internalUsageCommand";
 import {
   applyTaskAwareRouting,
@@ -651,36 +647,6 @@ async function handleChatImplementation(
     });
   }
 
-  // Reject image-generation models routed to /v1/chat/completions (#6457).
-  // Image-only models live in IMAGE_PROVIDERS (open-sse/config/imageRegistry.ts)
-  // and are served by /v1/images/generations. Forwarding them to a chat upstream
-  // yielded confusing raw provider 400s (e.g. HuggingFace: "not a chat model").
-  // Models such as Codex GPT-5.5 support both chat and image generation, so an
-  // image-registry match is only image-only when the same provider/model pair is
-  // absent from the chat catalog.
-  const imageModel = getImageModelEntry(modelStr);
-  // Exact stored combo names take precedence over colliding bare image aliases.
-  // Keep this narrower than getComboForModel() so mappings and synthetic aliases
-  // retain their existing resolution order.
-  const isExactStoredCombo = imageModel ? Boolean(await getComboByName(modelStr)) : false;
-  if (imageModel && !isExactStoredCombo && isImageOnlyModel(modelStr)) {
-    log.warn("CHAT", `Rejecting image-generation model on chat endpoint: ${modelStr}`);
-    return logHandlerRejection(
-      errorResponse(
-        HTTP_STATUS.BAD_REQUEST,
-        `Model '${modelStr}' is an image-generation model and cannot be used on /v1/chat/completions. Use POST /v1/images/generations instead.`
-      ),
-      {
-        path: new URL(request.url).pathname,
-        model: modelStr,
-        requestBody: body ?? null,
-        apiKeyId: null,
-        apiKeyName: null,
-        correlationId: reqId,
-      }
-    );
-  }
-
   // A trusted endpoint-tag mismatch is a local client error, not a provider or
   // connection health failure. Exact combo names are exempt in the resolver.
   const endpointMismatch = await getRequestedModelEndpointMismatch(modelStr, "chat");
@@ -878,10 +844,6 @@ async function handleChatImplementation(
   // guardrail transformed the payload (describe path) — stamped on the main
   // success exits below via withModalityBridgeHeader().
   const modalityBridgeHeader = buildModalityBridgeHeader(preCallGuardrails.results);
-  // #12150 P1b: video-bridge log/Memory shadow — undefined on every
-  // non-video request. Threaded through handleSingleModelChat's
-  // runtimeOptions -> executeChatWithBreaker -> handleChatCore.
-  const videoBridgeLog = deriveVideoBridgeLog(preCallGuardrails.results, body);
   telemetry.endPhase();
 
   // Agentic conversation tracking (X-ConversationId): resolved once per
@@ -970,7 +932,6 @@ async function handleChatImplementation(
   // T05 — Task-Aware Smart Routing
   // Detect the semantic task type and optionally route to the optimal model
   let resolvedModelStr = modelStr;
-  let taskRouteInfo: { taskType: string; wasRouted: boolean } | null = null;
   if (getTaskRoutingConfig().enabled) {
     telemetry.startPhase("task-route");
     const tr = applyTaskAwareRouting(modelStr, body);
@@ -984,7 +945,6 @@ async function handleChatImplementation(
     } else if (tr.taskType !== "chat") {
       log.debug("T05", `Task-Aware: detected="${tr.taskType}" (no override configured)`);
     }
-    taskRouteInfo = { taskType: tr.taskType, wasRouted: tr.wasRouted };
     telemetry.endPhase();
   }
 
@@ -1219,7 +1179,6 @@ async function handleChatImplementation(
             modelPinned: (target as any)?.modelPinned ?? false,
             reasoningTransportFallback,
             managedLease,
-            videoBridgeLog,
             // #7360 follow-up: without this, a target dispatch abandoned by
             // targetTimeoutRunner.ts's per-target timeout (comboTargetTimeoutMs)
             // never learns it was abandoned — it only watches the ORIGINAL
@@ -1293,7 +1252,6 @@ async function handleChatImplementation(
                 forceLiveComboTest: isComboLiveTest,
                 conversationId,
                 managedLease,
-                videoBridgeLog,
               },
               combo.strategy,
               true
@@ -1386,7 +1344,6 @@ async function handleChatImplementation(
       conversationId,
       routingComboId,
       managedLease,
-      videoBridgeLog,
       previousResponseResumed:
         (body as { _omniroutePreviousResponseResumed?: unknown })
           ._omniroutePreviousResponseResumed === true || undefined,
@@ -1446,8 +1403,6 @@ async function handleSingleModelChat(
     authorizationContextModel?: string | null; // admitted combo/alias (resolvedModelPolicy.ts)
     comboGrantsTargets?: boolean; // server-computed allowedCombos grant (#14197)
     managedLease?: ManagedLeaseDispatchContext | null;
-    /** #12150 P1b: video-bridge log/Memory shadow — undefined on every non-video request. */
-    videoBridgeLog?: VideoBridgeLog;
     /**
      * rehydrated-continuation flag; noted under the attempt store in
      * handleChatCore. Optional plumbing, no semantics.
@@ -1532,7 +1487,6 @@ async function handleSingleModelChat(
               redirectCombo.config?.reasoningTransportFallback === "skip" ? "skip" : "drop",
             conversationId: runtimeOptions?.conversationId ?? null,
             managedLease: runtimeOptions.managedLease ?? null,
-            videoBridgeLog: runtimeOptions.videoBridgeLog,
             previousResponseResumed: runtimeOptions.previousResponseResumed,
             // #7360 follow-up — see the primary handleSingleModel closure above.
             modelAbortSignal: target?.modelAbortSignal ?? null,
@@ -1687,7 +1641,6 @@ async function handleSingleModelChat(
   let requestRetryAttempt = 0;
   let requestRetryLastError = null;
   let requestRetryLastStatus = null;
-  let requestRetryLastCooldownMs = 0;
   // Bug #3758: per-request counter bounding the early-close (STREAM_EARLY_EOF)
   // re-attempt to exactly one for the whole request. Declared outside both retry
   // loops so it can never reset and loop.
@@ -1724,7 +1677,6 @@ async function handleSingleModelChat(
     const excludedConnectionIds = new Set<string>(agy.on ? agy.attempted : []);
     let lastError = requestRetryLastError;
     let lastStatus = requestRetryLastStatus;
-    let lastCooldownMs = requestRetryLastCooldownMs;
     let preselectedCredentials = initialPreselectedCredentials;
     initialPreselectedCredentials = null;
 
@@ -2110,7 +2062,6 @@ async function handleSingleModelChat(
             sessionAffinityKey: runtimeOptions.sessionAffinityKey ?? null,
             reasoningTransportFallback: runtimeOptions.reasoningTransportFallback ?? "drop",
             managedLease: runtimeOptions.managedLease ?? null,
-            videoBridgeLog: runtimeOptions.videoBridgeLog,
             previousResponseResumed: runtimeOptions.previousResponseResumed,
             fallbackAttempts: runtimeOptions.fallbackAttempts,
             beforeUpstreamAttempt:
@@ -2381,8 +2332,6 @@ async function handleSingleModelChat(
             `Antigravity connection ${accountId}... produced no useful stream content, trying fallback connection`
           );
           if (Number.isFinite(cooldownMs) && cooldownMs > 0) {
-            lastCooldownMs = cooldownMs;
-            requestRetryLastCooldownMs = cooldownMs;
           }
           if (runtimeOptions.sessionAffinityKey) {
             try {
@@ -2430,8 +2379,6 @@ async function handleSingleModelChat(
             `Antigravity connection ${accountId}... timed out before response headers, trying fallback connection`
           );
           if (Number.isFinite(cooldownMs) && cooldownMs > 0) {
-            lastCooldownMs = cooldownMs;
-            requestRetryLastCooldownMs = cooldownMs;
           }
           if (runtimeOptions.sessionAffinityKey) {
             try {
@@ -2718,8 +2665,6 @@ async function handleSingleModelChat(
       // already apply.
       if (shouldFallback && !hasForcedConnection) {
         if (Number.isFinite(cooldownMs) && cooldownMs > 0) {
-          lastCooldownMs = cooldownMs;
-          requestRetryLastCooldownMs = cooldownMs;
         }
         log.warn("AUTH", `Account ${accountId}... unavailable (${result.status}), trying fallback`);
         // #6219: evict the sticky pin when its account fails over, so it is not reused.

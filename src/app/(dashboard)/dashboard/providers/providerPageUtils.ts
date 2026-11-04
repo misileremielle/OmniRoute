@@ -16,7 +16,6 @@ import {
   isClaudeCodeCompatibleProvider,
   supportsApiKeyOnFreeProvider,
   supportsDualAuthProvider,
-  VIDEO_PROVIDER_IDS,
 } from "@/shared/constants/providers";
 import { getModelsByProviderId } from "@/shared/constants/models";
 import { getProviderServiceKinds, providerHasServiceKind } from "@/lib/providers/serviceKindIndex";
@@ -98,20 +97,12 @@ const PROVIDER_CATEGORY_URL_VALUES = new Set([
   "webcookie",
   "search",
   "webfetch",
-  "audio",
   "local",
   "cloudagent",
 ]);
 
 /** Media/service-kind chip keys that are valid in `?media=`. */
-const PROVIDER_SERVICE_KIND_URL_VALUES = new Set([
-  "image",
-  "video",
-  "music",
-  "tts",
-  "stt",
-  "embedding",
-]);
+const PROVIDER_SERVICE_KIND_URL_VALUES = new Set(["image", "music", "tts", "stt", "embedding"]);
 
 export interface ProviderFilterUrlState {
   searchQuery?: string;
@@ -231,7 +222,6 @@ export function isPrimaryLlmProviderEntry<TProvider>(entry: ProviderEntry<TProvi
     !IMAGE_ONLY_PROVIDER_IDS.has(entry.providerId) &&
     !AGGREGATOR_PROVIDER_IDS.has(entry.providerId) &&
     !ENTERPRISE_CLOUD_PROVIDER_IDS.has(entry.providerId) &&
-    !VIDEO_PROVIDER_IDS.has(entry.providerId) &&
     !EMBEDDING_RERANK_PROVIDER_IDS.has(entry.providerId) &&
     !providerEntryIsToolOnly(entry)
   );

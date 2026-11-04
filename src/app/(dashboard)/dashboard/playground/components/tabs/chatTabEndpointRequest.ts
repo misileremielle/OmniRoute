@@ -100,7 +100,7 @@ export function buildNonChatRequestBody(
   if (endpoint === "web.fetch") {
     return { url: query };
   }
-  const body: Record<string, unknown> = endpoint === "images" ? { prompt: query } : { query };
+  const body: Record<string, unknown> = { query };
   if (model) body.model = model;
   return body;
 }

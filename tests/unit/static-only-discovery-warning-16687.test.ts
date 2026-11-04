@@ -47,7 +47,7 @@ test.after(() => {
   rmSync(dataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });
 
-for (const provider of ["ideogram", "grok-web"]) {
+for (const provider of ["voyage-ai", "grok-web"]) {
   test(`${provider} static-only refresh identifies missing discovery without an upstream call`, async () => {
     assert.equal(getDiscoveryClass(provider), "static-only");
     const stored = await connection(provider);

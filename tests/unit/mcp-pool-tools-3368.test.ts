@@ -55,11 +55,11 @@ test("server.ts registers poolTools via the standard registration loop", () => {
   );
 });
 
-test("server.ts reserves the poolTools names", () => {
+test("server.ts counts poolTools in TOTAL_MCP_TOOL_COUNT", () => {
   assert.match(
     serverSource,
-    /\.\.\.Object\.keys\(poolTools\)/,
-    "poolTools names must be in RESERVED_MCP_NAMES to avoid collisions"
+    /countUniqueMcpTools\(\{[\s\S]*?poolTools,/,
+    "poolTools must be included in TOTAL_MCP_TOOL_COUNT"
   );
 });
 

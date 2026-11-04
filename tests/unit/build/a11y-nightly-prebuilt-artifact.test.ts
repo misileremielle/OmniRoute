@@ -47,9 +47,7 @@ function indexOfStep(job: Job, predicate: (step: Step) => boolean, label: string
 }
 
 const isIsolatedRuntime = (step: Step) =>
-  /mktemp -d "\$RUNNER_TEMP\//.test(step.run ?? "") &&
-  /DATA_DIR=/.test(step.run ?? "") &&
-  /OMNIROUTE_PLUGINS_DIR=/.test(step.run ?? "");
+  /mktemp -d "\$RUNNER_TEMP\//.test(step.run ?? "") && /DATA_DIR=/.test(step.run ?? "");
 
 test("a11y-build builds the production dashboard once on the build pool and uploads it", () => {
   assert.ok(build, "nightly-resilience.yml must define the a11y-build job");

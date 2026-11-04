@@ -43,7 +43,6 @@ describe("custom isFree tri-state (DB)", () => {
       undefined,
       {},
       undefined,
-      undefined,
       true
     );
     const rows = (await getCustomModels("p")) as CustomRow[];
@@ -58,7 +57,6 @@ describe("custom isFree tri-state (DB)", () => {
       ["chat"],
       undefined,
       {},
-      undefined,
       undefined,
       undefined
     );
@@ -78,7 +76,6 @@ describe("custom isFree tri-state (DB)", () => {
       undefined,
       {},
       undefined,
-      undefined,
       true
     );
     await updateCustomModel("p", "m", { isFree: null });
@@ -97,7 +94,6 @@ describe("custom isFree tri-state (DB)", () => {
       ["chat"],
       undefined,
       {},
-      undefined,
       undefined,
       undefined
     );
@@ -121,7 +117,6 @@ describe("custom isFree tri-state (DB)", () => {
       undefined,
       {},
       undefined,
-      undefined,
       true
     );
     await addCustomModel(
@@ -133,7 +128,6 @@ describe("custom isFree tri-state (DB)", () => {
       ["chat"],
       undefined,
       {},
-      undefined,
       undefined,
       undefined
     );
@@ -161,7 +155,6 @@ describe("custom isFree tri-state (DB)", () => {
       ["chat"],
       undefined,
       {},
-      undefined,
       undefined,
       true
     );

@@ -1,15 +1,7 @@
 import type { JsonlLineError, ValidationResult } from "./types";
 import type { SupportedBatchEndpoint } from "@/shared/constants/batchEndpoints";
 
-const OPENAI_LIKE = new Set([
-  "/v1/chat/completions",
-  "/v1/embeddings",
-  "/v1/completions",
-  "/v1/moderations",
-  "/v1/images/generations",
-  "/v1/videos/generations",
-  "/v1/responses",
-]);
+const OPENAI_LIKE = new Set(["/v1/chat/completions", "/v1/embeddings", "/v1/responses"]);
 
 interface LineResult {
   customId?: string;

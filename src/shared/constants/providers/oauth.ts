@@ -51,7 +51,7 @@ export const OAUTH_PROVIDERS = {
   },
   "grok-cli": {
     id: "grok-cli",
-    serviceKinds: ["llm", "image", "video", "tts", "stt"],
+    serviceKinds: ["llm"],
     alias: "gc",
     name: "Grok Build",
     icon: "bolt",

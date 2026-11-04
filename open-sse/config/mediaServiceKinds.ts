@@ -1,12 +1,8 @@
 /**
  * Media serviceKinds — derived from the backend registries.
  *
- * The dashboard's `/dashboard/media-providers/[kind]` pages list a provider
- * under a media kind when the provider supports it. Historically this relied on
- * a hand-maintained `serviceKinds` array on every provider in providers.ts,
- * which had drifted badly: ~48 providers were wired into the audio/video/music/
- * image/embedding registries (backend works) but declared no `serviceKinds`, so
- * they never appeared in the UI.
+ * The dashboard lists a provider under a service kind when the provider supports
+ * it.
  *
  * This module makes the registries the single source of truth: a provider that
  * appears as a key in a media registry supports that kind, full stop. The UI
@@ -19,20 +15,11 @@
  * backing registry (webSearch, webFetch, llm) are still declared explicitly via
  * `serviceKinds` on the provider entry; callers union declared + derived sources.
  */
-import { AUDIO_TRANSCRIPTION_PROVIDERS, AUDIO_SPEECH_PROVIDERS } from "./audioRegistry.ts";
-import { VIDEO_PROVIDERS } from "./videoRegistry.ts";
-import { MUSIC_PROVIDERS } from "./musicRegistry.ts";
-import { IMAGE_PROVIDERS } from "./imageRegistryData.ts";
 import { EMBEDDING_PROVIDERS } from "./embeddingRegistry.ts";
 import { OCR_PROVIDERS } from "./ocrRegistry.ts";
 
 /** Media kinds whose provider membership is defined by a backend registry. */
 export const MEDIA_KIND_REGISTRIES = {
-  stt: AUDIO_TRANSCRIPTION_PROVIDERS,
-  tts: AUDIO_SPEECH_PROVIDERS,
-  video: VIDEO_PROVIDERS,
-  music: MUSIC_PROVIDERS,
-  image: IMAGE_PROVIDERS,
   embedding: EMBEDDING_PROVIDERS,
   ocr: OCR_PROVIDERS,
 } as const satisfies Record<string, Record<string, unknown>>;
@@ -45,7 +32,7 @@ export const REGISTRY_MEDIA_KINDS: readonly RegistryMediaKind[] = Object.freeze(
 
 /**
  * Media serviceKinds a provider supports, derived from the backend registries.
- * Returns the kinds (e.g. `["tts","video","music"]`) for which `providerId`
+ * Returns the kinds (e.g. `["embedding","ocr"]`) for which `providerId`
  * appears as a registry key. Empty array if the provider serves no media.
  */
 export function getRegistryMediaKinds(providerId: string): RegistryMediaKind[] {

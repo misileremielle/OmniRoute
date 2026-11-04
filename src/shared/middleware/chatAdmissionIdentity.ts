@@ -24,8 +24,8 @@ export function resolveSessionId(request: Request): string {
 // persisted, never logged. Used ONLY as the last-resort self-loop bearer when the
 // operator hasn't set OMNIROUTE_API_KEY/ROUTER_API_KEY (#13679: the previous fallback
 // was the checked-in literal "sk_omniroute", a predictable shared secret anyone reading
-// the source could forge). Both the in-process caller (audioBridgeHelpers /
-// visionBridgeHelpers) and the verifiers (isInternalAdmissionBypass, API-key
+// the source could forge). Both the in-process caller (visionBridgeHelpers)
+// and the verifiers (isInternalAdmissionBypass, API-key
 // validation) read this same value. It lives on globalThis because the proxy (Next
 // middleware bundle) and the route handlers load separate copies of this module.
 const SELF_LOOP_SECRET_KEY = sharedSymbol("selfLoopSecret");

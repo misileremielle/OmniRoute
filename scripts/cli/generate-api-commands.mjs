@@ -20,12 +20,6 @@ const IGNORED_OP_IDS = new Set([
   "listModels",
   "getModel",
   "createEmbedding",
-  "createImage",
-  "createImageEdit",
-  "createImageVariation",
-  "createTranscription",
-  "createSpeech",
-  "createModeration",
 ]);
 
 function kebab(s) {

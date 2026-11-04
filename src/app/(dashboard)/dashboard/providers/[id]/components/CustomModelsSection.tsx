@@ -59,16 +59,7 @@ function targetFormatLabel(value: string, t: (key: string) => string): string {
   return key ? t(key) : value;
 }
 
-const MODEL_ENDPOINT_OPTIONS: ModelSupportedEndpoint[] = [
-  "chat",
-  "embeddings",
-  "rerank",
-  "images",
-  "videos",
-  "audio-speech",
-  "audio-transcriptions",
-  "music",
-];
+const MODEL_ENDPOINT_OPTIONS: ModelSupportedEndpoint[] = ["chat", "embeddings", "rerank"];
 
 // Layout shared by the add form and the inline edit form: two columns on phones (fields
 // pair up, endpoint checkboxes form a tidy grid), one flowing row from lg up.
@@ -82,11 +73,6 @@ function endpointLabel(endpoint: ModelSupportedEndpoint, t: (key: string) => str
     chat: t("supportedEndpointChat"),
     embeddings: t("supportedEndpointEmbeddings"),
     rerank: providerText(t, "rerankEndpoint", "Rerank"),
-    images: t("supportedEndpointImages"),
-    videos: "Video",
-    "audio-speech": t("audioSpeech"),
-    "audio-transcriptions": t("audioTranscriptions"),
-    music: "Music",
   };
   return labels[endpoint] || endpoint;
 }
@@ -500,10 +486,6 @@ export default function CustomModelsSection({
               <option value="responses">{t("responsesApi")}</option>
               <option value="embeddings">{t("embeddings")}</option>
               <option value="rerank">{t("rerank")}</option>
-              <option value="audio-transcriptions">{t("audioTranscriptions")}</option>
-              <option value="audio-speech">{t("audioSpeech")}</option>
-              <option value="images-generations">{t("imagesGenerations")}</option>
-              <option value="video">{t("video")}</option>
             </Select>
           </div>
           <div className="min-w-0 lg:w-48">
@@ -666,32 +648,6 @@ export default function CustomModelsSection({
                         {t("supportedEndpointEmbeddings")}
                       </CapabilityBadge>
                     )}
-                    {model.supportedEndpoints?.includes("images") && (
-                      <CapabilityBadge icon="image" className="bg-warning/15 text-warning">
-                        {t("imagesShortLabel")}
-                      </CapabilityBadge>
-                    )}
-                    {model.supportedEndpoints?.includes("audio") && (
-                      <CapabilityBadge icon="volume_up" className="bg-success/15 text-success">
-                        {t("audioShortLabel")}
-                      </CapabilityBadge>
-                    )}
-                    {(model.supportedEndpoints?.includes("videos") ||
-                      model.supportedEndpoints?.includes("video")) && (
-                      <CapabilityBadge icon="movie" className="bg-error/15 text-error">
-                        Video
-                      </CapabilityBadge>
-                    )}
-                    {model.supportedEndpoints?.includes("audio-speech") && (
-                      <CapabilityBadge icon="volume_up" className="bg-success/15 text-success">
-                        {t("audioSpeech")}
-                      </CapabilityBadge>
-                    )}
-                    {model.supportedEndpoints?.includes("audio-transcriptions") && (
-                      <CapabilityBadge icon="mic" className="bg-chart-2/15 text-chart-2">
-                        {t("audioTranscriptions")}
-                      </CapabilityBadge>
-                    )}
                     {anyNormalizeCompatBadge(model.id!, customMap, overrideMap) && (
                       <span
                         className="text-[10px] px-1.5 py-0.5 rounded-full bg-bg-subtle text-text-muted font-medium"
@@ -739,10 +695,6 @@ export default function CustomModelsSection({
                             <option value="responses">{t("responsesApi")}</option>
                             <option value="embeddings">{t("embeddings")}</option>
                             <option value="rerank">{t("rerank")}</option>
-                            <option value="audio-transcriptions">{t("audioTranscriptions")}</option>
-                            <option value="audio-speech">{t("audioSpeech")}</option>
-                            <option value="images-generations">{t("imagesGenerations")}</option>
-                            <option value="video">{t("video")}</option>
                           </Select>
                         </div>
                         <div className="min-w-0 lg:w-[11rem] lg:shrink-0">

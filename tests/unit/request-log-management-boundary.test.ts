@@ -5,7 +5,7 @@ import { runIsolatedBoundaryFixture } from "./helpers/runIsolatedBoundaryFixture
 test("request-log management boundaries pass in an isolated child process", () => {
   runIsolatedBoundaryFixture({
     fixtureUrl: new URL("./fixtures/request-log-management-boundary.fixture.ts", import.meta.url),
-    expectedTests: 4,
+    expectedTests: 3,
     label: "request-log management boundaries",
   });
 });

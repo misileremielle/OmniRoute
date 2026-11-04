@@ -44,25 +44,17 @@ test("#16929: operator and inferred tags reject an incorrect route, allow exact 
     transcription,
     "chat"
   );
-  assert.match(bad || "", /\/v1\/audio\/transcriptions/);
-  assert.equal(
-    getModelEndpointMismatchMessage(
-      "gemini/gemini-3.5-transcribe",
-      transcription,
-      "audio-transcriptions"
-    ),
-    null
-  );
+  assert.match(bad || "", /Use a supported endpoint instead/);
   assert.match(
     getModelEndpointMismatchMessage(
       "p/m",
       {
-        supportedEndpoints: ["videos"],
+        supportedEndpoints: ["rerank"],
         endpointCapabilitySource: "operator",
       },
-      "images"
+      "embeddings"
     ) || "",
-    /\/v1\/videos\/generations/
+    /\/v1\/rerank/
   );
 });
 
@@ -72,7 +64,6 @@ test("#16929: multimodal chat models remain chat-selectable", () => {
     endpointCapabilitySource: "declared",
   };
   assert.equal(getModelEndpointMismatchMessage("p/m", model, "chat"), null);
-  assert.equal(getModelEndpointMismatchMessage("p/m", model, "images"), null);
   assert.equal(
     getModelEndpointMismatchMessage(
       "p/m",
@@ -88,12 +79,10 @@ test("#16929: multimodal chat models remain chat-selectable", () => {
 
 test("#16929: normalize legacy image alias and preserve trusted multi-endpoint route checks", () => {
   const model = {
-    supportedEndpoints: ["images-generations", "audio-speech"],
+    supportedEndpoints: ["images-generations", "rerank"],
     endpointCapabilitySource: "operator",
   };
-  assert.equal(getModelEndpointMismatchMessage("p/media", model, "images"), null);
-  assert.equal(getModelEndpointMismatchMessage("p/media", model, "audio-speech"), null);
+  assert.equal(getModelEndpointMismatchMessage("p/media", model, "rerank"), null);
   const mismatch = getModelEndpointMismatchMessage("p/media", model, "embeddings");
-  assert.match(mismatch || "", /\/v1\/images\/generations/);
-  assert.match(mismatch || "", /\/v1\/audio\/speech/);
+  assert.match(mismatch || "", /\/v1\/rerank/);
 });

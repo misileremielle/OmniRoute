@@ -12,7 +12,6 @@ import { HTTP_STATUS } from "@omniroute/open-sse/config/constants.ts";
 import { errorResponse } from "@omniroute/open-sse/utils/error.ts";
 import { saveCallLog } from "@/lib/usageDb";
 import { cloneLogPayload } from "@/lib/logPayloads";
-import { redactVideoTranscriptFieldsForLog } from "@/lib/guardrails/videoBridgeSnapshotRedaction";
 import * as log from "../utils/logger";
 
 export interface AdmissionRejectionLogEntry {
@@ -51,7 +50,7 @@ export async function logAdmissionRejection(
       provider: "-",
       duration: 0,
       error: admissionError,
-      requestBody: cloneLogPayload(redactVideoTranscriptFieldsForLog(entry.requestBody)) ?? null,
+      requestBody: cloneLogPayload(entry.requestBody) ?? null,
       apiKeyId: entry.apiKeyId,
       apiKeyName: entry.apiKeyName,
       correlationId: entry.correlationId,

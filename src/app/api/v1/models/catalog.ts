@@ -13,17 +13,7 @@ import {
 } from "./catalogSyncedCoverage";
 import { buildSyncedCapabilities, mergeSyncedCapabilities } from "./syncedCapabilities";
 import { getAllEmbeddingModels } from "@omniroute/open-sse/config/embeddingRegistry";
-import {
-  getAllImageModels,
-  isRegisteredImageModel,
-  parseImageModel,
-} from "@omniroute/open-sse/config/imageRegistry";
-import { aiHordeImageCatalog } from "@omniroute/open-sse/services/aihordeImageCatalog";
 import { getAllRerankModels } from "@omniroute/open-sse/config/rerankRegistry";
-import { getAllAudioModels } from "@omniroute/open-sse/config/audioRegistry";
-import { getAllModerationModels } from "@omniroute/open-sse/config/moderationRegistry";
-import { getAllVideoModels } from "@omniroute/open-sse/config/videoRegistry";
-import { getAllMusicModels } from "@omniroute/open-sse/config/musicRegistry";
 import {
   getRegistryModelThinkingEfforts,
   getRegistryThinkingEfforts,
@@ -1360,23 +1350,6 @@ async function buildUnifiedModelsResponseCore(
           )
             continue;
           if (isExcludedByProviderConnections(canonicalProviderId, sm.id)) continue;
-          // #6457: some upstream discovery catalogs (e.g. HuggingFace's live
-          // `/v1/models`) return image/diffusion models with no modality info,
-          // so `endpoints` below would default to ["chat"] and misrepresent
-          // them as chat-capable. Skip a registered image model only when its
-          // synced metadata does not explicitly advertise a chat endpoint.
-          // Multi-capability models may intentionally share an id between the
-          // chat and image catalogs; getAllImageModels() adds the image entry.
-          const explicitlySupportsChat = sm.supportedEndpoints?.some(
-            (endpoint) => endpoint === "chat" || endpoint === "responses"
-          );
-          if (
-            !explicitlySupportsChat &&
-            (isRegisteredImageModel(canonicalProviderId, sm.id) ||
-              isRegisteredImageModel(providerId, sm.id))
-          ) {
-            continue;
-          }
           // #6328: apply hidePaidModels to synced provider rows too. Synced rows
           // rarely carry pricing metadata, so shouldHidePaid() keeps only
           // free-tier rows (catalog + isFree). Custom rows with isFree:true are
@@ -1461,28 +1434,6 @@ async function buildUnifiedModelsResponseCore(
               ...syncedNameField,
             });
           }
-          if ((includeAlias || Boolean(prefix)) && modelType === "audio") {
-            models.push({
-              id: aliasId,
-              object: "model",
-              created: timestamp,
-              owned_by: resolvePublicOwnerId(providerId, canonicalProviderId),
-              permission: [],
-              root: sm.id,
-              parent: null,
-              type: "audio",
-              subtype: "speech",
-              ...(sm.inputTokenLimit ? { context_length: sm.inputTokenLimit } : {}),
-              ...(typeof sm.outputTokenLimit === "number"
-                ? { max_output_tokens: sm.outputTokenLimit }
-                : {}),
-              ...(endpoints.length > 1 || !endpoints.includes("chat")
-                ? { supported_endpoints: endpoints }
-                : {}),
-              ...syncedNameField,
-            });
-          }
-
           if (includeCanonical && canonicalProviderId !== alias && !prefix) {
             const providerPrefixedId = `${canonicalProviderId}/${displayModelId}`;
             if (!models.some((model) => model.id === providerPrefixedId)) {
@@ -1672,39 +1623,6 @@ async function buildUnifiedModelsResponseCore(
       });
     }
 
-    // Add image models (filtered by active providers).
-    // AI Horde image workers come and go — refresh the live detector first.
-    if (isProviderActive("aihorde")) {
-      try {
-        await aiHordeImageCatalog.ensureFresh();
-      } catch {
-        // Keep the last good snapshot (or none) if Horde is unreachable.
-      }
-    }
-    for (const imgModel of getAllImageModels()) {
-      await maybeYieldCatalogBuild();
-      if (!isProviderActive(imgModel.provider)) continue;
-      const parsedImageModel = parseImageModel(imgModel.id);
-      const rawModelId =
-        parsedImageModel.provider === imgModel.provider && parsedImageModel.model
-          ? parsedImageModel.model
-          : getSpecialtyModelRelativeId(imgModel.id, imgModel.provider);
-      if (!providerSupportsModel(imgModel.provider, rawModelId)) continue;
-      if (isModelHiddenBulk(imgModel.provider, rawModelId, null, "images")) continue;
-      models.push({
-        id: imgModel.id,
-        object: "model",
-        created: timestamp,
-        owned_by: imgModel.provider,
-        type: "image",
-        supported_sizes: imgModel.supportedSizes,
-        input_modalities: imgModel.inputModalities || ["text"],
-        output_modalities: ["image"],
-        ...(imgModel.description ? { description: imgModel.description } : {}),
-        ...(imgModel.mediaCapabilities ? { media_capabilities: imgModel.mediaCapabilities } : {}),
-      });
-    }
-
     // Add rerank models (filtered by active providers)
     for (const rerankModel of getAllRerankModels()) {
       await maybeYieldCatalogBuild();
@@ -1722,77 +1640,6 @@ async function buildUnifiedModelsResponseCore(
         owned_by: rerankModel.provider,
         root: rawModelId,
         type: "rerank",
-      });
-    }
-
-    // Add audio models (filtered by active providers)
-    for (const audioModel of getAllAudioModels()) {
-      await maybeYieldCatalogBuild();
-      if (!isProviderActive(audioModel.provider)) continue;
-      const rawModelId = getSpecialtyModelRelativeId(audioModel.id, audioModel.provider);
-      if (!providerSupportsModel(audioModel.provider, rawModelId)) continue;
-      if (isModelHiddenBulk(audioModel.provider, rawModelId, null, "audio")) continue;
-      models.push({
-        id: audioModel.id,
-        object: "model",
-        created: timestamp,
-        owned_by: audioModel.provider,
-        type: "audio",
-        subtype: audioModel.subtype,
-      });
-    }
-
-    // Add moderation models (filtered by active providers)
-    for (const modModel of getAllModerationModels()) {
-      await maybeYieldCatalogBuild();
-      if (!isProviderActive(modModel.provider)) continue;
-      const rawModelId = getSpecialtyModelRelativeId(modModel.id, modModel.provider);
-      if (!providerSupportsModel(modModel.provider, rawModelId)) continue;
-      if (isModelHiddenBulk(modModel.provider, rawModelId, null, "moderation")) continue;
-      models.push({
-        id: modModel.id,
-        object: "model",
-        created: timestamp,
-        owned_by: modModel.provider,
-        type: "moderation",
-      });
-    }
-
-    // Add video models (filtered by active providers)
-    for (const videoModel of getAllVideoModels()) {
-      await maybeYieldCatalogBuild();
-      if (!isProviderActive(videoModel.provider)) continue;
-      const rawModelId = getSpecialtyModelRelativeId(videoModel.id, videoModel.provider);
-      if (!providerSupportsModel(videoModel.provider, rawModelId)) continue;
-      if (isModelHiddenBulk(videoModel.provider, rawModelId, null, "videos")) continue;
-      models.push({
-        id: videoModel.id,
-        object: "model",
-        created: timestamp,
-        owned_by: videoModel.provider,
-        type: "video",
-        supported_sizes: videoModel.supportedSizes,
-        input_modalities: ["text"],
-        output_modalities: ["video"],
-        ...(videoModel.mediaCapabilities
-          ? { media_capabilities: videoModel.mediaCapabilities }
-          : {}),
-      });
-    }
-
-    // Add music models (filtered by active providers)
-    for (const musicModel of getAllMusicModels()) {
-      await maybeYieldCatalogBuild();
-      if (!isProviderActive(musicModel.provider)) continue;
-      const rawModelId = getSpecialtyModelRelativeId(musicModel.id, musicModel.provider);
-      if (!providerSupportsModel(musicModel.provider, rawModelId)) continue;
-      if (isModelHiddenBulk(musicModel.provider, rawModelId, null, "music")) continue;
-      models.push({
-        id: musicModel.id,
-        object: "model",
-        created: timestamp,
-        owned_by: musicModel.provider,
-        type: "music",
       });
     }
 

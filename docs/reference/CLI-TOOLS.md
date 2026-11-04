@@ -204,12 +204,6 @@ Autonomous agents that appear in `/dashboard/cli-agents`:
 
 ---
 
-## 3. ACP Agents (/dashboard/acp-agents)
-
-This page (renamed from `/dashboard/agents`) shows CLIs that OmniRoute can **spawn** as backend execution engines via stdio/ACP protocol. The catalog is maintained separately in `src/lib/acp/registry.ts` and is **not** the same as `CLI_TOOLS`.
-
----
-
 ## 4. Unsupported CLIs (not shown in dashboard)
 
 The following CLIs do not support custom base URL natively and are **not listed** in CLI Code's or CLI Agents pages. They need a native custom-endpoint option before they can be integrated.
@@ -290,10 +284,6 @@ All routes use `sanitizeErrorMessage()` for error responses (Hard Rule #12).
 - `src/app/(dashboard)/dashboard/cli-agents/page.tsx` — server component
 - `src/app/(dashboard)/dashboard/cli-agents/CliAgentsPageClient.tsx` — client grid
 - `src/app/(dashboard)/dashboard/cli-agents/[id]/page.tsx` — reuses `ToolDetailClient`
-
-### ACP Agents (`/dashboard/acp-agents`)
-
-- `src/app/(dashboard)/dashboard/acp-agents/page.tsx` — server component (moved from `agents/`)
 
 ### Shared UI Components (`src/shared/components/cli/`)
 
@@ -773,15 +763,14 @@ omniroute completion                   # Generate shell completion
 
 ## Available API Endpoints
 
-| Endpoint                   | Description                   | Use For                     |
-| -------------------------- | ----------------------------- | --------------------------- |
-| `/v1/chat/completions`     | Standard chat (all providers) | All modern tools            |
-| `/v1/responses`            | Responses API (OpenAI format) | Codex, agentic workflows    |
-| `/v1/completions`          | Legacy text completions       | Older tools using `prompt:` |
-| `/v1/embeddings`           | Text embeddings               | RAG, search                 |
-| `/v1/images/generations`   | Image generation              | GPT-Image, Flux, etc.       |
-| `/v1/audio/speech`         | Text-to-speech                | ElevenLabs, OpenAI TTS      |
-| `/v1/audio/transcriptions` | Speech-to-text                | Deepgram, AssemblyAI        |
+| Endpoint                   | Description                   | Use For                  |
+| -------------------------- | ----------------------------- | ------------------------ |
+| `/v1/chat/completions`     | Standard chat (all providers) | All modern tools         |
+| `/v1/responses`            | Responses API (OpenAI format) | Codex, agentic workflows |
+| `/v1/embeddings`           | Text embeddings               | RAG, search              |
+| `/v1/images/generations`   | Image generation              | GPT-Image, Flux, etc.    |
+| `/v1/audio/speech`         | Text-to-speech                | ElevenLabs, OpenAI TTS   |
+| `/v1/audio/transcriptions` | Speech-to-text                | Deepgram, AssemblyAI     |
 
 ---
 

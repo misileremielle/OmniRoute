@@ -15,7 +15,6 @@ const providersDb = await import("../../src/lib/db/providers.ts");
 const modelsDb = await import("../../src/lib/db/models.ts");
 const providerModelsRoute = await import("../../src/app/api/providers/[id]/models/route.ts");
 const v1ModelsCatalog = await import("../../src/app/api/v1/models/catalog.ts");
-const imageRoute = await import("../../src/app/api/v1/images/generations/route.ts");
 const { createEmbeddingResponse } = await import("../../src/lib/embeddings/service.ts");
 
 const originalFetch = globalThis.fetch;
@@ -142,36 +141,6 @@ test("Ollama discovery maps /api/show capabilities into connection-scoped model 
   assert.equal(chatCatalogModel?.capabilities?.vision, true);
   assert.equal(chatCatalogModel?.capabilities?.tool_calling, true);
   assert.equal(chatCatalogModel?.capabilities?.reasoning, true);
-});
-
-test("Ollama image model routes through its advertising connection", async () => {
-  await seedOllamaConnection("http://127.0.0.1:11434/v1", 1);
-  const connection = await seedOllamaConnection("http://127.0.0.1:11435/v1", 2);
-  await modelsDb.replaceSyncedAvailableModelsForConnection("ollama-local", connection.id, [
-    {
-      id: "image-model",
-      name: "Image Model",
-      apiFormat: "images-generations",
-      supportedEndpoints: ["images"],
-    },
-  ]);
-
-  let capturedUrl = "";
-  globalThis.fetch = async (input) => {
-    capturedUrl = String(input);
-    return Response.json({ data: [{ b64_json: "aW1hZ2U=" }] });
-  };
-
-  const response = await imageRoute.POST(
-    new Request("http://localhost/v1/images/generations", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ model: "ollama-local/image-model", prompt: "test image" }),
-    })
-  );
-
-  assert.equal(response.status, 200, await response.text());
-  assert.equal(capturedUrl, "http://127.0.0.1:11435/v1/images/generations");
 });
 
 test("Ollama embedding model routes through its advertising connection", async () => {

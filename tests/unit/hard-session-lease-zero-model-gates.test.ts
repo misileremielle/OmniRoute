@@ -121,7 +121,7 @@ const GATES = new Map<number, GateEvidence[]>([
   [71, [inventory(/managed request surfaces are fenced centrally/)]],
   [72, [chat(/managed streaming chat/)]],
   [73, [chat(/managed chat dispatches only/)]],
-  [74, [chat(/legacy completions and messages-compatible paths/)]],
+  [74, [chat(/messages-compatible paths use the managed lease handler/)]],
   [75, [chat(/Responses-shaped request uses the same fenced chat path/)]],
   [76, [chat(/direct foreign connection pin/)]],
   [77, [chat(/direct foreign connection pin/)]],
@@ -147,7 +147,13 @@ const GATES = new Map<number, GateEvidence[]>([
   // #11775: FREE lease-capable connections are usable; only ACTIVE leases isolate.
   [97, [isolation(/lease-capable connection/), inventory(/auxiliaryIsolationSources/)]],
   [98, [inventory(/CLASSIFICATION/)]],
-  [99, [context(/only the explicit lease scope opts/), auth(/unmanaged selection may receive a lease-capable connection/)]],
+  [
+    99,
+    [
+      context(/only the explicit lease scope opts/),
+      auth(/unmanaged selection may receive a lease-capable connection/),
+    ],
+  ],
   [100, [connectionIsolation(/verification skips an ACTIVE exclusive lease/)]],
   [101, [internalKey(/lease:exclusive|hard-lease|exclusive/i)]],
   [102, [inventory(/has no unclassified site/)]],

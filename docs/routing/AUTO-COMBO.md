@@ -25,7 +25,6 @@ lastUpdated: 2026-06-28
 | `auto/offline` | offline | Favors providers with highest quota availability                         |
 | `auto/smart`   | smart   | Quality-first + higher exploration rate (10%) for better model discovery |
 | `auto/lkgp`    | lkgp    | Explicit LKGP (same as default `auto`)                                   |
-| `auto/chaos`   | chaos   | Parallel fan-out, one model per provider (not fault injection)           |
 
 ### Category × Tier Composition (`auto/<category>:<tier>`)
 
@@ -228,25 +227,25 @@ first observations land.
 
 ## Mode Packs
 
-6 pre-defined weight profiles in `open-sse/services/autoCombo/modePacks.ts`. Each pack replaces the default weights outright to bias selection toward one goal. Every pack already sums to `1.0` (`0.9999` as printed at four decimals), so `normalizeScoringWeights()` has nothing meaningful to correct when a pack is active — the values below are, to rounding, the ones the scorer applies.
+5 pre-defined weight profiles in `open-sse/services/autoCombo/modePacks.ts`. Each pack replaces the default weights outright to bias selection toward one goal. Every pack already sums to `1.0` (`0.9999` as printed at four decimals), so `normalizeScoringWeights()` has nothing meaningful to correct when a pack is active — the values below are, to rounding, the ones the scorer applies.
 
-| Factor                | ship-fast  | cost-saver | quality-first | offline-friendly | reliability-first | chaos-mode |
-| :-------------------- | :--------- | :--------- | :------------ | :--------------- | :---------------- | :--------- |
-| `quota`               | 0.1133     | 0.1133     | 0.0752        | **0.3324**       | 0.1133            | 0.0376     |
-| `health`              | 0.2667     | 0.1810     | 0.1714        | 0.2667           | **0.3524**        | **0.4000** |
-| `costInv`             | 0.0276     | **0.3324** | 0.0276        | 0.0752           | 0.0181            | 0.0140     |
-| `latencyInv`          | **0.3048** | 0.0476     | 0.0476        | 0.0476           | 0.0476            | 0.0186     |
-| `taskFit`             | 0.0952     | 0.0952     | **0.3524**    | 0.0000           | 0.0952            | 0.1905     |
-| `stability`           | 0.0000     | 0.0476     | 0.1429        | 0.0952           | 0.1905            | 0.1714     |
-| `tierPriority`        | 0.0376     | 0.0376     | 0.0276        | 0.0376           | 0.0276            | 0.0040     |
-| `tierAffinity`        | 0.0000     | 0.0000     | 0.0000        | 0.0000           | 0.0000            | 0.0000     |
-| `specificityMatch`    | 0.0000     | 0.0000     | 0.0000        | 0.0000           | 0.0000            | 0.0000     |
-| `contextAffinity`     | 0.0095     | 0.0000     | 0.0000        | 0.0000           | 0.0000            | 0.0186     |
-| `sessionAvailability` | 0.0476     | 0.0476     | 0.0476        | 0.0476           | 0.0476            | 0.0476     |
-| `resetWindowAffinity` | 0.0000     | 0.0000     | 0.0000        | 0.0000           | 0.0000            | 0.0000     |
-| `connectionDensity`   | 0.0476     | 0.0476     | 0.0476        | 0.0476           | 0.0476            | 0.0476     |
-| `quality`             | 0.02       | 0.02       | **0.03**      | 0.02             | 0.02              | 0.02       |
-| `reliability`         | 0.03       | 0.03       | 0.03          | 0.03             | **0.04**          | 0.03       |
+| Factor                | ship-fast  | cost-saver | quality-first | offline-friendly | reliability-first |
+| :-------------------- | :--------- | :--------- | :------------ | :--------------- | :---------------- |
+| `quota`               | 0.1133     | 0.1133     | 0.0752        | **0.3324**       | 0.1133            |
+| `health`              | 0.2667     | 0.1810     | 0.1714        | 0.2667           | **0.3524**        |
+| `costInv`             | 0.0276     | **0.3324** | 0.0276        | 0.0752           | 0.0181            |
+| `latencyInv`          | **0.3048** | 0.0476     | 0.0476        | 0.0476           | 0.0476            |
+| `taskFit`             | 0.0952     | 0.0952     | **0.3524**    | 0.0000           | 0.0952            |
+| `stability`           | 0.0000     | 0.0476     | 0.1429        | 0.0952           | 0.1905            |
+| `tierPriority`        | 0.0376     | 0.0376     | 0.0276        | 0.0376           | 0.0276            |
+| `tierAffinity`        | 0.0000     | 0.0000     | 0.0000        | 0.0000           | 0.0000            |
+| `specificityMatch`    | 0.0000     | 0.0000     | 0.0000        | 0.0000           | 0.0000            |
+| `contextAffinity`     | 0.0095     | 0.0000     | 0.0000        | 0.0000           | 0.0000            |
+| `sessionAvailability` | 0.0476     | 0.0476     | 0.0476        | 0.0476           | 0.0476            |
+| `resetWindowAffinity` | 0.0000     | 0.0000     | 0.0000        | 0.0000           | 0.0000            |
+| `connectionDensity`   | 0.0476     | 0.0476     | 0.0476        | 0.0476           | 0.0476            |
+| `quality`             | 0.02       | 0.02       | **0.03**      | 0.02             | 0.02              |
+| `reliability`         | 0.03       | 0.03       | 0.03          | 0.03             | **0.04**          |
 
 Notes:
 
@@ -258,7 +257,6 @@ Notes:
   - **quality-first** → taskFit 0.3524 + stability 0.1429 + quality 0.03, the highest of any pack (best model for the task, consistent)
   - **offline-friendly** → quota 0.3324 + health 0.2667 (max headroom regardless of speed/cost)
   - **reliability-first** → health 0.3524 + stability 0.1905 + reliability 0.04, the highest of any pack (fewest surprises)
-  - **chaos-mode** → health 0.4000 + taskFit 0.1905 (the weight pack `auto/chaos` assigns to its panel members; the parallel fan-out does not read these weights, and this is not a fault-injection profile, see [CHAOS-MODE.md](../guides/CHAOS-MODE.md#autochaos-parallel-fan-out))
 
 ### Per-Request Controls (headers) — #6023 / #6024 / #6025 / #3470
 
@@ -889,15 +887,15 @@ intentionally excluded from CI because they require live credentials and VPS acc
 
 ## Files
 
-| File                                                      | Purpose                                                                                                   |
-| :-------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------- |
-| `open-sse/services/autoCombo/scoring.ts`                  | 16-factor scoring function, `DEFAULT_WEIGHTS`, pool norm                                                  |
-| `open-sse/services/autoCombo/taskFitness.ts`              | Model × task fitness lookup                                                                               |
-| `open-sse/services/autoCombo/engine.ts`                   | Selection logic, bandit, budget cap                                                                       |
-| `open-sse/services/autoCombo/selfHealing.ts`              | Exclusion, probes, incident mode                                                                          |
-| `open-sse/services/autoCombo/modePacks.ts`                | 6 weight profiles (ship-fast, cost-saver, quality-first, offline-friendly, reliability-first, chaos-mode) |
-| `open-sse/services/autoCombo/autoPrefix.ts`               | `auto/` prefix parser + 6 variants                                                                        |
-| `open-sse/services/autoCombo/virtualFactory.ts`           | Builds in-memory `AutoComboConfig` from live connections                                                  |
-| `open-sse/services/autoCombo/providerRegistryAccessor.ts` | Test hook for mocking provider registry                                                                   |
-| `src/shared/constants/routingStrategies.ts`               | `ROUTING_STRATEGY_VALUES` (20 strategies)                                                                 |
-| `src/sse/handlers/chat.ts`                                | Integration: auto-prefix short-circuit                                                                    |
+| File                                                      | Purpose                                                                                       |
+| :-------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| `open-sse/services/autoCombo/scoring.ts`                  | 16-factor scoring function, `DEFAULT_WEIGHTS`, pool norm                                      |
+| `open-sse/services/autoCombo/taskFitness.ts`              | Model × task fitness lookup                                                                   |
+| `open-sse/services/autoCombo/engine.ts`                   | Selection logic, bandit, budget cap                                                           |
+| `open-sse/services/autoCombo/selfHealing.ts`              | Exclusion, probes, incident mode                                                              |
+| `open-sse/services/autoCombo/modePacks.ts`                | 5 weight profiles (ship-fast, cost-saver, quality-first, offline-friendly, reliability-first) |
+| `open-sse/services/autoCombo/autoPrefix.ts`               | `auto/` prefix parser + 6 variants                                                            |
+| `open-sse/services/autoCombo/virtualFactory.ts`           | Builds in-memory `AutoComboConfig` from live connections                                      |
+| `open-sse/services/autoCombo/providerRegistryAccessor.ts` | Test hook for mocking provider registry                                                       |
+| `src/shared/constants/routingStrategies.ts`               | `ROUTING_STRATEGY_VALUES` (20 strategies)                                                     |
+| `src/sse/handlers/chat.ts`                                | Integration: auto-prefix short-circuit                                                        |

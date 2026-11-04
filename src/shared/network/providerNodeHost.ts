@@ -11,7 +11,7 @@
  *  2. Otherwise, may the route dispatch to a REMOTE node (a LAN box, a Tailscale peer,
  *     a public host)? Two conditions, both required:
  *       - the route's operator opt-in flag is set (e.g. `RERANK_REMOTE_PROVIDER_NODES`,
- *         mirroring `AUDIO_REMOTE_PROVIDER_NODES` — routing to a remote host changes
+ *         mirroring `RERANK_REMOTE_PROVIDER_NODES` — routing to a remote host changes
  *         egress identity and must be an explicit decision, cf. #3963), and
  *       - the node's base URL passes the same outbound URL policy that already governs
  *         provider-node creation and use (`getProviderOutboundGuard()`, #5066 / #9123).

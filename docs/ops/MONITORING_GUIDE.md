@@ -453,10 +453,6 @@ OmniRoute supports **3 alert channels**:
 | Webhook          | Configure URL | Slack, Discord, PagerDuty    |
 | Log              | Default       | For external log aggregation |
 
-### Webhook Configuration
-
-> **Note:** Webhook alerting configuration is handled via the dashboard Settings page. See the Settings UI for webhook URL, event filtering, and payload customization.
-
 ### Alert Types
 
 | Alert                        | When                             | Default severity |

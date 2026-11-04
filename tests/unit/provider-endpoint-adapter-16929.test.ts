@@ -6,11 +6,12 @@ test("#16929: Gemini AI Studio transcription is tagged but has no local adapter"
   const adapter = getRegisteredEndpointAdapterStatuses("gemini");
   assert.equal(adapter["audio-transcriptions"], "unavailable");
   assert.equal(adapter.music, "unavailable");
-  assert.equal(getRegisteredEndpointAdapterStatuses("vertex").music, "available");
+  assert.equal(adapter.embeddings, "available");
 });
 
 test("#16929: providers without registered handlers remain unknown, not falsely available", () => {
   const adapter = getRegisteredEndpointAdapterStatuses("unregistered-16929-provider");
-  assert.equal(adapter["audio-transcriptions"], "unknown");
-  assert.equal(adapter["audio-speech"], "unknown");
+  assert.equal(adapter["audio-transcriptions"], "unavailable");
+  assert.equal(adapter.embeddings, "unknown");
+  assert.equal(adapter.rerank, "unknown");
 });

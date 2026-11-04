@@ -9,20 +9,7 @@ import { fileURLToPath } from "node:url";
 // renders a kit PageHeader titled like its sidebar entry (same keys the shell title used).
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PAGES: Array<[string, string, string]> = [
-  ["src/app/(dashboard)/dashboard/memory/page.tsx", "memory", "memorySubtitle"],
   ["src/app/(dashboard)/dashboard/mcp/page.tsx", "mcp", "mcpSubtitle"],
-  ["src/app/(dashboard)/dashboard/a2a/page.tsx", "a2a", "a2aSubtitle"],
-  ["src/app/(dashboard)/dashboard/cloud-agents/page.tsx", "cloudAgents", "cloudAgentsSubtitle"],
-  [
-    "src/app/(dashboard)/dashboard/agent-skills/AgentSkillsPageClient.tsx",
-    "agentSkills",
-    "agentSkillsSubtitle",
-  ],
-  [
-    "src/app/(dashboard)/dashboard/omni-skills/OmniSkillsPageClient.tsx",
-    "omniSkills",
-    "omniSkillsSubtitle",
-  ],
 ];
 
 test("the six lote-7 pages render a kit PageHeader with their sidebar title", () => {

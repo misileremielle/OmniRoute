@@ -7,19 +7,18 @@ import assert from "node:assert/strict";
 const { APIKEY_PROVIDERS } = await import("../../src/shared/constants/providers.ts");
 const { PROVIDER_ENDPOINTS } = await import("../../src/shared/constants/config.ts");
 const { REGISTRY: providerRegistry } = await import("../../open-sse/config/providerRegistry.ts");
-const { getEmbeddingProvider, getEmbeddingDimension } =
-  await import("../../open-sse/config/embeddingRegistry.ts");
-const { getTranscriptionProvider, getSpeechProvider } =
-  await import("../../open-sse/config/audioRegistry.ts");
-const { getImageProvider } = await import("../../open-sse/config/imageRegistry.ts");
-const { getRerankProvider } = await import("../../open-sse/config/rerankRegistry.ts");
+const {
+  getEmbeddingProvider: _getEmbeddingProvider,
+  getEmbeddingDimension: _getEmbeddingDimension,
+} = await import("../../open-sse/config/embeddingRegistry.ts");
+const { getRerankProvider: _getRerankProvider } =
+  await import("../../open-sse/config/rerankRegistry.ts");
 const { isNamedOpenAIStyleProvider } =
   await import("../../src/app/api/providers/[id]/models/discovery/providerSets.ts");
 const { USAGE_FETCHER_PROVIDERS } =
   await import("../../open-sse/services/usage/fetcherProviders.ts");
 const { USAGE_SUPPORTED_PROVIDERS } =
   await import("../../open-sse/services/usage/supportedProviders.ts");
-const { handleAudioSpeech } = await import("../../open-sse/handlers/audioSpeech.ts");
 const N = await import("../../open-sse/services/usage/nan.ts");
 
 const NAN_API = "https://api.nan.builders/v1";
@@ -32,7 +31,7 @@ test("nan is registered as an API-key provider in the UI catalog", () => {
   assert.equal(entry.name, "NaN.Builders");
   assert.equal(entry.website, "https://nan.builders");
   assert.equal(entry.color, "#6D5EF3");
-  for (const kind of ["llm", "embedding", "stt", "tts", "image"]) {
+  for (const kind of ["llm", "embedding"]) {
     assert.ok(entry.serviceKinds.includes(kind), `serviceKinds must include ${kind}`);
   }
   assert.equal(
@@ -56,67 +55,6 @@ test("nan chat registry entry is OpenAI-compatible with live model discovery", (
   assert.ok(ids.includes("deepseek-v4-flash"));
   assert.equal(new Set(ids).size, ids.length, "seed ids must be unique");
   assert.equal(isNamedOpenAIStyleProvider("nan"), true);
-});
-
-test("nan resolves in the embedding, audio, image and rerank registries", () => {
-  const embedding = getEmbeddingProvider("nan");
-  assert.equal(embedding?.baseUrl, `${NAN_API}/embeddings`);
-  assert.equal(getEmbeddingDimension("nan/qwen3-embedding"), 4096);
-
-  const stt = getTranscriptionProvider("nan");
-  assert.equal(stt?.baseUrl, `${NAN_API}/audio/transcriptions`);
-  assert.ok(stt?.models.some((m) => m.id === "whisper"));
-
-  const tts = getSpeechProvider("nan");
-  assert.equal(tts?.baseUrl, `${NAN_API}/audio/speech`);
-  assert.ok(tts?.models.some((m) => m.id === "kokoro"));
-  assert.equal(tts?.defaultVoice, "af_heart");
-
-  const image = getImageProvider("nan");
-  assert.equal(image?.baseUrl, `${NAN_API}/images/generations`);
-  assert.equal(image?.format, "openai");
-  const imageIds = image?.models.map((m: { id: string }) => m.id) ?? [];
-  assert.ok(imageIds.includes("flux-2-klein"));
-  assert.ok(imageIds.includes("qwen-image-2.1"));
-
-  const rerank = getRerankProvider("nan");
-  assert.equal(rerank?.baseUrl, `${NAN_API}/rerank`);
-});
-
-test("nan TTS falls back to the Kokoro default voice, never the OpenAI stock voice", async () => {
-  const originalFetch = globalThis.fetch;
-  const captured: Array<{ url: string; body: Record<string, unknown> }> = [];
-  globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-    captured.push({ url: String(input), body: JSON.parse(String(init?.body ?? "{}")) });
-    return new Response(new Uint8Array([1, 2, 3]), {
-      status: 200,
-      headers: { "content-type": "audio/mpeg" },
-    });
-  };
-  try {
-    const implicit = await handleAudioSpeech({
-      body: { model: "nan/kokoro", input: "hello" },
-      credentials: { apiKey: "nan-key" },
-    });
-    assert.equal(implicit.status, 200);
-    const explicit = await handleAudioSpeech({
-      body: { model: "nan/kokoro", input: "hello", voice: "am_adam" },
-      credentials: { apiKey: "nan-key" },
-    });
-    assert.equal(explicit.status, 200);
-    const openai = await handleAudioSpeech({
-      body: { model: "openai/tts-1", input: "hello" },
-      credentials: { apiKey: "openai-key" },
-    });
-    assert.equal(openai.status, 200);
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-  assert.equal(captured[0].url, `${NAN_API}/audio/speech`);
-  assert.equal(captured[0].body.model, "kokoro");
-  assert.equal(captured[0].body.voice, "af_heart");
-  assert.equal(captured[1].body.voice, "am_adam");
-  assert.equal(captured[2].body.voice, "alloy", "providers without defaultVoice keep alloy");
 });
 
 test("nan usage fetcher is wired into both provider lists", () => {

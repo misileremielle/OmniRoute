@@ -6,7 +6,7 @@ import path from "node:path";
 const REPO_ROOT = path.resolve(import.meta.dirname, "../..");
 
 // #13679 item #9: docker-compose.yml has no top-level `networks:` key, so
-// Compose puts every service (redis, qdrant, bifrost, cliproxyapi,
+// Compose puts every service (redis, bifrost, cliproxyapi,
 // codex-app-server, chatgpt-web-codex-browser, ...) on the same implicit
 // default bridge network. The chatgpt-web-codex-browser sidecar exposes an
 // UNAUTHENTICATED CDP proxy on 9223 (docker/chatgpt-web-codex-browser/cdp-proxy.mjs)
@@ -65,7 +65,7 @@ test("chatgpt-web-codex-browser is isolated off the shared default network", () 
     block,
     /networks:/,
     "chatgpt-web-codex-browser must declare an explicit `networks:` list — otherwise it " +
-      "attaches to the implicit default network shared with redis/qdrant/bifrost/etc."
+      "attaches to the implicit default network shared with redis/bifrost/etc."
   );
   assert.ok(
     !listedNetworks(block).includes("default"),
@@ -85,9 +85,9 @@ test("omniroute-web (the one legitimate CDP consumer) stays reachable via the de
   );
 });
 
-test("unrelated sidecars (redis, qdrant) are not put on the CDP-proxy network", () => {
+test("unrelated sidecars (redis, bifrost) are not put on the CDP-proxy network", () => {
   const compose = readCompose();
-  for (const serviceName of ["redis", "qdrant", "bifrost"]) {
+  for (const serviceName of ["redis", "bifrost"]) {
     const block = serviceBlock(compose, serviceName);
     assert.doesNotMatch(
       block,

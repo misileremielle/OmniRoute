@@ -27,7 +27,6 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 const { buildTargetTimeoutRunner } =
   await import("../../open-sse/services/combo/targetTimeoutRunner.ts");
 const { handleComboChat } = await import("../../open-sse/services/combo.ts");
-const { handleChaosChat } = await import("../../open-sse/services/autoCombo/chaosEngine.ts");
 const { evaluateCase } = await import("../../src/lib/evals/evalRunner.ts");
 const { withItemDispatchTimeout } = await import("../../open-sse/services/batchProcessor.ts");
 const { saveModelsDevCapabilities } = await import("../../src/lib/modelsDevSync.ts");
@@ -69,13 +68,6 @@ function createLog() {
 function okResponse(body: Record<string, unknown> = { choices: [{ message: { content: "ok" } }] }) {
   return new Response(JSON.stringify(body), {
     status: 200,
-    headers: { "content-type": "application/json" },
-  });
-}
-
-function errorResponse(status: number, message: string = `Error ${status}`) {
-  return new Response(JSON.stringify({ error: { message } }), {
-    status,
     headers: { "content-type": "application/json" },
   });
 }
@@ -208,31 +200,6 @@ test("G4: round-robin hung model → 504 via loop safety timer", async () => {
   assert.ok(
     log.entries.some((e) => e.level === "warn" && /Round-robin/i.test(String(e.msg))),
     "expected a warn about the round-robin safety timeout"
-  );
-});
-
-// ── G5: chaosEngine logs all-panel failures ─────────────────────────────────
-test("G5: chaos all-panel failure is logged with per-model errors", async () => {
-  const log = createLog();
-  const res = await handleChaosChat({
-    // Streaming client: the all-failed case keeps a well-formed SSE envelope.
-    // (A non-streaming client gets a JSON 502 instead — see
-    // tests/unit/chaos-non-stream-json.test.ts.)
-    body: { stream: true },
-    models: ["openai/gpt-4o-mini", "claude/sonnet"],
-    handleSingleModel: async () => errorResponse(503, "upstream down"),
-    log,
-    comboName: "g5-chaos",
-  });
-  assert.equal(res.status, 200); // SSE envelope stays well-formed
-  const body = await res.text();
-  assert.match(body, /All chaos panel models failed/);
-  assert.match(body, /upstream down/);
-  assert.ok(
-    log.entries.some(
-      (e) => e.level === "warn" && /All chaos panel models failed/i.test(String(e.msg))
-    ),
-    "expected the all-failed warn with model errors"
   );
 });
 

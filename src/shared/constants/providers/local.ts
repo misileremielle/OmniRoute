@@ -171,32 +171,4 @@ export const LOCAL_PROVIDERS = {
     localDefault: "http://localhost:5000/v1",
     passthroughModels: true,
   },
-  sdwebui: {
-    id: "sdwebui",
-    serviceKinds: [],
-    alias: "sdwebui",
-    name: "SD WebUI",
-    icon: "brush",
-    color: "#FF7043",
-    textIcon: "SD",
-    website: "https://github.com/AUTOMATIC1111/stable-diffusion-webui",
-    hasFree: true,
-    authHint:
-      "No API key required. Configure the local WebUI base URL (default: http://localhost:7860).",
-    localDefault: "http://localhost:7860",
-  },
-  comfyui: {
-    id: "comfyui",
-    serviceKinds: [],
-    alias: "comfyui",
-    name: "ComfyUI",
-    icon: "account_tree",
-    color: "#4CAF50",
-    textIcon: "CF",
-    website: "https://github.com/comfyanonymous/ComfyUI",
-    hasFree: true,
-    authHint:
-      "No API key required. Configure the local ComfyUI base URL (default: http://localhost:8188).",
-    localDefault: "http://localhost:8188",
-  },
 };

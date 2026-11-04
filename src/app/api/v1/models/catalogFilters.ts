@@ -30,16 +30,7 @@ export const CATALOG_CAPABILITY_FILTERS = [
  * Catalog `type` surfaces. Rows without a `type` are chat models, so `kind=chat`
  * matches them; the rest mirror NON_CHAT_SURFACE_TYPES in src/lib/modelCapabilities.ts.
  */
-export const CATALOG_KIND_FILTERS = [
-  "chat",
-  "audio",
-  "embedding",
-  "image",
-  "moderation",
-  "music",
-  "rerank",
-  "video",
-] as const;
+export const CATALOG_KIND_FILTERS = ["chat", "embedding", "rerank"] as const;
 
 /** Query params that switch GET /v1/models into the filtered path. */
 export const CATALOG_DISCOVERY_PARAMS = ["capability", "min_context", "kind", "q"] as const;

@@ -1,6 +1,5 @@
 import {
   APIKEY_PROVIDERS,
-  AUDIO_ONLY_PROVIDERS,
   CLOUD_AGENT_PROVIDERS,
   LOCAL_PROVIDERS,
   NOAUTH_PROVIDERS,
@@ -23,7 +22,6 @@ export type StaticProviderCatalogCategory =
   | "web-cookie"
   | "local"
   | "search"
-  | "audio"
   | "upstream-proxy"
   | "apikey"
   | "cloud-agent";
@@ -139,12 +137,6 @@ export const STATIC_PROVIDER_CATALOG_GROUPS: Record<
     displayAuthType: "apikey",
     toggleAuthType: "apikey",
   },
-  audio: {
-    category: "audio",
-    providers: AUDIO_ONLY_PROVIDERS as ProviderRecord,
-    displayAuthType: "apikey",
-    toggleAuthType: "apikey",
-  },
   "upstream-proxy": {
     category: "upstream-proxy",
     providers: UPSTREAM_PROXY_PROVIDERS as ProviderRecord,
@@ -171,7 +163,6 @@ export const STATIC_PROVIDER_CATALOG_RESOLUTION_ORDER: StaticProviderCatalogCate
   "web-cookie",
   "local",
   "search",
-  "audio",
   "upstream-proxy",
   "cloud-agent",
   "apikey",
@@ -182,7 +173,6 @@ const MANAGED_PROVIDER_CONNECTION_CATEGORIES = new Set<StaticProviderCatalogCate
   "web-cookie",
   "local",
   "search",
-  "audio",
   "cloud-agent",
 ]);
 

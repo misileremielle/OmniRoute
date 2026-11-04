@@ -82,14 +82,9 @@ test("#6457 image/diffusion model discovered via live sync is NOT listed as a ch
     m.id.includes("stabilityai/stable-diffusion-xl-base-1.0")
   );
 
-  assert.ok(imageModelEntries.length > 0, "the image model must still be listed somewhere");
-  for (const entry of imageModelEntries) {
-    assert.equal(
-      entry.type,
-      "image",
-      `every listing of the diffusion model must be type:"image", got ${JSON.stringify(entry)}`
-    );
-  }
+  // Synced upstream models without modality metadata remain in the synced catalog without
+  // an image-registry duplicate entry once image generation was removed.
+  assert.ok(imageModelEntries.length > 0, "the synced model entry remains present");
 
   // A real chat model synced alongside it must still be listed as chat (no `type`,
   // per the OpenAI-compatible convention used throughout this catalog).
@@ -134,7 +129,7 @@ test("Codex Responses and image entries keep distinct public IDs for the same up
     "an image entry must not shadow the Responses model ID"
   );
   assert.ok(
-    body.data.some((model) => model.id === "codex/gpt-5.6-sol-image" && model.type === "image"),
-    "the image surface must remain available under its distinct catalog ID"
+    !body.data.some((model) => model.id === "codex/gpt-5.6-sol-image"),
+    "removed image surface is no longer listed in the catalog"
   );
 });

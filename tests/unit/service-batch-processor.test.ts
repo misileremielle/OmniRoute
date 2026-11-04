@@ -88,17 +88,6 @@ describe("batchProcessor helpers", () => {
       });
       assert.equal(result.stream, undefined);
     });
-
-    it("does not add stream for images endpoint", () => {
-      const result = mod.buildRequestBody({
-        body: { prompt: "a cat" },
-        url: "/v1/images/generations",
-        customId: null,
-        lineNumber: 1,
-        method: "POST",
-      });
-      assert.equal(result.stream, undefined);
-    });
   });
 
   describe("maybeThrottle", () => {

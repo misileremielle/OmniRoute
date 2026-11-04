@@ -30,12 +30,10 @@ Simple guides for using OmniRoute — no technical background needed.
 - [USER_GUIDE.md](guides/USER_GUIDE.md) — daily usage of the dashboard and API.
 - [THINKING_BUDGET.md](guides/THINKING_BUDGET.md) — thinking/reasoning budget modes (passthrough vs auto-strip).
 - [FEATURES.md](guides/FEATURES.md) — dashboard feature gallery.
-- [CHAOS-MODE.md](guides/CHAOS-MODE.md) — `auto/chaos` parallel fan-out.
 - [TIERS.md](guides/TIERS.md) — OmniRoute tiers explained (user guide).
 - [USAGE_QUOTA_GUIDE.md](guides/USAGE_QUOTA_GUIDE.md) — usage, quota & spend tracking.
 - [COST_TRACKING.md](guides/COST_TRACKING.md) — cost and spend tracking.
 - [TEAM_COST_CENTERS.md](guides/TEAM_COST_CENTERS.md) — Team billing attribution, reports, and soft shared budgets.
-- [FREE_PROVIDER_RANKINGS.md](guides/FREE_PROVIDER_RANKINGS.md) — free provider rankings (Arena ELO).
 - [DOCKER_GUIDE.md](guides/DOCKER_GUIDE.md) — running OmniRoute under Docker, including runtime RAM for coding agents.
 - [TERMUX_GUIDE.md](guides/TERMUX_GUIDE.md) — running on Android via Termux.
 - [PWA_GUIDE.md](guides/PWA_GUIDE.md) — installing the dashboard as a PWA.
@@ -82,7 +80,6 @@ Lookup material — API surface, environment variables, CLI flags, provider cata
 - [API_REFERENCE.md](reference/API_REFERENCE.md) — REST API endpoints and shapes.
 - [PROVIDER_REFERENCE.md](reference/PROVIDER_REFERENCE.md) — auto-generated provider catalog (do not edit by hand).
 - [REMOVED_PROVIDERS.md](reference/REMOVED_PROVIDERS.md) — providers removed at their operator's request; never reintroduce without written permission.
-- [PROVIDER_PLUGIN_MANIFEST.md](reference/PROVIDER_PLUGIN_MANIFEST.md) — sidecar-safe provider plugin contract for Bifrost and CLIProxyAPI migration.
 - [openapi.yaml](openapi.yaml) — OpenAPI spec for the public API.
 - [ENVIRONMENT.md](reference/ENVIRONMENT.md) — environment variables reference.
 - [FEATURE_FLAGS.md](reference/FEATURE_FLAGS.md) — feature flags and their defaults.
@@ -97,14 +94,6 @@ Lookup material — API surface, environment variables, CLI flags, provider cata
 Pluggable subsystems exposed to clients, agents, and operators.
 
 - [MCP-SERVER.md](frameworks/MCP-SERVER.md) — Model Context Protocol server.
-- [A2A-SERVER.md](frameworks/A2A-SERVER.md) — Agent-to-Agent (A2A) JSON-RPC server.
-- [ACP.md](frameworks/ACP.md) — Agent Client Protocol.
-- [AGENT_PROTOCOLS_GUIDE.md](frameworks/AGENT_PROTOCOLS_GUIDE.md) — A2A / ACP / Cloud agent overview.
-- [AGENT-SKILLS.md](frameworks/AGENT-SKILLS.md) — agent skills catalog.
-- [CLOUD_AGENT.md](frameworks/CLOUD_AGENT.md) — cloud agent runtime and providers.
-- [SKILLS.md](frameworks/SKILLS.md) — Skills framework (sandboxed extension).
-- [MEMORY.md](frameworks/MEMORY.md) — persistent memory (FTS5 + Qdrant).
-- [WEBHOOKS.md](frameworks/WEBHOOKS.md) — webhook events and dispatch.
 - [EVALS.md](frameworks/EVALS.md) — eval suites.
 - [EMBEDDED-SERVICES.md](frameworks/EMBEDDED-SERVICES.md) — embedded sidecar services (9Router, CLIProxyAPI).
 - [NOTION_CONTEXT.md](frameworks/NOTION_CONTEXT.md) — Notion context source.
@@ -114,9 +103,6 @@ Pluggable subsystems exposed to clients, agents, and operators.
 - [OPEN_SSE_ARCHITECTURE.md](frameworks/OPEN_SSE_ARCHITECTURE.md) — open-sse streaming engine internals.
 - [PLAYGROUND_STUDIO.md](frameworks/PLAYGROUND_STUDIO.md) — Playground Studio UI.
 - [SEARCH_TOOLS_STUDIO.md](frameworks/SEARCH_TOOLS_STUDIO.md) — Search Tools Studio UI.
-- [PLUGINS.md](frameworks/PLUGINS.md) — CLI plugin system overview.
-- [PLUGIN_SDK.md](frameworks/PLUGIN_SDK.md) — plugin SDK reference.
-- [PLUGIN_MARKETPLACE.md](frameworks/PLUGIN_MARKETPLACE.md) — plugin marketplace.
 
 ## routing/
 

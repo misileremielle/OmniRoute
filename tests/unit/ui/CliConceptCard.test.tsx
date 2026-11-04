@@ -72,12 +72,6 @@ describe("CliConceptCard", () => {
     expect(container.textContent).toContain("concept.agent.title");
   });
 
-  it("renders with currentType=acp", () => {
-    const container = renderCard("acp");
-    expect(container.textContent).toContain("concept.acp.title");
-    expect(container.textContent).toContain("concept.acp.warning");
-  });
-
   it.each(["code", "agent"] satisfies CliConceptType[])(
     "does not show the ACP warning for currentType=%s",
     (type) => {
@@ -98,7 +92,7 @@ describe("CliConceptCard", () => {
     const links = container.querySelectorAll("a");
     const hrefs = Array.from(links).map((a) => a.getAttribute("href"));
     expect(hrefs).toContain("/dashboard/cli-agents");
-    expect(hrefs).toContain("/dashboard/acp-agents");
+    expect(hrefs).not.toContain("/dashboard/acp-agents");
     // Should NOT link to itself
     expect(hrefs).not.toContain("/dashboard/cli-code");
   });
@@ -108,7 +102,7 @@ describe("CliConceptCard", () => {
     const links = container.querySelectorAll("a");
     const hrefs = Array.from(links).map((a) => a.getAttribute("href"));
     expect(hrefs).toContain("/dashboard/cli-code");
-    expect(hrefs).toContain("/dashboard/acp-agents");
+    expect(hrefs).not.toContain("/dashboard/acp-agents");
     expect(hrefs).not.toContain("/dashboard/cli-agents");
   });
 
@@ -118,6 +112,6 @@ describe("CliConceptCard", () => {
     const hrefs = Array.from(links).map((a) => a.getAttribute("href"));
     expect(hrefs).toContain("/dashboard/cli-code");
     expect(hrefs).toContain("/dashboard/cli-agents");
-    expect(hrefs).not.toContain("/dashboard/acp-agents");
+    expect(hrefs).not.not.toContain("/dashboard/acp-agents");
   });
 });

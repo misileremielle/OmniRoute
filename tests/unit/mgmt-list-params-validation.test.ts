@@ -74,16 +74,6 @@ const routes: Array<{
     ],
   },
   {
-    name: "/api/webhooks",
-    path: "/api/webhooks",
-    load: () => import("../../src/app/api/webhooks/route.ts"),
-    auth: "session",
-    params: [
-      { name: "limit", valid: "5" },
-      { name: "offset", valid: "0" },
-    ],
-  },
-  {
     name: "/api/v1/management/proxies",
     path: "/api/v1/management/proxies",
     load: () => import("../../src/app/api/v1/management/proxies/route.ts"),

@@ -12,7 +12,6 @@ import {
   WEB_COOKIE_PROVIDERS,
 } from "@/shared/constants/providers";
 import { MODAL_DEFAULT_VALIDATION_MODEL_ID } from "@/shared/constants/modal";
-import { validateImageProviderApiKey } from "@/lib/providers/imageValidation";
 import { usesCcWireImage } from "@omniroute/open-sse/services/ccWireImageBuiltins.ts";
 import {
   isAlibabaRegionalProvider,
@@ -64,21 +63,13 @@ import {
   validateSapProvider,
 } from "./validation/cloudProviders";
 import {
-  validateDeepgramProvider,
-  validateAssemblyAIProvider,
-  validateRevAiProvider,
-  validateSonioxProvider,
-  validateElevenLabsProvider,
-  validateInworldProvider,
   validateKieProvider,
-  validateAwsPollyProvider,
   validateBailianCodingPlanProvider,
   validateQwenCloudTokenPlanProvider,
   validateRekaProvider,
   validateMaritalkProvider,
   validateNlpCloudProvider,
   validateOneMinAiProvider,
-  validateRunwayProvider,
   validateNousResearchProvider,
   validatePoeProvider,
 } from "./validation/audioMiscProviders";
@@ -115,7 +106,6 @@ import { validateZyloApiProvider } from "./validation/zylo";
 import { validateInceptionProvider } from "./validation/inception";
 import { validateClineProvider } from "./validation/cline";
 import { validateKilocodeProvider } from "./validation/kilocode";
-import { validateAdobeFireflyProvider } from "./validation/adobeFirefly";
 import {
   validateV0VercelProvider,
   validateAuggieProvider,
@@ -264,11 +254,6 @@ export async function validateProviderApiKey({
     auggie: validateAuggieProvider,
     "cursor-api": validateCursorApiProvider,
     aihorde: validateAiHordeProvider,
-    // #10522: registered under both the canonical id and the short alias — Firefly
-    // connections are commonly stored as "firefly" (same prefix as firefly/<model>
-    // routing ids), not the canonical "adobe-firefly" WEB_COOKIE_PROVIDERS key.
-    "adobe-firefly": validateAdobeFireflyProvider,
-    firefly: validateAdobeFireflyProvider,
     qoder: validateQoderProvider,
     kiro: validateKiroProvider,
     freebuff: validateFreebuffProvider,
@@ -289,7 +274,6 @@ export async function validateProviderApiKey({
     "zylo-api": validateZyloApiProvider,
     // Registered under the alias too: connections are commonly stored as "zylo" (same prefix as
     // the zylo/<model> routing ids), and the alias must not fall back to the open-catalog probe.
-    // Same shape as the adobe-firefly/firefly pair above.
     zylo: validateZyloApiProvider,
     // Inception Labs serves GET /v1/models without authentication (200 for any key), so the
     // generic OpenAI-like probe greened bogus keys. Probe the authenticated chat route instead.
@@ -305,26 +289,7 @@ export async function validateProviderApiKey({
     // Kilo Code serves unauthenticated GET /models (open catalog returning 200 for any key).
     // Authenticate against /chat/completions with the required X-KILOCODE-EDITORNAME header.
     kilocode: validateKilocodeProvider,
-    deepgram: validateDeepgramProvider,
-    assemblyai: validateAssemblyAIProvider,
-    "rev-ai": validateRevAiProvider,
-    soniox: validateSonioxProvider,
-    "fal-ai": ({ apiKey, providerSpecificData }: any) =>
-      validateImageProviderApiKey({ provider: "fal-ai", apiKey, providerSpecificData }),
-    "stability-ai": ({ apiKey, providerSpecificData }: any) =>
-      validateImageProviderApiKey({ provider: "stability-ai", apiKey, providerSpecificData }),
-    "black-forest-labs": ({ apiKey, providerSpecificData }: any) =>
-      validateImageProviderApiKey({ provider: "black-forest-labs", apiKey, providerSpecificData }),
-    recraft: ({ apiKey, providerSpecificData }: any) =>
-      validateImageProviderApiKey({ provider: "recraft", apiKey, providerSpecificData }),
-    topaz: ({ apiKey, providerSpecificData }: any) =>
-      validateImageProviderApiKey({ provider: "topaz", apiKey, providerSpecificData }),
-    magnific: ({ apiKey, providerSpecificData }: any) =>
-      validateImageProviderApiKey({ provider: "magnific", apiKey, providerSpecificData }),
-    elevenlabs: validateElevenLabsProvider,
-    inworld: validateInworldProvider,
     kie: validateKieProvider,
-    "aws-polly": validateAwsPollyProvider,
     "bailian-coding-plan": validateBailianCodingPlanProvider,
     "qwen-cloud-token-plan": validateQwenCloudTokenPlanProvider,
     heroku: validateHerokuProvider,
@@ -365,7 +330,6 @@ export async function validateProviderApiKey({
     maritalk: validateMaritalkProvider,
     nlpcloud: validateNlpCloudProvider,
     oneminai: validateOneMinAiProvider,
-    runwayml: validateRunwayProvider,
     typesafe: ({ apiKey }: any) => validateTypesafeProvider({ apiKey }),
     snowflake: validateSnowflakeProvider,
     gigachat: validateGigachatProvider,

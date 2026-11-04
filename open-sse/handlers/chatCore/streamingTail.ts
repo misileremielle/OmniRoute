@@ -13,7 +13,6 @@ import {
   STREAM_RECOVERY,
 } from "../../config/constants.ts";
 import { incrementTokenUsage } from "../../services/geminiRateLimitTracker.ts";
-import { forgetClaudeThinkingForClientResponse } from "../../services/claudeThinkingStore.ts";
 import { requestTtftMs, streamEmittedOutput } from "../../utils/streamTiming.ts";
 import { readStreamPartialUsage } from "../../utils/streamPartialUsage.ts";
 import { clearPostOutputFailureStreak } from "../../services/accountFallback/postOutputFailureStreak.ts";
@@ -146,7 +145,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     toolNameMap,
     traceId,
     translatedBody,
-    videoBridgeObserved,
   } = deps;
   let providerResponse, finalBody, effectiveServiceTier;
   providerResponse = deps.providerResponse;
@@ -426,12 +424,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
         });
       }
 
-      // The stream translator stores Claude signed thinking per tool call as it goes;
-      // a turn that may echo video transcript cues must not be retained at all.
-      if (videoBridgeObserved && streamResponseBody) {
-        forgetClaudeThinkingForClientResponse(streamResponseBody);
-      }
-
       if (normalizedStreamStatus === 200 && streamResponseBody) {
         captureStreamReasoningForReplay({
           streamResponseBody,
@@ -443,7 +435,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
           provider,
           model,
           reasoningCacheScope,
-          videoTranscriptSensitive: videoBridgeObserved,
         });
       }
       effectiveServiceTier = resolveReportedServiceTier(streamResponseBody) ?? effectiveServiceTier;
@@ -608,7 +599,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
       apiKeyId: apiKeyInfo?.id ?? undefined,
       streamUsage,
       log,
-      videoTranscriptSensitive: videoBridgeObserved,
     });
   };
 
@@ -807,6 +797,10 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     ),
   });
   const clientFacingStream = wrapReadableStreamWithFinalize(finalStream, releaseTurnExecution);
+
+  // Yield a turn so pipeWithDisconnect pumps the buffered readiness
+  // chunk into transformStream before handing the Response back to the caller.
+  await new Promise<void>((resolve) => setImmediate(resolve));
 
   const response = inheritEmptyTurnPolicy(
     providerResponse,

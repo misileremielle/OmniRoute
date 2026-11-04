@@ -17,13 +17,6 @@ test("HIDEABLE_SIDEBAR_ITEM_IDS includes cli-agents (plan 14 new entry)", () => 
   );
 });
 
-test("HIDEABLE_SIDEBAR_ITEM_IDS includes acp-agents (renamed from agents)", () => {
-  assert.ok(
-    (sidebarVisibility.HIDEABLE_SIDEBAR_ITEM_IDS as readonly string[]).includes("acp-agents"),
-    "expected 'acp-agents' in HIDEABLE_SIDEBAR_ITEM_IDS"
-  );
-});
-
 test("HIDEABLE_SIDEBAR_ITEM_IDS does NOT include legacy cli-tools", () => {
   assert.equal(
     (sidebarVisibility.HIDEABLE_SIDEBAR_ITEM_IDS as readonly string[]).includes("cli-tools"),

@@ -4,8 +4,6 @@ import { getDbInstance, resetDbInstance } from "../../src/lib/db/core.ts";
 import { classifyCallLogError, toStoredErrorType } from "../../src/lib/usage/callLogs/format.ts";
 import { saveCallLog } from "../../src/lib/usage/callLogs.ts";
 import { ERROR_TYPE_CUTOVER_ISO, getErrorTypeBreakdown } from "../../src/lib/db/callLogStats.ts";
-import { getCallLogsForExport } from "../../src/lib/usage/callLogExportSource.ts";
-import { toBigQueryRow } from "../../src/lib/logExport/destinations/bigquery.ts";
 import {
   ERROR_TYPE_CONTRACT,
   ERROR_TYPE_CONTRACT_VERSION,
@@ -296,41 +294,6 @@ test("cutover boundary: pre_migration only before ERROR_TYPE_CUTOVER_ISO", () =>
   }
 });
 
-test("log export keeps both legacy NULL and the new unknown error_type intact", async () => {
-  const stamp = Date.now();
-  const legacy = `hx-export-null-${stamp}`;
-  const fresh = `hx-export-unknown-${stamp}`;
-  const db = getDbInstance();
-  const before = Number(
-    (db.prepare("SELECT COALESCE(MAX(rowid), 0) AS m FROM call_logs").get() as { m: number }).m
-  );
-  try {
-    insertRawErrorType(legacy, null, new Date().toISOString(), 500);
-    await saveCallLog({
-      id: fresh,
-      method: "POST",
-      path: "/v1/chat/completions",
-      status: 403,
-      error: "some other 403 body",
-      model: "m",
-      provider: "openai",
-      duration: 1,
-      tokens: { in: 1, out: 1 },
-    });
-
-    const exported = getCallLogsForExport(before, 50);
-    const byId = new Map(exported.map((row) => [row.record.id, row.record]));
-    assert.equal(byId.get(legacy)?.errorType, null);
-    assert.equal(byId.get(fresh)?.errorType, "forbidden");
-
-    const exportedAt = new Date().toISOString();
-    assert.equal(toBigQueryRow(byId.get(legacy)!, exportedAt).error_type, null);
-    assert.equal(toBigQueryRow(byId.get(fresh)!, exportedAt).error_type, "forbidden");
-  } finally {
-    deleteCallLogs([legacy, fresh]);
-  }
-});
-
 test("getErrorTypeBreakdown maps free-text history to unclassified, keeps pre_migration", () => {
   const ids = ["hx-typo", "hx-old", "hx-new"];
   try {
@@ -405,41 +368,6 @@ test("cutover boundary: pre_migration only before ERROR_TYPE_CUTOVER_ISO", () =>
     assert.equal(byType["unclassified"], 1);
   } finally {
     deleteCallLogs(ids);
-  }
-});
-
-test("log export keeps both legacy NULL and the new unknown error_type intact", async () => {
-  const stamp = Date.now();
-  const legacy = `hx-export-null-${stamp}`;
-  const fresh = `hx-export-unknown-${stamp}`;
-  const db = getDbInstance();
-  const before = Number(
-    (db.prepare("SELECT COALESCE(MAX(rowid), 0) AS m FROM call_logs").get() as { m: number }).m
-  );
-  try {
-    insertRawErrorType(legacy, null, new Date().toISOString(), 500);
-    await saveCallLog({
-      id: fresh,
-      method: "POST",
-      path: "/v1/chat/completions",
-      status: 403,
-      error: "some other 403 body",
-      model: "m",
-      provider: "openai",
-      duration: 1,
-      tokens: { in: 1, out: 1 },
-    });
-
-    const exported = getCallLogsForExport(before, 50);
-    const byId = new Map(exported.map((row) => [row.record.id, row.record]));
-    assert.equal(byId.get(legacy)?.errorType, null);
-    assert.equal(byId.get(fresh)?.errorType, "forbidden");
-
-    const exportedAt = new Date().toISOString();
-    assert.equal(toBigQueryRow(byId.get(legacy)!, exportedAt).error_type, null);
-    assert.equal(toBigQueryRow(byId.get(fresh)!, exportedAt).error_type, "forbidden");
-  } finally {
-    deleteCallLogs([legacy, fresh]);
   }
 });
 
@@ -566,40 +494,5 @@ test("cutover boundary: pre_migration only before ERROR_TYPE_CUTOVER_ISO", () =>
     assert.equal(byType["unclassified"], 1);
   } finally {
     deleteCallLogs(ids);
-  }
-});
-
-test("log export keeps both legacy NULL and the new unknown error_type intact", async () => {
-  const stamp = Date.now();
-  const legacy = `hx-export-null-${stamp}`;
-  const fresh = `hx-export-unknown-${stamp}`;
-  const db = getDbInstance();
-  const before = Number(
-    (db.prepare("SELECT COALESCE(MAX(rowid), 0) AS m FROM call_logs").get() as { m: number }).m
-  );
-  try {
-    insertRawErrorType(legacy, null, new Date().toISOString(), 500);
-    await saveCallLog({
-      id: fresh,
-      method: "POST",
-      path: "/v1/chat/completions",
-      status: 403,
-      error: "some other 403 body",
-      model: "m",
-      provider: "openai",
-      duration: 1,
-      tokens: { in: 1, out: 1 },
-    });
-
-    const exported = getCallLogsForExport(before, 50);
-    const byId = new Map(exported.map((row) => [row.record.id, row.record]));
-    assert.equal(byId.get(legacy)?.errorType, null);
-    assert.equal(byId.get(fresh)?.errorType, "forbidden");
-
-    const exportedAt = new Date().toISOString();
-    assert.equal(toBigQueryRow(byId.get(legacy)!, exportedAt).error_type, null);
-    assert.equal(toBigQueryRow(byId.get(fresh)!, exportedAt).error_type, "forbidden");
-  } finally {
-    deleteCallLogs([legacy, fresh]);
   }
 });

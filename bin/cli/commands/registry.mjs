@@ -2,7 +2,6 @@ import { registerAudit } from "./audit.mjs";
 import { registerOAuth } from "./oauth.mjs";
 import { registerLogin } from "./login.mjs";
 import { registerEval } from "./eval.mjs";
-import { registerWebhooks } from "./webhooks.mjs";
 import { registerPolicy } from "./policy.mjs";
 import { registerCompression } from "./compression.mjs";
 import { registerFiles } from "./files.mjs";
@@ -87,7 +86,6 @@ export function registerCommands(program) {
   registerOAuth(program);
   registerLogin(program);
   registerEval(program);
-  registerWebhooks(program);
   registerPolicy(program);
   registerCompression(program);
   registerFiles(program);

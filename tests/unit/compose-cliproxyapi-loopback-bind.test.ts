@@ -43,13 +43,8 @@ test("cliproxyapi service forwards a management/auth key into its environment", 
   );
 });
 
-test("qdrant and bifrost sidecars also publish on loopback by default", () => {
+test("bifrost sidecar also publishes on loopback by default", () => {
   const compose = readCompose("docker-compose.yml");
-  assert.match(compose, /- "\$\{QDRANT_BIND_HOST:-127\.0\.0\.1\}:\$\{QDRANT_PORT:-6333\}:6333"/);
-  assert.match(
-    compose,
-    /- "\$\{QDRANT_BIND_HOST:-127\.0\.0\.1\}:\$\{QDRANT_GRPC_PORT:-6334\}:6334"/
-  );
   assert.match(compose, /- "\$\{BIFROST_BIND_HOST:-127\.0\.0\.1\}:\$\{BIFROST_PORT:-8080\}:8080"/);
 });
 

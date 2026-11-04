@@ -550,21 +550,6 @@ If a provider repeatedly enters OPEN state:
 
 ---
 
-## Audio Transcription Issues
-
-### "Unsupported model" error
-
-- Use a model id whose first segment is a provider you have credentials for (`openai/whisper-1`, `openrouter/deepgram/nova-3`). Bare `deepgram/nova-3` requires a native Deepgram key.
-- Verify the provider is connected in **Dashboard → Providers**
-
-### Transcription returns empty or fails
-
-- Check supported audio formats: `mp3`, `wav`, `m4a`, `flac`, `ogg`, `webm`
-- Verify file size is within provider limits (typically < 25MB)
-- Check provider API key validity in the provider card
-
----
-
 ## Translator Debugging
 
 Use **Dashboard → Translator** to debug format translation issues:

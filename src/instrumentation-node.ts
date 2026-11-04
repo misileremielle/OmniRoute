@@ -515,7 +515,7 @@ export async function registerNodejs(): Promise<void> {
   await import("@omniroute/open-sse/utils/proxyFetch.ts");
   console.log("[STARTUP] Global fetch proxy patch initialized");
 
-  // Subscribe the proxy set-aside webhook bridge (side-effect import only).
+  // Subscribe the proxy transition event bridge (side-effect import only).
   await import("@/lib/proxyEvents/proxyTransitionBridge");
 
   // Steer the local core selector off every set-aside member, whatever the

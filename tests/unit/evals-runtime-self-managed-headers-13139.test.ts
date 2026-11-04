@@ -26,7 +26,6 @@ test("eval case requests opt out of output-style and memory injection (#13139)",
   const request = buildEvalCaseRequest({ input: {} }, { type: "suite-default" }, null);
 
   assert.equal(request.headers.get("x-omniroute-compression"), "off");
-  assert.equal(request.headers.get("x-omniroute-no-memory"), "true");
 });
 
 test("the opt-out survives a run that carries an API key", () => {
@@ -36,7 +35,6 @@ test("the opt-out survives a run that carries an API key", () => {
   const request = buildEvalCaseRequest({ input: {} }, { type: "model", id: "gpt-4o" }, "sk-test");
 
   assert.equal(request.headers.get("x-omniroute-compression"), "off");
-  assert.equal(request.headers.get("x-omniroute-no-memory"), "true");
   assert.equal(request.headers.get("Authorization"), "Bearer sk-test");
   assert.equal(request.headers.get("Content-Type"), "application/json");
 });

@@ -130,15 +130,3 @@ test("Groq GPT-OSS routing low/none uses low without foreign envelopes", () => {
     assert.deepEqual(input.output_config, { effort });
   }
 });
-
-test("Groq forced none uses low even when routing removed the effort fields", () => {
-  const input = { model: "openai/gpt-oss-20b", messages: [{ role: "user", content: "hello" }] };
-  const out = stripGroqUnsupportedFields(input, input.model, "none") as Record<string, unknown>;
-  assert.equal(out.reasoning_effort, "low");
-  // An ordinary effort-less request must retain its provider default.
-  assert.equal("reasoning_effort" in stripGroqUnsupportedFields(input, input.model), false);
-  assert.equal(
-    stripGroqUnsupportedFields({ reasoning_effort: "high" }, input.model).reasoning_effort,
-    "high"
-  );
-});

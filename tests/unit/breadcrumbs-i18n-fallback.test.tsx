@@ -45,7 +45,7 @@ describe("Breadcrumbs missing translation fallback", () => {
     translate.has.mockClear();
   });
 
-  it("renders humanized Radar setup labels without asking next-intl for missing keys", async () => {
+  it("renders humanized Relay setup labels without asking next-intl for missing keys", async () => {
     const container = document.createElement("div");
     document.body.appendChild(container);
     const root = createRoot(container);
@@ -53,14 +53,14 @@ describe("Breadcrumbs missing translation fallback", () => {
     await act(async () => root.render(<Breadcrumbs />));
 
     expect(container.textContent).toContain("Dashboard");
-    expect(container.textContent).toContain("Radar");
+    expect(container.textContent).toContain("Relay");
     expect(container.textContent).toContain("Setup");
-    expect(translate).not.toHaveBeenCalledWith("radar");
+    expect(translate).not.toHaveBeenCalledWith("relay");
     expect(translate).not.toHaveBeenCalledWith("setup");
     act(() => root.unmount());
   });
 
-  it("uses localized breadcrumb labels when Radar and setup translations exist", async () => {
+  it("uses localized breadcrumb labels when Relay and setup translations exist", async () => {
     labels = ptBrMessages.breadcrumbs;
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -69,9 +69,9 @@ describe("Breadcrumbs missing translation fallback", () => {
     await act(async () => root.render(<Breadcrumbs />));
 
     expect(container.textContent).toContain("Painel");
-    expect(container.textContent).toContain("Radar");
+    expect(container.textContent).toContain("Retransmissão");
     expect(container.textContent).toContain("Configuração");
-    expect(translate).toHaveBeenCalledWith("radar");
+    expect(translate).toHaveBeenCalledWith("relay");
     expect(translate).toHaveBeenCalledWith("setup");
     act(() => root.unmount());
   });

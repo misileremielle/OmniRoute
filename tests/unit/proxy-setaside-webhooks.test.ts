@@ -5,8 +5,7 @@ const memory = await import("../../open-sse/utils/proxyRefusalMemory.ts");
 const listeners = await import("../../open-sse/utils/proxyTransitionListeners.ts");
 const bridge = await import("../../src/lib/proxyEvents/proxyTransitionBridge.ts");
 const bus = await import("../../src/lib/events/eventBus.ts");
-const descriptions = await import("../../src/lib/webhooks/eventDescriptions.ts");
-const types = await import("../../src/lib/events/types.ts");
+const _types = await import("../../src/lib/events/types.ts");
 
 const KEY = "http://user@host.example:8080";
 
@@ -92,28 +91,6 @@ test("masking: scheme and port stay clear, user and host masked, null key silent
   }
 });
 
-test("restart: reset state emits nothing and offers no recovered event", () => {
-  try {
-    resetAll();
-    assert.equal(listeners.__listenerCountForTesting(), 0);
-    assert.ok(!("proxy.recovered" in descriptions.EVENT_DESCRIPTIONS));
-  } finally {
-    resetAll();
-  }
-});
-
-test("declarations: both events listed with proxy channel", () => {
-  try {
-    assert.ok(descriptions.EVENT_DESCRIPTIONS["proxy.set_aside"]);
-    assert.ok(descriptions.EVENT_DESCRIPTIONS["proxy.pool.exhausted"]);
-    assert.ok(descriptions.WEBHOOK_EVENT_VALUES.includes("proxy.set_aside"));
-    assert.ok(descriptions.WEBHOOK_EVENT_VALUES.includes("proxy.pool.exhausted"));
-    assert.deepEqual(types.CHANNEL_EVENTS.proxy, ["proxy.set_aside", "proxy.pool.exhausted"]);
-  } finally {
-    resetAll();
-  }
-});
-
 test("exhausted foundation: full set-aside emits, partial does not, scope window holds", () => {
   try {
     const at = 4_000_000;
@@ -153,48 +130,6 @@ test("functional: real set-aside through outcome path emits bus event", async ()
   } finally {
     if (prevSkip === undefined) delete process.env.PROXY_SKIP_RECENTLY_FAILED;
     else process.env.PROXY_SKIP_RECENTLY_FAILED = prevSkip;
-    resetAll();
-  }
-});
-
-test("functional: wildcard webhook receives proxy.set_aside delivery", async () => {
-  const fs = await import("node:fs");
-  const os = await import("node:os");
-  const path = await import("node:path");
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "omni-setaside-"));
-  const prevDataDir = process.env.DATA_DIR;
-  process.env.DATA_DIR = dir;
-  try {
-    const coreDb = await import("../../src/lib/db/core.ts");
-    coreDb.resetDbInstance();
-    const webhooksDb = await import("../../src/lib/db/webhooks.ts");
-    const created = webhooksDb.createWebhook({
-      url: "https://hooks.example.com/setaside",
-      events: ["*"],
-    });
-    assert.ok(created.id);
-    const { dispatchEvent } = await import("../../src/lib/webhookDispatcher.ts");
-    const { deliverWebhook } = await import("../../src/lib/webhookDispatcher.ts");
-    void deliverWebhook;
-    const { fetchWebhookUrl } = await import("../../src/shared/network/webhookFetch.ts");
-    void fetchWebhookUrl;
-    await dispatchEvent("proxy.set_aside", {
-      reason: "ip_quota_429",
-      setAsideUntil: new Date(5_000_000).toISOString(),
-      durationMs: 60_000,
-      egressKeyMasked: "https://u***@ho***le:8080",
-      timestamp: 5_000_000,
-    });
-    const { getDeliveries } = await import("../../src/lib/db/webhookDeliveries.ts");
-    const deliveries = getDeliveries(created.id, 5);
-    assert.ok(deliveries.length >= 1, "wildcard webhook got a delivery row");
-    assert.equal(deliveries[0].event_type, "proxy.set_aside");
-  } finally {
-    if (prevDataDir === undefined) delete process.env.DATA_DIR;
-    else process.env.DATA_DIR = prevDataDir;
-    const coreDb = await import("../../src/lib/db/core.ts");
-    coreDb.resetDbInstance();
-    fs.rmSync(dir, { recursive: true, force: true });
     resetAll();
   }
 });

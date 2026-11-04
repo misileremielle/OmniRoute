@@ -17,7 +17,7 @@ const expected = check.actual;
 const evaluate = (content) => tallyDrift([{ ...check, files: ["README.md"] }], () => content);
 
 for (const stale of [
-  "355 providers",
+  "356 providers",
   "**352-provider catalog**",
   "327 AI Providers",
   "329 registered providers",
@@ -33,16 +33,10 @@ test("checks all reported documentation and skill surfaces", () => {
     "docs/architecture/ARCHITECTURE.md",
     "docs/architecture/CODEBASE_DOCUMENTATION.md",
     "docs/architecture/REPOSITORY_MAP.md",
-    "docs/frameworks/A2A-SERVER.md",
-    "docs/frameworks/ACP.md",
     "docs/frameworks/OPEN_SSE_ARCHITECTURE.md",
     "docs/getting-started/FREE-TIERS-GUIDE.md",
     "docs/comparison/OMNIROUTE_VS_ALTERNATIVES.md",
     "docs/guides/FREE_PROVIDER_RANKINGS.md",
-    "src/shared/constants/agentSkills.ts",
-    "skills/README.md",
-    "skills/omni-auth/SKILL.md",
-    "skills/omni-providers/SKILL.md",
   ]) {
     assert.ok(
       checks.some((entry) => entry.docKey === "providers" && entry.files.includes(file)),

@@ -1,5 +1,5 @@
 import "./setupPolyfill.ts";
-import { Agent, ProxyAgent, type Dispatcher } from "undici";
+import { Agent, Client, ProxyAgent, type Dispatcher } from "undici";
 import { decodeUserinfo } from "@/shared/utils/decodeUserinfo";
 import { getUpstreamTimeoutConfig } from "@/shared/utils/runtimeTimeouts";
 import { stripIpv6Brackets, detectIpLiteralFamily, parseProxyFamily } from "./proxyFamily.ts";
@@ -583,6 +583,33 @@ function buildProxyDispatcher(
     proxyTunnel: true,
     ...options,
     ...(proxyAuthorization ? { token: proxyAuthorization } : {}),
+    ...(detectIpLiteralFamily(parsed.hostname) !== null
+      ? {
+          // undici 8.12 ProxyAgent unconditionally passes `servername: proxyHostname`
+          // into Client.connect; Node 26 rejects IP literals in tls.connect's
+          // `servername` option with ERR_INVALID_ARG_VALUE.
+          clientFactory: ((origin: URL, clientOpts: Client.Options) => {
+            const innerConnect = clientOpts.connect;
+            return new Client(origin, {
+              ...clientOpts,
+              connect:
+                typeof innerConnect === "function"
+                  ? (connectOpts, cb) =>
+                      innerConnect(
+                        {
+                          ...connectOpts,
+                          ...(connectOpts.servername &&
+                          detectIpLiteralFamily(connectOpts.servername) !== null
+                            ? { servername: "" }
+                            : {}),
+                        },
+                        cb
+                      )
+                  : innerConnect,
+            });
+          }) as ProxyAgent.Options["clientFactory"],
+        }
+      : {}),
     ...(family !== null
       ? {
           proxyTls: {

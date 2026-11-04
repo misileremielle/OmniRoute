@@ -9,15 +9,9 @@ import assert from "node:assert/strict";
 const { hasUnsafeModelIdSyntax } = await import("../../open-sse/utils/modelIdSafety.ts");
 const { parseModel } = await import("../../open-sse/services/model.ts");
 const { DefaultExecutor } = await import("../../open-sse/executors/default.ts");
-const image = await import("../../open-sse/config/imageRegistry.ts");
-const embedding = await import("../../open-sse/config/embeddingRegistry.ts");
-const rerank = await import("../../open-sse/config/rerankRegistry.ts");
-const moderation = await import("../../open-sse/config/moderationRegistry.ts");
-const ocr = await import("../../open-sse/config/ocrRegistry.ts");
-const video = await import("../../open-sse/config/videoRegistry.ts");
-const music = await import("../../open-sse/config/musicRegistry.ts");
-const upscale = await import("../../open-sse/config/upscaleRegistry.ts");
-const audio = await import("../../open-sse/config/audioRegistry.ts");
+const _embedding = await import("../../open-sse/config/embeddingRegistry.ts");
+const _rerank = await import("../../open-sse/config/rerankRegistry.ts");
+const _ocr = await import("../../open-sse/config/ocrRegistry.ts");
 
 const UNSAFE = [
   "%2e%2e/cachedContents#",
@@ -101,31 +95,4 @@ test("the Gemini upstream URL is only ever built for ids that keep it on the mod
   assert.equal(upstream("gemini/.%2e/.%2e/upload/v1beta/files?x="), null);
   // Matches an allow-list pattern of `gemini/gemini-2.5-flash*` but would reach another model.
   assert.equal(upstream("gemini/gemini-2.5-flash/%2e%2e/gemini-3-pro"), null);
-});
-
-test("every registry parser refuses the same ids", () => {
-  const parsers: Array<
-    [string, (value: string) => { provider: string | null; model: string | null }]
-  > = [
-    ["image", image.parseImageModel],
-    ["embedding", (v) => embedding.parseEmbeddingModel(v)],
-    ["rerank", rerank.parseRerankModel],
-    ["moderation", moderation.parseModerationModel],
-    ["ocr", ocr.parseOcrModel],
-    ["video", video.parseVideoModel],
-    ["music", music.parseMusicModel],
-    ["upscale", upscale.parseUpscaleModel],
-    ["transcription", (v) => audio.parseTranscriptionModel(v)],
-    ["speech", (v) => audio.parseSpeechModel(v)],
-    ["translation", (v) => audio.parseTranslationModel(v)],
-  ];
-  for (const [name, parse] of parsers) {
-    for (const id of UNSAFE) {
-      for (const value of [`gemini/${id}`, `vertex/${id}`, id]) {
-        const parsed = parse(value);
-        assert.equal(parsed.model, null, `${name}: ${value}`);
-        assert.equal(parsed.provider, null, `${name}: ${value}`);
-      }
-    }
-  }
 });

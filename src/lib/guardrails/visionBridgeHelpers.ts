@@ -821,9 +821,7 @@ async function callVisionModelSingle(
       if (bearer) headers.Authorization = `Bearer ${bearer}`;
       // Any call into our own listener carries the recursion guard, including a bare-id one.
       if (useFullModelId || selfLoopBearer) {
-        headers["x-omniroute-disabled-guardrails"] = routeThroughOmniRoute
-          ? "vision-bridge,video-bridge"
-          : "vision-bridge";
+        headers["x-omniroute-disabled-guardrails"] = "vision-bridge";
         // The compression pipeline must not touch the image payload of the
         // self-loop describe call (stacked RTK/Caveman can mangle data URIs).
         headers["x-omniroute-compression"] = "off";

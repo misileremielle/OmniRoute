@@ -46,12 +46,10 @@ spawn-capable prefixes and fails CI if any is not classified local-only.
 | `/api/cli-tools/{omp,letta,grok-build,forge,jcode,qwen}-settings`                                        | Per-tool settings writers that can touch tool binaries/config on the host                       |
 | `/api/cli-tools/{claude,cline,codewhale,codex,crush,deepseek-tui,droid,kilo,openclaw,pi,smelt}-settings` | Same `getCliRuntimeStatus()` spawn as the six siblings above (GHSA-35fw-cv32-2373)              |
 | `/api/cli-tools/{all-statuses,status,detect}`                                                            | CLI inventory probes — spawn `command -v` / `--version` per tool (GHSA-35fw-cv32-2373)          |
-| `/api/modality-bridge/video/`                                                                            | Strict trusted-loopback Video Bridge runtime probe and internal extraction bridge               |
 | `/api/services/`                                                                                         | Embedded services (9Router / CLIProxy / Bifrost / Mux / Dario) — `npm install` + spawn          |
 | `/dashboard/providers/services/`                                                                         | Reverse proxy to embedded-service UIs                                                           |
 | `/api/copilot/`                                                                                          | Unauthenticated LLM driver — CLI-only by default                                                |
 | `/api/issue-agent/`                                                                                      | Issue agent — spawns local tooling against the repo                                             |
-| `/api/plugins/`, `/api/plugins`                                                                          | Plugins — load/execute via `worker_threads` + `child_process`                                   |
 | `/api/middleware/`                                                                                       | User middleware — loads/executes operator code in-process                                       |
 | `/api/system/version`                                                                                    | Auto-update (POST only; GET/HEAD/OPTIONS exempt) — spawns `git checkout` + `npm install`        |
 | `/api/db-backups/exportAll`                                                                              | Spawns `tar` for the export archive                                                             |
@@ -60,11 +58,8 @@ spawn-capable prefixes and fails CI if any is not classified local-only.
 | `/api/jobs`, `/api/jobs/`                                                                                | Job runner control — executes scheduled host-side work                                          |
 | `/api/oauth/cursor/auto-import`                                                                          | `execFile("which", ["cursor"])` before importing creds                                          |
 | `/api/oauth/kiro/auto-import`                                                                            | Reads Kiro CLI credential files from the host                                                   |
-| `/api/skills/collect/`                                                                                   | Skill collection — detects/installs local tooling                                               |
-| `/api/skills/install`, `/api/skills/executions`                                                          | Skill handler registration + execution — reach the sandbox container spawn (GHSA-jx89)          |
 | `/api/discovery/`                                                                                        | Local network/provider discovery probes                                                         |
 | `/api/vnc-session` (`VNC_ROUTE_PREFIX`)                                                                  | Spawns a headful browser + VNC session for interactive logins                                   |
-| `/api/acp/agents`                                                                                        | ACP — discovers and spawns local CLI agent binaries                                             |
 | `/api/resilience/connections`                                                                            | Per-account resilience JSON (cooldown, breaker, lockout). The dashboard HTML is not local-only. |
 | `/api/providers/cursor/agent-availability`                                                               | Dashboard install-nudge check — spawns `cursor-agent status --format json`                      |
 | `/api/providers/{id}/login` (regex)                                                                      | Launches a headful Playwright Chromium for web-cookie login                                     |
@@ -162,10 +157,10 @@ with `getRequestPeerLocality()` (`src/shared/utils/apiAuth.ts`) and only runs th
 for `loopback` / `lan` callers. A `remote` caller gets the same response shape built from
 non-spawning sources (persisted state, settings, fs checks), flagged `probed: false`.
 
-| Route                                                            | Probe skipped for remote callers                                    |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `POST /api/providers/{id}/test`, `/api/providers/test-batch`     | CLI runtime probe (`allowLocalRuntimeProbe`) and CLI-fallback spawn |
-| `GET /api/headroom/status`                                       | `which headroom` and the python `--version` probes                  |
+| Route                                                        | Probe skipped for remote callers                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `POST /api/providers/{id}/test`, `/api/providers/test-batch` | CLI runtime probe (`allowLocalRuntimeProbe`) and CLI-fallback spawn |
+| `GET /api/headroom/status`                                   | `which headroom` and the python `--version` probes                  |
 
 A new read route that probes the host follows the same pattern, or is classified
 LOCAL_ONLY outright.
@@ -193,7 +188,6 @@ server process.
 | `/api/cli-tools/guide-settings`           | Writes guide-driven CLI config files           |
 | `/api/cli-tools/hermes-agent-settings`    | Writes the Hermes agent config                 |
 | `/api/cli-tools/backups`                  | Restores and deletes CLI config backups        |
-| `/api/log-export`                         | Ships call logs to a configured destination    |
 | `/api/restart`                            | Restarts the server process                    |
 
 **Response on violation:** `401 Authentication required`

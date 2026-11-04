@@ -114,7 +114,6 @@ Themes for Phases 6-7:
 - [ ] Cover branch behavior in:
   - `src/lib/providers/validation.ts`
   - `src/app/api/v1/embeddings/route.ts`
-  - `src/app/api/v1/moderations/route.ts`
 
 ### Phase 3: 65% -> 70%
 

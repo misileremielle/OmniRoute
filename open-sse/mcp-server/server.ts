@@ -101,7 +101,6 @@ import {
 import { getDbInstance, ensureDbInitialized } from "../../src/lib/db/core.ts";
 import { isMcpScopeEnforcementEnabled } from "../../src/shared/utils/featureFlags.ts";
 import { toSafeMcpErrorMessage } from "./errorMessage.ts";
-import { registerRadarCatalogTool } from "./radarCatalog.ts";
 import type { TextToolResult } from "./toolResult.ts";
 export { getMcpModelsCatalog } from "./catalog.ts";
 
@@ -388,8 +387,6 @@ export function createMcpServer(options?: CreateMcpServerOptions): McpServer {
       handleListModelsCatalog(listModelsCatalogInput.parse(args))
     )
   );
-
-  registerRadarCatalogTool(server, withScopeEnforcement);
 
   server.registerTool(
     "omniroute_simulate_route",

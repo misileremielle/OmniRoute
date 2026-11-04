@@ -124,7 +124,6 @@ test("detectTestKind in modelTestRunner detects embedding test probe for harrier
   } as unknown as SyncedAvailableModel);
   assert.equal(result1.isEmbedding, true);
   assert.equal(result1.isRerank, false);
-  assert.equal(result1.isAudioTranscription, false);
 
   // Test with supportedEndpoints
   const result2 = detectTestKind("lemonade/harrier-oss-v1-0.6b", {

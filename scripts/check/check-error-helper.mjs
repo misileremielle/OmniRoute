@@ -70,7 +70,8 @@ const IS_API_ROUTE = /^src\/app\/api\/.+\/route\.tsx?$/;
 // Both gate bugs are fixed, with regression guards in
 // tests/unit/check-error-helper-false-positives-15159.test.ts.
 //
-// The honest count is 21.
+// The honest count was 21; the media, skills and outbound-webhook feature removals
+// deleted ten of those frozen files, leaving 11.
 export const KNOWN_MISSING_ERROR_HELPER = new Set([
   // --- Provider-auth import/export routes: `error: error.message` on a thrown
   // provider error. 8 sites, one shape.
@@ -96,33 +97,8 @@ export const KNOWN_MISSING_ERROR_HELPER = new Set([
   "src/app/api/providers/[id]/codex-auth/apply-local/route.ts",
   "src/app/api/providers/[id]/codex-auth/export/route.ts",
 
-  // --- Image generation/upscale/video handlers: `error: err.message` on an
-  // internal result object that a caller later serializes. The sibling
-  // `errorText = sanitizeErrorMessage(...)` on the next line proves the intent.
-  // This is the class E-15 closed at stability.ts but missed here.
-  "open-sse/handlers/imageGeneration/providers/adobeFirefly.ts",
-  "open-sse/handlers/imageUpscale/adobeFirefly.ts",
-  "open-sse/handlers/videoGeneration/adobeFireflyHandler.ts",
-
-  // --- UNFROZEN #15159 wave 1.2 (removed, do not re-add).
-  // These two were frozen as "toJsonErrorPayload passthrough: unsanitized
-  // upstream envelope -> new Response(JSON.stringify(...))". Both are now clean
-  // for two independent reasons, and both were needed:
-  //   1. toJsonErrorPayload() sanitizes internally (wave 1.1), so the payload
-  //      itself is safe.
-  //   2. Each proxy-context catch now sanitizes AT THE CAPTURE SITE
-  //      (`error: sanitizeErrorMessage(err.message)`), which is what this gate
-  //      actually judges — per line, unable to see through a helper call. Without
-  //      (2) the entries above would still look live and assertNoStale would
-  //      fail the moment (1) landed.
-  // upscale/route.ts additionally now builds its response via errorResponse()
-  // instead of hand-serializing with new Response(JSON.stringify(...)).
-  //
-  // Regression guard: tests/unit/image-routes-proxy-error-sanitization-15159.test.ts
-
   // --- Executors forwarding a raw caught error into the response body.
   "open-sse/executors/copilot-web.ts",
-  "open-sse/executors/veoaifree-web.ts",
   "open-sse/executors/yuanbao-web.ts",
 
   // --- API routes returning a caught error message directly. Note
@@ -130,7 +106,6 @@ export const KNOWN_MISSING_ERROR_HELPER = new Set([
   // app-defined message, not upstream text) and is latent for the same reason as the
   // provider-auth block above; the sibling branch one line down already sanitizes.
   "src/app/api/cli-tools/grok-build-settings/route.ts",
-  "src/app/api/webhooks/[id]/test/route.ts",
 ]);
 
 // G-03 (#15159): a line that actually routes an error value through a sanitizer

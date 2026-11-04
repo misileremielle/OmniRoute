@@ -162,14 +162,6 @@ test("every KNOWN_UNCLASSIFIED_SOURCE_SPAWN entry carries a non-empty justificat
   }
 });
 
-test("#7948: /api/acp/agents (transitive execFileSync via registry) is classified local-only", () => {
-  // /api/acp/agents is spawn-capable only transitively (route.ts imports
-  // src/lib/acp/registry.ts, which calls execFileSync) — the source-scan
-  // subcheck above only greps the route file itself, so it cannot catch this
-  // class of gap. This assertion is the direct regression guard for #7948.
-  assert.equal(isLocalOnlyPath("/api/acp/agents"), true);
-});
-
 test("GHSA-35fw-cv32-2373: every cli-tools route that reaches getCliRuntimeStatus()/detectAllTools() is classified local-only", () => {
   // Same transitive-spawn class as #7948: the spawn lives in
   // src/shared/services/cliRuntime.ts (runProcess -> spawn) and
@@ -195,19 +187,6 @@ test("GHSA-35fw-cv32-2373: every cli-tools route that reaches getCliRuntimeStatu
     "/api/cli-tools/whycodes-settings",
   ];
   for (const r of routes) {
-    assert.equal(isLocalOnlyPath(r), true, `${r} must be local-only`);
-    assert.ok(
-      SPAWN_CAPABLE_ROUTE_ROOTS.includes(`src/app${r}`),
-      `src/app${r} must be a SPAWN_CAPABLE_ROUTE_ROOT`
-    );
-  }
-});
-
-test("GHSA-jx89-f37j-pq89: /api/skills/install + /api/skills/executions (transitive sandbox spawn) are classified local-only", () => {
-  // The spawn is three modules away from the route (executor.ts -> builtins.ts ->
-  // sandbox.ts childProcess.spawn), so the source-scan subcheck cannot see it.
-  // Both are now SPAWN_CAPABLE_ROUTE_ROOTs so subcheck 1 enforces membership.
-  for (const r of ["/api/skills/install", "/api/skills/executions"]) {
     assert.equal(isLocalOnlyPath(r), true, `${r} must be local-only`);
     assert.ok(
       SPAWN_CAPABLE_ROUTE_ROOTS.includes(`src/app${r}`),

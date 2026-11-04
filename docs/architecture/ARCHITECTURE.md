@@ -17,7 +17,7 @@ It provides a single OpenAI-compatible endpoint (`/v1/*`) and routes traffic acr
 
 Core capabilities:
 
-- OpenAI-compatible API surface for CLI/tools (380 providers, 159 executor modules)
+- OpenAI-compatible API surface for CLI/tools (355 providers, 159 executor modules)
 - Request/response translation across provider formats
 - Model combo fallback (multi-model sequence)
 - Structured combo steps (`provider + model + connection`) with runtime ordering by `compositeTiers`
@@ -31,7 +31,6 @@ Core capabilities:
 - Video generation via `/v1/videos/generations` (ComfyUI + SD WebUI)
 - Music generation via `/v1/music/generations` (ComfyUI)
 - Web search via `/v1/search` (20 providers)
-- Moderations via `/v1/moderations`
 - Reranking via `/v1/rerank`
 - Think tag parsing (`<think>...</think>`) for reasoning models
 - Response sanitization for strict OpenAI SDK compatibility
@@ -57,7 +56,7 @@ Core capabilities:
 - Compliance audit logging with opt-out per API key
 - Eval framework for LLM quality assurance
 - Health dashboard with real-time provider circuit breaker status
-- MCP Server (110 tools) with 3 transports (stdio/SSE/Streamable HTTP)
+- MCP Server (80 tools) with 3 transports (stdio/SSE/Streamable HTTP)
 - A2A Server (JSON-RPC 2.0 + SSE) with skills and task lifecycle
 - Memory system (extraction, injection, retrieval, summarization)
 - Skills system (registry, executor, sandbox, built-in skills)
@@ -181,7 +180,6 @@ flowchart LR
     end
 
     subgraph Upstreams[Upstream Providers]
-        P1[OAuth Providers\nClaude/Codex/Gemini/Qoder/GitHub/Kiro/Cursor/Antigravity]
         P2[API Key Providers\nOpenAI/Anthropic/OpenRouter/GLM/Kimi/MiniMax\nDeepSeek/Groq/xAI/Mistral/Perplexity\nTogether/Fireworks/Cerebras/Cohere/NVIDIA]
         P3[Compatible Nodes\nOpenAI-compatible / Anthropic-compatible]
     end
@@ -225,7 +223,6 @@ Important compatibility routes:
 - `src/app/api/v1/responses/route.ts`
 - `src/app/api/v1/models/route.ts` — includes custom models with `custom: true`
 - `src/app/api/v1/embeddings/route.ts` — embedding generation (6 providers)
-- `src/app/api/v1/images/generations/route.ts` — image generation (4+ providers incl. Antigravity/Nebius)
 - `src/app/api/v1/messages/count_tokens/route.ts`
 - `src/app/api/v1/providers/[provider]/chat/completions/route.ts` — dedicated per-provider chat
 - `src/app/api/v1/providers/[provider]/embeddings/route.ts` — dedicated per-provider embeddings
@@ -259,8 +256,6 @@ Management domains:
 - Budget: `src/app/api/usage/budget` (GET/POST)
 - Fallback chains: `src/app/api/fallback/chains` (GET/POST/DELETE)
 - Compliance audit: `src/app/api/compliance/audit-log` (GET, with pagination + structured metadata)
-- Evals: `src/app/api/evals` (GET/POST), `src/app/api/evals/[suiteId]` (GET)
-- Policies: `src/app/api/policies` (GET/POST)
 - Sync tokens: `src/app/api/sync/tokens` (GET/POST), `src/app/api/sync/tokens/[id]` (GET/DELETE)
 - Config bundle: `src/app/api/sync/bundle` (GET, ETag-versioned snapshot of settings/providers/combos/keys)
 - WebSocket: `src/app/api/v1/ws/route.ts` — Upgrade handler for OpenAI-compatible WS clients
@@ -281,8 +276,6 @@ Main flow modules:
 - Think tag parser: `open-sse/utils/thinkTagParser.ts`
 - Embedding handler: `open-sse/handlers/embeddings.ts`
 - Embedding provider registry: `open-sse/config/embeddingRegistry.ts`
-- Image generation handler: `open-sse/handlers/imageGeneration.ts`
-- Image provider registry: `open-sse/config/imageRegistry.ts`
 - Response sanitization: `open-sse/handlers/responseSanitizer.ts`
 - Role normalization: `open-sse/services/roleNormalizer.ts`
 
@@ -363,7 +356,6 @@ Auto Combo dynamically scores and picks routing targets at request time, rather 
 relying on a static combo definition. It powers the `auto/*` model prefix family.
 
 - Engine entry: `open-sse/services/autoCombo/` (`autoComboEngine.ts`,
-  `scoringEngine.ts`, `virtualFactory.ts`, `modePacks.ts`)
 - Resolver: `src/domain/comboResolver.ts` (auto-detection of `auto/` prefix)
 - Dashboard: `/dashboard/auto-combo`
 - Telemetry: `auto_combo_decisions` SQLite table
@@ -384,7 +376,7 @@ Key capabilities:
   exists, sourcing candidates from healthy active provider connections.
 - **Auto prefixes**: `auto/coding`, `auto/cheap`, `auto/fast`, `auto/offline`,
   `auto/smart`, `auto/lkgp` — each backed by a tuned weight profile.
-- **6 mode packs**: `ship-fast`, `cost-saver`, `quality-first`, `offline-friendly`,
+- **5 mode packs**: `ship-fast`, `cost-saver`, `quality-first`, `offline-friendly`,
   `reliability-first` and `chaos-mode` — preset weight configurations callable from
   the dashboard. (Not to be confused with the `auto/*` prefixes above, which are
   request-time variants.)
@@ -407,7 +399,6 @@ endpoints require management authentication.
 - Storage: `cloud_agent_tasks` table
 
 For per-agent provisioning and OAuth specifics, see
-[`docs/frameworks/CLOUD_AGENT.md`](../frameworks/CLOUD_AGENT.md).
 
 ### C. Guardrails
 
@@ -468,8 +459,6 @@ provider mutations require management auth (HTTP 401 if missing).
 For the full route classification rules, see
 [`docs/architecture/AUTHZ_GUIDE.md`](./AUTHZ_GUIDE.md).
 
-### F. Workflow FSM and Task-Aware Router
-
 A finite-state-machine driven router layered above combo selection to direct
 traffic based on the detected workflow stage (planning, execution,
 review) and background-task affinity.
@@ -488,10 +477,9 @@ planning/review turns.
 Several providers ship dedicated resilience and stealth modules that piggy-back on
 the global circuit breaker / connection cooldown / model lockout layers:
 
-- Antigravity 429 engine: `open-sse/services/antigravity429Engine.ts` (rotates
-  identity, scrubs response headers, drives credits/version tracking via
-  `antigravityCredits.ts`, `antigravityHeaderScrub.ts`, `antigravityHeaders.ts`,
-  `antigravityIdentity.ts`, `antigravityVersion.ts`)
+`antigravityCredits.ts`, `antigravityHeaderScrub.ts`, `antigravityHeaders.ts`,
+`antigravityIdentity.ts`, `antigravityVersion.ts`)
+
 - Antigravity 429 guard: `open-sse/services/antigravity429Guard.ts` (per-request budget of
   upstream 429s across all hosts, `ANTIGRAVITY_MAX_429_ATTEMPTS`; an identical re-send of a
   refused body is answered locally; `src/sse/handlers/chat.ts` does not restart such a request
@@ -509,10 +497,7 @@ For the full stealth playbook and operational guidance, see
 ### H. Webhooks, Reasoning Cache, Read Cache
 
 - **Webhooks** — outbound dispatch for provider/account/task events.
-  - Dispatcher: `src/lib/webhookDispatcher.ts`
-  - Storage: `webhooks` SQLite table (via `src/lib/db/webhooks.ts`)
   - Dashboard: `/dashboard/webhooks` (subscriptions, secrets, retry history)
-  - For event taxonomy and retry semantics, see [`docs/frameworks/WEBHOOKS.md`](../frameworks/WEBHOOKS.md).
 - **Reasoning Cache** — replayable reasoning blocks for providers that emit
   thinking tokens (Claude, GLMT, etc.) so consecutive turns can skip re-thinking.
   - DB layer: `src/lib/db/reasoningCache.ts`
@@ -964,7 +949,6 @@ All other providers (including custom compatible nodes) use the `DefaultExecutor
 | Cline               | openai           | OAuth                 | ✅               | ✅         | ✅            | ❌                 |
 | Kimi Coding         | openai           | OAuth                 | ✅               | ✅         | ✅            | ❌                 |
 | OpenRouter          | openai           | API Key               | ✅               | ✅         | ❌            | ❌                 |
-| GLM/Kimi/MiniMax    | claude           | API Key               | ✅               | ✅         | ❌            | ❌                 |
 | DeepSeek            | openai           | API Key               | ✅               | ✅         | ❌            | ❌                 |
 | Groq                | openai           | API Key               | ✅               | ✅         | ❌            | ❌                 |
 | xAI (Grok)          | openai           | API Key               | ✅               | ✅         | ❌            | ❌                 |
@@ -1048,7 +1032,6 @@ Additional processing layers in the translation pipeline:
 | `POST /v1/responses`                               | OpenAI Responses   | `open-sse/handlers/responsesHandler.ts`                             |
 | `POST /v1/embeddings`                              | OpenAI Embeddings  | `open-sse/handlers/embeddings.ts`                                   |
 | `GET /v1/embeddings`                               | Model listing      | API route                                                           |
-| `POST /v1/images/generations`                      | OpenAI Images      | `open-sse/handlers/imageGeneration.ts`                              |
 | `GET /v1/images/generations`                       | Model listing      | API route                                                           |
 | `POST /v1/providers/{provider}/chat/completions`   | OpenAI Chat        | Dedicated per-provider with model validation                        |
 | `POST /v1/providers/{provider}/embeddings`         | OpenAI Embeddings  | Dedicated per-provider with model validation                        |

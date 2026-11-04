@@ -152,7 +152,6 @@ function dataFrames(stdout: string) {
 }
 
 const { runMcpCallCommand } = await import("../../bin/cli/commands/mcp.mjs");
-const { runSkillsEnable } = await import("../../bin/cli/commands/skills.mjs");
 const globalOpts = { baseUrl: BASE_URL };
 
 test("stateless handler: mcp call runs the tool once, without session id or DELETE", async () => {
@@ -194,27 +193,6 @@ test("stateless handler: a failing tool surfaces as 'MCP error:' with exit 1", a
     assert.equal(stdout, "");
     assert.equal(stderr, "MCP error: boom\n");
   });
-});
-
-test("stateless handler: skills enable (an mcpCallTool caller) reaches the tool", async () => {
-  const invocations: ToolInvocation[] = [];
-  const savedBaseUrl = process.env.OMNIROUTE_BASE_URL;
-  // runSkillsEnable takes no connection options; it resolves the server like
-  // every other management command.
-  process.env.OMNIROUTE_BASE_URL = BASE_URL;
-  try {
-    await withServer(statelessHandler(invocations), async (calls) => {
-      const { stdout } = await captureStdio(() => runSkillsEnable("sk_pdf", {}, {}));
-      assert.equal(stdout, "Enabled: sk_pdf\n");
-      assert.ok(!rpcSequence(calls).includes("DELETE"));
-    });
-  } finally {
-    if (savedBaseUrl === undefined) delete process.env.OMNIROUTE_BASE_URL;
-    else process.env.OMNIROUTE_BASE_URL = savedBaseUrl;
-  }
-  assert.deepEqual(invocations, [
-    { name: "omniroute_skills_enable", args: { skillId: "sk_pdf", enabled: true } },
-  ]);
 });
 
 test("sessionful handler: session id is echoed and DELETE comes last", async () => {

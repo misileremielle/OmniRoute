@@ -80,5 +80,4 @@ For sustained high RPM/RPS and strict success SLO:
 
 Sidecars should import provider metadata through the JSON-safe provider plugin
 manifest instead of depending on TypeScript executor internals. See
-[Provider Plugin Manifest](./PROVIDER_PLUGIN_MANIFEST.md) for the sidecar
 eligibility contract and migration phases.

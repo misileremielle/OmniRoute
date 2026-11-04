@@ -50,9 +50,6 @@ export const AUTO_TEMPLATE_VARIANTS: Record<string, AutoVariant | undefined> = {
   // than bias toward cheap/fast within an allowance the operator already paid for.
   "auto/subscription": undefined,
   "auto/thrifty": "cheap",
-  // Chaos mode — parallel dispatch to top-N stable models
-  "auto/best-chaos": "chaos",
-  "auto/chaos": "chaos",
 };
 
 /**

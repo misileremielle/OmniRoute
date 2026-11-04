@@ -1,13 +1,13 @@
 import test, { type TestContext } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, realpathSync, writeFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { pathToFileURL } from "node:url";
 import { systrayModuleSpecifier, SYSTRAY_PACKAGE } from "../../../bin/cli/runtime/trayRuntime.ts";
 
 function installedRuntime(t: TestContext) {
-  const runtimeDir = mkdtempSync(path.join(os.tmpdir(), "omniroute tray #%"));
+  const runtimeDir = realpathSync(mkdtempSync(path.join(os.tmpdir(), "omniroute tray #%")));
   t.after(() => rmSync(runtimeDir, { recursive: true, force: true }));
   const packageDir = path.join(runtimeDir, "node_modules", SYSTRAY_PACKAGE);
   mkdirSync(path.join(packageDir, "lib"), { recursive: true });

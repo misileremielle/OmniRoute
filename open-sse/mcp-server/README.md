@@ -1,6 +1,6 @@
 # OmniRoute MCP Server
 
-> **Model Context Protocol server** that exposes OmniRoute's gateway intelligence as **110 tools** for AI agents.
+> **Model Context Protocol server** that exposes OmniRoute's gateway intelligence as **80 tools** for AI agents.
 >
 > **Source of truth for the full tool catalog and REST surface:** [`docs/frameworks/MCP-SERVER.md`](../../docs/frameworks/MCP-SERVER.md). This README focuses on architecture, configuration, and integration examples; the catalog below is a summary subset.
 
@@ -183,11 +183,8 @@ mistake metadata shrink estimates for provider token receipts.
 
 ### Skills & Catalog Tools
 
-| Tool                              | Scopes         | Description                                                                                              |
-| --------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------- |
-| `omniroute_agent_skills_list`     | `read:catalog` | List all 42 agent skills with optional `category` (`api`\|`cli`) and `area` filters; metadata + coverage |
-| `omniroute_agent_skills_get`      | `read:catalog` | Full metadata + SKILL.md content for a single skill by canonical `id`                                    |
-| `omniroute_agent_skills_coverage` | `read:catalog` | Coverage stats: how many of the 22 API and 20 CLI skills have SKILL.md files on disk vs catalog totals   |
+| Tool | Scopes | Description |
+| ---- | ------ | ----------- |
 
 ### Proxy, Pricing & Data Tools
 

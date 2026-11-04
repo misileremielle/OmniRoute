@@ -75,10 +75,6 @@ export const MODE_PACK_OPTIONS = [
   { id: "quality-first", label: "Quality First", emoji: "target" },
   { id: "offline-friendly", label: "Offline Friendly", emoji: "cloud_off" },
   { id: "reliability-first", label: "Reliability First", emoji: "shield" },
-  // Named for what it does: `modePacks.ts` ships it as the fault-injection
-  // profile behind `auto/chaos`. It belongs in the list — the engine offers it —
-  // but not under a label that reads like a routing preference.
-  { id: "chaos-mode", label: "Chaos Mode (fault injection — testing)", emoji: "science" },
 ] as const;
 
 export const ROUTER_STRATEGY_OPTIONS = [

@@ -56,8 +56,6 @@ import {
   buildGlmCodingHeaders,
   buildGlmModelsUrl,
 } from "@omniroute/open-sse/config/glmProvider.ts";
-import { getImageProvider } from "@omniroute/open-sse/config/imageRegistry.ts";
-import { getVideoProvider } from "@omniroute/open-sse/config/videoRegistry.ts";
 import {
   discoverBedrockNativeModels,
   isBedrockNativeApiError,
@@ -96,16 +94,11 @@ import {
 import { getEmbeddingProvider } from "@omniroute/open-sse/config/embeddingRegistry.ts";
 import { getRerankProvider } from "@omniroute/open-sse/config/rerankRegistry.ts";
 import {
-  getSpeechProvider,
-  getTranscriptionProvider,
-} from "@omniroute/open-sse/config/audioRegistry.ts";
-import {
   getCachedDiscoveredModels,
   isAutoFetchModelsEnabled,
   persistDiscoveredModels,
 } from "@/lib/providerModels/modelDiscovery";
 import { buildProviderModelsUrl, getDiscoveryClientVersionOptions } from "./discoveryClientVersion";
-import { getAdobeModels } from "./adobeFireflyDiscovery";
 import { getSyncedAvailableModels, getCustomModels, getModelIsHidden } from "@/lib/db/models";
 import { isConnectionUnavailableToAuxiliaryActivity } from "@/lib/exclusiveLeaseIsolation";
 import { AUTHZ_HEADER_PEER_LOCALITY } from "@/server/authz/headers";
@@ -413,11 +406,6 @@ export async function GET(
       if (status === 400 || status === 503 || status === 504) return null;
       return buildDiscoveryFallbackResponse({ ...warnings, failure });
     };
-
-    if (provider === "adobe-firefly") {
-      const discovery = await getAdobeModels(apiKey, accessToken, connection.providerSpecificData);
-      return buildResponse({ provider, connectionId, ...discovery });
-    }
 
     const maybeReturnCachedDiscovery = () => {
       if (!refresh && cachedDiscoveryModels.length > 0) {

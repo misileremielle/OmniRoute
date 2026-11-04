@@ -11,7 +11,6 @@ export { resolveWebProviderHost };
 import { APIKEY_PROVIDERS } from "./providers/apikey";
 import { LOCAL_PROVIDERS } from "./providers/local";
 import { SEARCH_PROVIDERS } from "./providers/search";
-import { AUDIO_ONLY_PROVIDERS } from "./providers/audio";
 import { UPSTREAM_PROXY_PROVIDERS } from "./providers/upstream-proxy";
 import { CLOUD_AGENT_PROVIDERS } from "./providers/cloud-agent";
 import { SYSTEM_PROVIDERS } from "./providers/system";
@@ -37,7 +36,6 @@ export const FREE_APIKEY_PROVIDER_IDS = new Set([
   "aihorde",
   // Veo AI Free accepts optional web-session credentials (wordpress_logged_in cookie)
   // for authenticated generation.
-  "veoaifree-web",
 ]);
 
 export function supportsApiKeyOnFreeProvider(providerId: unknown): boolean {
@@ -94,17 +92,7 @@ export function getProviderConnectionFamilyIds(providerId: unknown): readonly st
 // API Key Providers
 
 // Sub-categories within APIKEY_PROVIDERS (used by dashboard and catalog views).
-export const IMAGE_ONLY_PROVIDER_IDS = new Set([
-  "nanobanana",
-  "fal-ai",
-  "stability-ai",
-  "black-forest-labs",
-  "recraft",
-  "topaz",
-  "segmind",
-  "magnific",
-  "deepai",
-]);
+export const IMAGE_ONLY_PROVIDER_IDS = new Set(["deepai"]);
 
 export const AGGREGATOR_PROVIDER_IDS = new Set([
   "openrouter",
@@ -192,20 +180,6 @@ export const ENTERPRISE_CLOUD_PROVIDER_IDS = new Set([
   "modal",
 ]);
 
-export const VIDEO_PROVIDER_IDS = new Set([
-  "agnes",
-  "runwayml",
-  "veoaifree-web",
-  "pollinations",
-  "minimax",
-  "together",
-  "replicate",
-  "haiper",
-  "leonardo",
-  "segmind",
-  "novita",
-]);
-
 // IDE Providers: editors with built-in AI subscription (separate section in UI).
 // These providers live in OAUTH_PROVIDERS but render under "IDE Providers"
 // instead of "OAuth Providers" to avoid visual duplication.
@@ -216,8 +190,6 @@ export const EMBEDDING_RERANK_PROVIDER_IDS = new Set(["voyage-ai", "jina-ai"]);
 // Local / Self-Hosted Providers
 
 // Search Providers
-
-// Audio Only Providers
 
 export const OPENAI_COMPATIBLE_PREFIX = "openai-compatible-";
 export const ANTHROPIC_COMPATIBLE_PREFIX = "anthropic-compatible-";
@@ -348,7 +320,6 @@ const _PROVIDER_SECTIONS = [
   WEB_COOKIE_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
-  AUDIO_ONLY_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
   CLOUD_AGENT_PROVIDERS,
   SYSTEM_PROVIDERS,
@@ -364,7 +335,6 @@ function ensureProvidersValidated() {
   validateProviders(WEB_COOKIE_PROVIDERS, "WEB_COOKIE_PROVIDERS");
   validateProviders(LOCAL_PROVIDERS, "LOCAL_PROVIDERS");
   validateProviders(SEARCH_PROVIDERS, "SEARCH_PROVIDERS");
-  validateProviders(AUDIO_ONLY_PROVIDERS, "AUDIO_ONLY_PROVIDERS");
   validateProviders(UPSTREAM_PROXY_PROVIDERS, "UPSTREAM_PROXY_PROVIDERS");
   validateProviders(CLOUD_AGENT_PROVIDERS, "CLOUD_AGENT_PROVIDERS");
   _validated = true;
@@ -419,7 +389,6 @@ export function getProviderById(id: string) {
     (WEB_COOKIE_PROVIDERS as Record<string, any>)[id] ??
     (LOCAL_PROVIDERS as Record<string, any>)[id] ??
     (SEARCH_PROVIDERS as Record<string, any>)[id] ??
-    (AUDIO_ONLY_PROVIDERS as Record<string, any>)[id] ??
     (UPSTREAM_PROXY_PROVIDERS as Record<string, any>)[id] ??
     (CLOUD_AGENT_PROVIDERS as Record<string, any>)[id] ??
     (SYSTEM_PROVIDERS as Record<string, any>)[id] ??
@@ -454,7 +423,6 @@ export type AiProviderDefinition =
   | (typeof WEB_COOKIE_PROVIDERS)[keyof typeof WEB_COOKIE_PROVIDERS]
   | (typeof LOCAL_PROVIDERS)[keyof typeof LOCAL_PROVIDERS]
   | (typeof SEARCH_PROVIDERS)[keyof typeof SEARCH_PROVIDERS]
-  | (typeof AUDIO_ONLY_PROVIDERS)[keyof typeof AUDIO_ONLY_PROVIDERS]
   | (typeof UPSTREAM_PROXY_PROVIDERS)[keyof typeof UPSTREAM_PROXY_PROVIDERS]
   | (typeof CLOUD_AGENT_PROVIDERS)[keyof typeof CLOUD_AGENT_PROVIDERS]
   | (typeof SYSTEM_PROVIDERS)[keyof typeof SYSTEM_PROVIDERS];
@@ -538,7 +506,6 @@ export {
   APIKEY_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
-  AUDIO_ONLY_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
   CLOUD_AGENT_PROVIDERS,
   SYSTEM_PROVIDERS,

@@ -148,6 +148,15 @@ test("model test route ignores forwarded hosts and works in strict API-key mode"
 });
 
 test("#17071 model test route forwards the skipped flag for image-only models", async () => {
+  const { addCustomModel } = await import("../../src/lib/db/models.ts");
+  await addCustomModel(
+    "agnes",
+    "agnes-image-2.5-flash",
+    undefined,
+    "manual",
+    "images-generations",
+    ["images"]
+  );
   globalThis.fetch = async () => {
     throw new Error("an image-only model must not be dispatched");
   };

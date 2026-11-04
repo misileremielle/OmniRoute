@@ -15,15 +15,12 @@ const { createProviderNode, createProviderConnection } =
 const { waitForCallLogSaves } = await import("../../src/lib/usage/callLogs.ts");
 const { createEmbeddingResponse } = await import("../../src/lib/embeddings/service.ts");
 const { handleValidatedRerankRequestBody } = await import("../../src/app/api/v1/rerank/route.ts");
-const transcriptions = await import("../../src/app/api/v1/audio/transcriptions/route.ts");
-const translations = await import("../../src/app/api/v1/audio/translations/route.ts");
 const originalFetch = globalThis.fetch;
 
 test.before(async () => {
   for (const [prefix, apiType] of [
     ["scanembed", "embeddings"],
     ["scanrank", "rerank"],
-    ["scanaudio", "audio-transcriptions"],
   ]) {
     await createProviderNode({
       id: `openai-compatible-${prefix}`,
@@ -54,13 +51,6 @@ test.after(async () => {
   fs.rmSync(dataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });
 
-function audioRequest(endpoint: string): Request {
-  const form = new FormData();
-  form.set("model", "scanaudio-combo");
-  form.set("file", new Blob([new Uint8Array(64)], { type: "audio/wav" }), "sample.wav");
-  return new Request(`http://localhost/v1/audio/${endpoint}`, { method: "POST", body: form });
-}
-
 const cases: Array<{ name: string; run: () => Promise<Response>; upstream: string }> = [
   {
     name: "embeddings",
@@ -76,16 +66,6 @@ const cases: Array<{ name: string; run: () => Promise<Response>; upstream: strin
         documents: ["synthetic document"],
       }),
     upstream: "/rerank",
-  },
-  {
-    name: "transcriptions",
-    run: () => transcriptions.POST(audioRequest("transcriptions")),
-    upstream: "/audio/transcriptions",
-  },
-  {
-    name: "translations",
-    run: () => translations.POST(audioRequest("translations")),
-    upstream: "/audio/translations",
   },
 ];
 

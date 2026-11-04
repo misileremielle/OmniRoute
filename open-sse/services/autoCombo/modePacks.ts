@@ -7,7 +7,6 @@
  *   - quality-first:   Prioritize task fitness and stability (highest quality weight, 0.03)
  *   - offline-friendly: Prioritize quota availability
  *   - reliability-first: Prioritize health+stability (highest reliability weight, 0.04)
- *   - chaos-mode:      Fault-injection — health > stability > taskFit
  */
 
 import type { ScoringWeights } from "./scoring";
@@ -105,29 +104,6 @@ export const MODE_PACKS: Record<string, ScoringWeights> = {
     connectionDensity: 0.0476,
     quality: 0.02,
     reliability: 0.04,
-  },
-  // Chaos mode — priority: health > stability > taskFit > latency.
-  // Selects top-N healthy providers for parallel dispatch. Favors providers with
-  // closed circuit breakers, low latency variance, and high task fitness.
-  // quota weight reduced (chaos fans out in parallel, quota diversity is secondary
-  // to picking the most stable providers); connectionDensity boosted slightly to
-  // prefer providers with multiple accounts (more resilient to per-account rate limits).
-  "chaos-mode": {
-    quota: 0.0376,
-    health: 0.4,
-    costInv: 0.014,
-    latencyInv: 0.0186,
-    taskFit: 0.1905,
-    stability: 0.1714,
-    tierPriority: 0.004,
-    tierAffinity: 0,
-    specificityMatch: 0,
-    contextAffinity: 0.0186,
-    sessionAvailability: 0.0476,
-    resetWindowAffinity: 0,
-    connectionDensity: 0.0476,
-    quality: 0.02,
-    reliability: 0.03,
   },
 };
 

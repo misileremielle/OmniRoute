@@ -13,14 +13,12 @@ import {
   APIKEY_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
-  AUDIO_ONLY_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
   CLOUD_AGENT_PROVIDERS,
   SYSTEM_PROVIDERS,
   IMAGE_ONLY_PROVIDER_IDS,
   AGGREGATOR_PROVIDER_IDS,
   ENTERPRISE_CLOUD_PROVIDER_IDS,
-  VIDEO_PROVIDER_IDS,
   EMBEDDING_RERANK_PROVIDER_IDS,
   SELF_HOSTED_CHAT_PROVIDER_IDS,
 } from "../../src/shared/constants/providers.ts";
@@ -79,7 +77,6 @@ function hasToolCallingColumn(rows: ProviderRecord[]): boolean {
 function categoryTags(id: string): string[] {
   const tags: string[] = [];
   if (IMAGE_ONLY_PROVIDER_IDS.has(id)) tags.push("image");
-  if (VIDEO_PROVIDER_IDS.has(id)) tags.push("video");
   if (AGGREGATOR_PROVIDER_IDS.has(id)) tags.push("aggregator");
   if (ENTERPRISE_CLOUD_PROVIDER_IDS.has(id)) tags.push("enterprise");
   if (EMBEDDING_RERANK_PROVIDER_IDS.has(id)) tags.push("embed/rerank");
@@ -143,7 +140,6 @@ function buildHeader(total: number): string {
     "- **API key** — paid provider configured via API key (free credits may apply)",
     "- **Local** — runs on the user's machine (Ollama, LM Studio, vLLM, etc.)",
     "- **Search** — web search providers",
-    "- **Audio** — audio-only providers (TTS/STT)",
     "- **Upstream proxy** — providers that proxy to other providers",
     "- **Cloud agent** — long-running coding agents (Codex Cloud, Devin, Jules)",
     "- **System** — OmniRoute-internal providers (loopback, etc.)",
@@ -179,7 +175,6 @@ function main() {
   const apiKey = asRecords(APIKEY_PROVIDERS);
   const local = asRecords(LOCAL_PROVIDERS);
   const search = asRecords(SEARCH_PROVIDERS);
-  const audio = asRecords(AUDIO_ONLY_PROVIDERS);
   const upstreamProxy = asRecords(UPSTREAM_PROXY_PROVIDERS);
   const cloudAgent = asRecords(CLOUD_AGENT_PROVIDERS);
   const system = asRecords(SYSTEM_PROVIDERS);
@@ -192,7 +187,6 @@ function main() {
     ...apiKey.map((p) => p.id),
     ...local.map((p) => p.id),
     ...search.map((p) => p.id),
-    ...audio.map((p) => p.id),
     ...upstreamProxy.map((p) => p.id),
     ...cloudAgent.map((p) => p.id),
     ...system.map((p) => p.id),
@@ -206,7 +200,6 @@ function main() {
     buildSection("API Key Providers (paid / paid-with-free-credits)", apiKey, "API key"),
     buildSection("Local Providers", local, "Local"),
     buildSection("Search Providers", search, "Search"),
-    buildSection("Audio-only Providers", audio, "Audio"),
     buildSection("Upstream Proxy Providers", upstreamProxy, "Upstream proxy"),
     buildSection("Cloud Agent Providers", cloudAgent, "Cloud agent"),
     buildSection("System Providers", system, "System"),
@@ -235,7 +228,7 @@ function main() {
   console.log(
     `  Sections: free=${free.length}, noauth=${noauth.length}, oauth=${oauth.length}, ` +
       `web=${webCookie.length}, apikey=${apiKey.length}, local=${local.length}, ` +
-      `search=${search.length}, audio=${audio.length}, proxy=${upstreamProxy.length}, ` +
+      `search=${search.length}, proxy=${upstreamProxy.length}, ` +
       `cloud=${cloudAgent.length}, system=${system.length}`
   );
 }

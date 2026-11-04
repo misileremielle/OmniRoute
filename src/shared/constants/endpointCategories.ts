@@ -21,8 +21,8 @@ export const ENDPOINT_CATEGORIES: readonly EndpointCategory[] = [
   {
     id: "chat",
     label: "Chat / Messages",
-    description: "Chat completions, text completions, messages, and responses",
-    prefixes: ["/v1/chat/completions", "/v1/completions", "/v1/messages", "/v1/responses"],
+    description: "Chat completions, messages, and responses",
+    prefixes: ["/v1/chat/completions", "/v1/messages", "/v1/responses"],
   },
   {
     id: "search",
@@ -35,36 +35,6 @@ export const ENDPOINT_CATEGORIES: readonly EndpointCategory[] = [
     label: "Embeddings",
     description: "Text embeddings generation",
     prefixes: ["/v1/embeddings", "/v1/multimodal-embeddings"],
-  },
-  {
-    id: "images",
-    label: "Images",
-    description: "Image generation, editing and upscaling",
-    prefixes: ["/v1/images"],
-  },
-  {
-    id: "audio",
-    label: "Audio / Speech",
-    description: "Text-to-speech and speech-to-text",
-    prefixes: ["/v1/audio"],
-  },
-  {
-    id: "elevenlabs",
-    label: "ElevenLabs Voice",
-    description: "Native ElevenLabs speech-to-text, text-to-speech, voices and sound effects",
-    prefixes: ["/v1/speech-to-text", "/v1/text-to-speech", "/v1/voices", "/v1/sound-generation"],
-  },
-  {
-    id: "video",
-    label: "Video",
-    description: "Video generation",
-    prefixes: ["/v1/videos"],
-  },
-  {
-    id: "music",
-    label: "Music",
-    description: "Music generation",
-    prefixes: ["/v1/music"],
   },
   {
     id: "rerank",
@@ -83,12 +53,6 @@ export const ENDPOINT_CATEGORIES: readonly EndpointCategory[] = [
     label: "Models",
     description: "List available models (read-only)",
     prefixes: ["/v1/models"],
-  },
-  {
-    id: "moderations",
-    label: "Moderations",
-    description: "Content moderation",
-    prefixes: ["/v1/moderations"],
   },
   {
     id: "ocr",

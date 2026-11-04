@@ -286,7 +286,6 @@ tool expects (verified in the command source):
 | `setup-aider` (`OPENAI_API_BASE`)                                          | root             | No — LiteLLM appends `/v1/chat/completions` |
 | `setup-kilo`, `setup-roo`, `setup-continue`, `setup-crush`, `setup-cursor` | with `/v1`       | Yes                                         |
 | `setup-zed` (`language_models.openai_compatible.omniroute.api_url`)        | with `/v1`       | Yes                                         |
-| `setup-claude` (`ANTHROPIC_BASE_URL`), `launch`                            | root             | No — Claude Code appends `/v1/messages`     |
 | `setup-codex`, `launch-codex` (`model_providers.omniroute.base_url`)       | with `/v1`       | Yes                                         |
 | `setup-qwen` (`modelProviders.openai[].baseUrl`)                           | with `/v1`       | Yes                                         |
 | `run gemini` (`GOOGLE_GEMINI_BASE_URL`)                                    | root             | No — the SDK appends `/v1beta/models/…`     |
@@ -347,7 +346,6 @@ omniroute run gemini --model glm/glm-5.2 -- --skip-trust -p "hello"
 Gemini's workspace-trust guard still applies in headless mode — pass
 `--skip-trust` (or trust the directory interactively) yourself; the launcher
 deliberately does not bypass it. This launcher is distinct from the **ACP
-registration** (`src/lib/acp/registry.ts`, `gemini --acp`), which remains the
 agent-protocol integration for `/dashboard/acp-agents`.
 
 ---

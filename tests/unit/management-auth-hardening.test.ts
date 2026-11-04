@@ -338,14 +338,3 @@ test("management routes sanitize error.message before returning it to clients", 
     );
   }
 });
-
-test("memory health endpoint requires management authentication", () => {
-  // verifyExtractionPipeline() exposes the memory subsystem state (Qdrant
-  // reachability, DB error paths). Same precedent as /api/db/health and
-  // /api/monitoring/health, which require management auth.
-  const routePath = "src/app/api/memory/health/route.ts";
-  const content = fs.readFileSync(routePath, "utf8");
-  assert.ok(content.includes('from "@/lib/api/requireManagementAuth"'));
-  assert.ok(content.includes("const authError = await requireManagementAuth(request);"));
-  assert.ok(content.includes("if (authError) return authError;"));
-});

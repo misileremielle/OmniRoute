@@ -30,17 +30,9 @@ test("the only non-pack option is the manual one", () => {
   assert.deepEqual(unknown, [], "an option id matches no mode pack and is not 'custom'");
 });
 
-test("the fault-injection pack says so in its label", () => {
-  // `chaos-mode` is the profile behind `auto/chaos`; offering it next to
-  // "Ship Fast" and "Cost Saver" without saying what it is would read as one
-  // more routing preference.
+test("chaos-mode pack is not offered in the dashboard", () => {
   const chaos = MODE_PACK_OPTIONS.find((option) => option.id === "chaos-mode");
-  assert.ok(chaos, "chaos-mode must be offered — the engine ships it");
-  assert.match(
-    chaos.label,
-    /fault injection/i,
-    "an operator must be able to tell this one apart from a routing preference"
-  );
+  assert.equal(chaos, undefined);
 });
 
 test("no strategy label states a factor count", () => {

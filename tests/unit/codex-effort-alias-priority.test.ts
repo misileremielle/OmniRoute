@@ -93,10 +93,8 @@ test("#2331 codex.ts still ranks modelEffort above client-injected reasoning def
   //
   // #2331's invariant is a RELATIVE one: a model-suffix alias (gpt-5.5-xhigh) must beat
   // the defaults a client injects (OpenCode's reasoning.effort=medium, reasoning_effort).
-  // It is not a claim about the head of the chain — #13556 deliberately puts the
-  // server-selected force rule ahead of everything, which is stronger than both.
-  const apply = (model: string, body: Record<string, unknown>, forced?: string) => {
-    applyCodexReasoningSelection(model, body, undefined, "low", true, forced);
+  const apply = (model: string, body: Record<string, unknown>) => {
+    applyCodexReasoningSelection(model, body, undefined, "low", true);
     return (body.reasoning as Record<string, unknown> | undefined)?.effort;
   };
 
@@ -105,6 +103,4 @@ test("#2331 codex.ts still ranks modelEffort above client-injected reasoning def
   assert.equal(apply("gpt-5.5-low", { reasoning: { effort: "high" } }), "low");
   // A client value still beats the connection default when there is no suffix.
   assert.equal(apply("gpt-5.5", { reasoning: { effort: "high" } }), "high");
-  // The server-selected force rule outranks even the suffix.
-  assert.equal(apply("gpt-5.5-xhigh", { reasoning: { effort: "medium" } }, "low"), "low");
 });

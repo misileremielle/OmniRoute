@@ -68,14 +68,6 @@ test("retired Hailuo alias is absent while official MiniMax aliases remain disti
   assert.equal(resolveProviderId("minimax-cn"), "minimax-cn");
 });
 
-test("freepik is the Magnific Mystic legacy alias, not a second provider id", () => {
-  assert.equal(resolveProviderId("freepik"), "magnific");
-  assert.equal(resolveProviderId("magnific"), "magnific");
-  assert.equal(getProviderAlias("magnific"), "freepik");
-  assert.ok("magnific" in APIKEY_PROVIDERS);
-  assert.ok(!("freepik" in APIKEY_PROVIDERS));
-});
-
 test("no provider id is registered in both the API-key and web-cookie catalogs", () => {
   // A provider belongs to exactly one auth category; the same id in both catalogs
   // renders the provider twice in the dashboard (once per section). huggingchat

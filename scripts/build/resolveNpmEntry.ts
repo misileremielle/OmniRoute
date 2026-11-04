@@ -32,6 +32,7 @@ export function resolveBundledNpmEntry(
   if (npmExecPath) candidates.push(join(dirname(npmExecPath), name));
   candidates.push(join(binDir, "node_modules", "npm", "bin", name));
   candidates.push(join(binDir, "..", "lib", "node_modules", "npm", "bin", name));
+  candidates.push(join(binDir, "..", "..", "..", "..", "lib", "node_modules", "npm", "bin", name));
 
   for (const candidate of candidates) {
     if (exists(candidate)) return candidate;

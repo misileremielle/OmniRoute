@@ -3,16 +3,18 @@ export const MODEL_SUPPORTED_ENDPOINT_VALUES = [
   "responses",
   "embeddings",
   "rerank",
+  // System One typed-decision models (TypeSafe Jev, …) — POST /v1/systemone.
+  // Not chat-capable; see classifyModelSupportedEndpoints.
+  "decisions",
+  // Persisted media tags stay valid input so stored rows keep validating and are not
+  // mistaken for chat models. The endpoints themselves are gone: no UI offers these
+  // values and getRegisteredEndpointAdapterStatuses reports them unavailable.
   "images",
   "videos",
   "audio-speech",
   "audio-transcriptions",
   "music",
   "images-generations",
-  // System One typed-decision models (TypeSafe Jev, …) — POST /v1/systemone.
-  // Not chat-capable; see classifyModelSupportedEndpoints.
-  "decisions",
-  // Persisted legacy values remain valid input and normalize on write/edit.
   "video",
   "audio",
 ] as const;
@@ -77,7 +79,7 @@ export function classifyModelSupportedEndpoints(endpoints: readonly string[]): {
  * Default `supportedEndpoints` for a model row discovered from (or added to) an
  * OpenAI-compatible provider node, derived from the node's `apiType`.
  *
- * A node typed `embeddings` or `rerank` (or an audio/image type) serves exactly that
+ * A node typed `embeddings` or `rerank` serves exactly that
  * modality, so a row with no explicit endpoint metadata — the common case, since local
  * `/v1/models` listings rarely carry any — should inherit the node's modality rather
  * than the historical `["chat"]` default, which misrepresented e.g. `bge-m3` as a chat
@@ -91,12 +93,19 @@ export function defaultEndpointsForProviderNodeApiType(
       return ["embeddings"];
     case "rerank":
       return ["rerank"];
+    // Preserve old persisted node types so they cannot be mistaken for chat.
+    // Their endpoint adapters are unavailable and creation no longer accepts them.
+    case "images-generations":
+    case "images":
+      return ["images"];
     case "audio-speech":
       return ["audio-speech"];
     case "audio-transcriptions":
       return ["audio-transcriptions"];
-    case "images-generations":
-      return ["images"];
+    case "videos":
+      return ["videos"];
+    case "music":
+      return ["music"];
     case "decisions":
       return ["decisions"];
     default:

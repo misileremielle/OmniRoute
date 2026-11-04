@@ -21,10 +21,8 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 const { LOCAL_PROVIDER_NODE_HOSTS_ENV, getConfiguredLocalNodeHosts, isLocalProviderNodeHost } =
   await import("../../src/shared/network/localNodeHosts.ts");
 const { isEligibleProviderNodeHost } = await import("../../src/shared/network/providerNodeHost.ts");
-const { RERANK_REMOTE_NODES_FLAG, selectRerankProviderNodes } =
+const { RERANK_REMOTE_NODES_FLAG, selectRerankProviderNodes: _selectRerankProviderNodes } =
   await import("../../src/app/api/v1/_shared/rerankProviderNodes.ts");
-const { selectAudioProviderNodes } =
-  await import("../../src/app/api/v1/_shared/audioProviderNodes.ts");
 const { resolveProxyForRequest } = await import("../../open-sse/utils/proxyFetch.ts");
 const core = await import("../../src/lib/db/core.ts");
 const { invalidateDbCache } = await import("../../src/lib/db/readCache.ts");
@@ -160,50 +158,6 @@ test.describe("isLocalProviderNodeHost", () => {
     assert.equal(isLocalProviderNodeHost(OTHER_SERVICE_NODE.baseUrl), false);
     assert.equal(isLocalProviderNodeHost("http://user:pw@reranker:8080/v1"), false);
     assert.equal(isEligibleProviderNodeHost(SERVICE_NODE.baseUrl, { allowRemote: false }), true);
-  });
-});
-
-test.describe("provider-node selection honors listed hosts", () => {
-  test.afterEach(() => resetEnv());
-
-  test("rerank: listed service node joins with the remote flag off", () => {
-    delete process.env[LOCAL_PROVIDER_NODE_HOSTS_ENV];
-    assert.deepEqual(
-      selectRerankProviderNodes([LOOPBACK_NODE, SERVICE_NODE, OTHER_SERVICE_NODE], {
-        allowRemote: false,
-      }).map((p) => p.id),
-      ["loop"]
-    );
-
-    process.env[LOCAL_PROVIDER_NODE_HOSTS_ENV] = "reranker";
-    const selected = selectRerankProviderNodes([LOOPBACK_NODE, SERVICE_NODE, OTHER_SERVICE_NODE], {
-      allowRemote: false,
-    });
-    assert.deepEqual(
-      selected.map((p) => p.id),
-      ["loop", "sidecar"]
-    );
-    assert.equal(selected[1].baseUrl, "http://reranker:8080/v1/rerank");
-  });
-
-  test("audio: listed service node joins with the remote flag off and keeps its credential", () => {
-    const node = { ...SERVICE_NODE, name: "sidecar", apiType: "audio-transcriptions" };
-    const opts = {
-      audioPath: "/audio/transcriptions",
-      nodeApiType: "audio-transcriptions",
-      allowRemote: false,
-    };
-    delete process.env[LOCAL_PROVIDER_NODE_HOSTS_ENV];
-    assert.deepEqual(selectAudioProviderNodes([node], opts), []);
-
-    process.env[LOCAL_PROVIDER_NODE_HOSTS_ENV] = "reranker";
-    const [byPrefix] = selectAudioProviderNodes([node], opts);
-    assert.equal(byPrefix?.id, "sidecar");
-    assert.equal(byPrefix?.baseUrl, "http://reranker:8080/v1/audio/transcriptions");
-    // Eligibility widens; the auth decision stays loopback-only, so a listed sidecar that
-    // requires a token (TEI --api-key, Infinity behind a gateway) still receives it.
-    assert.equal(byPrefix?.authType, "apikey");
-    assert.equal(byPrefix?.credentialProviderId, node.id);
   });
 });
 

@@ -4,12 +4,11 @@
  * reports a junk key as valid. Horde's own `GET /v2/find_user` is the
  * documented key lookup and returns 401/404 for unknown keys.
  */
-import {
-  AI_HORDE_ANONYMOUS_KEY,
-  AI_HORDE_API_BASE,
-  AI_HORDE_CLIENT_AGENT,
-} from "@omniroute/open-sse/services/aihordeImageCatalog.ts";
 import { toValidationErrorResult, validationRead } from "./transport";
+
+const AI_HORDE_API_BASE = "https://aihorde.net/api";
+const AI_HORDE_ANONYMOUS_KEY = "0000000000";
+const AI_HORDE_CLIENT_AGENT = "OmniRoute:3.8.49:https://github.com/cheaper-inference/OmniRoute";
 
 type HordeFetch = typeof validationRead;
 

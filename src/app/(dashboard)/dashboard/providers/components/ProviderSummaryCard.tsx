@@ -23,7 +23,6 @@ export interface ProviderSummaryStats {
   compatible: SummaryStat;
   webcookie: SummaryStat;
   search: SummaryStat;
-  audio: SummaryStat;
   local: SummaryStat;
   upstreamproxy: SummaryStat;
   cloudagent: SummaryStat;
@@ -74,11 +73,6 @@ function providerText(
 
 const SERVICE_KIND_CHIPS: Array<{ key: string; icon: string; labelKey: string; fallback: string }> =
   [
-    { key: "image", icon: "image", labelKey: "serviceKindImage", fallback: "Image" },
-    { key: "video", icon: "videocam", labelKey: "serviceKindVideo", fallback: "Video" },
-    { key: "music", icon: "music_note", labelKey: "serviceKindMusic", fallback: "Music" },
-    { key: "tts", icon: "record_voice_over", labelKey: "serviceKindTts", fallback: "Text→Speech" },
-    { key: "stt", icon: "hearing", labelKey: "serviceKindStt", fallback: "Speech→Text" },
     {
       key: "embedding",
       icon: "scatter_plot",
@@ -150,11 +144,6 @@ export default function ProviderSummaryCard({
       label: t("webFetch"),
       stat: summaryStats.webfetch,
       title: t("webFetchTooltip"),
-    },
-    {
-      key: "audio",
-      label: providerText(t, "categoryAudio", "Audio"),
-      stat: summaryStats.audio,
     },
     {
       key: "local",

@@ -128,8 +128,8 @@ test("every icon name held as a lookup-object value resolves to a Lucide icon in
       }
     }
   assert.ok(
-    checked > 50,
-    `the detector found only ${checked} lookup values; expected well over 50`
+    checked >= 30,
+    `the detector found only ${checked} lookup values; expected at least 30`
   );
   assert.deepEqual(
     missing,

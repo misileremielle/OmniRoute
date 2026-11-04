@@ -9,7 +9,6 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 
 const core = await import("../../src/lib/db/core.ts");
 const providersDb = await import("../../src/lib/db/providers.ts");
-const moderationRoute = await import("../../src/app/api/v1/moderations/route.ts");
 const embeddingsRoute = await import("../../src/app/api/v1/embeddings/route.ts");
 
 async function withEnv(name, value, fn) {
@@ -61,79 +60,6 @@ async function readConnection(id) {
 test.after(() => {
   core.resetDbInstance();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-});
-
-test("moderations route clears stale provider error metadata on success", async () => {
-  await resetStorage();
-  const created = await seedOpenAIConnection("moderation@example.com");
-
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async () =>
-    Response.json({
-      id: "modr-1",
-      model: "omni-moderation-latest",
-      results: [{ flagged: false }],
-    });
-
-  try {
-    const request = new Request("http://localhost/v1/moderations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input: "hello" }),
-    });
-
-    const response = await moderationRoute.POST(request);
-    assert.equal(response.status, 200);
-
-    const updated = await readConnection(created.id);
-    assert.equal(updated.testStatus, "active");
-    assert.equal(updated.errorCode, undefined);
-    assert.equal(updated.lastErrorType, undefined);
-    assert.equal(updated.lastErrorSource, undefined);
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-});
-
-test("moderations route covers CORS, validation, and missing credential branches", async () => {
-  await resetStorage();
-
-  const optionsResponse = await moderationRoute.OPTIONS();
-  assert.equal(optionsResponse.status, 200);
-  assert.equal(optionsResponse.headers.get("Access-Control-Allow-Methods"), "POST, OPTIONS");
-
-  const invalidJsonResponse = await moderationRoute.POST(
-    new Request("http://localhost/v1/moderations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: "{",
-    })
-  );
-  assert.equal(invalidJsonResponse.status, 400);
-  assert.match(await invalidJsonResponse.text(), /Invalid JSON body/i);
-
-  const invalidBodyResponse = await moderationRoute.POST(
-    new Request("http://localhost/v1/moderations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    })
-  );
-  assert.equal(invalidBodyResponse.status, 400);
-  assert.match(await invalidBodyResponse.text(), /Invalid request/i);
-
-  const noCredentialsResponse = await moderationRoute.POST(
-    new Request("http://localhost/v1/moderations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        input: "hello",
-        model: "anthropic/omni-moderation-latest",
-      }),
-    })
-  );
-  assert.equal(noCredentialsResponse.status, 400);
-  assert.match(await noCredentialsResponse.text(), /No credentials for provider: openai/i);
 });
 
 test("embeddings route clears stale provider error metadata on success", async () => {

@@ -2715,7 +2715,7 @@
         "copilot-integration-id": "copilot-developer-cli",
         "editor-version": "copilot/1.0.91",
         "openai-intent": "conversation-agent",
-        "user-agent": "copilot/1.0.91 (linux) term/unknown",
+        "user-agent": "copilot/1.0.91 (darwin) term/unknown",
         "x-client-machine-id": "<UUID>",
         "x-github-api-version": "2026-08-01",
         "x-interaction-type": "conversation-user"
@@ -2729,7 +2729,7 @@
         "copilot-integration-id": "copilot-developer-cli",
         "editor-version": "copilot/1.0.91",
         "openai-intent": "conversation-agent",
-        "user-agent": "copilot/1.0.91 (linux) term/unknown",
+        "user-agent": "copilot/1.0.91 (darwin) term/unknown",
         "x-client-machine-id": "<UUID>",
         "x-github-api-version": "2026-08-01",
         "x-interaction-type": "conversation-user"
@@ -2743,7 +2743,7 @@
         "copilot-integration-id": "copilot-developer-cli",
         "editor-version": "copilot/1.0.91",
         "openai-intent": "conversation-agent",
-        "user-agent": "copilot/1.0.91 (linux) term/unknown",
+        "user-agent": "copilot/1.0.91 (darwin) term/unknown",
         "x-client-machine-id": "<UUID>",
         "x-github-api-version": "2026-08-01",
         "x-interaction-type": "conversation-user"
@@ -2812,7 +2812,7 @@
         "copilot-integration-id": "copilot-developer-cli",
         "editor-version": "copilot/1.0.91",
         "openai-intent": "conversation-agent",
-        "user-agent": "copilot/1.0.91 (linux) term/unknown",
+        "user-agent": "copilot/1.0.91 (darwin) term/unknown",
         "x-client-machine-id": "<UUID>",
         "x-github-api-version": "2026-08-01",
         "x-interaction-type": "conversation-user",
@@ -2827,7 +2827,7 @@
         "copilot-integration-id": "copilot-developer-cli",
         "editor-version": "copilot/1.0.91",
         "openai-intent": "conversation-agent",
-        "user-agent": "copilot/1.0.91 (linux) term/unknown",
+        "user-agent": "copilot/1.0.91 (darwin) term/unknown",
         "x-client-machine-id": "<UUID>",
         "x-github-api-version": "2026-08-01",
         "x-interaction-type": "conversation-user",
@@ -2842,7 +2842,7 @@
         "copilot-integration-id": "copilot-developer-cli",
         "editor-version": "copilot/1.0.91",
         "openai-intent": "conversation-agent",
-        "user-agent": "copilot/1.0.91 (linux) term/unknown",
+        "user-agent": "copilot/1.0.91 (darwin) term/unknown",
         "x-client-machine-id": "<UUID>",
         "x-github-api-version": "2026-08-01",
         "x-interaction-type": "conversation-user",
@@ -3102,29 +3102,6 @@
       "stream": "https://api.groq.com/openai/v1/chat/completions"
     }
   },
-  "haiper": {
-    "format": "openai",
-    "headers": {
-      "apiKey": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "nonStream": {
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "oauth": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      }
-    },
-    "url": {
-      "nonStream": "https://api.haiper.ai/v1",
-      "stream": "https://api.haiper.ai/v1"
-    }
-  },
   "hcnsec": {
     "format": "openai",
     "headers": {
@@ -3309,29 +3286,6 @@
       "stream": "https://api.hyperbolic.xyz/v1/chat/completions"
     }
   },
-  "ideogram": {
-    "format": "openai",
-    "headers": {
-      "apiKey": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "nonStream": {
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "oauth": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      }
-    },
-    "url": {
-      "nonStream": "https://api.ideogram.ai",
-      "stream": "https://api.ideogram.ai"
-    }
-  },
   "iflytek": {
     "format": "openai",
     "headers": {
@@ -3445,6 +3399,29 @@
     "url": {
       "nonStream": "https://chat.intern-ai.org.cn/api/v1/chat/completions",
       "stream": "https://chat.intern-ai.org.cn/api/v1/chat/completions"
+    }
+  },
+  "kagi-assistant": {
+    "format": "openai",
+    "headers": {
+      "apiKey": {
+        "Accept": "text/event-stream",
+        "Authorization": "Bearer <TOK>",
+        "Content-Type": "application/json"
+      },
+      "nonStream": {
+        "Authorization": "Bearer <TOK>",
+        "Content-Type": "application/json"
+      },
+      "oauth": {
+        "Accept": "text/event-stream",
+        "Authorization": "Bearer <TOK>",
+        "Content-Type": "application/json"
+      }
+    },
+    "url": {
+      "nonStream": "https://assistant.kagi.com",
+      "stream": "https://assistant.kagi.com"
     }
   },
   "kenari": {
@@ -3694,29 +3671,6 @@
     "url": {
       "nonStream": "https://api.lambda.ai/v1/chat/completions",
       "stream": "https://api.lambda.ai/v1/chat/completions"
-    }
-  },
-  "leonardo": {
-    "format": "openai",
-    "headers": {
-      "apiKey": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "nonStream": {
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "oauth": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      }
-    },
-    "url": {
-      "nonStream": "https://cloud.leonardo.ai/api/rest/v1",
-      "stream": "https://cloud.leonardo.ai/api/rest/v1"
     }
   },
   "liquid": {
@@ -6282,29 +6236,6 @@
       "stream": "https://api.uncensored.com/api/v1"
     }
   },
-  "udio": {
-    "format": "openai",
-    "headers": {
-      "apiKey": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "nonStream": {
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "oauth": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      }
-    },
-    "url": {
-      "nonStream": "https://www.udio.com/api/generate-proxy",
-      "stream": "https://www.udio.com/api/generate-proxy"
-    }
-  },
   "uncloseai": {
     "format": "openai",
     "headers": {
@@ -6441,29 +6372,6 @@
     "url": {
       "nonStream": "https://api.venice.ai/api/v1/chat/completions",
       "stream": "https://api.venice.ai/api/v1/chat/completions"
-    }
-  },
-  "veoaifree-web": {
-    "format": "openai",
-    "headers": {
-      "apiKey": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "nonStream": {
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      },
-      "oauth": {
-        "Accept": "text/event-stream",
-        "Authorization": "Bearer <TOK>",
-        "Content-Type": "application/json"
-      }
-    },
-    "url": {
-      "nonStream": "https://veoaifree.com/wp-admin/admin-ajax.php",
-      "stream": "https://veoaifree.com/wp-admin/admin-ajax.php"
     }
   },
   "vercel-ai-gateway": {

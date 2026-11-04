@@ -16,8 +16,6 @@ import { emit } from "@/lib/events/eventBus";
 import { maybeLogToolCallSpecViolation } from "./toolCallSpecViolationAudit.ts";
 import type { RequestCompletedPayload, RequestFailedPayload } from "@/lib/events/types";
 import { saveCallLog } from "@/lib/usageDb";
-import type { VideoBridgeLogRedactionEntry } from "@/lib/guardrails/videoBridge";
-import { redactVideoTranscriptFieldsForLog } from "@/lib/guardrails/videoBridgeSnapshotRedaction";
 import { FORMATS } from "../../translator/formats.ts";
 import { takeEarlyKeepaliveBytes } from "../../utils/earlyKeepaliveByteBuffer.ts";
 import { sanitizeErrorMessage } from "../../utils/error.ts";
@@ -30,195 +28,6 @@ import {
   queueWaitMsFromDispatch,
 } from "../../utils/proxyFetch.ts";
 import { clientSessionIdFromRawRequest } from "./clientSessionId.ts";
-
-const OMITTED_VIDEO_TRANSCRIPT_REQUEST = { _omniroute_omitted: "video-transcript" };
-
-interface VideoLogCloneState {
-  source: Record<string, unknown>;
-  rootClone: Record<string, unknown> | null;
-  containers: Map<string, unknown[]>;
-  messages: Map<string, Record<string, unknown>>;
-}
-
-function mutableVideoLogMessage(
-  state: VideoLogCloneState,
-  container: string,
-  messageIndex: number,
-  originalContainer: unknown[],
-  originalMessage: Record<string, unknown>,
-  originalContent: unknown
-): Record<string, unknown> {
-  if (!state.rootClone) state.rootClone = { ...state.source };
-  let containerClone = state.containers.get(container);
-  if (!containerClone) {
-    containerClone = [...originalContainer];
-    state.containers.set(container, containerClone);
-    state.rootClone[container] = containerClone;
-  }
-  const messageKey = `${container}:${messageIndex}`;
-  let messageClone = state.messages.get(messageKey);
-  if (!messageClone) {
-    messageClone = { ...originalMessage };
-    if (Array.isArray(originalContent)) messageClone.content = [...originalContent];
-    state.messages.set(messageKey, messageClone);
-    containerClone[messageIndex] = messageClone;
-  }
-  return messageClone;
-}
-
-/**
- * Apply the video-bridge redaction shadow (P1a's `meta.videoBridgeLogRedaction`,
- * threaded here via `PersistAttemptLogsContext.videoBridgeLogRedaction`) to a
- * CLONE of `body` before it is serialized into the persisted call log (#12150
- * surface 1).
- *
- * `body` itself is NEVER mutated: by the time an attempt is logged, this same
- * `body` reference has already been sent upstream (the model path), so
- * mutating it here would be both unsafe and pointless. Shadow replacement
- * clones only the containers on the path to each redacted part (container
- * array -> message -> content array -> part). With failClosedOnMiss enabled,
- * the final structural redactor also clones the result to protect raw video
- * siblings. The common non-video path still returns `body` unchanged (same
- * reference, no allocation) when there is nothing to redact.
- *
- * #12150 fix round 1 (adversarial review, CRITICAL): matches by CONTENT
- * (`entry.fullText === part.text`), never by `entry.messageIndex`/
- * `entry.partIndex`. Those positions are computed by the guardrail's preCall,
- * but request-mutation stages that run AFTER it and BEFORE this log write —
- * context-relay handoff injection, reasoning-rule body rewrites —
- * can prepend or splice the message array, silently invalidating any
- * positional index. A stale index either misses the real part (the
- * transcript is logged unredacted) or, worse, lands on and overwrites an
- * unrelated legitimate message. Scanning every part in the named container
- * for an exact text match finds the video part wherever it ended up and
- * never touches a part whose text differs — see
- * `tests/unit/video-bridge-log-redaction.test.ts`'s "Scenario A" test for the
- * reproduction this fixes.
- *
- * #12430 item 4 (P2c): a message's `content` can also be a plain STRING that
- * embeds `fullText` as a SUBSTRING rather than an exact array part — derived
- * dispatches (pipeline-strategy stages, smart-auto-pipeline, context-handoff
- * summaries) all interpolate the transcript blob into a larger rendered
- * prompt string before calling `handleSingleModel`. That string branch is
- * mutually exclusive with the array branch (a message's `content` is one or
- * the other, never both) and uses `String.prototype.replaceAll` against the
- * trusted `fullText` literal to swap every occurrence — see
- * `tests/unit/video-bridge-derived-prompt-redaction.test.ts`.
- * When persisting an observed video request, every shadow entry must match:
- * a partial match can otherwise leave another video's transcript in the log.
- */
-export function applyVideoBridgeLogRedaction(
-  body: unknown,
-  redaction: VideoBridgeLogRedactionEntry[] | null | undefined,
-  failClosedOnMiss = false
-): unknown {
-  if (!redaction || redaction.length === 0) {
-    return failClosedOnMiss ? OMITTED_VIDEO_TRANSCRIPT_REQUEST : body;
-  }
-  if (!body || typeof body !== "object") {
-    return failClosedOnMiss ? OMITTED_VIDEO_TRANSCRIPT_REQUEST : body;
-  }
-
-  const source = body as Record<string, unknown>;
-  const cloneState: VideoLogCloneState = {
-    source,
-    rootClone: null,
-    containers: new Map(),
-    messages: new Map(),
-  };
-  let redacted = false;
-
-  for (const entry of redaction) {
-    const { container, fullText, redactedText } = entry;
-    if (typeof fullText !== "string" || fullText.length === 0) {
-      if (failClosedOnMiss) return OMITTED_VIDEO_TRANSCRIPT_REQUEST;
-      continue;
-    }
-    const originalContainer = source[container];
-    if (!Array.isArray(originalContainer)) {
-      if (failClosedOnMiss) return OMITTED_VIDEO_TRANSCRIPT_REQUEST;
-      continue;
-    }
-    let matchedEntry = false;
-    // Mirrors the exact `type` replaceVideoParts() writes for this container
-    // (videoBridgeHelpers.ts) — a stronger anchor than a loose "text-like"
-    // check, at zero extra cost.
-    const expectedPartType = container === "input" ? "input_text" : "text";
-
-    for (let messageIndex = 0; messageIndex < originalContainer.length; messageIndex++) {
-      const originalMessage = originalContainer[messageIndex];
-      if (!originalMessage || typeof originalMessage !== "object") continue;
-      const originalContent = (originalMessage as Record<string, unknown>).content;
-
-      // Derived-prompt dispatches (pipeline-strategy stages, smart-auto-pipeline,
-      // context-handoff summaries — #12430 item 4) embed the transcript as a
-      // SUBSTRING of a plain string `content`, e.g. a rendered stage prompt or a
-      // `{HISTORY}`-interpolated handoff summary, never as an exact array part.
-      // Mutually exclusive with the array branch below: a message's `content`
-      // is either a string or an array, never both, so this and the
-      // `Array.isArray` check never both match the same message.
-      if (typeof originalContent === "string") {
-        if (!originalContent.includes(fullText)) continue;
-
-        // Same lazy clone-on-write as the array branch: root -> container
-        // array -> this message. Siblings keep referencing the originals.
-        const messageClone = mutableVideoLogMessage(
-          cloneState,
-          container,
-          messageIndex,
-          originalContainer,
-          originalMessage as Record<string, unknown>,
-          originalContent
-        );
-
-        // Re-read from the (possibly already-cloned) message so a second
-        // redaction entry matching the same string content composes with the
-        // first instead of clobbering it. `fullText` is a trusted literal
-        // (the `[Video description:...]` blob), so replaceAll(string, string)
-        // needs no regex and is safe. replaceAll (not replace): a stage/summary
-        // prompt can quote the transcript back more than once.
-        const currentText =
-          typeof messageClone.content === "string" ? messageClone.content : originalContent;
-        messageClone.content = currentText.replaceAll(fullText, redactedText);
-        redacted = true;
-        matchedEntry = true;
-        continue;
-      }
-      if (!Array.isArray(originalContent)) continue;
-
-      for (let partIndex = 0; partIndex < originalContent.length; partIndex++) {
-        const originalPart = originalContent[partIndex];
-        if (!originalPart || typeof originalPart !== "object") continue;
-        const partRecord = originalPart as Record<string, unknown>;
-        if (partRecord.type !== expectedPartType) continue;
-        if (partRecord.text !== fullText) continue;
-
-        // Content-address match — clone the path down to this part lazily
-        // (root -> container array -> this message -> its content array),
-        // leaving every other sibling on the original references.
-        const messageClone = mutableVideoLogMessage(
-          cloneState,
-          container,
-          messageIndex,
-          originalContainer,
-          originalMessage as Record<string, unknown>,
-          originalContent
-        );
-
-        const contentClone = messageClone.content as unknown[];
-        contentClone[partIndex] = { ...partRecord, text: redactedText };
-        redacted = true;
-        matchedEntry = true;
-      }
-    }
-    if (failClosedOnMiss && !matchedEntry) return OMITTED_VIDEO_TRANSCRIPT_REQUEST;
-  }
-
-  const result = redacted && cloneState.rootClone ? cloneState.rootClone : body;
-  // A matched description shadow does not cover raw video siblings left by a
-  // failed description or maxVideos. Redact their fields on the retained copy.
-  return failClosedOnMiss ? redactVideoTranscriptFieldsForLog(result) : result;
-}
 
 /**
  * Extract the OpenAI Responses API response id this attempt produced, so it
@@ -307,24 +116,6 @@ export type PersistAttemptLogsContext = {
    * explicitly present (never synthesized from skillRequestId) — persisted as call_logs.session_tag
    * for per-session cost attribution. */
   sessionTag?: string | null;
-  /**
-   * #12150 P1b: video-bridge structured-redaction shadow (P1a's
-   * `meta.videoBridgeLogRedaction`), threaded from chat.ts's
-   * `preCallGuardrails.results` down through handleChatCore. When present,
-   * `applyVideoBridgeLogRedaction` swaps each mapped part's text for the
-   * placeholder in the CLONE that gets persisted — `body` itself (the model
-   * path) is never touched. Omitted/empty for every non-video request.
-   */
-  videoBridgeLogRedaction?: VideoBridgeLogRedactionEntry[];
-  /**
-   * #12150 P2 surface 2: true when the video-bridge guardrail observed and
-   * rewrote video parts on this request, so the persisted client snapshot had
-   * its transcript cues structurally redacted (videoBridgeObserved in
-   * chatCore.ts). Written to the `call_logs.video_content_removed` marker so
-   * `resolvePreviousResponseState` refuses to rehydrate this row as continuation
-   * history. Omitted/false for every non-video request.
-   */
-  videoContentRemoved?: boolean;
 };
 
 function toConnectionId(value: unknown): string | null {
@@ -443,8 +234,6 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
     correlationId,
     modelPinned,
     sessionTag,
-    videoBridgeLogRedaction,
-    videoContentRemoved,
   } = ctx;
   const initialConnectionId = toConnectionId(connectionId);
   const finalConnectionId = toConnectionId(credentials?.connectionId) || initialConnectionId;
@@ -454,27 +243,7 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
     finalConnectionId
   );
 
-  // The upstream response can quote a video transcript in arbitrary prose,
-  // including errors and SSE chunks. There is no trustworthy structured
-  // response-side cue boundary to redact, so retained copies are omitted as
-  // a whole. The provider response and client-visible reply remain unchanged.
-  const redactedRequest = applyVideoBridgeLogRedaction(
-    body,
-    videoBridgeLogRedaction,
-    videoContentRemoved
-  );
-  // The observed signal and its per-part shadow normally arrive together.
-  // If the shadow is missing or even one entry fails to match after request
-  // mutations, do not retain a partially redacted transcript. The identity
-  // fallback also covers an unchanged body with no applicable entries.
-  const retainedRequest =
-    videoContentRemoved && redactedRequest === body
-      ? OMITTED_VIDEO_TRANSCRIPT_REQUEST
-      : redactedRequest;
-  const retainedResponse = videoContentRemoved
-    ? { _omniroute_omitted: "video-transcript" }
-    : (responseBody ?? (status >= 400 ? providerResponse : undefined));
-  const retainedError = videoContentRemoved && error ? "[omitted: video transcript]" : error;
+  const retainedResponse = responseBody ?? (status >= 400 ? providerResponse : undefined);
 
   const providerWarnings = extractProviderWarnings(providerResponse, clientResponse, responseBody);
   if (providerWarnings.length > 0) {
@@ -490,15 +259,11 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
         model,
         connectionId: finalConnectionId,
         httpStatus: status,
-        warnings: videoContentRemoved
-          ? providerWarnings.map(() => "[omitted: video transcript]")
-          : providerWarnings,
+        warnings: providerWarnings,
       },
     });
   }
 
-  // Detect against the live response, but omit provider-supplied tool names
-  // from the durable audit detail when they might echo a video transcript.
   maybeLogToolCallSpecViolation({
     responseBody,
     provider,
@@ -506,26 +271,10 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
     connectionId: finalConnectionId,
     httpStatus: status,
     requestId: skillRequestId,
-    redactViolationDetail: videoContentRemoved,
   });
 
-  // The detailed artifact mixes provider/client responses, raw wire chunks
-  // and transformed requests. None is safe to persist for observed video.
-  const capturedPipeline = videoContentRemoved
-    ? null
-    : (reqLogger?.getPipelinePayloads?.() ?? null);
-  const pipelinePayloads = videoContentRemoved
-    ? null
-    : detailedLoggingEnabled
-      ? (capturedPipeline ?? {})
-      : null;
-
-  // The external keepalive buffer can contain error frames that quote a
-  // transcript. Since this attempt omits the pipeline artifact, drop those
-  // buffered bytes now instead of keeping them until the TTL expires.
-  if (videoContentRemoved && correlationId) {
-    takeEarlyKeepaliveBytes(correlationId);
-  }
+  const capturedPipeline = reqLogger?.getPipelinePayloads?.() ?? null;
+  const pipelinePayloads = detailedLoggingEnabled ? (capturedPipeline ?? {}) : null;
 
   if (pipelinePayloads) {
     if (providerRequest !== undefined && !pipelinePayloads.providerRequest) {
@@ -537,12 +286,12 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
     if (clientResponse !== undefined) {
       pipelinePayloads.clientResponse = clientResponse as Record<string, unknown>;
     }
-    if (retainedError) {
+    if (error) {
       pipelinePayloads.error = {
         ...(typeof pipelinePayloads.error === "object" && pipelinePayloads.error
           ? (pipelinePayloads.error as Record<string, unknown>)
           : {}),
-        message: retainedError,
+        message: error,
       };
     }
     // withEarlyStreamKeepalive writes keepalive/startup/error frames directly
@@ -599,7 +348,7 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
     clientRequestBody: body ?? null,
     upstreamRequestBody: providerRequest ?? null,
     requestBody: cloneBoundedChatLogPayload(
-      attachLogMeta(truncateForLog(retainedRequest as Record<string, unknown>), {
+      attachLogMeta(truncateForLog(body as Record<string, unknown>), {
         ...accountRotationMeta,
         claudePromptCache: claudeCacheMeta,
         geminiPromptCache,
@@ -622,7 +371,7 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
         usageEstimated: isEstimatedUsage(tokens) ? true : null,
       })
     ),
-    error: retainedError || null,
+    error: error || null,
     sourceFormat,
     targetFormat,
     comboName,
@@ -639,7 +388,6 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
     sessionTag: sessionTag || null,
     clientSessionId: clientSessionIdFromRawRequest(clientRawRequest),
     responseId: extractResponsesId(sourceFormat, clientResponse),
-    videoContentRemoved: videoContentRemoved || false,
     addedWaitMs: addedWait?.ms ?? null,
     queueWaitMs: queueWaitMsFromDispatch(upstreamDispatchedAt, startTime),
     addedWaitCause: addedWait?.cause ?? null,
@@ -654,7 +402,7 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
     const lifecycle = resolveRequestLifecycleEvent({
       traceId,
       status,
-      error: retainedError,
+      error,
       model,
       provider,
       comboName,

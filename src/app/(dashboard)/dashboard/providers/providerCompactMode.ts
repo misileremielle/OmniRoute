@@ -20,12 +20,9 @@ export interface CompactProviderEntryOptions<TProvider> {
   aggregatorProviderEntries: ProviderCategoryEntries<TProvider>;
   enterpriseProviderEntries: ProviderCategoryEntries<TProvider>;
   embeddingRerankProviderEntries: ProviderCategoryEntries<TProvider>;
-  imageProviderEntries: ProviderCategoryEntries<TProvider>;
-  videoProviderEntries: ProviderCategoryEntries<TProvider>;
   webCookieProviderEntries: ProviderCategoryEntries<TProvider>;
   searchProviderEntries: ProviderCategoryEntries<TProvider>;
   webFetchEntries: ProviderCategoryEntries<TProvider>;
-  audioProviderEntries: ProviderCategoryEntries<TProvider>;
   localProviderEntries: ProviderCategoryEntries<TProvider>;
   cloudAgentProviderEntries: ProviderCategoryEntries<TProvider>;
 }
@@ -43,12 +40,9 @@ function getCompactProviderEntryGroups<TProvider>({
   aggregatorProviderEntries,
   enterpriseProviderEntries,
   embeddingRerankProviderEntries,
-  imageProviderEntries,
-  videoProviderEntries,
   webCookieProviderEntries,
   searchProviderEntries,
   webFetchEntries,
-  audioProviderEntries,
   localProviderEntries,
   cloudAgentProviderEntries,
 }: CompactProviderEntryOptions<TProvider>): ProviderEntry<TProvider>[][] {
@@ -60,8 +54,6 @@ function getCompactProviderEntryGroups<TProvider>({
     aggregatorProviderEntries,
     enterpriseProviderEntries,
     embeddingRerankProviderEntries,
-    imageProviderEntries,
-    videoProviderEntries,
   ];
 
   if (showFreeOnly) return [freeSectionEntries];
@@ -75,7 +67,6 @@ function getCompactProviderEntryGroups<TProvider>({
   if (activeCategory === "webcookie") return [webCookieProviderEntries];
   if (activeCategory === "search") return [searchProviderEntries];
   if (activeCategory === "webfetch") return [webFetchEntries];
-  if (activeCategory === "audio") return [audioProviderEntries];
   if (activeCategory === "local") return [localProviderEntries];
   if (activeCategory === "cloudagent") return [cloudAgentProviderEntries];
 
@@ -92,9 +83,6 @@ function getCompactProviderEntryGroups<TProvider>({
     localProviderEntries,
     searchProviderEntries,
     embeddingRerankProviderEntries,
-    imageProviderEntries,
-    audioProviderEntries,
-    videoProviderEntries,
     noAuthEntries,
   ];
 }

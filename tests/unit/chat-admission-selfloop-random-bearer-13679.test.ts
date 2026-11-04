@@ -54,7 +54,7 @@ test("resolveSelfLoopBearer's generated fallback is stable within the same proce
       first,
       second,
       "the generated self-loop bearer must be memoized for the process lifetime — the same " +
-        "in-process caller (audioBridgeHelpers/visionBridgeHelpers) and verifier " +
+        "in-process caller (visionBridgeHelpers) and verifier " +
         "(isInternalAdmissionBypass) must agree on the value"
     );
   } finally {

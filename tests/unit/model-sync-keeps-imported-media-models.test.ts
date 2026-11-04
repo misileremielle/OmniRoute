@@ -16,16 +16,8 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 process.env.API_KEY_SECRET ||= `test-model-sync-media-${Date.now()}`;
 
 const core = await import("../../src/lib/db/core.ts");
-const providersDb = await import("../../src/lib/db/providers.ts");
 const modelsDb = await import("../../src/lib/db/models.ts");
-const modelSyncRoute = await import("../../src/app/api/providers/[id]/sync-models/route.ts");
-const providerModelsRoute = await import("../../src/app/api/providers/[id]/models/route.ts");
-const scheduler = await import("../../src/shared/services/modelSyncScheduler.ts");
 const { importManagedModels } = await import("../../src/lib/providerModels/managedModelImport.ts");
-const { getStaticModelsForProvider } = await import("../../src/lib/providers/staticModels.ts");
-const { expandAutoComboCandidatePool } =
-  await import("../../open-sse/services/combo/autoStrategy.ts");
-const { invalidateDbCache } = await import("../../src/lib/db/readCache.ts");
 
 const originalFetch = globalThis.fetch;
 
@@ -35,55 +27,6 @@ test.after(() => {
   globalThis.fetch = originalFetch;
   core.resetDbInstance();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-});
-
-test("model sync keeps the speech and transcription models a media-only provider imported", async () => {
-  const connection = await providersDb.createProviderConnection({
-    provider: "soniox",
-    authType: "apikey",
-    name: "Soniox media sync",
-    apiKey: "soniox-test-key",
-  });
-  const catalog = getStaticModelsForProvider("soniox") || [];
-  assert.ok(catalog.length > 0);
-  for (const model of catalog) {
-    await modelsDb.addCustomModel(
-      "soniox",
-      model.id,
-      model.name,
-      "imported",
-      model.apiFormat,
-      model.supportedEndpoints
-    );
-  }
-  const importedIds = catalog.map((model) => model.id).sort();
-
-  // Serve the self-fetch from the real /models route so the sync sees exactly
-  // what production sees, including the chat-surface filter.
-  globalThis.fetch = async (input, init) => {
-    const url = new URL(String(input));
-    if (url.pathname.includes("__readiness_probe__")) {
-      return new Response(null, { status: 404 });
-    }
-    if (url.pathname === `/api/providers/${connection.id}/models`) {
-      return providerModelsRoute.GET(new Request(url.href, { headers: init?.headers }), {
-        params: Promise.resolve({ id: connection.id }),
-      });
-    }
-    throw new Error(`Unexpected fetch in media sync test: ${url.href}`);
-  };
-
-  const response = await modelSyncRoute.POST(
-    new Request(`http://localhost/api/providers/${connection.id}/sync-models?quiet=1`, {
-      method: "POST",
-      headers: scheduler.buildModelSyncInternalHeaders(),
-    }),
-    { params: { id: connection.id } }
-  );
-
-  assert.equal(response.status, 200);
-  const stored = (await modelsDb.getCustomModels("soniox")) as StoredModel[];
-  assert.deepEqual(stored.map((model) => model.id).sort(), importedIds);
 });
 
 test("sync still replaces imported chat rows with the discovered catalog", async () => {
@@ -155,21 +98,4 @@ test("self-hosted providers keep replacing every imported row, since their disco
 
   const stored = (await modelsDb.getCustomModels("ollama-local")) as StoredModel[];
   assert.deepEqual(stored, []);
-});
-
-test("a pure-auto combo does not expand imported speech models into chat targets", async () => {
-  await providersDb.createProviderConnection({
-    provider: "soniox",
-    authType: "apikey",
-    name: "Soniox auto pool",
-    apiKey: "soniox-test-key",
-  });
-  invalidateDbCache();
-
-  const targets = await expandAutoComboCandidatePool([], { config: {} });
-
-  assert.deepEqual(
-    targets.filter((target) => target.providerId === "soniox").map((target) => target.modelStr),
-    []
-  );
 });

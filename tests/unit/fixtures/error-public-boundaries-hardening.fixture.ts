@@ -418,12 +418,11 @@ test("chatCore provider-failure writes use the projected persistent message", ()
 
   assert.doesNotMatch(failureBlock, /lastError:\s*message\b/);
   assert.match(failureBlock, /await applyProviderFailureClassification\(/);
-  // #14527 moved the projection into chatCore/providerFailureRetention.ts (it adds a
-  // video-transcript omission in front of the same sanitizer). Hold chatCore to calling the
-  // projection, and the projection to sanitizing — the invariant, wherever it lives.
+  // #14527 moved the projection into chatCore/providerFailureRetention.ts. Hold chatCore to
+  // calling the projection, and the projection to sanitizing — the invariant, wherever it lives.
   assert.match(
     classifierBlock,
-    /const persistentMessage = projectRetainedProviderFailureMessage\(message, /
+    /const persistentMessage = projectRetainedProviderFailureMessage\(message\)/
   );
   const retentionSource = fs.readFileSync(
     path.join(REPO_ROOT, "open-sse/handlers/chatCore/providerFailureRetention.ts"),

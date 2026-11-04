@@ -2,6 +2,10 @@
 // inworld, kie, aws-polly, bailian-coding-plan, reka, maritalk, nlpcloud, runwayml, nous-research,
 // poe. Extracted from validation.ts (god-file decomposition) — top-level functions with no
 // dispatcher-state captures; behavior is byte-identical to the original inline defs.
+// Audio/speech + miscellaneous API-key provider validators: deepgram, assemblyai, elevenlabs,
+// inworld, kie, aws-polly, bailian-coding-plan, reka, maritalk, nlpcloud, runwayml, nous-research,
+// poe. Extracted from validation.ts (god-file decomposition) — top-level functions with no
+// dispatcher-state captures; behavior is byte-identical to the original inline defs.
 import { getRegistryEntry } from "@omniroute/open-sse/config/providerRegistry.ts";
 import { POE_DEFAULT_BASE_URL } from "@omniroute/open-sse/config/providers/registry/poe/index.ts";
 import { normalizeBaseUrl } from "./urlHelpers";
@@ -14,143 +18,13 @@ import {
 } from "./headers";
 import { toValidationErrorResult, validationRead, validationWrite } from "./transport";
 import { validateDirectChatProvider } from "./directChatProbe";
-import {
-  buildRunwayApiUrl,
-  buildRunwayHeaders,
-  normalizeRunwayBaseUrl,
-} from "@omniroute/open-sse/config/runway.ts";
+
 import {
   buildMaritalkChatUrl,
   buildMaritalkModelsUrl,
 } from "@omniroute/open-sse/config/maritalk.ts";
-import { signAwsRequest } from "@omniroute/open-sse/utils/awsSigV4.ts";
+
 import { resolveAlibabaProviderBaseUrl } from "@/shared/constants/alibabaProviderRegions";
-
-export async function validateDeepgramProvider({ apiKey, providerSpecificData = {} }: any) {
-  try {
-    const response = await validationRead("https://api.deepgram.com/v1/auth/token", {
-      method: "GET",
-      headers: applyCustomUserAgent({ Authorization: `Token ${apiKey}` }, providerSpecificData),
-    });
-    if (response.ok) return { valid: true, error: null };
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-    return { valid: false, error: `Validation failed: ${response.status}` };
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-}
-
-export async function validateAssemblyAIProvider({ apiKey, providerSpecificData = {} }: any) {
-  try {
-    const response = await validationRead("https://api.assemblyai.com/v2/transcript?limit=1", {
-      method: "GET",
-      headers: applyCustomUserAgent(
-        {
-          Authorization: apiKey,
-          "Content-Type": "application/json",
-        },
-        providerSpecificData
-      ),
-    });
-    if (response.ok) return { valid: true, error: null };
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-    return { valid: false, error: `Validation failed: ${response.status}` };
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-}
-
-export async function validateRevAiProvider({ apiKey, providerSpecificData = {} }: any) {
-  try {
-    const response = await validationRead("https://api.rev.ai/speechtotext/v1/jobs?limit=1", {
-      method: "GET",
-      headers: buildBearerHeaders(apiKey, providerSpecificData),
-    });
-    if (response.ok) return { valid: true, error: null };
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-    return { valid: false, error: `Validation failed: ${response.status}` };
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-}
-
-export async function validateSonioxProvider({ apiKey, providerSpecificData = {} }: any) {
-  try {
-    const response = await validationRead("https://api.soniox.com/v1/transcriptions", {
-      method: "GET",
-      headers: buildBearerHeaders(apiKey, providerSpecificData),
-    });
-    if (response.ok) return { valid: true, error: null };
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-    return { valid: false, error: `Validation failed: ${response.status}` };
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-}
-
-export async function validateElevenLabsProvider({ apiKey, providerSpecificData = {} }: any) {
-  try {
-    // Lightweight auth check endpoint
-    const response = await validationRead("https://api.elevenlabs.io/v1/voices", {
-      method: "GET",
-      headers: applyCustomUserAgent(
-        {
-          "xi-api-key": apiKey,
-          "Content-Type": "application/json",
-        },
-        providerSpecificData
-      ),
-    });
-
-    if (response.ok) return { valid: true, error: null };
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-
-    return { valid: false, error: `Validation failed: ${response.status}` };
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-}
-
-export async function validateInworldProvider({ apiKey, providerSpecificData = {} }: any) {
-  try {
-    // Inworld TTS lacks a simple key-introspection endpoint.
-    // Send a minimal synth request and treat non-auth 4xx as auth-pass.
-    const response = await validationWrite("https://api.inworld.ai/tts/v1/voice", {
-      method: "POST",
-      headers: applyCustomUserAgent(
-        {
-          Authorization: `Basic ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        providerSpecificData
-      ),
-      body: JSON.stringify({
-        text: "test",
-        modelId: "inworld-tts-1.5-mini",
-        audioConfig: { audioEncoding: "MP3" },
-      }),
-    });
-
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-
-    // Any other response indicates auth is accepted (payload/model may still be wrong)
-    return { valid: true, error: null };
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-}
 
 export async function validateKieProvider({ apiKey, providerSpecificData = {} }: any) {
   try {
@@ -197,73 +71,6 @@ export async function validateKieProvider({ apiKey, providerSpecificData = {} }:
 
     return { valid: false, error: `Validation failed: ${chatRes.status}` };
   } catch (error: unknown) {
-    return toValidationErrorResult(error);
-  }
-}
-
-export function getAwsProviderString(value: unknown): string | null {
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-}
-
-export function getAwsPollyRegion(providerSpecificData: any = {}) {
-  return (
-    getAwsProviderString(providerSpecificData.region) ||
-    getAwsProviderString(providerSpecificData.awsRegion) ||
-    process.env.AWS_REGION ||
-    process.env.AWS_DEFAULT_REGION ||
-    "us-east-1"
-  );
-}
-
-export function getAwsPollyBaseUrl(providerSpecificData: any = {}, region: string) {
-  return (
-    getAwsProviderString(providerSpecificData.baseUrl) || `https://polly.${region}.amazonaws.com`
-  ).replace(/\/+$/, "");
-}
-
-export async function validateAwsPollyProvider({ apiKey, providerSpecificData = {} }: any) {
-  const accessKeyId =
-    getAwsProviderString(providerSpecificData.accessKeyId) ||
-    getAwsProviderString(providerSpecificData.awsAccessKeyId);
-  const secretAccessKey = getAwsProviderString(apiKey);
-
-  if (!accessKeyId) {
-    return { valid: false, error: "Missing AWS accessKeyId" };
-  }
-  if (!secretAccessKey) {
-    return { valid: false, error: "Missing AWS Secret Access Key" };
-  }
-
-  const region = getAwsPollyRegion(providerSpecificData);
-  const baseUrl = getAwsPollyBaseUrl(providerSpecificData, region).replace(/\/v1\/voices$/i, "");
-  const url = `${baseUrl}/v1/voices?Engine=standard`;
-
-  try {
-    const signedHeaders = signAwsRequest({
-      method: "GET",
-      url,
-      region,
-      service: "polly",
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-        sessionToken:
-          getAwsProviderString(providerSpecificData.sessionToken) ||
-          getAwsProviderString(providerSpecificData.awsSessionToken),
-      },
-    });
-
-    const response = await validationRead(url, {
-      method: "GET",
-      headers: applyCustomUserAgent(signedHeaders, providerSpecificData),
-    });
-
-    if (response.ok) return { valid: true, error: null };
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid AWS credentials" };
-    }
-    return { valid: false, error: `Validation failed: ${response.status}` };
-  } catch (error: any) {
     return toValidationErrorResult(error);
   }
 }
@@ -582,42 +389,6 @@ export async function validateOneMinAiProvider({ apiKey, providerSpecificData = 
   }
 
   return { valid: false, error: "Connection failed while testing 1min.ai" };
-}
-
-export async function validateRunwayProvider({ apiKey, providerSpecificData = {} }: any) {
-  const baseUrl = normalizeRunwayBaseUrl(providerSpecificData.baseUrl);
-
-  try {
-    const response = await validationRead(buildRunwayApiUrl("/organization", baseUrl), {
-      method: "GET",
-      headers: buildRunwayHeaders(apiKey),
-    });
-
-    if (response.ok) {
-      return { valid: true, error: null, method: "runway_organization" };
-    }
-
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-
-    if (response.status === 429) {
-      return {
-        valid: true,
-        error: null,
-        method: "runway_organization",
-        warning: "Rate limited, but credentials are valid",
-      };
-    }
-
-    if (response.status >= 500) {
-      return { valid: false, error: `Provider unavailable (${response.status})` };
-    }
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-
-  return { valid: false, error: "Connection failed while testing Runway" };
 }
 
 export async function validateNousResearchProvider({ apiKey, providerSpecificData = {} }: any) {

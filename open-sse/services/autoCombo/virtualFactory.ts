@@ -61,7 +61,6 @@ import {
   buildConnectionResilienceMap,
   SYNTHETIC_NOAUTH_CONNECTION_ID as RESILIENCE_NOAUTH_CONNECTION_ID,
 } from "./resilienceCandidateFilter";
-import type { ChaosTuning } from "./chaosEngine";
 import {
   applyTracedPoolStage,
   recordAutoCandidatePool,
@@ -175,12 +174,6 @@ type VirtualAutoCombo = AutoComboConfig & {
       weights: ScoringWeights;
       explorationRate: number;
       routerStrategy: string;
-    };
-    chaos?: {
-      enabled: true;
-      panelSize: number;
-      judgeModel?: string;
-      tuning: ChaosTuning;
     };
   };
 };
@@ -1161,12 +1154,6 @@ export async function createVirtualAutoComboFromPrepared(
       // LKGP is default for all auto variants, this variant just explicitly names it.
       // Use default weights.
       break;
-    case "chaos":
-      // Chaos mode: select top-N most stable models and fan them out in parallel
-      // (strategy "fusion"). Prioritize health + stability via the chaos-mode pack.
-      weights = { ...MODE_PACKS["chaos-mode"] };
-      explorationRate = 0; // no exploration — only the proven-stable set
-      break;
     case undefined: // Default auto
       // Use default weights
       break;
@@ -1215,38 +1202,7 @@ export async function createVirtualAutoComboFromPrepared(
     routerStrategy,
     ...failClosedAutoConfig(spec),
   };
-  // Chaos mode fans out to the top-N most stable models in parallel. Panel size
-  // is capped to keep a single IDE request from fanning out to dozens of providers;
-  // operators can override via env var OMNIROUTE_CHAOS_MAX_PANEL (default 5).
-  //
-  // Provider diversity: when multiple candidates from the same provider exist, only
-  // the highest-scored model per provider is included. This prevents a single
-  // provider from monopolizing the panel and gives the IDE truly diverse answers.
-  const isChaos = variant === "chaos";
-  const CHAOS_MAX_PANEL = (() => {
-    const env = process.env.OMNIROUTE_CHAOS_MAX_PANEL;
-    const parsed = env ? parseInt(env, 10) : 5;
-    return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 10) : 5;
-  })();
-  let chaosModels: typeof models;
-  if (isChaos) {
-    // Deduplicate by provider: keep first occurrence per provider (models are
-    // already scored/sorted by health + stability from scoring).
-    const seenProviders = new Set<string>();
-    const diverse: typeof models = [];
-    for (const m of models) {
-      if (seenProviders.has(m.providerId)) continue;
-      seenProviders.add(m.providerId);
-      diverse.push(m);
-      if (diverse.length >= CHAOS_MAX_PANEL) break;
-    }
-    chaosModels = diverse.length > 0 ? diverse : models.slice(0, CHAOS_MAX_PANEL);
-  } else {
-    chaosModels = models;
-  }
-
   recordAutoSurvivors(traceInvocationId, effectivePool, "category_tier");
-
   const advertisedLimits = computeAdvertisedLimits(effectivePool);
 
   return {
@@ -1254,31 +1210,13 @@ export async function createVirtualAutoComboFromPrepared(
     name: `Auto ${variant || "Default"}`,
     type: "auto",
     strategy: "auto",
-    models: chaosModels,
+    models,
     candidatePool: providerPool,
     weights,
     explorationRate,
     routerStrategy,
     autoConfig,
-    // For chaos, stash the panel size + a flag so downstream handlers can detect
-    // the broadcast mode and stream each panel model back to IDEs that opt in.
-    config: {
-      auto: autoConfig,
-      ...(isChaos
-        ? {
-            chaos: {
-              enabled: true,
-              panelSize: chaosModels.length,
-              judgeModel: chaosModels[0]?.model,
-              tuning: {
-                panelHardTimeoutMs:
-                  Number(process.env.OMNIROUTE_CHAOS_PANEL_TIMEOUT_MS) || undefined,
-                minPanel: Number(process.env.OMNIROUTE_CHAOS_MIN_PANEL) || undefined,
-              },
-            },
-          }
-        : {}),
-    },
+    config: { auto: autoConfig },
     advertisedContextLength: advertisedLimits.contextLength,
     advertisedMaxOutputTokens: advertisedLimits.maxOutputTokens,
   };

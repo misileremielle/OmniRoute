@@ -63,7 +63,7 @@ function fixture(t: test.TestContext) {
   };
   fs.writeFileSync(env.GITHUB_ENV!, "");
   const scripts = {
-    node: 'printf "%s\\n%s\\n%s\\n" "$DATA_DIR" "$DISABLE_SQLITE_AUTO_BACKUP" "$OMNIROUTE_PLUGINS_DIR" > "$FIXTURE/server-env"\nexec /bin/sleep 60',
+    node: 'printf "%s\\n%s\\n" "$DATA_DIR" "$DISABLE_SQLITE_AUTO_BACKUP" > "$FIXTURE/server-env"\nexec /bin/sleep 60',
     // Healthy only once the fake server has written its environment, like a real health
     // check: the start step runs the server in the background, so a curl that always
     // passed let the step return before the server wrote anything (see the k6 sibling).
@@ -145,17 +145,16 @@ for (const { jobName, startStep, gated } of TARGETS) {
         false,
         "a fresh DATA_DIR must start with no database"
       );
-      assert.equal(exported.OMNIROUTE_PLUGINS_DIR, path.join(dataDir, "plugins"));
+      assert.equal(exported.OMNIROUTE_PLUGINS_DIR, undefined, "plugins were removed");
 
       // Each boot must be judged by its own server: drop the previous boot's file first.
       fs.rmSync(path.join(f.dir, "server-env"), { force: true });
       const booted = f.run(start!, { ...exported, PORT: port });
       assert.equal(booted.status, 0, booted.stderr);
-      const [seenDataDir, seenBackupFlag, seenPluginsDir] = fs
+      const [seenDataDir, seenBackupFlag] = fs
         .readFileSync(path.join(f.dir, "server-env"), "utf8")
         .split("\n");
       assert.equal(seenDataDir, dataDir, "the server must boot on the prepared DATA_DIR");
-      assert.equal(seenPluginsDir, path.join(dataDir, "plugins"));
       assert.equal(
         seenBackupFlag,
         "true",

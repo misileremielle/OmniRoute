@@ -734,7 +734,7 @@ test("v1 models catalog uses provider-node prefixes for compatible provider cust
   assert.equal(ids.has("anthropic-compatible-demo/claude-edge"), false);
 });
 
-test("v1 models catalog includes synced Gemini models and duplicates audio models for speech", async () => {
+test("v1 models catalog includes synced Gemini embedding models and filters hidden models", async () => {
   const connection = await seedConnection("gemini", {
     name: "gemini-synced",
     apiKey: "gm-key",
@@ -744,13 +744,6 @@ test("v1 models catalog includes synced Gemini models and duplicates audio model
     "gemini" as any,
     (connection as any).id,
     [
-      {
-        id: "gemini-audio-live",
-        name: "Gemini Audio Live",
-        source: "imported",
-        supportedEndpoints: ["audio"],
-        inputTokenLimit: 4096,
-      },
       {
         id: "text-embedding-004",
         name: "Text Embedding 004",
@@ -772,12 +765,9 @@ test("v1 models catalog includes synced Gemini models and duplicates audio model
     new Request("http://localhost/api/v1/models")
   );
   const body = (await response.json()) as any;
-  const audioVariants = body.data.filter((item) => item.id === "gemini/gemini-audio-live");
   const embedding = body.data.find((item) => item.id === "gemini/text-embedding-004");
 
   assert.equal(response.status, 200);
-  assert.equal(audioVariants.length, 2);
-  assert.deepEqual(audioVariants.map((item) => item.subtype).sort(), ["speech", "transcription"]);
   assert.equal(embedding.type, "embedding");
   assert.equal(
     body.data.some((item) => item.id === "gemini/gemini-hidden"),
@@ -963,14 +953,9 @@ test("v1 models catalog preserves GLM-5.2 limits alongside GitHub Copilot Astra"
   }
 });
 
-test("v1 models catalog includes media, moderation, rerank, video, and music models for active providers", async () => {
-  await seedConnection("openai", { name: "openai-media" });
+test("v1 models catalog includes embedding and rerank models for active providers", async () => {
+  await seedConnection("openai", { name: "openai-embedding" });
   await seedConnection("cohere", { name: "cohere-rerank" });
-  await seedConnection("comfyui", {
-    name: "comfy-media",
-    apiKey: null,
-    accessToken: null,
-  });
 
   const response = await v1ModelsCatalog.getUnifiedModelsResponse(
     new Request("http://localhost/api/v1/models")
@@ -979,13 +964,8 @@ test("v1 models catalog includes media, moderation, rerank, video, and music mod
   const byId = new Map(body.data.map((item) => [item.id, item]));
 
   assert.equal(response.status, 200);
-  assert.equal((byId.get("openai/gpt-image-2") as any).type, "image");
-  assert.equal((byId.get("openai/whisper-1") as any).type, "audio");
-  assert.equal((byId.get("openai/whisper-1") as any).subtype, "transcription");
-  assert.equal((byId.get("openai/omni-moderation-latest") as any).type, "moderation");
+  assert.equal((byId.get("openai/text-embedding-3-small") as any).type, "embedding");
   assert.equal((byId.get("cohere/rerank-v3.5") as any).type, "rerank");
-  assert.equal((byId.get("comfyui/animatediff") as any).type, "video");
-  assert.equal((byId.get("comfyui/stable-audio-open") as any).type, "music");
 });
 
 test("v1 models catalog does not duplicate imported Jina specialty models", async () => {
@@ -1083,25 +1063,6 @@ test("v1 models catalog does not duplicate custom Jina specialty models", async 
   assert.equal(visibleJinaEmbeddingRows[0].id, "jina-ai/jina-embeddings-v5-text-small");
   assert.equal(visibleJinaRerankRows.length, 1);
   assert.equal(visibleJinaRerankRows[0].id, "jina-ai/jina-reranker-v3");
-});
-
-test("v1 models catalog exposes image model input and output modalities for advanced image providers", async () => {
-  await seedConnection("together", { name: "together-images" });
-  await seedConnection("topaz", { name: "topaz-images" });
-
-  const response = await v1ModelsCatalog.getUnifiedModelsResponse(
-    new Request("http://localhost/api/v1/models")
-  );
-  const body = (await response.json()) as any;
-  const byId = new Map(body.data.map((item) => [item.id, item]));
-
-  assert.equal(response.status, 200);
-  assert.deepEqual((byId as any).get("flux-2-dev")?.input_modalities, ["text", "image"]);
-  (assert as any).deepEqual((byId.get("flux-2-dev") as any).output_modalities, ["image"]);
-  (assert as any).equal((byId.get("flux-2-dev") as any).type, "image");
-  assert.ok((byId.get("flux-2-dev") as any).supported_sizes?.includes("1024x1024"));
-  (assert as any).deepEqual((byId.get("topaz/topaz-enhance") as any).input_modalities, ["image"]);
-  assert.deepEqual((byId.get("topaz/topaz-enhance") as any).output_modalities, ["image"]);
 });
 
 test("v1 models catalog tolerates custom model lookup failures and keeps builtin models available", async () => {

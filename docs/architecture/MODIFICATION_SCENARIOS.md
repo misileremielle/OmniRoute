@@ -54,18 +54,15 @@ lastUpdated: 2026-10-18
 
 1. Create skill in `src/lib/a2a/skills/` (6 already exist: smart-routing, quota-management, provider-discovery, cost-analysis, health-report, list-capabilities)
 2. Skill receives task context (messages, metadata) → returns structured result
-3. Register in `A2A_SKILL_HANDLERS` in `src/lib/a2a/taskExecution.ts`
-4. Expose in `src/lib/a2a/agentCardMetadata.ts` (Agent Card skills array, shared by both discovery routes)
-5. Write tests in `tests/unit/`
-6. Document in `docs/frameworks/A2A-SERVER.md` skill table
+3. Write tests in `tests/unit/`
+4. Document in `docs/frameworks/A2A-SERVER.md` skill table
 
 ## Adding a New Cloud Agent
 
 1. Create agent class in `src/lib/cloudAgent/agents/` extending `CloudAgentBase` (4 already exist: codex-cloud, devin, jules, cursor-cloud)
 2. Implement `createTask`, `getStatus`, `approvePlan`, `sendMessage`, `listSources`
-3. Register in `src/lib/cloudAgent/registry.ts`
-4. Add OAuth/credentials handling if needed (`src/lib/oauth/providers/`)
-5. Tests + document in `docs/frameworks/CLOUD_AGENT.md`
+3. Add OAuth/credentials handling if needed (`src/lib/oauth/providers/`)
+4. Tests + document in `docs/frameworks/CLOUD_AGENT.md`
 
 ## Adding a New Embedded Service
 
@@ -83,7 +80,5 @@ lastUpdated: 2026-10-18
 - Guardrail: `src/lib/guardrails/` → docs: `docs/security/GUARDRAILS.md`
 - Eval suite: `src/lib/evals/` → docs: `docs/frameworks/EVALS.md`
 - Skill (sandbox): `src/lib/skills/` → docs: `docs/frameworks/SKILLS.md`
-- Webhook event: `src/lib/webhookDispatcher.ts` → docs: `docs/frameworks/WEBHOOKS.md`
 - Log-export destination: add `src/lib/logExport/destinations/<name>.ts` + one line in
-  `src/lib/logExport/registry.ts` → docs: `docs/frameworks/LOG-EXPORT.md`. The runner, REST layer
   and dashboard form all read the registry, so nothing else changes.

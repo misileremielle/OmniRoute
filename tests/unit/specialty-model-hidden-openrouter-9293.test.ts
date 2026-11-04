@@ -62,26 +62,26 @@ test("#9293 hidden OpenRouter specialty models are excluded from /v1/models cata
 
   // Confirm the hidden flag is not set yet
   assert.equal(
-    getModelIsHidden("openrouter", "google/chirp-3"),
+    getModelIsHidden("openrouter", "baai/bge-m3"),
     false,
-    "chirp-3 is initially visible"
+    "baai/bge-m3 is initially visible"
   );
   assert.equal(
-    getModelIsHidden("openrouter", "black-forest-labs/flux.2-pro"),
+    getModelIsHidden("openrouter", "cohere/rerank-v3.5"),
     false,
-    "flux.2-pro is initially visible"
+    "cohere/rerank-v3.5 is initially visible"
   );
 
-  // Hide two OpenRouter specialty models: one audio, one image
-  mergeModelCompatOverride("openrouter", "google/chirp-3", { isHidden: true });
-  mergeModelCompatOverride("openrouter", "black-forest-labs/flux.2-pro", { isHidden: true });
+  // Hide two OpenRouter specialty models: one embedding, one rerank
+  mergeModelCompatOverride("openrouter", "baai/bge-m3", { isHidden: true });
+  mergeModelCompatOverride("openrouter", "cohere/rerank-v3.5", { isHidden: true });
 
   // Confirm the hidden flags are stored correctly
-  assert.equal(getModelIsHidden("openrouter", "google/chirp-3"), true, "chirp-3 is now hidden");
+  assert.equal(getModelIsHidden("openrouter", "baai/bge-m3"), true, "baai/bge-m3 is now hidden");
   assert.equal(
-    getModelIsHidden("openrouter", "black-forest-labs/flux.2-pro"),
+    getModelIsHidden("openrouter", "cohere/rerank-v3.5"),
     true,
-    "flux.2-pro is now hidden"
+    "cohere/rerank-v3.5 is now hidden"
   );
 
   // Fetch the full catalog
@@ -92,30 +92,28 @@ test("#9293 hidden OpenRouter specialty models are excluded from /v1/models cata
   const body = (await response.json()) as { data: Array<{ id: string; type?: string }> };
   assert.ok(Array.isArray(body.data), "response has data array");
 
-  // Find audio and image models
-  const audioModels = body.data.filter((m) => m.type === "audio");
-  const imageModels = body.data.filter((m) => m.type === "image");
+  // Find embedding and rerank models
+  const embeddingModels = body.data.filter((m) => m.type === "embedding");
+  const rerankModels = body.data.filter((m) => m.type === "rerank");
 
-  // chirp-3 model ID from the audio registry is openrouter/google/chirp-3
-  const hiddenAudio = audioModels.find((m) => String(m.id).endsWith("google/chirp-3"));
+  const hiddenEmbedding = embeddingModels.find((m) => String(m.id).endsWith("baai/bge-m3"));
   assert.equal(
-    hiddenAudio,
+    hiddenEmbedding,
     undefined,
-    "#9293 RED: hidden audio model openrouter/google/chirp-3 should NOT appear in catalog"
+    "#9293 RED: hidden embedding model openrouter/baai/bge-m3 should NOT appear in catalog"
   );
 
-  // flux.2-pro model ID from the image registry is openrouter/black-forest-labs/flux.2-pro
-  const hiddenImage = imageModels.find((m) =>
-    String(m.id).endsWith("black-forest-labs/flux.2-pro")
-  );
+  const hiddenRerank = rerankModels.find((m) => String(m.id).endsWith("cohere/rerank-v3.5"));
   assert.equal(
-    hiddenImage,
+    hiddenRerank,
     undefined,
-    "#9293 RED: hidden image model openrouter/black-forest-labs/flux.2-pro should NOT appear in catalog"
+    "#9293 RED: hidden rerank model openrouter/cohere/rerank-v3.5 should NOT appear in catalog"
   );
 
-  // Verify non-hidden audio models from OpenRouter still appear
-  // deepgram/nova-3 is not hidden, so it should be present
-  const visibleAudio = audioModels.find((m) => String(m.id).endsWith("deepgram/nova-3"));
-  assert.ok(visibleAudio, "non-hidden audio model deepgram/nova-3 should still appear in catalog");
+  // Verify non-hidden rerank models from OpenRouter still appear
+  const visibleRerank = rerankModels.find((m) => String(m.id).endsWith("cohere/rerank-4-pro"));
+  assert.ok(
+    visibleRerank,
+    "non-hidden rerank model cohere/rerank-4-pro should still appear in catalog"
+  );
 });

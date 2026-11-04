@@ -15,25 +15,15 @@ const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-12172-mod
 process.env.DATA_DIR = TEST_DATA_DIR;
 process.env.API_KEY_SECRET = process.env.API_KEY_SECRET || "modality-collision-test-secret";
 
-const { setModelIsHidden, getModelIsHidden, getHiddenModelsByProvider } = await import(
-  "../../src/lib/db/models.ts"
-);
+const { setModelIsHidden, getModelIsHidden, getHiddenModelsByProvider } =
+  await import("../../src/lib/db/models.ts");
 const { resetDbInstance } = await import("../../src/lib/db/core.ts");
-const { codexProvider } = await import(
-  "../../open-sse/config/providers/registry/codex/index.ts"
-);
-const { IMAGE_PROVIDERS } = await import("../../open-sse/config/imageRegistry.ts");
+const { codexProvider: _codexProvider } =
+  await import("../../open-sse/config/providers/registry/codex/index.ts");
 
 test.after(() => {
   resetDbInstance();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true });
-});
-
-test("#12172: codex chat and image registries collide on the same model id (premise)", () => {
-  const chatModel = codexProvider.models.find((m) => m.id === "gpt-5.6-sol");
-  const imageModel = IMAGE_PROVIDERS.codex.models.find((m) => m.id === "gpt-5.6-sol");
-  assert.ok(chatModel, "codex chat registry must define gpt-5.6-sol (premise check)");
-  assert.ok(imageModel, "codex image registry must define gpt-5.6-sol (premise check)");
 });
 
 test("#12172: hiding the codex CHAT model gpt-5.6-sol must not suppress the codex IMAGE model", () => {

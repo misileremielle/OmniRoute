@@ -31,30 +31,20 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     // fenced centrally (class A).
     "open-sse/handlers/chatCore/emptyTurnRetryLoop.ts": 1,
     "open-sse/handlers/chatCore/providerExecutionPipeline.ts": 2,
-    "open-sse/services/imageCombo.ts": 1,
     // GHSA-3w2r: keyless providers (local zero-config defaults, keyless
     // remotes) look up an in-scope connection for a connection-scoped API key
     // before running (chat's #9057 rule) — one extra scoped lookup per site.
-    "open-sse/services/speechCombo.ts": 2,
-    "open-sse/services/videoCombo.ts": 2,
     "src/app/api/compression/compare/verify/route.ts": 1,
     "src/app/api/internal/codex-responses-ws/route.ts": 1,
     // PR #11390: rerank listing endpoint probes configured credentials so the
     // dashboard rerank selector only offers providers that can actually serve.
-    "src/app/api/memory/rerank-providers/route.ts": 1,
     "src/app/api/search/providers/route.ts": 3,
-    "src/app/api/v1/_shared/elevenLabsProxy.ts": 1,
-    "src/app/api/v1/_shared/fishAudioProxy.ts": 1,
     // #13987: System One decisions (/v1/systemone), same
     // scoped quota-preflight credential lookup as /v1/classify (class B).
     "src/app/api/v1/_shared/systemOneRoute.ts": 1,
     // GHSA-3w2r: keyless providers (local zero-config defaults, keyless
     // remotes) look up an in-scope connection for a connection-scoped API key
     // before running (chat's #9057 rule) — one extra scoped lookup per site.
-    "src/app/api/v1/audio/speech/route.ts": 2,
-    "src/app/api/v1/_shared/videoModelResolution.ts": 1,
-    "src/app/api/v1/audio/transcriptions/route.ts": 3,
-    "src/app/api/v1/audio/translations/route.ts": 2,
     "src/app/api/v1/classify/route.ts": 1,
     // v3.8.51 #11754: the second resolveImageRouteModel() call (a duplicate
     // of the retirement-check one hoisted before enforceApiKeyPolicy) was
@@ -65,22 +55,15 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     // shape as the sibling provider branches, 7->8.
     // #14619 extracted Firefly's credential lookup into adobeFireflyEdit.ts;
     // the same class-B site moves with it, 8->7 here and 0->1 in the helper.
-    "src/app/api/v1/images/edits/route.ts": 7,
-    "src/app/api/v1/images/generations/route.ts": 3,
-    "src/app/api/v1/images/upscale/route.ts": 1,
     "src/app/api/v1/messages/count_tokens/route.ts": 1,
-    "src/app/api/v1/moderations/route.ts": 1,
     // GHSA-3w2r: the local-override lookup now reuses the shared
     // resolveLocalOverrideCredentials (_shared/videoModelResolution.ts), 2->1.
-    "src/app/api/v1/music/generations/route.ts": 1,
     "src/app/api/v1/ocr/route.ts": 1,
     "src/app/api/v1/providers/[provider]/embeddings/route.ts": 1,
-    "src/app/api/v1/providers/[provider]/images/generations/route.ts": 1,
     "src/app/api/v1/rerank/route.ts": 2,
     "src/app/api/v1/search/route.ts": 2,
     "src/app/api/v1/segment/route.ts": 1,
     "src/app/api/v1/session-leases/route.ts": 1,
-    "src/app/api/v1/videos/generations/route.ts": 2,
     // #13788: Codex native web search (/v1/alpha/search) — same quota-preflight credential
     // lookup as web/fetch (class B).
     "src/app/api/v1/alpha/search/route.ts": 1,
@@ -97,13 +80,11 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     // remotes) look up an in-scope connection for a connection-scoped API key
     // before running (chat's #9057 rule) — one extra scoped lookup per site.
     "src/lib/embeddings/service.ts": 5,
-    "src/lib/images/adobeFireflyEdit.ts": 1,
     // PR #11390: second site is the generic derived-provider listing fallback —
     // read-only key presence probe used to decide whether a configured chat
     // provider may appear in the memory embedding-source dropdown.
-    "src/lib/memory/embedding/index.ts": 2,
     "src/lib/search/executeWebSearch.ts": 2,
-    "src/lib/skills/webFetchExecution.ts": 1,
+    "src/lib/serverTools/webFetchExecution.ts": 1,
     "src/sse/handlers/chat.ts": 2,
     "src/sse/services/auth.ts": 4,
     "src/sse/services/imageCredentialRetry.ts": 1,
@@ -123,7 +104,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     // through its adapter and does not reintroduce this bypass call site.
     // Gemini Web's own image handler+file (open-sse/handlers/imageGeneration/providers/geminiWeb.ts)
     // was already retired by #11708 (its .execute() site removed then too).
-    "open-sse/handlers/videoGeneration.ts": 1,
     "open-sse/services/compression/eval/executorModelClient.ts": 1,
     "src/lib/compression/judgeModelClient.ts": 1,
     "src/lib/services/quotaAutoPing.ts": 1,
@@ -216,7 +196,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     // 7a921299 (configurable semantic-cache embeddings): the provider picker reads the connection rows once.
     "src/app/api/settings/cache-config/embeddingOptions.ts": 1,
     "src/app/api/settings/export-json/route.ts": 1,
-    "src/app/api/settings/qdrant/embedding-models/route.ts": 1,
     "src/app/api/settings/route.ts": 1,
     "src/app/api/token-health/route.ts": 1,
     "src/app/api/translator/send/route.ts": 1,
@@ -232,13 +211,11 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/app/api/usage/utilization/route.ts": 1,
     "src/app/api/v1beta/models/route.ts": 1,
     "src/instrumentation-node.ts": 1,
-    "src/lib/a2a/skills/providerDiscovery.ts": 1,
     // #17999: CLIProxyAPI management compat (/v0/management/api-call) re-resolves the
     // connection named by auth_index and sends the allowlisted usage request with its
     // stored OAuth token, so it is a direct dispatch site (class B) and carries the
     // exclusive-lease auxiliary fence (see auxiliaryIsolationSources below).
     "src/lib/cliproxyCompat/managementApi.ts": 1,
-    "src/lib/cloudAgent/api.ts": 1,
     "src/lib/cloudSync.ts": 1,
     "src/lib/combos/builderOptions.ts": 1,
     "src/lib/copilot/tools.ts": 1,
@@ -355,7 +332,6 @@ const CLASSIFICATION: Record<InventoryKind, Record<string, BypassClass>> = {
     "open-sse/handlers/chatCore/streamingResponse.ts": "A",
     "open-sse/handlers/chatCore/cliproxyModelMapping.ts": "A",
     "open-sse/handlers/chatCore/cliproxyapiCredentials.ts": "A",
-    "open-sse/handlers/videoGeneration.ts": "B",
     "open-sse/services/compression/eval/executorModelClient.ts": "B",
     "src/lib/compression/judgeModelClient.ts": "B",
     "src/lib/services/quotaAutoPing.ts": "B",

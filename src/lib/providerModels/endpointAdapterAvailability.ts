@@ -8,13 +8,6 @@
 import { getRegistryEntry } from "@omniroute/open-sse/config/providerRegistry";
 import { getEmbeddingProvider } from "@omniroute/open-sse/config/embeddingRegistry";
 import { getRerankProvider } from "@omniroute/open-sse/config/rerankRegistry";
-import { getImageProvider } from "@omniroute/open-sse/config/imageRegistry";
-import { getVideoProvider } from "@omniroute/open-sse/config/videoRegistry";
-import { getMusicProvider } from "@omniroute/open-sse/config/musicRegistry";
-import {
-  getSpeechProvider,
-  getTranscriptionProvider,
-} from "@omniroute/open-sse/config/audioRegistry";
 import {
   isTrustedEndpointCapabilitySource,
   normalizeModelSupportedEndpoints,
@@ -23,36 +16,22 @@ import {
 export type EndpointAdapterStatus = "available" | "unavailable" | "unknown";
 export type EndpointAdapterStatuses = Record<string, EndpointAdapterStatus>;
 
-/**
- * A model-scoped adapter (see `AudioProvider.modelScoped`) only counts as present
- * for the models it lists; without a model id it is not a provider-wide adapter.
- */
-function hasTranscriptionAdapter(provider: string, modelId?: string): boolean {
-  const config = getTranscriptionProvider(provider);
-  if (!config) return false;
-  if (!config.modelScoped) return true;
-  return Boolean(modelId) && config.models.some((model) => model.id === modelId);
-}
-
-export function getRegisteredEndpointAdapterStatuses(
-  provider: string,
-  modelId?: string
-): EndpointAdapterStatuses {
+export function getRegisteredEndpointAdapterStatuses(provider: string): EndpointAdapterStatuses {
   const hasChatRegistry = Boolean(getRegistryEntry(provider));
   const status = (present: boolean, knownAbsent = false): EndpointAdapterStatus =>
     present ? "available" : knownAbsent ? "unavailable" : "unknown";
-  const audioMissing = hasChatRegistry;
   return {
     chat: status(hasChatRegistry),
     responses: status(hasChatRegistry),
     embeddings: status(Boolean(getEmbeddingProvider(provider))),
     rerank: status(Boolean(getRerankProvider(provider))),
-    images: status(Boolean(getImageProvider(provider))),
-    "images-generations": status(Boolean(getImageProvider(provider))),
-    videos: status(Boolean(getVideoProvider(provider))),
-    music: status(Boolean(getMusicProvider(provider)), hasChatRegistry),
-    "audio-speech": status(Boolean(getSpeechProvider(provider)), audioMissing),
-    "audio-transcriptions": status(hasTranscriptionAdapter(provider, modelId), audioMissing),
+    // Media endpoints no longer exist; rows still tagged with them are unrunnable.
+    images: "unavailable",
+    "images-generations": "unavailable",
+    videos: "unavailable",
+    music: "unavailable",
+    "audio-speech": "unavailable",
+    "audio-transcriptions": "unavailable",
   };
 }
 
@@ -72,6 +51,6 @@ export function hasNoRunnableEndpointAdapter(
   if (!isTrustedEndpointCapabilitySource(model.endpointCapabilitySource)) return false;
   const endpoints = normalizeModelSupportedEndpoints(model.supportedEndpoints);
   if (endpoints.length === 0) return false;
-  const adapters = getRegisteredEndpointAdapterStatuses(provider, model.id);
+  const adapters = getRegisteredEndpointAdapterStatuses(provider);
   return endpoints.every((endpoint) => adapters[endpoint] === "unavailable");
 }

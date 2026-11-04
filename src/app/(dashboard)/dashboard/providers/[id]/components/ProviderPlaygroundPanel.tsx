@@ -10,28 +10,14 @@ import { useTranslations } from "next-intl";
 import { LlmChatCard } from "@/app/(dashboard)/dashboard/media-providers/components/LlmChatCard";
 import { ServiceKindTabs } from "@/app/(dashboard)/dashboard/media-providers/components/ServiceKindTabs";
 import { EmbeddingExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/EmbeddingExampleCard";
-import { ImageExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/ImageExampleCard";
-import { TtsExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/TtsExampleCard";
-import { SttExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/SttExampleCard";
 import { WebSearchExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/WebSearchExampleCard";
 import { WebFetchExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/WebFetchExampleCard";
-import { VideoExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/VideoExampleCard";
-import { MusicExampleCard } from "@/app/(dashboard)/dashboard/media-providers/components/MusicExampleCard";
 import type { ServiceKind } from "@/shared/constants/providers";
 import { AI_PROVIDERS } from "@/shared/constants/providers";
 import { providerText } from "../providerPageHelpers";
 import type { JSX } from "react";
 
-export const MEDIA_SERVICE_KINDS: ServiceKind[] = [
-  "embedding",
-  "image",
-  "tts",
-  "stt",
-  "webSearch",
-  "webFetch",
-  "video",
-  "music",
-];
+export const MEDIA_SERVICE_KINDS: ServiceKind[] = ["embedding", "webSearch", "webFetch"];
 
 export function renderKindPanel(kind: ServiceKind, providerId: string): JSX.Element | null {
   switch (kind) {
@@ -39,20 +25,10 @@ export function renderKindPanel(kind: ServiceKind, providerId: string): JSX.Elem
       return <LlmChatCard providerId={providerId} />;
     case "embedding":
       return <EmbeddingExampleCard providerId={providerId} />;
-    case "image":
-      return <ImageExampleCard providerId={providerId} />;
-    case "tts":
-      return <TtsExampleCard providerId={providerId} />;
-    case "stt":
-      return <SttExampleCard providerId={providerId} />;
     case "webSearch":
       return <WebSearchExampleCard providerId={providerId} />;
     case "webFetch":
       return <WebFetchExampleCard providerId={providerId} />;
-    case "video":
-      return <VideoExampleCard providerId={providerId} />;
-    case "music":
-      return <MusicExampleCard providerId={providerId} />;
     default:
       return null;
   }
@@ -68,18 +44,7 @@ export default function ProviderPlaygroundPanel({ providerId }: { providerId: st
 
   const rawKinds: string[] = providerEntry?.serviceKinds ?? [];
 
-  const ALL_VALID_KINDS = [
-    "llm",
-    "embedding",
-    "image",
-    "imageToText",
-    "tts",
-    "stt",
-    "webSearch",
-    "webFetch",
-    "video",
-    "music",
-  ] as const;
+  const ALL_VALID_KINDS = ["llm", "embedding", "imageToText", "webSearch", "webFetch"] as const;
 
   const kinds: ServiceKind[] =
     rawKinds.length > 0

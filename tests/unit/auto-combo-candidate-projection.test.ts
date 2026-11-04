@@ -102,20 +102,6 @@ test("candidate-only projection preserves base/category/family/subscription iden
   await assertProjectionParity("cheap", { tier: "thrifty" });
 });
 
-test("candidate-only projection preserves the exact chaos visible set and order", async () => {
-  const before = process.env.OMNIROUTE_CHAOS_MAX_PANEL;
-  process.env.OMNIROUTE_CHAOS_MAX_PANEL = "3";
-  try {
-    await assertProjectionParity("chaos");
-    const projection = await projectVirtualAutoCandidatesFromPrepared(prepared, "chaos");
-    assert.equal(projection.length, 3);
-    assert.equal(new Set(projection.map((model) => model.providerId)).size, 3);
-  } finally {
-    if (before === undefined) delete process.env.OMNIROUTE_CHAOS_MAX_PANEL;
-    else process.env.OMNIROUTE_CHAOS_MAX_PANEL = before;
-  }
-});
-
 test("candidate-only projection omits score and advertised-capability work products", async () => {
   const projection = await projectVirtualAutoCandidatesFromPrepared(prepared, undefined);
   const serialized = JSON.stringify(projection);

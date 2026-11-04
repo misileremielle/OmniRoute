@@ -13,7 +13,6 @@ const { setCliCompatProviders } = await import("../../open-sse/config/cliFingerp
 const { antigravityCliUserAgent } = await import("../../open-sse/services/antigravityHeaders.ts");
 const { clearAntigravityVersionCaches, seedAntigravityCliVersionCache } =
   await import("../../open-sse/services/antigravityVersion.ts");
-const { handleImageGeneration } = await import("../../open-sse/handlers/imageGeneration.ts");
 const core = await import("../../src/lib/db/core.ts");
 
 const originalFetch = globalThis.fetch;
@@ -100,46 +99,4 @@ test("credits retry keeps the selected CLI identity after fingerprint serializat
     assert.equal(call.headers.get("x-client-name"), null);
     assert.equal(call.headers.get("X-Goog-Api-Client"), null);
   }
-});
-
-test("image generation forwards the selected CLI identity and public envelope", async () => {
-  seedAntigravityCliVersionCache("1.1.1");
-  let capturedHeaders = new Headers();
-  let capturedBody: Record<string, unknown> = {};
-  globalThis.fetch = async (_url, init) => {
-    capturedHeaders = new Headers(init?.headers);
-    capturedBody = JSON.parse(String(init?.body));
-    return Response.json({
-      response: {
-        candidates: [
-          {
-            content: {
-              parts: [{ inlineData: { mimeType: "image/png", data: "aW1hZ2U=" } }],
-            },
-          },
-        ],
-      },
-    });
-  };
-
-  const result = await handleImageGeneration({
-    body: {
-      model: "antigravity/gemini-3.1-flash-image",
-      prompt: "painted beach",
-      size: "1024x1024",
-    },
-    credentials: {
-      accessToken: "image-token",
-      projectId: "image-project",
-      providerSpecificData: { clientProfile: "cli" },
-    },
-    log: null,
-  });
-
-  assert.equal(result.success, true);
-  assert.equal(capturedHeaders.get("User-Agent"), antigravityCliUserAgent("1.1.1"));
-  assert.equal(capturedHeaders.get("x-client-name"), null);
-  assert.equal(capturedHeaders.get("X-Goog-Api-Client"), null);
-  assert.equal(capturedBody.userAgent, "antigravity");
-  assert.equal(capturedBody.requestType, "image_gen");
 });

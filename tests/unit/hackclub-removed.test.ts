@@ -33,9 +33,7 @@ import {
   NOAUTH_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
-  AUDIO_ONLY_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
-  CLOUD_AGENT_PROVIDERS,
   SYSTEM_PROVIDERS,
 } from "../../src/shared/constants/providers.ts";
 
@@ -49,9 +47,10 @@ const CATALOGS: Record<string, Record<string, { id?: string; alias?: string }>> 
   NOAUTH_PROVIDERS: NOAUTH_PROVIDERS as Record<string, { id?: string; alias?: string }>,
   LOCAL_PROVIDERS: LOCAL_PROVIDERS as Record<string, { id?: string; alias?: string }>,
   SEARCH_PROVIDERS: SEARCH_PROVIDERS as Record<string, { id?: string; alias?: string }>,
-  AUDIO_ONLY_PROVIDERS: AUDIO_ONLY_PROVIDERS as Record<string, { id?: string; alias?: string }>,
-  UPSTREAM_PROXY_PROVIDERS: UPSTREAM_PROXY_PROVIDERS as Record<string, { id?: string; alias?: string }>,
-  CLOUD_AGENT_PROVIDERS: CLOUD_AGENT_PROVIDERS as Record<string, { id?: string; alias?: string }>,
+  UPSTREAM_PROXY_PROVIDERS: UPSTREAM_PROXY_PROVIDERS as Record<
+    string,
+    { id?: string; alias?: string }
+  >,
   SYSTEM_PROVIDERS: SYSTEM_PROVIDERS as Record<string, { id?: string; alias?: string }>,
 };
 
@@ -67,11 +66,7 @@ function walk(dir: string): string[] {
 
 test("hackclub is absent from every canonical provider catalog", () => {
   for (const [name, catalog] of Object.entries(CATALOGS)) {
-    assert.equal(
-      "hackclub" in catalog,
-      false,
-      `${name} still contains a hackclub entry (#11176)`
-    );
+    assert.equal("hackclub" in catalog, false, `${name} still contains a hackclub entry (#11176)`);
   }
 });
 

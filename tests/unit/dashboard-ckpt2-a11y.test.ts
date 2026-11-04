@@ -38,20 +38,12 @@ test("the caveman prompt preview is a focusable scroll region (§6.7)", () => {
   );
 });
 
-test("the inline Settings → Routing link on acp-agents is underlined (§6.8 link-in-text-block)", () => {
-  assert.match(
-    read("src/app/(dashboard)/dashboard/acp-agents/page.tsx"),
-    /href="\/dashboard\/settings\?tab=routing" className="text-primary underline"/
-  );
-});
-
-test("MCP/A2A step messages pass nodes, not functions, to their ICU {code} arguments (§6.11)", () => {
+test("MCP step messages pass nodes, not functions, to their ICU {code} arguments (§6.11)", () => {
   // The en messages use `{code}` arguments (not `<code>` tags); a function value there renders as
   // "Functions are not valid as a React child".
   const en = JSON.parse(read("src/i18n/messages/en.json"));
   assert.match(en.mcpDashboard.mcpStep1, /\{code\}/);
-  assert.match(en.a2aDashboard.a2aStep1, /\{code\}/);
-  for (const page of ["mcp", "a2a"]) {
+  for (const page of ["mcp"]) {
     assert.doesNotMatch(
       read(`src/app/(dashboard)/dashboard/${page}/page.tsx`),
       /code\d?: \(chunks\) =>/,

@@ -89,10 +89,10 @@ test("model alias route requires a dashboard session when management auth is ena
 
 test("api models catalog route reuses the unified catalog diagnostics headers", async () => {
   await providersDb.createProviderConnection({
-    provider: "deepgram",
+    provider: "jina-ai",
     authType: "apikey",
-    name: "deepgram-audio-catalog",
-    apiKey: "dg-test",
+    name: "jina-embedding-catalog",
+    apiKey: "jina-test",
     isActive: true,
     testStatus: "active",
   });
@@ -109,11 +109,10 @@ test("api models catalog route reuses the unified catalog diagnostics headers", 
   assert.match(response.headers.get("X-Model-Catalog-Version") || "", /^model-metadata-v1:/);
   assert.equal(typeof body.catalog, "object");
   assert.equal(typeof body.catalogVersion, "string");
-  const nova = body.catalog.deepgram.models.find(
-    (model: { id?: string }) => model.id === "deepgram/nova-3"
+  const jina = body.catalog["jina-ai"].models.find(
+    (model: { id?: string }) => model.id === "jina-ai/jina-embeddings-v5-text-small"
   );
-  assert.equal(nova.type, "audio");
-  assert.equal(nova.subtype, "transcription");
+  assert.equal(jina.type, "embedding");
 });
 
 test("v1 models catalog emits diagnostics headers alongside the OpenAI-compatible list", async () => {

@@ -70,11 +70,11 @@ afterEach(() => {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe("CliComparisonCard", () => {
-  it("renders 3 columns for all types", () => {
+  it("renders the two retained CLI types", () => {
     const container = renderCard("code");
     expect(container.textContent).toContain("Code tool");
     expect(container.textContent).toContain("Broad autonomous agent");
-    expect(container.textContent).toContain("CLI used as backend by Omni");
+    expect(container.textContent).not.toContain("CLI used as backend by Omni");
   });
 
   it("shows current page badge for currentType=code column", () => {
@@ -89,19 +89,13 @@ describe("CliComparisonCard", () => {
     expect(container.textContent).toContain("✓");
   });
 
-  it("shows current page badge for currentType=acp column", () => {
-    const container = renderCard("acp");
-    expect(container.textContent).toContain("This page");
-    expect(container.textContent).toContain("✓");
-  });
-
   it("renders Open → links for the non-current columns", () => {
     const container = renderCard("code");
     const links = container.querySelectorAll("a");
     const texts = Array.from(links).map((a) => a.textContent);
     const verLinks = texts.filter((t) => t?.includes("Open →"));
     // 2 non-current columns → 2 links
-    expect(verLinks).toHaveLength(2);
+    expect(verLinks).toHaveLength(1);
   });
 
   it("for currentType=code, Ver → links point to agent and acp hrefs", () => {
@@ -109,7 +103,7 @@ describe("CliComparisonCard", () => {
     const links = container.querySelectorAll("a");
     const hrefs = Array.from(links).map((a) => a.getAttribute("href"));
     expect(hrefs).toContain("/dashboard/cli-agents");
-    expect(hrefs).toContain("/dashboard/acp-agents");
+    expect(hrefs).not.toContain("/dashboard/acp-agents");
   });
 
   it("current column has primary styling class", () => {

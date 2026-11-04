@@ -19,16 +19,13 @@ import {
   getCliConfigPaths,
   getCliPrimaryConfigPath,
 } from "../../../src/shared/services/cliRuntime";
-import { getCliTool, listCliTools } from "../../../src/shared/constants/cliTools";
+import { getCliTool } from "../../../src/shared/constants/cliTools";
 import {
   CLI_INTEGRATION_MANIFEST,
   CLI_INTEGRATION_PLATFORMS,
   getCliDeclaredPrimaryConfigPaths,
   getCliProviderAlias,
-  listCliIntegrationIds,
 } from "../../../src/shared/constants/cliIntegrationManifest";
-import { BUILT_IN_AGENT_IDS } from "../../../src/lib/acp/registry";
-import { CONFIG_GENERATOR_IDS } from "../../../src/lib/cli-helper/config-generator";
 
 /**
  * Drift guard for the executable manifest (`bin/cli/cli-manifest.mjs`).
@@ -39,29 +36,7 @@ import { CONFIG_GENERATOR_IDS } from "../../../src/lib/cli-helper/config-generat
  * disagreeing with it silently.
  */
 
-const manifestIds = Object.keys(CLI_TARGET_MANIFEST);
-
-test("neutral manifest is the exact union of every CLI integration surface", () => {
-  const observed = new Set([
-    ...CLI_TOOL_IDS,
-    ...listCliTools().map((tool) => tool.id),
-    ...BUILT_IN_AGENT_IDS,
-  ]);
-  assert.deepEqual([...observed].sort(), Object.keys(CLI_INTEGRATION_MANIFEST).sort());
-  assert.deepEqual(manifestIds.sort(), Object.keys(CLI_INTEGRATION_MANIFEST).sort());
-});
-
-test("each consumer derives its exact capability set from the neutral manifest", () => {
-  assert.deepEqual([...CLI_TOOL_IDS].sort(), listCliIntegrationIds("detect").sort());
-  assert.deepEqual(
-    listCliTools()
-      .map((tool) => tool.id)
-      .sort(),
-    listCliIntegrationIds("catalog").sort()
-  );
-  assert.deepEqual([...CONFIG_GENERATOR_IDS].sort(), listCliIntegrationIds("generate").sort());
-  assert.deepEqual([...BUILT_IN_AGENT_IDS].sort(), listCliIntegrationIds("agentBackend").sort());
-});
+const _manifestIds = Object.keys(CLI_TARGET_MANIFEST);
 
 test("aliases, binary candidates and ACP badges cannot drift from the neutral manifest", () => {
   const expectedAliases: Record<string, string> = {};

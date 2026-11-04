@@ -19,10 +19,6 @@ test("resolveEndpointCategory: maps /v1/chat/completions to 'chat'", () => {
   assert.equal(resolveEndpointCategory("/v1/chat/completions"), "chat");
 });
 
-test("resolveEndpointCategory: maps /v1/completions to 'chat'", () => {
-  assert.equal(resolveEndpointCategory("/v1/completions"), "chat");
-});
-
 test("resolveEndpointCategory: maps /v1/messages to 'chat'", () => {
   assert.equal(resolveEndpointCategory("/v1/messages"), "chat");
 });
@@ -47,30 +43,6 @@ test("resolveEndpointCategory: maps /v1/multimodal-embeddings to 'embeddings'", 
   assert.equal(resolveEndpointCategory("/v1/multimodal-embeddings"), "embeddings");
 });
 
-test("resolveEndpointCategory: maps /v1/images/generations to 'images'", () => {
-  assert.equal(resolveEndpointCategory("/v1/images/generations"), "images");
-});
-
-test("resolveEndpointCategory: maps /v1/images/edits to 'images'", () => {
-  assert.equal(resolveEndpointCategory("/v1/images/edits"), "images");
-});
-
-test("resolveEndpointCategory: maps /v1/audio/speech to 'audio'", () => {
-  assert.equal(resolveEndpointCategory("/v1/audio/speech"), "audio");
-});
-
-test("resolveEndpointCategory: maps /v1/audio/transcriptions to 'audio'", () => {
-  assert.equal(resolveEndpointCategory("/v1/audio/transcriptions"), "audio");
-});
-
-test("resolveEndpointCategory: maps /v1/videos/generations to 'video'", () => {
-  assert.equal(resolveEndpointCategory("/v1/videos/generations"), "video");
-});
-
-test("resolveEndpointCategory: maps /v1/music/generations to 'music'", () => {
-  assert.equal(resolveEndpointCategory("/v1/music/generations"), "music");
-});
-
 test("resolveEndpointCategory: maps /v1/rerank to 'rerank'", () => {
   assert.equal(resolveEndpointCategory("/v1/rerank"), "rerank");
 });
@@ -79,12 +51,25 @@ test("resolveEndpointCategory: maps /v1/models to 'models'", () => {
   assert.equal(resolveEndpointCategory("/v1/models"), "models");
 });
 
-test("resolveEndpointCategory: maps /v1/moderations to 'moderations'", () => {
-  assert.equal(resolveEndpointCategory("/v1/moderations"), "moderations");
-});
-
 test("resolveEndpointCategory: maps /v1/ocr to 'ocr'", () => {
   assert.equal(resolveEndpointCategory("/v1/ocr"), "ocr");
+});
+
+test("resolveEndpointCategory: removed media and agent endpoints no longer map to a category", () => {
+  for (const pathname of [
+    "/v1/images/generations",
+    "/v1/images/edits",
+    "/v1/audio/speech",
+    "/v1/audio/transcriptions",
+    "/v1/videos/generations",
+    "/v1/music/generations",
+    "/v1/agents/tasks",
+    "/v1/speech-to-text",
+    "/v1/text-to-speech/voice_123",
+    "/v1/voices",
+  ]) {
+    assert.equal(resolveEndpointCategory(pathname), null, pathname);
+  }
 });
 
 test("resolveEndpointCategory: maps /v1/batches to 'batches'", () => {
@@ -97,22 +82,6 @@ test("resolveEndpointCategory: maps /v1/files to 'files'", () => {
 
 test("resolveEndpointCategory: maps /v1/web/fetch to 'web-fetch'", () => {
   assert.equal(resolveEndpointCategory("/v1/web/fetch"), "web-fetch");
-});
-
-test("resolveEndpointCategory: maps /v1/agents/tasks to 'agents'", () => {
-  assert.equal(resolveEndpointCategory("/v1/agents/tasks"), "agents");
-});
-
-test("resolveEndpointCategory: maps /v1/speech-to-text to 'elevenlabs'", () => {
-  assert.equal(resolveEndpointCategory("/v1/speech-to-text"), "elevenlabs");
-});
-
-test("resolveEndpointCategory: maps /v1/text-to-speech/voice_123 to 'elevenlabs'", () => {
-  assert.equal(resolveEndpointCategory("/v1/text-to-speech/voice_123"), "elevenlabs");
-});
-
-test("resolveEndpointCategory: maps /v1/voices to 'elevenlabs'", () => {
-  assert.equal(resolveEndpointCategory("/v1/voices"), "elevenlabs");
 });
 
 test("resolveEndpointCategory: returns null for unknown path", () => {

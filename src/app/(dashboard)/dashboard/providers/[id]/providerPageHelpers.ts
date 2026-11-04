@@ -1055,12 +1055,6 @@ export function getApiLabel(
       return t("responsesApi");
     case "embeddings":
       return t("embeddings");
-    case "audio-transcriptions":
-      return t("audioTranscriptions");
-    case "audio-speech":
-      return t("audioSpeech");
-    case "images-generations":
-      return t("imagesGenerations");
     default:
       return t("chatCompletions");
   }
@@ -1078,12 +1072,6 @@ export function getApiDefaultPath(
       return "/responses";
     case "embeddings":
       return "/embeddings";
-    case "audio-transcriptions":
-      return "/audio/transcriptions";
-    case "audio-speech":
-      return "/audio/speech";
-    case "images-generations":
-      return "/images/generations";
     default:
       return "/chat/completions";
   }

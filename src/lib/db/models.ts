@@ -151,10 +151,6 @@ export async function addCustomModel(
   // #1904: optional manual vision-capability override for the "add custom model"
   // form — read back by getCustomVisionCapabilityFields() in the /v1/models catalog.
   supportsVision?: boolean,
-  // #9820: optional video-generation job preset (e.g. "agnes-video-job") for
-  // custom OpenAI-compatible video models. Persisted on the model row; the
-  // /v1/videos/generations handler reads it back to pick the job/poll path.
-  generationConfig?: { preset: string },
   isFree?: boolean,
   extraMeta?: {
     dimensions?: number;
@@ -190,7 +186,6 @@ export async function addCustomModel(
       : {}),
     ...(typeof supportsVision === "boolean" ? { supportsVision } : {}),
     ...(typeof isFree === "boolean" ? { isFree } : {}),
-    ...(generationConfig && generationConfig.preset ? { generationConfig } : {}),
     ...(typeof extraMeta?.dimensions === "number" && extraMeta.dimensions > 0
       ? { dimensions: extraMeta.dimensions }
       : {}),
@@ -225,7 +220,6 @@ export async function replaceCustomModels(
     description?: string;
     supportsThinking?: boolean;
     targetFormat?: string;
-    generationConfig?: { preset?: string };
     isFree?: boolean;
   }>,
   { allowEmpty = false }: { allowEmpty?: boolean } = {}
@@ -281,11 +275,6 @@ export async function replaceCustomModels(
           : {}),
       // #9820: preserve a video job preset across auto-sync (new value wins,
       // else prev — so sync overwrites don't drop a job-config model).
-      ...(m.generationConfig?.preset
-        ? { generationConfig: { preset: m.generationConfig.preset } }
-        : (prev as any)?.generationConfig?.preset
-          ? { generationConfig: { preset: (prev as any).generationConfig.preset } }
-          : {}),
       // Preserve metadata from provider API (or previous sync)
       ...(m.inputTokenLimit != null
         ? { inputTokenLimit: m.inputTokenLimit }
@@ -870,14 +859,6 @@ export async function updateCustomModel(
   // #9820: optional video-generation job preset. Mirrors the upstreamHeaders
   // pattern: `null`/`undefined` clears a previously set preset; a well-formed
   // object replaces it verbatim.
-  if (Object.prototype.hasOwnProperty.call(updates, "generationConfig")) {
-    const gc = updates.generationConfig;
-    if (gc === null || gc === undefined) {
-      delete next.generationConfig;
-    } else if (typeof gc === "object" && !Array.isArray(gc)) {
-      next.generationConfig = gc;
-    }
-  }
 
   models[index] = next;
 

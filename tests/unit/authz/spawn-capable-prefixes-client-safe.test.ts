@@ -74,11 +74,9 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
     "/api/cli-tools/runtime/",
     "/api/services/",
     "/api/local/",
-    "/api/skills/collect/",
     "/api/headroom/start",
     "/api/headroom/stop",
     "/api/vnc-session",
-    "/api/modality-bridge/video/",
     // GHSA-35fw-cv32-2373: the 14 cli-tools routes that reach the same
     // getCliRuntimeStatus() / detectAllTools() spawn as their gated siblings.
     "/api/cli-tools/all-statuses",
@@ -98,14 +96,11 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
     "/api/cli-tools/whycodes-settings",
     // GHSA-jx89-f37j-pq89: skills handler registration + execution reach the
     // sandbox container spawn transitively.
-    "/api/skills/install",
-    "/api/skills/executions",
     // The CLIProxyAPI binary lifecycle under /api/version-manager/, same work as /api/services/.
     "/api/version-manager/",
     // LOCAL_ONLY spawn / code-exec routes that were never mirrored into the deny-list
     // (drift guard: tests/unit/authz/local-only-bypass-spawn-denylist.test.ts).
     "/api/middleware/",
-    "/api/acp/agents",
     "/api/system/version",
     "/api/db-backups/exportAll",
     "/api/db/health",
@@ -132,5 +127,5 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
   // qwen-settings is the one pre-existing entry not enumerated above.
   // - 6 tunnel routes (Cloudflare/Tailscale tunnel feature removed).
   // - 4 MITM / Agent Bridge / Traffic Inspector routes (feature removed).
-  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 43);
+  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 38);
 });

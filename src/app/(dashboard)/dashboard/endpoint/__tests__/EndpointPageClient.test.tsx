@@ -124,8 +124,6 @@ vi.mock("next-intl", () => ({
       "endpoint.videoDesc": "Video endpoint",
       "endpoint.rerank": "Rerank",
       "endpoint.rerankDesc": "Rerank endpoint",
-      "endpoint.moderations": "Moderations",
-      "endpoint.moderationsDesc": "Moderation endpoint",
       "endpoint.listModels": "List Models",
       "endpoint.listModelsDesc": "List model endpoint",
       "endpoint.overviewTitle": "Endpoint overview",

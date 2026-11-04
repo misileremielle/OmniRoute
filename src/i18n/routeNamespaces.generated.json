@@ -1,7 +1,6 @@
 {
   "root": ["auth", "common", "docs", "endpoint", "header", "landing", "miniapp", "publicSystem"],
   "chrome": [
-    "agentSkills",
     "analytics",
     "breadcrumbs",
     "cache",
@@ -28,7 +27,6 @@
     "trafficInspector"
   ],
   "home": [
-    "agentSkills",
     "analytics",
     "breadcrumbs",
     "cache",
@@ -57,94 +55,8 @@
     "usage"
   ],
   "sections": {
-    "a2a": [
-      "a2aDashboard",
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
-    "acp-agents": [
-      "acpAgents",
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cliCommon",
-      "cliTools",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
     "activity": [
       "activity",
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
-    "agent-skills": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -171,7 +83,6 @@
       "trafficInspector"
     ],
     "analytics": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -199,7 +110,6 @@
       "usage"
     ],
     "api-endpoints": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -227,7 +137,6 @@
       "trafficInspector"
     ],
     "api-manager": [
-      "agentSkills",
       "analytics",
       "apiManager",
       "breadcrumbs",
@@ -257,7 +166,6 @@
       "usageLimits"
     ],
     "audit": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -285,7 +193,6 @@
       "trafficInspector"
     ],
     "auto-combo": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -312,7 +219,6 @@
       "trafficInspector"
     ],
     "batch": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -339,7 +245,6 @@
       "trafficInspector"
     ],
     "cache": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -351,7 +256,6 @@
       "header",
       "kiroAuthModal",
       "kiroSocialOAuthModal",
-      "media",
       "noAuthProvider",
       "oauthModal",
       "providers",
@@ -369,7 +273,6 @@
       "trafficInspector"
     ],
     "changelog": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -397,7 +300,6 @@
       "trafficInspector"
     ],
     "cli-agents": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -427,7 +329,6 @@
       "trafficInspector"
     ],
     "cli-code": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -456,36 +357,7 @@
       "traeAuthModal",
       "trafficInspector"
     ],
-    "cloud-agents": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudAgents",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
     "combos": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -515,7 +387,6 @@
       "trafficInspector"
     ],
     "compression": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -543,36 +414,7 @@
       "traeAuthModal",
       "trafficInspector"
     ],
-    "conductor": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "conductor",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
     "context": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -605,7 +447,6 @@
       "trafficInspector"
     ],
     "conversations": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -633,7 +474,6 @@
       "trafficInspector"
     ],
     "costs": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -665,7 +505,6 @@
       "usageLimits"
     ],
     "discovery": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -693,8 +532,6 @@
       "trafficInspector"
     ],
     "endpoint": [
-      "a2aDashboard",
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -723,7 +560,6 @@
       "trafficInspector"
     ],
     "free-tiers": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -751,7 +587,6 @@
       "trafficInspector"
     ],
     "health": [
-      "agentSkills",
       "analytics",
       "auth",
       "breadcrumbs",
@@ -783,7 +618,6 @@
       "trafficInspector"
     ],
     "limits": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -794,34 +628,6 @@
       "header",
       "kiroAuthModal",
       "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
-    "log-export": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "logExport",
       "noAuthProvider",
       "oauthModal",
       "providers",
@@ -838,7 +644,6 @@
       "trafficInspector"
     ],
     "logs": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -867,7 +672,6 @@
       "trafficInspector"
     ],
     "mcp": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -894,65 +698,7 @@
       "traeAuthModal",
       "trafficInspector"
     ],
-    "media-providers": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "media",
-      "miniPlayground",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
-    "memory": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "memory",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
     "models": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -980,36 +726,7 @@
       "traeAuthModal",
       "trafficInspector"
     ],
-    "omni-skills": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "skills",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
     "onboarding": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1036,37 +753,7 @@
       "traeAuthModal",
       "trafficInspector"
     ],
-    "orchestration": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "combos",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "orchestration",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
     "playground": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1094,36 +781,7 @@
       "trafficInspector",
       "translator"
     ],
-    "plugins": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "plugins",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
     "provider-stats": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1151,7 +809,6 @@
       "trafficInspector"
     ],
     "providers": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1187,7 +844,6 @@
       "trafficInspector"
     ],
     "quota": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1217,7 +873,6 @@
       "usageLimits"
     ],
     "relay": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1245,7 +900,6 @@
       "trafficInspector"
     ],
     "resilience": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1274,7 +928,6 @@
       "trafficInspector"
     ],
     "runtime": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1303,7 +956,6 @@
       "trafficInspector"
     ],
     "search-tools": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1332,7 +984,6 @@
       "trafficInspector"
     ],
     "settings": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1341,10 +992,8 @@
       "connectionTest",
       "costs",
       "cursorAuthModal",
-      "endpoint",
       "featureFlags",
       "header",
-      "health",
       "kiroAuthModal",
       "kiroSocialOAuthModal",
       "noAuthProvider",
@@ -1356,7 +1005,6 @@
       "proxyLog",
       "proxyLogger",
       "proxyRegistry",
-      "publicSystem",
       "requestLogger",
       "requestTimeline",
       "settings",
@@ -1368,7 +1016,6 @@
       "trafficInspector"
     ],
     "system": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1397,7 +1044,6 @@
       "trafficInspector"
     ],
     "translator": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1426,7 +1072,6 @@
       "translator"
     ],
     "usage": [
-      "agentSkills",
       "analytics",
       "breadcrumbs",
       "cache",
@@ -1455,34 +1100,6 @@
       "trafficInspector",
       "usage",
       "usageLimits"
-    ],
-    "webhooks": [
-      "agentSkills",
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector",
-      "webhooks"
     ]
   }
 }

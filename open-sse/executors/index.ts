@@ -117,10 +117,6 @@ const lazyExecutors: Record<string, () => Promise<BaseExecutor>> = {
   "copilot-m365-web": () =>
     import("./copilot-m365-web.ts").then((m) => new m.CopilotM365WebExecutor()),
   copilot: () => import("./copilot-web.ts").then((m) => new m.CopilotWebExecutor()), // Alias
-  "adobe-firefly": () => import("./adobe-firefly.ts").then((m) => new m.AdobeFireflyExecutor()),
-  firefly: () => import("./adobe-firefly.ts").then((m) => new m.AdobeFireflyExecutor()), // Alias
-  "veoaifree-web": () => import("./veoaifree-web.ts").then((m) => new m.VeoAIFreeWebExecutor()),
-  "veo-free": () => import("./veoaifree-web.ts").then((m) => new m.VeoAIFreeWebExecutor()), // Alias
   "duckduckgo-web": () => import("./duckduckgo-web.ts").then((m) => new m.DuckDuckGoWebExecutor()),
   ddgw: () => import("./duckduckgo-web.ts").then((m) => new m.DuckDuckGoWebExecutor()), // Alias
   "t3-web": () => import("./t3-chat-web.ts").then((m) => new m.T3ChatWebExecutor()),

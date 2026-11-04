@@ -41,19 +41,6 @@ test("modelSelectModalHelpers exports survive isProviderModelHidden (#9011 missi
   assert.equal(helpers.isProviderModelHidden(hidden, "anthropic", "gpt-4o"), false);
 });
 
-test("videoGeneration handler links with a single handleFalVideoGeneration binding (#9982)", async () => {
-  // A duplicate import binding is an ESM early SyntaxError, so the import itself is
-  // the assertion. The Fal video path must resolve to the provider-neutral module
-  // that #9982 added (it also covers the #9969 Grok Imagine routing).
-  const mod = await import("@omniroute/open-sse/handlers/videoGeneration.ts");
-  assert.equal(typeof mod.handleVideoGeneration, "function");
-
-  const source = readFileSync(path.join(repoRoot, "open-sse/handlers/videoGeneration.ts"), "utf8");
-  const falImports = source.match(/import \{ handleFalVideoGeneration \}/g) ?? [];
-  assert.equal(falImports.length, 1, "handleFalVideoGeneration must be imported exactly once");
-  assert.match(source, /handleFalVideoGeneration \} from "\.\/mediaGeneration\/fal\.ts"/);
-});
-
 test("catalog.ts re-exports only what catalogCache actually exports (#9199)", async () => {
   // #9199 deliberately replaced #8728's injectable SWR policy with a fixed bound, but
   // left catalog.ts re-exporting the three removed symbols. Re-exporting a binding the
@@ -104,35 +91,6 @@ test("the stale-while-revalidate path does not throw a ReferenceError (#9199 mer
   const stale = await call("second");
   assert.equal(await stale.text(), "first", "the stale body must be served, not a crash");
   await catalogCache.__flushCatalogBackgroundRefreshForTest();
-});
-
-test("conolDiscovery resolves getProviderOutboundGuard from the policy module (#8974)", async () => {
-  // outboundUrlGuard.ts does NOT export getProviderOutboundGuard — importing it from
-  // there is a link-time error, so the import below is the assertion.
-  const mod = await import("@/app/api/providers/[id]/models/conolDiscovery");
-  assert.equal(typeof mod.maybeHandleConolModelDiscovery, "function");
-
-  // The fix must stay on the consumer side. outboundUrlGuard.ts is loaded by the packaged
-  // CLI, where no tsconfig resolves `@/*`, so re-exporting the policy helpers from it
-  // (they pull in featureFlags → the DB layer) would break `omniroute setup-opencode`
-  // (#7682). Guard that nobody "fixes" this by adding the re-export instead.
-  const guardSource = readFileSync(
-    path.join(repoRoot, "src/shared/network/outboundUrlGuard.ts"),
-    "utf8"
-  );
-  // Positive anchor: prove we are still reading the real guard module — a stable
-  // top-level export — so the negative guard below cannot rot into a vacuous pass
-  // against an empty/moved file (source-scanner-guards rule).
-  assert.match(
-    guardSource,
-    /export class OutboundUrlGuardError extends Error/,
-    "outboundUrlGuard.ts moved or was emptied — re-anchor this guard before trusting it"
-  );
-  assert.doesNotMatch(
-    guardSource,
-    /^\s*(import|export)[^\n]*from\s+["']@\//m,
-    "outboundUrlGuard.ts must stay free of @/-aliased imports/re-exports (#7682)"
-  );
 });
 
 test("tinycmsSigner has no build-time-resolvable wasm sidecar URL (#8736/#10087)", () => {

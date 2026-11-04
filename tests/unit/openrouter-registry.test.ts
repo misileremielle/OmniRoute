@@ -5,7 +5,6 @@ import {
   parseEmbeddingModel,
   getAllEmbeddingModels,
 } from "../../open-sse/config/embeddingRegistry.ts";
-import { getImageProvider, parseImageModel } from "../../open-sse/config/imageRegistry.ts";
 
 describe("OpenRouter registry entries (#960)", () => {
   // ── Embedding Registry ──────────────────────────────────────────────────
@@ -38,23 +37,5 @@ describe("OpenRouter registry entries (#960)", () => {
 
   // ── Image Registry ───────────────────────────────────────────────────────
 
-  describe("imageRegistry — openrouter", () => {
-    it("resolves openrouter image provider config", () => {
-      const p = getImageProvider("openrouter");
-      assert.ok(p, "openrouter should be in IMAGE_PROVIDERS");
-      assert.equal(p.baseUrl, "https://openrouter.ai/api/v1/images/generations");
-      assert.equal(p.format, "openai");
-    });
-
-    it("openrouter image provider has at least 2 models", () => {
-      const p = getImageProvider("openrouter");
-      assert.ok(p.models.length >= 2, `Expected ≥2 models, got ${p.models.length}`);
-    });
-
-    it("parses openrouter/openai/gpt-5.4-image-2 correctly", () => {
-      const result = parseImageModel("openrouter/openai/gpt-5.4-image-2");
-      assert.equal(result.provider, "openrouter");
-      assert.equal(result.model, "openai/gpt-5.4-image-2");
-    });
-  });
+  describe("imageRegistry — openrouter", () => {});
 });

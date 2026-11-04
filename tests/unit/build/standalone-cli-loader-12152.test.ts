@@ -17,7 +17,7 @@ const repository = fileURLToPath(new URL("../../../", import.meta.url));
 // outside this checkout. A resolver-only assertion would miss a missing binary.
 for (const mode of ["assemble", "sync"] as const) {
   test(`#12152 ${mode} output executes the CLI's tsx loader and TypeScript helper`, async () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-cli-12152-"));
+    const tmp = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-cli-12152-")));
     const project = path.join(tmp, "project");
     const distDir = path.join(project, ".build", "next");
     const outDir = path.join(tmp, "runtime");

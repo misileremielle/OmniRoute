@@ -63,12 +63,12 @@ test("detectTestKind leaves an ordinary chat model alone", () => {
   assert.equal(kind.isResponses, false);
   assert.equal(kind.isRerank, false);
   assert.equal(kind.isEmbedding, false);
-  assert.equal(kind.isAudioTranscription, false);
+  assert.equal(kind.isNonChatGeneration, false);
 });
 
-test("embeddings, rerank and audio still win over a Responses node type", () => {
+test("embeddings and rerank still win over a Responses node type", () => {
   // A Responses-typed node can host these too, and /v1/responses is the wrong
-  // endpoint for all three. Losing this ordering would break working setups
+  // endpoint for both. Losing this ordering would break working setups
   // rather than fix a broken one.
   assert.equal(
     runner.detectTestKind("baai/bge-m3", null, "responses").isEmbedding,
@@ -82,14 +82,6 @@ test("embeddings, rerank and audio still win over a Responses node type", () => 
     runner.detectTestKind("jina/jina-reranker-v2", null, "responses").isResponses,
     false
   );
-
-  const audio = runner.detectTestKind(
-    "vendor/whisper",
-    { apiFormat: "audio-transcriptions" },
-    "responses"
-  );
-  assert.equal(audio.isAudioTranscription, true);
-  assert.equal(audio.isResponses, false);
 });
 
 // ---------------------------------------------------------------------------

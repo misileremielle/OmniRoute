@@ -93,33 +93,7 @@ test("lockfile marks the whole ONNX chain optional", () => {
 test("every @huggingface/transformers consumer loads it lazily so absent installs degrade gracefully", () => {
   // If any module ever switches to a STATIC import of the optional chain,
   // startup crashes on platforms where npm skipped it (Android/Termux).
-  // transformersLocal.ts must keep its lazy await import() (D8/D25);
   // onnxWorker.ts must keep its runtime-variable dynamicImport indirection.
-
-  const embeddingSrc = readFileSync(
-    join(repoRoot, "src/lib/memory/embedding/transformersLocal.ts"),
-    "utf8"
-  );
-  assert.doesNotMatch(
-    embeddingSrc,
-    /^\s*import\s+(?:[^'"]*?\s+from\s+)?["']@huggingface\/transformers["']/m,
-    "transformersLocal.ts must not statically import @huggingface/transformers"
-  );
-  assert.doesNotMatch(
-    embeddingSrc,
-    /import\(\s*["']@huggingface\/transformers["']\s*\)/,
-    "transformersLocal.ts must not pass a literal specifier to import() - Next traces it at compile time"
-  );
-  assert.match(
-    embeddingSrc,
-    /webpackIgnore:\s*true/,
-    "transformersLocal.ts must mark the optional import webpackIgnore so Next does not resolve it during /health"
-  );
-  assert.match(
-    embeddingSrc,
-    /["']@huggingface\/["']\s*\+\s*["']transformers["']/,
-    "transformersLocal.ts must assemble the specifier at runtime"
-  );
 
   const workerSrc = readFileSync(
     join(repoRoot, "open-sse/services/compression/engines/llmlingua/onnxWorker.ts"),

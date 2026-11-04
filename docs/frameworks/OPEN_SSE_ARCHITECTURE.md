@@ -348,7 +348,6 @@ Providers are resolved via `getExecutor(providerId)`, which returns the configur
 export default {
   id: "together",
   baseURL: "https://api.together.xyz/v1/chat/completions",
-}
 ````
 
 **Custom auth** is handled through the provider registry's auth configuration (API key, OAuth, header profiles).
@@ -409,9 +408,9 @@ Common translations:
 
 `open-sse/mcp-server/` implements the **Model Context Protocol** server:
 
-- **110 tools** (provider management, combos, memory, cache, compression, proxy, skills, plugins, Notion, Obsidian, local corpus)
+- **80 tools** (provider management, combos, memory, cache, compression, proxy, skills, plugins, Notion, Obsidian, local corpus)
 - **3 transports**: stdio, SSE, Streamable HTTP
-- **33 scopes** for fine-grained authorization
+- **22 scopes** for fine-grained authorization
 
 ### Tool Registration
 
@@ -490,7 +489,7 @@ This handles:
 
 | File                          | Purpose                                           |
 | ----------------------------- | ------------------------------------------------- |
-| `providerRegistry.ts`         | Chat-model registry over the 380-provider catalog |
+| `providerRegistry.ts`         | Chat-model registry over the 355-provider catalog |
 | `providerModels.ts`           | Model aliases, format mapping                     |
 | `constants.ts`                | Timeouts, limits, status codes                    |
 | `defaultThinkingSignature.ts` | Default Claude thinking signature                 |
@@ -575,5 +574,4 @@ The routing engine has strict performance budgets:
 - [REPOSITORY_MAP.md](../architecture/REPOSITORY_MAP.md) — directory-by-directory
 - [AUTO-COMBO.md](../routing/AUTO-COMBO.md) — 16-factor scoring
 - [MCP-SERVER.md](./MCP-SERVER.md) — MCP server
-- [A2A-SERVER.md](./A2A-SERVER.md) — A2A server
 - Source: `open-sse/` (400+ files, ~143K LOC)

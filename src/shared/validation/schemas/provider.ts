@@ -328,23 +328,6 @@ export const providerModelMutationSchema = z.object({
   compatByProtocol: z
     .partialRecord(z.enum(["openai", "openai-responses", "claude"]), modelCompatPerProtocolSchema)
     .optional(),
-  // #9820: optional async video-generation job preset for a custom
-  // OpenAI-compatible provider whose /videos surface is a submit→poll API
-  // (agnes-video-job, agnes-video-2.5-job, muapi-video-job, sora-job). Persisted on the custom model
-  // row; the /v1/videos/generations handler branches on it between the
-  // synchronous OpenAI-compatible path and the job/poll path. `"openai-video"`
-  // is a legacy no-op value that keeps the sync handler selected.
-  generationConfig: z
-    .object({
-      preset: z.enum([
-        "agnes-video-job",
-        "agnes-video-2.5-job",
-        "muapi-video-job",
-        "sora-job",
-        "openai-video",
-      ]),
-    })
-    .optional(),
 });
 
 export const updateModelAliasesSchema = z.object({
@@ -382,16 +365,7 @@ export const createProviderNodeSchema = z
     // instead of unconditionally here.
     name: z.string().trim().optional().or(z.literal("")),
     prefix: z.string().trim().optional().or(z.literal("")),
-    apiType: z
-      .enum([
-        "chat",
-        "responses",
-        "embeddings",
-        "audio-transcriptions",
-        "audio-speech",
-        "images-generations",
-      ])
-      .optional(),
+    apiType: z.enum(["chat", "responses", "embeddings"]).optional(),
     baseUrl: z.string().trim().min(1).optional(),
     type: z.enum(["openai-compatible", "anthropic-compatible", "systemone-compatible"]).optional(),
     compatMode: z.enum(["cc"]).optional(),
@@ -488,16 +462,7 @@ export const updateProviderNodeSchema = z
   .object({
     name: z.string().trim().min(1, "Name is required"),
     prefix: z.string().trim().min(1, "Prefix is required"),
-    apiType: z
-      .enum([
-        "chat",
-        "responses",
-        "embeddings",
-        "audio-transcriptions",
-        "audio-speech",
-        "images-generations",
-      ])
-      .optional(),
+    apiType: z.enum(["chat", "responses", "embeddings"]).optional(),
     baseUrl: z.string().trim().min(1, "Base URL is required"),
     chatPath: z.string().trim().startsWith("/").max(500).optional().or(z.literal("")),
     modelsPath: z.string().trim().startsWith("/").max(500).optional().or(z.literal("")),
@@ -526,17 +491,7 @@ export const providerNodeValidateSchema = z.object({
   apiKey: z.string().trim().optional(),
   type: z.enum(["openai-compatible", "anthropic-compatible", "systemone-compatible"]).optional(),
   compatMode: z.enum(["cc"]).optional(),
-  apiType: z
-    .enum([
-      "chat",
-      "responses",
-      "embeddings",
-      "rerank",
-      "audio-transcriptions",
-      "audio-speech",
-      "images-generations",
-    ])
-    .optional(),
+  apiType: z.enum(["chat", "responses", "embeddings", "rerank"]).optional(),
   chatPath: z.string().trim().startsWith("/").max(500).optional().or(z.literal("")),
   modelsPath: z.string().trim().startsWith("/").max(500).optional().or(z.literal("")),
   modelId: z.string().trim().max(200).optional().or(z.literal("")),

@@ -1,4 +1,7 @@
-import { cacheReasoningFromAssistantMessage, requiresReasoningReplay } from "../../services/reasoningCache.ts";
+import {
+  cacheReasoningFromAssistantMessage,
+  requiresReasoningReplay,
+} from "../../services/reasoningCache.ts";
 import { FORMATS } from "../../translator/formats.ts";
 import { needsTranslation } from "../../translator/index.ts";
 import { extractToolSchemaMap } from "../../translator/response/openai-responses/toolSchemas.ts";
@@ -14,7 +17,6 @@ interface StreamReasoningCaptureInput {
   provider: string;
   model: string;
   reasoningCacheScope: string | null | undefined;
-  videoTranscriptSensitive: boolean;
 }
 
 /** Best-effort reasoning capture after a successful stream; never changes the client response. */
@@ -42,7 +44,6 @@ export function captureStreamReasoningForReplay(input: StreamReasoningCaptureInp
       cacheReasoningFromAssistantMessage(msg, input.provider, input.model, {
         scope: input.reasoningCacheScope,
         historyMessages: Array.isArray(historyMessages) ? historyMessages : [],
-        videoTranscriptSensitive: input.videoTranscriptSensitive,
       });
     }
   } catch {

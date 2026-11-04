@@ -1,26 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-
-// The MCP server (open-sse/mcp-server/server.ts) registers the memory, skill,
-// and compression tool collections with:
-//
-//   Object.values(<collection>).forEach((toolDef) => {
-//     server.registerTool(toolDef.name, { description, inputSchema }, ...);
-//     ... const parsedArgs = toolDef.inputSchema.parse(args ?? {});
-//     ... const result = await toolDef.handler(parsedArgs);
-//     withScopeEnforcement(toolDef.name, handler, toolDef.scopes);
-//   });
-//
-// The forEach callbacks were previously annotated `(toolDef: any)`, which hid
-// the structural contract from the type system. After removing that `any`, the
-// loop relies on every entry exposing { name, description, inputSchema.parse,
-// handler, scopes }. These tests pin that contract so a future tool entry that
-// drops a field fails loudly here instead of breaking MCP registration at
-// runtime.
-
-// Dynamic imports for ESM + tsx compatibility (mirrors agentSkillTools-mcp.test.ts)
-const { memoryTools } = await import("../../open-sse/mcp-server/tools/memoryTools.ts");
-const { skillTools } = await import("../../open-sse/mcp-server/tools/skillTools.ts");
 const { compressionTools } = await import("../../open-sse/mcp-server/tools/compressionTools.ts");
 const { poolTools } = await import("../../open-sse/mcp-server/tools/poolTools.ts");
 
@@ -33,8 +12,6 @@ type McpToolDef = {
 };
 
 const COLLECTIONS: Record<string, Record<string, McpToolDef>> = {
-  memoryTools: memoryTools as unknown as Record<string, McpToolDef>,
-  skillTools: skillTools as unknown as Record<string, McpToolDef>,
   compressionTools: compressionTools as unknown as Record<string, McpToolDef>,
   poolTools: poolTools as unknown as Record<string, McpToolDef>,
 };
@@ -67,7 +44,11 @@ for (const [collectionName, collection] of Object.entries(COLLECTIONS)) {
         `${toolDef.name}: inputSchema.parse must be callable`
       );
       // handler must be callable — the loop awaits toolDef.handler(parsedArgs)
-      assert.equal(typeof toolDef.handler, "function", `${toolDef.name}: handler must be a function`);
+      assert.equal(
+        typeof toolDef.handler,
+        "function",
+        `${toolDef.name}: handler must be a function`
+      );
       // scopes feeds the 3-arg withScopeEnforcement(name, handler, scopes)
       assert.ok(
         Array.isArray(toolDef.scopes) && toolDef.scopes.length > 0,

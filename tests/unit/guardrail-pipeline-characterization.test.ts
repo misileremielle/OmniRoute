@@ -491,7 +491,7 @@ test("vision-bridge describe self-loop: recursion-guard headers sent, no self-ho
   });
   assert.equal(result, "A green square");
   assert.equal(capturedUrl, `http://localhost:${getRuntimePorts().port}/v1/chat/completions`);
-  assert.equal(headers["x-omniroute-disabled-guardrails"], "vision-bridge,video-bridge");
+  assert.equal(headers["x-omniroute-disabled-guardrails"], "vision-bridge");
   assert.equal(headers["x-omniroute-compression"], "off");
   assert.equal(headers["x-omniroute-admission-bypass"], "internal");
   assert.equal(headers.Authorization, `Bearer ${resolveSelfLoopBearer()}`);
@@ -504,13 +504,12 @@ test("vision-bridge describe self-loop: recursion-guard headers sent, no self-ho
   );
 
   // The receiving chat route resolves the recursion-guard header into a disable list that
-  // makes the nested pre-call pass skip both bridges.
+  // makes the nested pre-call pass skip the bridge.
   const disabled = resolveDisabledGuardrails({ headers });
-  assert.deepEqual(disabled, ["vision-bridge", "video-bridge"]);
+  assert.deepEqual(disabled, ["vision-bridge"]);
   const calls: string[] = [];
   const registry = new GuardrailRegistry();
   registry.register(new Recorder("vision-bridge", calls, 5));
-  registry.register(new Recorder("video-bridge", calls, 7));
   registry.register(new Recorder("pii-masker", calls, 10));
   await registry.runPreCallHooks({}, { log: silentLog, disabledGuardrails: disabled });
   assert.deepEqual(calls, ["pre:pii-masker"]);

@@ -858,81 +858,41 @@
     "connectionDisable": [
       {
         "input": {
+          "errorCode": "context_length_exceeded",
+          "hasExtraKeys": true,
+          "is401": true,
+          "provider": "openai",
+          "status": 408
+        },
+        "output": true
+      },
+      {
+        "input": {
           "errorCode": null,
           "hasExtraKeys": false,
           "is401": true,
           "provider": "codex",
-          "status": 499
-        },
-        "output": true
-      },
-      {
-        "input": {
-          "errorCode": "plugin_block",
-          "hasExtraKeys": true,
-          "is401": false,
-          "provider": "openai",
           "status": 401
         },
-        "output": true
+        "output": false
       },
       {
         "input": {
-          "errorCode": "plugin_block",
+          "errorCode": null,
           "hasExtraKeys": true,
           "is401": true,
           "provider": "openai",
-          "status": 401
+          "status": 499
         },
         "output": true
       },
       {
         "input": {
           "errorCode": "client_disconnected",
-          "hasExtraKeys": false,
-          "is401": false,
-          "provider": "openai",
-          "status": 408
-        },
-        "output": true
-      },
-      {
-        "input": {
-          "errorCode": null,
           "hasExtraKeys": true,
-          "is401": true,
-          "provider": "openai",
-          "status": 401
-        },
-        "output": true
-      },
-      {
-        "input": {
-          "errorCode": "context_length_exceeded",
-          "hasExtraKeys": false,
-          "is401": true,
-          "provider": "codex",
-          "status": 401
-        },
-        "output": true
-      },
-      {
-        "input": {
-          "errorCode": null,
-          "hasExtraKeys": false,
           "is401": false,
           "provider": "codex",
-          "status": 408
-        },
-        "output": false
-      },
-      {
-        "input": {
-          "errorCode": "context_length_exceeded",
-          "hasExtraKeys": true,
-          "is401": true,
-          "provider": "openai",
-          "status": 499
+          "status": 502
         },
         "output": true
       },
@@ -940,16 +900,6 @@
         "input": {
           "errorCode": "context_length_exceeded",
           "hasExtraKeys": false,
-          "is401": false,
-          "provider": "openai",
-          "status": 401
-        },
-        "output": true
-      },
-      {
-        "input": {
-          "errorCode": "context_length_exceeded",
-          "hasExtraKeys": true,
           "is401": false,
           "provider": "codex",
           "status": 408
@@ -959,20 +909,10 @@
       {
         "input": {
           "errorCode": "client_disconnected",
-          "hasExtraKeys": false,
-          "is401": true,
-          "provider": "codex",
-          "status": 401
-        },
-        "output": true
-      },
-      {
-        "input": {
-          "errorCode": "plugin_block",
           "hasExtraKeys": true,
           "is401": false,
-          "provider": "codex",
-          "status": 401
+          "provider": "openai",
+          "status": 502
         },
         "output": true
       },
@@ -980,7 +920,7 @@
         "input": {
           "errorCode": null,
           "hasExtraKeys": false,
-          "is401": true,
+          "is401": false,
           "provider": "openai",
           "status": 502
         },
@@ -988,9 +928,19 @@
       },
       {
         "input": {
-          "errorCode": "plugin_block",
+          "errorCode": "context_length_exceeded",
+          "hasExtraKeys": false,
+          "is401": true,
+          "provider": "openai",
+          "status": 401
+        },
+        "output": true
+      },
+      {
+        "input": {
+          "errorCode": "context_length_exceeded",
           "hasExtraKeys": true,
-          "is401": false,
+          "is401": true,
           "provider": "codex",
           "status": 499
         },
@@ -1000,16 +950,6 @@
         "input": {
           "errorCode": null,
           "hasExtraKeys": true,
-          "is401": false,
-          "provider": "codex",
-          "status": 401
-        },
-        "output": false
-      },
-      {
-        "input": {
-          "errorCode": "context_length_exceeded",
-          "hasExtraKeys": false,
           "is401": true,
           "provider": "codex",
           "status": 502
@@ -1018,19 +958,59 @@
       },
       {
         "input": {
-          "errorCode": "plugin_block",
+          "errorCode": null,
           "hasExtraKeys": false,
-          "is401": false,
+          "is401": true,
           "provider": "openai",
+          "status": 502
+        },
+        "output": false
+      },
+      {
+        "input": {
+          "errorCode": null,
+          "hasExtraKeys": false,
+          "is401": true,
+          "provider": "codex",
+          "status": 502
+        },
+        "output": false
+      },
+      {
+        "input": {
+          "errorCode": null,
+          "hasExtraKeys": true,
+          "is401": false,
+          "provider": "codex",
           "status": 408
         },
-        "output": true
+        "output": false
       },
       {
         "input": {
           "errorCode": "context_length_exceeded",
           "hasExtraKeys": false,
-          "is401": true,
+          "is401": false,
+          "provider": "openai",
+          "status": 502
+        },
+        "output": true
+      },
+      {
+        "input": {
+          "errorCode": null,
+          "hasExtraKeys": true,
+          "is401": false,
+          "provider": "openai",
+          "status": 401
+        },
+        "output": false
+      },
+      {
+        "input": {
+          "errorCode": null,
+          "hasExtraKeys": false,
+          "is401": false,
           "provider": "codex",
           "status": 499
         },
@@ -1039,20 +1019,10 @@
       {
         "input": {
           "errorCode": "client_disconnected",
-          "hasExtraKeys": true,
-          "is401": true,
-          "provider": "openai",
-          "status": 502
-        },
-        "output": true
-      },
-      {
-        "input": {
-          "errorCode": null,
           "hasExtraKeys": false,
           "is401": false,
           "provider": "openai",
-          "status": 499
+          "status": 502
         },
         "output": true
       },
@@ -1061,17 +1031,37 @@
           "errorCode": "context_length_exceeded",
           "hasExtraKeys": false,
           "is401": true,
+          "provider": "openai",
+          "status": 499
+        },
+        "output": true
+      },
+      {
+        "input": {
+          "errorCode": "client_disconnected",
+          "hasExtraKeys": true,
+          "is401": false,
           "provider": "codex",
-          "status": 408
+          "status": 401
         },
         "output": true
       },
       {
         "input": {
           "errorCode": null,
-          "hasExtraKeys": false,
-          "is401": true,
+          "hasExtraKeys": true,
+          "is401": false,
           "provider": "codex",
+          "status": 401
+        },
+        "output": false
+      },
+      {
+        "input": {
+          "errorCode": null,
+          "hasExtraKeys": true,
+          "is401": false,
+          "provider": "openai",
           "status": 408
         },
         "output": false
@@ -1081,6 +1071,16 @@
           "errorCode": "context_length_exceeded",
           "hasExtraKeys": true,
           "is401": true,
+          "provider": "openai",
+          "status": 499
+        },
+        "output": true
+      },
+      {
+        "input": {
+          "errorCode": "context_length_exceeded",
+          "hasExtraKeys": false,
+          "is401": false,
           "provider": "codex",
           "status": 502
         },
@@ -1088,13 +1088,13 @@
       },
       {
         "input": {
-          "errorCode": "plugin_block",
-          "hasExtraKeys": true,
+          "errorCode": null,
+          "hasExtraKeys": false,
           "is401": false,
           "provider": "codex",
-          "status": 502
+          "status": 408
         },
-        "output": true
+        "output": false
       }
     ],
     "connectionStatusCutoff": [

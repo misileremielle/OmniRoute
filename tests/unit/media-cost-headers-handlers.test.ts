@@ -13,10 +13,6 @@ const core = await import("../../src/lib/db/core.ts");
 const { OMNIROUTE_RESPONSE_HEADERS } = await import("../../src/shared/constants/headers.ts");
 const { saveSyncedPricing } = await import("../../src/lib/pricingSync.ts");
 const rerankHandler = await import("../../open-sse/handlers/rerank.ts");
-const moderationHandler = await import("../../open-sse/handlers/moderations.ts");
-const speechRoute = await import("../../src/app/api/v1/audio/speech/route.ts");
-const transcriptionRoute = await import("../../src/app/api/v1/audio/transcriptions/route.ts");
-const videoRoute = await import("../../src/app/api/v1/videos/generations/route.ts");
 
 const originalFetch = globalThis.fetch;
 
@@ -32,33 +28,6 @@ test.after(() => {
   restoreGlobals();
   core.resetDbInstance();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-});
-
-test("v1 video generation failure preserves provider status and error payload", async () => {
-  globalThis.fetch = (async (url: unknown) => {
-    assert.equal(String(url), "http://localhost:7860/animatediff/v1/generate");
-    return new Response("provider busy", { status: 503 });
-  }) as typeof fetch;
-
-  const response = await videoRoute.POST(
-    new Request("http://localhost/api/v1/videos/generations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "sdwebui/animatediff-webui",
-        prompt: "media failure test",
-      }),
-    })
-  );
-
-  assert.equal(response.status, 503);
-  assert.deepEqual(await response.json(), {
-    error: {
-      message: "provider busy",
-      type: "upstream_error",
-      code: "upstream_error",
-    },
-  });
 });
 
 // Shared assertions: every successful media Response must carry the
@@ -174,97 +143,5 @@ test("rerank NVIDIA-format success Response reflects synthesized search unit in 
     response.headers.get(OMNIROUTE_RESPONSE_HEADERS.responseCost),
     "0.0020000000",
     "NVIDIA rerank cost must reflect the synthesized 1 search unit read from result"
-  );
-});
-
-test("moderation handler success Response carries cost telemetry headers (cost 0)", async () => {
-  globalThis.fetch = (async (url: unknown) => {
-    const stringUrl = String(url);
-    if (stringUrl === "https://api.openai.com/v1/moderations") {
-      return new Response(
-        JSON.stringify({
-          id: "modr-1",
-          model: "omni-moderation-latest",
-          results: [{ flagged: false }],
-        }),
-        { status: 200, headers: { "content-type": "application/json" } }
-      );
-    }
-    throw new Error(`Unexpected URL: ${stringUrl}`);
-  }) as typeof fetch;
-
-  const response = (await moderationHandler.handleModeration({
-    body: { model: "omni-moderation-latest", input: "telemetry moderation" },
-    credentials: { apiKey: "test-key" },
-  })) as Response;
-
-  assertCostTelemetryHeaders(response);
-  assert.equal(
-    response.headers.get(OMNIROUTE_RESPONSE_HEADERS.responseCost),
-    "0.0000000000",
-    "moderation is free → cost must be exactly 0"
-  );
-});
-
-test("v1 audio speech success Response carries cost telemetry headers", async () => {
-  globalThis.fetch = (async (url: unknown) => {
-    const stringUrl = String(url);
-    if (stringUrl === "http://localhost:8000/v1/audio/speech") {
-      return new Response(new Uint8Array([1, 2, 3, 4]), {
-        status: 200,
-        headers: { "content-type": "audio/mpeg" },
-      });
-    }
-    throw new Error(`Unexpected URL: ${stringUrl}`);
-  }) as typeof fetch;
-
-  const response = await speechRoute.POST(
-    new Request("http://localhost/api/v1/audio/speech", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "qwen/qwen3-tts",
-        input: "telemetry speech text",
-      }),
-    }),
-    {}
-  );
-
-  assertCostTelemetryHeaders(response);
-  assert.equal(
-    response.headers.get("Content-Type"),
-    "audio/mpeg",
-    "audio Content-Type must be preserved"
-  );
-});
-
-test("v1 audio transcription success Response carries cost telemetry headers (cost 0)", async () => {
-  globalThis.fetch = (async (url: unknown) => {
-    const stringUrl = String(url);
-    if (stringUrl === "http://localhost:8000/v1/audio/transcriptions") {
-      return new Response(JSON.stringify({ text: "transcribed telemetry" }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      });
-    }
-    throw new Error(`Unexpected URL: ${stringUrl}`);
-  }) as typeof fetch;
-
-  const formData = new FormData();
-  formData.set("model", "qwen/qwen3-asr");
-  formData.set("file", new Blob([new Uint8Array([1, 2, 3])], { type: "audio/wav" }), "clip.wav");
-
-  const response = await transcriptionRoute.POST(
-    new Request("http://localhost/api/v1/audio/transcriptions", {
-      method: "POST",
-      body: formData,
-    })
-  );
-
-  assertCostTelemetryHeaders(response);
-  assert.equal(
-    response.headers.get(OMNIROUTE_RESPONSE_HEADERS.responseCost),
-    "0.0000000000",
-    "transcription duration unavailable → cost must be 0"
   );
 });

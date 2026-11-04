@@ -45,7 +45,6 @@ for (const [name, build] of builders) {
     const request = build({ model: "openai/gpt-4o" }, new AbortController().signal, "conn-1");
 
     assert.equal(request.headers.get("Authorization"), `Bearer ${resolveSelfLoopBearer()}`);
-    assert.equal(request.headers.get("x-omniroute-no-memory"), "true");
     assert.equal(request.headers.get("X-OmniRoute-Connection"), "conn-1");
     assert.equal(await enforceClientApiRouteAuth(request), null);
   });

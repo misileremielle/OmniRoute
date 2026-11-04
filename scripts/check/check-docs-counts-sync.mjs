@@ -245,7 +245,7 @@ function readCodeFacts() {
     'import * as PROV from "./src/shared/constants/providers.ts";',
     "const provCols=[PROV.FREE_PROVIDERS,PROV.NOAUTH_PROVIDERS,PROV.OAUTH_PROVIDERS,",
     "PROV.WEB_COOKIE_PROVIDERS,PROV.APIKEY_PROVIDERS,PROV.LOCAL_PROVIDERS,PROV.SEARCH_PROVIDERS,",
-    "PROV.AUDIO_ONLY_PROVIDERS,PROV.UPSTREAM_PROXY_PROVIDERS,PROV.CLOUD_AGENT_PROVIDERS,",
+    "PROV.UPSTREAM_PROXY_PROVIDERS,PROV.CLOUD_AGENT_PROVIDERS,",
     "PROV.SYSTEM_PROVIDERS];",
     "const pids=new Set();",
     "for(const c of provCols)for(const p of Object.values(c||{}))if(p&&p.id)pids.add(p.id);",
@@ -875,17 +875,17 @@ export function buildChecks() {
           validate: makeModePackNamesValidator(packs),
         },
         {
-          // Every pack must pin `quality` explicitly (6 pins, 0.02/0.03) so
+          // Every pack must pin `quality` explicitly (0.02/0.03) so
           // no pack silently inherits a future DEFAULT. Validates live code,
           // not docs — the gate loops `files` content through `validate`.
           label: "mode packs pin quality explicitly (live code)",
-          actual: 6,
+          actual: packs.length,
           docKey: "packs quality pins",
           strict: true,
           files: ["open-sse/services/autoCombo/modePacks.ts"],
           validate: (content) => {
             const pins = (content.match(/^\s*quality:\s*0\.0\d,?\s*$/gm) ?? []).length;
-            return pins >= 6
+            return pins === packs.length
               ? { ok: true, detail: `${pins} quality pins` }
               : { ok: false, detail: `only ${pins} quality pins — every pack must pin quality` };
           },

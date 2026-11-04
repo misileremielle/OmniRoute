@@ -54,17 +54,22 @@ function startFlakyRedis(): Promise<{ port: number; close: () => void }> {
   return new Promise((resolve) => {
     const server = net.createServer((socket) => {
       socket.on("data", (buf) => {
-        const cmd = buf.toString().toLowerCase();
-        if (cmd.includes("hgetall") || cmd.includes("hset") || cmd.includes("hget")) {
-          socket.destroy(); // the outage: connection drops mid-command
-          return;
+        for (const cmd of buf
+          .toString()
+          .toLowerCase()
+          .split(/(?=\*\d+\r\n)/)
+          .filter(Boolean)) {
+          if (cmd.includes("hgetall") || cmd.includes("hset") || cmd.includes("hget")) {
+            socket.destroy(); // the outage: connection drops mid-command
+            return;
+          }
+          if (cmd.includes("\r\ninfo\r\n")) {
+            const body = "redis_version:7.0.0\r\n";
+            socket.write(`$${body.length}\r\n${body}\r\n`);
+            continue;
+          }
+          socket.write("+PONG\r\n");
         }
-        if (cmd.includes("info")) {
-          const body = "redis_version:7.0.0\r\n";
-          socket.write(`$${body.length}\r\n${body}\r\n`);
-          return;
-        }
-        socket.write("+PONG\r\n");
       });
       socket.on("error", () => {});
     });

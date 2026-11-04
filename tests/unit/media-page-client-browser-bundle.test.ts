@@ -21,12 +21,6 @@ async function assertBrowserBundleSafe(relativePath: string) {
   );
 }
 
-test("media page client entry stays browser-bundle safe", async () => {
-  await assertBrowserBundleSafe(
-    "../../src/app/(dashboard)/dashboard/cache/media/MediaPageClient.tsx"
-  );
-});
-
 test("provider detail client entry stays browser-bundle safe", async () => {
   await assertBrowserBundleSafe(
     "../../src/app/(dashboard)/dashboard/providers/[id]/ProviderDetailPageClient.tsx"

@@ -116,7 +116,7 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     getModelNormalizeToolCallId,
     getModelPreserveOpenAIDeveloperRole,
     getSafeErrorMetadata,
-    getSkillsModelIdForFormat,
+    getToolCallModelIdForFormat,
     guardrailRegistry,
     handleCredentialsRefreshed,
     handleToolCallExecution,
@@ -196,7 +196,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     toolNameMap,
     tokensCompressed,
     traceEnabled,
-    videoBridgeObserved,
   } = deps;
   const familyFallback = createRequestFamilyFallback(provider, {
     headers: clientRawRequest?.headers,
@@ -361,7 +360,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       requestToolIdentityMap,
       reasoningCacheScope,
       reasoningReplayHistory,
-      videoTranscriptSensitive: videoBridgeObserved,
       clientHeaders: clientRawRequest?.headers ?? null,
       isClaudeCodeCompatible,
       log,
@@ -495,7 +493,7 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       sourceFormat,
       initialLeg: legResult,
       sourceBody: (body || {}) as Record<string, unknown>,
-      skillsModelId: getSkillsModelIdForFormat(sourceFormat),
+      skillsModelId: getToolCallModelIdForFormat(sourceFormat),
       executionContext: {
         apiKeyId: toolOwnerId || "local",
         sessionId: pipelineSessionId,
@@ -565,7 +563,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
               requestToolIdentityMap,
               reasoningCacheScope,
               reasoningReplayHistory,
-              videoTranscriptSensitive: videoBridgeObserved,
               clientHeaders: clientRawRequest?.headers ?? null,
               isClaudeCodeCompatible,
               log,
@@ -728,7 +725,7 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     if (!toolLoopRan && builtinToolNames.length > 0) {
       translatedResponse = await handleToolCallExecution(
         translatedResponse,
-        getSkillsModelIdForFormat(sourceFormat),
+        getToolCallModelIdForFormat(sourceFormat),
         {
           apiKeyId: toolOwnerId || "local",
           sessionId: pipelineSessionId,
@@ -957,7 +954,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       apiKeyId: apiKeyInfo?.id ?? undefined,
       usage,
       log,
-      videoTranscriptSensitive: videoBridgeObserved,
     });
 
     // ── Phase 9.2: Save for idempotency ──
@@ -1020,8 +1016,7 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
       fallbackAttempts,
     });
     // #6426: align response body `model` with the `X-OmniRoute-Model` header
-    // (both must be the resolved backend model). Some upstreams (notably legacy
-    // /v1/completions text-completion path) return a body `model` field that
+    // (both must be the resolved backend model). Some upstreams return a body `model` field that
     // differs from the resolved backend id we advertised in the header, leaving
     // strict clients unable to reconcile the two. Rewrite body.model to `model`
     // FIRST, then let #1311 echo override it when the opt-in setting is on.

@@ -9,7 +9,7 @@
 
 **Created by [Diego Souza](https://github.com/diegosouzapw)**
 
-<img src="./docs/diagrams/readme-hero.svg" width="100%" alt="OmniRoute — Never stop coding. Every AI tool → 380 providers — 150+ free — through one endpoint. Claude Code, Codex, Cursor, Cline, Copilot & Antigravity into FREE Claude / GPT / Gemini with auto-fallback. RTK + Caveman stacked compression saves 15–95% tokens (~89% avg) — never hit limits. 380 AI providers · 150+ free tiers · ~1.62B free tokens/mo · 20 routing strategies · $0 to start."/>
+<img src="./docs/diagrams/readme-hero.svg" width="100%" alt="OmniRoute — Never stop coding. Every AI tool → 355 providers — 150+ free — through one endpoint. Claude Code, Codex, Cursor, Cline, Copilot & Antigravity into FREE Claude / GPT / Gemini with auto-fallback. RTK + Caveman stacked compression saves 15–95% tokens (~89% avg) — never hit limits. 355 AI providers · 150+ free tiers · ~1.62B free tokens/mo · 20 routing strategies · $0 to start."/>
 
 </div>
 
@@ -65,16 +65,16 @@
 
 <div align="center">
 
-|                           |          v3.8.50          | **v3.8.51** |      `v3.8.53+`       |
-| ------------------------- | :-----------------------: | :---------: | :-------------------: |
-| 🌐 Providers              |            352            |   **358**   |          380          |
-| 🧠 Unique chat model IDs  |           1320            |  **1374**   |         1491          |
-| 🖼️ Modality Bridge        | 🆕 vision + audio + video |      ✓      |           ✓           |
-| ⚖️ Quota-aware scheduling |      🆕 Quota-Share       |      ✓      |           ✓           |
-| 📊 Quota telemetry        |          🆕 live          |      ✓      |           ✓           |
-| 🧰 Headless mode          |             —             |      —      | 🆕 `serve --headless` |
-| 🛤️ LTS rail infra         |             —             |      —      |  🆕 release channels  |
-| 🔎 Model discovery API    |             —             |      —      | 🆕 `/v1/models/query` |
+|                           |    v3.8.50     | **v3.8.51** |      `v3.8.53+`       |
+| ------------------------- | :------------: | :---------: | :-------------------: |
+| 🌐 Providers              |      352       |   **358**   |          380          |
+| 🧠 Unique chat model IDs  |      1320      |  **1374**   |         1491          |
+| 🖼️ Vision Bridge          |   🆕 vision    |      ✓      |           ✓           |
+| ⚖️ Quota-aware scheduling | 🆕 Quota-Share |      ✓      |           ✓           |
+| 📊 Quota telemetry        |    🆕 live     |      ✓      |           ✓           |
+| 🧰 Headless mode          |       —        |      —      | 🆕 `serve --headless` |
+| 🛤️ LTS rail infra         |       —        |      —      |  🆕 release channels  |
+| 🔎 Model discovery API    |       —        |      —      | 🆕 `/v1/models/query` |
 
 **→ [Roadmap](ROADMAP.md) — riding the rail to `v3.9.0 LTS`**
 
@@ -125,7 +125,6 @@
     <td align="right"><b>💚 Support</b></td>
     <td align="center"><a href="#-support-omniroute">💚 Support / Donate</a></td>
     <td align="center"><a href="#-community--help">💬 Community</a></td>
-    <td align="center"><a href="#-sponsors">💖 Sponsors</a></td>
   </tr>
   <tr>
     <td align="right"><b>📦 Project</b></td>
@@ -242,7 +241,7 @@ curl http://localhost:20128/v1/chat/completions \
 
 </div>
 
-<img src="./docs/diagrams/promise-pillars.svg" width="100%" alt="The Promise — One endpoint and 380 providers. Automatic fallback keeps routing while another healthy target is available. Six pillars: resilient fallback across 380 providers · up to 95% token savings on eligible workloads · $0 to start with 150+ free tiers and 53 recurring/keyless free-forever providers · 39 CLI/agent integrations through one config · OpenAI, Claude, Gemini and Responses API compatibility at /v1 · production controls including circuit breakers, TLS stealth, MCP 110 tools, A2A, memory, guardrails, evals and 56,000+ static test declarations across 7,800+ tracked test files."/>
+<img src="./docs/diagrams/promise-pillars.svg" width="100%" alt="The Promise — One endpoint and 355 providers. Automatic fallback keeps routing while another healthy target is available. Six pillars: resilient fallback across 355 providers · up to 95% token savings on eligible workloads · $0 to start with 150+ free tiers and 53 recurring/keyless free-forever providers · 39 CLI/agent integrations through one config · OpenAI, Claude, Gemini and Responses API compatibility at /v1 · production controls including circuit breakers, TLS stealth, MCP 80 tools, A2A, memory, guardrails, evals and 56,000+ static test declarations across 7,800+ tracked test files."/>
 
 <br/>
 <br/>
@@ -315,7 +314,6 @@ No combo to create. Set your model to `auto` (or a variant) and OmniRoute builds
   <tr><td align="left" nowrap><code>auto/offline</code></td><td align="left">🔋 Most quota / rate-limit headroom first</td></tr>
   <tr><td align="left" nowrap><code>auto/smart</code></td><td align="left">🔭 Quality-first + 10% exploration to discover better models</td></tr>
   <tr><td align="left" nowrap><code>auto/lkgp</code></td><td align="left">📌 Explicit last-known-good-provider stickiness</td></tr>
-  <tr><td align="left" nowrap><code>auto/chaos</code></td><td align="left">🧪 Parallel fan-out to a panel of models (one per provider, 5 by default), returns one answer; one upstream call per panel model, not fault injection</td></tr>
 </table>
 
 ##
@@ -450,63 +448,11 @@ All **20** strategies — mix & match per combo step:
 
 </div>
 
-<img src="./docs/diagrams/comparison-table.svg" width="100%" alt="What sets OmniRoute apart — a dated feature snapshot vs 9router, OpenRouter, CLIProxyAPI and LiteLLM across 13 capabilities. OmniRoute: 380 providers, 150+ free tiers built in, 20 routing strategies, 12-engine token compression, built-in MCP server with 110 tools, A2A agent protocol, persistent memory, guardrails, cloud agents, TLS fingerprint stealth, Desktop/Termux/PWA and 67 i18n UI locales. OmniRoute is MIT-licensed and self-hostable. Competitor capabilities and counts may change; see the linked methodology."/>
+<img src="./docs/diagrams/comparison-table.svg" width="100%" alt="What sets OmniRoute apart — a dated feature snapshot vs 9router, OpenRouter, CLIProxyAPI and LiteLLM across 13 capabilities. OmniRoute: 355 providers, 150+ free tiers built in, 20 routing strategies, 12-engine token compression, built-in MCP server with 80 tools, A2A agent protocol, persistent memory, guardrails, cloud agents, TLS fingerprint stealth, Desktop/Termux/PWA and 67 i18n UI locales. OmniRoute is MIT-licensed and self-hostable. Competitor capabilities and counts may change; see the linked methodology."/>
 
 <sub>📊 Full methodology &amp; per-feature detail vs 9router, OpenRouter, CLIProxyAPI &amp; LiteLLM → [`docs/comparison/OMNIROUTE_VS_ALTERNATIVES.md`](docs/comparison/OMNIROUTE_VS_ALTERNATIVES.md)</sub>
 
 <br/>
-
-## 💚 Support OmniRoute
-
-OmniRoute is MIT-licensed and maintained in the open. If it saves you time or money, here's how to keep it independent — pick whatever fits you. Sponsorship never affects routing priority; it buys visibility, not ranking.
-
-<table>
-  <tr><td nowrap>⭐ <b>Star the repo</b></td><td>Free — genuinely helps visibility</td><td><a href="https://github.com/diegosouzapw/OmniRoute">Star OmniRoute</a></td></tr>
-  <tr><td nowrap>🐙 <b>GitHub Sponsors</b></td><td>One-off or monthly · zero platform fee</td><td><a href="https://github.com/sponsors/diegosouzapw">github.com/sponsors/diegosouzapw</a></td></tr>
-  <tr><td nowrap>☕ <b>Ko-fi</b></td><td>Quick one-off tip, no signup for the donor</td><td><a href="https://ko-fi.com/diegosouzapw">ko-fi.com/diegosouzapw</a></td></tr>
-  <tr><td nowrap>🧋 <b>Buy Me a Coffee</b></td><td>Small, informal gesture</td><td><a href="https://www.buymeacoffee.com/diegosouzapw">buymeacoffee.com/diegosouzapw</a></td></tr>
-  <tr><td nowrap>🖐 <b>Liberapay</b></td><td>Recurring · non-profit · open source</td><td><a href="https://liberapay.com/diegosouzapw">liberapay.com/diegosouzapw</a></td></tr>
-  <tr><td nowrap>🇧🇷 <b>PIX</b> (Brazil)</td><td>Instant, no fees</td><td>key &amp; QR below</td></tr>
-  <tr><td nowrap>₿ <b>Crypto</b></td><td>BTC · ETH · USDT-TRC20 · USDC-Solana</td><td>addresses below</td></tr>
-</table>
-
-**🇧🇷 PIX** — instant, no fees (Brazil)
-
-<img src="docs/assets/pix-qr.png" width="140" align="right" alt="OmniRoute PIX QR code"/>
-
-Key (random): `5d865059-bc44-483a-962d-43ceb80126eb`
-
-Pix copia-e-cola:
-
-```
-00020101021126580014br.gov.bcb.pix01365d865059-bc44-483a-962d-43ceb80126eb5204000053039865802BR5922OMNIROUTE CONTRIBUICAO6006BRASIL62070503***630475DD
-```
-
-<br clear="right"/>
-
-<details>
-<summary><b>₿ Crypto</b> — BTC · ETH · USDT-TRC20 · USDC-Solana (click to expand)</summary>
-
-<table>
-  <tr><td nowrap><b>₿ BTC</b></td><td nowrap>Bitcoin (SegWit)</td><td><code>bc1qh00smz004sy85wyl28v77tenkt3ckl6eaep7fd</code></td></tr>
-  <tr><td nowrap><b>Ξ ETH</b></td><td nowrap>Ethereum (ERC20)</td><td><code>0x64Cf6B68A6Ff34288e89172950a2d00102337a84</code></td></tr>
-  <tr><td nowrap><b>₮ USDT</b></td><td nowrap>Tron (TRC20)</td><td><code>TKAF41JpuQrHbKTnsQa9svJE2T192Hvsc2</code></td></tr>
-  <tr><td nowrap><b>$ USDC</b></td><td nowrap>Solana</td><td><code>2emNNZzVVWQc3FQ2wk9M6qXUQmW8AKdjjL174fXR28Tu</code></td></tr>
-</table>
-
-<sub>⚠️ Send each coin only on the network shown — sending on the wrong network can lose the funds.</sub>
-
-</details>
-
-🐛 Found a bug or have feedback? Open a [Discussion](https://github.com/diegosouzapw/OmniRoute/discussions).
-
-<br/>
-
-<p><strong>Developer notes:</strong> The project may generate a local <code>.env</code> file during npm install/postinstall for developer convenience. This file is intentionally ignored via <code>.gitignore</code> (see <code>.gitignore</code>) and must never be committed — if accidentally committed, rotate any exposed secrets and remove the file from history. See <a href="docs/DEVELOPER-ENVIRONMENT.md">docs/DEVELOPER-ENVIRONMENT.md</a> for guidance on managing local environment files and secrets.</p>
-
-<br/>
-
-<div align="center">
 
 ## ✨ What's New
 
@@ -536,10 +482,9 @@ Pix copia-e-cola:
 - **🖼️ New endpoints** — `/v1/ocr` (Mistral OCR) and `/v1/audio/translations` (Whisper-style) round out the media surface. → [API Reference](docs/reference/API_REFERENCE.md)
 - **🎨 Image / video / audio generation** — one API for media: xAI Grok Imagine & Novita AI video, ComfyUI, Magnific, Adobe Firefly, Segmind, and speech providers such as ElevenLabs. → [API Reference](docs/reference/API_REFERENCE.md)
 - **🌍 Deployment & ops** — reverse-proxy `basePath`, browser-language auto-detect, per-key device tracking, zh-TW localization. → [Environment](docs/reference/ENVIRONMENT.md)
-- **🤝 More providers & agents** — cloud agents (Codex Cloud, Cursor, Devin, Jules), Grok Build (xAI) with browser + OAuth login, Ollama first-class card, Claude Opus 5 & Sonnet 5, Kimi official partnership (Code/Web/Moonshot), Zed, Requesty, SenseNova, Yuanbao, Agnes AI… and a refreshed **380-provider catalog**. → [Providers](docs/reference/PROVIDER_REFERENCE.md)
+- **🤝 More providers & agents** — cloud agents (Codex Cloud, Cursor, Devin, Jules), Grok Build (xAI) with browser + OAuth login, Ollama first-class card, Claude Opus 5 & Sonnet 5, Kimi official partnership (Code/Web/Moonshot), Zed, Requesty, SenseNova, Yuanbao, Agnes AI… and a refreshed **355-provider catalog**. → [Providers](docs/reference/PROVIDER_REFERENCE.md)
 - **📡 Routing transparency** — every response carries an `X-OmniRoute-Decision` header naming the strategy/provider/latency that served it, a new `cache-optimized` combo strategy + Auto-Combo `cacheAffinity` factor route repeat requests back to the connection holding the cached prefix, and a read-only `/v1/auto-combo/{channel}/candidates` endpoint exposes an `auto/*` channel's live candidate pool. → [Auto-Combo](docs/routing/AUTO-COMBO.md)
 - **⚡ Local performance & infra** — one-click local Redis, Cloudflare Workers / Deno Deploy relay deployers, Bifrost & Mux as supervised embedded services. → [Embedded Services](docs/frameworks/EMBEDDED-SERVICES.md)
-- **🧩 Also in the box** — plugin framework + marketplace, Omni/Agent/GitHub skills frameworks, Obsidian vault integration (22 MCP tools), OpenAI-compatible Batch & Files APIs, semantic response cache, ACP agent discovery (15 built-in agents), scheduled log export to BigQuery, `auto/chaos` parallel multi-model fan-out, a Telegram bot bridge, an in-app version manager and LMArena-ELO free-provider rankings. → [Docs](docs/README.md)
 
 <br/>
 
@@ -620,11 +565,11 @@ of your shell history. → [CLI Integrations](docs/guides/CLI-INTEGRATIONS.md)
 
 <div align="center">
 
-## 🌐 380 AI Providers — 153 Catalog-Marked Free
+## 🌐 355 AI Providers — 153 Catalog-Marked Free
 
 </div>
 
-> **380 registered providers** across the canonical chat, media, search, local, cloud-agent and system collections, including **153 carrying `hasFree: true` discovery metadata**. The chat model registry covers **239 providers / 3,059 distinct provider-model pairs / 1,475 raw model IDs**; the separate free-budget catalog has **471 per-model rows**, **34 recurring pools** and **53 recurring/keyless free-forever providers**. These are different denominators by design; definitions and pool-deduped calculations live in the [Provider Reference](docs/reference/PROVIDER_REFERENCE.md) and [Free Tiers](docs/reference/FREE_TIERS.md).
+> **355 registered providers** across the canonical chat, media, search, local, cloud-agent and system collections, including **153 carrying `hasFree: true` discovery metadata**. The chat model registry covers **239 providers / 3,059 distinct provider-model pairs / 1,475 raw model IDs**; the separate free-budget catalog has **471 per-model rows**, **34 recurring pools** and **53 recurring/keyless free-forever providers**. These are different denominators by design; definitions and pool-deduped calculations live in the [Provider Reference](docs/reference/PROVIDER_REFERENCE.md) and [Free Tiers](docs/reference/FREE_TIERS.md).
 
 <div align="center">
 
@@ -806,7 +751,7 @@ Expose OmniRoute over **MCP**, **A2A**, a **REST API**, **webhooks** or a **remo
 <table>
   <tr><th align="left">Interface</th><th align="left">Endpoint / command</th><th align="left">Use it for</th></tr>
   <tr><td align="left" nowrap>🧰 <b>MCP (stdio)</b></td><td align="left" nowrap><code>omniroute --mcp</code></td><td align="left">Plug into Claude Desktop, Cursor, any MCP client</td></tr>
-  <tr><td align="left" nowrap>🌊 <b>MCP (HTTP)</b></td><td align="left" nowrap><code>/api/mcp/stream</code></td><td align="left">Remote MCP — <b>110 tools</b>, 33 scopes (enforcement opt-in), full audit trail</td></tr>
+  <tr><td align="left" nowrap>🌊 <b>MCP (HTTP)</b></td><td align="left" nowrap><code>/api/mcp/stream</code></td><td align="left">Remote MCP — <b>80 tools</b>, 22 scopes (enforcement opt-in), full audit trail</td></tr>
   <tr><td align="left" nowrap>📡 <b>MCP (SSE)</b></td><td align="left" nowrap><code>/api/mcp/sse</code></td><td align="left">Streaming MCP transport</td></tr>
   <tr><td align="left" nowrap>🤝 <b>A2A</b></td><td align="left" nowrap><code>/.well-known/agent.json</code></td><td align="left">Agent-to-agent, <b>JSON-RPC 2.0</b> + SSE, 6 skills</td></tr>
   <tr><td align="left" nowrap>🌐 <b>REST API</b></td><td align="left" nowrap><code>/v1/*</code></td><td align="left">OpenAI-compatible — chat, embeddings, images, audio, OCR</td></tr>
@@ -1441,108 +1386,6 @@ Métricas canônicas em 2026-10-18: **1.976 vídeos únicos** · **20.220.289 vi
 ---
 
 <br/>
-
-## 💖 Sponsors
-
-<div align="center">
-
-A heartfelt thank-you to the people who fund OmniRoute out of their own pocket — every contribution keeps the project free, independent and moving.
-
-<table>
-  <tr>
-    <td align="center" width="160">
-      <a href="https://github.com/drewbitt">
-        <img src="https://github.com/drewbitt.png?size=140" width="72" style="border-radius:50%" alt="Andrew"/><br/>
-        <b>Andrew</b>
-      </a><br/>
-      <sub>💛 Active monthly sponsor</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/psylligent">
-        <img src="https://github.com/psylligent.png?size=140" width="72" style="border-radius:50%" alt="Vlad I"/><br/>
-        <b>Vlad I</b>
-      </a><br/>
-      <sub>💛 Active monthly sponsor</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/xiaoyaner0201">
-        <img src="https://github.com/xiaoyaner0201.png?size=140" width="72" style="border-radius:50%" alt="小妍儿"/><br/>
-        <b>小妍儿</b>
-      </a><br/>
-      <sub>💛 Active monthly sponsor</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/Guilsc">
-        <img src="https://github.com/Guilsc.png?size=140" width="72" style="border-radius:50%" alt="Guilherme Costa"/><br/>
-        <b>Guilherme Costa</b>
-      </a><br/>
-      <sub>💛 Active one-time sponsor</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/TheVingance">
-        <img src="https://github.com/TheVingance.png?size=140" width="72" style="border-radius:50%" alt="Henrique Triches Iurkiv"/><br/>
-        <b>Henrique Iurkiv</b>
-      </a><br/>
-      <sub>💛 Active one-time sponsor</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/somesh-ghaturle">
-        <img src="https://github.com/somesh-ghaturle.png?size=140" width="72" style="border-radius:50%" alt="Somesh Ghaturle"/><br/>
-        <b>Somesh Ghaturle</b>
-      </a><br/>
-      <sub>💛 Active one-time sponsor</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="160">
-      <a href="https://github.com/Kolonie-AI">
-        <img src="https://github.com/Kolonie-AI.png?size=140" width="72" style="border-radius:50%" alt="Kolonie AI"/><br/>
-        <b>Kolonie AI</b>
-      </a><br/>
-      <sub>💛 Past one-time supporter</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/igormorais123">
-        <img src="https://github.com/igormorais123.png?size=140" width="72" style="border-radius:50%" alt="Professor Igor Morais Vasconcelos"/><br/>
-        <b>Prof. Igor Morais</b>
-      </a><br/>
-      <sub>💛 Past one-time supporter</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/PixmaNts">
-        <img src="https://github.com/PixmaNts.png?size=140" width="72" style="border-radius:50%" alt="Pixma"/><br/>
-        <b>Pixma</b>
-      </a><br/>
-      <sub>💛 Past one-time supporter</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/pacocartones">
-        <img src="https://github.com/pacocartones.png?size=140" width="72" style="border-radius:50%" alt="Paco Cartones"/><br/>
-        <b>Paco Cartones</b>
-      </a><br/>
-      <sub>💛 Past one-time supporter</sub>
-    </td>
-    <td align="center" width="160">
-      <a href="https://github.com/longtao77">
-        <img src="https://github.com/longtao77.png?size=140" width="72" style="border-radius:50%" alt="longtao"/><br/>
-        <b>longtao</b>
-      </a><br/>
-      <sub>💛 Past one-time supporter</sub>
-    </td>
-  </tr>
-</table>
-
-<sub>… and others who prefer to stay private 💛</sub>
-
-<sub>Public GitHub Sponsors revalidated on 2026-10-18 through the GitHub Sponsors GraphQL API: 11 public sponsorships (6 active, 5 past) out of 14 in total. GitHub's <code>isActive</code> status determines the active labels above; past public one-time supporters remain thanked, and private sponsors remain anonymous. Ko-fi, Buy Me a Coffee, Liberapay, PIX and crypto donations are not listed because they have no public sponsor record.</sub>
-
-<b><a href="https://github.com/sponsors/diegosouzapw">💖 Become a sponsor →</a></b> — every dollar keeps OmniRoute free and independent.
-
-</div>
-
-<br/>
-
-<div align="center">
 
 ## 👥 1,000+ Contributors
 

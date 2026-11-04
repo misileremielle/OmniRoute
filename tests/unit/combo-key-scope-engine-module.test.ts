@@ -6,8 +6,6 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
 
 import * as engine from "../../open-sse/services/comboKeyScope.ts";
 import * as app from "../../src/sse/services/keyConnectionScope.ts";
@@ -32,14 +30,6 @@ test("the app key-scope module re-exports the engine implementations", () => {
     assert.equal(app[name], engine[name], name);
   }
   assert.equal(appNoAuth, engineNoAuth);
-});
-
-test("media combo executors import the key scope from the engine, never from src", () => {
-  for (const file of ["imageCombo.ts", "speechCombo.ts", "videoCombo.ts"]) {
-    const source = fs.readFileSync(path.join("open-sse/services", file), "utf8");
-    assert.doesNotMatch(source, /@\/sse\/services\/keyConnectionScope/, file);
-    assert.match(source, /open-sse\/services\/comboKeyScope\.ts/, file);
-  }
 });
 
 test("scopeComboTargetsForKey keeps the injected model gate and connection scope", async () => {

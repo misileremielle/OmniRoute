@@ -280,6 +280,11 @@ export class KagiAssistantExecutor extends BaseExecutor {
     super("kagi-assistant", { id: "kagi-assistant", baseUrl: KAGI_ASSISTANT_URL });
   }
 
+  /**
+   * @executorRecovery native
+   * @executorRecoveryReason Kagi Assistant uses its own web-session conversation + HTML/SSE turn envelope, not OpenAI/Claude/Gemini JSON parameter schemas.
+   * @executorRecoveryTest tests/unit/kagi-providers.test.ts
+   */
   async execute(input: ExecuteInput) {
     const { body, credentials, signal, stream: wantStream } = input;
     const bodyObj = (body || {}) as Record<string, unknown>;

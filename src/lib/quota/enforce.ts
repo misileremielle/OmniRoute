@@ -169,18 +169,6 @@ export async function enforceQuotaShare(input: EnforceInput): Promise<EnforceDec
       };
       const modelConsumed = await store.peek(input.apiKeyId, modelDimKey).catch(() => 0);
       if (modelConsumed >= modelCap.capValue) {
-        try {
-          const { notifyWebhookEvent } = await import("@/lib/webhookDispatcher");
-          notifyWebhookEvent("quota.exceeded", {
-            apiKeyId: input.apiKeyId,
-            provider: input.provider,
-            connectionId: input.connectionId,
-            reason: "model-cap",
-            model: input.model,
-          });
-        } catch {
-          // webhook is best-effort
-        }
         return {
           kind: "block",
           reason: `Model cap reached for your API key on ${input.provider}/${input.model} [model-cap]`,
@@ -278,19 +266,6 @@ export async function enforceQuotaShare(input: EnforceInput): Promise<EnforceDec
   });
 
   if (decision.kind === "block") {
-    // Fire webhook (fire-and-forget, never blocks the response)
-    try {
-      const { notifyWebhookEvent } = await import("@/lib/webhookDispatcher");
-      notifyWebhookEvent("quota.exceeded", {
-        apiKeyId: input.apiKeyId,
-        provider: input.provider,
-        connectionId: input.connectionId,
-        reason: decision.reason,
-      });
-    } catch {
-      // webhook dispatch is best-effort
-    }
-
     return {
       kind: "block",
       reason: messageForReason(decision.reason, input.provider),
@@ -453,7 +428,6 @@ async function checkSchedules(
   if (verdict.kind === "unscheduled") return null;
 
   if (verdict.kind === "closed") {
-    await notifyQuotaExceeded(input, verdict.reason, verdict.schedule?.id);
     return {
       kind: "block",
       reason:
@@ -475,7 +449,6 @@ async function checkSchedules(
     const saturation = await planSaturation(plan, input, schedule);
     const breached = failingReserve(schedule, saturation);
     if (breached) {
-      await notifyQuotaExceeded(input, "schedule-reserve", schedule.id);
       const scope = breached.window === "any" ? "quota" : `${breached.window} quota`;
       return {
         kind: "block",
@@ -494,7 +467,6 @@ async function checkSchedules(
     };
     const consumed = await store.poolConsumedTotal(poolId, dimKey).catch(() => 0);
     if (consumed >= schedule.budgetValue) {
-      await notifyQuotaExceeded(input, "schedule-budget", schedule.id);
       return {
         kind: "block",
         reason: `Scheduled ${schedule.budgetUnit} budget for ${input.provider} is spent for this window [schedule-budget]`,
@@ -540,26 +512,6 @@ async function planSaturation(
   }
 
   return saturation;
-}
-
-/** Fire the quota.exceeded webhook. Best-effort — never blocks the decision. */
-async function notifyQuotaExceeded(
-  input: EnforceInput,
-  reason: string,
-  scheduleId?: string
-): Promise<void> {
-  try {
-    const { notifyWebhookEvent } = await import("@/lib/webhookDispatcher");
-    notifyWebhookEvent("quota.exceeded", {
-      apiKeyId: input.apiKeyId,
-      provider: input.provider,
-      connectionId: input.connectionId,
-      reason,
-      ...(scheduleId ? { scheduleId } : {}),
-    });
-  } catch {
-    // webhook is best-effort
-  }
 }
 
 /**

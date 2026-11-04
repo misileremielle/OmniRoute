@@ -92,7 +92,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   "search-tools": "searchToolsDescription",
   logs: "logsDescription",
   audit: "auditDescription",
-  webhooks: "webhooksDescription",
   health: "healthDescription",
   proxy: "proxyDescription",
   changelog: "changelogDescription",

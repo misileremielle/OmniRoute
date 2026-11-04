@@ -2,28 +2,12 @@
 import { z } from "zod";
 
 /**
- * Endpoint suportado pelo Playground Studio. Reflete os 13 endpoints da API OmniRoute
- * consumíveis pelas tabs Chat/Compare/Build/Search/Scrape via Export Code.
- *
- * D4-rev2 (2026-05-28): contrato expandido de 10 → 13 incluindo `responses`, `video`,
- * `music` para refletir a API real (`/v1/responses`, `/v1/videos/generations`,
- * `/v1/music/generations`). A tab API (Monaco editor) mantém seu próprio sistema
- * de endpoint values (D14) e não consome este type.
+ * Endpoint suportado pelo Playground Studio, consumível pelas tabs
+ * Chat/Compare/Build/Search/Scrape via Export Code. A tab API (Monaco editor) mantém seu
+ * próprio sistema de endpoint values (D14) e não consome este type.
  */
 export type PlaygroundEndpoint =
-  | "chat.completions"
-  | "responses"
-  | "completions"
-  | "embeddings"
-  | "images"
-  | "audio.transcriptions"
-  | "audio.speech"
-  | "video"
-  | "music"
-  | "moderations"
-  | "rerank"
-  | "search"
-  | "web.fetch";
+  "chat.completions" | "responses" | "embeddings" | "rerank" | "search" | "web.fetch";
 
 /** Linguagens de export suportadas. */
 export type ExportLanguage = "curl" | "python" | "typescript";
@@ -53,7 +37,7 @@ export interface PlaygroundState {
   model?: string; // não aplicável a web.fetch
   systemPrompt?: string;
   messages?: ChatMessage[]; // chat/completions
-  prompt?: string; // completions/embeddings
+  prompt?: string; // embeddings
   query?: string; // search/rerank
   url?: string; // web.fetch
   params?: Partial<{
@@ -85,14 +69,7 @@ export const PlaygroundStateSchema = z.object({
   endpoint: z.enum([
     "chat.completions",
     "responses",
-    "completions",
     "embeddings",
-    "images",
-    "audio.transcriptions",
-    "audio.speech",
-    "video",
-    "music",
-    "moderations",
     "rerank",
     "search",
     "web.fetch",
@@ -130,14 +107,7 @@ export function endpointToPath(endpoint: PlaygroundEndpoint): string {
   const map: Record<PlaygroundEndpoint, string> = {
     "chat.completions": "/v1/chat/completions",
     responses: "/v1/responses",
-    completions: "/v1/completions",
     embeddings: "/v1/embeddings",
-    images: "/v1/images/generations",
-    "audio.transcriptions": "/v1/audio/transcriptions",
-    "audio.speech": "/v1/audio/speech",
-    video: "/v1/videos/generations",
-    music: "/v1/music/generations",
-    moderations: "/v1/moderations",
     rerank: "/v1/rerank",
     search: "/v1/search",
     "web.fetch": "/v1/web/fetch",
@@ -187,70 +157,9 @@ function buildBody(state: PlaygroundState): Record<string, unknown> {
       return body;
     }
 
-    case "completions": {
-      const body: Record<string, unknown> = {
-        model: model ?? "gpt-3.5-turbo-instruct",
-        prompt: state.prompt ?? "Hello,",
-        stream: stream ?? false,
-      };
-      if (params) Object.assign(body, params);
-      return body;
-    }
-
     case "embeddings": {
       return {
         model: model ?? "text-embedding-3-small",
-        input: state.prompt ?? "Hello world",
-      };
-    }
-
-    case "images": {
-      return {
-        model: model ?? "dall-e-3",
-        prompt: state.prompt ?? "A beautiful sunset",
-        n: 1,
-        size: "1024x1024",
-      };
-    }
-
-    case "audio.transcriptions": {
-      // Note: actual usage needs multipart/form-data; shown as JSON for documentation
-      return {
-        model: model ?? "whisper-1",
-        file: "<audio-file-binary>",
-        language: "en",
-      };
-    }
-
-    case "audio.speech": {
-      return {
-        model: model ?? "tts-1",
-        input: state.prompt ?? "Hello, world!",
-        voice: "alloy",
-      };
-    }
-
-    case "video": {
-      const body: Record<string, unknown> = {
-        model: model ?? "sora-1.0",
-        prompt: state.prompt ?? "A cinematic shot of a city at sunset",
-      };
-      if (params) Object.assign(body, params);
-      return body;
-    }
-
-    case "music": {
-      const body: Record<string, unknown> = {
-        model: model ?? "music-1",
-        prompt: state.prompt ?? "An upbeat lo-fi instrumental",
-      };
-      if (params) Object.assign(body, params);
-      return body;
-    }
-
-    case "moderations": {
-      return {
-        model: model ?? "text-moderation-latest",
         input: state.prompt ?? "Hello world",
       };
     }

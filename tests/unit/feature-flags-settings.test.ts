@@ -62,7 +62,7 @@ const {
 // API_KEY_AUDIT_CLIENT_DETAILS_ENABLED (#17982, client IP + user-agent on api_key.auth.touch
 // audit rows, default off) takes it to 115; removing MITM_DISABLE_TLS_VERIFY with the MITM
 // proxy takes it to 114.
-const EXPECTED_FEATURE_FLAG_COUNT = 114;
+const EXPECTED_FEATURE_FLAG_COUNT = 111;
 // tool_call wrapper repair, default on) to 86; OPENCODE_V2_CLIENT_FINGERPRINT_ENABLED
 // (#16571, OpenCode v2 client fingerprint, default off) to 87.
 // tool_call wrapper repair, default on) to 86; CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED
@@ -384,17 +384,6 @@ describe("featureFlagDefinitions", () => {
     assert.strictEqual(def.requiresRestart, false);
   });
 
-  it("defines remote audio provider nodes as a network boolean flag disabled by default", () => {
-    // Guards the egress default: with this on, /v1/audio/* may reach a provider node
-    // hosted outside localhost. It must never become an implicit default (cf. #3963).
-    const def = FEATURE_FLAG_DEFINITIONS.find((d) => d.key === "AUDIO_REMOTE_PROVIDER_NODES");
-    assert.ok(def, "AUDIO_REMOTE_PROVIDER_NODES should exist");
-    assert.strictEqual(def.category, "network");
-    assert.strictEqual(def.type, "boolean");
-    assert.strictEqual(def.defaultValue, "false");
-    assert.strictEqual(def.warningLevel, "danger");
-  });
-
   it("defines CC discovery aliases as a runtime boolean flag disabled by default", () => {
     const def = FEATURE_FLAG_DEFINITIONS.find((d) => d.key === "EXPOSE_CC_DISCOVERY_ALIASES");
     assert.ok(def, "EXPOSE_CC_DISCOVERY_ALIASES should exist");
@@ -550,8 +539,8 @@ describe("resolveFeatureFlag", () => {
     });
 
     it("returns true for '1'", () => {
-      setFeatureFlagOverride("SKILLS_SANDBOX_NETWORK_ENABLED", "1");
-      assert.ok(isFeatureFlagEnabled("SKILLS_SANDBOX_NETWORK_ENABLED"));
+      setFeatureFlagOverride("REQUIRE_API_KEY", "1");
+      assert.ok(isFeatureFlagEnabled("REQUIRE_API_KEY"));
     });
 
     it("returns true for 'yes'", () => {

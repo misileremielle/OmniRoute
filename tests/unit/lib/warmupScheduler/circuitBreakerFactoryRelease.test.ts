@@ -49,12 +49,22 @@ function startProbeRefusingRedis(): Promise<{
       });
       socket.on("error", () => {});
       socket.on("data", (buf) => {
-        if (buf.toString().toLowerCase().includes("info")) {
-          const body = "redis_version:7.0.0\r\n";
-          socket.write(`$${body.length}\r\n${body}\r\n`);
-          return;
+        for (const cmd of buf
+          .toString()
+          .toLowerCase()
+          .split(/(?=\*\d+\r\n)/)
+          .filter(Boolean)) {
+          if (cmd.includes("setinfo")) {
+            socket.write("+OK\r\n");
+            continue;
+          }
+          if (cmd.includes("\r\ninfo\r\n")) {
+            const body = "redis_version:7.0.0\r\n";
+            socket.write(`$${body.length}\r\n${body}\r\n`);
+            continue;
+          }
+          socket.write("-ERR probe refused\r\n");
         }
-        socket.write("-ERR probe refused\r\n");
       });
     });
     server.listen(0, "127.0.0.1", () => {

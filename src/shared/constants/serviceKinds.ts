@@ -6,29 +6,13 @@
  * providers.ts and providerSchema.ts.
  */
 
-export type ServiceKind =
-  | "llm"
-  | "embedding"
-  | "image"
-  | "imageToText"
-  | "tts"
-  | "stt"
-  | "webSearch"
-  | "webFetch"
-  | "video"
-  | "music"
-  | "ocr";
+export type ServiceKind = "llm" | "embedding" | "imageToText" | "webSearch" | "webFetch" | "ocr";
 
 export const SERVICE_KIND_VALUES: readonly ServiceKind[] = [
   "llm",
   "embedding",
-  "image",
   "imageToText",
-  "tts",
-  "stt",
   "webSearch",
   "webFetch",
-  "video",
-  "music",
   "ocr",
 ];

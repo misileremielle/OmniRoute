@@ -551,7 +551,7 @@ export default function ProviderDetailPageClient() {
     <div className="flex flex-col gap-8">
       <ProviderPageHeader
         providerId={providerId}
-        providerInfo={{ ...providerInfo, website: providerHeaderWebsite }}
+        providerInfo={providerInfo}
         connectionsCount={displayConnectionCount}
         isOpenAICompatible={isOpenAICompatible}
         isAnthropicProtocolCompatible={isAnthropicProtocolCompatible}

@@ -38,10 +38,6 @@ vi.mock(
   "@/app/(dashboard)/dashboard/settings/components/modalityBridge/ModalityBridgeVisionTab",
   () => ({ default: () => <div data-testid="vision-tab">vision</div> })
 );
-vi.mock(
-  "@/app/(dashboard)/dashboard/settings/components/modalityBridge/ModalityBridgeAudioTab",
-  () => ({ default: () => <div data-testid="audio-tab">audio</div> })
-);
 
 const roots: Array<{ root: Root; el: HTMLDivElement }> = [];
 
@@ -71,17 +67,6 @@ describe("Modality Bridge settings page", () => {
     }
   });
 
-  it("renders the audio deep-link with all three modality tabs", () => {
-    navigation.search = "tab=audio";
-    const el = renderPage();
-    expect(el.querySelectorAll('[role="tab"]')).toHaveLength(3);
-    expect(el.querySelector('[data-testid="audio-tab"]')).toBeTruthy();
-    expect(el.textContent).not.toContain("modalityBridgeAudioComingSoon");
-    expect(el.querySelector('[role="tab"][aria-selected="true"]')?.textContent).toContain(
-      "modalityBridgeAudioTab"
-    );
-  });
-
   it("defaults invalid or missing tab values to Vision", () => {
     navigation.search = "tab=unsupported";
     const el = renderPage();
@@ -93,32 +78,15 @@ describe("Modality Bridge settings page", () => {
     messages.values = {
       modalityBridgeIntro: "Introducción localizada",
       modalityBridgeVisionTab: "Visión localizada",
-      modalityBridgeAudioTab: "Audio localizado",
-      modalityBridgeVideoTab: "Vídeo localizado",
       modalityBridgeSubTabsAria: "Secciones localizadas",
     };
 
     const el = renderPage();
     expect(Array.from(el.querySelectorAll('[role="tab"]')).map((tab) => tab.textContent)).toEqual([
       "Visión localizada",
-      "Audio localizado",
-      "Vídeo localizado",
     ]);
     expect(el.querySelector('[role="tablist"]')?.getAttribute("aria-label")).toBe(
       "Secciones localizadas"
-    );
-  });
-
-  it("updates the URL without scrolling when an operator changes tabs", () => {
-    navigation.search = "tab=vision&source=sidebar";
-    const el = renderPage();
-    const videoTab = Array.from(el.querySelectorAll('[role="tab"]')).find((button) =>
-      button.textContent?.includes("modalityBridgeVideoTab")
-    ) as HTMLButtonElement | undefined;
-    act(() => videoTab?.click());
-    expect(navigation.replace).toHaveBeenCalledWith(
-      "/dashboard/settings/modality-bridge?tab=video&source=sidebar",
-      { scroll: false }
     );
   });
 

@@ -58,7 +58,6 @@ const PATH_LABELS = {
   costs: "costs",
   health: "health",
   runtime: "runtime",
-  webhooks: "webhooks",
   home: "home",
   activity: "activity",
   "combo-health": "comboHealth",

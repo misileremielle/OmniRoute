@@ -188,7 +188,7 @@ describe("StudioConfigPane", () => {
     expect(setConfigState).toHaveBeenCalled();
   });
 
-  it("renders endpoint select with all 13 options (D4-rev2)", () => {
+  it("renders endpoint select with the six retained endpoints (D4-rev2)", () => {
     const config = makeConfig();
     const el = renderPane(config, vi.fn());
     // Multiple <select> elements may exist (PresetPicker also renders one).
@@ -198,6 +198,6 @@ describe("StudioConfigPane", () => {
       Array.from(s.options).some((o) => o.value === "chat.completions")
     );
     expect(endpointSelect).toBeTruthy();
-    expect(endpointSelect?.options.length).toBe(13);
+    expect(endpointSelect?.options.length).toBe(6);
   });
 });

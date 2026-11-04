@@ -41,7 +41,6 @@ import {
 import { resolveModelLockoutSettings } from "../../../src/lib/resilience/modelLockoutSettings";
 import { fetchCodexQuota } from "../codexQuotaFetcher.ts";
 import { emit } from "../../../src/lib/events/eventBus";
-import { notifyWebhookEvent } from "../../../src/lib/webhookDispatcher";
 import { getSessionConnection } from "../sessionManager.ts";
 import { recordStickyBinding } from "./sessionStickiness.ts";
 import { recordStickyWeightedSuccess } from "./rrState.ts";
@@ -621,19 +620,6 @@ export async function executeTargetAttempt(
           );
         }
       }
-      // Webhook fan-out: best-effort, never blocks the response stream.
-      notifyWebhookEvent("request.completed", {
-        combo: deps.combo.name,
-        provider,
-        model: modelStr,
-        account:
-          typeof target.label === "string" && target.label.trim().length > 0
-            ? target.label.trim()
-            : "",
-        accountId: effectiveConnectionId ?? "",
-        latencyMs,
-        fallbackCount: state.fallbackCount,
-      });
 
       // Silent-stop fix: reset the consecutive-failure counter for this session-combo pair
       // on every successful dispatch so a transient recovery doesn't get "credited" against

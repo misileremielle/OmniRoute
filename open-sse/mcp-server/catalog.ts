@@ -116,8 +116,6 @@ function normalizeCapability(value: string): string {
       return "image";
     case "videos":
       return "video";
-    case "moderations":
-      return "moderation";
     case "chat-completions":
       return "chat";
     default:

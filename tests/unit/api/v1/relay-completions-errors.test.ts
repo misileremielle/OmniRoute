@@ -85,6 +85,10 @@ test("relay route: normalizes plain-text Bifrost 404 into JSON error (Issue #1)"
   setupBifrostEnv();
   const relayToken = seedRelayToken(`relay_err_${Date.now()}`);
 
+  const { POST } = await import(
+    `../../../../src/app/api/v1/relay/chat/completions/route.ts?case=${Date.now()}-${Math.random()}`
+  );
+
   // Bifrost sidecar returns a raw HTML/plain-text non-OK response — the exact
   // "invalid character 'd'" scenario behind client JSON parse failures.
   globalThis.fetch = async () => {
@@ -93,10 +97,6 @@ test("relay route: normalizes plain-text Bifrost 404 into JSON error (Issue #1)"
       headers: { "content-type": "text/html" },
     });
   };
-
-  const { POST } = await import(
-    `../../../../src/app/api/v1/relay/chat/completions/route.ts?case=${Date.now()}-${Math.random()}`
-  );
 
   const req = new Request("http://localhost/api/v1/relay/chat/completions", {
     method: "POST",
@@ -200,8 +200,16 @@ test("relay route: strips stale upstream content-length before serializing JSON 
 
   const res = await POST(req);
   assert.equal(res.status, 404);
-  assert.equal(res.headers.get("content-encoding"), null, "stale content-encoding must be stripped");
-  assert.equal(res.headers.get("transfer-encoding"), null, "stale transfer-encoding must be stripped");
+  assert.equal(
+    res.headers.get("content-encoding"),
+    null,
+    "stale content-encoding must be stripped"
+  );
+  assert.equal(
+    res.headers.get("transfer-encoding"),
+    null,
+    "stale transfer-encoding must be stripped"
+  );
 
   const raw = await res.text();
   const declaredLength = res.headers.get("content-length");

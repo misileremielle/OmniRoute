@@ -46,7 +46,6 @@ test("eval without a selected key passes required authentication and opts out of
   const request = buildEvalCaseRequest({ input: {} }, { type: "suite-default" }, null);
   const denial = await enforceClientApiRouteAuth(request);
   assert.equal(denial?.status ?? 200, 200);
-  assert.equal(request.headers.get("x-omniroute-no-memory"), "true");
   assert.equal(request.headers.get("x-omniroute-compression"), "off");
 });
 
@@ -68,13 +67,10 @@ test("recorded triage authenticates its internal chat call without importing mem
     issueUrl: "https://github.com/cheaper-inference/OmniRoute/issues/16593",
     recordedContext: { title: "Internal authentication", body: "Recorded diagnostic context" },
   });
-  let noMemory: string | null = null;
   const result = await executeRecordedTriageChatCompletion({ run }, async (request) => {
-    noMemory = request.headers.get("x-omniroute-no-memory");
     return (await enforceClientApiRouteAuth(request)) ?? Response.json({ choices: [] });
   });
   assert.equal(result.status, 200);
-  assert.equal(noMemory, "true");
 });
 
 test("generated internal identity remains restricted to chat and audio", async () => {

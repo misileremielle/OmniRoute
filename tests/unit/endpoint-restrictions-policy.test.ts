@@ -306,12 +306,12 @@ test("chat-only key blocks /v1/embeddings", async () => {
   assert.ok(msg.includes("embeddings"), `Error message should mention 'embeddings', got: ${msg}`);
 });
 
-test("search-only key blocks /v1/images/generations", async () => {
-  const policy = await loadPolicy("search-blocks-images");
+test("search-only key blocks /v1/rerank", async () => {
+  const policy = await loadPolicy("search-blocks-rerank");
   const key = await createKeyWithEndpoints(["search"]);
 
-  const request = makeRequest("http://localhost/v1/images/generations", key.key);
-  const result = await policy.enforceApiKeyPolicy(request, "dall-e-3");
+  const request = makeRequest("http://localhost/v1/rerank", key.key);
+  const result = await policy.enforceApiKeyPolicy(request, "rerank-english-v3.0");
 
   assert.ok(result.rejection, "Should reject the request");
   assert.equal(result.rejection.status, 403);

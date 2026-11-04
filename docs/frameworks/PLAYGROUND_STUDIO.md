@@ -61,7 +61,7 @@ The key differentiator for a proxy: run 1 prompt across up to **4 models in para
 
 Preserves 100% of the original Monaco editor for power users (D14):
 
-- 10 endpoints: chat completions, completions, embeddings, images, audio, speech, transcriptions, moderations, rerank, search.
+- 10 endpoints: chat completions, embeddings, images, audio, speech, transcriptions, rerank, search.
 - Multimodal file upload.
 - SSE streaming with real-time output.
 - Wrapped as `ApiTab.tsx` (lazy-loaded, `ssr: false`).

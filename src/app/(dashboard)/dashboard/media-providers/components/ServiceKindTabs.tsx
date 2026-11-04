@@ -7,14 +7,9 @@ import type { ServiceKind } from "@/shared/constants/providers";
 const KIND_ICON: Record<ServiceKind, string> = {
   llm: "chat",
   embedding: "data_object",
-  image: "image",
   imageToText: "image_search",
-  tts: "record_voice_over",
-  stt: "mic",
   webSearch: "search",
   webFetch: "language",
-  video: "videocam",
-  music: "music_note",
   ocr: "document_scanner",
 };
 

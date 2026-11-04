@@ -367,5 +367,3 @@ Go to Providers → click on the provider → click **Disconnect**.
 - **[Provider Reference](../reference/PROVIDER_REFERENCE.md)** — Full list of 226 providers
 
 ## Cursor images
-
-Cursor plan images use `IMAGE_PROVIDERS.cursor` (`cursor-agent-image`). See [CURSOR_IMAGE.md](../providers/CURSOR_IMAGE.md).

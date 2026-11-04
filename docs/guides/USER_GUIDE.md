@@ -821,7 +821,6 @@ curl -X PUT http://localhost:20128/api/settings/proxy \
 curl -X PUT http://localhost:20128/api/settings/proxy \
   -d '{"providers": {"openai": {"type":"socks5","host":"proxy.example.com","port":"1080"}}}'
 
-# Test proxy
 curl -X POST http://localhost:20128/api/settings/proxy/test \
   -d '{"proxy":{"type":"socks5","host":"proxy.example.com","port":"1080"}}'
 ```
@@ -846,7 +845,6 @@ Returns models grouped by provider with types (`chat`, `embedding`, `image`).
 
 - **Semantic Cache** — Auto-caches non-streaming, temperature=0 responses (bypass with `X-OmniRoute-No-Cache: true`)
 - **Request Idempotency** — Deduplicates requests within 5s via `Idempotency-Key` or `X-Request-Id` header
-- **Progress Tracking** — Opt-in SSE `event: progress` events via `X-OmniRoute-Progress: true` header
 
 ---
 
@@ -854,12 +852,11 @@ Returns models grouped by provider with types (`chat`, `embedding`, `image`).
 
 Access via **Dashboard → Translator**. Debug and visualize how OmniRoute translates API requests between providers.
 
-| Mode             | Purpose                                                                                |
-| ---------------- | -------------------------------------------------------------------------------------- |
-| **Playground**   | Select source/target formats, paste a request, and see the translated output instantly |
-| **Chat Tester**  | Send live chat messages through the proxy and inspect the full request/response cycle  |
-| **Test Bench**   | Run batch tests across multiple format combinations to verify translation correctness  |
-| **Live Monitor** | Watch real-time translations as requests flow through the proxy                        |
+| Mode            | Purpose                                                                                |
+| --------------- | -------------------------------------------------------------------------------------- |
+| **Playground**  | Select source/target formats, paste a request, and see the translated output instantly |
+| **Chat Tester** | Send live chat messages through the proxy and inspect the full request/response cycle  |
+| **Test Bench**  | Run batch tests across multiple format combinations to verify translation correctness  |
 
 **Use cases:**
 
@@ -870,8 +867,6 @@ Access via **Dashboard → Translator**. Debug and visualize how OmniRoute trans
 ---
 
 ### Routing Strategies
-
-Configure via **Dashboard → Settings → Routing**. The dashboard exposes the six most-used strategies; combos and the auto-router internally support a wider set.
 
 **Dashboard-visible strategies (account-level routing):**
 
@@ -1027,8 +1022,6 @@ OmniRoute implements provider-level resilience with five components:
 
 4. **Wait For Cooldown** — If every candidate connection is already cooling down, OmniRoute can wait for the earliest cooldown and retry the same client request automatically.
 
-5. **Rate Limit Auto-Detection** — When upstream providers return explicit wait windows, those hints override the local connection cooldown when the setting is enabled.
-
 **Pro Tip:** Use the **Health** page to inspect and reset live provider breakers after an outage. The Resilience page only changes configuration.
 
 ---
@@ -1106,56 +1099,6 @@ curl http://localhost:20128/api/usage/budget
 ```
 
 **Cost Tracking:** Every request logs token usage and calculates cost using the pricing table. View breakdowns in **Dashboard → Usage** by provider, model, and API key.
-
----
-
-### Audio Transcription
-
-OmniRoute supports audio transcription via the OpenAI-compatible endpoint:
-
-```bash
-POST /v1/audio/transcriptions
-Authorization: Bearer your-api-key
-Content-Type: multipart/form-data
-
-# Example with curl
-curl -X POST http://localhost:20128/v1/audio/transcriptions \
-  -H "Authorization: Bearer your-api-key" \
-  -F "file=@audio.mp3" \
-  -F "model=openai/whisper-1"
-```
-
-`deepgram/nova-3` is the native Deepgram route and needs a Deepgram API key.
-If only OpenRouter is configured, use `openrouter/deepgram/nova-3`.
-
-**Speech-to-Text (transcription)** providers:
-
-- `openai/` (whisper-compatible)
-- `groq/` (Groq Whisper Turbo)
-- `deepgram/` (Nova family)
-- `assemblyai/`
-- `nvidia/` (Parakeet, Canary)
-- `huggingface/` (whisper variants)
-- `qwen/`
-
-**Text-to-Speech (`POST /v1/audio/speech`)** providers:
-
-- `openai/` (tts-1, tts-1-hd)
-- `hyperbolic/`
-- `deepgram/` (Aura)
-- `nvidia/` (Magpie TTS)
-- `elevenlabs/`
-- `huggingface/`
-- `inworld/`
-- `cartesia/`
-- `playht/`
-- `kie/`
-- `aws-polly/`
-- `xiaomi-mimo/`
-- `coqui/`, `tortoise/`
-- `qwen/`
-
-Supported audio formats for transcription: `mp3`, `wav`, `m4a`, `flac`, `ogg`, `webm`. TTS output formats depend on the provider (mp3, wav, opus, pcm, mulaw).
 
 ---
 
@@ -1270,8 +1213,6 @@ Use the SSE URL `http://localhost:20128/api/mcp/sse` and a Bearer API key genera
 
 ### Scopes
 
-MCP currently defines 32 named scopes. Each Bearer key can be limited to specific scopes — see [MCP-SERVER.md](../frameworks/MCP-SERVER.md) for the authoritative scope and tool inventory and [A2A-SERVER.md](../frameworks/A2A-SERVER.md) for the JSON-RPC schema.
-
 ---
 
 ## 🧠 Skills System
@@ -1281,8 +1222,6 @@ OmniRoute exposes an extensible **skill framework** (`src/lib/skills/`) so agent
 - **Marketplace UI** — Browse and install skills from **Dashboard → Skills**
 - **Per-key scopes** — Restrict which API keys can invoke which skills
 - **Custom skills** — Drop a TypeScript file in `src/lib/a2a/skills/`, register it, and it becomes immediately invocable over A2A
-
-Full reference: [SKILLS.md](../frameworks/SKILLS.md).
 
 ---
 
@@ -1295,8 +1234,6 @@ OmniRoute persists **long-term conversational memory** with hybrid retrieval:
 - **Automatic fact extraction** — entities, preferences, and decisions are summarized after each session and stored in the `memory_facts` table
 - Memories are scoped per API key and per session
 
-Manage memories in **Dashboard → Memory** (search, edit, export, purge). The HTTP surface (`/api/memory/*`) lets agents push and query facts programmatically — see [MEMORY.md](../frameworks/MEMORY.md).
-
 ---
 
 ## 🔔 Webhooks
@@ -1308,8 +1245,6 @@ Subscribe to OmniRoute events for real-time monitoring and automation.
 - Every payload includes `X-OmniRoute-Signature` (HMAC-SHA256) for verification
 - Retries: 3 attempts with exponential backoff, then dead-letter queue
 
-Full schema in [WEBHOOKS.md](../frameworks/WEBHOOKS.md).
-
 ---
 
 ## ☁️ Cloud Agents
@@ -1319,8 +1254,6 @@ OmniRoute integrates with cloud coding agents (**OpenAI Codex Cloud**, **Devin**
 - Create tasks in **Dashboard → Cloud Agents** or via `POST /api/v1/agents/tasks`
 - Track status, logs, and artifacts per task
 - Bring-your-own API key per provider — credentials never leave the OmniRoute instance
-
-Full reference: [CLOUD_AGENT.md](../frameworks/CLOUD_AGENT.md).
 
 ---
 

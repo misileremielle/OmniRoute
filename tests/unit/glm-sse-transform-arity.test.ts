@@ -57,6 +57,7 @@ test("createSSETransformStreamWithLogger declares the buffer slot then the optio
     "clientTools",
     "streamBufferBytes",
     "pendingRequestId",
+    "permitsEmptyTurn",
   ]);
   // #12925: the slot GLM had been filling since #12179 is now declared, so the
   // value reaches TransformStream instead of being dropped as an extra arg.
@@ -66,7 +67,7 @@ test("createSSETransformStreamWithLogger declares the buffer slot then the optio
   );
   // #18217: an optional pending cleanup identity follows the buffer slot; `false`
   // lets a nested adapter (GLM) opt out of cleanup owned by the outer request.
-  assert.equal(declarations.length, 19);
+  assert.equal(declarations.length, 20);
   assert.match(
     declarations[18],
     /^pendingRequestId\s*:\s*StreamPendingRequestIdentity\s*\|\s*null\s*=\s*null$/
@@ -91,10 +92,10 @@ test("GLM translateSseResponse fills the buffer-size slot with the named constan
   const params = splitTopLevel(header).map((param) => param.split(/[:=]/)[0].trim());
   const args = splitTopLevel(call);
 
-  assert.equal(params.length, 19);
+  assert.equal(params.length, 20);
   assert.equal(
     args.length,
-    params.length,
+    19,
     `GLM must match the helper arity and opt out of pending ownership:\n${call}`
   );
   assert.equal(params[17], "streamBufferBytes");

@@ -73,8 +73,6 @@ test("detectTestKind defaults to a plain chat test for ordinary models", () => {
   assert.deepEqual(detectTestKind("openai/gpt-4o", null), {
     isRerank: false,
     isEmbedding: false,
-    isAudioTranscription: false,
-    isAudioSpeech: false,
     isResponses: false,
     isNonChatGeneration: false,
   });
@@ -97,8 +95,6 @@ test("detectTestKind detects rerank by id and by metadata, and rerank wins over 
   assert.deepEqual(detectTestKind("jina/jina-reranker-v2", null), {
     isRerank: true,
     isEmbedding: false,
-    isAudioTranscription: false,
-    isAudioSpeech: false,
     isResponses: false,
     isNonChatGeneration: false,
   });
@@ -114,54 +110,29 @@ test("detectTestKind detects rerank by id and by metadata, and rerank wins over 
   assert.equal(both.isEmbedding, false);
 });
 
-test("detectTestKind detects audio transcription from metadata, and it wins over rerank/embedding", () => {
-  // Audio nodes are detected from metadata only — there is no id heuristic, because an
-  // OpenAI-compatible audio node commonly exposes opaque model ids (e.g. a gateway that
-  // returns GUIDs from /models).
+test("detectTestKind marks audio transcription metadata as non-chat generation", () => {
   assert.deepEqual(detectTestKind("vendor/opaque-model", { apiFormat: "audio-transcriptions" }), {
     isRerank: false,
     isEmbedding: false,
-    isAudioTranscription: true,
-    isAudioSpeech: false,
     isResponses: false,
-    isNonChatGeneration: false,
+    isNonChatGeneration: true,
   });
   assert.equal(
     detectTestKind("vendor/opaque-model", { supportedEndpoints: ["audio-transcriptions"] })
-      .isAudioTranscription,
+      .isNonChatGeneration,
     true
   );
-
-  // An audio node must not be probed as embedding/rerank just because its id happens to
-  // match those heuristics — otherwise the Check hits the wrong endpoint.
-  const audioLookingLikeEmbedding = detectTestKind("vendor/text-embedding-whisper", {
-    apiFormat: "audio-transcriptions",
-  });
-  assert.equal(audioLookingLikeEmbedding.isAudioTranscription, true);
-  assert.equal(audioLookingLikeEmbedding.isEmbedding, false);
-  assert.equal(audioLookingLikeEmbedding.isRerank, false);
 });
 
 test("detectTestKind falls back to the provider node's configured apiType", () => {
-  // Imported/synced models carry no per-model metadata (they come straight from the
-  // upstream /models list, often as opaque ids). The node's own apiType is then the only
-  // signal for which endpoint the Play button may probe — without it the runner defaults
-  // to chat and an audio-only node answers "All AI backends exhausted for chat".
-  const audio = detectTestKind("vendor/0123456789abcdef", null, "audio-transcriptions");
-  assert.equal(audio.isAudioTranscription, true);
-  assert.equal(audio.isEmbedding, false);
-  assert.equal(audio.isRerank, false);
-
   const embeddings = detectTestKind("vendor/opaque-guid", null, "embeddings");
   assert.equal(embeddings.isEmbedding, true);
-  assert.equal(embeddings.isAudioTranscription, false);
+  assert.equal(embeddings.isRerank, false);
 
   // A chat node (or no node at all) keeps the plain chat default.
   assert.deepEqual(detectTestKind("vendor/opaque-guid", null, "chat"), {
     isRerank: false,
     isEmbedding: false,
-    isAudioTranscription: false,
-    isAudioSpeech: false,
     isResponses: false,
     isNonChatGeneration: false,
   });
@@ -172,7 +143,7 @@ test("detectTestKind falls back to the provider node's configured apiType", () =
     { apiFormat: "audio-transcriptions" },
     "chat"
   );
-  assert.equal(modelSaysAudio.isAudioTranscription, true);
+  assert.equal(modelSaysAudio.isNonChatGeneration, true);
 });
 
 test("extractProviderErrorMessage includes upstream details when generic error is unhelpful", () => {
@@ -528,7 +499,7 @@ test("detectTestKind prioritizes chat/responses capability over secondary audio-
     },
     undefined
   );
-  assert.equal(result.isAudioTranscription, false);
+  assert.equal(result.isNonChatGeneration, false);
   assert.equal(result.isRerank, false);
   assert.equal(result.isEmbedding, false);
 });
@@ -536,7 +507,7 @@ test("detectTestKind prioritizes chat/responses capability over secondary audio-
 test("detectTestKind: node-level chat/responses apiType never overrides per-model or name detection", () => {
   // The node apiType is only a fallback for models without metadata.
   const audioOnChatNode = detectTestKind("vendor/x", { apiFormat: "audio-transcriptions" }, "chat");
-  assert.equal(audioOnChatNode.isAudioTranscription, true);
+  assert.equal(audioOnChatNode.isNonChatGeneration, true);
 
   const embeddingOnChatNode = detectTestKind(
     "vendor/x",
@@ -564,7 +535,7 @@ test("detectTestKind: node-level chat/responses apiType never overrides per-mode
     { apiFormat: "chat-completions", supportedEndpoints: ["audio-transcriptions"] },
     "chat"
   );
-  assert.equal(audioEndpointWithChatFormat.isAudioTranscription, true);
+  assert.equal(audioEndpointWithChatFormat.isNonChatGeneration, true);
 
   // Only the model's own supportedEndpoints with chat wins over audio-transcriptions.
   const multimodal = detectTestKind(
@@ -572,5 +543,5 @@ test("detectTestKind: node-level chat/responses apiType never overrides per-mode
     { supportedEndpoints: ["chat", "audio-transcriptions"] },
     undefined
   );
-  assert.equal(multimodal.isAudioTranscription, false);
+  assert.equal(multimodal.isNonChatGeneration, false);
 });

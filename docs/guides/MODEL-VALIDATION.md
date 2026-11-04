@@ -97,9 +97,7 @@ exact JSON `model` field. Redirects are refused before a second destination can 
 request. Specialized executor subclasses and other provider IDs return
 `VALIDATION_EXECUTOR_UNSUPPORTED` (`422`). Session pools, extra-key rotation, alternate auth
 headers, provider proxies and credential refresh are refused. This restriction applies only
-to Test & Add: normal chat retains its existing provider, refresh, retry and pool behavior.
 
-Active runtime plugins also make strict validation unavailable (`VALIDATION_PLUGINS_UNSUPPORTED`).
 The request does not skip an installed plugin policy: it fails before running that plugin.
 A private async request guard prevents handlers activated during the proof, including delayed
 response/stream work, from executing in the validation scope. Normal requests retain their

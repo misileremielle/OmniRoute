@@ -1,8 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { prepareConnectionModelTest } from "@/lib/providerModels/prepareConnectionModelTest";
 import { POST as postChatCompletion } from "@/app/api/v1/chat/completions/route";
-import { POST as postAudioSpeech } from "@/app/api/v1/audio/speech/route";
-import { POST as postAudioTranscription } from "@/app/api/v1/audio/transcriptions/route";
 import { handleValidatedEmbeddingRequestBody } from "@/app/api/v1/embeddings/route";
 import { POST as postRerank } from "@/app/api/v1/rerank/route";
 import { POST as postResponses } from "@/app/api/v1/responses/route";
@@ -16,7 +14,6 @@ import { getCustomModels } from "@/lib/db/models";
 import { getProviderNodeById } from "@/lib/db/providers";
 import { requiresWebSessionCredential } from "@/shared/providers/webSessionCredentials";
 import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error";
-import { isImageOnlyModel } from "@omniroute/open-sse/config/imageRegistry";
 import { withRateLimit } from "@omniroute/open-sse/services/rateLimitManager";
 import {
   isCreditsExhausted,
@@ -253,63 +250,6 @@ export function buildInternalRerankRequest(
   });
 }
 
-function buildTinyWavFile(): File {
-  return new File(
-    [
-      new Uint8Array([
-        0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45, 0x66, 0x6d, 0x74,
-        0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x40, 0x1f, 0x00, 0x00, 0x80, 0x3e,
-        0x00, 0x00, 0x02, 0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00,
-      ]),
-    ],
-    "omniroute-model-test.wav",
-    { type: "audio/wav" }
-  );
-}
-
-export function buildInternalAudioTranscriptionRequest(
-  model: string,
-  signal: AbortSignal,
-  connectionId?: string
-) {
-  const formData = new FormData();
-  formData.set("model", model);
-  formData.set("file", buildTinyWavFile());
-
-  return new Request(`${INTERNAL_ORIGIN}/v1/audio/transcriptions`, {
-    method: "POST",
-    headers: {
-      "X-Internal-Test": "combo-health-check",
-      "X-OmniRoute-No-Cache": "true",
-      "X-OmniRoute-Compression": "off",
-      "X-Request-Id": `model-test-${randomUUID()}`,
-      ...(connectionId ? { "X-OmniRoute-Connection": connectionId } : {}),
-    },
-    body: formData,
-    signal,
-  });
-}
-
-export function buildInternalAudioSpeechRequest(
-  model: string,
-  signal: AbortSignal,
-  connectionId?: string
-) {
-  return new Request(`${INTERNAL_ORIGIN}/v1/audio/speech`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Internal-Test": "combo-health-check",
-      "X-OmniRoute-No-Cache": "true",
-      "X-OmniRoute-Compression": "off",
-      "X-Request-Id": `model-test-${randomUUID()}`,
-      ...(connectionId ? { "X-OmniRoute-Connection": connectionId } : {}),
-    },
-    body: JSON.stringify({ model, input: "Hi", voice: "alloy", response_format: "mp3" }),
-    signal,
-  });
-}
-
 export function detectTestKind(modelStr: string, customModel: any, nodeApiType?: string) {
   const supportedEndpoints = Array.isArray(customModel?.supportedEndpoints)
     ? customModel.supportedEndpoints
@@ -317,9 +257,7 @@ export function detectTestKind(modelStr: string, customModel: any, nodeApiType?:
   const apiFormat = typeof customModel?.apiFormat === "string" ? customModel.apiFormat : "";
   // Imported/synced models carry no per-model metadata — they come straight from the
   // upstream /models list and are often opaque ids. The provider node's configured
-  // apiType is then the only signal for which endpoint may be probed; without it an
-  // audio-only node gets tested against /chat/completions and fails with
-  // "All AI backends exhausted for chat".
+  // apiType is then the only signal for which endpoint may be probed.
   const nodeType = typeof nodeApiType === "string" ? nodeApiType : "";
   const lowerModel = modelStr.toLowerCase();
   // Only the model's own endpoint metadata counts as an explicit chat signal. The node
@@ -327,29 +265,14 @@ export function detectTestKind(modelStr: string, customModel: any, nodeApiType?:
   // name heuristics below (an embedding model can live on a chat-typed node).
   const isExplicitChat =
     supportedEndpoints.includes("chat") || supportedEndpoints.includes("responses");
-  const isAudioTranscription =
-    !isExplicitChat &&
-    (apiFormat === "audio-transcriptions" ||
-      nodeType === "audio-transcriptions" ||
-      supportedEndpoints.includes("audio-transcriptions"));
-  const isAudioSpeech =
-    !isExplicitChat &&
-    !isAudioTranscription &&
-    (supportedEndpoints.includes("audio-speech") ||
-      apiFormat === "audio-speech" ||
-      nodeType === "audio-speech");
   const isRerank =
-    !isAudioSpeech &&
     !isExplicitChat &&
-    !isAudioTranscription &&
     (apiFormat === "rerank" ||
       nodeType === "rerank" ||
       supportedEndpoints.includes("rerank") ||
       lowerModel.includes("rerank"));
   const isEmbedding =
-    !isAudioSpeech &&
     !isExplicitChat &&
-    !isAudioTranscription &&
     !isRerank &&
     (apiFormat === "embeddings" ||
       nodeType === "embeddings" ||
@@ -371,34 +294,37 @@ export function detectTestKind(modelStr: string, customModel: any, nodeApiType?:
   // Last in the chain deliberately: a Responses-typed node can still host an
   // embedding or rerank model, and those endpoints stay right for it.
   const isResponses =
-    !isAudioTranscription &&
     !isRerank &&
     !isEmbedding &&
     (apiFormat === "responses" ||
       nodeType === "responses" ||
       supportedEndpoints.includes("responses"));
-  // Non-chat generation endpoints (image, music, video) should NOT be dispatched
-  // as chat completions — they incur billable generation costs (#13376). An explicit
-  // generation apiFormat, or an image-only registry model that chat.ts rejects
-  // (#6457), wins over the add-model form's default "chat" tick (#17071).
-  const isGenerationFormat = apiFormat === "images-generations" || apiFormat === "video";
+  // Rows persisted with a media tag (image, music, video, audio) should NOT be
+  // dispatched as chat completions — they incur billable generation costs (#13376). An
+  // explicit generation apiFormat wins over the add-model form's default "chat" tick
+  // (#17071).
+  const isGenerationFormat = [
+    "images-generations",
+    "video",
+    "audio-speech",
+    "audio-transcriptions",
+  ].includes(apiFormat);
   const isGenerationOnlyTag =
     !supportedEndpoints.includes("chat") &&
-    ["images", "images-generations", "music", "videos"].some((endpoint) =>
-      supportedEndpoints.includes(endpoint)
-    );
+    [
+      "images",
+      "images-generations",
+      "music",
+      "videos",
+      "audio-speech",
+      "audio-transcriptions",
+    ].some((endpoint) => supportedEndpoints.includes(endpoint));
   const isNonChatGeneration =
-    !isAudioTranscription &&
-    !isRerank &&
-    !isEmbedding &&
-    !isResponses &&
-    (isGenerationFormat || isGenerationOnlyTag || isImageOnlyModel(modelStr));
+    !isRerank && !isEmbedding && !isResponses && (isGenerationFormat || isGenerationOnlyTag);
 
   return {
     isRerank,
     isEmbedding,
-    isAudioTranscription,
-    isAudioSpeech,
     isResponses,
     isNonChatGeneration,
   };
@@ -470,19 +396,9 @@ export function classifyModelTestOutput(
 
 export async function extractModelTestResponseText(
   response: Response,
-  streamChat: boolean,
-  isAudioSpeech = false
+  streamChat: boolean
 ): Promise<ModelTestResponseText> {
   const contentType = (response.headers.get("content-type") || "").toLowerCase();
-  if (isAudioSpeech) {
-    const audio = await response.arrayBuffer();
-    return {
-      text:
-        contentType.startsWith("audio/") && audio.byteLength > 0
-          ? `Audio generated (${audio.byteLength} bytes)`
-          : "",
-    };
-  }
   if (streamChat && !contentType.includes("application/json")) {
     return extractComboTestStreamResult(await response.text());
   }
@@ -595,16 +511,13 @@ export async function runSingleModelTest(
     findCustomModelMetadata(providerId, fullModelStr),
     findProviderNodeApiType(providerId),
   ]);
-  const {
-    isRerank,
-    isEmbedding,
-    isAudioTranscription,
-    isAudioSpeech,
-    isResponses,
-    isNonChatGeneration,
-  } = detectTestKind(fullModelStr, customModel, nodeApiType);
+  const { isRerank, isEmbedding, isResponses, isNonChatGeneration } = detectTestKind(
+    fullModelStr,
+    customModel,
+    nodeApiType
+  );
 
-  // #13376: Skip image/music/video generation models — dispatching them as
+  // #13376: Skip image/music/video/audio generation models — dispatching them as
   // chat completions incurs real billable generations the operator never asked for.
   if (isNonChatGeneration) {
     return {
@@ -617,14 +530,11 @@ export async function runSingleModelTest(
       httpStatus: 422,
       skipped: true,
       error:
-        "Skipped: non-chat generation model (images/music/video) — use the corresponding generation endpoint instead",
+        "Skipped: non-chat generation model (images/music/video/audio) — media endpoints are not available",
     };
   }
 
-  if (
-    options.prompt !== undefined &&
-    (isEmbedding || isRerank || isAudioTranscription || isAudioSpeech)
-  ) {
+  if (options.prompt !== undefined && (isEmbedding || isRerank)) {
     return {
       modelId: fullModelStr,
       status: "error",
@@ -645,24 +555,22 @@ export async function runSingleModelTest(
         top_n: 1,
         return_documents: false,
       }
-    : isAudioTranscription
-      ? { model: fullModelStr }
-      : isResponses
-        ? {
-            model: fullModelStr,
-            // Responses takes `input`, not `messages`.
-            input: buildComboTestPrompt(),
-            max_output_tokens: RESPONSES_TEST_MAX_OUTPUT_TOKENS,
-            // Non-streaming on purpose: the SSE reader below understands Chat
-            // Completions deltas and the `output_text`/`output[]` shapes, but not
-            // Responses stream events (`response.output_text.delta`), so a
-            // streamed answer would read as empty — the very failure being fixed.
-            stream: false,
-          }
-        : buildComboTestRequestBody(fullModelStr, isEmbedding, {
-            stream: !isEmbedding && streamChat,
-            maxTokens: !isEmbedding && streamChat ? STREAMING_CHAT_TEST_MAX_TOKENS : undefined,
-          });
+    : isResponses
+      ? {
+          model: fullModelStr,
+          // Responses takes `input`, not `messages`.
+          input: buildComboTestPrompt(),
+          max_output_tokens: RESPONSES_TEST_MAX_OUTPUT_TOKENS,
+          // Non-streaming on purpose: the SSE reader below understands Chat
+          // Completions deltas and the `output_text`/`output[]` shapes, but not
+          // Responses stream events (`response.output_text.delta`), so a
+          // streamed answer would read as empty — the very failure being fixed.
+          stream: false,
+        }
+      : buildComboTestRequestBody(fullModelStr, isEmbedding, {
+          stream: !isEmbedding && streamChat,
+          maxTokens: !isEmbedding && streamChat ? STREAMING_CHAT_TEST_MAX_TOKENS : undefined,
+        });
 
   if (options.prompt !== undefined && "messages" in testBody) {
     testBody.messages = [{ role: "user", content: options.prompt }];
@@ -687,15 +595,6 @@ export async function runSingleModelTest(
     }
     if (isRerank) {
       return postRerank(buildInternalRerankRequest(testBody, signal, connectionId));
-    }
-    if (isAudioSpeech) {
-      return postAudioSpeech(buildInternalAudioSpeechRequest(fullModelStr, signal, connectionId));
-    }
-
-    if (isAudioTranscription) {
-      return postAudioTranscription(
-        buildInternalAudioTranscriptionRequest(fullModelStr, signal, connectionId)
-      );
     }
     if (isResponses) {
       return postResponses(buildInternalResponsesRequest(testBody, signal, connectionId));
@@ -804,11 +703,7 @@ export async function runSingleModelTest(
       // deactivated") would run outside runAsProbe and could still reach
       // markAccountUnavailable (#9817).
       const parsedResponse = await runAsProbe(() =>
-        extractModelTestResponseText(
-          res,
-          !isEmbedding && !isRerank && !isResponses && streamChat,
-          isAudioSpeech
-        )
+        extractModelTestResponseText(res, !isEmbedding && !isRerank && !isResponses && streamChat)
       );
       responseText = parsedResponse.text;
       streamError = parsedResponse.error;

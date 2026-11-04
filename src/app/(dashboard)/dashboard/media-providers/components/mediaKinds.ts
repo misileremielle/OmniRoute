@@ -1,24 +1,9 @@
-export type MediaKind =
-  | "embedding"
-  | "image"
-  | "imageToText"
-  | "tts"
-  | "stt"
-  | "webSearch"
-  | "webFetch"
-  | "video"
-  | "music"
-  | "ocr";
+export type MediaKind = "embedding" | "imageToText" | "webSearch" | "webFetch" | "ocr";
 
 export const MEDIA_KINDS: MediaKind[] = [
   "embedding",
-  "image",
   "imageToText",
-  "tts",
-  "stt",
   "webSearch",
   "webFetch",
-  "video",
-  "music",
   "ocr",
 ];

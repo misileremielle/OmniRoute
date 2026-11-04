@@ -242,8 +242,8 @@ export const SEARCH_PROVIDERS: Record<string, SearchProviderConfig> = {
     method: "POST",
     authType: "apikey",
     authHeader: "bearer",
-    // Kagi's v1 docs publish no rate; $25 per 1000 is its long-standing Search API price.
-    costPerQuery: 0.025,
+    // Published Search API price: https://help.kagi.com/kagi/api/api-portal.html
+    costPerQuery: 0.012,
     freeMonthlyQuota: 0,
     searchTypes: ["web"],
     defaultMaxResults: 5,

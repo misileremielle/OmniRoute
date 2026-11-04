@@ -116,7 +116,6 @@ full scope model.
 
 - **Knowledge-grounded answers** — let an agent `notion_search` the workspace and
   `notion_get_page` the top hit before answering, so responses cite real internal docs.
-- **Database-backed workflows** — `notion_query_database` a tasks/CRM database with
   filters + sorts, then summarize or triage the rows.
 - **Write-back / logging** — `notion_append_blocks` to append meeting notes, run
   summaries, or agent output into an existing page (append-only; no destructive edits).
@@ -127,5 +126,4 @@ full scope model.
 
 - [MCP Server](./MCP-SERVER.md) — transports, scope enforcement, full tool inventory.
 - [Obsidian Context Source](./OBSIDIAN_CONTEXT.md) — the other built-in context source.
-- [Memory System](./MEMORY.md) — persistent conversational memory (complementary
   context layer, injected automatically rather than tool-fetched).

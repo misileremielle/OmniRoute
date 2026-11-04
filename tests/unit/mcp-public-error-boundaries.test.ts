@@ -5,7 +5,7 @@ import { runIsolatedBoundaryFixture } from "./helpers/runIsolatedBoundaryFixture
 test("MCP public error boundaries pass in an isolated child process", () => {
   runIsolatedBoundaryFixture({
     fixtureUrl: new URL("./fixtures/mcp-public-error-boundaries.fixture.ts", import.meta.url),
-    expectedTests: 4,
+    expectedTests: 2,
     label: "MCP public error boundaries",
   });
 });

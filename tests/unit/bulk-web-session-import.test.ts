@@ -124,8 +124,9 @@ describe("web-session credential helpers", () => {
     assert.equal(requiresWebSessionCredential("grok-web"), true);
     assert.equal(requiresWebSessionCredential("claude-web"), true);
     assert.equal(requiresWebSessionCredential("deepseek-web"), true);
-    assert.equal(requiresWebSessionCredential("veoaifree-web"), true);
-    assert.equal(requiresWebSessionCredential("veo-free"), true);
+    assert.equal(requiresWebSessionCredential("kagi-assistant"), true);
+    // Removed video provider: no longer a web-session credential target.
+    assert.equal(requiresWebSessionCredential("veoaifree-web"), false);
   });
 
   it("requiresWebSessionCredential returns false for non-web providers", () => {
@@ -156,17 +157,12 @@ describe("web-session credential helpers", () => {
     assert.equal(hasUsableWebSessionCredential("perplexity-web", { cookie: "" }), false);
     assert.equal(hasUsableWebSessionCredential("perplexity-web", {}), false);
     assert.equal(
-      hasUsableWebSessionCredential("veoaifree-web", {
-        wordpress_logged_in_test: "session_value",
+      hasUsableWebSessionCredential("kagi-assistant", {
+        cookie: "kagi_session=session_value",
       }),
       true
     );
-    assert.equal(
-      hasUsableWebSessionCredential("veo-free", {
-        cookie: "wordpress_logged_in_test=session_value",
-      }),
-      true
-    );
+    assert.equal(hasUsableWebSessionCredential("kagi-assistant", { cookie: "" }), false);
   });
 
   it("hasUsableWebSessionCredential validates token data correctly", () => {

@@ -9,7 +9,7 @@ import {
 // Regression guard for the #11936 follow-up: the console fallback removal deduplicated
 // log output for chat-family routes (re-evaluated by guardrailRegistry.runPreCallHooks
 // with a pino logger), but the 13 middleware-only routes (/v1/embeddings, /v1/images/*,
-// /v1/audio/speech, /v1/moderations, /v1/rerank, /v1/ocr, /v1/search, /v1/segment,
+// /v1/audio/speech, /v1/rerank, /v1/ocr, /v1/search, /v1/segment,
 // /v1/classify, /v1/videos/generations, /v1/music/generations) call
 // createInjectionGuard() with no logger — there the middleware is the ONLY evaluation,
 // so a null logger left blocked/flagged injections with ZERO server-side trace.

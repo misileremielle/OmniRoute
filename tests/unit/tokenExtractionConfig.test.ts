@@ -137,7 +137,7 @@ describe("tokenExtractionConfig", () => {
     // volcengine-console is exempt: it extracts a console session cookie for
     // provider binding (volcenginePlanBinding), not a chat-web credential, so
     // the "-web" suffix convention does not apply to it.
-    const exempt = new Set(["volcengine-console"]);
+    const exempt = new Set(["volcengine-console", "kagi-assistant"]);
     for (const providerId of TOKEN_EXTRACTION_CONFIGS.keys()) {
       assert.ok(
         providerId.endsWith("-web") || exempt.has(providerId),

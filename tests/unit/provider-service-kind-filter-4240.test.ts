@@ -31,13 +31,13 @@ function entry(providerId: string, name: string, total: number): Entry {
   };
 }
 
-// vertex → video/music, haiper → video, openai → image/embedding, udio → music
+// openai → embedding, jina-ai → embedding, mistral → embedding/imageToText, anthropic → none
 // (all registry-derived; none declare serviceKinds explicitly here)
 const ENTRIES: Entry[] = [
-  entry("vertex", "Vertex AI", 1),
-  entry("haiper", "Haiper", 0),
   entry("openai", "OpenAI", 1),
-  entry("udio", "Udio", 1),
+  entry("jina-ai", "Jina AI", 0),
+  entry("mistral", "Mistral", 1),
+  entry("anthropic", "Anthropic", 1),
 ];
 
 function ids(list: Entry[]): string[] {
@@ -45,27 +45,27 @@ function ids(list: Entry[]): string[] {
 }
 
 test("serviceKindFilter keeps only providers whose (registry-derived) kinds include it", () => {
-  const out = filterConfiguredProviderEntries(ENTRIES, false, "", false, "", "video");
-  assert.deepEqual(ids(out), ["haiper", "vertex"]);
+  const out = filterConfiguredProviderEntries(ENTRIES, false, "", false, "", "embedding");
+  assert.deepEqual(ids(out), ["jina-ai", "mistral", "openai"]);
 });
 
 test("a registry-derived kind is resolved even with no declared serviceKinds (#4240)", () => {
-  assert.ok(getProviderServiceKinds("vertex", undefined).includes("video"));
-  assert.ok(getProviderServiceKinds("openai", undefined).includes("image"));
+  assert.ok(getProviderServiceKinds("mistral", undefined).includes("imageToText"));
+  assert.ok(getProviderServiceKinds("openai", undefined).includes("embedding"));
   // a pure declared kind still works through the union
   assert.ok(getProviderServiceKinds("openai", ["llm"]).includes("llm"));
 });
 
 test("serviceKindFilter composes with showConfiguredOnly (intersection)", () => {
-  // video → {vertex, haiper}; configured-only drops haiper (stats.total === 0)
-  const out = filterConfiguredProviderEntries(ENTRIES, true, "", false, "", "video");
-  assert.deepEqual(ids(out), ["vertex"]);
+  // embedding → {openai, jina-ai, mistral}; configured-only drops jina-ai (stats.total === 0)
+  const out = filterConfiguredProviderEntries(ENTRIES, true, "", false, "", "embedding");
+  assert.deepEqual(ids(out), ["mistral", "openai"]);
 });
 
 test("serviceKindFilter composes with the search query (intersection)", () => {
-  // video → {vertex, haiper}; search "haip" narrows to haiper only
-  const out = filterConfiguredProviderEntries(ENTRIES, false, "haip", false, "", "video");
-  assert.deepEqual(ids(out), ["haiper"]);
+  // embedding → {openai, jina-ai, mistral}; search "jina" narrows to jina-ai only
+  const out = filterConfiguredProviderEntries(ENTRIES, false, "jina", false, "", "embedding");
+  assert.deepEqual(ids(out), ["jina-ai"]);
 });
 
 test("a null/undefined serviceKindFilter leaves the list unchanged", () => {
@@ -75,7 +75,7 @@ test("a null/undefined serviceKindFilter leaves the list unchanged", () => {
   assert.deepEqual(ids(out2), ids(ENTRIES));
 });
 
-test("serviceKindFilter=music keeps only music providers", () => {
-  const out = filterConfiguredProviderEntries(ENTRIES, false, "", false, "", "music");
-  assert.deepEqual(ids(out), ["udio", "vertex"]);
+test("serviceKindFilter=imageToText keeps only ocr providers", () => {
+  const out = filterConfiguredProviderEntries(ENTRIES, false, "", false, "", "imageToText");
+  assert.deepEqual(ids(out), ["mistral"]);
 });

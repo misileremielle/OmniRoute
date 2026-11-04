@@ -418,13 +418,6 @@ export const WEB_SESSION_CREDENTIAL_REQUIREMENTS = {
       "uid",
     ],
   },
-  "veoaifree-web": {
-    kind: "cookie",
-    credentialName: "wordpress_logged_in cookie",
-    placeholder: "wordpress_logged_in_...=... or full Cookie header from veoaifree.com",
-    acceptsFullCookieHeader: true,
-    storageKeys: ["cookie", "wordpress_logged_in"],
-  },
 } satisfies Record<string, WebSessionCredentialRequirement> &
   Record<keyof typeof WEB_COOKIE_PROVIDERS, WebSessionCredentialRequirement>;
 

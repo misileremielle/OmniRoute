@@ -174,7 +174,6 @@ allowed scopes sourced from `OMNIROUTE_MCP_SCOPES` or the API key's scope contex
 | `DELETE` | `/api/settings/obsidian/webdav` | Disable WebDAV sync.                                  |
 
 > These are dashboard settings routes. The vault itself is reached through the Obsidian
-> Local REST API (the configured `base_url`) and through the MCP tools above — there is
 > no public `/v1` Obsidian proxy endpoint.
 
 ## Use cases
@@ -196,5 +195,4 @@ allowed scopes sourced from `OMNIROUTE_MCP_SCOPES` or the API key's scope contex
 
 - [MCP Server](./MCP-SERVER.md) — transports, scope enforcement, full tool inventory.
 - [Notion Context Source](./NOTION_CONTEXT.md) — the other built-in context source.
-- [Memory System](./MEMORY.md) — persistent conversational memory (complementary
   context layer, injected automatically rather than tool-fetched).

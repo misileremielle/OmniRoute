@@ -17,14 +17,6 @@ test("search-tools: export modal mounts on exportOpen (not by default) without i
   );
 });
 
-test("memory: tabs ordered memories -> engine -> playground", () => {
-  const src = read("src/app/(dashboard)/dashboard/memory/page.tsx");
-  assert.ok(
-    src.includes('["memories", "engine", "playground"]'),
-    "TABS order is memories, engine, playground"
-  );
-});
-
 test("shared Select: renders children and guards placeholder/options when children present", () => {
   const src = read("src/shared/components/Select.tsx");
   assert.ok(src.includes("{children}"), "renders children passed by callers");

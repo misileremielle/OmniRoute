@@ -14,7 +14,6 @@ const ORIGINAL_DATA_DIR = process.env.DATA_DIR;
 process.env.DATA_DIR = TEST_DATA_DIR;
 
 const { detectTestKind, runSingleModelTest } = await import("../../src/lib/api/modelTestRunner.ts");
-const { isImageOnlyModel } = await import("../../open-sse/config/imageRegistry.ts");
 const { resetDbInstance } = await import("../../src/lib/db/core.ts");
 
 const serial = { concurrency: false };
@@ -24,12 +23,6 @@ test.after(() => {
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   if (ORIGINAL_DATA_DIR === undefined) delete process.env.DATA_DIR;
   else process.env.DATA_DIR = ORIGINAL_DATA_DIR;
-});
-
-test("#17071 — isImageOnlyModel: image-registry model absent from the chat catalog", serial, () => {
-  assert.equal(isImageOnlyModel("agnes/agnes-image-2.5-flash"), true);
-  assert.equal(isImageOnlyModel("agnes/agnes-2.5-flash"), false, "chat model");
-  assert.equal(isImageOnlyModel("openai/gpt-4o"), false, "not an image-registry model");
 });
 
 test("#17071 — apiFormat images-generations wins over the default chat tick", serial, () => {
@@ -49,17 +42,6 @@ test("#17071 — apiFormat video wins over the default chat tick", serial, () =>
   );
   assert.equal(result.isNonChatGeneration, true);
 });
-
-test(
-  "#17071 — image-only registry model is never chat-probed, even without metadata",
-  serial,
-  () => {
-    assert.equal(
-      detectTestKind("agnes/agnes-image-2.5-flash", null, undefined).isNonChatGeneration,
-      true
-    );
-  }
-);
 
 test("#17071 — 'images-generations' endpoint tag counts as generation-only", serial, () => {
   const result = detectTestKind(

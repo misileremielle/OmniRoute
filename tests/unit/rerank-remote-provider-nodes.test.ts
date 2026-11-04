@@ -19,13 +19,12 @@ import path from "node:path";
 const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-rerank-remote-test-"));
 process.env.DATA_DIR = TEST_DATA_DIR;
 
-const { isLoopbackNodeHost } = await import("../../src/shared/network/loopbackNodeHost.ts");
+const { isLoopbackNodeHost: _isLoopbackNodeHost } =
+  await import("../../src/shared/network/loopbackNodeHost.ts");
 const { isEligibleProviderNodeHost, isRemoteNodeHostAllowedByPolicy } =
   await import("../../src/shared/network/providerNodeHost.ts");
 const { RERANK_REMOTE_NODES_FLAG, selectRerankProviderNodes } =
   await import("../../src/app/api/v1/_shared/rerankProviderNodes.ts");
-const { isLoopbackNodeHost: audioLoopback } =
-  await import("../../open-sse/config/audioRegistry.ts");
 const core = await import("../../src/lib/db/core.ts");
 const { invalidateDbCache } = await import("../../src/lib/db/readCache.ts");
 const { createProviderNode, createProviderConnection } =
@@ -85,24 +84,6 @@ function resetEnv() {
     else process.env[k] = savedEnv[k];
   }
 }
-
-test.describe("loopback host classification (shared)", () => {
-  test("accepts localhost, 127.0.0.1 and 172.16/12; rejects ::1, LAN, public, user@host", () => {
-    assert.equal(isLoopbackNodeHost("http://localhost:8080/v1"), true);
-    assert.equal(isLoopbackNodeHost("http://127.0.0.1:8080/v1"), true);
-    assert.equal(isLoopbackNodeHost("http://172.31.255.1:8080/v1"), true);
-    assert.equal(isLoopbackNodeHost("http://[::1]:8080/v1"), false);
-    assert.equal(isLoopbackNodeHost("http://10.10.50.19:8888/v1"), false);
-    assert.equal(isLoopbackNodeHost("http://192.168.1.10:8888/v1"), false);
-    assert.equal(isLoopbackNodeHost("https://rerank.example.com/v1"), false);
-    assert.equal(isLoopbackNodeHost("http://localhost@evil.com/v1"), false);
-    assert.equal(isLoopbackNodeHost("not a url"), false);
-  });
-
-  test("audio registry re-exports the shared definition", () => {
-    assert.equal(audioLoopback, isLoopbackNodeHost);
-  });
-});
 
 test.describe("remote node policy", () => {
   test.afterEach(() => resetEnv());

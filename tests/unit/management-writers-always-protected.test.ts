@@ -12,7 +12,6 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { makeManagementSessionRequest } from "../helpers/managementSession.ts";
 
 const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-mgmt-writers-"));
 const TEST_HOME = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-mgmt-writers-home-"));
@@ -37,9 +36,6 @@ const applyRoute = await import("../../src/app/api/cli-tools/apply/route.ts");
 const backupsRoute = await import("../../src/app/api/cli-tools/backups/route.ts");
 const hermesRoute = await import("../../src/app/api/cli-tools/hermes-agent-settings/route.ts");
 const guideRoute = await import("../../src/app/api/cli-tools/guide-settings/[toolId]/route.ts");
-const destinationsRoute = await import("../../src/app/api/log-export/destinations/route.ts");
-const runRoute = await import("../../src/app/api/log-export/destinations/[id]/run/route.ts");
-const statusRoute = await import("../../src/app/api/log-export/status/route.ts");
 const restartRoute = await import("../../src/app/api/restart/route.ts");
 
 test.after(() => {
@@ -53,7 +49,7 @@ test.after(() => {
 });
 
 const BASE = "http://localhost:20128";
-const idCtx = (id: string) => ({ params: Promise.resolve({ id }) });
+const _idCtx = (id: string) => ({ params: Promise.resolve({ id }) });
 const toolCtx = (toolId: string) => ({ params: Promise.resolve({ toolId }) });
 
 function anonymous(pathname: string, method = "GET"): Request {
@@ -85,10 +81,6 @@ test("the central route guard always protects the host-config, log-export and re
     "/api/cli-tools/backups",
     "/api/cli-tools/hermes-agent-settings",
     "/api/cli-tools/guide-settings/claude",
-    "/api/log-export/destinations",
-    "/api/log-export/destinations/dest-1/run",
-    "/api/log-export/destinations/dest-1/test",
-    "/api/log-export/status",
     "/api/restart",
   ]) {
     assert.equal(isAlwaysProtectedPath(p), true, `${p} must be ALWAYS_PROTECTED`);
@@ -121,30 +113,6 @@ test("with login disabled, anonymous callers cannot rewrite host CLI configs", a
   });
 });
 
-test("with login disabled, anonymous callers cannot configure or run a log export", async () => {
-  await withLoginDisabled(async () => {
-    await assertUnauthenticated(
-      "GET /api/log-export/destinations",
-      await destinationsRoute.GET(anonymous("/api/log-export/destinations"))
-    );
-    await assertUnauthenticated(
-      "POST /api/log-export/destinations",
-      await destinationsRoute.POST(anonymous("/api/log-export/destinations", "POST"))
-    );
-    await assertUnauthenticated(
-      "POST /api/log-export/destinations/[id]/run",
-      await runRoute.POST(
-        anonymous("/api/log-export/destinations/missing/run", "POST"),
-        idCtx("missing")
-      )
-    );
-    await assertUnauthenticated(
-      "GET /api/log-export/status",
-      await statusRoute.GET(anonymous("/api/log-export/status"))
-    );
-  });
-});
-
 test("with login disabled, anonymous callers cannot restart the server", async (t) => {
   const kill = t.mock.method(process, "kill", () => true);
   try {
@@ -160,21 +128,4 @@ test("with login disabled, anonymous callers cannot restart the server", async (
     await new Promise((resolve) => setTimeout(resolve, 650));
   }
   assert.equal(kill.mock.callCount(), 0, "an anonymous restart must not signal the process");
-});
-
-test("with login disabled, a dashboard session keeps using these routes", async (t) => {
-  const kill = t.mock.method(process, "kill", () => true);
-  await withLoginDisabled(async () => {
-    const list = await destinationsRoute.GET(
-      await makeManagementSessionRequest(`${BASE}/api/log-export/destinations`)
-    );
-    assert.equal(list.status, 200, await list.clone().text());
-
-    const restart = await restartRoute.POST(
-      await makeManagementSessionRequest(`${BASE}/api/restart`, { method: "POST" })
-    );
-    assert.equal(restart.status, 200, await restart.clone().text());
-  });
-  await new Promise((resolve) => setTimeout(resolve, 650));
-  assert.equal(kill.mock.callCount(), 1, "the authenticated restart signals the process once");
 });

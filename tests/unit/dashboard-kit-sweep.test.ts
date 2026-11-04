@@ -130,10 +130,7 @@ test("hard-coded palette hues and dark: variants only where the exception is doc
   const HUE_ALLOWED: Record<string, number> = {};
   assert.deepEqual(countBy(DASHBOARD, HUE), HUE_ALLOWED);
 
-  const DARK_ALLOWED: Record<string, number> = {
-    // Typography plugin colours flip with prose-invert (no kit prose).
-    "src/app/(dashboard)/dashboard/agent-skills/components/SkillPreviewPane.tsx": 1,
-  };
+  const DARK_ALLOWED: Record<string, number> = {};
   assert.deepEqual(countBy(DASHBOARD, /(?<=["'`\s])dark:[a-z]/g), DARK_ALLOWED);
 });
 

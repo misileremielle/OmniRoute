@@ -14,10 +14,8 @@ test("kimi-coding-apikey and kimi never render as their own dashboard card in AN
     "web-cookie",
     "local",
     "search",
-    "audio",
     "upstream-proxy",
     "apikey",
-    "cloud-agent",
   ] as const;
 
   for (const category of categories) {

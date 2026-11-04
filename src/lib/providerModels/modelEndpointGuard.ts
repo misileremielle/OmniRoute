@@ -18,15 +18,7 @@ import {
 } from "@/shared/constants/modelSupportedEndpoints";
 import { isModelEndpointCapabilityGateEnabled } from "./endpointCapabilityGateFlag";
 
-export type RequestedEndpoint =
-  | "chat"
-  | "embeddings"
-  | "rerank"
-  | "images"
-  | "videos"
-  | "music"
-  | "audio-speech"
-  | "audio-transcriptions";
+export type RequestedEndpoint = "chat" | "embeddings" | "rerank";
 
 type TaggedModel = {
   supportedEndpoints?: readonly string[];
@@ -37,18 +29,10 @@ const ENDPOINT_ROUTE: Record<string, string> = {
   responses: "/v1/responses",
   embeddings: "/v1/embeddings",
   rerank: "/v1/rerank",
-  images: "/v1/images/generations",
-  "images-generations": "/v1/images/generations",
-  videos: "/v1/videos/generations",
-  music: "/v1/music/generations",
-  "audio-speech": "/v1/audio/speech",
-  "audio-transcriptions": "/v1/audio/transcriptions",
 };
 
 function supportsRequestedEndpoint(supported: string[], requested: RequestedEndpoint): boolean {
   if (requested === "chat") return supported.includes("chat") || supported.includes("responses");
-  if (requested === "images")
-    return supported.includes("images") || supported.includes("images-generations");
   return supported.includes(requested);
 }
 

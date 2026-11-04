@@ -61,10 +61,10 @@ test("explicit context survives enabled:false normalization without certifying b
   assert.deepEqual(body.reasoning, { effort: "none", context: "current_turn" });
 });
 
-test("forced effort preserves explicit context while unsupported siblings are stripped", () => {
+test("client effort preserves explicit context while unsupported siblings are stripped", () => {
   const body: Record<string, unknown> = {
     reasoning: { effort: "low", context: "all_turns", enabled: true, exclude: true },
   };
-  applyCodexReasoningSelection("gpt-6.1-sol", body, undefined, undefined, false, "xhigh");
-  assert.deepEqual(body.reasoning, { effort: "xhigh", context: "all_turns" });
+  applyCodexReasoningSelection("gpt-6.1-sol", body, undefined, undefined, false);
+  assert.deepEqual(body.reasoning, { effort: "low", context: "all_turns" });
 });

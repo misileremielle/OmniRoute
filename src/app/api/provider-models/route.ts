@@ -236,8 +236,6 @@ export async function POST(request) {
       max_output_tokens: maxOutputTokens,
       // #1904: manual vision-capability override set in the add-model form.
       supportsVision,
-      // #9820: optional video-generation job preset (job/poll path).
-      generationConfig,
       isFree,
       dimensions,
       supportedInputTypes,
@@ -265,7 +263,6 @@ export async function POST(request) {
         ...(maxOutputTokens != null ? { outputTokenLimit: maxOutputTokens } : {}),
       },
       typeof supportsVision === "boolean" ? supportsVision : undefined,
-      generationConfig,
       typeof isFree === "boolean" ? isFree : undefined,
       {
         ...(typeof dimensions === "number" && dimensions > 0 ? { dimensions } : {}),
@@ -322,7 +319,6 @@ export async function PUT(request) {
       contextWindowOverride,
       maxOutputTokenOverride,
       supportsVision,
-      generationConfig,
       isFree,
     } = validation.data;
 
@@ -345,9 +341,6 @@ export async function PUT(request) {
     if ("isFree" in raw) updates.isFree = isFree;
     // #9820: video-generation job preset — schema is non-nullable optional, so
     // presence implies a well-formed { preset } object; null is rejected by Zod.
-    if ("generationConfig" in raw && generationConfig !== undefined) {
-      updates.generationConfig = generationConfig;
-    }
     if ("compatByProtocol" in raw && compatByProtocol !== undefined) {
       updates.compatByProtocol = compatByProtocol;
     }

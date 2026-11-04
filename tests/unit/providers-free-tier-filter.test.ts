@@ -14,10 +14,8 @@ const CATALOG_CATEGORIES = [
   "web-cookie",
   "local",
   "search",
-  "audio",
   "upstream-proxy",
   "apikey",
-  "cloud-agent",
 ] as const satisfies readonly StaticProviderCatalogCategory[];
 
 type CategoryFilter = "all" | "free" | StaticProviderCatalogCategory;
@@ -82,11 +80,9 @@ function countByCategory(entries: ProviderFilterEntry[]) {
     apikey: filterByCategory(entries, "apikey").length,
     webcookie: filterByCategory(entries, "web-cookie").length,
     search: filterByCategory(entries, "search").length,
-    audio: filterByCategory(entries, "audio").length,
     local: filterByCategory(entries, "local").length,
     noauth: filterByCategory(entries, "no-auth").length,
     upstreamProxy: filterByCategory(entries, "upstream-proxy").length,
-    cloudAgent: filterByCategory(entries, "cloud-agent").length,
   };
 }
 
@@ -132,11 +128,9 @@ test("summaryStats.free counts the aggregate overlap without subtracting native 
     summaryStats.apikey +
     summaryStats.webcookie +
     summaryStats.search +
-    summaryStats.audio +
     summaryStats.local +
     summaryStats.noauth +
-    summaryStats.upstreamProxy +
-    summaryStats.cloudAgent;
+    summaryStats.upstreamProxy;
 
   assert.ok(summaryStats.free >= 60);
   assert.ok(nativeCategoryTotal + summaryStats.free > summaryStats.all);

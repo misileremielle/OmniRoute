@@ -8,17 +8,7 @@ import {
   type ModelSupportedEndpoint,
 } from "@/shared/constants/modelSupportedEndpoints";
 
-const OPTIONS: ModelSupportedEndpoint[] = [
-  "chat",
-  "responses",
-  "embeddings",
-  "rerank",
-  "images",
-  "videos",
-  "audio-speech",
-  "audio-transcriptions",
-  "music",
-];
+const OPTIONS: ModelSupportedEndpoint[] = ["chat", "responses", "embeddings", "rerank"];
 
 export interface ModelEndpointEditorInfo {
   supportedEndpoints?: readonly string[];

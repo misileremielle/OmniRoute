@@ -32,7 +32,7 @@ different endpoint families, so all four products remain separate provider IDs.
 | Provider family         | `global-sg`                                                              | `china-beijing`                                                      | Wire format |
 | ----------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------- | ----------- |
 | `alibaba`               | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1`                 | `https://dashscope.aliyuncs.com/compatible-mode/v1`                  | OpenAI      |
-| `bailian-coding-plan`   | `https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1` | `https://token-plan.cn-beijing.maas.aliyuncs.com/apps/anthropic/v1`  | Anthropic   |
+| `bailian-coding-plan`   | `https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1`  | `https://token-plan.cn-beijing.maas.aliyuncs.com/apps/anthropic/v1`  | Anthropic   |
 | `qwen-cloud`            | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1`                 | `https://dashscope.aliyuncs.com/compatible-mode/v1`                  | OpenAI      |
 | `qwen-cloud-token-plan` | `https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1` | `https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1` | OpenAI      |
 
@@ -72,9 +72,6 @@ creating another provider card or changing saved provider IDs.
 6. Keep custom endpoint overrides available for advanced and workspace-specific deployments.
 
 Token Plan media models remain outside the chat catalog because they use dedicated endpoints.
-`wan2.7-image` and `wan2.7-image-pro` are registered in `open-sse/config/imageRegistry.ts`;
-`happyhorse-1.1-i2v`, `happyhorse-1.1-t2v`, and `happyhorse-1.1-r2v` are registered in
-`open-sse/config/videoRegistry.ts`. Both registries reuse the `qwen-cloud-token-plan` connection
 identity and its region-specific credentials.
 
 Regular Qwen Cloud has separate pay-as-you-go image and video catalogs under the `qwen-cloud`

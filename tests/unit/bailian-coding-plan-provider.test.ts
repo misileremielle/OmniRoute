@@ -301,17 +301,6 @@ test("getStaticModelsForProvider returns undefined for non-static providers", ()
   }
 });
 
-test("getStaticModelsForProvider returns local image catalogs for image-only providers", () => {
-  // nanobanana has IMAGE_PROVIDERS rows but no chat registry models — specialty
-  // must still surface them. Chat+image providers (xai/lmarena/openai) keep
-  // image models exclusively in IMAGE_PROVIDERS (not the chat specialty list).
-  const models = getStaticModelsForProvider("nanobanana");
-
-  assert.ok(models, "nanobanana should expose local image models");
-  assert.ok(models.length >= 1);
-  assert.ok(models.every((m) => m.supportedEndpoints?.includes("images")));
-});
-
 test("getStaticModelsForProvider does not dump IMAGE_PROVIDERS into chat specialty", () => {
   for (const provider of ["lmarena", "openai", "xai"]) {
     const models = getStaticModelsForProvider(provider) || [];
@@ -326,7 +315,7 @@ test("getStaticModelsForProvider does not dump IMAGE_PROVIDERS into chat special
 
 test("getStaticModelsForProvider returns models for other static providers", () => {
   // Verify other static providers still work
-  const staticProviders = ["deepgram", "assemblyai", "nanobanana", "perplexity"];
+  const staticProviders = ["claude", "antigravity", "perplexity"];
 
   for (const provider of staticProviders) {
     const models = getStaticModelsForProvider(provider);

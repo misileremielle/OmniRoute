@@ -39,11 +39,6 @@
       "count": 1
     }
   },
-  "open-sse/executors/awsPollyTts.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "open-sse/executors/azure-openai.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -189,16 +184,6 @@
       "count": 1
     }
   },
-  "open-sse/handlers/imageGeneration.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 4
-    }
-  },
-  "open-sse/handlers/musicGeneration.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
   "open-sse/handlers/responseSanitizer.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -222,19 +207,6 @@
   },
   "open-sse/handlers/sseParser.ts": {
     "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "open-sse/handlers/videoGeneration.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 4
-    }
-  },
-  "open-sse/handlers/videoGeneration/leonardoHandler.ts": {
-    "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
   },
@@ -273,21 +245,11 @@
       "count": 2
     }
   },
-  "open-sse/mcp-server/tools/gamificationTools.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
   "open-sse/mcp-server/tools/pickFastestModel.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     },
     "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "open-sse/mcp-server/tools/pluginTools.ts": {
-    "@typescript-eslint/no-explicit-any": {
       "count": 1
     }
   },
@@ -334,11 +296,6 @@
   "open-sse/services/antigravityQuotaFamily.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "open-sse/services/autoCombo/chaosEngine.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "open-sse/services/autoCombo/engine.ts": {
@@ -910,7 +867,7 @@
   },
   "src/app/api/providers/[id]/models/route.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 9
+      "count": 5
     }
   },
   "src/app/api/providers/bulk-web-session/route.ts": {
@@ -958,22 +915,7 @@
       "count": 1
     }
   },
-  "src/app/api/v1/audio/speech/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/api/v1/embeddings/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/app/api/v1/images/edits/route.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/app/api/v1/images/generations/route.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -998,16 +940,6 @@
       "count": 1
     }
   },
-  "src/app/api/v1/moderations/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/app/api/v1/music/generations/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/api/v1/ocr/route.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1021,11 +953,6 @@
   "src/app/api/v1/search/route.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 3
-    }
-  },
-  "src/app/api/v1/videos/generations/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "src/app/login/page.tsx": {
@@ -1283,11 +1210,6 @@
       "count": 1
     }
   },
-  "src/lib/plugins/manager.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/lib/providers/validation.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1541,11 +1463,6 @@
       "count": 11
     }
   },
-  "src/sse/handlers/chat.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 8
-    }
-  },
   "src/sse/handlers/chatHelpers.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -1656,7 +1573,7 @@
   },
   "tests/integration/api-routes-critical.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 39
+      "count": 34
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1828,7 +1745,7 @@
   },
   "tests/integration/v1-contracts-behavior.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 10
+      "count": 9
     }
   },
   "tests/live/deepseek-web-live.test.ts": {
@@ -1887,11 +1804,6 @@
   "tests/unit/admission-virtual-lanes-9654.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "tests/unit/adobe-firefly.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
     }
   },
   "tests/unit/adversarialPii.test.ts": {
@@ -1972,11 +1884,6 @@
       "count": 3
     }
   },
-  "tests/unit/api/webhooks/webhook-url-ssrf-guard.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/apikey-connection-health-check.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
@@ -1985,21 +1892,6 @@
   "tests/unit/apikeypolicy-disable-non-public.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "tests/unit/audio-speech-handler.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 9
-    }
-  },
-  "tests/unit/audio-transcription-handler.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 9
-    }
-  },
-  "tests/unit/audio-translations-route.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 6
     }
   },
   "tests/unit/auggie-executor.test.ts": {
@@ -2363,11 +2255,6 @@
       "count": 5
     }
   },
-  "tests/unit/cli-memory-types.test.mjs": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 4
-    }
-  },
   "tests/unit/cli-nodes-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 15
@@ -2407,11 +2294,6 @@
       "count": 1
     }
   },
-  "tests/unit/cli-plugin-system.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/cli-policy-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 20
@@ -2427,7 +2309,7 @@
   },
   "tests/unit/cli-process-supervisor.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 6
+      "count": 5
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -2534,11 +2416,6 @@
   "tests/unit/cli-usage.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 17
-    }
-  },
-  "tests/unit/cli-webhooks-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 23
     }
   },
   "tests/unit/cli/alias-resolver-7791.test.ts": {
@@ -2687,11 +2564,6 @@
   "tests/unit/combos-quota-protected.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 4
-    }
-  },
-  "tests/unit/comfyui-baseurl-override-6928.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/command-code-executor.test.ts": {
@@ -2880,11 +2752,6 @@
   "tests/unit/db-domainState-crud.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 5
-    }
-  },
-  "tests/unit/db-gamification-federation-3500.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
     }
   },
   "tests/unit/db-health-check.test.ts": {
@@ -3169,16 +3036,6 @@
       "count": 1
     }
   },
-  "tests/unit/gamification/events.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/gamification/leaderboard.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    }
-  },
   "tests/unit/gemini-finish-reason-normalization.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 3
@@ -3232,11 +3089,6 @@
       "count": 25
     }
   },
-  "tests/unit/gtts-provider.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/guardrails/visionBridgeHelpers.callVisionModel.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -3250,21 +3102,6 @@
   "tests/unit/i18n-nest-dotted-keys.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 4
-    }
-  },
-  "tests/unit/image-generation-fetch-timeout.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/image-generation-handler.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/image-generation-route.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/injection-guard-nonchat-route-logging.test.ts": {
@@ -3342,11 +3179,6 @@
       "count": 4
     }
   },
-  "tests/unit/minimax-tts-1043.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 6
-    }
-  },
   "tests/unit/model-alias-route.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 6
@@ -3399,7 +3231,7 @@
   },
   "tests/unit/models-catalog-route.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 78
+      "count": 63
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 3
@@ -3413,11 +3245,6 @@
   "tests/unit/modelsDevSync.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    }
-  },
-  "tests/unit/moderations-handler.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 7
     }
   },
   "tests/unit/nanobanana-image-generation.test.ts": {
@@ -3540,57 +3367,6 @@
       "count": 20
     }
   },
-  "tests/unit/plugins-config-route.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/plugins-config.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/plugins-dev-mode.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "tests/unit/plugins-edge-cases.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/plugins-fs-safety.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/plugins-hooks.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/plugins-index.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 9
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "tests/unit/plugins-manager-lifecycle.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/plugins-welcome-banner-e2e.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 4
-    }
-  },
   "tests/unit/pollinations-jsonmode-3981.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 3
@@ -3638,7 +3414,7 @@
   },
   "tests/unit/provider-models-route.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 54
+      "count": 51
     }
   },
   "tests/unit/provider-models-token-limits.test.ts": {
@@ -3659,11 +3435,6 @@
   "tests/unit/provider-nodes-validate-modelid.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 8
-    }
-  },
-  "tests/unit/provider-proxy-lazy.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/provider-request-failure-pipeline.test.ts": {
@@ -3828,31 +3599,6 @@
       "count": 1
     }
   },
-  "tests/unit/radar-api-routes.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "tests/unit/radar-apply-feed.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/radar-db.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 5
-    }
-  },
-  "tests/unit/radar-referrals-sync.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "tests/unit/radar-sync.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "tests/unit/rate-limit-enhanced.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -3948,10 +3694,7 @@
   },
   "tests/unit/route-edge-coverage.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 57
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
+      "count": 56
     }
   },
   "tests/unit/route-guard-loopback-via-proxy.test.ts": {
@@ -4541,16 +4284,6 @@
       "count": 2
     }
   },
-  "tests/unit/vertex-media.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    }
-  },
-  "tests/unit/video-custom-provider-route.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/waitForServer-tcp-fallback-6800.test.mjs": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -4584,11 +4317,6 @@
   "tests/unit/web-session-pool-health.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 2
-    }
-  },
-  "tests/unit/webhook-abort-timer-cleanup.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 5
     }
   },
   "tests/unit/xiaomi-providers-registry.test.ts": {

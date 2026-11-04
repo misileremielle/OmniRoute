@@ -22,7 +22,6 @@ const settingsDb = await import("../../src/lib/db/settings.ts");
 const apiKeysDb = await import("../../src/lib/db/apiKeys.ts");
 const { upsertSyncedCapabilities } = await import("../../src/lib/modelsDevSync.ts");
 const { updatePricing } = await import("../../src/lib/db/settings/pricing.ts");
-const { aiHordeImageCatalog } = await import("../../open-sse/services/aihordeImageCatalog.ts");
 const { mintDashboardSessionToken, DASHBOARD_SESSION_COOKIE } =
   await import("../../src/shared/utils/dashboardSessionToken.ts");
 const catalog = await import("../../src/app/api/v1/models/catalog.ts");
@@ -74,9 +73,6 @@ test.beforeEach(async () => {
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   fs.mkdirSync(TEST_DATA_DIR, { recursive: true });
   catalog.__resetCatalogBuilderRunsForTest();
-  // Isolate unrelated anonymous image discovery at its HTTP boundary.
-  aiHordeImageCatalog.setFetch(async () => Response.json([]));
-  await aiHordeImageCatalog.ensureFresh();
   await settingsDb.updateSettings({
     password: "wildcard-catalog-test-password",
     requireLogin: true,

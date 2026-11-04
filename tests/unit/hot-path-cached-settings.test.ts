@@ -9,8 +9,6 @@ import { fileURLToPath } from "node:url";
 // They must use the 5s TTL getCachedSettings() (invalidated by updateSettings()).
 const HOT_PATH_MODULES = [
   "src/lib/guardrails/visionBridge.ts",
-  "src/lib/guardrails/audioBridge.ts",
-  "src/lib/guardrails/videoBridge.ts",
   "src/lib/guardrails/credentialMasker.ts",
   "src/lib/db/detailedLogs.ts",
 ];

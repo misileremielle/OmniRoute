@@ -24,11 +24,7 @@ for (const [label, body] of [
   ["a number", "5"],
   ["true", "true"],
 ] as const) {
-  for (const url of [
-    "http://localhost/v1/chat/completions",
-    "http://localhost/v1/messages",
-    "http://localhost/v1/completions",
-  ]) {
+  for (const url of ["http://localhost/v1/chat/completions", "http://localhost/v1/messages"]) {
     test(`${label} on ${new URL(url).pathname} is rejected with a clear 400`, async () => {
       let status = 0;
       let message = "";
@@ -36,8 +32,7 @@ for (const [label, body] of [
         const response = await handleChat(buildRequest({ url, body }));
         status = response.status;
         message =
-          ((await response.json()) as { error?: { message?: string } }).error
-            ?.message ?? "";
+          ((await response.json()) as { error?: { message?: string } }).error?.message ?? "";
       } catch (error) {
         // A throw out of handleChat is what the route turns into a 500.
         status = 500;

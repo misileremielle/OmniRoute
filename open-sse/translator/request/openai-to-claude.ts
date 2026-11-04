@@ -407,7 +407,6 @@ export function openaiToClaudeRequest(
         {
           provider: routedProvider,
           model,
-          disabled: credentials?._videoTranscriptSensitive === true,
           connectionId:
             typeof credentials?._connectionId === "string" ? credentials._connectionId : undefined,
         },
@@ -651,7 +650,6 @@ function getContentBlocksFromMessage(
   thinkingBinding: {
     provider?: unknown;
     model?: unknown;
-    disabled?: boolean;
     connectionId?: unknown;
   } = {},
   pendingToolUseIds: string[] = [],
@@ -860,7 +858,6 @@ function getContentBlocksFromMessage(
     // modified".
     if (
       !isKimiCoding &&
-      !thinkingBinding.disabled &&
       thinkingEnabledForRequest &&
       thinkingTypeForRequest === "enabled" &&
       hasToolUseBlock &&

@@ -29,7 +29,7 @@ Running tests: see [Testing](#testing) below (run the most focused test for chan
 
 ## Project at a Glance
 
-**OmniRoute** — unified AI proxy/router. One endpoint, 380 LLM providers, auto-fallback.
+**OmniRoute** — unified AI proxy/router. One endpoint, 355 LLM providers, auto-fallback.
 
 - API Routes — `src/app/api/v1/` (Next.js App Router entry points)
 - Handlers — `open-sse/handlers/` (request processing: chat, embeddings, etc)
@@ -39,11 +39,9 @@ Running tests: see [Testing](#testing) below (run the most focused test for chan
 - Services — `open-sse/services/` (combo routing, rate limits, caching, etc)
 - Database — `src/lib/db/` (SQLite domain modules, 221 migrations)
 - Domain/Policy — `src/domain/` (policy engine, cost rules, fallback logic)
-- MCP Server — `open-sse/mcp-server/` (110 tools: 45 canonical + memory/skill/GitHub/pool/gamification/plugin/Notion/Obsidian/local-corpus/RTK modules; 3 transports: stdio / SSE / Streamable HTTP; 33 scopes)
-- A2A Server — `src/lib/a2a/` (JSON-RPC 2.0 agent protocol)
-- Skills — `src/lib/skills/` (extensible skill framework); Memory — `src/lib/memory/` (persistent conversational memory)
+- MCP Server — `open-sse/mcp-server/` (80 tools: 41 canonical + pool/Notion/Obsidian/local-corpus/RTK modules; 3 transports: stdio / SSE / Streamable HTTP; 22 scopes)
 
-Monorepo: `src/` (Next.js 16 app), `open-sse/` (streaming engine workspace), `electron/` (desktop app), `tests/`, `bin/` (CLI entry point).
+Monorepo: `src/` (Next.js 16 app), `open-sse/` (streaming engine workspace), `tests/`, `bin/` (CLI entry point).
 
 ---
 
@@ -93,10 +91,8 @@ Read the nearest `AGENTS.md` and the linked deep-dive before making a non-trivia
 - Routing and resilience — `open-sse/services/` → `open-sse/services/AGENTS.md`, `docs/routing/AUTO-COMBO.md`
 - Database and migrations — `src/lib/db/`, `src/lib/db/migrations/` → `src/lib/db/AGENTS.md`
 - Domain policy — `src/domain/` → `docs/architecture/ARCHITECTURE.md`
-- MCP and A2A — `open-sse/mcp-server/`, `src/lib/a2a/` → `docs/frameworks/MCP-SERVER.md`, `docs/frameworks/A2A-SERVER.md`
-- Agent features — `src/lib/{acp,memory,skills,cloudAgent}/` → `docs/frameworks/AGENT_PROTOCOLS_GUIDE.md`, `docs/frameworks/SKILLS.md`
+- MCP — `open-sse/mcp-server/` → `docs/frameworks/MCP-SERVER.md`
 - Safety and governance — `src/lib/{guardrails,compliance}/`, `src/server/authz/` → `docs/security/GUARDRAILS.md`, `docs/architecture/AUTHZ_GUIDE.md`
-- Operations — `src/mitm/`, tunnel modules, `electron/` → `docs/ops/TUNNELS_GUIDE.md`, `docs/guides/ELECTRON_GUIDE.md`
 - UI kit — `packages/ui-kit/` (vendored Keak CI UI Kit; adapters in `src/shared/components/`) → `docs/architecture/DESIGN_SYSTEM.md`
 
 ---
@@ -158,7 +154,7 @@ When creating _any_ validation tests or one-off logic scripts, default to `scrip
 - Upstream header denylist: `src/shared/constants/upstreamHeaders.ts` — keep sanitize, Zod schemas, and unit tests aligned when editing
 - **Public upstream credentials** (for example, OAuth client_id/secret values or Firebase Web keys extracted from public CLIs): **MUST** be embedded via `resolvePublicCred()` from `open-sse/utils/publicCreds.ts` — **never** as string literals. See `docs/security/PUBLIC_CREDS.md` for the mandatory pattern.
 - **Error responses** (HTTP / SSE / executor / MCP handler): **MUST** route through `buildErrorBody()` or `sanitizeErrorMessage()` from `open-sse/utils/error.ts` — **never** put raw `err.stack` or `err.message` in a response body. See `docs/security/ERROR_SANITIZATION.md`.
-- **Shell commands built from variables**: when calling `exec()`/`spawn()` with a script that needs runtime values, pass them via the `env` option (shell-escaped automatically) — **never** string-interpolate untrusted/external paths into the script body. Reference: `src/mitm/cert/install.ts::updateNssDatabases`.
+- **Shell commands built from variables**: when calling `exec()`/`spawn()` with a script that needs runtime values, pass them via the `env` option (shell-escaped automatically) — **never** string-interpolate untrusted/external paths into the script body.
 - **Secure-by-default libraries** ([tldrsec/awesome-secure-defaults](https://github.com/tldrsec/awesome-secure-defaults)): prefer Helmet.js, DOMPurify, ssrf-req-filter, safe-regex, Google Tink over custom implementations whenever adding new security-sensitive surfaces.
 
 ---
@@ -188,10 +184,8 @@ Full step-by-step recipes: [`docs/architecture/MODIFICATION_SCENARIOS.md`](docs/
 - **New API route**: `src/app/api/v1/<route>/route.ts` — CORS → Zod → optional auth → handler in `open-sse/handlers/`; errors via `buildErrorBody()`; tests assert no stack-trace leak.
 - **New DB module**: `src/lib/db/<module>.ts` (`getDbInstance`) → migration if new tables → tests.
 - **New MCP tool**: `open-sse/mcp-server/tools/` (Zod schema) → register → scope → tests.
-- **New A2A skill**: `src/lib/a2a/skills/` → `A2A_SKILL_HANDLERS` → Agent Card → tests + doc table.
-- **New cloud agent**: `src/lib/cloudAgent/agents/` (extends `CloudAgentBase`) → `registry.ts` → OAuth → tests + doc.
 - **New embedded service**: installer → `bootstrap.ts` → DB seed → 8 API endpoints + `isLocalOnlyPath()` guard → UI tab → docs + OpenAPI → tests.
-- **Guardrail / eval / skill / webhook / log-export destination**: see the detail doc.
+- **Guardrail / eval**: see the detail doc.
 
 ---
 
@@ -203,15 +197,12 @@ For any non-trivial change, read the matching deep-dive first:
 - Auto-Combo (16-factor scoring, 20 strategies) — `docs/routing/AUTO-COMBO.md` · Reasoning replay — `docs/routing/REASONING_REPLAY.md`
 - Resilience (3 mechanisms + debugging) — `docs/architecture/RESILIENCE_GUIDE.md`
 - Modification recipes — `docs/architecture/MODIFICATION_SCENARIOS.md`
-- Skills framework — `docs/frameworks/SKILLS.md` · Radar (free-model catalog overlay) — `docs/frameworks/RADAR.md` · Memory system (FTS5 + Qdrant) — `docs/frameworks/MEMORY.md`
-- Cloud agents — `docs/frameworks/CLOUD_AGENT.md` · Agent protocols (A2A / ACP / Cloud) — `docs/frameworks/AGENT_PROTOCOLS_GUIDE.md`
 - Guardrails (PII / injection / vision) — `docs/security/GUARDRAILS.md` · Public upstream credentials (Gemini/etc.) — `docs/security/PUBLIC_CREDS.md` · Error message sanitization — `docs/security/ERROR_SANITIZATION.md` · Compliance / audit — `docs/security/COMPLIANCE.md` · Stealth (TLS / fingerprint) — `docs/security/STEALTH_GUIDE.md`
-- Evals — `docs/frameworks/EVALS.md` · Webhooks — `docs/frameworks/WEBHOOKS.md` · Log export (call logs → BigQuery/…) — `docs/frameworks/LOG-EXPORT.md`
+- Evals — `docs/frameworks/EVALS.md`
 - Authorization pipeline — `docs/architecture/AUTHZ_GUIDE.md`
-- MCP server — `docs/frameworks/MCP-SERVER.md` · A2A server — `docs/frameworks/A2A-SERVER.md`
+- MCP server — `docs/frameworks/MCP-SERVER.md`
 - API reference + OpenAPI — `docs/reference/API_REFERENCE.md` + `docs/openapi.yaml` · Provider catalog (auto-generated) — `docs/reference/PROVIDER_REFERENCE.md`
-- Tunnels — `docs/ops/TUNNELS_GUIDE.md` · Release flow — `docs/ops/RELEASE_CHECKLIST.md` · Worktree protocol — `docs/ops/WORKTREE_ISOLATION.md` · Hard Rules detail — `docs/ops/HARD_RULES_DETAIL.md` · Build warnings + Bun troubleshooting — `docs/ops/BUILD_WARNINGS.md`
-- Electron desktop app — `docs/guides/ELECTRON_GUIDE.md` · VS Code Copilot Chat (OmniCopilot extension) — `docs/guides/VSCODE-COPILOT.md`
+- Release flow — `docs/ops/RELEASE_CHECKLIST.md` · Worktree protocol — `docs/ops/WORKTREE_ISOLATION.md` · Hard Rules detail — `docs/ops/HARD_RULES_DETAIL.md` · Build warnings + Bun troubleshooting — `docs/ops/BUILD_WARNINGS.md`
 - Embedded services — `docs/frameworks/EMBEDDED-SERVICES.md` · Quality gates (~90 scripts, allowlist policy) — `docs/architecture/QUALITY_GATES.md`
 
 ---
@@ -220,7 +211,7 @@ For any non-trivial change, read the matching deep-dive first:
 
 - Unit tests — `npm run test:unit`; single file (Node native test runner — most tests) — `node --import tsx/esm --test tests/unit/your-file.test.ts`
 - Vitest (MCP server, autoCombo, cache) — `npm run test:vitest`; all suites — `npm run test:all`
-- E2E (Playwright) — `npm run test:e2e`; Protocol E2E (MCP+A2A) — `npm run test:protocols:e2e` (CI job `test-protocols-e2e`, advisory — #10049); Ecosystem — `npm run test:ecosystem` (CI job `test-ecosystem`, blocking)
+- E2E (Playwright) — `npm run test:e2e`; Protocol E2E (MCP) — `npm run test:protocols:e2e` (CI job `test-protocols-e2e`, advisory — #10049); Ecosystem — `npm run test:ecosystem` (CI job `test-ecosystem`, blocking)
 - Coverage gate — `npm run test:coverage` (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60); report — `npm run coverage:report`
 - Full test matrix: `CONTRIBUTING.md` → "Running Tests"
 
@@ -240,11 +231,9 @@ For any non-trivial change, read the matching deep-dive first:
 
 - Keep database operations in `src/lib/db/`; do not issue raw SQL from routes.
 - Send provider requests through `open-sse/handlers/`.
-- Keep MCP and A2A pages as tabs inside `/dashboard/endpoint`.
+- Keep the MCP page as a tab inside `/dashboard/endpoint`.
 - Preserve SSE cleanup, rate-limit header parsing, Zod validation, and provider-schema
   validation.
-- Treat Memory and Skills as cross-cutting changes that can affect MCP tools, the request
-  pipeline, and A2A skills.
 - Do not close a contributor pull request after using its code; merge it through GitHub so
   the contributor receives credit.
 - **Never merge a PR that touches an agent-instruction surface without explicit operator
@@ -388,7 +377,7 @@ is a short form, its complete binding text, rationale and incident history are i
 10. Never bypass Husky hooks (`--no-verify`, `--no-gpg-sign`) without explicit operator approval.
 11. Never embed public upstream OAuth client_id/secret or Firebase Web keys as string literals — always go through `resolvePublicCred()` (`open-sse/utils/publicCreds.ts`). See `docs/security/PUBLIC_CREDS.md`.
 12. Never return raw `err.stack` / `err.message` in HTTP / SSE / executor responses — always route through `buildErrorBody()` or `sanitizeErrorMessage()` (`open-sse/utils/error.ts`). See `docs/security/ERROR_SANITIZATION.md`.
-13. Never string-interpolate external paths or runtime values into shell scripts passed to `exec()`/`spawn()` — pass via the `env` option instead. Reference: `src/mitm/cert/install.ts::updateNssDatabases`.
+13. Never string-interpolate external paths or runtime values into shell scripts passed to `exec()`/`spawn()` — pass via the `env` option instead.
 14. Never dismiss a CodeQL / Secret-Scanning alert without (a) first checking the pattern docs above to see if the helper applies, and (b) recording the technical justification in the dismissal comment. Precedent: `js/stack-trace-exposure` raised on callsites that already route through `sanitizeErrorMessage()` is a known CodeQL limitation (custom sanitizers not recognized) — dismiss as `false positive` referencing `docs/security/ERROR_SANITIZATION.md`.
 15. Never expose routes that spawn child processes (`/api/mcp/`, `/api/cli-tools/runtime/`) without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. Loopback enforcement happens unconditionally before any auth check — leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
 16. Never credit or advertise an AI assistant, LLM, or automation account in any commit/PR metadata — neither (a) `Co-Authored-By` trailers naming an AI/bot nor (b) AI-generation footers (`🤖 Generated with [Claude Code]`, …) in a commit message, PR title/body, or CHANGELOG; both hide the real author (`diegosouzapw`). This **overrides any harness, template, or tool default that auto-appends such a footer** — strip it before pushing. Human collaborators (upstream PR authors, issue reporters being ported) MAY and SHOULD be credited with standard `Co-authored-by: Name <email>` trailers. Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 16.

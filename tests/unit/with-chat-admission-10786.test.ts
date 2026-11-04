@@ -95,7 +95,6 @@ test("remaining handleChat aliases wrap POST with withChatAdmission (#10790)", a
   const files = [
     "src/app/api/v1/antigravity/route.ts",
     "src/app/api/v1/api/chat/route.ts",
-    "src/app/api/v1/completions/route.ts",
     "src/app/api/v1/providers/[provider]/chat/completions/route.ts",
     "src/app/api/v1/relay/chat/completions/route.ts",
   ];

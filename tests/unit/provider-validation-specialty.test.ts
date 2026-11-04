@@ -55,40 +55,6 @@ data:
 `;
 }
 
-test("specialty provider validators cover Deepgram, AssemblyAI, ElevenLabs and Inworld branches", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    const target = String(url);
-    const headers = init.headers || {};
-
-    if (target.match(/deepgram/i)) {
-      assert.equal(headers.Authorization, "Token dg-key");
-      return new Response(JSON.stringify({ ok: true }), { status: 200 });
-    }
-    if (target.match(/assemblyai/i)) {
-      assert.equal(headers.Authorization, "aa-key");
-      return new Response(JSON.stringify({ error: "unauthorized" }), { status: 403 });
-    }
-    if (target.match(/elevenlabs/i)) {
-      return new Response(JSON.stringify({ voices: [] }), { status: 200 });
-    }
-    if (target.match(/inworld/i)) {
-      return new Response(JSON.stringify({ error: "bad request" }), { status: 400 });
-    }
-
-    throw new Error(`unexpected fetch: ${target}`);
-  };
-
-  const deepgram = await validateProviderApiKey({ provider: "deepgram", apiKey: "dg-key" });
-  const assembly = await validateProviderApiKey({ provider: "assemblyai", apiKey: "aa-key" });
-  const eleven = await validateProviderApiKey({ provider: "elevenlabs", apiKey: "el-key" });
-  const inworld = await validateProviderApiKey({ provider: "inworld", apiKey: "iw-key" });
-
-  assert.equal(deepgram.valid, true);
-  assert.equal(assembly.error, "Invalid API key");
-  assert.equal(eleven.valid, true);
-  assert.equal(inworld.valid, true);
-});
-
 test("validateCommandCodeProvider ignores caller baseUrl and chatPath overrides", async () => {
   globalThis.fetch = async (url, init = {}) => {
     assert.equal(String(url), "https://api.commandcode.ai/provider/v1/chat/completions");
@@ -126,29 +92,14 @@ test("validateCommandCodeProvider defaults probe model to DeepSeek flash", async
 test("specialty providers surface network failures and non-auth upstream failures", async () => {
   globalThis.fetch = async (url) => {
     const target = String(url);
-    if (target.match(/deepgram/i)) {
-      throw new Error("deepgram offline");
-    }
-    if (target.match(/elevenlabs/i)) {
-      return new Response(JSON.stringify({ error: "server" }), { status: 500 });
-    }
-    if (target.match(/inworld/i)) {
-      return new Response(JSON.stringify({ error: "forbidden" }), { status: 403 });
-    }
     if (target.match(/longcat/i)) {
       throw new Error("longcat offline");
     }
     throw new Error(`unexpected fetch: ${target}`);
   };
 
-  const deepgram = await validateProviderApiKey({ provider: "deepgram", apiKey: "dg-key" });
-  const eleven = await validateProviderApiKey({ provider: "elevenlabs", apiKey: "el-key" });
-  const inworld = await validateProviderApiKey({ provider: "inworld", apiKey: "iw-key" });
   const longcat = await validateProviderApiKey({ provider: "longcat", apiKey: "lc-key" });
 
-  assert.equal(deepgram.error, "deepgram offline");
-  assert.equal(eleven.error, "Validation failed: 500");
-  assert.equal(inworld.error, "Invalid API key");
   assert.equal(longcat.error, "longcat offline");
 });
 
@@ -176,57 +127,6 @@ test("embedding and rerank specialty validators cover Voyage AI and Jina AI", as
 
   assert.equal(voyage.valid, true);
   assert.equal(jina.valid, true);
-});
-
-test("AWS Polly specialty validator signs DescribeVoices with SigV4", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    const target = String(url);
-    const headers = init.headers as Record<string, string>;
-
-    assert.equal(target, "https://polly.us-east-2.amazonaws.com/v1/voices?Engine=standard");
-    assert.match(
-      headers.Authorization,
-      /^AWS4-HMAC-SHA256 Credential=AKIA_POLLY\/\d{8}\/us-east-2\/polly\/aws4_request,/
-    );
-    assert.equal(headers.host, "polly.us-east-2.amazonaws.com");
-    assert.equal(headers["x-amz-content-sha256"].length, 64);
-    return new Response(JSON.stringify({ Voices: [] }), { status: 200 });
-  };
-
-  const result = await validateProviderApiKey({
-    provider: "aws-polly",
-    apiKey: "aws-secret",
-    providerSpecificData: {
-      accessKeyId: "AKIA_POLLY",
-      region: "us-east-2",
-    },
-  });
-
-  assert.equal(result.valid, true);
-});
-
-test("AWS Polly specialty validator requires an access key id", async () => {
-  const result = await validateProviderApiKey({
-    provider: "aws-polly",
-    apiKey: "aws-secret",
-    providerSpecificData: {
-      region: "us-east-2",
-    },
-  });
-
-  assert.equal(result.error, "Missing AWS accessKeyId");
-});
-
-test("AWS Polly specialty validator identifies invalid AWS credentials", async () => {
-  globalThis.fetch = async () => new Response("forbidden", { status: 403 });
-
-  const result = await validateProviderApiKey({
-    provider: "aws-polly",
-    apiKey: "aws-secret",
-    providerSpecificData: { accessKeyId: "AKIA_POLLY" },
-  });
-
-  assert.equal(result.error, "Invalid AWS credentials");
 });
 
 test("embedding and rerank specialty validators surface auth failures for Voyage AI and Jina AI", async () => {
@@ -1223,21 +1123,9 @@ test("registry providers cover remaining OpenAI-like and Claude-like validation 
   assert.equal(calls[1].headers["x-api-key"], "sk-claude");
 });
 
-test("specialty validators cover remaining status branches for Deepgram, AssemblyAI, ElevenLabs, Inworld, Bailian and LongCat", async () => {
+test("specialty validators cover remaining status branches for Bailian and LongCat", async () => {
   globalThis.fetch = async (url) => {
     const target = String(url);
-    if (target.match(/deepgram/i)) {
-      return new Response(JSON.stringify({ error: "server" }), { status: 500 });
-    }
-    if (target.match(/assemblyai/i)) {
-      return new Response(JSON.stringify({ transcripts: [] }), { status: 200 });
-    }
-    if (target.match(/elevenlabs/i)) {
-      return new Response(JSON.stringify({ error: "forbidden" }), { status: 403 });
-    }
-    if (target.match(/inworld/i)) {
-      throw new Error("inworld offline");
-    }
     // Alibaba-family hosts: dashscope.aliyuncs.com (pay-as-you-go / AIGC) and
     // *.maas.aliyuncs.com (Token Plan).
     if (target.match(/(?:dashscope|maas)\.aliyuncs\.com/i)) {
@@ -1249,10 +1137,6 @@ test("specialty validators cover remaining status branches for Deepgram, Assembl
     throw new Error(`unexpected fetch: ${target}`);
   };
 
-  const deepgram = await validateProviderApiKey({ provider: "deepgram", apiKey: "dg-key" });
-  const assembly = await validateProviderApiKey({ provider: "assemblyai", apiKey: "aa-key" });
-  const eleven = await validateProviderApiKey({ provider: "elevenlabs", apiKey: "el-key" });
-  const inworld = await validateProviderApiKey({ provider: "inworld", apiKey: "iw-key" });
   const bailian = await validateProviderApiKey({
     provider: "bailian-coding-plan",
     apiKey: "bailian-key",
@@ -1263,25 +1147,16 @@ test("specialty validators cover remaining status branches for Deepgram, Assembl
   const longcatInvalid = await validateProviderApiKey({ provider: "longcat", apiKey: "lc-key" });
 
   globalThis.fetch = async (url) => {
-    if (String(url).match(/elevenlabs/i)) {
-      throw new Error("elevenlabs offline");
-    }
     if (String(url).match(/longcat/i)) {
       return new Response(JSON.stringify({ error: "unprocessable" }), { status: 422 });
     }
     throw new Error(`unexpected fetch: ${url}`);
   };
 
-  const elevenOffline = await validateProviderApiKey({ provider: "elevenlabs", apiKey: "el-key" });
   const longcatValid = await validateProviderApiKey({ provider: "longcat", apiKey: "lc-key" });
 
-  assert.equal(deepgram.error, "Validation failed: 500");
-  assert.equal(assembly.valid, true);
-  assert.equal(eleven.error, "Invalid API key");
-  assert.equal(inworld.error, "inworld offline");
   assert.equal(bailian.error, "Validation failed: 500");
   assert.equal(longcatInvalid.error, "Invalid API key");
-  assert.equal(elevenOffline.error, "elevenlabs offline");
   assert.equal(longcatValid.valid, true);
 });
 
@@ -2029,51 +1904,6 @@ test("specialty validator rejects invalid NLP Cloud credentials", async () => {
   });
 
   assert.equal(nlpCloud.error, "Invalid API key");
-});
-
-test("specialty validator accepts Runway credentials on the organization endpoint", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    const target = String(url);
-
-    if (target === "https://api.dev.runwayml.com/v1/organization") {
-      const headers = init.headers as Record<string, string>;
-      assert.equal(headers.Authorization, "Bearer runway-key");
-      assert.equal(headers["X-Runway-Version"], "2024-11-06");
-      return new Response(JSON.stringify({ id: "org_demo" }), { status: 200 });
-    }
-
-    throw new Error(`unexpected fetch: ${target}`);
-  };
-
-  const runway = await validateProviderApiKey({
-    provider: "runwayml",
-    apiKey: "runway-key",
-  });
-
-  assert.equal(runway.valid, true);
-  assert.equal(runway.method, "runway_organization");
-});
-
-test("specialty validator rejects invalid Runway credentials", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    const target = String(url);
-
-    if (target === "https://api.dev.runwayml.com/v1/organization") {
-      const headers = init.headers as Record<string, string>;
-      assert.equal(headers.Authorization, "Bearer runway-bad");
-      assert.equal(headers["X-Runway-Version"], "2024-11-06");
-      return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
-    }
-
-    throw new Error(`unexpected fetch: ${target}`);
-  };
-
-  const runway = await validateProviderApiKey({
-    provider: "runwayml",
-    apiKey: "runway-bad",
-  });
-
-  assert.equal(runway.error, "Invalid API key");
 });
 
 test("validateCommandCodeProvider sends Command Code probe URL, headers, and flat OpenAI body", async () => {

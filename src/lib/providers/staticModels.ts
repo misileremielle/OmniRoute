@@ -1,11 +1,5 @@
 import { getEmbeddingProvider } from "@omniroute/open-sse/config/embeddingRegistry.ts";
 import { getRerankProvider } from "@omniroute/open-sse/config/rerankRegistry.ts";
-import { getImageProvider } from "@omniroute/open-sse/config/imageRegistry.ts";
-import { getVideoProvider } from "@omniroute/open-sse/config/videoRegistry.ts";
-import {
-  getSpeechProvider,
-  getTranscriptionProvider,
-} from "@omniroute/open-sse/config/audioRegistry.ts";
 import { ANTIGRAVITY_PUBLIC_MODELS } from "@omniroute/open-sse/config/antigravityModelAliases.ts";
 import { getStaticQoderModels } from "@omniroute/open-sse/services/qoderCli.ts";
 import { getSearchProvider } from "@omniroute/open-sse/config/searchRegistry.ts";
@@ -21,18 +15,6 @@ export type LocalCatalogModel = {
 };
 
 const STATIC_MODEL_PROVIDERS: Record<string, () => Array<{ id: string; name: string }>> = {
-  deepgram: () => [
-    { id: "nova-3", name: "Nova 3 (Transcription)" },
-    { id: "nova-2", name: "Nova 2 (Transcription)" },
-    { id: "whisper-large", name: "Whisper Large (Transcription)" },
-    { id: "aura-asteria-en", name: "Aura Asteria EN (TTS)" },
-    { id: "aura-luna-en", name: "Aura Luna EN (TTS)" },
-    { id: "aura-stella-en", name: "Aura Stella EN (TTS)" },
-  ],
-  assemblyai: () => [
-    { id: "universal-3-pro", name: "Universal 3 Pro (Transcription)" },
-    { id: "universal-2", name: "Universal 2 (Transcription)" },
-  ],
   antigravity: () => ANTIGRAVITY_PUBLIC_MODELS.map((model) => ({ ...model })),
   claude: () => [
     { id: "claude-fable-5-1", name: "Claude Fable 5.1" },
@@ -204,45 +186,6 @@ export function getStaticModelsForProvider(provider: string): LocalCatalogModel[
     appendModels(rerankProvider.models, {
       apiFormat: "rerank",
       supportedEndpoints: ["rerank"],
-    });
-  }
-
-  // Image / video: only fold into the provider specialty list for *media-only*
-  // providers (no chat registry models). Chat+image providers (openai, lmarena,
-  // xai, …) keep image rows exclusively in IMAGE_PROVIDERS so the provider page
-  // chat catalog is not polluted with flux-* / dalle ids.
-  const chatRegistry = getModelsByProviderId(provider);
-  const hasChatRegistry = Array.isArray(chatRegistry) && chatRegistry.length > 0;
-
-  const imageProvider = getImageProvider(provider);
-  if (imageProvider && !hasChatRegistry) {
-    appendModels(imageProvider.models, {
-      apiFormat: "images-generations",
-      supportedEndpoints: ["images"],
-    });
-  }
-
-  const videoProvider = getVideoProvider(provider);
-  if (videoProvider && !hasChatRegistry) {
-    appendModels(videoProvider.models, {
-      apiFormat: "video",
-      supportedEndpoints: ["videos"],
-    });
-  }
-
-  const speechProvider = getSpeechProvider(provider);
-  if (speechProvider) {
-    appendModels(speechProvider.models, {
-      apiFormat: "audio-speech",
-      supportedEndpoints: ["audio-speech"],
-    });
-  }
-
-  const transcriptionProvider = getTranscriptionProvider(provider);
-  if (transcriptionProvider) {
-    appendModels(transcriptionProvider.models, {
-      apiFormat: "audio-transcriptions",
-      supportedEndpoints: ["audio-transcriptions"],
     });
   }
 

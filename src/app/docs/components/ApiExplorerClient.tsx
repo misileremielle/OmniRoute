@@ -48,11 +48,6 @@ const EXAMPLE_BODIES: Record<string, string> = {
     null,
     2
   ),
-  "/api/v1/images/generations": JSON.stringify(
-    { model: "openai/gpt-image-2", prompt: "A sunset over mountains", n: 1 },
-    null,
-    2
-  ),
   "/api/v1/responses": JSON.stringify(
     { model: "openai/gpt-4o-mini", input: "What is OmniRoute?" },
     null,
@@ -75,23 +70,12 @@ const EXAMPLE_BODIES: Record<string, string> = {
     null,
     2
   ),
-  "/api/v1/moderations": JSON.stringify(
-    { model: "openai/omni-moderation-latest", input: "Sample text" },
-    null,
-    2
-  ),
   "/api/v1/rerank": JSON.stringify(
     {
       model: "cohere/rerank-v3.5",
       query: "best ai gateway",
       documents: ["Document 1", "Document 2"],
     },
-    null,
-    2
-  ),
-  "/api/v1/audio/transcriptions": "",
-  "/api/v1/audio/speech": JSON.stringify(
-    { model: "openai/tts-1", input: "Hello world", voice: "alloy" },
     null,
     2
   ),

@@ -122,13 +122,7 @@ async function loadModalityRows(): Promise<ModalityRow[]> {
   const loaders: Array<() => Promise<unknown>> = [
     async () =>
       (await import("@omniroute/open-sse/config/embeddingRegistry")).getAllEmbeddingModels(),
-    async () => (await import("@omniroute/open-sse/config/imageRegistry")).getAllImageModels(),
     async () => (await import("@omniroute/open-sse/config/rerankRegistry")).getAllRerankModels(),
-    async () => (await import("@omniroute/open-sse/config/audioRegistry")).getAllAudioModels(),
-    async () =>
-      (await import("@omniroute/open-sse/config/moderationRegistry")).getAllModerationModels(),
-    async () => (await import("@omniroute/open-sse/config/videoRegistry")).getAllVideoModels(),
-    async () => (await import("@omniroute/open-sse/config/musicRegistry")).getAllMusicModels(),
   ];
   for (const load of loaders) {
     let listed: unknown = null;

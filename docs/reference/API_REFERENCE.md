@@ -136,7 +136,7 @@ account per project:
 Source: `src/sse/handlers/chat.ts` (header read), `src/sse/services/auth.ts` and
 `src/sse/services/sessionAffinityPin.ts` (pin release and the missing-from-pool check).
 
-> **Cost telemetry headers:** non-streaming success responses also carry the `X-OmniRoute-*` cost-telemetry set — `X-OmniRoute-Response-Cost` (USD, fixed 10 decimals; `0.0000000000` for free/unpriced), `X-OmniRoute-Tokens-In` / `X-OmniRoute-Tokens-Out`, `X-OmniRoute-Model`, `X-OmniRoute-Provider`, `X-OmniRoute-Latency-Ms`, `X-OmniRoute-Cache-Hit`, and `X-OmniRoute-Fallback-Attempts` (only when > 0), plus `X-OmniRoute-Request-Id` and `X-OmniRoute-Version`. These are emitted by chat completions, `/v1/responses`, `/v1/messages`, **and the media endpoints** — `/v1/embeddings`, `/v1/images/generations`, `/v1/audio/speech`, `/v1/audio/transcriptions`, `/v1/rerank`, `/v1/videos/generations`, `/v1/music/generations`, and `/v1/moderations` (always cost `0`). Media cost is computed per modality (per-image, per-second, per-character, per search-unit) when pricing is available, otherwise `0` (fail-open).
+> **Cost telemetry headers:** non-streaming success responses also carry the `X-OmniRoute-*` cost-telemetry set — `X-OmniRoute-Response-Cost` (USD, fixed 10 decimals; `0.0000000000` for free/unpriced), `X-OmniRoute-Tokens-In` / `X-OmniRoute-Tokens-Out`, `X-OmniRoute-Model`, `X-OmniRoute-Provider`, `X-OmniRoute-Latency-Ms`, `X-OmniRoute-Cache-Hit`, and `X-OmniRoute-Fallback-Attempts` (only when > 0), plus `X-OmniRoute-Request-Id` and `X-OmniRoute-Version`. These are emitted by chat completions, `/v1/responses`, `/v1/messages`, **and the media endpoints** — `/v1/embeddings`, `/v1/images/generations`, `/v1/audio/speech`, `/v1/audio/transcriptions`, `/v1/rerank`, `/v1/videos/generations`, and `/v1/music/generations`. Media cost is computed per modality (per-image, per-second, per-character, per search-unit) when pricing is available, otherwise `0` (fail-open).
 
 > **Cache-hit cost semantics:** on a semantic-cache HIT (`X-OmniRoute-Cache-Hit: true`) no upstream call is made, so `X-OmniRoute-Response-Cost` is `0.0000000000` (the **incremental** cost of serving the hit). The original/would-have-been cost is reported separately in `X-OmniRoute-Cost-Saved`. Billing consumers should sum `X-OmniRoute-Response-Cost` (hits cost nothing); cache analytics can aggregate `X-OmniRoute-Cost-Saved`.
 
@@ -359,56 +359,6 @@ GET /v1/embeddings
 
 ---
 
-## Image Generation
-
-```bash
-POST /v1/images/generations
-Authorization: Bearer your-api-key
-Content-Type: application/json
-
-{
-  "model": "openai/gpt-image-2",
-  "prompt": "A beautiful sunset over mountains",
-  "size": "1024x1024"
-}
-```
-
-Available providers include OpenAI (GPT Image 2), xAI (Grok Image), Together AI (FLUX), Fireworks AI, Nebius (FLUX), Hyperbolic, NanoBanana, **OpenRouter**, **ZenMux**, SD WebUI (local), ComfyUI (local).
-
-`n` returns `n` images in `data[]`. Providers whose upstream API returns one image per call
-(Black Forest Labs, Stability AI, Leonardo, Ideogram, Haiper, Hyperbolic, Magnific/Freepik,
-NVIDIA NIM, Cloudflare Workers AI) get `n` separate upstream calls, at most 4 in flight. A
-fixed `seed` is offset by call index (`seed`, `seed + 1`, …), so the images differ but stay
-reproducible. `n` is capped at 10. The request fails as a whole if any call fails. The list
-of fan-out formats is `SINGLE_IMAGE_FANOUT_FORMATS` in
-`open-sse/handlers/imageGeneration/fanOut.ts`.
-
-ZenMux reuses the existing API-key connection and accepts `zenmux/` or `zm/` prefixes:
-
-- `zenmux/openai/gpt-image-2` uses ZenMux's OpenAI Images API. Options include `size`,
-  `quality`, `n`, `output_format`, `output_compression`, `background`, and `response_format`.
-- Other publishers, such as `zm/meta/muse-image-1.0`, use ZenMux's Vertex AI `:predict`
-  endpoint. `n` maps to `sampleCount`, `aspect_ratio` to `aspectRatio`, and `image_size`
-  (`1K`, `2K`, `4K`) to `sampleImageSize`. A pixel `size` supplies only an aspect ratio,
-  not guaranteed pixel dimensions. Supported ratios, resolutions, and counts vary by model.
-- `zm/inclusionai/ming-image-0.1-design` chooses its own dimensions. Omit `size`,
-  `aspect_ratio`, and `image_size`; explicit values return HTTP 400. PNG, JPEG, and WebP
-  can be requested with `output_format`.
-
-This integration supports text-to-image generation, not reference-image editing. Vertex
-output is normalized to `data[].b64_json`; `response_format: "url"` returns an upstream
-HTTPS URL or a base64 data URL when only image bytes are available. Empty/filtered outputs
-return an error rather than an empty success. Model access depends on the ZenMux account.
-See [ZenMux's Vertex API](https://docs.zenmux.ai/api/vertexai/generate-images) and
-[OpenAI Images API](https://docs.zenmux.ai/api/openai/generate-an-image).
-
-```bash
-# List all image models
-GET /v1/images/generations
-```
-
----
-
 ## Document OCR
 
 ```bash
@@ -562,7 +512,7 @@ GET /v1/models?q=sonnet&limit=10                           # case-insensitive ma
 | ------------- | --------------------------------------------------------------------------------------------------- |
 | `capability`  | `attachment`, `reasoning`, `structured_output`, `temperature`, `thinking`, `tool_calling`, `vision` |
 | `min_context` | non-negative integer, compared with `context_length`                                                |
-| `kind`        | `chat`, `audio`, `embedding`, `image`, `moderation`, `music`, `rerank`, `video`                     |
+| `kind`        | `chat`, `audio`, `embedding`, `image`, `music`, `rerank`, `video`                                   |
 | `q`           | 1–200 characters                                                                                    |
 
 An unknown value, or a `min_context` that is not a non-negative integer (for example `1.5`),
@@ -725,7 +675,6 @@ Upstream contracts: [sound effects](https://elevenlabs.io/docs/api-reference/tex
 | POST   | `/v1/rerank`                | Cohere/Voyage-style rerank         |
 | POST   | `/v1/classify`              | Jina classify (`api.jina.ai`)      |
 | POST   | `/v1/segment`               | Jina segmenter (`segment.jina.ai`) |
-| POST   | `/v1/moderations`           | OpenAI Moderations                 |
 | GET    | `/v1/models`                | OpenAI                             |
 | POST   | `/v1/models/query`          | Filtered model shortlist           |
 | POST   | `/v1/messages/count_tokens` | Anthropic                          |
@@ -733,7 +682,7 @@ Upstream contracts: [sound effects](https://elevenlabs.io/docs/api-reference/tex
 | POST   | `/v1beta/models/{...path}`  | Gemini generateContent             |
 | POST   | `/v1/api/chat`              | Ollama                             |
 
-All POST routes follow the same shape: `Bearer your-api-key` + Zod-validated JSON body (`v1RerankSchema`, `v1ModerationSchema`, `v1AudioSpeechSchema`, etc., see `src/shared/validation/schemas.ts`). 4xx is returned on schema failure.
+All POST routes follow the same shape: `Bearer your-api-key` + Zod-validated JSON body (`v1RerankSchema`, `v1AudioSpeechSchema`, etc., see `src/shared/validation/schemas.ts`). 4xx is returned on schema failure.
 
 ```bash
 # Rerank (cloud registry provider, or an OpenAI-compatible provider node as "<prefix>/<model>")
@@ -747,9 +696,6 @@ POST /v1/segment     { "content": "...", "return_chunks": true }
 
 # Jina search (s.jina.ai; provider aliases: jina-search, jina-ai, jina)
 POST /v1/search      { "query": "...", "provider": "jina-search" }
-
-# Moderations
-POST /v1/moderations { "model": "omni-moderation-latest", "input": "..." }
 
 # TTS — returns audio/mpeg (or requested format) body
 POST /v1/audio/speech { "model": "openai/tts-1", "input": "Hello", "voice": "alloy" }
@@ -1449,15 +1395,13 @@ curl -X PATCH "$OMNIROUTE_URL/api/keys/$KEY_ID" \
 
 ### Monitoring
 
-| Endpoint                             | Method     | Description                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/api/sessions`                      | GET        | Active session tracking                                                                                                                                                                                                                                                                                                                                                                      |
-| `/api/rate-limits`                   | GET        | Per-account rate limits                                                                                                                                                                                                                                                                                                                                                                      |
-| `/api/monitoring/health`             | GET        | Health check + provider summary (`catalogCount`, `configuredCount`, `activeCount`, `monitoredCount`). Management view includes `credentialHealth`: probe-cache scalars, `failedConnections` when `failed>0`, and `staleDbNonOkCount` (SQLite sticky `test_status`, not the gauge). See [MONITORING_GUIDE.md](../ops/MONITORING_GUIDE.md#credentialhealth-probe-cache-vs-sqlite-test_status). |
-| `/api/cache/stats`                   | GET/DELETE | Cache stats / clear                                                                                                                                                                                                                                                                                                                                                                          |
-| `/api/modality-bridge/stats`         | GET        | In-memory `attempts`, successes/`bridged`, failures, cache hits, `totalLatencyMs`, `latencySamples`, sample-denominated `averageLatencyMs`, and last-use time (reset on restart; management auth)                                                                                                                                                                                            |
-| `/api/modality-bridge/video/runtime` | GET        | Strict trusted-loopback check before management auth/probe; sanitized FFmpeg/ffprobe availability and versions (no-store)                                                                                                                                                                                                                                                                    |
-| `/api/modality-bridge/video/extract` | POST       | Internal authenticated trusted-loopback byte broker; 50 MiB input, bounded queue/32 MiB output, `503` capacity, `499` disconnect, `504` deadline; not a public upload API                                                                                                                                                                                                                    |
+| Endpoint                     | Method     | Description                                                                                                                                                                                                                                                                                                                                                                                  |
+| ---------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/sessions`              | GET        | Active session tracking                                                                                                                                                                                                                                                                                                                                                                      |
+| `/api/rate-limits`           | GET        | Per-account rate limits                                                                                                                                                                                                                                                                                                                                                                      |
+| `/api/monitoring/health`     | GET        | Health check + provider summary (`catalogCount`, `configuredCount`, `activeCount`, `monitoredCount`). Management view includes `credentialHealth`: probe-cache scalars, `failedConnections` when `failed>0`, and `staleDbNonOkCount` (SQLite sticky `test_status`, not the gauge). See [MONITORING_GUIDE.md](../ops/MONITORING_GUIDE.md#credentialhealth-probe-cache-vs-sqlite-test_status). |
+| `/api/cache/stats`           | GET/DELETE | Cache stats / clear                                                                                                                                                                                                                                                                                                                                                                          |
+| `/api/modality-bridge/stats` | GET        | In-memory `attempts`, successes/`bridged`, failures, cache hits, `totalLatencyMs`, `latencySamples`, sample-denominated `averageLatencyMs`, and last-use time (reset on restart; management auth)                                                                                                                                                                                            |
 
 ### Backup & Export/Import
 
@@ -1490,11 +1434,6 @@ a manual backup (`PUT`) keep ordinary management auth.
 | `/api/sync/initialize` | POST    | Initialize sync       |
 | `/api/cloud/*`         | Various | Cloud management      |
 
-### Tunnels
-
-| Endpoint | Method | Description |
-| -------- | ------ | ----------- |
-
 ### CLI Tools
 
 | Endpoint                           | Method | Description         |
@@ -1506,16 +1445,6 @@ a manual backup (`PUT`) keep ordinary management auth.
 | `/api/cli-tools/runtime/[toolId]`  | GET    | Generic CLI runtime |
 
 CLI responses include: `installed`, `runnable`, `command`, `commandPath`, `runtimeMode`, `reason`.
-
-### ACP Agents
-
-| Endpoint          | Method | Description                                              |
-| ----------------- | ------ | -------------------------------------------------------- |
-| `/api/acp/agents` | GET    | List all detected agents (built-in + custom) with status |
-| `/api/acp/agents` | POST   | Add custom agent or refresh detection cache              |
-| `/api/acp/agents` | DELETE | Remove a custom agent by `id` query param                |
-
-GET response includes `agents[]` (id, name, binary, version, installed, protocol, isCustom) and `summary` (total, installed, notFound, builtIn, custom).
 
 ### Resilience & Rate Limits
 
@@ -1631,56 +1560,6 @@ The channel model (`latest` = v3 until the 4.0 GA, `next` = rc, `nightly` = `dev
 
 ---
 
-## Audio Transcription
-
-```bash
-POST /v1/audio/transcriptions
-Authorization: Bearer your-api-key
-Content-Type: multipart/form-data
-```
-
-Transcribe audio files using any configured STT provider. The first path
-segment selects the native provider (`openai/…`, `deepgram/…`). Gateways that
-re-export another vendor's model use a qualified id
-(`openrouter/deepgram/nova-3`).
-
-**Request:**
-
-```bash
-curl -X POST http://localhost:20128/v1/audio/transcriptions \
-  -H "Authorization: Bearer your-api-key" \
-  -F "file=@recording.mp3" \
-  -F "model=openai/whisper-1"
-```
-
-**Response:**
-
-```json
-{
-  "text": "Hello, this is the transcribed audio content.",
-  "task": "transcribe",
-  "language": "en",
-  "duration": 12.5
-}
-```
-
-**Example model ids:** `openai/whisper-1` (requires an OpenAI key),
-`openrouter/deepgram/nova-3` (requires an OpenRouter key),
-`deepgram/nova-3` (requires a native Deepgram key). A bare
-`deepgram/nova-3` request does **not** use OpenRouter.
-
-**Supported formats:** `mp3`, `wav`, `m4a`, `flac`, `ogg`, `webm`.
-
-**Gemini Live (`gemini/gemini-3.5-transcribe-live`):** file-mode transcription over the Gemini Live
-WebSocket (requires a Gemini API key). The upload is converted to 16 kHz mono PCM with `ffmpeg`
-(must be on `PATH`, unless the file is already a 16 kHz mono PCM WAV), streamed to the session and
-the finalized text is returned as `{ "text": "..." }`. Optional `language` and `prompt` form fields
-are forwarded. Limits: uploads above 25 MiB or decoded audio longer than 10 minutes answer
-`413`; a conversion that runs longer than 60 s is killed and answers `504`. The API key is sent
-in the `x-goog-api-key` header only, never in the WebSocket URL.
-
----
-
 ## Ollama Compatibility
 
 For clients that use Ollama's API format:
@@ -1709,7 +1588,6 @@ GET /api/telemetry/summary
 ```json
 {
   "providers": {
-    "claudeCode": { "p50": 245, "p95": 890, "p99": 1200, "count": 150 },
     "github": { "p50": 180, "p95": 620, "p99": 950, "count": 320 }
   }
 }
@@ -1769,15 +1647,10 @@ DELETE /api/usage/token-limits?id=tl-abc
 ## Request Processing
 
 1. Client sends request to `/v1/*`
-2. Route handler calls `handleChat`, `handleEmbedding`, `handleAudioTranscription`, or `handleImageGeneration`
-3. Model is resolved (direct provider/model or alias/combo)
-4. Credentials selected from local DB with account availability filtering
-5. For chat: `handleChatCore` checks semantic/signature cache and resolves combo compression settings
-6. Proactive compression runs before provider translation when enabled (`lite`, Caveman, RTK, or stacked)
-7. Provider executor sends upstream request
-8. Response translated back to client format (chat) or returned as-is (embeddings/images/audio)
-9. Usage, compression analytics, and request logs are recorded
-10. Fallback applies on errors according to combo rules
+2. Model is resolved (direct provider/model or alias/combo)
+3. Proactive compression runs before provider translation when enabled (`lite`, Caveman, RTK, or stacked)
+4. Provider executor sends upstream request
+5. Usage, compression analytics, and request logs are recorded
 
 Full architecture reference: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md)
 
@@ -1785,32 +1658,9 @@ Full architecture reference: [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md
 
 ## Combo Management
 
-Higher-level routing combos (already summarized under `/api/combos*`) can also be mapped 1:1 from a model id pattern, allowing transparent redirection of an OpenAI-style model id to a combo.
-
-| Method | Path                             | Description                                                                    |
-| ------ | -------------------------------- | ------------------------------------------------------------------------------ |
-| GET    | `/api/model-combo-mappings`      | List all model→combo mappings                                                  |
-| POST   | `/api/model-combo-mappings`      | Create mapping — body: `{pattern, comboId, priority?, enabled?, description?}` |
-| GET    | `/api/model-combo-mappings/[id]` | Retrieve a single mapping                                                      |
-| PUT    | `/api/model-combo-mappings/[id]` | Update fields of an existing mapping                                           |
-| DELETE | `/api/model-combo-mappings/[id]` | Remove a mapping                                                               |
-
-**Auth:** management session/API key (`requireManagementAuth`).
-
----
-
-## Webhooks
-
-Outbound webhook subscriptions for OmniRoute events (request completion, quota exhaustion, key rotation, etc.).
-
-| Method | Path                      | Description                                                           |
-| ------ | ------------------------- | --------------------------------------------------------------------- |
-| GET    | `/api/webhooks`           | List webhooks (secrets are masked to `<prefix>...`)                   |
-| POST   | `/api/webhooks`           | Create webhook — body: `{url, events?: ["*"], secret?, description?}` |
-| GET    | `/api/webhooks/[id]`      | Retrieve a webhook                                                    |
-| PUT    | `/api/webhooks/[id]`      | Update url/events/secret/description                                  |
-| DELETE | `/api/webhooks/[id]`      | Remove a webhook                                                      |
-| POST   | `/api/webhooks/[id]/test` | Send a test payload to the webhook URL and return delivery status     |
+| POST | `/api/model-combo-mappings` | Create mapping — body: `{pattern, comboId, priority?, enabled?, description?}` |
+| PUT | `/api/model-combo-mappings/[id]` | Update fields of an existing mapping |
+| DELETE | `/api/model-combo-mappings/[id]` | Remove a mapping |
 
 **Auth:** management session/API key (`requireManagementAuth`).
 
@@ -1820,13 +1670,9 @@ Outbound webhook subscriptions for OmniRoute events (request completion, quota e
 
 Used by the auto-key management subsystem to issue and rotate API keys against a backing provider/account, with daily/hourly quotas.
 
-| Method | Path                                  | Description                                                                                                                                                                                 |
-| ------ | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/v1/registered-keys`             | List registered keys (masked prefix only)                                                                                                                                                   |
-| POST   | `/api/v1/registered-keys`             | Issue a new registered key — body: `{name, provider?, accountId?, idempotencyKey?, expiresAt?, dailyBudget?, hourlyBudget?}`. Returns the raw key **once**. Returns `429` on quota refusal. |
-| GET    | `/api/v1/registered-keys/[id]`        | Retrieve a registered key's metadata (no raw material)                                                                                                                                      |
-| DELETE | `/api/v1/registered-keys/[id]`        | Revoke a registered key                                                                                                                                                                     |
-| POST   | `/api/v1/registered-keys/[id]/revoke` | Explicit revoke endpoint (same effect as DELETE)                                                                                                                                            |
+| GET | `/api/v1/registered-keys/[id]` | Retrieve a registered key's metadata (no raw material) |
+| DELETE | `/api/v1/registered-keys/[id]` | Revoke a registered key |
+| POST | `/api/v1/registered-keys/[id]/revoke` | Explicit revoke endpoint (same effect as DELETE) |
 
 **Auth:** management session/API key (`requireManagementAuth`) — the same guard as `/api/keys`: a dashboard session, the local CLI token, or an API key with `manage`/`admin` scope; inference-only API keys get `403`. See also `/v1/quotas/check` and `/v1/issues/report`.
 
@@ -1908,45 +1754,14 @@ Full conceptual reference and breaker defaults: see [`CLAUDE.md`](../../CLAUDE.m
 ### Rate-Limit Queue & Auto-Enable Safety Net
 
 - **Supported write path**: `POST /api/rate-limits` with body `{"connectionId": "<id>", "enabled": true|false}` is the supported management endpoint to toggle rate-limit protection for a connection. `PUT /api/providers/[id]` deliberately does not modify or flip `rateLimitProtection` (#11278).
-- **Semantics of `enabled: false`**: Setting `enabled: false` removes explicit protection for the connection, but **does not** opt an active API-key connection out of the global auto-enable safety net (`autoEnableApiKeyProviders = true`). In `reconcileEnabledConnections` (`open-sse/services/rateLimitManager.ts`), `false` and `undefined` are equivalent; active API-key connections without explicit protection remain protected under the auto-enable safety net.
-- **Global disable**: To run API-key connections without rate-limit queues, disable the safety net globally via `RATE_LIMIT_AUTO_ENABLE=false` (env) or `resilienceSettings.requestQueue.autoEnableApiKeyProviders = false` (Settings → Resilience / `PATCH /api/resilience`).
 
 ---
 
 ## Skills
 
-Skill framework for extending OmniRoute with custom executable handlers, plus marketplace integrations.
-
-| Method | Path                              | Description                                                                                                                |
-| ------ | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/skills`                     | List installed skills — filterable by `?q=`, `?mode=on\|off\|auto`, `?source=skillsmp\|skillssh\|local`, paginated         |
-| GET    | `/api/skills/[id]`                | Retrieve one skill                                                                                                         |
-| PUT    | `/api/skills/[id]`                | Update skill (name, description, mode, schema, handler, tags)                                                              |
-| DELETE | `/api/skills/[id]`                | Uninstall a skill                                                                                                          |
-| POST   | `/api/skills/install`             | Install a skill from a raw manifest — body: `{name, version, description, schema:{input, output}, handlerCode, apiKeyId?}` |
-| GET    | `/api/skills/executions`          | List recent skill executions (audit trail with inputs/outputs/duration)                                                    |
-| GET    | `/api/skills/marketplace?q=...`   | Search/popular list from the SkillsMP marketplace (requires `skillsmpApiKey` setting)                                      |
-| POST   | `/api/skills/marketplace/install` | Install a skill by id from SkillsMP                                                                                        |
-| GET    | `/api/skills/skillssh?q=&limit=`  | Search the skills.sh registry                                                                                              |
-| POST   | `/api/skills/skillssh/install`    | Install a skill by id from skills.sh                                                                                       |
-
-**Auth:** management session/API key. Marketplace search routes accept either management auth or a Bearer API key (`isAuthenticated`).
-
 ---
 
 ## Memory
-
-Persistent conversational/factual memory store, scoped per API key / session.
-
-| Method | Path                 | Description                                                                                                  |
-| ------ | -------------------- | ------------------------------------------------------------------------------------------------------------ |
-| GET    | `/api/memory`        | List memories — `?apiKeyId=`, `?type=`, `?sessionId=`, `?q=`, with `offset/limit` or `page/limit` pagination |
-| POST   | `/api/memory`        | Create memory — body validated by Zod: `{content, key, type?, sessionId?, apiKeyId?, metadata?, expiresAt?}` |
-| GET    | `/api/memory/[id]`   | Retrieve one memory                                                                                          |
-| DELETE | `/api/memory/[id]`   | Delete a memory                                                                                              |
-| GET    | `/api/memory/health` | Memory subsystem health (DB connectivity, embeddings backend, vector index status)                           |
-
-**Auth:** management session/API key (`requireManagementAuth`). `type` enum: `FACTUAL`, `EPISODIC`, `SEMANTIC`, `PROCEDURAL` (see `MemoryType` in `src/lib/memory/types.ts`).
 
 ---
 
@@ -1972,61 +1787,6 @@ OmniRoute ships an embedded Model Context Protocol server with 3 transports (std
 
 ---
 
-## A2A Server
-
-OmniRoute exposes an A2A (Agent-to-Agent) JSON-RPC 2.0 endpoint plus a REST wrapper for inspection/dashboard use.
-
-### JSON-RPC
-
-```bash
-POST /a2a
-Authorization: Bearer your-api-key   # optional unless OMNIROUTE_API_KEY is set
-Content-Type: application/json
-
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "message/send",
-  "params": {
-    "skill": "smart-routing",
-    "messages": [{"role": "user", "content": "Route this coding task"}]
-  }
-}
-```
-
-Supported methods (all gated on `settings.a2aEnabled`):
-
-| Method           | Description                                                        |
-| ---------------- | ------------------------------------------------------------------ |
-| `message/send`   | Synchronous skill execution; returns `{task, artifacts, metadata}` |
-| `message/stream` | Streaming SSE execution of the same skill set                      |
-| `tasks/get`      | Fetch a task by `taskId`                                           |
-| `tasks/cancel`   | Cancel a task by `taskId`                                          |
-
-Built-in skills: `smart-routing`, `quota-management`, `provider-discovery`, `cost-analysis`, `health-report`.
-
-### Agent Card
-
-```bash
-GET /.well-known/agent.json
-```
-
-Returns the public A2A agent card (name, description, capabilities, skill catalog, auth scheme) — cached publicly for 1h. No auth required.
-
-### REST helpers
-
-| Method | Path                         | Description                                                                                                     |
-| ------ | ---------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/a2a/status`            | A2A enabled + task stats + cached agent card summary                                                            |
-| GET    | `/api/a2a/tasks`             | List tasks — `?state=submitted\|working\|completed\|failed\|cancelled`, `?skill=`, `?limit=` (≤200), `?offset=` |
-| POST   | `/api/a2a/tasks`             | (Not implemented as a REST helper — create via JSON-RPC `message/send`)                                         |
-| GET    | `/api/a2a/tasks/[id]`        | Retrieve one task                                                                                               |
-| POST   | `/api/a2a/tasks/[id]/cancel` | Cancel a task                                                                                                   |
-
-**Auth:** the REST helpers run without management auth (dashboard-readable); the JSON-RPC `/a2a` route uses Bearer `OMNIROUTE_API_KEY` if configured.
-
----
-
 ## Cloud, Evals & Assess
 
 | Method | Path | Description |
@@ -2043,53 +1803,6 @@ Returns the public A2A agent card (name, description, capabilities, skill catalo
 | GET | `/api/evals/suites/[id]` | Retrieve a custom eval suite |
 
 **Auth:** `/api/cloud/auth` validates a Bearer key directly and returns the masked key and `projectId` of each connection only for a key with the `manage` / `admin` scope; the other `/api/cloud/*`, `/api/evals/*`, and `/api/assess` routes require management session/API key. `/api/assess` POST uses `validateBody` with a discriminated-union scope schema.
-
----
-
-## ACP (Agent Client Protocol) Management
-
-as child processes. These endpoints manage ACP agent detection and custom agent
-registration.
-
-| Method | Path              | Description                                                                                                                                            |
-| ------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| GET    | `/api/acp/agents` | List all known CLI agents (built-in + custom) with installation status, version, binary                                                                |
-| POST   | `/api/acp/agents` | Register a custom ACP agent or refresh cache — body: `{id, name, binary, versionCommand, providerAlias, spawnArgs, protocol}` or `{action: "refresh"}` |
-| DELETE | `/api/acp/agents` | Remove a custom ACP agent — query param: `?id=<agentId>`                                                                                               |
-
-**Response example** (`GET /api/acp/agents`):
-
-```json
-{
-  "agents": [
-    {
-      "id": "claude",
-      "name": "Claude Code CLI",
-      "binary": "claude",
-      "version": "1.0.45",
-      "installed": true,
-      "protocol": "stdio",
-      "providerAlias": "claude",
-      "isCustom": false
-    },
-    {
-      "id": "my-custom-cli",
-      "name": "My Custom CLI",
-      "installed": false,
-      "protocol": "stdio",
-      "providerAlias": "my-provider",
-      "isCustom": true
-    }
-  ],
-  "cacheTtlMs": 60000,
-  "cacheAge": 1234
-}
-```
-
-**Auth:** Requires management session (dashboard `auth_token` cookie) or a
-management-scoped API key.
-
-See [ACP Framework](../frameworks/ACP.md) for full details.
 
 ---
 
@@ -2223,15 +1936,8 @@ devin-cli, etc.). See [Provider Reference](./PROVIDER_REFERENCE.md) for the full
 
 Manage AI agent skills (similar to OpenAI's custom GPTs but for agents).
 
-| Method | Path                         | Description                                                                             |
-| ------ | ---------------------------- | --------------------------------------------------------------------------------------- |
-| GET    | `/api/agent-skills`          | List all agent skills (built-in + custom)                                               |
-| GET    | `/api/agent-skills/[id]`     | Get a specific agent skill                                                              |
-| POST   | `/api/agent-skills`          | Create a custom agent skill — body: `{name, description, prompt, model?, temperature?}` |
-| PUT    | `/api/agent-skills/[id]`     | Update a custom agent skill                                                             |
-| DELETE | `/api/agent-skills/[id]`     | Delete a custom agent skill                                                             |
-| GET    | `/api/agent-skills/[id]/raw` | Get raw prompt + metadata (no execution)                                                |
-| POST   | `/api/agent-skills/generate` | AI-generate a new skill from a natural language description                             |
+| Method | Path | Description |
+| ------ | ---- | ----------- |
 
 **Auth:** Requires management session or management-scoped API key.
 
@@ -2254,79 +1960,14 @@ Manage the semantic cache and reasoning cache.
 
 ---
 
-## Memory System
-
-Manage persistent memory (FTS5 + vector embeddings).
-
-| Method | Path               | Description                                                             |
-| ------ | ------------------ | ----------------------------------------------------------------------- |
-| GET    | `/api/memory`      | List memory entries (filter by scope, type, search query)               |
-| POST   | `/api/memory`      | Create a new memory entry — body: `{scope, type, content, metadata?}`   |
-| GET    | `/api/memory/[id]` | Get a specific memory entry                                             |
-| PUT    | `/api/memory/[id]` | Update a memory entry                                                   |
-| DELETE | `/api/memory/[id]` | Delete a memory entry                                                   |
-| GET    | `/api/memory?q=`   | Search memory (FTS5 + vector) — stats are included in the same response |
-
-**Auth:** Requires management session or management-scoped API key.
-
----
-
-## Webhooks
-
-Manage webhook subscriptions for events.
-
-| Method | Path                            | Description                                                               |
-| ------ | ------------------------------- | ------------------------------------------------------------------------- |
-| GET    | `/api/webhooks`                 | List all webhook subscriptions                                            |
-| POST   | `/api/webhooks`                 | Create a webhook subscription — body: `{url, events[], secret?, active?}` |
-| GET    | `/api/webhooks/[id]`            | Get a specific webhook subscription                                       |
-| PUT    | `/api/webhooks/[id]`            | Update a webhook subscription                                             |
-| DELETE | `/api/webhooks/[id]`            | Delete a webhook subscription                                             |
-| GET    | `/api/webhooks/[id]/deliveries` | List delivery history for a webhook (success/failure log)                 |
-| POST   | `/api/webhooks/[id]/test`       | Send a test event to a webhook                                            |
-
-**Auth:** Requires management session.
-
-See [Webhooks Framework](../frameworks/WEBHOOKS.md) for full event types.
-
----
-
 ## Skills Framework
 
 Manage Skills (the agentic extensions framework).
 
-| Method | Path                     | Description                                                                             |
-| ------ | ------------------------ | --------------------------------------------------------------------------------------- |
-| GET    | `/api/skills`            | List all installed skills (built-in + custom)                                           |
-| POST   | `/api/skills/install`    | Install a skill from a local path or URL                                                |
-| DELETE | `/api/skills/[id]`       | Uninstall a skill                                                                       |
-| PUT    | `/api/skills/[id]`       | Enable or disable a skill — body: `{enabled?: boolean, mode?: "on" \| "off" \| "auto"}` |
-| POST   | `/api/skills/executions` | Execute a skill — body: `{skillName, apiKeyId, input?, sessionId?}`                     |
-| GET    | `/api/skills/executions` | List execution history for all skills (filter by `?apiKeyId=`)                          |
+| Method | Path | Description |
+| ------ | ---- | ----------- |
 
 **Auth:** Requires management session or management-scoped API key.
-
-See [Skills Framework](../frameworks/SKILLS.md) for full details.
-
----
-
-## Plugins
-
-Manage OmniRoute plugins (third-party extensions).
-
-| Method | Path                               | Description                           |
-| ------ | ---------------------------------- | ------------------------------------- |
-| GET    | `/api/plugins`                     | List installed plugins                |
-| POST   | `/api/plugins/marketplace/install` | Install a plugin from the marketplace |
-| DELETE | `/api/plugins/[name]`              | Uninstall a plugin                    |
-| POST   | `/api/plugins/[name]/activate`     | Activate a plugin                     |
-| POST   | `/api/plugins/[name]/deactivate`   | Deactivate a plugin                   |
-| GET    | `/api/plugins/[name]/config`       | Get plugin configuration              |
-| PUT    | `/api/plugins/[name]/config`       | Update plugin configuration           |
-
-**Auth:** Requires management session.
-
-See [Plugins Framework](../frameworks/PLUGIN_SDK.md) for full details.
 
 ---
 

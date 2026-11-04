@@ -988,7 +988,7 @@ export const APIKEY_PROVIDERS_GATEWAYS = {
   // embeddings, STT, TTS, images and rerank; per-model token quotas feed the limits panel.
   nan: {
     id: "nan",
-    serviceKinds: ["llm", "imageToText", "embedding", "stt", "tts", "image"],
+    serviceKinds: ["llm", "imageToText", "embedding"],
     alias: "nan",
     name: "NaN.Builders",
     icon: "hub",

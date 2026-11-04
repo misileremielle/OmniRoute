@@ -7,11 +7,6 @@ import { getCompatibleFallbackModels } from "@/lib/providers/managedAvailableMod
 import { getResolvedModelCapabilities } from "@/lib/modelCapabilities";
 import { getSyncedCapabilities } from "@/lib/modelsDevSync";
 import { getModelsByProviderId } from "@/shared/constants/models";
-import { getImageProvider } from "@omniroute/open-sse/config/imageRegistry.ts";
-import {
-  getSpeechProvider,
-  getTranscriptionProvider,
-} from "@omniroute/open-sse/config/audioRegistry.ts";
 import {
   AI_PROVIDERS,
   NOAUTH_PROVIDERS,
@@ -20,7 +15,6 @@ import {
   isOpenAICompatibleProvider,
 } from "@/shared/constants/providers";
 import type { RegistryModel } from "@omniroute/open-sse/config/providerRegistry.ts";
-import { getVideoProvider } from "@omniroute/open-sse/config/videoRegistry.ts";
 import { appendSyncedEffortVariants } from "@omniroute/open-sse/utils/syncedEffortVariants";
 
 type JsonRecord = Record<string, unknown>;
@@ -408,58 +402,6 @@ function addModelOption(
   );
 }
 
-/**
- * The chat provider registry deliberately does not include models whose only
- * route is a media endpoint.  Combos, however, are endpoint-agnostic routing
- * plans, so an account that can serve a static image/video/audio model must be
- * able to select it without entering its id manually.  Keep this local to the
- * builder rather than broadening the chat catalog used by provider pages.
- */
-function addStaticMediaModelOptions(
-  modelMap: Map<string, ComboBuilderModelOption>,
-  providerId: string
-): void {
-  const append = (
-    models: unknown,
-    apiFormat: string,
-    supportedEndpoint: string,
-    visibilityModality: string
-  ) => {
-    if (!Array.isArray(models)) return;
-    for (const model of models) {
-      if (!model || typeof model !== "object" || Array.isArray(model)) continue;
-      const entry = model as { id?: unknown; name?: unknown };
-      addModelOption(modelMap, providerId, {
-        id: toStringOrNull(entry.id),
-        name: toStringOrNull(entry.name),
-        source: "system",
-        apiFormat,
-        supportedEndpoints: [supportedEndpoint],
-        visibilityModality,
-      });
-    }
-  };
-
-  const imageProvider = getImageProvider(providerId) as { models?: unknown } | null;
-  append(imageProvider?.models, "images", "images", "images");
-
-  // Some registries intentionally retain a diagnostic-only provider definition
-  // for unsupported transports.  It must not become a selectable combo target.
-  const videoProvider = getVideoProvider(providerId) as {
-    models?: unknown;
-    unsupported?: boolean;
-  } | null;
-  if (!videoProvider?.unsupported) {
-    append(videoProvider?.models, "video", "videos", "videos");
-  }
-
-  const speechProvider = getSpeechProvider(providerId);
-  append(speechProvider?.models, "audio", "audio-speech", "audio-speech");
-
-  const transcriptionProvider = getTranscriptionProvider(providerId);
-  append(transcriptionProvider?.models, "audio", "audio-transcriptions", "audio-transcriptions");
-}
-
 function buildModelOptions(
   providerId: string,
   builtInModels: RegistryModel[],
@@ -568,8 +510,6 @@ function buildModelOptions(
       supportsThinking: resolved.supportsThinking ?? undefined,
     });
   }
-
-  addStaticMediaModelOptions(modelMap, providerId);
 
   // #9485: static registry models can declare provider-specific effort tiers even
   // when a connection's synced row does not include supportedThinkingEfforts.

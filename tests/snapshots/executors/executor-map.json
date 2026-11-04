@@ -15,11 +15,6 @@
       "configSource": "<custom-config>",
       "provider": "adapta-web"
     },
-    "adobe-firefly": {
-      "className": "AdobeFireflyExecutor",
-      "configSource": "<custom-config>",
-      "provider": "adobe-firefly"
-    },
     "adp-web": {
       "className": "AdaptaWebExecutor",
       "configSource": "<custom-config>",
@@ -300,11 +295,6 @@
       "configSource": "freebuff",
       "provider": "freebuff"
     },
-    "firefly": {
-      "className": "AdobeFireflyExecutor",
-      "configSource": "<custom-config>",
-      "provider": "adobe-firefly"
-    },
     "freebuff": {
       "className": "FreebuffExecutor",
       "configSource": "freebuff",
@@ -399,6 +389,16 @@
       "className": "InnerAiExecutor",
       "configSource": "<custom-config>",
       "provider": "inner-ai"
+    },
+    "kagi": {
+      "className": "KagiAssistantExecutor",
+      "configSource": "<custom-config>",
+      "provider": "kagi-assistant"
+    },
+    "kagi-assistant": {
+      "className": "KagiAssistantExecutor",
+      "configSource": "<custom-config>",
+      "provider": "kagi-assistant"
     },
     "kimi": {
       "className": "MoonshotExecutor",
@@ -620,16 +620,6 @@
       "configSource": "<custom-config>",
       "provider": "venice-web"
     },
-    "veo-free": {
-      "className": "VeoAIFreeWebExecutor",
-      "configSource": "<custom-config>",
-      "provider": "veoaifree-web"
-    },
-    "veoaifree-web": {
-      "className": "VeoAIFreeWebExecutor",
-      "configSource": "<custom-config>",
-      "provider": "veoaifree-web"
-    },
     "vertex": {
       "className": "VertexExecutor",
       "configSource": "vertex",
@@ -701,6 +691,6 @@
       "provider": "zai-web"
     }
   },
-  "keyCount": 140,
+  "keyCount": 138,
   "sharedInstances": []
 }

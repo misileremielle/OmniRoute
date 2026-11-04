@@ -39,7 +39,7 @@ test("#16929: runnable, multi-endpoint and unknown models remain in the catalog"
       supportedEndpoints: ["music"],
       endpointCapabilitySource: "declared",
     }),
-    true
+    false
   );
   assert.equal(
     isUnifiedChatSourceModelSelectable("gemini", {
@@ -52,7 +52,7 @@ test("#16929: runnable, multi-endpoint and unknown models remain in the catalog"
   assert.equal(
     isUnifiedChatSourceModelSelectable("unregistered-16929", {
       id: "model-x",
-      supportedEndpoints: ["audio-transcriptions"],
+      supportedEndpoints: ["rerank"],
       endpointCapabilitySource: "declared",
     }),
     true

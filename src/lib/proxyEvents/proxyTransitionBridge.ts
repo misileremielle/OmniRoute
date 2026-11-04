@@ -69,13 +69,6 @@ export function emitSetAside(transition: ProxyTransition): boolean {
     timestamp: now,
   };
   emit("proxy.set_aside", payload);
-  void import("@/lib/webhookDispatcher")
-    .then(({ notifyWebhookEvent }) => {
-      notifyWebhookEvent("proxy.set_aside", payload);
-    })
-    .catch(() => {
-      /* webhook delivery is best-effort */
-    });
   return true;
 }
 
@@ -138,13 +131,6 @@ export function maybeEmitPoolExhausted(
   if (!shouldEmitPoolExhausted(scope, candidates.length, setAsideCount, now)) return false;
   const event = buildPoolExhaustedEvent(scope, candidates.length, setAsideCount, now);
   emit("proxy.pool.exhausted", event);
-  void import("@/lib/webhookDispatcher")
-    .then(({ notifyWebhookEvent }) => {
-      notifyWebhookEvent("proxy.pool.exhausted", event);
-    })
-    .catch(() => {
-      /* webhook delivery is best-effort */
-    });
   return true;
 }
 

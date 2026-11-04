@@ -18,7 +18,6 @@ import {
   ENTERPRISE_CLOUD_PROVIDER_IDS,
   IDE_PROVIDER_IDS,
   IMAGE_ONLY_PROVIDER_IDS,
-  VIDEO_PROVIDER_IDS,
 } from "@/shared/constants/providers";
 import { partitionNoAuthEntriesByBlocked } from "@/shared/utils/noAuthProviders";
 import { buttonVariants } from "@omniroute/ui-kit/button";
@@ -646,19 +645,6 @@ function ProvidersPageContent() {
     liveModelsByProviderId,
     connections
   );
-  const videoProviderEntriesAll = apiKeyProviderEntriesAll.filter((entry) =>
-    VIDEO_PROVIDER_IDS.has(entry.providerId)
-  );
-  const videoProviderEntries = filterConfiguredProviderEntries(
-    videoProviderEntriesAll,
-    effectiveShowConfiguredOnly,
-    searchQuery,
-    showFreeOnly,
-    modelSearchQuery,
-    activeServiceKind,
-    liveModelsByProviderId,
-    connections
-  );
   const embeddingRerankProviderEntriesAll = apiKeyProviderEntriesAll.filter((entry) =>
     EMBEDDING_RERANK_PROVIDER_IDS.has(entry.providerId)
   );
@@ -700,18 +686,6 @@ function ProvidersPageContent() {
   const searchProviderEntriesAll = buildStaticProviderEntries("search", getProviderStats);
   const searchProviderEntries = filterConfiguredProviderEntries(
     searchProviderEntriesAll,
-    effectiveShowConfiguredOnly,
-    searchQuery,
-    showFreeOnly,
-    modelSearchQuery,
-    activeServiceKind,
-    liveModelsByProviderId,
-    connections
-  );
-
-  const audioProviderEntriesAll = buildStaticProviderEntries("audio", getProviderStats);
-  const audioProviderEntries = filterConfiguredProviderEntries(
-    audioProviderEntriesAll,
     effectiveShowConfiguredOnly,
     searchQuery,
     showFreeOnly,
@@ -793,7 +767,6 @@ function ProvidersPageContent() {
     ...webCookieProviderEntriesAll,
     ...localProviderEntriesAll,
     ...searchProviderEntriesAll,
-    ...audioProviderEntriesAll,
     ...cloudAgentProviderEntriesAll,
     ...upstreamProxyEntriesAll,
   ] as DashboardProviderEntry[]);
@@ -867,11 +840,9 @@ function ProvidersPageContent() {
     enterpriseProviderEntries,
     embeddingRerankProviderEntries,
     imageProviderEntries,
-    videoProviderEntries,
     webCookieProviderEntries,
     searchProviderEntries,
     webFetchEntries,
-    audioProviderEntries,
     localProviderEntries,
     cloudAgentProviderEntries,
   });
@@ -885,7 +856,6 @@ function ProvidersPageContent() {
     compatible: countConfigured(compatibleProviderEntriesAll),
     webcookie: countConfigured(webCookieProviderEntriesAll),
     search: countConfigured(searchProviderEntriesAll),
-    audio: countConfigured(audioProviderEntriesAll),
     local: countConfigured(localProviderEntriesAll),
     upstreamproxy: countConfigured(upstreamProxyEntriesAll),
     cloudagent: countConfigured(cloudAgentProviderEntriesAll),
@@ -1752,83 +1722,6 @@ function ProvidersPageContent() {
                 />
                 <ProviderCardGrid>
                   {imageProviderEntries.map(
-                    ({ providerId, provider, stats, displayAuthType, toggleAuthType }) => (
-                      <HighlightableProviderCard
-                        key={providerId}
-                        providerId={providerId}
-                        provider={provider}
-                        stats={stats}
-                        authType={displayAuthType}
-                        onToggle={(active) =>
-                          handleToggleProvider(providerId, toggleAuthType, active)
-                        }
-                      />
-                    )
-                  )}
-                </ProviderCardGrid>
-              </div>
-            )}
-
-            {/* Audio Only Providers */}
-            {showSection("audio") && audioProviderEntries.length > 0 && (
-              <div className="flex flex-col gap-4">
-                <SectionHeader
-                  title={
-                    <span className="flex items-center gap-2">
-                      {t("audioProvidersHeading")}{" "}
-                      <CategoryDot category="audio" size="md" label={t("audioProvidersHeading")} />
-                      <ProviderCountBadge {...countConfigured(audioProviderEntriesAll)} />
-                    </span>
-                  }
-                  description={t("audioProvidersDesc")}
-                  actions={
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        icon="play_arrow"
-                        loading={testingMode === "audio"}
-                        onClick={() => handleBatchTest("audio")}
-                        disabled={!!testingMode}
-                        title={t("testAll")}
-                      >
-                        {testingMode === "audio" ? t("testing") : t("testAll")}
-                      </Button>
-                    </>
-                  }
-                />
-                <ProviderCardGrid>
-                  {audioProviderEntries.map(({ providerId, provider, stats, toggleAuthType }) => (
-                    <HighlightableProviderCard
-                      key={providerId}
-                      providerId={providerId}
-                      provider={provider}
-                      stats={stats}
-                      authType="audio"
-                      onToggle={(active) =>
-                        handleToggleProvider(providerId, toggleAuthType, active)
-                      }
-                    />
-                  ))}
-                </ProviderCardGrid>
-              </div>
-            )}
-
-            {/* Video Generation */}
-            {showSection("apikey") && videoProviderEntries.length > 0 && (
-              <div className="flex flex-col gap-4">
-                <SectionHeader
-                  title={
-                    <span className="flex items-center gap-2">
-                      {t("videoProviders")}{" "}
-                      <CategoryDot category="apikey" size="md" label={t("videoProviders")} />
-                      <ProviderCountBadge {...countConfigured(videoProviderEntriesAll)} />
-                    </span>
-                  }
-                  description={t("videoProvidersDesc")}
-                />
-                <ProviderCardGrid>
-                  {videoProviderEntries.map(
                     ({ providerId, provider, stats, displayAuthType, toggleAuthType }) => (
                       <HighlightableProviderCard
                         key={providerId}

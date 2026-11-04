@@ -212,36 +212,6 @@ describe("ChatTab", () => {
     fetchSpy.mockRestore();
   });
 
-  it("opts image requests into the bounded stream and restores the JSON body", async () => {
-    let capturedHeaders: Record<string, string> | undefined;
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(async (_url, init) => {
-      capturedHeaders = init?.headers as Record<string, string>;
-      return buildImageResultResponse(
-        200,
-        JSON.stringify({ data: [{ url: "https://cdn.example.com/chat-image.png" }] })
-      );
-    });
-    const config = makeConfig("You are a helpful assistant.", "images");
-    config.model = "openai/gpt-image-2";
-    const el = renderChatTab(config);
-    const textarea = el.querySelector("textarea") as HTMLTextAreaElement;
-    act(() => setInputValue(textarea, "Draw a lighthouse"));
-    const sendBtn = Array.from(el.querySelectorAll("button")).find((button) =>
-      button.textContent?.includes("Send")
-    );
-
-    await act(async () => sendBtn?.click());
-    // #16006 renders image results inline as <img>, not as JSON text.
-    await waitFor(() => el.querySelector("img") !== null);
-
-    expect((el.querySelector("img") as HTMLImageElement).getAttribute("src")).toBe(
-      "https://cdn.example.com/chat-image.png"
-    );
-    expect(capturedHeaders?.["X-OmniRoute-Playground-Stream"]).toBe("1");
-    expect(el.textContent).not.toContain("playground.image.result");
-    fetchSpy.mockRestore();
-  });
-
   it("uses the restored image status for existing error handling", async () => {
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")

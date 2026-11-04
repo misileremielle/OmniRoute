@@ -28,34 +28,6 @@ test.after(() => {
   harness.cleanup?.();
 });
 
-test("POST /v1/chat/completions with a HuggingFace image model returns 400 + generations hint (#6457)", async () => {
-  const request = buildRequest({
-    body: {
-      model: "huggingface/stabilityai/stable-diffusion-xl-base-1.0",
-      messages: [{ role: "user", content: "draw a cat" }],
-    },
-  });
-
-  const originalFetch = globalThis.fetch;
-  let fetchCalls = 0;
-  globalThis.fetch = async (...args: Parameters<typeof originalFetch>) => {
-    fetchCalls++;
-    return originalFetch(...args);
-  };
-
-  try {
-    const res = await handleChat(request);
-    assert.equal(res.status, 400, "must reject with 400 before dispatch");
-    const body = (await res.json()) as { error?: { message?: string } };
-    const msg = body?.error?.message || JSON.stringify(body);
-    assert.match(msg, /image-generation model/i);
-    assert.match(msg, /\/v1\/images\/generations/);
-    assert.equal(fetchCalls, 0, "must not dispatch upstream for an image-only model");
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-});
-
 test("POST /v1/chat/completions with a chat model still reaches routing (guard is invisible)", async () => {
   const request = buildRequest({
     body: {

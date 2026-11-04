@@ -79,3 +79,12 @@ process.env.ADOBE_FIREFLY_BROWSER_REFRESH ||= "0";
 // DNS-write guard: the suite must NEVER mutate /etc/hosts. Tests that exercise
 // the real MITM path call addDNSEntries(); this env var makes it a no-op.
 process.env.OMNIROUTE_SKIP_DNS_WRITE = "1";
+
+// Host-shell API key isolation: readJinaEnvApiKey() (src/lib/providers/jina.ts) falls
+// back to process.env.JINA_AI_API_KEY / JINA_API_KEY when no DB connection exists. If
+// the developer's host shell exports JINA_API_KEY, unconfigured search and web-fetch
+// tests unexpectedly pick jina-search / jina-reader instead of duckduckgo-free or 400.
+// Tests that exercise the env fallback set process.env.JINA_AI_API_KEY inside their own
+// test callbacks after this module runs.
+delete process.env.JINA_AI_API_KEY;
+delete process.env.JINA_API_KEY;

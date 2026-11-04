@@ -2,8 +2,6 @@
 import React, { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import MediaProviderPageClient from "@/app/(dashboard)/dashboard/media-providers/[kind]/[id]/MediaProviderPageClient";
 import SettingsAiPage from "@/app/(dashboard)/dashboard/settings/ai/page";
 import ModalityBridgeMovedCard from "@/app/(dashboard)/dashboard/settings/components/ModalityBridgeMovedCard";
 
@@ -118,38 +116,5 @@ describe("Modality Bridge relocation and shortcuts", () => {
     const page = await render(<SettingsAiPage />);
     expect(page.textContent).not.toContain("visionBridgeEnabledLabel");
     expect(page.textContent).toContain("modalityBridgeMovedTitle");
-  });
-
-  it("links Image-to-Text providers to the Vision tab", async () => {
-    const el = await render(
-      <MediaProviderPageClient
-        providerId="openai"
-        providerName="OpenAI"
-        kindLabel="Image to Text"
-        activeKind="imageToText"
-      />
-    );
-    expect(
-      el.querySelector('a[href="/dashboard/settings/modality-bridge?tab=vision"]')
-    ).toBeTruthy();
-    expect(el.textContent).toContain("imageToTextBridgeAvailable");
-    expect(el.textContent).not.toContain("imageToTextComingSoon");
-    expect(el.textContent).toContain("imageToTextBridgeCta");
-  });
-
-  it("adds the Audio shortcut without removing the existing STT playground", async () => {
-    const el = await render(
-      <MediaProviderPageClient
-        providerId="openrouter"
-        providerName="OpenRouter"
-        kindLabel="Speech to Text"
-        activeKind="stt"
-      />
-    );
-    expect(el.querySelector('[data-testid="stt-playground"]')).toBeTruthy();
-    expect(
-      el.querySelector('a[href="/dashboard/settings/modality-bridge?tab=audio"]')
-    ).toBeTruthy();
-    expect(el.textContent).toContain("sttBridgeCta");
   });
 });

@@ -37,14 +37,13 @@ function fixture(t: test.TestContext) {
     RUNNER_TEMP: dir,
     GITHUB_ENV: path.join(dir, "github-env"),
     DATA_DIR: data,
-    OMNIROUTE_PLUGINS_DIR: path.join(data, "plugins"),
     PROBE_MODE: "healthy",
     FIXTURE: dir,
   };
   fs.writeFileSync(env.GITHUB_ENV!, "");
   const scripts = {
-    npm: 'printf "%s\\n%s\\n" "$DATA_DIR" "$OMNIROUTE_PLUGINS_DIR" > "$FIXTURE/build-env"',
-    node: 'printf "%s\\n%s\\n" "$DATA_DIR" "$OMNIROUTE_PLUGINS_DIR" > "$FIXTURE/server-env"\n[ "$PROBE_MODE" = dead ] && exit 1\nexec /bin/sleep 60',
+    npm: 'printf "%s\\n" "$DATA_DIR" > "$FIXTURE/build-env"',
+    node: 'printf "%s\\n" "$DATA_DIR" > "$FIXTURE/server-env"\n[ "$PROBE_MODE" = dead ] && exit 1\nexec /bin/sleep 60',
     curl: 'printf "%s\\n" "$@" > "$FIXTURE/health-args"\n/bin/sleep 0.02\n{ [ "$PROBE_MODE" = healthy ] && [ -s "$FIXTURE/server-env" ]; } || [ "$PROBE_MODE" = dead ]',
     schemathesis: 'printf "%s\\n" "$@" > "$FIXTURE/fuzz-args"\nexit 42',
     sleep: "/bin/sleep 0.01",
@@ -119,7 +118,6 @@ test("each run gives build and server the same fresh state, distinct from a prio
       fs.readFileSync(path.join(f.dir, "server-env"), "utf8"),
       fs.readFileSync(path.join(f.dir, "build-env"), "utf8")
     );
-    assert.equal(f.env.OMNIROUTE_PLUGINS_DIR, path.join(dataDir, "plugins"));
     dataDirs.push(dataDir);
     assert.equal(f.run(stop).status, 0);
   }

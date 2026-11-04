@@ -2,11 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
-  capMemoryExtractionText,
   truncateChatLogText,
   cloneBoundedChatLogPayload,
   truncateForLog,
-  MEMORY_EXTRACTION_TEXT_LIMIT,
 } from "../../open-sse/handlers/chatCore/logTruncation.ts";
 import {
   getChatLogTextLimit,
@@ -14,25 +12,6 @@ import {
   getChatLogMaxDepth,
   getChatLogMaxObjectKeys,
 } from "../../src/lib/logEnv.ts";
-
-test("MEMORY_EXTRACTION_TEXT_LIMIT is the documented 64KB constant", () => {
-  assert.equal(MEMORY_EXTRACTION_TEXT_LIMIT, 64 * 1024);
-});
-
-test("capMemoryExtractionText returns short strings unchanged", () => {
-  assert.equal(capMemoryExtractionText("hello"), "hello");
-  // exactly at the limit is not truncated (<= limit)
-  const exact = "x".repeat(MEMORY_EXTRACTION_TEXT_LIMIT);
-  assert.equal(capMemoryExtractionText(exact), exact);
-});
-
-test("capMemoryExtractionText keeps the trailing window of over-limit strings", () => {
-  const long = "a".repeat(MEMORY_EXTRACTION_TEXT_LIMIT) + "TAIL";
-  const capped = capMemoryExtractionText(long);
-  assert.equal(capped.length, MEMORY_EXTRACTION_TEXT_LIMIT);
-  // slice(-LIMIT) keeps the end, so the appended TAIL survives.
-  assert.ok(capped.endsWith("TAIL"));
-});
 
 test("truncateChatLogText passes through strings up to the configured limit", () => {
   const limit = getChatLogTextLimit();

@@ -160,7 +160,7 @@ test("/v1/embeddings: flag off keeps the tip path, flag on answers 400 locally",
   assert.equal(on.status, 400);
   const onText = await on.text();
   assert.match(onText, /does not serve POST \/v1\/embeddings/);
-  assert.match(onText, /Use POST \/v1\/audio\/transcriptions instead/);
+  assert.match(onText, /Use a supported endpoint instead/);
 });
 
 test("/v1/models policy: flag off keeps an unrunnable tagged model listed, flag on hides it", () => {

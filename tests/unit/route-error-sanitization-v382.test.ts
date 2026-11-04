@@ -24,23 +24,6 @@ function readRoute(rel: string): string {
 const CACHE_STATS = "src/app/api/cache/stats/route.ts";
 const HERMES = "src/app/api/cli-tools/hermes-agent-settings/route.ts";
 const COPILOT_CHAT = "src/app/api/copilot/chat/route.ts";
-const DB_IMPORT = "src/app/api/db-backups/import/route.ts";
-
-test("db-backups/import awaits getSettings() before re-hydrating the system prompt", () => {
-  // getSettings() is async; without `await`, importedSettings is a Promise and
-  // `.systemPrompt` is always undefined, so the #2470 re-hydration silently
-  // never fires after a DB import.
-  const src = readRoute(DB_IMPORT);
-  assert.match(
-    src,
-    /const importedSettings = await getSettings\(\);/,
-    "must await getSettings() so systemPrompt re-hydration actually runs"
-  );
-  assert.ok(
-    !/const importedSettings = getSettings\(\);/.test(src),
-    "must not read systemPrompt off an un-awaited Promise"
-  );
-});
 
 test("cache/stats route routes errors through sanitizeErrorMessage", () => {
   const src = readRoute(CACHE_STATS);

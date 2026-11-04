@@ -62,20 +62,11 @@ describe("installDashboardCsrfFetch", () => {
     expect(headers.get("Content-Type")).toBe("application/json");
   });
 
-  it("adds dashboard CSRF to explicit top-level management routes", async () => {
-    fetchMock.mockResolvedValueOnce(csrfResponse()).mockResolvedValueOnce(new Response("{}"));
-
-    await fetch("/a2a", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: "{}",
-    });
-
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock.mock.calls[0][0]).toBe("/api/auth/csrf");
-    expect(fetchMock.mock.calls[1][0]).toBe("/a2a");
-    const headers = fetchMock.mock.calls[1][1]?.headers as Headers;
-    expect(headers.get(DASHBOARD_CSRF_HEADER)).toBe("csrf-token");
+  it("leaves the removed A2A path outside management CSRF handling", async () => {
+    fetchMock.mockResolvedValueOnce(new Response("{}"));
+    await fetch("/a2a", { method: "POST", body: "{}" });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe("/a2a");
   });
 
   it("reuses a prefetched dashboard CSRF token for later unsafe requests", async () => {

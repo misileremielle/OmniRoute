@@ -24,10 +24,10 @@ describe("getAllToolDefinitions", () => {
     const names = all.map((t) => t.name);
     expect(new Set(names).size).toBe(names.length);
   });
-  it("includes all GitHub skill tools", () => {
+  it("omits removed GitHub skill tools", () => {
     const names = new Set(all.map((tool) => tool.name));
     for (const name of GITHUB_SKILL_TOOL_NAMES) {
-      expect(names.has(name)).toBe(true);
+      expect(names.has(name)).toBe(false);
     }
   });
   it("includes every canonical CCR lifecycle tool", () => {
