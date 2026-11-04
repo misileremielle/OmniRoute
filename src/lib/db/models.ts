@@ -21,6 +21,7 @@ import {
   persistCanonicalSyncedAvailableModels,
 } from "./models/syncedAvailableModelPersistence";
 import { finishModelCatalogWriteWithBackup } from "./models/modelCatalogWriteSignals";
+import { getModelCatalogCacheVersion } from "./readCache";
 import {
   readCompatList,
   writeCompatList,
@@ -1055,6 +1056,20 @@ export function getModelIsHidden(
   return isOverrideHiddenForModality(co, modality);
 }
 
+// getHiddenModelsByProvider() runs on every chat request (hidden-model gate) and
+// JSON-parses every customModels / modelCompatOverrides blob, which grow with model
+// discovery. Memoize per modality, keyed by the DB instance and the model-catalog
+// version that every customModels / compat writer bumps
+// (finishModelCatalogWrite*), with a short TTL as a backstop for writes made by
+// another process.
+const HIDDEN_MODELS_CACHE_TTL_MS = 10_000;
+let hiddenModelsCache: {
+  db: unknown;
+  version: number;
+  expiresAt: number;
+  byModality: Map<string, Map<string, Set<string>>>;
+} | null = null;
+
 /**
  * Get a map of provider ID → set of hidden model IDs from all modelCompatOverrides
  * and customModels, scoped to one `modality` (default "chat", matching every
@@ -1063,6 +1078,35 @@ export function getModelIsHidden(
  */
 export function getHiddenModelsByProvider(modality: string = "chat"): Map<string, Set<string>> {
   const db = getDbInstance();
+  const version = getModelCatalogCacheVersion();
+  const now = Date.now();
+  if (
+    !hiddenModelsCache ||
+    hiddenModelsCache.db !== db ||
+    hiddenModelsCache.version !== version ||
+    hiddenModelsCache.expiresAt <= now
+  ) {
+    hiddenModelsCache = {
+      db,
+      version,
+      expiresAt: now + HIDDEN_MODELS_CACHE_TTL_MS,
+      byModality: new Map(),
+    };
+  }
+  let computed = hiddenModelsCache.byModality.get(modality);
+  if (!computed) {
+    computed = computeHiddenModelsByProvider(db, modality);
+    hiddenModelsCache.byModality.set(modality, computed);
+  }
+  // Callers (getHiddenChatModels) add prefix aliases to the returned map, so
+  // never hand out the cached instance.
+  return new Map([...computed].map(([providerId, ids]) => [providerId, new Set(ids)]));
+}
+
+function computeHiddenModelsByProvider(
+  db: ReturnType<typeof getDbInstance>,
+  modality: string
+): Map<string, Set<string>> {
   const visibilityByProvider = new Map<string, Map<string, boolean>>();
   const rows = db
     .prepare(
