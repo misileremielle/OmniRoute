@@ -309,51 +309,42 @@ export function registerBackup(program) {
 test("parseCliRegistry() reads positionals declared with .addArgument()", () => {
   // Commander takes a positional either inline in .command("stop <type>") or
   // through .addArgument(new Argument(...)). The parser only saw the first, so
-  // `tunnel create [type]` was published as `tunnel create` -- the generator
+  // `backup create [type]` was published as `backup create` -- the generator
   // then wanted to delete the argument from the committed page on every run.
   const fixture = `
 import { Argument } from "commander";
 
-export function registerTunnel(program) {
-  const tunnel = program.command("tunnel").description("Manage tunnels");
+export function registerBackup(program) {
+  const backup = program.command("backup").description("Manage backups");
 
-  tunnel
+  backup
     .command("create")
-    .description("Create a tunnel")
-    .addArgument(new Argument("[type]", "Tunnel type").choices(["cloudflare"]).default("cloudflare"));
+    .description("Create a backup")
+    .addArgument(new Argument("[type]", "Backup type").choices(["full"]).default("full"));
 
-  tunnel
+  backup
     .command("set")
     .description("Set a profile")
     .addArgument(new Argument("<name>", "Profile name").choices(["a", "b"]));
 
-  tunnel.command("stop <type>").description("Stop a tunnel");
+  backup.command("stop <type>").description("Stop a backup");
 }
 `;
-  const { cleanup } = withFixtureCli({ "tunnel.mjs": fixture });
+  const { cleanup } = withFixtureCli({ "backup.mjs": fixture });
   try {
     const { commands } = parseCliRegistry();
-    assert.ok(commands.get("tunnel create [type]"), "optional positional should be kept");
-    assert.ok(commands.get("tunnel set <name>"), "required positional should be kept");
+    assert.ok(commands.get("backup create [type]"), "optional positional should be kept");
+    assert.ok(commands.get("backup set <name>"), "required positional should be kept");
     // The inline form still works, and is not doubled up by the new pattern.
-    assert.ok(commands.get("tunnel stop <type>"), "inline positional should be unchanged");
+    assert.ok(commands.get("backup stop <type>"), "inline positional should be unchanged");
     assert.equal(
-      commands.get("tunnel create"),
+      commands.get("backup create"),
       undefined,
       "the bare name must not also be registered"
     );
   } finally {
     cleanup();
   }
-});
-
-test("parseCliRegistry() with the real tunnel.mjs keeps `tunnel create [type]`", () => {
-  // Guards the drift directly: this is the line the generator was rewriting.
-  const { commands } = parseCliRegistry();
-  assert.ok(
-    commands.get("tunnel create [type]"),
-    "tunnel create must carry its optional type argument"
-  );
 });
 
 test("parseCliRegistry() skips unrecognised .mjs files", () => {

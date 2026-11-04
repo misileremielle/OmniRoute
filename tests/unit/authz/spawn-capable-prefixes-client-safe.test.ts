@@ -84,12 +84,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
     "/api/modality-bridge/video/",
     "/api/settings/mitm",
     "/api/cli-tools/antigravity-mitm",
-    "/api/tunnels/cloudflared",
-    "/api/tunnels/tailscale/disable",
-    "/api/tunnels/tailscale/enable",
-    "/api/tunnels/tailscale/install",
-    "/api/tunnels/tailscale/login",
-    "/api/tunnels/tailscale/start-daemon",
     // GHSA-35fw-cv32-2373: the 14 cli-tools routes that reach the same
     // getCliRuntimeStatus() / detectAllTools() spawn as their gated siblings.
     "/api/cli-tools/all-statuses",
@@ -141,5 +135,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
   // + 1 host-credential read (/api/oauth/kiro/auto-import) that must never be bypassable.
   // + 1 (whycodes-settings, #14107).
   // qwen-settings is the one pre-existing entry not enumerated above.
-  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 53);
+  // - 6 tunnel routes (Cloudflare/Tailscale tunnel feature removed).
+  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 47);
 });

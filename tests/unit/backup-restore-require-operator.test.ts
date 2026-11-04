@@ -50,7 +50,7 @@ const IMPORT_JSON_URL = "http://localhost:20128/api/settings/import-json";
 const LIVE_SENTINEL = "live-sentinel-key";
 const CANDIDATE_MARKER = "candidate-only-key";
 // Settings sentinel for the JSON import: the payload flips it, a refused import must not.
-const SETTINGS_SENTINEL_KEY = "showQuickStartOnHome";
+const SETTINGS_SENTINEL_KEY = "showProviderTopologyOnHome";
 
 await updateSettings({ requireLogin: true, [SETTINGS_SENTINEL_KEY]: true });
 const manageKey = await apiKeysDb.createApiKey("manage-automation", "machine-restore", ["manage"]);

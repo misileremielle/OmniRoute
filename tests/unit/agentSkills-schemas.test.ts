@@ -135,10 +135,10 @@ test("AgentSkillSchema — .parse throws on invalid input", () => {
 
 test("SkillCoverageSchema — valid coverage parses successfully", () => {
   const input = {
-    api: { have: 23, total: 23 },
-    cli: { have: 21, total: 21 },
+    api: { have: 22, total: 22 },
+    cli: { have: 20, total: 20 },
     config: { have: 1, total: 1 },
-    totalSkills: 45,
+    totalSkills: 43,
     generatedAt: new Date().toISOString(),
   };
   const result = SkillCoverageSchema.safeParse(input);
@@ -148,9 +148,9 @@ test("SkillCoverageSchema — valid coverage parses successfully", () => {
 test("SkillCoverageSchema — wrong total literal (api.total=21) fails", () => {
   const input = {
     api: { have: 21, total: 21 },
-    cli: { have: 21, total: 21 },
+    cli: { have: 20, total: 20 },
     config: { have: 1, total: 1 },
-    totalSkills: 44,
+    totalSkills: 42,
     generatedAt: new Date().toISOString(),
   };
   const result = SkillCoverageSchema.safeParse(input);
@@ -159,10 +159,10 @@ test("SkillCoverageSchema — wrong total literal (api.total=21) fails", () => {
 
 test("SkillCoverageSchema — wrong total literal (cli.total=19) fails", () => {
   const input = {
-    api: { have: 23, total: 23 },
-    cli: { have: 20, total: 20 },
+    api: { have: 22, total: 22 },
+    cli: { have: 19, total: 19 },
     config: { have: 1, total: 1 },
-    totalSkills: 44,
+    totalSkills: 42,
     generatedAt: new Date().toISOString(),
   };
   const result = SkillCoverageSchema.safeParse(input);
@@ -171,10 +171,10 @@ test("SkillCoverageSchema — wrong total literal (cli.total=19) fails", () => {
 
 test("SkillCoverageSchema — invalid datetime fails", () => {
   const input = {
-    api: { have: 23, total: 23 },
-    cli: { have: 21, total: 21 },
+    api: { have: 22, total: 22 },
+    cli: { have: 20, total: 20 },
     config: { have: 1, total: 1 },
-    totalSkills: 45,
+    totalSkills: 43,
     generatedAt: "not-a-date",
   };
   const result = SkillCoverageSchema.safeParse(input);
@@ -183,10 +183,10 @@ test("SkillCoverageSchema — invalid datetime fails", () => {
 
 test("SkillCoverageSchema — negative have value fails", () => {
   const input = {
-    api: { have: -1, total: 23 },
-    cli: { have: 21, total: 21 },
+    api: { have: -1, total: 22 },
+    cli: { have: 20, total: 20 },
     config: { have: 1, total: 1 },
-    totalSkills: 45,
+    totalSkills: 43,
     generatedAt: new Date().toISOString(),
   };
   const result = SkillCoverageSchema.safeParse(input);

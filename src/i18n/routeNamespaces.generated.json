@@ -34,7 +34,6 @@
     "analytics",
     "breadcrumbs",
     "cache",
-    "cheaperInferenceSponsorBanner",
     "cloudSyncStatus",
     "codexKeyServiceMode",
     "common",
@@ -42,7 +41,6 @@
     "cursorAuthModal",
     "header",
     "home",
-    "kimiSponsorBanner",
     "kiroAuthModal",
     "kiroSocialOAuthModal",
     "noAuthProvider",
@@ -60,8 +58,7 @@
     "teamCosts",
     "traeAuthModal",
     "trafficInspector",
-    "usage",
-    "vscodeCopilotBanner"
+    "usage"
   ],
   "sections": {
     "a2a": [

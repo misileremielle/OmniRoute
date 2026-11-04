@@ -193,7 +193,7 @@ test("manager.stub.ts exports every name statically imported from @/mitm/manager
   const srcDir = path.join(process.cwd(), "src");
 
   // Collect value names imported via `... from "@/mitm/manager"` across ALL of src/ —
-  // not just src/app: src/lib/tailscaleTunnel.ts imports from it and is pulled into
+  // not just src/app: src/lib modules can import from it and are pulled into
   // routes transitively, so a src/app-only scan would miss that surface. NOT
   // manager.runtime (loaded via dynamic import(), resolves to the real module at
   // runtime). Inline `type` imports are erased at build time and need no stub export.

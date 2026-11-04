@@ -4,11 +4,8 @@
  * probes for a remote peer.
  *
  *   GET /api/headroom/status       -> findHeadroomBinary() / findPython310()
- *   GET /api/tunnels/tailscale     -> resolveBinary() + `tailscale status/funnel --json`
- *   GET /api/tunnels/tailscale/check
- *   GET /api/tunnels/cloudflared   -> resolveBinary() (PATH lookup)
  *
- * None of these paths is LOCAL_ONLY for GET (the dashboard polls them through a
+ * This path is not LOCAL_ONLY for GET (the dashboard polls them through a
  * tunnel too), so the probe is gated at its call site on the trusted peer-locality
  * verdict: loopback/LAN callers keep the exact probed response, remote callers get the
  * same shape built only from non-spawning sources, flagged `probed: false`.
@@ -80,9 +77,6 @@ const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-spawn-pro
 const ORIGINAL_DATA_DIR = process.env.DATA_DIR;
 const ORIGINAL_STAMP_TOKEN = process.env.OMNIROUTE_PEER_STAMP_TOKEN;
 const ORIGINAL_BINS = {
-  TAILSCALE_BIN: process.env.TAILSCALE_BIN,
-  TAILSCALED_BIN: process.env.TAILSCALED_BIN,
-  CLOUDFLARED_BIN: process.env.CLOUDFLARED_BIN,
   HEADROOM_PYTHON: process.env.HEADROOM_PYTHON,
 };
 process.env.DATA_DIR = TEST_DATA_DIR;
@@ -96,9 +90,6 @@ const core = await import("../../src/lib/db/core.ts");
 const settingsDb = await import("../../src/lib/db/settings.ts");
 const { AUTHZ_HEADER_PEER_LOCALITY } = await import("../../src/server/authz/headers.ts");
 const headroomStatusRoute = await import("../../src/app/api/headroom/status/route.ts");
-const tailscaleRoute = await import("../../src/app/api/tunnels/tailscale/route.ts");
-const tailscaleCheckRoute = await import("../../src/app/api/tunnels/tailscale/check/route.ts");
-const cloudflaredRoute = await import("../../src/app/api/tunnels/cloudflared/route.ts");
 
 // requireLogin=false: isAuthenticated() is true for every caller, so the probe gate
 // is the only thing standing between a remote peer and the spawn.
@@ -183,103 +174,3 @@ for (const locality of ["loopback", "lan"] as const) {
     assert.deepEqual(Object.keys(body).sort(), HEADROOM_KEYS, "local response shape unchanged");
   });
 }
-
-const TAILSCALE_ROUTES = [
-  { pathname: "/api/tunnels/tailscale", handler: tailscaleRoute.GET },
-  { pathname: "/api/tunnels/tailscale/check", handler: tailscaleCheckRoute.GET },
-];
-
-for (const { pathname, handler } of TAILSCALE_ROUTES) {
-  test(`tailscale ${pathname}: a remote peer gets the unprobed status without any spawn`, async () => {
-    const { status, body, calls } = await callWith(
-      "remote",
-      pathname,
-      handler as (request: Request) => Promise<Response>
-    );
-    assert.equal(status, 200);
-    assert.deepEqual(calls, [], `remote GET ${pathname} must not spawn`);
-    assert.equal(body.probed, false);
-    assert.equal(body.installed, false);
-    assert.equal(body.binaryPath, null);
-    assert.equal(body.brewAvailable, false);
-    assert.equal(typeof body.supported, "boolean");
-    assert.equal(typeof body.running, "boolean");
-  });
-
-  test(`tailscale ${pathname}: a loopback peer still probes the binary (unchanged shape)`, async () => {
-    const { status, body, calls } = await callWith(
-      "loopback",
-      pathname,
-      handler as (request: Request) => Promise<Response>
-    );
-    assert.equal(status, 200);
-    assert.ok(
-      calls.some(
-        (c) =>
-          c.fn === "execFile" &&
-          (c.command === "which" || c.command === "where") &&
-          Array.isArray(c.args) &&
-          c.args.includes("tailscale")
-      ),
-      `loopback GET ${pathname} must probe for the tailscale binary`
-    );
-    assert.equal("probed" in body, false, "local response shape unchanged");
-    assert.equal(body.installed, false);
-  });
-}
-
-test("tailscale status: a remote peer still sees a funnel the operator enabled", async () => {
-  const funnelUrl = "https://omniroute-test.tailnet-example.ts.net";
-  await settingsDb.updateSettings({ tailscaleEnabled: true, tailscaleUrl: funnelUrl });
-  try {
-    const { body, calls } = await callWith(
-      "remote",
-      "/api/tunnels/tailscale",
-      tailscaleRoute.GET as (request: Request) => Promise<Response>
-    );
-    assert.deepEqual(calls, []);
-    assert.equal(body.probed, false);
-    assert.equal(body.running, true);
-    assert.equal(body.enabled, true);
-    assert.equal(body.tunnelUrl, funnelUrl);
-    assert.equal(body.apiUrl, `${funnelUrl}/v1`);
-    assert.equal(body.phase, "running");
-  } finally {
-    await settingsDb.updateSettings({ tailscaleEnabled: false, tailscaleUrl: "" });
-  }
-});
-
-test("cloudflared status: a remote peer gets the unprobed status without any spawn", async () => {
-  const { status, body, calls } = await callWith(
-    "remote",
-    "/api/tunnels/cloudflared",
-    cloudflaredRoute.GET as unknown as (request: Request) => Promise<Response>
-  );
-  assert.equal(status, 200);
-  assert.deepEqual(calls, [], "remote GET /api/tunnels/cloudflared must not spawn");
-  assert.equal(body.probed, false);
-  assert.equal(body.installed, false);
-  assert.equal(body.binaryPath, null);
-  assert.equal(body.running, false);
-  assert.notEqual(body.phase, "not_installed", "an unprobed status never claims not_installed");
-});
-
-test("cloudflared status: a loopback peer still probes the binary (unchanged shape)", async () => {
-  const { status, body, calls } = await callWith(
-    "loopback",
-    "/api/tunnels/cloudflared",
-    cloudflaredRoute.GET as unknown as (request: Request) => Promise<Response>
-  );
-  assert.equal(status, 200);
-  assert.ok(
-    calls.some(
-      (c) =>
-        c.fn === "execFile" &&
-        (c.command === "which" || c.command === "where") &&
-        Array.isArray(c.args) &&
-        c.args.includes("cloudflared")
-    ),
-    "loopback GET /api/tunnels/cloudflared must probe for the cloudflared binary"
-  );
-  assert.equal("probed" in body, false, "local response shape unchanged");
-});

@@ -48,7 +48,7 @@ export async function resolvePrincipalFromHeaders(
   // Nothing to resolve without an Authorization / x-api-key header.
   if (!headers.Authorization && !headers["x-api-key"]) return undefined;
   const { extractApiKey } = await import("../../src/sse/services/auth.ts");
-  const rawKey = extractApiKey({ headers: new Headers(headers) }, { allowUrl: false });
+  const rawKey = extractApiKey({ headers: new Headers(headers) });
   if (!rawKey) return undefined;
   try {
     const meta = await lookup(rawKey);

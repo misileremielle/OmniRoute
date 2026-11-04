@@ -189,8 +189,6 @@ export async function getSettings() {
   const rows = db.prepare("SELECT key, value FROM key_value WHERE namespace = 'settings'").all();
   const settings: Record<string, unknown> = {
     cloudEnabled: false,
-    tailscaleEnabled: false,
-    tailscaleUrl: "",
     stickyRoundRobinLimit: 3,
     disableSessionStickiness: false,
     // Global connection-aware expansion fallback for group-B combo strategies is opt-in.
@@ -244,9 +242,6 @@ export async function getSettings() {
     sidebarSectionOrder: [],
     sidebarItemOrder: {},
     sidebarActivePreset: null,
-    hideEndpointCloudflaredTunnel: false,
-    hideEndpointTailscaleFunnel: false,
-    hideEndpointNgrokTunnel: false,
     preferClaudeCodeForUnprefixedClaudeModels: isTruthyEnvFlag(
       process.env.OMNIROUTE_PREFER_CLAUDE_CODE_FOR_UNPREFIXED_CLAUDE_MODELS
     ),
@@ -300,8 +295,6 @@ export async function getSettings() {
     autoDisableBannedScope: "all",
     proxyEnabled: true,
     perKeyProxyEnabled: false,
-    customSystemPromptEnabled: false,
-    customSystemPrompt: "",
     // #6316: Opt-in filter that hides paid-only models from the /v1/models catalog.
     // Uses isFreeModel() from src/shared/utils/freeModels.ts to detect free entries
     // (`:free` suffix, zero-price pricing, or FREE_MODEL_BUDGETS membership). Default

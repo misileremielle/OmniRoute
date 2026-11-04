@@ -27,7 +27,6 @@ export type RuntimeReloadSection =
   | "corsOrigins"
   | "ccBridgeTransforms"
   | "systemTransforms"
-  | "systemPrompt"
   | "authzBypass"
   | "bannedSignals"
   | "cliVersionOverrides";
@@ -56,7 +55,6 @@ interface RuntimeSettingsSnapshot {
   corsOrigins: string;
   ccBridgeTransforms: unknown;
   systemTransforms: unknown;
-  systemPrompt: unknown;
   authzBypass: AuthzBypassSnapshot;
   customBannedSignals: string[];
   providerErrorRules: Record<string, OperatorProviderErrorRule[]> | null;
@@ -85,7 +83,6 @@ const DEFAULT_RUNTIME_SETTINGS_SNAPSHOT: RuntimeSettingsSnapshot = {
   corsOrigins: "",
   ccBridgeTransforms: null,
   systemTransforms: null,
-  systemPrompt: null,
   authzBypass: DEFAULT_AUTHZ_BYPASS_SNAPSHOT,
   customBannedSignals: [],
   providerErrorRules: null,
@@ -101,8 +98,7 @@ let lastAppliedSnapshot: RuntimeSettingsSnapshot | null = null;
 // the proxy route-guard's bundle) shares one object. A module-local `let`
 // would leave a manage-scope-configured bypass prefix invisible to whichever
 // bundle evaluates the route guard (#13995), the same class of defect
-// previously fixed via globalThis in systemPrompt.ts (#2470) and
-// modelDeprecation.ts (#5777).
+// previously fixed via globalThis in modelDeprecation.ts (#5777).
 const AUTHZ_BYPASS_GLOBAL_KEY = "__omniroute_authzBypass_config__";
 const _authzBypassStore = globalThis as unknown as Record<string, AuthzBypassSnapshot | undefined>;
 
@@ -313,9 +309,6 @@ export function buildRuntimeSettingsSnapshot(
     corsOrigins: typeof settings.corsOrigins === "string" ? settings.corsOrigins : "",
     ccBridgeTransforms: parseStoredJson(settings.ccBridgeTransforms, "ccBridgeTransforms"),
     systemTransforms: parseStoredJson(settings.systemTransforms, "systemTransforms"),
-    systemPrompt: settings.systemPrompt
-      ? parseStoredJson(settings.systemPrompt, "systemPrompt")
-      : null,
     authzBypass: normalizeAuthzBypass(settings),
     customBannedSignals: normalizeStringArray(settings.customBannedSignals),
     providerErrorRules: normalizeOperatorProviderErrorRules(settings.providerErrorRules),
@@ -444,21 +437,6 @@ async function applySystemTransformsSection(systemTransforms: unknown) {
   }
 
   setSystemTransformsConfig(systemTransforms);
-}
-
-async function applySystemPromptSection(systemPrompt: unknown) {
-  const { setSystemPromptConfig } = await import("@omniroute/open-sse/services/systemPrompt.ts");
-
-  if (systemPrompt && typeof systemPrompt === "object") {
-    setSystemPromptConfig(systemPrompt as Record<string, unknown>);
-  } else {
-    setSystemPromptConfig({
-      enabled: false,
-      prefixPrompt: "",
-      suffixPrompt: "",
-      prompt: "",
-    });
-  }
 }
 
 async function applyModelsDevSyncSection(
@@ -616,11 +594,6 @@ export async function applyRuntimeSettings(
   if (force || hasChanged(currentSnapshot.systemTransforms, previousSnapshot.systemTransforms)) {
     await applySystemTransformsSection(currentSnapshot.systemTransforms);
     markChanged("systemTransforms");
-  }
-
-  if (force || hasChanged(currentSnapshot.systemPrompt, previousSnapshot.systemPrompt)) {
-    await applySystemPromptSection(currentSnapshot.systemPrompt);
-    markChanged("systemPrompt");
   }
 
   if (force || hasChanged(currentSnapshot.authzBypass, previousSnapshot.authzBypass)) {

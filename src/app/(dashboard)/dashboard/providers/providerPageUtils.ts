@@ -27,7 +27,6 @@ import {
   parseProviderDisplayModePreference,
   type ProviderDisplayMode,
 } from "./providerPageStorage";
-import { getFeaturedProviderRank } from "./featuredProviders";
 
 export interface ProviderStatsSnapshot {
   total?: number;
@@ -326,35 +325,6 @@ export function sortProviderEntriesByName<TProvider>(
   });
 }
 
-/**
- * Sort provider entries alphabetically (via `sortProviderEntriesByName`), then
- * stable-pin sponsors first in explicit rank order (see `featuredProviders.ts`):
- * rank 1 block, then rank 2, then everything unranked — each block keeping the
- * alphabetical order established above. Presentation-only: this must never
- * influence routing/fallback order, only how the dashboard's provider category
- * grids are sorted.
- */
-export function sortProviderEntriesFeaturedFirst<TProvider>(
-  entries: ProviderEntry<TProvider>[]
-): ProviderEntry<TProvider>[] {
-  const sorted = sortProviderEntriesByName(entries);
-  // A plain "featured first" pin would order Cheaper Inference above Kimi (the
-  // alphabet), which is exactly what the explicit ranks prevent.
-  const ranked: ProviderEntry<TProvider>[] = [];
-  const rest: ProviderEntry<TProvider>[] = [];
-  for (const entry of sorted) {
-    (getFeaturedProviderRank(entry.providerId) === null ? rest : ranked).push(entry);
-  }
-  // Array.prototype.sort is stable in ES2019+, so equal-rank entries keep the
-  // alphabetical order established above.
-  ranked.sort(
-    (a, b) =>
-      (getFeaturedProviderRank(a.providerId) as number) -
-      (getFeaturedProviderRank(b.providerId) as number)
-  );
-  return [...ranked, ...rest];
-}
-
 export function buildProviderEntries<TProvider = Record<string, unknown>>(
   providers: ProviderRecord<TProvider>,
   displayAuthType: ProviderEntry["displayAuthType"],
@@ -578,7 +548,7 @@ export function filterConfiguredProviderEntries<TProvider>(
     });
   }
 
-  return sortProviderEntriesFeaturedFirst(filtered);
+  return sortProviderEntriesByName(filtered);
 }
 
 function pushUniqueProviderEntry<TProvider>(

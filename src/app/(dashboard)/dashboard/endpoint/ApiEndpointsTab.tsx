@@ -15,7 +15,6 @@ import Select from "@/shared/components/Select";
 import Textarea from "@/shared/components/Textarea";
 import { cn } from "@/shared/utils/cn";
 import { useDisplayBaseUrl } from "@/shared/hooks";
-import VscodeTokenAliasCard from "./VscodeTokenAliasCard";
 import { matchesSearch } from "@/shared/utils/turkishText";
 
 /* ─── Types ──────────────────────────────────────────── */
@@ -395,8 +394,6 @@ export default function ApiEndpointsTab() {
               </div>
             </div>
           </Card>
-
-          <VscodeTokenAliasCard variant="catalog" />
         </>
       )}
 
@@ -474,8 +471,6 @@ export default function ApiEndpointsTab() {
               </Button>
             </div>
           </div>
-
-          <VscodeTokenAliasCard variant="catalog" />
 
           {/* Endpoint groups */}
           {Object.entries(groupedEndpoints).map(([tag, endpoints]) => (

@@ -15,7 +15,7 @@ Agent Skills are structured SKILL.md files that teach external agents, MCP clien
 
 ## Overview
 
-The catalog contains **45 Agent Skills** (23 REST API + 21 CLI + 1 configuration workflow). Each skill has:
+The catalog contains **43 Agent Skills** (22 REST API + 20 CLI + 1 configuration workflow). Each skill has:
 
 - A **canonical ID** (`omni-auth`, `cli-serve`, etc.)
 - A **SKILL.md** file in `skills/{id}/SKILL.md` with YAML frontmatter (`name`, `description`) + rich markdown body
@@ -27,7 +27,7 @@ The catalog contains **45 Agent Skills** (23 REST API + 21 CLI + 1 configuration
 ## Architecture
 
 ```
-src/shared/constants/agentSkills.ts    — 45-entry curated list (name/desc/category/area/icon)
+src/shared/constants/agentSkills.ts    — 43-entry curated list (name/desc/category/area/icon)
 src/lib/agentSkills/
   catalog.ts                           — getCatalog(), getSkillById(), filterCatalog(), computeCoverage()
   generator.ts                         — generateAgentSkills() writes SKILL.md to skills/{id}/
@@ -36,7 +36,7 @@ src/lib/agentSkills/
   schemas.ts                           — Zod schemas: AgentSkillSchema, SkillCoverageSchema, etc.
   types.ts                             — TypeScript interfaces: AgentSkill, SkillCoverage, etc.
 
-skills/{id}/SKILL.md                   — Generated + curated markdown files (45 total)
+skills/{id}/SKILL.md                   — Generated + curated markdown files (43 total)
 
 src/app/api/agent-skills/
   route.ts                             — GET /api/agent-skills
@@ -128,7 +128,7 @@ See [MCP-SERVER.md](./MCP-SERVER.md) for scope wiring and authentication.
 
 ## A2A Discovery
 
-The A2A skill `list-capabilities` returns the full 45-skill catalog as a markdown table artifact. External orchestrators can invoke it via:
+The A2A skill `list-capabilities` returns the full 43-skill catalog as a markdown table artifact. External orchestrators can invoke it via:
 
 ```json
 {
@@ -146,7 +146,7 @@ See [A2A-SERVER.md](./A2A-SERVER.md) for protocol details.
 
 ---
 
-## Catalog — 45 Skill IDs
+## Catalog — 43 Skill IDs
 
 ### API Skills (23)
 
@@ -166,7 +166,6 @@ See [A2A-SERVER.md](./A2A-SERVER.md) for protocol details.
 | `omni-context-rtk`     | context-rtk     | RTK compression                      |
 | `omni-resilience`      | resilience      | Circuit breakers + cooldowns         |
 | `omni-cli-tools`       | cli-tools       | CLI tools REST proxy                 |
-| `omni-tunnels`         | tunnels         | Tunnel management                    |
 | `omni-sync-cloud`      | sync-cloud      | Cloud sync                           |
 | `omni-db-backups`      | db-backups      | Database backups                     |
 | `omni-webhooks`        | webhooks        | Webhook event dispatcher             |
@@ -192,7 +191,6 @@ See [A2A-SERVER.md](./A2A-SERVER.md) for protocol details.
 | `cli-cost-usage`      | cli-cost-usage     | `omniroute cost`        |
 | `cli-mcp`             | cli-mcp            | `omniroute mcp`         |
 | `cli-a2a`             | cli-a2a            | `omniroute a2a`         |
-| `cli-tunnel`          | cli-tunnel         | `omniroute tunnel`      |
 | `cli-backup-sync`     | cli-backup-sync    | `omniroute backup`      |
 | `cli-policy-audit`    | cli-policy-audit   | `omniroute policy`      |
 | `cli-batches`         | cli-batches        | `omniroute batch`       |
@@ -240,7 +238,7 @@ resp = requests.post("http://your-omniroute/a2a", json={
     "params": {"skill": "list-capabilities", "messages": [{"role": "user", "content": "list"}]}
 })
 table = resp.json()["result"]["artifacts"][0]["content"]
-# table is a markdown table with all 45 skill IDs + rawUrl columns
+# table is a markdown table with all 43 skill IDs + rawUrl columns
 ```
 
 ### 4. Direct GitHub raw fetch (no server required)
@@ -298,10 +296,10 @@ curl "http://localhost:20128/api/agent-skills/coverage"
 
 ```json
 {
-  "api": { "have": 23, "total": 23 },
-  "cli": { "have": 21, "total": 21 },
+  "api": { "have": 22, "total": 22 },
+  "cli": { "have": 20, "total": 20 },
   "config": { "have": 1, "total": 1 },
-  "totalSkills": 45,
+  "totalSkills": 43,
   "generatedAt": "2026-08-02T00:00:00.000Z"
 }
 ```
@@ -314,4 +312,4 @@ curl "http://localhost:20128/api/agent-skills/coverage"
 - [MCP-SERVER.md](./MCP-SERVER.md) — MCP tool catalog (`omniroute_agent_skills_*` tools)
 - [A2A-SERVER.md](./A2A-SERVER.md) — A2A protocol (`list-capabilities` skill)
 - `src/lib/agentSkills/` — catalog, generator, parsers
-- `skills/` — generated SKILL.md files (45 entries)
+- `skills/` — generated SKILL.md files (43 entries)

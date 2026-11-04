@@ -332,8 +332,7 @@
     "tests/unit/translator-openai-to-gemini.test.ts": 1989,
     "tests/unit/translator-openai-to-kiro.test.ts": 1473,
     "tests/unit/translator-resp-gemini-to-openai.test.ts": 1481,
-    "tests/unit/usage-service-hardening.test.ts": 1785,
-    "tests/unit/vscode-token-routes.test.ts": 1521
+    "tests/unit/usage-service-hardening.test.ts": 1785
   },
   "_rebaseline_2026_06_09": "Re-baseline consciente pre-release v3.8.19: 9 arquivos cresceram durante o ciclo (features mergeadas: RequestLoggerV2 +281 request-logger rework, stream +101, combo +73, chatCore +45, catalog +32 fable-5/catalog-flag, callLogs +4, accountFallback +2, usageHistory novo 840) + core.ts +7 (fix resetAllDbModuleState, PR 3536). A catraca segue valendo destes valores \u2014 proximo crescimento falha. Decisao: encolher (esp. RequestLoggerV2/chatCore) e a issue #3501 ficam para o ciclo seguinte.",
   "_rebaseline_2026_06_11_phase1f": "Phase 1f (#3501): ProviderDetailPageClient.tsx 4948\u21924062 (-886 LOC); 3 novos hooks extra\u00eddos. useProviderConnections.ts=954 acima do cap=800 \u2014 justificado: extra\u00e7\u00e3o direta do god-component (zero l\u00f3gica nova), pr\u00f3pria redu\u00e7\u00e3o do cliente supera o custo. useProviderSettings.ts=263 e useProviderModels.ts=154 j\u00e1 abaixo do cap.",
@@ -594,7 +593,6 @@
     "src/lib/db/core.ts": 2163,
     "src/lib/db/migrationRunner.ts": 1445,
     "src/lib/db/providers.ts": 1480,
-    "src/lib/tailscaleTunnel.ts": 1450,
     "src/lib/tokenHealthCheck.ts": 1492,
     "src/lib/usage/usageHistory.ts": 1473,
     "src/shared/components/RequestLoggerDetail.tsx": 1490,

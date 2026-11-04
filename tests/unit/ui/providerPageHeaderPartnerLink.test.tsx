@@ -1,10 +1,8 @@
 // @vitest-environment jsdom
 /**
  * ProviderPageHeader — discreet "Partner link" indicator on the top-of-page
- * website link for the 3 visible Kimi (Moonshot AI) provider cards
- * (kimi-coding, kimi-web, moonshot). Presentation only — see
- * featuredProviders.ts (isKimiPartnerProviderId) and the aff-link URLs
- * asserted in tests/unit/kimi-partner-aff-links.test.ts.
+ * website link, shown only when the website is a Radar default referral
+ * (`isReferralLink`). Plain catalog websites are never flagged.
  */
 import React from "react";
 import { act } from "react";
@@ -13,10 +11,10 @@ import { afterEach, describe, expect, it } from "vitest";
 import ProviderPageHeader from "@/app/(dashboard)/dashboard/providers/[id]/components/ProviderPageHeader";
 
 // No `.has` method — providerText() falls back to the hardcoded English
-// default, matching the pattern used in providerCardKimiPartnerAccent.test.tsx.
+// default.
 const t = (key: string) => key;
 
-describe("ProviderPageHeader — Kimi partner-link note", () => {
+describe("ProviderPageHeader — partner-link note", () => {
   let container: HTMLDivElement | null = null;
   const mounted: { root: Root; container: HTMLDivElement }[] = [];
 
@@ -30,7 +28,7 @@ describe("ProviderPageHeader — Kimi partner-link note", () => {
     }
   });
 
-  function renderHeader(id: string, name: string, website: string) {
+  function renderHeader(id: string, name: string, website: string, isReferralLink = false) {
     container = document.createElement("div");
     document.body.appendChild(container);
     const root = createRoot(container);
@@ -45,18 +43,16 @@ describe("ProviderPageHeader — Kimi partner-link note", () => {
           isAnthropicProtocolCompatible={false}
           onOpenTutorial={() => {}}
           t={t}
+          isReferralLink={isReferralLink}
         />
       );
     });
     return container;
   }
 
-  it.each([
-    ["moonshot", "Kimi", "https://platform.kimi.ai?aff=omniroute"],
-    ["kimi-coding", "Kimi Code CLI", "https://www.kimi.ai/code?aff=omniroute"],
-    ["kimi-web", "Kimi Web", "https://www.kimi.ai"],
-  ])("flags the %s header link as a partner link", (id, name, website) => {
-    const el = renderHeader(id, name, website);
+  it("flags a Radar referral header link as a partner link", () => {
+    const [id, name, website] = ["example", "Example", "https://example.com/?ref=omniroute"];
+    const el = renderHeader(id, name, website, true);
     // The component also renders a "Back to Providers" <Link> above the
     // website title link — target the website anchor specifically, not the
     // first <a> in the tree.
@@ -71,9 +67,13 @@ describe("ProviderPageHeader — Kimi partner-link note", () => {
     expect(el.textContent).toContain("Partner link — supports OmniRoute at no extra cost to you");
   });
 
-  it("does NOT flag an unrelated provider's website link as a partner link", () => {
-    const el = renderHeader("openai", "OpenAI", "https://openai.com");
-    const link = el.querySelector(`a[href="https://openai.com"]`);
+  it.each([
+    ["openai", "OpenAI", "https://openai.com"],
+    ["moonshot", "Kimi", "https://platform.kimi.ai"],
+    ["kimi-coding", "Kimi Code CLI", "https://www.kimi.ai/code"],
+  ])("does NOT flag the plain %s website link as a partner link", (id, name, website) => {
+    const el = renderHeader(id, name, website);
+    const link = el.querySelector(`a[href="${website}"]`);
     expect(link).not.toBeNull();
     expect(link?.getAttribute("title")).toBeNull();
     expect(link?.getAttribute("aria-label")).toBeNull();

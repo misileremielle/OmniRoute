@@ -75,7 +75,7 @@ test("import-json keeps the stored session cutoff and revocation list", async ()
     sessionsValidAfter: 0,
     revokedDashboardSessions: [],
     currentPassword: "imported-current-password",
-    showQuickStartOnHome: false,
+    showProviderTopologyOnHome: false,
   });
 
   const after = (await settingsDb.getSettings()) as Record<string, unknown>;
@@ -85,7 +85,7 @@ test("import-json keeps the stored session cutoff and revocation list", async ()
   ]);
   assert.equal(after.currentPassword, undefined);
   // Non-security settings still import.
-  assert.equal(after.showQuickStartOnHome, false);
+  assert.equal(after.showProviderTopologyOnHome, false);
 });
 
 test("a signed-out dashboard session stays dead after importing an older backup", async () => {

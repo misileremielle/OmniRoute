@@ -1,7 +1,7 @@
 export type SkillCategory = "api" | "cli" | "config" | "external";
 
 export type SkillArea =
-  // API areas (23)
+  // API areas (22)
   | "auth"
   | "providers"
   | "models"
@@ -16,7 +16,6 @@ export type SkillArea =
   | "context-rtk"
   | "resilience"
   | "cli-tools"
-  | "tunnels"
   | "sync-cloud"
   | "db-backups"
   | "webhooks"
@@ -28,7 +27,7 @@ export type SkillArea =
   | "github-skills"
   // Config skills
   | "config-codex-cli"
-  // CLI families (21)
+  // CLI families (20)
   | "cli-serve"
   | "cli-health"
   | "cli-providers"
@@ -42,7 +41,6 @@ export type SkillArea =
   | "cli-cost-usage"
   | "cli-mcp"
   | "cli-a2a"
-  | "cli-tunnel"
   | "cli-backup-sync"
   | "cli-policy-audit"
   | "cli-batches"

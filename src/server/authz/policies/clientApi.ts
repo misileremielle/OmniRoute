@@ -103,10 +103,8 @@ export const clientApiPolicy: RoutePolicy = {
   routeClass: "CLIENT_API",
   async evaluate(ctx: PolicyContext): Promise<AuthOutcome> {
     // Every credential the client presented, in precedence order (Bearer,
-    // x-api-key, x-goog-api-key #7034, path-scoped `/vscode/<key>/…` token).
-    // A non-"Bearer <token>" Authorization header (an empty "Bearer ", or a
-    // client's own non-OmniRoute token — VS Code Copilot sends one even when the
-    // OmniRoute key lives in the URL path of a /vscode tokenized endpoint) must
+    // x-api-key, x-goog-api-key #7034). A non-"Bearer <token>" Authorization
+    // header (an empty "Bearer ", or a client's own non-OmniRoute token) must
     // NOT short-circuit auth, and neither may an unrelated Bearer sent ALONGSIDE
     // a valid x-api-key (Claude Code with a claude.ai session or
     // ANTHROPIC_AUTH_TOKEN): the request is accepted when ANY credential validates.

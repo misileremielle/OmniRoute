@@ -10,7 +10,7 @@
  *  - Bundled-for-all (verify only): better-sqlite3 v13 ships Node-API prebuilds
  *    for 8 platforms, and onnxruntime-node ships `bin/napi-v6/<os>/<arch>`.
  *  - Install-machine-forked (hydrate): `@img/sharp-*`, `@img/sharp-libvips-*`,
- *    `@ngrok/ngrok-*`, `@wreq-js/binding-*`, and macOS-only `fsevents` resolve
+ *    `@wreq-js/binding-*`, and macOS-only `fsevents` resolve
  *    to whichever platform ran `npm ci`. The ubuntu-built tree carries the
  *    linux forks; each leg replaces them with the forks from its OWN install.
  */
@@ -24,7 +24,6 @@ import { resolveWreqJsNativeBinding } from "./wreqJsNative.mjs";
 export const HYDRATED_SCOPES = [
   "@img/sharp-",
   "@img/sharp-libvips-",
-  "@ngrok/ngrok-",
   "@wreq-js/binding-",
 ];
 

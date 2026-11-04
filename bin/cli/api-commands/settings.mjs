@@ -125,31 +125,6 @@ export function register_settings(parent) {
       const data = res.ok ? await res.json() : await res.text();
       emit(data, gOpts);
     });
-  tag.command("get-api-settings-system-prompt")
-    .description("Get system prompt configuration")
-    .action(async (opts, cmd) => {
-      const gOpts = cmd.optsWithGlobals();
-      let url = "/api/settings/system-prompt";
-      const res = await apiFetch(url, { method: "GET", baseUrl: gOpts.baseUrl, apiKey: gOpts.apiKey });
-      const data = res.ok ? await res.json() : await res.text();
-      emit(data, gOpts);
-    });
-  tag.command("put-api-settings-system-prompt")
-    .description("Update system prompt configuration")
-    .option("--body <jsonOrPath>", "JSON body or @path/to/file.json")
-    .action(async (opts, cmd) => {
-      const gOpts = cmd.optsWithGlobals();
-      let url = "/api/settings/system-prompt";
-      let body;
-      if (opts.body) {
-        body = opts.body.startsWith("@")
-          ? JSON.parse(readFileSync(opts.body.slice(1), "utf8"))
-          : JSON.parse(opts.body);
-      }
-      const res = await apiFetch(url, { method: "PUT", body, baseUrl: gOpts.baseUrl, apiKey: gOpts.apiKey });
-      const data = res.ok ? await res.json() : await res.text();
-      emit(data, gOpts);
-    });
   tag.command("get-api-settings-thinking-budget")
     .description("Get thinking budget configuration")
     .action(async (opts, cmd) => {

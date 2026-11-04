@@ -290,7 +290,7 @@ jobs:
         #          re-verify every entry (existence + size + content hash + symlink
         #          targets, and no unlisted files) byte-for-byte.
         # hydrate: the bundle was built on ubuntu, so install-machine-forked native
-        #          optionals (@img/sharp-*, @img/sharp-libvips-*, @ngrok/ngrok-*,
+        #          optionals (@img/sharp-*, @img/sharp-libvips-*,
         #          @wreq-js/binding-*, fsevents) carry linux forks. Replace them with the forks this
         #          leg's own `npm ci` resolved, then assert every bundled native
         #          (better-sqlite3 prebuilds, wreq-js, onnxruntime)

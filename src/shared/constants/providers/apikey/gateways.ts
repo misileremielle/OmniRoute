@@ -24,7 +24,7 @@ export const APIKEY_PROVIDERS_GATEWAYS = {
       "1min.ai uses a proprietary chat API (single prompt string + SSE) instead of OpenAI chat/completions. OmniRoute flattens OpenAI messages into a labeled prompt and translates the SSE stream.",
     passthroughModels: true,
   },
-  // Cheaper Inference (https://cheaperinference.com) — OSS-sponsor gateway.
+  // Cheaper Inference (https://cheaperinference.com) — gateway.
   // Cost-ranked reseller of 42 upstream models (Anthropic/OpenAI/Google/Moonshot/
   // xAI/Z.AI/DeepSeek/MiniMax) behind one OpenAI-compatible surface, with a native
   // /v1/responses endpoint and 3 image models. Keys are `ir_live_…` bearer tokens.
@@ -36,9 +36,9 @@ export const APIKEY_PROVIDERS_GATEWAYS = {
     icon: "savings",
     color: "#31f889",
     textIcon: "CI",
-    website: "https://cheaperinference.com/?utm_source=omniroute",
+    website: "https://cheaperinference.com",
     apiHint:
-      "Create an API key at https://cheaperinference.com/?utm_source=omniroute (needs the `inference` scope), then paste the ir_live_… token here.",
+      "Create an API key at https://cheaperinference.com (needs the `inference` scope), then paste the ir_live_… token here.",
     passthroughModels: true,
   },
   "charm-hyper": {

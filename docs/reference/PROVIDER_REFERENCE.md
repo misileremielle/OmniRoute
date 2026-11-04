@@ -1,14 +1,14 @@
 ---
 title: "Provider Reference"
 version: 3.8.53
-lastUpdated: 2026-10-29
+lastUpdated: 2026-11-04
 ---
 
 # Provider Reference
 
 > **Auto-generated** from `src/shared/constants/providers.ts` — do not edit by hand.
 > Regenerate with: `npm run gen:provider-reference`
-> **Last generated:** 2026-10-29
+> **Last generated:** 2026-11-04
 
 Total providers: **380**. See category breakdown below.
 
@@ -70,7 +70,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `gitlab-duo` | `gitlab-duo` | GitLab Duo | OAuth | [link](https://docs.gitlab.com/user/duo_agent_platform/code_suggestions/) | GitLab Duo OAuth is not configured. Register an OAuth application at https://gitlab.com/-/profile/applications with redirect URI http://localhost:20128/callback and scopes "ai_features read_user", then set GITLAB_DUO_OAUTH_CLIENT_ID (and optionally GITLAB_DUO_OAUTH_CLIENT_SECRET) and restart. |
 | `grok-cli` | `gc` | Grok Build | OAuth | — | Sign in with your browser, or paste your ~/.grok/auth.json (or the JWT access token) from the Grok Build CLI; refresh_token is rotated automatically either way. Imagine image/video and TTS/STT reuse this login where your account is entitled. |
 | `kilocode` | `kc` | Kilo Code | OAuth | — | Sign in with your Kilo Code account (device-code OAuth), or paste a direct API key from app.kilo.ai → Settings → API Keys. Multiple API keys are supported and rotated automatically — add each as a separate connection. Without any connection, free anonymous models are available via the anonymousFallback. |
-| `kimi-coding` | `kmc` | Kimi Code CLI | OAuth | [link](https://www.kimi.ai/code?aff=omniroute) | Sign in with the same Kimi account used by Kimi Code CLI. OmniRoute uses the CLI OAuth flow and Kimi Coding Plan endpoints. |
+| `kimi-coding` | `kmc` | Kimi Code CLI | OAuth | [link](https://www.kimi.ai/code) | Sign in with the same Kimi account used by Kimi Code CLI. OmniRoute uses the CLI OAuth flow and Kimi Coding Plan endpoints. |
 | `kiro` | `kr` | Kiro AI | OAuth | — | Free tier: 50 credits/month (~25K–100K tokens). ⚠️ Kiro ToS prohibits third-party proxy/harness use. |
 | `muse-code` | `mc` | Muse Code (Meta) | OAuth | [link](https://ai.developer.meta.com/docs/muse-code/auth) | Sign in with the Muse Code device flow (same as `muse login` / CLIProxyAPI `-meta-login`) to use a Muse subscription, or paste a META_API_KEY. Device login keeps the durable dca token and mints the inference key; a 401 remints that key. Wire format is OpenAI Responses (POST /responses). |
 | `openference` | `of` | Openference | OAuth | [link](https://openference.com) | Sign in with your Openference account to route requests through api.openference.com. Includes free-tier access to Qwen3.8 27b and Llama 3.2 3B — see openference.com/pricing for current plan terms. |
@@ -165,7 +165,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `charm-hyper` | `charm-hyper` | Charm Hyper | API key | [link](https://hyper.charm.land) | 100 free monthly Hypercredits on signup |
 | `chat-oripe` | `chat-oripe` | Chat Oripe | API key, aggregator | [link](https://api.oriper.com) | Official metadata advertises 2M tokens/month, but the public site and documentation were blocked during audit; treat the quota and brand mapping as unconfirmed. |
 | `chatanywhere` | `chatanywhere` | ChatAnywhere | API key, aggregator | [link](https://chatanywhere.tech) | Personal, educational or research use only: public documentation cites 10,000 points/day and 200 requests/day per IP/key; do not use for commercial traffic. |
-| `cheaperinference` | `cinf` | Cheaper Inference | API key | [link](https://cheaperinference.com/?utm_source=omniroute) | — |
+| `cheaperinference` | `cinf` | Cheaper Inference | API key | [link](https://cheaperinference.com) | — |
 | `chenzk` | `chenzk` | Chenzk API | API key | [link](https://chenzk.top) | — |
 | `chutes` | `chutes` | Chutes.ai | API key, aggregator | [link](https://chutes.ai) | Bearer API key for the Chutes OpenAI-compatible gateway. |
 | `clarifai` | `clarifai` | Clarifai | API key, enterprise | [link](https://docs.clarifai.com) | Use your Clarifai PAT or app-specific API key. OmniRoute targets the OpenAI-compatible endpoint at https://api.clarifai.com/v2/ext/openai/v1 and authenticates with Authorization: Key <token>. |
@@ -242,8 +242,8 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `kenari` | `kenari` | Kenari | API key | [link](https://kenari.id) | Use your Kenari API key (kn-...) in Authorization: Bearer <key>. Fully OpenAI-compatible. API base URL: https://kenari.id/v1. |
 | `kie` | `kie` | KIE.AI | API key | [link](https://kie.ai) | — |
 | `kilo-gateway` | `kg` | Kilo Gateway | API key, aggregator | [link](https://kilo.ai) | — |
-| `kimi` | `kimi` | Kimi (Legacy Moonshot API) | API key | [link](https://platform.kimi.ai?aff=omniroute) | — |
-| `kimi-coding-apikey` | `kmca` | Kimi Code API Key | API key | [link](https://www.kimi.ai/code?aff=omniroute) | — |
+| `kimi` | `kimi` | Kimi (Legacy Moonshot API) | API key | [link](https://platform.kimi.ai) | — |
+| `kimi-coding-apikey` | `kmca` | Kimi Code API Key | API key | [link](https://www.kimi.ai/code) | — |
 | `lambda-ai` | `lambda` | Lambda AI | API key | [link](https://lambda.ai) | — |
 | `laozhang` | `lz` | LaoZhang AI | API key, aggregator | [link](https://api.laozhang.ai) | — |
 | `leonardo` | `leo` | Leonardo AI | API key, video | [link](https://leonardo.ai) | Get API key at leonardo.ai/developer |
@@ -269,7 +269,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 | `modal` | `mdl` | Modal | API key, enterprise | [link](https://modal.com/docs) | Use the bearer token that protects your Modal deployment, if enabled. Base URL should point to your OpenAI-compatible Modal app, for example https://<workspace>--<app>.modal.run/v1. |
 | `modelscope` | `ms` | ModelScope | API key | [link](https://modelscope.cn) | Free tier via ModelScope API-Inference — Alibaba account required. |
 | `monsterapi` | `monster` | MonsterAPI | API key | [link](https://monsterapi.ai) | ⚠️ **DEPRECATED.** Monster API shuttered operations on 2026-06-30. Use alternative OpenAI-compatible providers. |
-| `moonshot` | `moonshot` | Kimi | API key | [link](https://platform.kimi.ai?aff=omniroute) | — |
+| `moonshot` | `moonshot` | Kimi | API key | [link](https://platform.kimi.ai) | — |
 | `morph` | `morph` | Morph | API key | [link](https://morphllm.com) | Free tier: 250K credits/month, $0 |
 | `naga-ac` | `naga` | Naga.ac | API key, aggregator | [link](https://naga.ac) | Get API key at naga.ac — Google/GitHub/Discord signup available. |
 | `naga-ai` | `naga-ai` | Naga AI | API key, aggregator | [link](https://naga.ac) | Models marked :free are publicly listed, but no numeric quota is confirmed. Naga's policy warns that free-tier prompts and outputs may be collected or used for training. |
@@ -468,7 +468,7 @@ Use the dashboard at `/dashboard/providers` to enable, configure, and test each 
 
 - Catalog: [`src/shared/constants/providers.ts`](../../src/shared/constants/providers.ts)
 - Registry (per-model details): [`open-sse/config/providerRegistry.ts`](../../open-sse/config/providerRegistry.ts)
-- Executors: [`open-sse/executors/`](../../open-sse/executors/) (158 implementations)
+- Executors: [`open-sse/executors/`](../../open-sse/executors/) (159 implementations)
 - Translators: [`open-sse/translator/`](../../open-sse/translator/)
 
 ## See Also

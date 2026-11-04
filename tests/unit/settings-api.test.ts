@@ -169,30 +169,6 @@ describe("Settings API - persisted preferences", () => {
       );
     });
 
-    test("PATCH /api/settings persists endpoint tunnel visibility", async () => {
-      const response = await harness.settingsRoute.PATCH(
-        await makeManagementSessionRequest("http://localhost/api/settings", {
-          method: "PATCH",
-          body: {
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
-          },
-        })
-      );
-      const body = (await response.json()) as Record<string, unknown>;
-
-      assert.equal(response.status, 200);
-      assert.equal(body.hideEndpointCloudflaredTunnel, true);
-      assert.equal(body.hideEndpointTailscaleFunnel, true);
-      assert.equal(body.hideEndpointNgrokTunnel, true);
-
-      const settings = await harness.getSettings();
-      assert.equal(settings.hideEndpointCloudflaredTunnel, true);
-      assert.equal(settings.hideEndpointTailscaleFunnel, true);
-      assert.equal(settings.hideEndpointNgrokTunnel, true);
-    });
-
     test("PATCH /api/settings persists Responses previous_response_id handling", async () => {
       const response = await harness.settingsRoute.PATCH(
         await makeManagementSessionRequest("http://localhost/api/settings", {

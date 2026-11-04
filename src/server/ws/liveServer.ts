@@ -230,9 +230,7 @@ async function authorizeConnection(request: import("http").IncomingMessage): Pro
   try {
     // Validate API key via the existing auth system (warmed at startup).
     const { extractApiKey, isValidApiKey } = await loadAuthModule();
-    const apiKey = extractApiKey({ headers: { authorization: `Bearer ${token}` } } as any, {
-      allowUrl: false,
-    });
+    const apiKey = extractApiKey({ headers: { authorization: `Bearer ${token}` } } as any);
 
     if (!apiKey || !(await isValidApiKey(apiKey))) {
       return { authorized: false, sessionId, error: "Invalid API key" };

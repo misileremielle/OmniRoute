@@ -238,9 +238,7 @@ network can burn your provider quotas. The order is fixed:
 For TLS / a domain, run Caddy or Traefik in front and leave `APP_BIND_HOST`
 at `127.0.0.1`. See the
 [DOCKER_GUIDE — Caddy HTTPS](../guides/DOCKER_GUIDE.md#docker-compose-with-caddy-https-auto-tls)
-and
-[Cloudflare Quick Tunnel](../guides/DOCKER_GUIDE.md#cloudflare-quick-tunnel)
-sections for copy-paste reverse-proxy configs.
+section for copy-paste reverse-proxy configs.
 
 ---
 

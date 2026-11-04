@@ -98,8 +98,6 @@ import { resolveChatCoreTargetFormat } from "./chatCore/targetFormat.ts";
 import { resolveOmniGlyphTransport } from "../services/compression/imageTransportPolicy.ts";
 import { usesClaudeBridge } from "./chatCore/agentRouterProtocol.ts";
 import { normalizeUpstreamRequestParams } from "./chatCore/upstreamRequestParams.ts";
-import { injectSystemPromptPreTranslation } from "../services/systemPrompt.ts";
-import { applyCustomSystemPrompt } from "./chatCore/customSystemPrompt.ts";
 import { applyProviderSystemTransforms } from "../services/systemTransforms.ts";
 import { translateRequest } from "../translator/index.ts";
 import { applyReasoningRuleDirective } from "@/lib/reasoningRouting/policy";
@@ -475,10 +473,6 @@ async function handleChatCoreInner({
   const { assertManagedLeaseFence, getManagedLeaseFenceErrorCode, managedLeaseFenceErrorResult } =
     createManagedLeaseFence(managedLease);
   let tokensCompressed: number | null = null;
-  // ── Per-endpoint custom system prompt (port of upstream #2063) ──
-  // Extracted to chatCore/customSystemPrompt.ts (chatCore slice 2); reads cachedSettings when the
-  // combo/chat layer passed it in, so the hot path does no extra DB read.
-  body = applyCustomSystemPrompt(body, cachedSettings ?? (await getCachedSettings()), log);
   // ── Plugin onRequest hook ── extracted to chatCore/pluginRequestGate.ts (chatCore slice 2):
   // a block becomes the labelled 403 `plugin_block` result; a rewrite replaces the body.
   const pluginGate = await runPluginRequestGate({
@@ -2289,12 +2283,6 @@ async function handleChatCoreInner({
         model || "",
         sourceFormat
       );
-      // Carrier-less targets (kiro / antigravity) have no post-translation
-      // system carrier for the single pass at ~3068 to write into — inject
-      // into the client body BEFORE translation so their user-merge /
-      // relocation paths carry the global prompt (baseline coverage of the
-      // removed pre-translation pass). The gate writes ONE carrier only.
-      translatedBody = injectSystemPromptPreTranslation(translatedBody, { targetFormat });
       translatedBody = translateRequest(
         sourceFormat,
         targetFormat,

@@ -52,7 +52,6 @@ import { registerCache } from "./cache.mjs";
 import { registerRedis } from "./redis.mjs";
 import { registerMcp } from "./mcp.mjs";
 import { registerA2a } from "./a2a.mjs";
-import { registerTunnel } from "./tunnel.mjs";
 import { registerEnv } from "./env.mjs";
 import { registerTestProvider } from "./test-provider.mjs";
 import { registerCompletion } from "./completion.mjs";
@@ -145,7 +144,6 @@ export function registerCommands(program) {
   registerRedis(program);
   registerMcp(program);
   registerA2a(program);
-  registerTunnel(program);
   registerEnv(program);
   registerTestProvider(program);
   registerCompletion(program);

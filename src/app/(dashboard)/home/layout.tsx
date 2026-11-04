@@ -4,7 +4,7 @@ import sectionNamespaces from "@/i18n/routeNamespaces.generated.json";
 
 /**
  * Home route (`/home`) i18n provider — the "home" set covers the home page,
- * the sponsor banners and the companion components under
+ * the banners and the companion components under
  * `src/app/(dashboard)/dashboard/` that it renders. Without this layout the
  * route inherits the dashboard chrome provider, whose namespace set is missing
  * "home" and every banner namespace, so next-intl renders MISSING_MESSAGE

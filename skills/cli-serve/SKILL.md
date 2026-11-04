@@ -79,7 +79,7 @@ omniroute stop
 ```
 
 <!-- skill:custom-start -->
-<!-- Aggregated from: omniroute-cli (setup + index), omniroute-cli-admin (lifecycle/setup/backup/tunnel) -->
+<!-- Aggregated from: omniroute-cli (setup + index), omniroute-cli-admin (lifecycle/setup/backup) -->
 
 ## Setup
 
@@ -264,20 +264,6 @@ omniroute autostart status             # Show current autostart state
 
 On Linux: creates a **systemd user service** (`~/.config/systemd/user/omniroute.service`) and enables **linger** so the service can start after reboot without a graphical login; on desktop sessions it also adds an XDG autostart entry with `--tray`. On macOS: LaunchAgent plist. On Windows: registry startup entry.
 
-### Tunnels (public URL)
-
-Expose a local OmniRoute instance via a secure tunnel:
-
-```bash
-omniroute tunnel list                  # List active tunnels
-omniroute tunnel create cloudflare     # Start a Cloudflare Tunnel (free)
-omniroute tunnel create tailscale      # Start a Tailscale funnel
-omniroute tunnel create ngrok          # Start an ngrok tunnel
-omniroute tunnel stop <id>             # Stop a running tunnel
-```
-
-The tunnel URL is printed and can be used as `OMNIROUTE_BASE_URL` from remote machines.
-
 ### Config & environment
 
 ```bash
@@ -316,5 +302,4 @@ omniroute update                       # Check for a newer version and prompt to
 
 - `doctor` shows `STORAGE_ENCRYPTION_KEY missing` → set the key in `.env` or run `reset-encrypted-columns --force` to wipe and re-enter credentials
 - `doctor` reports native binary fail → `npm rebuild better-sqlite3` in the OmniRoute app directory
-- `tunnel create cloudflare` hangs → ensure `cloudflared` is installed: `brew install cloudflare/cloudflare/cloudflared`
 <!-- skill:custom-end -->

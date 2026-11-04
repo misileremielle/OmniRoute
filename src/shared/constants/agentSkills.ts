@@ -35,9 +35,9 @@ export interface CuratedSkillEntry {
   isNew?: boolean;
 }
 
-// ── Canonical 46-entry curated list (D28) ────────────────────────────────────
+// ── Canonical 44-entry curated list (D28) ────────────────────────────────────
 
-/** Curated metadata for all 46 agent skills. Source-of-truth for the catalog. */
+/** Curated metadata for all 44 agent skills. Source-of-truth for the catalog. */
 export const CURATED_SKILLS: CuratedSkillEntry[] = [
   // ── API Skills (23) ─────────────────────────────────────────────────────────
 
@@ -171,15 +171,6 @@ export const CURATED_SKILLS: CuratedSkillEntry[] = [
     category: "api",
     area: "cli-tools",
     icon: "terminal",
-  },
-  {
-    id: "omni-tunnels",
-    name: "Tunnels",
-    description:
-      "Create and manage secure tunnels (ngrok, Cloudflare Tunnel, custom) to expose OmniRoute to the internet or share access with remote agents and CI pipelines.",
-    category: "api",
-    area: "tunnels",
-    icon: "vpn_lock",
   },
   {
     id: "omni-sync-cloud",
@@ -364,15 +355,6 @@ export const CURATED_SKILLS: CuratedSkillEntry[] = [
     category: "cli",
     area: "cli-a2a",
     icon: "device_hub",
-  },
-  {
-    id: "cli-tunnel",
-    name: "CLI: Tunnels",
-    description:
-      "Start and stop tunnel connections (ngrok, Cloudflare, custom) from the CLI. Inspect active tunnel URLs, configure authentication, and test external reachability.",
-    category: "cli",
-    area: "cli-tunnel",
-    icon: "vpn_lock",
   },
   {
     id: "cli-backup-sync",

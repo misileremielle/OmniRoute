@@ -154,17 +154,6 @@ test("verifyAuth no longer accepts API keys supplied via query string (#3300 fol
   assert.notEqual(result, null);
 });
 
-test("isAuthenticated accepts API keys embedded in vscode path aliases", async () => {
-  const key = await apiKeysDb.createApiKey("path-auth", "machine1234567890");
-  const request = new Request(
-    `https://example.com/api/v1/vscode/${encodeURIComponent(key.key)}/models`
-  );
-
-  const result = await apiAuth.isAuthenticated(request);
-
-  assert.equal(result, true);
-});
-
 test("verifyAuth never honours a URL-borne token on MANAGEMENT routes (#3300 follow-up)", async () => {
   // The historical escalation: a credential in the query string on a management
   // route (/api/* but not /api/v1/*). It must not be extracted at all, so the

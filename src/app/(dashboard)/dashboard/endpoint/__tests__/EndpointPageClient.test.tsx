@@ -135,19 +135,6 @@ vi.mock("next-intl", () => ({
       "endpoint.categoryCore": "Core APIs",
       "endpoint.categoryMedia": "Media APIs",
       "endpoint.categoryUtility": "Utility APIs",
-      "endpoint.vscodeAliasTitle": "VS Code Token Alias",
-      "endpoint.vscodeAliasDescriptionReady":
-        "Ready-to-paste compatibility URLs using the /api/v1/vscode/{token}/... endpoint.",
-      "endpoint.vscodeAliasDescriptionError":
-        "Showing placeholder URLs because CLI keys could not be loaded in this session.",
-      "endpoint.vscodeAliasDescriptionLoading":
-        "Loading CLI keys. Placeholder URLs are shown until a key is available.",
-      "endpoint.vscodeAliasDescriptionPlaceholder":
-        "Showing placeholder URLs. Create or activate an API key in CLI Tools to replace {token}.",
-      "endpoint.vscodeAliasManage": "CLI Tools",
-      "endpoint.vscodeAliasBaseLabel": "VS Code base",
-      "endpoint.vscodeAliasModelsLabel": "VS Code models",
-      "endpoint.vscodeAliasChatLabel": "VS Code chat",
       "endpoint.machineId": "Machine {id}",
       "endpoint.usingLocalServer": "Using local server",
       "common.copy": "Copy",
@@ -178,9 +165,6 @@ describe("EndpointPageClient", () => {
             cloudEnabled: false,
             cloudConfigured: true,
             cloudUrl: "https://cloud.example",
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       return Promise.resolve(jsonResponse({ data: [], providers: [], keys: [] }));
@@ -237,9 +221,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             cloudEnabled: false,
             cloudConfigured: false,
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       }
@@ -248,7 +229,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             localUrl: "http://localhost:20131/v1",
             lanUrls: [],
-            tailscaleIpUrl: null,
           })
         );
       }
@@ -288,9 +268,6 @@ describe("EndpointPageClient", () => {
             cloudEnabled: false,
             cloudConfigured: true,
             cloudUrl: "https://cloud.example",
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       return Promise.resolve(jsonResponse({ data: [], providers: [], keys: [] }));
@@ -312,9 +289,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             cloudEnabled: false,
             cloudConfigured: false,
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       return Promise.resolve(jsonResponse({ data: [], providers: [], keys: [] }));
@@ -331,7 +305,7 @@ describe("EndpointPageClient", () => {
     expect(line.querySelector(".break-all")).toBeNull();
   });
 
-  it("renders the endpoint shell before models finish and skips hidden tunnel probes", async () => {
+  it("renders the endpoint shell before models finish", async () => {
     const modelsDeferred = createDeferred<Response>();
 
     fetchMock.mockImplementation((input: RequestInfo | URL) => {
@@ -341,9 +315,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             cloudEnabled: false,
             cloudConfigured: false,
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
             machineId: "machine-12345678",
           })
         );
@@ -392,9 +363,6 @@ describe("EndpointPageClient", () => {
     await waitForText("Endpoint");
     expect(document.body.textContent).toContain("Loading available models...");
     expect(fetchMock).toHaveBeenCalledWith("/v1/models");
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/tunnels/cloudflared", expect.anything());
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/tunnels/tailscale", expect.anything());
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/tunnels/ngrok", expect.anything());
 
     modelsDeferred.resolve(
       jsonResponse({
@@ -415,9 +383,6 @@ describe("EndpointPageClient", () => {
     );
 
     await waitForText("2 models across");
-    await waitForText("/api/v1/vscode/sk-test-1234/models");
-    expect(document.body.textContent).toContain("VS Code Token Alias");
-    expect(document.body.textContent).toContain("/api/v1/vscode/sk-test-1234/models");
   });
 
   it("does not start background endpoint requests after unmounting during settings load", async () => {
@@ -438,9 +403,6 @@ describe("EndpointPageClient", () => {
         jsonResponse({
           cloudEnabled: false,
           cloudConfigured: false,
-          hideEndpointCloudflaredTunnel: false,
-          hideEndpointTailscaleFunnel: false,
-          hideEndpointNgrokTunnel: false,
         })
       );
       await settingsDeferred.promise;
@@ -459,9 +421,6 @@ describe("EndpointPageClient", () => {
           jsonResponse({
             cloudEnabled: false,
             cloudConfigured: false,
-            hideEndpointCloudflaredTunnel: true,
-            hideEndpointTailscaleFunnel: true,
-            hideEndpointNgrokTunnel: true,
           })
         );
       }

@@ -181,7 +181,7 @@ test("import-json does not write the password-gated security settings", async ()
           oidcDisablePasswordLogin: true,
           oidcClientSecret: "imported-secret",
           newPassword: "imported-new-password",
-          showQuickStartOnHome: false,
+          showProviderTopologyOnHome: false,
         },
       }),
     })
@@ -201,7 +201,7 @@ test("import-json does not write the password-gated security settings", async ()
   assert.equal(after.oidcClientSecret, before.oidcClientSecret);
   assert.equal(after.newPassword, undefined);
   // Non-security settings still import.
-  assert.equal(after.showQuickStartOnHome, false);
+  assert.equal(after.showProviderTopologyOnHome, false);
 });
 
 // ─── Drift guard: every LOCAL_ONLY entry is classified ───────────────────────

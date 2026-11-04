@@ -110,7 +110,6 @@ beforeEach(() => {
       if (url === "/api/settings") {
         return Promise.resolve(
           jsonResponse({
-            showQuickStartOnHome: true,
             showProviderTopologyOnHome: false,
           })
         );
@@ -157,5 +156,5 @@ it("renders the dashboard home client without throwing an internal server error"
   });
 
   expect(container.textContent).not.toContain("Internal Server Error");
-  expect(container.textContent).toContain("quickStart");
+  expect(container.firstElementChild).not.toBeNull();
 });

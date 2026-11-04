@@ -327,8 +327,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/lib/usage/resilienceExplain.ts": 1,
     "src/lib/usage/usageStats.ts": 1,
     "src/lib/vncSession/service.ts": 2,
-    // #17360 moved the two VS Code tag routes' connection read here (same read-only listing).
-    "src/lib/vscode/tagModels.ts": 1,
     "src/lib/warmupScheduler.ts": 1,
     "src/shared/services/codexCatalogRevalidation.ts": 2,
     "src/shared/services/modelSyncScheduler.ts": 1,

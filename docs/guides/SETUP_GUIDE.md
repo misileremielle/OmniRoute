@@ -156,15 +156,6 @@ API Key:  [copy from Endpoint page]
 Model:    if/qwen3.8-max-preview (or any provider/model prefix)
 ```
 
-If your editor cannot send `Authorization: Bearer ...`, use the tokenized compatibility base instead:
-
-```txt
-Base URL: http://localhost:20128/api/v1/vscode/YOUR_KEY/
-Models URL: http://localhost:20128/api/v1/vscode/YOUR_KEY/models
-Chat URL: http://localhost:20128/api/v1/vscode/YOUR_KEY/chat/completions
-Ollama Tags URL: http://localhost:20128/api/v1/vscode/YOUR_KEY/api/tags
-```
-
 Works with Claude Code, Codex CLI, Cursor, Cline, OpenClaw, OpenCode, and OpenAI-compatible SDKs.
 
 #### Auto-configure with `setup-*`

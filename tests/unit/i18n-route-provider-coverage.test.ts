@@ -10,9 +10,8 @@
  * The regression: the generator emitted a provider layout for every section
  * under `src/app/(dashboard)/dashboard/`, but `src/app/(dashboard)/home/` is
  * a SIBLING route with its own page.tsx. It never got a provider, so /home
- * inherited only the chrome set and rendered home.*, providers.*,
- * kimiSponsorBanner.*, cheaperInferenceSponsorBanner.* and
- * vscodeCopilotBanner.* raw. The existing guard in
+ * inherited only the chrome set and rendered home.*, providers.* and the
+ * home banner namespaces raw. The existing guard in
  * i18n-route-namespaces.test.ts could not catch this: it only iterates
  * `sections`, and `home` is not a section.
  *

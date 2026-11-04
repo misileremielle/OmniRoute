@@ -78,8 +78,6 @@ const PATH_AREA_MAP: Array<[string, SkillArea]> = [
   ["/api/circuit-breakers", "resilience"],
   // CLI tools
   ["/api/cli-tools", "cli-tools"],
-  // Tunnels
-  ["/api/tunnel", "tunnels"],
   // Sync / cloud
   ["/api/cloud", "sync-cloud"],
   ["/api/sync", "sync-cloud"],

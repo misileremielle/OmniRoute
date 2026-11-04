@@ -42,7 +42,6 @@ Core capabilities:
 - Optional cloud sync for multi-device/state sync
 - IP allowlist/blocklist for API access control
 - Thinking budget management (passthrough/auto/custom/adaptive)
-- Global system prompt injection
 - Session tracking and fingerprinting
 - Per-account enhanced rate limiting with provider-specific profiles
 - Circuit breaker pattern for provider resilience
@@ -120,7 +119,7 @@ the rest are linked from their domain-specific guides.
 
 Main pages under `src/app/(dashboard)/dashboard/`:
 
-- `/dashboard` — quick start + provider overview
+- `/dashboard` — provider overview
 - `/dashboard/endpoint` — endpoint proxy + MCP + A2A + API endpoint tabs
 - `/dashboard/providers` — provider connections and credentials
 - `/dashboard/combos` — combo strategies, templates, step-based builder, model routing rules, manual persisted ordering
@@ -250,7 +249,6 @@ Management domains:
 - CLI tooling helpers: `src/app/api/cli-tools/*`
 - IP filter: `src/app/api/settings/ip-filter` (GET/PUT)
 - Thinking budget: `src/app/api/settings/thinking-budget` (GET/PUT)
-- System prompt: `src/app/api/settings/system-prompt` (GET/PUT)
 - Compression: `src/app/api/settings/compression`, `src/app/api/compression/*`, and
   `src/app/api/context/*`
 - Sessions: `src/app/api/sessions` (GET)
@@ -296,7 +294,6 @@ Services (business logic):
 - IP filter enforcement: `open-sse/services/ipFilter.ts`
 - Session tracking: `open-sse/services/sessionManager.ts`
 - Request deduplication: `open-sse/services/signatureCache.ts`
-- System prompt injection: `open-sse/services/systemPrompt.ts`
 - Thinking budget management: `open-sse/services/thinkingBudget.ts`
 - Wildcard model routing: `open-sse/services/wildcardRouter.ts`
 - Rate limit management: `open-sse/services/rateLimitManager.ts`
@@ -874,7 +871,6 @@ flowchart LR
 - `src/app/api/cli-tools/*`: local CLI config writers/checkers
 - `src/app/api/settings/ip-filter`: IP allowlist/blocklist (GET/PUT)
 - `src/app/api/settings/thinking-budget`: thinking token budget config (GET/PUT)
-- `src/app/api/settings/system-prompt`: global system prompt (GET/PUT)
 - `src/app/api/settings/compression`: global compression settings (GET/PUT)
 - `src/app/api/compression/*`: compression preview, rule metadata, and language packs
 - `src/app/api/context/caveman/config`: Caveman settings alias (GET/PUT)

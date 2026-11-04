@@ -750,8 +750,8 @@ Loose coupling, by design:
   provider page is byte-identical to before this feature existed. Same outcome when
   there is no cache yet or no default referral for that specific provider.
 - When a default referral does apply, `ProviderPageHeader` receives `isReferralLink`
-  and shows the same discreet note/tooltip as the Kimi partner link (reusing the
-  `providers.kimiPartnerLinkNote` key) — never a new, separate visual treatment.
+  and shows a discreet "Partner link" note/tooltip (the
+  `providers.kimiPartnerLinkNote` key).
 
 ---
 

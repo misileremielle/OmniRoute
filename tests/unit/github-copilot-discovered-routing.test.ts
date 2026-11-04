@@ -19,8 +19,6 @@ const { resolveChatCoreTargetFormat } =
 const { resolveExecutionCredentials } =
   await import("../../open-sse/handlers/chatCore/executionCredentials.ts");
 const { GithubExecutor } = await import("../../open-sse/executors/github.ts");
-const { isUsableChatModel } =
-  await import("../../src/app/api/v1/vscode/[token]/usableChatModel.ts");
 
 let connectionId: string;
 const executor = new GithubExecutor();
@@ -89,15 +87,6 @@ test("discovered GPT-6 Responses-only models retain endpoint metadata and route 
       targetFormat: "openai-responses",
       url: "https://api.githubcopilot.com/responses",
     });
-  }
-});
-
-test("synced endpoint kinds remain usable in the VS Code model catalog", async () => {
-  const cached = await getCachedDiscoveredModels("github", connectionId);
-  for (const id of ["gpt-6-luna", "gpt-6.1-sol", "gpt-6-chat", "gpt-6-dual"]) {
-    const model = cached.find((row) => row.id === id);
-    assert.ok(model);
-    assert.ok(isUsableChatModel({ id, supported_endpoints: model.supportedEndpoints }), id);
   }
 });
 

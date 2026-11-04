@@ -722,14 +722,6 @@ export async function registerNodejs(): Promise<void> {
       );
     }
 
-    // Restore Global System Prompt into in-memory config (#2468/#2470)
-    if (settings.systemPrompt) {
-      const { setSystemPromptConfig } =
-        await import("@omniroute/open-sse/services/systemPrompt.ts");
-      setSystemPromptConfig(settings.systemPrompt);
-      console.log("[STARTUP] Global System Prompt restored from settings");
-    }
-
     // Restore the proxy-level Thinking-Budget config (#5312 RC-A). It lives in
     // `settings.thinkingBudget` and is NOT covered by applyRuntimeSettings, so
     // without this the dashboard mode (auto/custom/adaptive) silently reverts to

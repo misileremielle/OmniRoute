@@ -104,7 +104,7 @@ export const managementPolicy: RoutePolicy = {
       if (isLocalOnlyBypassableByManageScope(path)) {
         // Management auth is header-only — a URL-borne token must never satisfy a
         // manage-scope bypass of a LOCAL_ONLY route. See #3300 follow-up.
-        const apiKey = extractApiKey(ctx.request as unknown as Request, { allowUrl: false });
+        const apiKey = extractApiKey(ctx.request as unknown as Request);
         if (apiKey) {
           try {
             if (await isValidApiKey(apiKey)) {
@@ -226,7 +226,7 @@ export const managementPolicy: RoutePolicy = {
     // locality guard, so it catches the loopback/LAN requests that the Tier 1
     // gate does not reach.
     if (path.startsWith("/api/mcp/")) {
-      const apiKey = extractApiKey(ctx.request as unknown as Request, { allowUrl: false });
+      const apiKey = extractApiKey(ctx.request as unknown as Request);
       if (apiKey) {
         try {
           if (await isValidApiKey(apiKey)) {
@@ -308,7 +308,7 @@ export const managementPolicy: RoutePolicy = {
 
     // Management auth is header-only — a URL-borne token must not authenticate
     // a management route. See #3300 follow-up.
-    const apiKey = extractApiKey(ctx.request as unknown as Request, { allowUrl: false });
+    const apiKey = extractApiKey(ctx.request as unknown as Request);
     if (apiKey) {
       try {
         if (await isValidApiKey(apiKey)) {

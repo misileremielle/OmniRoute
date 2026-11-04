@@ -211,7 +211,7 @@ own spending controls for a hard cap.
 
 #### Kimi K2 ($9/month flat)
 
-1. Subscribe: [Moonshot AI](https://platform.kimi.ai?aff=omniroute)
+1. Subscribe: [Moonshot AI](https://platform.kimi.ai)
 2. Get API key → Dashboard → Add API Key
 
 **Use:** `kimi/kimi-k2.5` — **Pro Tip:** Fixed $9/month for 10M tokens = $0.90/1M effective cost!
@@ -617,8 +617,6 @@ post_install() {
 | `DISABLE_SQLITE_AUTO_BACKUP`            | `false`                  | Disable automatic SQLite snapshots before writes/import/restore; manual backups still work                                             |
 | `APP_LOG_TO_FILE`                       | `true`                   | Enables application and audit log output to disk                                                                                       |
 | `AUTH_COOKIE_SECURE`                    | `false`                  | Force `Secure` auth cookie (behind HTTPS reverse proxy)                                                                                |
-| `CLOUDFLARED_BIN`                       | unset                    | Use an existing `cloudflared` binary instead of managed download                                                                       |
-| `CLOUDFLARED_PROTOCOL`                  | `http2`                  | Transport for managed Quick Tunnels (`http2`, `quic`, or `auto`)                                                                       |
 | `OMNIROUTE_MEMORY_MB`                   | `512`                    | Node.js heap limit in MB                                                                                                               |
 | `PROMPT_CACHE_MAX_SIZE`                 | `50`                     | Max prompt cache entries                                                                                                               |
 | `SEMANTIC_CACHE_MAX_SIZE`               | `100`                    | Max semantic cache entries                                                                                                             |
@@ -844,18 +842,6 @@ Returns models grouped by provider with types (`chat`, `embedding`, `image`).
 - Sync providers, combos, and settings across devices
 - Automatic background sync with timeout + fail-fast
 - Prefer server-side `NEXT_PUBLIC_BASE_URL`/`NEXT_PUBLIC_CLOUD_URL` in production
-
-### Cloudflare Quick Tunnel
-
-- Available in **Dashboard → Endpoints** for Docker and other self-hosted deployments
-- Creates a temporary `https://*.trycloudflare.com` URL that forwards to your current OpenAI-compatible `/v1` endpoint
-- First enable installs `cloudflared` only when needed; later restarts reuse the same managed binary
-- Quick Tunnels are not auto-restored after an OmniRoute or container restart; re-enable them from the dashboard when needed
-- Tunnel URLs are ephemeral and change every time you stop/start the tunnel
-- Managed Quick Tunnels default to HTTP/2 transport to avoid noisy QUIC UDP buffer warnings in constrained containers
-- Set `CLOUDFLARED_PROTOCOL=quic` or `auto` if you want to override the managed transport choice
-- Set `CLOUDFLARED_BIN` if you prefer using a preinstalled `cloudflared` binary instead of the managed download
-- Cloudflare Quick Tunnel, Tailscale Funnel, and ngrok Tunnel panels can be shown or hidden in **Settings → Appearance**. Hiding a panel does not stop a running tunnel.
 
 ### LLM Gateway Intelligence (Phase 9)
 
@@ -1084,15 +1070,15 @@ curl -X POST http://localhost:20128/api/db-backups/import \
 
 The settings page is organized into **7 tabs** for easy navigation:
 
-| Tab            | Contents                                                                                                                                                  |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **General**    | System storage tools, default behavior, Endpoint tunnel visibility                                                                                        |
-| **Appearance** | Theme controls (light/dark/system), sidebar visibility, panel toggles for Cloudflare/Tailscale/ngrok tunnel cards                                         |
-| **AI**         | Thinking budget (passthrough / auto-strip / custom / adaptive — see [THINKING_BUDGET.md](./THINKING_BUDGET.md)), global system prompt, prompt cache stats |
-| **Security**   | Login/Password settings, IP Access Control, API auth for `/models`, Provider Blocking, prompt-injection guard                                             |
-| **Routing**    | Global routing strategy (Fill First / Round Robin / P2C / Random / Least Used / Cost Optimized), wildcard model aliases, fallback chains, combo defaults  |
-| **Resilience** | Request queue, connection cooldown, provider breaker config, and wait-for-cooldown behavior                                                               |
-| **Advanced**   | Global proxy configuration (HTTP/SOCKS5), per-provider proxy overrides                                                                                    |
+| Tab            | Contents                                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **General**    | System storage tools, default behavior, Endpoint tunnel visibility                                                                                       |
+| **Appearance** | Theme controls (light/dark/system), sidebar visibility                                                                                                   |
+| **AI**         | Thinking budget (passthrough / auto-strip / custom / adaptive — see [THINKING_BUDGET.md](./THINKING_BUDGET.md)), prompt cache stats                      |
+| **Security**   | Login/Password settings, IP Access Control, API auth for `/models`, Provider Blocking, prompt-injection guard                                            |
+| **Routing**    | Global routing strategy (Fill First / Round Robin / P2C / Random / Least Used / Cost Optimized), wildcard model aliases, fallback chains, combo defaults |
+| **Resilience** | Request queue, connection cooldown, provider breaker config, and wait-for-cooldown behavior                                                              |
+| **Advanced**   | Global proxy configuration (HTTP/SOCKS5), per-provider proxy overrides                                                                                   |
 
 General no longer duplicates read-only logging and cache notes. Database retention and
 optimization settings are persisted through `/api/settings/database`; manual cache clearing uses
@@ -1393,7 +1379,6 @@ omniroute health                   # Detailed health (breakers, cache, memory)
 omniroute quota                    # Provider quota usage
 omniroute mcp status               # MCP server status
 omniroute a2a status               # A2A server status
-omniroute tunnel list|create|stop  # Cloudflare/Tailscale/ngrok tunnels
 omniroute reset-password           # Reset the admin password
 omniroute --mcp                    # Start MCP server over stdio
 omniroute --port 3000              # Start the server on a custom port

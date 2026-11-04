@@ -1073,16 +1073,6 @@
       "count": 1
     }
   },
-  "src/app/api/v1/vscode/[token]/models/route.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "src/app/api/v1/vscode/combos/[token]/[[...slug]]/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/login/page.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 3
@@ -1333,11 +1323,6 @@
       "count": 1
     }
   },
-  "src/lib/ngrokTunnel.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/lib/notion/api.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -1449,11 +1434,6 @@
     }
   },
   "src/lib/streamingPiiTransform.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/tailscaleTunnel.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -2825,14 +2805,6 @@
       "count": 3
     }
   },
-  "tests/unit/cloudflaredTunnel-extended.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/codex-banked-reset-credits-5199.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 7
@@ -3766,7 +3738,7 @@
   },
   "tests/unit/models-catalog-route.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 79
+      "count": 78
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 3
@@ -4616,11 +4588,6 @@
       "count": 1
     }
   },
-  "tests/unit/tailscaleTunnel-anti-fold-10293.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/telemetry-summary-route.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
@@ -4797,11 +4764,6 @@
       "count": 1
     }
   },
-  "tests/unit/ui/cheaperInferenceSponsorBanner.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/ui/cli-code-detail-page.test.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -4959,14 +4921,6 @@
     }
   },
   "tests/unit/video-custom-provider-route.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/vscode-token-routes.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 65
-    },
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }

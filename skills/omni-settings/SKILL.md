@@ -41,8 +41,6 @@ All requests require a valid Bearer token or session cookie. Obtain a token via 
 - [`GET /api/settings/pii`](references/endpoints.md#get-apisettingspii)
 - [`PUT /api/settings/pii`](references/endpoints.md#put-apisettingspii)
 - [`POST /api/settings/pii/test`](references/endpoints.md#post-apisettingspiitest)
-- [`GET /api/settings/system-prompt`](references/endpoints.md#get-apisettingssystem-prompt)
-- [`PUT /api/settings/system-prompt`](references/endpoints.md#put-apisettingssystem-prompt)
 - [`GET /api/settings/thinking-budget`](references/endpoints.md#get-apisettingsthinking-budget)
 - [`PUT /api/settings/thinking-budget`](references/endpoints.md#put-apisettingsthinking-budget)
 - [`GET /api/settings/cli-versions`](references/endpoints.md#get-apisettingscli-versions)

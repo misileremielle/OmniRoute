@@ -100,10 +100,7 @@ export const APIKEY_PROVIDERS_REGIONAL = {
     icon: "psychology",
     color: "#1E3A8A",
     textIcon: "KM",
-    // Kimi official-partnership aff link (2026-07) — see KIMI_PROVIDER_IDS in
-    // featuredProviders.ts. hiddenFromDashboard, so this rarely renders, but is
-    // kept in sync with moonshot's aff link for consistency.
-    website: "https://platform.kimi.ai?aff=omniroute",
+    website: "https://platform.kimi.ai",
     hiddenFromDashboard: true,
   },
   "kimi-coding-apikey": {
@@ -114,10 +111,7 @@ export const APIKEY_PROVIDERS_REGIONAL = {
     icon: "psychology",
     color: "#1E40AF",
     textIcon: "KC",
-    // Kimi official-partnership aff link (2026-07) — folds into the kimi-coding
-    // card (PROVIDER_CONNECTION_ALIASES in providerPageUtils.ts) so this rarely
-    // renders its own header, but stays in sync with kimi-coding's aff link.
-    website: "https://www.kimi.ai/code?aff=omniroute",
+    website: "https://www.kimi.ai/code",
     hiddenFromDashboard: true,
   },
   minimax: {
@@ -204,21 +198,14 @@ export const APIKEY_PROVIDERS_REGIONAL = {
     id: "moonshot",
     serviceKinds: ["llm"],
     alias: "moonshot",
-    // Display name only — Kimi official-partnership rebrand (2026-07). The
-    // catalog id/alias/routing stay "moonshot" (DB connections, combos, and
-    // /dashboard/providers/moonshot all address it by id, never by name) — see
-    // KIMI_PROVIDER_IDS in featuredProviders.ts for the full id list this
-    // touches. "Kimi (Legacy Moonshot API)" (id "kimi") and "Moonshot AI" in
-    // company-name mentions (e.g. README, kimiOfficialSupporterTooltip) are
-    // intentionally left as-is.
+    // Display name only — the catalog id/alias/routing stay "moonshot" (DB
+    // connections, combos, and /dashboard/providers/moonshot all address it by
+    // id, never by name).
     name: "Kimi",
     icon: "rocket_launch",
     color: "#1E40AF",
     textIcon: "MS",
-    // Kimi official-partnership aff link (2026-07): the "Kimi API Platform"
-    // tracking link — was the unattributed legacy platform.moonshot.ai domain
-    // (301s to platform.kimi.ai with no aff tag).
-    website: "https://platform.kimi.ai?aff=omniroute",
+    website: "https://platform.kimi.ai",
   },
   volcengine: {
     id: "volcengine",

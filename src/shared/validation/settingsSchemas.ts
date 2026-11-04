@@ -217,9 +217,6 @@ export const updateSettingsSchema = z.object({
     })
     .optional(),
   hideHealthCheckLogs: z.boolean().optional(),
-  hideEndpointCloudflaredTunnel: z.boolean().optional(),
-  hideEndpointTailscaleFunnel: z.boolean().optional(),
-  hideEndpointNgrokTunnel: z.boolean().optional(),
   preferClaudeCodeForUnprefixedClaudeModels: z.boolean().optional(),
   // Opt-in (default "off"): short-circuits Claude Code's `--permission-mode auto`
   // internal security-classifier request with a synthetic ALLOW response instead of
@@ -229,7 +226,6 @@ export const updateSettingsSchema = z.object({
   autoRefreshProviderQuota: z.boolean().optional(),
   autoRefreshProviderQuotaInterval: z.number().int().min(10).max(3600).optional(),
   pinProviderQuotaToHome: z.boolean().optional(),
-  showQuickStartOnHome: z.boolean().optional(),
   showProviderTopologyOnHome: z.boolean().optional(),
   localOnlyManageScopeBypassEnabled: z.boolean().optional(),
   // Layer 1 of the spawn-capable guard (Hard Rules #15/#17): reject any bypass
@@ -256,8 +252,6 @@ export const updateSettingsSchema = z.object({
     )
     .optional(),
   customBannedSignals: z.array(z.string().max(200)).optional(),
-  customSystemPromptEnabled: z.boolean().optional(),
-  customSystemPrompt: z.string().max(10000).optional(),
   // #9817: opt-in (default off) — lets a probe-origin (model test-all)
   // failure deactivate a connection like real traffic. Off by default:
   // probe failures are recorded but never mutate routing state.

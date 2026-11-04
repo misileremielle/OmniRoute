@@ -34,7 +34,7 @@ model selection.
 
 Other compatibility surfaces are listed in [API Reference](./API_REFERENCE.md),
 including `/v1/messages`, `/v1/rerank`, `/v1/moderations`, video/music routes,
-Files, Batches, and the tokenized VS Code aliases.
+Files and Batches.
 
 ## Chat request fields
 

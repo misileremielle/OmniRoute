@@ -50,8 +50,6 @@ spawn-capable prefixes and fails CI if any is not classified local-only.
 | `/api/modality-bridge/video/`                                                                            | Strict trusted-loopback Video Bridge runtime probe and internal extraction bridge               |
 | `/api/services/`                                                                                         | Embedded services (9Router / CLIProxy / Bifrost / Mux / Dario) — `npm install` + spawn          |
 | `/dashboard/providers/services/`                                                                         | Reverse proxy to embedded-service UIs                                                           |
-| `/api/tunnels/cloudflared`                                                                               | Installs/spawns the cloudflared binary                                                          |
-| `/api/tunnels/tailscale/{install,enable,disable,login,start-daemon}`                                     | Installs/controls tailscaled on the host                                                        |
 | `/api/copilot/`                                                                                          | Unauthenticated LLM driver — CLI-only by default                                                |
 | `/api/tools/agent-bridge/`                                                                               | AgentBridge — spawns MITM server + DNS edits                                                    |
 | `/api/tools/traffic-inspector/`                                                                          | Traffic Inspector — http-proxy listener + system proxy                                          |
@@ -172,8 +170,6 @@ non-spawning sources (persisted state, settings, fs checks), flagged `probed: fa
 | ---------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `POST /api/providers/{id}/test`, `/api/providers/test-batch`     | CLI runtime probe (`allowLocalRuntimeProbe`) and CLI-fallback spawn |
 | `GET /api/headroom/status`                                       | `which headroom` and the python `--version` probes                  |
-| `GET /api/tunnels/tailscale`, `GET /api/tunnels/tailscale/check` | `which tailscale`, `tailscale status/funnel --json`, `which brew`   |
-| `GET /api/tunnels/cloudflared` (GET-exempt from LOCAL_ONLY)      | `which cloudflared` PATH lookup                                     |
 
 A new read route that probes the host follows the same pattern, or is classified
 LOCAL_ONLY outright.

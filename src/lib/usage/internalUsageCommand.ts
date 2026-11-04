@@ -117,29 +117,6 @@ function readHeader(request: Request, name: string): string | null {
   return request.headers.get(name) || request.headers.get(name.toLowerCase());
 }
 
-function readPathScopedToken(request: Request): string | null {
-  try {
-    const url = new URL(request.url, "http://localhost");
-    const segments = url.pathname
-      .split("/")
-      .map((segment) => segment.trim())
-      .filter(Boolean);
-
-    if (segments[0] === "vscode" && segments[1]) {
-      return decodeURIComponent(segments[1]).trim() || null;
-    }
-
-    if (segments[0] === "api" && segments[1] === "v1" && segments[2] === "vscode") {
-      const tokenIndex = segments[3] === "raw" || segments[3] === "combos" ? 4 : 3;
-      if (segments[tokenIndex]) return decodeURIComponent(segments[tokenIndex]).trim() || null;
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-}
-
 function extractUsageCommandApiKey(request: Request): string | null {
   const authHeader = readHeader(request, "Authorization");
   if (authHeader) {
@@ -152,7 +129,7 @@ function extractUsageCommandApiKey(request: Request): string | null {
     if (xApiKey?.trim()) return xApiKey.trim();
   }
 
-  return readPathScopedToken(request);
+  return null;
 }
 
 function toNumber(value: unknown, fallback = Number.NaN): number {
@@ -539,8 +516,8 @@ function appendQuotaBlock(
 
 /**
  * Structured form of the usage command — what {@link buildUsageCommandText}
- * renders as text, exposed as data for API consumers (the OmniCopilot panel
- * asks for it via `?format=json`). Text and JSON share the exact same
+ * renders as text, exposed as data for API consumers (requested via
+ * `?format=json`). Text and JSON share the exact same
  * collectors, so the two can never disagree about a number.
  *
  * NOTE on percentage semantics (#15530):

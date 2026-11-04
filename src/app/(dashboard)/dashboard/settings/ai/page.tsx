@@ -5,7 +5,6 @@ import { PageHeader } from "@omniroute/ui-kit/page-header";
 import ConnectionTestSettings from "../components/ConnectionTestSettings";
 import ThinkingBudgetTab from "../components/ThinkingBudgetTab";
 import ModalityBridgeMovedCard from "../components/ModalityBridgeMovedCard";
-import SystemPromptTab from "../components/SystemPromptTab";
 import ResponsesStatePolicyTab from "../components/ResponsesStatePolicyTab";
 import CodexFastTierTab from "../components/CodexFastTierTab";
 import CodexAutoPingTab from "../components/CodexAutoPingTab";
@@ -23,7 +22,6 @@ export default function SettingsAiPage() {
       <PageHeader compact title={tSidebar("settingsAi")} description={t("aiSettingsIntro")} />
       <ThinkingBudgetTab />
       <ModalityBridgeMovedCard />
-      <SystemPromptTab />
       <ResponsesStatePolicyTab />
       <UsageTokenBufferTab />
       <CodexFastTierTab />

@@ -6,14 +6,12 @@ import { updateSettingsSchema } from "../../src/shared/validation/settingsSchema
 test("appearance widget visibility settings are accepted by the settings PATCH schema", () => {
   const validation = updateSettingsSchema.safeParse({
     pinProviderQuotaToHome: true,
-    showQuickStartOnHome: false,
     showProviderTopologyOnHome: true,
   });
 
   assert.equal(validation.success, true);
   if (!validation.success) return;
   assert.equal(validation.data.pinProviderQuotaToHome, true);
-  assert.equal(validation.data.showQuickStartOnHome, false);
   assert.equal(validation.data.showProviderTopologyOnHome, true);
 });
 
@@ -23,14 +21,12 @@ test("appearance widget visibility settings default to undefined when not provid
   assert.equal(validation.success, true);
   if (!validation.success) return;
   assert.equal(validation.data.pinProviderQuotaToHome, undefined);
-  assert.equal(validation.data.showQuickStartOnHome, undefined);
   assert.equal(validation.data.showProviderTopologyOnHome, undefined);
 });
 
 test("appearance widget visibility settings reject non-boolean values", () => {
   const validation = updateSettingsSchema.safeParse({
     pinProviderQuotaToHome: "yes",
-    showQuickStartOnHome: "no",
   });
 
   assert.equal(validation.success, false);

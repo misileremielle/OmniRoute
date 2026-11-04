@@ -2,8 +2,8 @@
 /**
  * ProviderCardHandle imperative API — highlight(), scrollIntoView(), getProviderId().
  *
- * NOTE on placement: see providerCardKimiPartnerAccent.test.tsx for rationale
- * on keeping tests in tests/unit/ui/ (both vitest configs discover it here).
+ * NOTE on placement: kept in tests/unit/ui/ so both vitest configs discover it
+ * (a co-located `__tests__/` under src/app/(dashboard) is not picked up).
  */
 import React from "react";
 import { createRoot, type Root } from "react-dom/client";

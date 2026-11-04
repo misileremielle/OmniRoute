@@ -79,7 +79,7 @@ export async function resolveMcpCallerAuthInfo(
     import("../../src/sse/services/auth.ts"),
     import("../../src/lib/db/apiKeys.ts"),
   ]);
-  const rawKey = extractApiKey(request, { allowUrl: false });
+  const rawKey = extractApiKey(request);
   if (!rawKey) return undefined;
 
   try {

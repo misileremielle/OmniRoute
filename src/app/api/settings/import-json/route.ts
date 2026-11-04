@@ -8,8 +8,6 @@ import {
   requireOperatorCredential,
 } from "@/lib/api/operatorCredential";
 import { runJsonMigration, type LegacyJsonData } from "@/lib/db/jsonMigration";
-import { getSettings } from "@/lib/db/settings";
-import { setSystemPromptConfig } from "@omniroute/open-sse/services/systemPrompt.ts";
 import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error";
 import { IMPORT_STRIPPED_SETTINGS_KEYS } from "@/shared/constants/securityImpactingSettings";
 
@@ -92,13 +90,6 @@ export async function POST(request: Request) {
     const counts = runJsonMigration(db, data);
     clearApiKeyCaches();
     invalidateDbCache();
-
-    // Re-hydrate the in-memory Global System Prompt config — the migration writes it to
-    // the DB but the in-memory state would stay stale until a restart otherwise (#2470).
-    const importedSettings = await getSettings();
-    if (importedSettings.systemPrompt) {
-      setSystemPromptConfig(importedSettings.systemPrompt);
-    }
 
     console.log(
       `[JSON Import] Imported ${counts.connections} connections, ${counts.nodes} nodes, ` +

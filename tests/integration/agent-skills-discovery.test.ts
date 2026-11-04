@@ -4,8 +4,8 @@
  * Verifies:
  *  1. Every catalog ID has a skills/<id>/SKILL.md on disk.
  *  2. Each SKILL.md has valid frontmatter (name + description) and body ≥ 100 chars.
- *  3. MCP tool omniroute_agent_skills_list handler returns 46 entries.
- *  4. A2A skill list-capabilities returns one artifact containing all 46 entries.
+ *  3. MCP tool omniroute_agent_skills_list handler returns 44 entries.
+ *  4. A2A skill list-capabilities returns one artifact containing all 44 entries.
  *
  * Does NOT spin up a server — tests handlers directly via imports.
  */
@@ -82,8 +82,8 @@ test("every config skill ID has skills/<id>/SKILL.md on disk", () => {
   assert.deepEqual(missing, [], `Missing config SKILL.md files: ${missing.join(", ")}`);
 });
 
-test("canonical skill count is exactly 45 (23 API + 21 CLI + 1 config)", () => {
-  assert.equal(CANONICAL_IDS.length, 45);
+test("canonical skill count is exactly 43 (22 API + 20 CLI + 1 config)", () => {
+  assert.equal(CANONICAL_IDS.length, 43);
 });
 
 // ── §2: Frontmatter validation ────────────────────────────────────────────────
@@ -133,14 +133,14 @@ test("each SKILL.md body is at least 100 chars", () => {
 
 // ── §3: MCP tool omniroute_agent_skills_list ─────────────────────────────────
 
-test("MCP omniroute_agent_skills_list handler returns count 46", async () => {
+test("MCP omniroute_agent_skills_list handler returns count 44", async () => {
   const result = await agentSkillTools.omniroute_agent_skills_list.handler({});
-  assert.equal(result.count, 46, `Expected 46 but got ${result.count}`);
+  assert.equal(result.count, 44, `Expected 44 but got ${result.count}`);
   assert.ok(Array.isArray(result.skills));
-  assert.equal(result.skills.length, 46);
+  assert.equal(result.skills.length, 44);
 });
 
-test("MCP omniroute_agent_skills_list result has all 46 IDs", async () => {
+test("MCP omniroute_agent_skills_list result has all 44 IDs", async () => {
   const result = await agentSkillTools.omniroute_agent_skills_list.handler({});
   const returnedIds = new Set(result.skills.map((s: { id: string }) => s.id));
   for (const id of ALL_IDS) {
@@ -158,7 +158,7 @@ test("A2A list-capabilities returns exactly 1 artifact", async () => {
   assert.equal(result.artifacts[0].type, "text", "Artifact type should be 'text'");
 });
 
-test("A2A list-capabilities artifact content contains 46 skill IDs as table rows", async () => {
+test("A2A list-capabilities artifact content contains 44 skill IDs as table rows", async () => {
   const result = await executeListCapabilities(stubTask);
   const content = result.artifacts[0].content;
   const rows = content
@@ -167,15 +167,15 @@ test("A2A list-capabilities artifact content contains 46 skill IDs as table rows
       (line) => line.startsWith("| ") && !line.startsWith("| ID") && !line.startsWith("| ---")
     );
   // Each skill row starts with "| <id> |"
-  assert.equal(rows.length, 46, `Expected 46 data rows but got ${rows.length}`);
+  assert.equal(rows.length, 44, `Expected 44 data rows but got ${rows.length}`);
 });
 
-test("A2A list-capabilities metadata.totalSkills === 46", async () => {
+test("A2A list-capabilities metadata.totalSkills === 44", async () => {
   const result = await executeListCapabilities(stubTask);
-  assert.equal(result.metadata.totalSkills, 46);
+  assert.equal(result.metadata.totalSkills, 44);
 });
 
-test("A2A list-capabilities artifact contains all 46 skill IDs", async () => {
+test("A2A list-capabilities artifact contains all 44 skill IDs", async () => {
   const result = await executeListCapabilities(stubTask);
   const content = result.artifacts[0].content;
   const missing: string[] = [];

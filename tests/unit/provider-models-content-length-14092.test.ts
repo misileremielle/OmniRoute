@@ -1,5 +1,5 @@
 /**
- * #14092 — the provider-models and vscode catalog routes re-serialize a filtered
+ * #14092 — the provider-models route re-serializes a filtered
  * catalog body but used to forward the catalog's own `content-length` onto it.
  * A client then saw the full catalog's byte length (~833 KB) on a much smaller
  * body and the response never completed (the dashboard model picker stayed on
@@ -25,8 +25,6 @@ process.env.CATALOG_BUILD_TIMEOUT_MS = "120000";
 
 const core = await import("../../src/lib/db/core.ts");
 const { GET } = await import("../../src/app/api/v1/providers/[provider]/models/route.ts");
-const { getVscodeModelsCatalogResponse } =
-  await import("../../src/app/api/v1/vscode/[token]/models/route.ts");
 
 test.after(() => {
   core.resetDbInstance();
@@ -58,22 +56,6 @@ test("provider models route re-serializes without the catalog's stale content-le
   assertNoStaleLength(response, text, "providers route");
   const payload = JSON.parse(text) as { object?: string; data?: unknown };
   assert.ok(Array.isArray(payload.data), "route must return a model list");
-});
-
-test("vscode catalog helper drops stale length headers and keeps the cache headers", async () => {
-  const request = new Request("http://127.0.0.1:20128/api/v1/vscode/tok/api/models");
-  const catalog = await getVscodeModelsCatalogResponse(request);
-
-  assert.equal(catalog.status, 200);
-  assert.equal(catalog.headers["content-length"], undefined);
-  assert.equal(catalog.headers["transfer-encoding"], undefined);
-  assert.equal(catalog.headers.Pragma, "no-cache", "cache headers must survive the strip");
-
-  const response = Response.json(catalog.body, {
-    status: catalog.status,
-    headers: catalog.headers,
-  });
-  assertNoStaleLength(response, await response.text(), "vscode helper");
 });
 
 /**

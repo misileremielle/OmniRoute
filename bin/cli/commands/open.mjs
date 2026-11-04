@@ -16,7 +16,6 @@ const RESOURCES = {
   cost: "/dashboard/cost",
   resilience: "/dashboard/resilience",
   pricing: "/dashboard/pricing",
-  tunnels: "/dashboard/tunnels",
   quota: "/dashboard/quota",
 };
 
