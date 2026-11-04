@@ -2,7 +2,7 @@
  * getAllToolDefinitions — unified catalog of all MCP tool definitions.
  *
  * Aggregates the same collections referenced by TOTAL_MCP_TOOL_COUNT in server.ts:
- *   MCP_TOOLS + memoryTools + skillTools + agentSkillTools + githubSkillTools +
+ *   MCP_TOOLS + skillTools + agentSkillTools + githubSkillTools +
  *   poolTools + gamificationTools + pluginTools + notionTools + obsidianTools +
  *   localCorpusTools + compressionTools
  *
@@ -10,7 +10,6 @@
  */
 
 import { MCP_TOOLS } from "../schemas/tools.ts";
-import { memoryTools } from "../tools/memoryTools.ts";
 import { skillTools } from "../tools/skillTools.ts";
 import { agentSkillTools } from "../tools/agentSkillTools.ts";
 import { githubSkillTools } from "../tools/githubSkillTools.ts";
@@ -71,7 +70,6 @@ function collectAny(collection: unknown): ToolCatalogEntry[] {
 export function getAllToolDefinitions(): ToolCatalogEntry[] {
   const collections: unknown[] = [
     MCP_TOOLS,
-    memoryTools,
     skillTools,
     agentSkillTools,
     githubSkillTools,

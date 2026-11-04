@@ -70,7 +70,6 @@ const LEGACY_FLAT_KEYS: {
     callLogs: ["callLogs"],
     conversationTurnNodes: ["conversationTurnNodes"],
     usageHistory: ["usageHistory"],
-    memoryEntries: ["memoryEntries"],
     domainCostHistory: ["domainCostHistory"],
     compressionCacheStats: ["compressionCacheStats"],
     xpAuditLog: ["xpAuditLog"],

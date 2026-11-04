@@ -87,7 +87,6 @@ const HEADER_DESCRIPTIONS: Partial<
   media: "mediaDescription",
   "cli-code": "cliToolsDescription",
   "cli-agents": "agentsDescription",
-  memory: "memoryDescription",
   skills: "skillsDescription",
   "agent-skills": "agentSkillsDescription",
   "omni-skills": "omniSkillsDescription",

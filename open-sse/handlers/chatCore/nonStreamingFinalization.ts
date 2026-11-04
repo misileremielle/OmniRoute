@@ -7,7 +7,7 @@ import type {
   ChatCoreErrorResult,
   ProviderLegUsage,
   ServerOwnedToolLoopResult,
-} from "@/lib/skills/toolLoopTypes.ts";
+} from "@/lib/serverTools/toolLoopTypes.ts";
 import type { PersistAttemptLogsArgs } from "./attemptLogging.ts";
 import type { PendingRequestIdentity, PendingRequestMetadata } from "@/lib/usage/usageHistory.ts";
 import { type FailureUsageAggregate, toFailureUsageAggregate } from "./failureUsage.ts";

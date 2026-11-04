@@ -548,13 +548,6 @@ const MCP_ITEM: SidebarItemDefinition = {
 
 const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
   {
-    id: "memory",
-    href: "/dashboard/memory",
-    i18nKey: "memory",
-    subtitleKey: "memorySubtitle",
-    icon: "psychology",
-  },
-  {
     id: "agent-skills",
     href: "/dashboard/agent-skills",
     i18nKey: "agentSkills",

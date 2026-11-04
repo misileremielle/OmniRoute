@@ -218,7 +218,6 @@ function buildDispatchRequest(
   const headers = new Headers({
     "Content-Type": "application/json",
     Authorization: `Bearer ${apiKey || resolveSelfLoopBearer()}`,
-    "x-omniroute-no-memory": "true",
   });
   return new Request("http://localhost/api/v1/chat/completions", {
     method: "POST",

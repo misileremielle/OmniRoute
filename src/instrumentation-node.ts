@@ -347,8 +347,7 @@ export interface OptionalBootSubsystem {
  * inside the background-services block. Headless mode (`OMNIROUTE_HEADLESS=1`,
  * see src/lib/system/headless.ts) skips the whole table. Proxy-engine
  * background work — token auto-refresh, connection-cooldown recovery,
- * context-window reconcile, the memory subsystems (cross-cutting: `/v1`
- * injects and queries memory) and the backup schedule — stays inline in
+ * context-window reconcile and the backup schedule — stays inline in
  * `registerNodejs()` and runs in both modes.
  */
 export const OPTIONAL_BOOT_SUBSYSTEMS: ReadonlyArray<OptionalBootSubsystem> = [
@@ -870,28 +869,6 @@ export async function registerNodejs(): Promise<void> {
         .catch((err: unknown) => {
           const msg = err instanceof Error ? err.message : String(err);
           console.warn("[STARTUP] context-window reconcile failed to start (non-fatal):", msg);
-        }),
-
-      // TV6 typed memory decay: optional periodic sweep of decayed episodic memories.
-      // Doubly opt-in (no-op unless MEMORY_TYPED_DECAY_ENABLED=true AND
-      // MEMORY_TYPED_DECAY_SWEEP_INTERVAL>0). Never deletes by default. Never fatal.
-      import("@/lib/memory/typedDecay")
-        .then((m) => m.startMemoryDecaySweep())
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn("[STARTUP] memory decay sweep failed to start (non-fatal):", msg);
-        }),
-
-      // MemoryBackend provider pattern (PR #8752): initialize configured memory
-      // backends from settings (sqlite, obsidian, notion, custom HTTP, etc.).
-      // Reads the DB settings synchronously (non-blocking, never fatal). Must
-      // run after the DB is ready AND after getSettings/applyRuntimeSettings so
-      // memory backend config is hydrated.
-      import("@/lib/memory/index")
-        .then((m) => m.initMemoryBackends())
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn("[STARTUP] memory backend initialization failed (non-fatal):", msg);
         }),
 
       // Backup schedule (#8513): execute `backup-schedule.json` cron server-side.

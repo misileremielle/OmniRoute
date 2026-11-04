@@ -87,7 +87,6 @@ import {
 } from "./tools/inferenceTools.ts";
 import { handleWebFetch, handleWebSearch, handleXSearch } from "./tools/webTools.ts";
 import { toRecord } from "./coercions.ts";
-import { memoryTools } from "./tools/memoryTools.ts";
 import { skillTools } from "./tools/skillTools.ts";
 import { agentSkillTools } from "./tools/agentSkillTools.ts";
 import { githubSkillTools } from "./tools/githubSkillTools.ts";
@@ -123,7 +122,6 @@ const MCP_ALLOWED_SCOPES = new Set(
 );
 const TOTAL_MCP_TOOL_COUNT = countUniqueMcpTools({
   MCP_TOOLS,
-  memoryTools,
   skillTools,
   agentSkillTools,
   githubSkillTools,
@@ -305,7 +303,6 @@ export function createMcpServer(options?: CreateMcpServerOptions): McpServer {
 
   const RESERVED_MCP_NAMES = new Set([
     ...MCP_TOOLS.map((t) => t.name),
-    ...Object.keys(memoryTools),
     ...Object.keys(skillTools),
     ...Object.keys(compressionTools),
     ...Object.keys(poolTools),
@@ -660,33 +657,6 @@ export function createMcpServer(options?: CreateMcpServerOptions): McpServer {
   );
 
   registerToolSearchTool(server, withScopeEnforcement);
-
-  // ── Memory Tools ──────────────────────────────
-  Object.values(memoryTools).forEach((toolDef: any) => {
-    server.registerTool(
-      toolDef.name,
-      {
-        description: toolDef.description,
-        // @ts-ignore: dynamic zod access
-        inputSchema: toolDef.inputSchema,
-      },
-      withScopeEnforcement(
-        toolDef.name,
-        async (args, extra) => {
-          try {
-            const parsedArgs = toolDef.inputSchema.parse(args ?? {});
-            // @ts-ignore - handler type lost through dynamic Object.values() access
-            const result = await toolDef.handler(parsedArgs, extra);
-            return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-          } catch (err) {
-            const msg = toSafeMcpErrorMessage(err, "Memory tool execution failed");
-            return { content: [{ type: "text" as const, text: `Error: ${msg}` }], isError: true };
-          }
-        },
-        toolDef.scopes
-      )
-    );
-  });
 
   // ── Skill Tools ──────────────────────────────
   Object.values(skillTools).forEach((toolDef: any) => {

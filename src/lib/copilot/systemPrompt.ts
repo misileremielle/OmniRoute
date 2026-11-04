@@ -33,7 +33,6 @@ DeepSeek, Groq, xAI, Mistral, and many more). It supports:
 - **Dashboard**: Web UI for monitoring and configuration
 - **CLI**: Full command-line interface for headless operations
 - **Webhooks**: HMAC-signed delivery with exponential backoff
-- **Memory system**: Persistent conversational memory across sessions
 - **Skills system**: Extensible skill framework with sandbox execution
 
 ---
@@ -67,7 +66,7 @@ Client → API Route (/v1/chat/completions)
 ### Key Modules
 - **open-sse/**: Core streaming engine (handlers, executors, translator)
 - **src/app/api/**: Next.js App Router API routes
-- **src/lib/**: Infrastructure (db, events, memory, skills, guardrails, etc.)
+- **src/lib/**: Infrastructure (db, events, guardrails, etc.)
 - **src/server/**: Server infrastructure (WebSocket, authz)
 - **bin/**: CLI entry points
 
@@ -129,7 +128,7 @@ Lite: collapse whitespace, dedup system, compress tool results, etc.
 
 ### 3.9 MCP Server (110 tools)
 Core: health, combos, routing, cost, session, models, web search
-Cache, compression, 1proxy, memory, skills tools
+Cache, compression, 1proxy tools
 
 ### 3.10 Webhooks
 7 event types, exponential backoff, auto-disable at 10 failures.

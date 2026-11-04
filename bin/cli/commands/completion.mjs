@@ -133,7 +133,6 @@ _omniroute() {
     'test:Test provider connection'
     'update:Check for updates'
     'completion:Shell completion'
-    'memory:Manage memory store'
     'skills:Manage skills'
     'connect:Connect to a local or remote OmniRoute server'
     'contexts:Manage local and remote server contexts'
@@ -176,7 +175,7 @@ _omniroute() {
             '--system[System prompt]:' \\
             '--max-tokens[Max tokens]:' ;;
         open)
-          _arguments '1:resource:(combos providers api-manager cli-tools agents settings logs memory skills evals audit cost resilience)' ;;
+          _arguments '1:resource:(combos providers api-manager cli-tools agents settings logs skills evals audit cost resilience)' ;;
         completion) _arguments '1:subcommand:(zsh bash fish install refresh)' ;;
         config) _arguments '1:subcommand:(list get set validate contexts)' ;;
         models) _arguments '1:subcommand:(${modelCommands})' ;;
@@ -229,7 +228,7 @@ _omniroute() {
   COMPREPLY=()
   cur="\${COMP_WORDS[COMP_CWORD]}"
   prev="\${COMP_WORDS[COMP_CWORD-1]}"
-  cmds="setup doctor status logs providers config test update serve stop restart keys models combo chat stream completion dashboard open backup restore health quota cache mcp env memory skills connect contexts configure launch launch-codex run runtime repair"
+  cmds="setup doctor status logs providers config test update serve stop restart keys models combo chat stream completion dashboard open backup restore health quota cache mcp env skills connect contexts configure launch launch-codex run runtime repair"
 
   case "\${prev}" in
     combo)       COMPREPLY=($(compgen -W "list switch create delete show suggest" -- "\${cur}")); return 0 ;;
@@ -238,7 +237,7 @@ _omniroute() {
     config)      COMPREPLY=($(compgen -W "list get set validate contexts" -- "\${cur}")); return 0 ;;
     models)      COMPREPLY=($(compgen -W "${modelCommands}" -- "\${cur}")); return 0 ;;
     completion)  COMPREPLY=($(compgen -W "zsh bash fish install refresh" -- "\${cur}")); return 0 ;;
-    open)        COMPREPLY=($(compgen -W "combos providers api-manager cli-tools agents settings logs memory skills evals audit cost resilience" -- "\${cur}")); return 0 ;;
+    open)        COMPREPLY=($(compgen -W "combos providers api-manager cli-tools agents settings logs skills evals audit cost resilience" -- "\${cur}")); return 0 ;;
     contexts)    COMPREPLY=($(compgen -W "list add use current show remove rename export import migrate" -- "\${cur}")); return 0 ;;
     configure)   COMPREPLY=($(compgen -W "${CONFIGURE_TARGET_WORDS}" -- "\${cur}")); return 0 ;;
     run)         COMPREPLY=($(compgen -W "${RUN_TARGET_WORDS}" -- "\${cur}")); return 0 ;;
@@ -268,7 +267,7 @@ function generateFishScript(modelCommands) {
   return `# OmniRoute CLI fish completion (dynamic)
 complete -c omniroute -f
 
-set -l commands serve stop restart setup doctor status logs providers config keys models combo chat stream completion dashboard open backup restore health quota cache mcp env memory skills connect contexts configure launch launch-codex update test run runtime repair
+set -l commands serve stop restart setup doctor status logs providers config keys models combo chat stream completion dashboard open backup restore health quota cache mcp env skills connect contexts configure launch launch-codex update test run runtime repair
 
 for cmd in $commands
   complete -c omniroute -n '__fish_is_nth_token 1' -a $cmd
@@ -281,7 +280,7 @@ complete -c omniroute -n '__fish_seen_subcommand_from providers' -a 'available l
 complete -c omniroute -n '__fish_seen_subcommand_from config' -a 'list get set validate contexts'
 complete -c omniroute -n '__fish_seen_subcommand_from models' -a '${modelCommands}'
 complete -c omniroute -n '__fish_seen_subcommand_from completion' -a 'zsh bash fish install refresh'
-complete -c omniroute -n '__fish_seen_subcommand_from open' -a 'combos providers api-manager cli-tools agents settings logs memory skills evals audit cost resilience'
+complete -c omniroute -n '__fish_seen_subcommand_from open' -a 'combos providers api-manager cli-tools agents settings logs skills evals audit cost resilience'
 complete -c omniroute -n '__fish_seen_subcommand_from contexts' -a 'list add use current show remove rename export import migrate'
 complete -c omniroute -n '__fish_seen_subcommand_from configure' -a '${CONFIGURE_TARGET_WORDS}'
 complete -c omniroute -n '__fish_seen_subcommand_from run' -a '${RUN_TARGET_WORDS}'

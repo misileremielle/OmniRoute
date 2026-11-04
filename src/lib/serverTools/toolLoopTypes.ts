@@ -52,7 +52,6 @@ export type NonStreamingProviderLegResult =
   | {
       kind: "ok";
       response: Record<string, unknown>;
-      responseForMemoryExtraction: Record<string, unknown>;
       providerBody: Record<string, unknown>;
       providerRequest: Record<string, unknown>;
       usage: ProviderLegUsage | null;
@@ -101,7 +100,6 @@ export interface ServerOwnedToolLoopOptions {
 export interface ServerOwnedToolLoopResult {
   kind: "ok" | "error";
   response?: Record<string, unknown>;
-  responseForMemoryExtraction?: Record<string, unknown>;
   finalProviderBody?: Record<string, unknown>;
   finalProviderRequest?: Record<string, unknown>;
   errorResult?: ChatCoreErrorResult;
@@ -140,8 +138,6 @@ export interface ExecutionContext {
   requestId: string;
   requestIdentity?: string;
   builtinToolNames?: string[];
-  injectedCustomSkillNames?: string[];
-  customSkillExecutionEnabled?: boolean;
   executionFenceEnabled?: boolean;
   provider?: string;
   model?: string;
@@ -224,5 +220,4 @@ export interface NonStreamingClientTranslateInput {
 
 export interface NonStreamingClientTranslateResult {
   response: Record<string, unknown>;
-  responseForMemoryExtraction: Record<string, unknown>;
 }

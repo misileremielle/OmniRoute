@@ -1,7 +1,6 @@
 {
   "_comment": "Allowlist anti-slopsquatting (check-deps.mjs). Toda dep nova exige adicao EXPLICITA aqui apos verificar que e legitima.",
   "_justifications": {
-    "@agentclientprotocol/sdk": "Official Agent Client Protocol TypeScript SDK (agentclientprotocol/typescript-sdk, Apache-2.0). Exact 1.4.0 registry tarball and integrity verified for the registered native Gemini ACP launcher.",
     "@fontsource/ibm-plex-mono": "Self-hosted Keak type ramp for the vendored CI UI Kit (fontsource, OFL fonts; same no-CDN reasoning as Material Symbols #3695). KEA-7886 — CI UI Kit runtime dependency.",
     "@fontsource/instrument-serif": "Self-hosted Keak type ramp for the vendored CI UI Kit (fontsource, OFL fonts; same no-CDN reasoning as Material Symbols #3695). KEA-7886 — CI UI Kit runtime dependency.",
     "@fontsource/inter": "Self-hosted Keak type ramp for the vendored CI UI Kit (fontsource, OFL fonts; same no-CDN reasoning as Material Symbols #3695). KEA-7886 — CI UI Kit runtime dependency.",
@@ -28,7 +27,6 @@
     "subset-font": "devDependency used only by scripts/docs/readme-fonts.mjs to subset the OFL IBM Plex Mono @fontsource woff2 to the code characters each README SVG keeps as real text, embedded as a data: URI that renders inside GitHub's <img> sandbox. BSD-3-Clause; HarfBuzz compiled to WASM (harfbuzzjs, MIT), no native build, no network at runtime. Maintained by papandreou (assetgraph), 2.x line since 2022."
   },
   "allowed": [
-    "@agentclientprotocol/sdk",
     "@atjsh/llmlingua-2",
     "@aws-sdk/client-bedrock-runtime",
     "@axe-core/playwright",
@@ -181,7 +179,6 @@
     "socks",
     "source-map-js",
     "sql.js",
-    "sqlite-vec",
     "subset-font",
     "tailwind-merge",
     "tailwindcss",

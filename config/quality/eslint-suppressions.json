@@ -238,11 +238,6 @@
       "count": 1
     }
   },
-  "open-sse/mcp-server/__tests__/a2aLifecycle.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
   "open-sse/mcp-server/__tests__/dbHealthTool.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
@@ -265,7 +260,7 @@
   },
   "open-sse/mcp-server/server.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 3
+      "count": 2
     }
   },
   "open-sse/mcp-server/tools/advancedTools.ts": {
@@ -903,11 +898,6 @@
       "count": 3
     }
   },
-  "src/app/api/memory/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "src/app/api/middleware/hooks/[name]/route.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -951,11 +941,6 @@
   "src/app/api/settings/obsidian/route.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    }
-  },
-  "src/app/api/settings/qdrant/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "src/app/api/settings/route.ts": {
@@ -1084,16 +1069,6 @@
     }
   },
   "src/hooks/useLiveDashboard.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/a2a/skills/healthReport.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "src/lib/a2a/streaming.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -1268,31 +1243,6 @@
       "count": 1
     }
   },
-  "src/lib/memory/__tests__/generic-backend.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 4
-    }
-  },
-  "src/lib/memory/__tests__/schemas.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/memory/genericBackend.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/memory/retrieval.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/memory/sqliteBackend.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "src/lib/middleware/registry.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -1396,11 +1346,6 @@
   "src/lib/skills/hybrid.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 7
-    }
-  },
-  "src/lib/skills/memoryBuiltins.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "src/lib/skills/schemas.ts": {
@@ -2032,11 +1977,6 @@
       "count": 1
     }
   },
-  "tests/unit/acp-agents-route.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
   "tests/unit/adaptive-admission-runtime.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -2435,14 +2375,6 @@
       "count": 1
     }
   },
-  "tests/unit/cli-a2a-invoke-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 16
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/cli-audit-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 15
@@ -2750,11 +2682,6 @@
       "count": 3
     }
   },
-  "tests/unit/cloud-agent-cursor-4227.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
   "tests/unit/cloudflare-models-uuid-4259.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 3
@@ -3001,16 +2928,6 @@
   "tests/unit/compression/ultra.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    }
-  },
-  "tests/unit/conductor-agent-card.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/conductor-ask-route.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/context-manager.test.ts": {

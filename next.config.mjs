@@ -294,11 +294,6 @@ const nextConfig = {
     // require at runtime, where node_modules/tiktoken/tiktoken_bg.wasm
     // resolves normally.
     "tiktoken",
-    // sqlite-vec ships a native vec0.so loaded at runtime via createRequire().
-    // Turbopack otherwise tries to bundle the .so and fails with "Unknown module
-    // type"; externalizing it keeps the require at runtime (like better-sqlite3).
-    // See issue #3066.
-    "sqlite-vec",
     "node-machine-id",
     "keytar",
     "wreq-js",
@@ -566,11 +561,6 @@ const nextConfig = {
         permanent: true,
       },
       // Frameworks
-      {
-        source: "/docs/agent-protocols-guide",
-        destination: "/docs/frameworks/agent-protocols-guide",
-        permanent: true,
-      },
       { source: "/docs/evals", destination: "/docs/frameworks/evals", permanent: true },
       {
         source: "/docs/gamification",
@@ -578,7 +568,6 @@ const nextConfig = {
         permanent: true,
       },
       { source: "/docs/mcp-server", destination: "/docs/frameworks/mcp-server", permanent: true },
-      { source: "/docs/memory", destination: "/docs/frameworks/memory", permanent: true },
       { source: "/docs/opencode", destination: "/docs/frameworks/opencode", permanent: true },
       { source: "/docs/skills", destination: "/docs/frameworks/skills", permanent: true },
       { source: "/docs/webhooks", destination: "/docs/frameworks/webhooks", permanent: true },

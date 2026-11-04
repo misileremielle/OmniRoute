@@ -3,7 +3,7 @@
  * Extracted from chatCore.ts (lines ~3804-5096) by symbol boundaries.
  *
  * Owns: expectedConnectionId, allowAccountRotation, allowModelFallback.
- * Does NOT write terminal side effects (usage_history, cost, memory extraction).
+ * Does NOT write terminal side effects (usage_history, cost).
  * Returns usage in both ok and error results.
  */
 
@@ -12,7 +12,7 @@ import type {
   ProviderLegReceipt,
   ChatCoreErrorResult,
   NonStreamingProviderLegResult,
-} from "@/lib/skills/toolLoopTypes.ts";
+} from "@/lib/serverTools/toolLoopTypes.ts";
 import type {
   ProviderExecutionOutcome,
   ProviderExecutionPolicy,
@@ -328,7 +328,6 @@ function finishOk(
   return {
     kind: "ok",
     response: clientTranslate.response,
-    responseForMemoryExtraction: clientTranslate.responseForMemoryExtraction,
     providerBody: body,
     providerRequest: input.translatedBody ?? {},
     usage,

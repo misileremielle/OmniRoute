@@ -27,7 +27,6 @@ const SLASH_COMMANDS = [
   "max-tokens",
   "reasoning",
   "skill",
-  "memory",
   "help",
   "exit",
   "quit",
@@ -49,8 +48,6 @@ const HELP_TEXT = `Available commands:
   /max-tokens <n>    Adjust max tokens
   /reasoning <level> Adjust reasoning level
   /skill execute <id> '<args>'  Run a skill
-  /memory search <q> Search memory
-  /memory add <text> Add to memory
   /help              Show this help
   /exit, /quit       Exit REPL`;
 
@@ -347,7 +344,6 @@ function ReplApp({ initialOptions, onExit }) {
         setStatusMsg(`✓ ${cmd} set to ${args[0]} (applied to next request)`);
         break;
       case "skill":
-      case "memory":
         await sendMessage(line);
         break;
       case "help":

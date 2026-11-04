@@ -1,25 +1,12 @@
 /**
  * chatCore skills-format mappers (Quality Gate v2 / Fase 9 — chatCore god-file decomposition, #3501).
  *
- * Pure mappers extracted from chatCore: translate the request wire format into the skills provider
- * bucket and the skills model id used when injecting skill context. Side-effect-free; behaviour is
+ * Pure mapper extracted from chatCore: translates the request wire format into the model id used
+ * to read tool calls out of a response. Side-effect-free; behaviour is
  * byte-identical to the previous module-level functions.
  */
 
 import { FORMATS } from "../../translator/formats.ts";
-
-export function getSkillsProviderForFormat(
-  format: string
-): "openai" | "anthropic" | "google" | "other" {
-  switch (format) {
-    case FORMATS.CLAUDE:
-      return "anthropic";
-    case FORMATS.GEMINI:
-      return "google";
-    default:
-      return "openai";
-  }
-}
 
 export function getSkillsModelIdForFormat(format: string): string {
   switch (format) {

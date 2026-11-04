@@ -13,7 +13,7 @@
 import type {
   NonStreamingClientTranslateInput,
   NonStreamingClientTranslateResult,
-} from "@/lib/skills/toolLoopTypes.ts";
+} from "@/lib/serverTools/toolLoopTypes.ts";
 import { needsTranslation } from "../../translator/index.ts";
 import { FORMATS } from "../../translator/formats.ts";
 import { translateNonStreamingResponse } from "../responseTranslator.ts";
@@ -113,7 +113,6 @@ export function translateNonStreamingClientResponse(
         { signatureNamespace: input.signatureNamespace ?? null }
       )
     : responseBody;
-  const responseForMemoryExtraction = translatedResponse;
 
   // ── T18: Normalize finish_reason to 'tool_calls' if tool calls present ─────
   normalizeOpenAIToolFinishReasons(translatedResponse);
@@ -275,6 +274,5 @@ export function translateNonStreamingClientResponse(
 
   return {
     response: translatedResponse,
-    responseForMemoryExtraction,
   };
 }

@@ -64,7 +64,6 @@ export interface DatabaseSettings {
     callLogs: number;
     conversationTurnNodes: number;
     usageHistory: number;
-    memoryEntries: number;
     domainCostHistory: number;
     compressionCacheStats: number;
     xpAuditLog: number;
@@ -158,7 +157,6 @@ export const DEFAULT_DATABASE_SETTINGS: Omit<DatabaseSettings, "location" | "sta
     // shorter reconnect-anchor window than their call-log retention (#12453).
     conversationTurnNodes: 30,
     usageHistory: 30,
-    memoryEntries: 30,
     domainCostHistory: 30,
     compressionCacheStats: 30,
     xpAuditLog: 30,

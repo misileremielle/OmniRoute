@@ -18,13 +18,6 @@ import { checkAndRefreshToken } from "@/sse/services/tokenRefresh";
 import { resolveCodexWsModelInfo } from "./modelResolution";
 import { isFeatureFlagEnabled, isRequireApiKeyEnabled } from "@/shared/utils/featureFlags";
 import { buildHandshakeOriginRequest, isWebSocketOriginAllowed } from "@/server/origin/wsOrigin";
-import { formatMemoryContext } from "@/lib/memory/injection";
-import { retrieveMemories } from "@/lib/memory/retrieval";
-import {
-  DEFAULT_MEMORY_SETTINGS,
-  getMemorySettings,
-  toMemoryRetrievalConfig,
-} from "@/lib/memory/settings";
 import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error.ts";
 import { logger } from "@omniroute/open-sse/utils/logger.ts";
 import { resolveProxyForConnection } from "@/lib/db/settings";
@@ -124,156 +117,6 @@ function isRecord(value: unknown): value is JsonRecord {
 
 function toStringOrNull(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-}
-
-const RESPONSES_WS_MEMORY_CONTEXT_PREFIX = "Memory context:";
-const RESPONSES_WS_MEMORY_TEXT_PART_TYPES = new Set(["text", "input_text", "output_text"]);
-const RESPONSES_WS_MEMORY_SKIP_ITEM_TYPES = new Set([
-  "function_call",
-  "function_call_output",
-  "tool_call",
-  "tool_call_output",
-  "reasoning",
-  "computer_call",
-  "computer_call_output",
-  "web_search_call",
-  "file_search_call",
-]);
-
-function compactText(parts: Array<string | null>): string | null {
-  const text = parts
-    .map((part) => (typeof part === "string" ? part.trim() : ""))
-    .filter(Boolean)
-    .join("\n");
-  return text.length > 0 ? text : null;
-}
-
-function extractResponsesWsContentText(value: unknown): string | null {
-  if (typeof value === "string") return toStringOrNull(value);
-
-  if (Array.isArray(value)) {
-    return compactText(
-      value.map((part) => {
-        if (typeof part === "string") return toStringOrNull(part);
-        if (!isRecord(part)) return null;
-
-        const type = typeof part.type === "string" ? part.type : "";
-        if (type && !RESPONSES_WS_MEMORY_TEXT_PART_TYPES.has(type)) return null;
-
-        return toStringOrNull(part.text) || toStringOrNull(part.input_text);
-      })
-    );
-  }
-
-  if (isRecord(value)) {
-    const type = typeof value.type === "string" ? value.type : "";
-    if (type && !RESPONSES_WS_MEMORY_TEXT_PART_TYPES.has(type)) return null;
-    return toStringOrNull(value.text) || toStringOrNull(value.input_text);
-  }
-
-  return null;
-}
-
-function extractResponsesWsItemText(value: unknown): string | null {
-  if (typeof value === "string") return toStringOrNull(value);
-  if (!isRecord(value)) return null;
-
-  return (
-    extractResponsesWsContentText(value.content) ||
-    extractResponsesWsContentText(value.text) ||
-    extractResponsesWsContentText(value.input_text) ||
-    extractResponsesWsContentText(value.output_text) ||
-    extractResponsesWsContentText(value.output)
-  );
-}
-
-function isResponsesWsMemoryCandidate(value: unknown): boolean {
-  if (!isRecord(value)) return typeof value === "string";
-  const type = typeof value.type === "string" ? value.type : "";
-  return !RESPONSES_WS_MEMORY_SKIP_ITEM_TYPES.has(type);
-}
-
-function extractLatestResponsesWsInputText(input: unknown): string | null {
-  if (typeof input === "string") return toStringOrNull(input);
-  if (!Array.isArray(input)) return null;
-
-  for (let index = input.length - 1; index >= 0; index -= 1) {
-    const item = input[index];
-    if (!isResponsesWsMemoryCandidate(item) || !isRecord(item) || item.role !== "user") continue;
-    const text = extractResponsesWsItemText(item);
-    if (text) return text;
-  }
-
-  for (let index = input.length - 1; index >= 0; index -= 1) {
-    const item = input[index];
-    if (!isResponsesWsMemoryCandidate(item)) continue;
-    const text = extractResponsesWsItemText(item);
-    if (text) return text;
-  }
-
-  return null;
-}
-
-export function extractResponsesWsMemoryQuery(body: JsonRecord): string {
-  return (
-    extractLatestResponsesWsInputText(body.input) ||
-    extractLatestResponsesWsInputText(body.messages) ||
-    toStringOrNull(body.prompt) ||
-    toStringOrNull(body.instructions) ||
-    ""
-  );
-}
-
-export function injectResponsesWsMemoryInstructions(
-  body: JsonRecord,
-  memoryText: string
-): JsonRecord {
-  const memoryContext = toStringOrNull(memoryText);
-  if (!memoryContext) return body;
-
-  const existingInstructions = toStringOrNull(body.instructions);
-  if (existingInstructions?.includes(RESPONSES_WS_MEMORY_CONTEXT_PREFIX)) return body;
-
-  return {
-    ...body,
-    instructions: [memoryContext, existingInstructions].filter(Boolean).join("\n\n"),
-  };
-}
-
-async function getMemorySettingsForResponsesWs() {
-  try {
-    return await getMemorySettings();
-  } catch (error) {
-    log.warn("memory.settings.defaulted", {
-      error: sanitizeErrorMessage(error instanceof Error ? error.message : String(error)),
-    });
-    return DEFAULT_MEMORY_SETTINGS;
-  }
-}
-
-async function maybeInjectResponsesWsMemory(
-  responseBody: JsonRecord,
-  metadata: ApiKeyMetadata | null
-): Promise<JsonRecord> {
-  if (!metadata?.id) return responseBody;
-
-  const query = extractResponsesWsMemoryQuery(responseBody);
-  if (!query) return responseBody;
-
-  try {
-    const memorySettings = await getMemorySettingsForResponsesWs();
-    const memories = await retrieveMemories(
-      metadata.id,
-      toMemoryRetrievalConfig(memorySettings, { query })
-    );
-    const memoryText = formatMemoryContext(memories);
-    return injectResponsesWsMemoryInstructions(responseBody, memoryText);
-  } catch (error) {
-    log.warn("memory.injection.skipped", {
-      error: sanitizeErrorMessage(error instanceof Error ? error.message : String(error)),
-    });
-    return responseBody;
-  }
 }
 
 function getBridgeSecret(): string {
@@ -703,36 +546,36 @@ async function prepare(body: JsonRecord) {
   } = upstream;
   const reasoningDecision = upstream.reasoningDecision;
 
-  let responseBodyWithMemory: JsonRecord;
+  let preparedResponseBody: JsonRecord;
   let reasoningRouting: JsonRecord | null = null;
   let transformed: JsonRecord;
   let credentialsWithFingerprint: typeof refreshedCredentials;
   let reasoningRuleDirective: unknown;
   try {
-    responseBodyWithMemory = await maybeInjectResponsesWsMemory(responseBody, metadata);
+    preparedResponseBody = responseBody;
     if (reasoningDecision) {
-      const withDirective = attachReasoningRuleDirective(responseBodyWithMemory, reasoningDecision);
+      const withDirective = attachReasoningRuleDirective(preparedResponseBody, reasoningDecision);
       reasoningRuleDirective = withDirective._omnirouteReasoningRule;
       reasoningRouting = isRecord(withDirective._omnirouteReasoningRouteTrace)
         ? withDirective._omnirouteReasoningRouteTrace
         : null;
-      responseBodyWithMemory = applyReasoningRuleDirective(
+      preparedResponseBody = applyReasoningRuleDirective(
         withDirective,
         "openai-responses"
       ) as JsonRecord;
-      delete responseBodyWithMemory._omnirouteReasoningRouteTrace;
+      delete preparedResponseBody._omnirouteReasoningRouteTrace;
     }
     // #8052: the WS bridge previously skipped the whole prompt-compression pipeline that the
     // HTTP/SSE path (chatCore.ts) runs on every request — wire the same core pipeline in here,
     // per logical turn, before handing off to the executor.
-    responseBodyWithMemory = await applyResponsesWsCompression(responseBodyWithMemory, {
+    preparedResponseBody = await applyResponsesWsCompression(preparedResponseBody, {
       provider,
       model,
       requestId: randomUUID(),
     });
-    responseBodyWithMemory = applyApiKeyCodexServiceMode(
+    preparedResponseBody = applyApiKeyCodexServiceMode(
       provider,
-      responseBodyWithMemory,
+      preparedResponseBody,
       metadata?.codexServiceMode
     );
     credentialsWithFingerprint = withCodexFingerprintCredentials(
@@ -742,13 +585,13 @@ async function prepare(body: JsonRecord) {
         metadata?.codexServiceMode
       ),
       context.clientHeaders,
-      responseBodyWithMemory
+      preparedResponseBody
     );
     transformed = (await executor.transformRequest(
       model,
       // This route already accepts native Responses input. Match HTTP passthrough
       // so the executor preserves custom tools and native tool-result history.
-      { ...responseBodyWithMemory, _nativeCodexPassthrough: true },
+      { ...preparedResponseBody, _nativeCodexPassthrough: true },
       true,
       credentialsWithFingerprint
     )) as JsonRecord;

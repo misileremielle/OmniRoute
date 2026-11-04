@@ -164,8 +164,6 @@ export async function runServerOwnedToolLoop(
       return {
         kind: "ok",
         response: currentLeg.kind === "ok" ? currentLeg.response : undefined,
-        responseForMemoryExtraction:
-          currentLeg.kind === "ok" ? currentLeg.responseForMemoryExtraction : undefined,
         finalProviderBody: currentLeg.kind === "ok" ? currentLeg.providerBody : undefined,
         finalProviderRequest: currentLeg.kind === "ok" ? currentLeg.providerRequest : undefined,
         cumulativeUsage: aggregateUsageOrNull(usages),
@@ -222,8 +220,6 @@ export async function runServerOwnedToolLoop(
       return {
         kind: "ok",
         response: formatted,
-        responseForMemoryExtraction:
-          currentLeg.kind === "ok" ? currentLeg.responseForMemoryExtraction : undefined,
         finalProviderBody: currentLeg.kind === "ok" ? currentLeg.providerBody : undefined,
         finalProviderRequest: currentLeg.kind === "ok" ? currentLeg.providerRequest : undefined,
         cumulativeUsage: aggregateUsageOrNull(usages),
@@ -313,8 +309,6 @@ export async function runServerOwnedToolLoop(
       return {
         kind: "ok",
         response: formatted,
-        responseForMemoryExtraction:
-          currentLeg.kind === "ok" ? currentLeg.responseForMemoryExtraction : undefined,
         finalProviderBody: currentLeg.kind === "ok" ? currentLeg.providerBody : undefined,
         finalProviderRequest: currentLeg.kind === "ok" ? currentLeg.providerRequest : undefined,
         cumulativeUsage: aggregateUsageOrNull(usages),

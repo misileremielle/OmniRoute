@@ -2,7 +2,7 @@
  * countUniqueMcpTools — de-duplicated MCP tool count.
  *
  * The various tool collections registered by the MCP server (array-shaped, e.g.
- * `MCP_TOOLS`, and record-shaped, e.g. `memoryTools`) are not guaranteed disjoint by
+ * `MCP_TOOLS`, and record-shaped, e.g. `poolTools`) are not guaranteed disjoint by
  * tool `name` — some tools (e.g. the agent-skills trio) are intentionally defined in
  * both an array collection and a record collection for registration purposes. Summing
  * `collection.length` / `Object.keys(collection).length` across all sources therefore
