@@ -25,6 +25,8 @@ interface CompatibleNodeCardProps {
   isCcCompatible: boolean;
   isAnthropicCompatible: boolean;
   isAnthropicProtocolCompatible: boolean;
+  /** System One (Jev) decision endpoint — POST <baseUrl>/v1/systemone. */
+  isSystemOneCompatible?: boolean;
   gateConnectionFlow: (callback: () => void) => void;
   openApiKeyAddFlow: () => void;
   onOpenEditNodeModal: () => void;
@@ -37,6 +39,7 @@ export default function CompatibleNodeCard({
   isCcCompatible,
   isAnthropicCompatible,
   isAnthropicProtocolCompatible,
+  isSystemOneCompatible = false,
   gateConnectionFlow,
   openApiKeyAddFlow,
   onOpenEditNodeModal,
@@ -54,25 +57,41 @@ export default function CompatibleNodeCard({
               src={providerNode.iconUrl}
               size={32}
               className="shrink-0 rounded-lg"
-              fallbackText={isCcCompatible ? "CC" : isAnthropicCompatible ? "AC" : "OC"}
+              fallbackText={
+                isSystemOneCompatible
+                  ? "S1"
+                  : isCcCompatible
+                    ? "CC"
+                    : isAnthropicCompatible
+                      ? "AC"
+                      : "OC"
+              }
             />
           )}
           <div>
             <h2 className="text-lg font-semibold">
-              {isCcCompatible
-                ? t("ccCompatibleDetailsTitle")
-                : isAnthropicCompatible
-                  ? t("anthropicCompatibleDetails")
-                  : t("openaiCompatibleDetails")}
+              {isSystemOneCompatible
+                ? t("systemOneCompatibleName")
+                : isCcCompatible
+                  ? t("ccCompatibleDetailsTitle")
+                  : isAnthropicCompatible
+                    ? t("anthropicCompatibleDetails")
+                    : t("openaiCompatibleDetails")}
             </h2>
             <p className="text-sm text-text-muted">
-              {getApiLabel(t, isAnthropicProtocolCompatible, providerNode?.apiType)} ·{" "}
-              {(providerNode.baseUrl || "").replace(/\/$/, "")}/
-              {getApiPath(
-                isCcCompatible,
-                isAnthropicCompatible,
-                providerNode?.apiType,
-                providerNode?.chatPath
+              {isSystemOneCompatible ? (
+                <>System One · {(providerNode.baseUrl || "").replace(/\/$/, "")}/v1/systemone</>
+              ) : (
+                <>
+                  {getApiLabel(t, isAnthropicProtocolCompatible, providerNode?.apiType)} ·{" "}
+                  {(providerNode.baseUrl || "").replace(/\/$/, "")}/
+                  {getApiPath(
+                    isCcCompatible,
+                    isAnthropicCompatible,
+                    providerNode?.apiType,
+                    providerNode?.chatPath
+                  )}
+                </>
               )}
             </p>
           </div>
@@ -92,11 +111,13 @@ export default function CompatibleNodeCard({
               if (
                 !confirm(
                   t("deleteCompatibleNodeConfirm", {
-                    type: isCcCompatible
-                      ? t("ccCompatibleLabel")
-                      : isAnthropicCompatible
-                        ? t("anthropic")
-                        : t("openai"),
+                    type: isSystemOneCompatible
+                      ? "System One"
+                      : isCcCompatible
+                        ? t("ccCompatibleLabel")
+                        : isAnthropicCompatible
+                          ? t("anthropic")
+                          : t("openai"),
                   })
                 )
               )

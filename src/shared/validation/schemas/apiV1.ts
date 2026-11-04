@@ -532,7 +532,12 @@ export const v1SegmentSchema = z
 export const v1SystemOneSchema = z
   .object({
     model: modelIdSchema.optional(),
-    state: z.union([nonEmptyStringSchema, z.record(z.string(), z.unknown())]),
+    // TypeSafe SDK: "Text, an asset, a JSON object, or an array to evaluate".
+    state: z.union([
+      nonEmptyStringSchema,
+      z.record(z.string(), z.unknown()),
+      z.array(z.unknown()).min(1),
+    ]),
     questions: z.record(z.string().min(1), z.unknown()),
   })
   .catchall(z.unknown())

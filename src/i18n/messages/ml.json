@@ -7084,7 +7084,15 @@
     "chatgptConnectorLabel": "ChatGPT ഇഷ്ടാനുസൃത കണക്ടർ",
     "doctorChecking": "സ്ഥിതി പരിശോധിക്കുന്നു…",
     "doctorCheck": "ഡോക്ടർ (doctor) സ്ഥിതി പരിശോധിക്കുക",
-    "fallbackRetryBackendTitle": "പരിഹാര റീട്രൈ ബാക്ക്എൻഡ്"
+    "fallbackRetryBackendTitle": "പരിഹാര റീട്രൈ ബാക്ക്എൻഡ്",
+    "addSystemOneCompatible": "__MISSING__:Add System One Compatible",
+    "systemOneCompatibleName": "__MISSING__:System One Compatible",
+    "systemOneNamePlaceholder": "__MISSING__:OpenRouter System One",
+    "systemOnePrefixPlaceholder": "__MISSING__:sys1",
+    "systemOneBaseUrlPlaceholder": "__MISSING__:https://openrouter.ai/api",
+    "systemOneBaseUrlHint": "__MISSING__:Root URL of a System One (Jev) API; OmniRoute appends /v1/systemone. Starts with OpenRouter — use https://api.typesafe.ai for TypeSafe direct, or any Jev-compatible server.",
+    "systemOnePrefixHint": "__MISSING__:Required. Clients call POST /v1/systemone with the model written as prefix/model (e.g. sys1/jev-latest).",
+    "systemOneTestModelPlaceholder": "__MISSING__:jev-latest"
   },
   "settings": {
     "title": "ക്രമീകരണങ്ങൾ",

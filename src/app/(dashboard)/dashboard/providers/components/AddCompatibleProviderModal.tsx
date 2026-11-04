@@ -15,7 +15,7 @@ import {
 import NewApiAggregatorFields from "../[id]/components/modals/NewApiAggregatorFields";
 import { providerText } from "../[id]/providerPageHelpers";
 
-type CompatibleMode = "openai" | "anthropic" | "cc";
+type CompatibleMode = "openai" | "anthropic" | "cc" | "systemone";
 type CompatibleProviderNode = { id: string } & Record<string, unknown>;
 
 interface AddCompatibleProviderModalProps {
@@ -48,12 +48,14 @@ const MODE_DEFAULTS: Record<
   CompatibleMode,
   {
     baseUrl: string;
-    type: "openai-compatible" | "anthropic-compatible";
+    type: "openai-compatible" | "anthropic-compatible" | "systemone-compatible";
     compatMode?: "cc";
     chatPath: string;
     hasApiType: boolean;
     hasModelsPath: boolean;
     hasWarning: boolean;
+    /** Chat-gateway extras (aggregator balance, advanced paths, client identity). */
+    hasChatExtras: boolean;
   }
 > = {
   openai: {
@@ -63,6 +65,7 @@ const MODE_DEFAULTS: Record<
     hasApiType: true,
     hasModelsPath: true,
     hasWarning: false,
+    hasChatExtras: true,
   },
   anthropic: {
     baseUrl: "https://api.anthropic.com/v1",
@@ -71,6 +74,7 @@ const MODE_DEFAULTS: Record<
     hasApiType: false,
     hasModelsPath: true,
     hasWarning: false,
+    hasChatExtras: true,
   },
   cc: {
     baseUrl: "",
@@ -80,6 +84,19 @@ const MODE_DEFAULTS: Record<
     hasApiType: false,
     hasModelsPath: false,
     hasWarning: true,
+    hasChatExtras: true,
+  },
+  // System One (Jev) decision endpoint — POST <root>/v1/systemone. The initial
+  // root is OpenRouter's System One API; TypeSafe direct or any Jev-compatible
+  // server works the same way.
+  systemone: {
+    baseUrl: "https://openrouter.ai/api",
+    type: "systemone-compatible",
+    chatPath: "",
+    hasApiType: false,
+    hasModelsPath: false,
+    hasWarning: false,
+    hasChatExtras: false,
   },
 };
 
@@ -163,34 +180,49 @@ export default function AddCompatibleProviderModal({
       ? t("addOpenAICompatible")
       : mode === "anthropic"
         ? t("addAnthropicCompatible")
-        : t("addCcCompatible"));
+        : mode === "systemone"
+          ? t("addSystemOneCompatible")
+          : t("addCcCompatible"));
 
   const namePlaceholder =
     mode === "cc"
       ? t("ccCompatibleNamePlaceholder")
-      : t("compatibleProdPlaceholder", {
-          type: mode === "openai" ? t("openai") : t("anthropic"),
-        });
+      : mode === "systemone"
+        ? t("systemOneNamePlaceholder")
+        : t("compatibleProdPlaceholder", {
+            type: mode === "openai" ? t("openai") : t("anthropic"),
+          });
   const nameHint = mode === "cc" ? t("ccCompatibleNameHint") : t("nameHint");
   const prefixPlaceholder =
     mode === "openai"
       ? t("openaiPrefixPlaceholder")
       : mode === "cc"
         ? t("ccCompatiblePrefixPlaceholder")
-        : t("anthropicPrefixPlaceholder");
-  const prefixHint = mode === "cc" ? t("ccCompatiblePrefixHint") : t("prefixHint");
+        : mode === "systemone"
+          ? t("systemOnePrefixPlaceholder")
+          : t("anthropicPrefixPlaceholder");
+  const prefixHint =
+    mode === "cc"
+      ? t("ccCompatiblePrefixHint")
+      : mode === "systemone"
+        ? t("systemOnePrefixHint")
+        : t("prefixHint");
   const baseUrlPlaceholder =
     mode === "openai"
       ? t("openaiBaseUrlPlaceholder")
       : mode === "cc"
         ? t("ccCompatibleBaseUrlPlaceholder")
-        : t("anthropicBaseUrlPlaceholder");
+        : mode === "systemone"
+          ? t("systemOneBaseUrlPlaceholder")
+          : t("anthropicBaseUrlPlaceholder");
   const baseUrlHint =
     mode === "cc"
       ? t("ccCompatibleBaseUrlHint")
-      : t("compatibleBaseUrlHint", {
-          type: mode === "openai" ? t("openai") : t("anthropic"),
-        });
+      : mode === "systemone"
+        ? t("systemOneBaseUrlHint")
+        : t("compatibleBaseUrlHint", {
+            type: mode === "openai" ? t("openai") : t("anthropic"),
+          });
   const chatPathPlaceholder =
     mode === "openai" ? "/v1/chat/completions" : mode === "cc" ? CC_DEFAULT_CHAT_PATH : "/messages";
   const chatPathHint = mode === "cc" ? t("ccCompatibleChatPathHint") : t("chatPathHint");
@@ -383,66 +415,72 @@ export default function AddCompatibleProviderModal({
           hint={iconUrlError ?? t("iconUrlHint")}
         />
 
-        <Toggle
-          label={t("newApiAggregatorToggleLabel")}
-          description={t("newApiAggregatorToggleHint")}
-          checked={formData.newApiAggregatorBalance}
-          onChange={(checked: boolean) =>
-            setFormData({ ...formData, newApiAggregatorBalance: checked })
-          }
-        />
-        <NewApiAggregatorFields
-          enabled={formData.newApiAggregatorBalance}
-          values={{
-            consoleApiKey: formData.consoleApiKey,
-            newApiUserId: formData.newApiUserId,
-            quotaPerUnit: formData.quotaPerUnit,
-          }}
-          onChange={(patch) => setFormData({ ...formData, ...patch })}
-          t={t}
-        />
+        {defaults.hasChatExtras && (
+          <>
+            <Toggle
+              label={t("newApiAggregatorToggleLabel")}
+              description={t("newApiAggregatorToggleHint")}
+              checked={formData.newApiAggregatorBalance}
+              onChange={(checked: boolean) =>
+                setFormData({ ...formData, newApiAggregatorBalance: checked })
+              }
+            />
+            <NewApiAggregatorFields
+              enabled={formData.newApiAggregatorBalance}
+              values={{
+                consoleApiKey: formData.consoleApiKey,
+                newApiUserId: formData.newApiUserId,
+                quotaPerUnit: formData.quotaPerUnit,
+              }}
+              onChange={(patch) => setFormData({ ...formData, ...patch })}
+              t={t}
+            />
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="self-start gap-1 px-1 text-text-muted"
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          aria-expanded={showAdvanced}
-          aria-controls={advancedId}
-        >
-          <Icon
-            name="chevron_right"
-            size={14}
-            className={`transition-transform ${showAdvanced ? "rotate-90" : ""}`}
-          />
-          {t("advancedSettings")}
-        </Button>
-        {showAdvanced && (
-          <div id={advancedId} className="flex flex-col gap-3 pl-2 border-l-2 border-border">
-            <Input
-              label={t("chatPathLabel")}
-              value={formData.chatPath}
-              onChange={(e) => setFormData({ ...formData, chatPath: e.target.value })}
-              placeholder={chatPathPlaceholder}
-              hint={chatPathHint}
-            />
-            {defaults.hasModelsPath && (
-              <Input
-                label={t("modelsPathLabel")}
-                value={formData.modelsPath}
-                onChange={(e) => setFormData({ ...formData, modelsPath: e.target.value })}
-                placeholder={t("modelsPathPlaceholder")}
-                hint={t("modelsPathHint")}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="self-start gap-1 px-1 text-text-muted"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              aria-expanded={showAdvanced}
+              aria-controls={advancedId}
+            >
+              <Icon
+                name="chevron_right"
+                size={14}
+                className={`transition-transform ${showAdvanced ? "rotate-90" : ""}`}
               />
+              {t("advancedSettings")}
+            </Button>
+            {showAdvanced && (
+              <div id={advancedId} className="flex flex-col gap-3 pl-2 border-l-2 border-border">
+                <Input
+                  label={t("chatPathLabel")}
+                  value={formData.chatPath}
+                  onChange={(e) => setFormData({ ...formData, chatPath: e.target.value })}
+                  placeholder={chatPathPlaceholder}
+                  hint={chatPathHint}
+                />
+                {defaults.hasModelsPath && (
+                  <Input
+                    label={t("modelsPathLabel")}
+                    value={formData.modelsPath}
+                    onChange={(e) => setFormData({ ...formData, modelsPath: e.target.value })}
+                    placeholder={t("modelsPathPlaceholder")}
+                    hint={t("modelsPathHint")}
+                  />
+                )}
+                <Select
+                  label={t("clientIdentityLabel")}
+                  options={CLIENT_IDENTITY_PROFILE_OPTIONS.map((option) => ({ ...option }))}
+                  value={formData.clientIdentityProfile}
+                  onChange={(e) =>
+                    setFormData({ ...formData, clientIdentityProfile: e.target.value })
+                  }
+                  hint={t("clientIdentityHint")}
+                />
+              </div>
             )}
-            <Select
-              label={t("clientIdentityLabel")}
-              options={CLIENT_IDENTITY_PROFILE_OPTIONS.map((option) => ({ ...option }))}
-              value={formData.clientIdentityProfile}
-              onChange={(e) => setFormData({ ...formData, clientIdentityProfile: e.target.value })}
-              hint={t("clientIdentityHint")}
-            />
-          </div>
+          </>
         )}
 
         <div className="flex gap-2">
@@ -467,7 +505,9 @@ export default function AddCompatibleProviderModal({
           label={t("testModelIdLabel")}
           value={checkModelId}
           onChange={(e) => setCheckModelId(e.target.value)}
-          placeholder={t("testModelIdPlaceholder")}
+          placeholder={
+            mode === "systemone" ? t("systemOneTestModelPlaceholder") : t("testModelIdPlaceholder")
+          }
           hint={t("testModelIdHint")}
         />
         {validationResult && (

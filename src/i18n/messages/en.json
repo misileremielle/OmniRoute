@@ -7084,7 +7084,15 @@
     "chatgptConnectorLabel": "ChatGPT custom connector",
     "doctorChecking": "Checking status…",
     "doctorCheck": "Check doctor status",
-    "fallbackRetryBackendTitle": "Fallback retry backend"
+    "fallbackRetryBackendTitle": "Fallback retry backend",
+    "addSystemOneCompatible": "Add System One Compatible",
+    "systemOneCompatibleName": "System One Compatible",
+    "systemOneNamePlaceholder": "OpenRouter System One",
+    "systemOnePrefixPlaceholder": "sys1",
+    "systemOneBaseUrlPlaceholder": "https://openrouter.ai/api",
+    "systemOneBaseUrlHint": "Root URL of a System One (Jev) API; OmniRoute appends /v1/systemone. Starts with OpenRouter — use https://api.typesafe.ai for TypeSafe direct, or any Jev-compatible server.",
+    "systemOnePrefixHint": "Required. Clients call POST /v1/systemone with the model written as prefix/model (e.g. sys1/jev-latest).",
+    "systemOneTestModelPlaceholder": "jev-latest"
   },
   "settings": {
     "title": "Settings",

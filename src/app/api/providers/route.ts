@@ -29,6 +29,7 @@ import {
   isClaudeCodeCompatibleProvider,
   isOpenAICompatibleProvider,
   isAnthropicCompatibleProvider,
+  isSystemOneCompatibleProvider,
   providerAllowsOptionalApiKey,
   NOAUTH_PROVIDERS,
   resolveProviderId,
@@ -273,6 +274,7 @@ export async function POST(request: Request) {
       isManagedProviderConnectionId(provider) ||
       isOpenAICompatibleProvider(provider) ||
       isAnthropicCompatibleProvider(provider) ||
+      isSystemOneCompatibleProvider(provider) ||
       isNoAuthProvider;
 
     if (!isValidProvider) {
@@ -345,6 +347,16 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: sanitizeErrorMessage(hydrated.error) }, { status: 400 });
       }
       providerSpecificData = hydrated.data;
+    } else if (isSystemOneCompatibleProvider(provider)) {
+      // Decision endpoints keep no per-connection routing data: /v1/systemone
+      // reads the node's base URL at request time.
+      const node: any = await resolveProviderNodeForConnection(provider);
+      if (!node) {
+        return NextResponse.json(
+          { error: "System One Compatible node not found" },
+          { status: 404 }
+        );
+      }
     } else if (isAnthropicCompatibleProvider(provider)) {
       const node: any = await resolveProviderNodeForConnection(provider);
       if (!node) {

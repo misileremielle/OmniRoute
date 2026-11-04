@@ -56,6 +56,8 @@ export type CompatibleProviderGroups = {
   openai: CompatibleProviderInfo[];
   anthropic: CompatibleProviderInfo[];
   claudeCode: CompatibleProviderInfo[];
+  /** System One (Jev) decision endpoints — POST /v1/systemone only. */
+  systemOne: CompatibleProviderInfo[];
 };
 
 export function shouldApplyConfiguredOnlyFilter(
@@ -406,13 +408,26 @@ export function buildCompatibleProviderGroups(
     openaiCompatibleName: string;
     anthropicCompatibleName: string;
     claudeCodeCompatibleName: string;
+    systemOneCompatibleName?: string;
   }
 ): CompatibleProviderGroups {
   const openai: CompatibleProviderInfo[] = [];
   const anthropic: CompatibleProviderInfo[] = [];
   const claudeCode: CompatibleProviderInfo[] = [];
+  const systemOne: CompatibleProviderInfo[] = [];
 
   for (const node of providerNodes) {
+    if (node.type === "systemone-compatible") {
+      systemOne.push({
+        id: node.id,
+        name: node.name || labels.systemOneCompatibleName || "System One Compatible",
+        color: "#4F46E5",
+        textIcon: "S1",
+        iconUrl: node.iconUrl || undefined,
+      });
+      continue;
+    }
+
     if (node.type === "openai-compatible") {
       openai.push({
         id: node.id,
@@ -447,7 +462,7 @@ export function buildCompatibleProviderGroups(
     });
   }
 
-  return { openai, anthropic, claudeCode };
+  return { openai, anthropic, claudeCode, systemOne };
 }
 
 export type LiveModelsByProviderId = Record<string, Array<{ id: string; name?: string }>>;

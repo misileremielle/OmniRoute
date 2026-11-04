@@ -393,7 +393,7 @@ export const createProviderNodeSchema = z
       ])
       .optional(),
     baseUrl: z.string().trim().min(1).optional(),
-    type: z.enum(["openai-compatible", "anthropic-compatible"]).optional(),
+    type: z.enum(["openai-compatible", "anthropic-compatible", "systemone-compatible"]).optional(),
     compatMode: z.enum(["cc"]).optional(),
     // #6874: named presets fill in name/prefix/apiType for well-known
     // OpenAI-compatible local gateways so the operator only has to paste
@@ -524,7 +524,7 @@ export const updateProviderNodeSchema = z
 export const providerNodeValidateSchema = z.object({
   baseUrl: z.string().trim().min(1, "Base URL and API key required"),
   apiKey: z.string().trim().optional(),
-  type: z.enum(["openai-compatible", "anthropic-compatible"]).optional(),
+  type: z.enum(["openai-compatible", "anthropic-compatible", "systemone-compatible"]).optional(),
   compatMode: z.enum(["cc"]).optional(),
   apiType: z
     .enum([

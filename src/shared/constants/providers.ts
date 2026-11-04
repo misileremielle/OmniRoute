@@ -222,6 +222,13 @@ export const EMBEDDING_RERANK_PROVIDER_IDS = new Set(["voyage-ai", "jina-ai"]);
 export const OPENAI_COMPATIBLE_PREFIX = "openai-compatible-";
 export const ANTHROPIC_COMPATIBLE_PREFIX = "anthropic-compatible-";
 export const CLAUDE_CODE_COMPATIBLE_PREFIX = "anthropic-compatible-cc-";
+// Operator-added System One (Jev) decision endpoints — POST /v1/systemone only,
+// never chat. Mirrors SYSTEMONE_COMPATIBLE_PREFIX in open-sse/config/systemOneRegistry.ts.
+export const SYSTEMONE_COMPATIBLE_PREFIX = "systemone-compatible-";
+
+export function isSystemOneCompatibleProvider(providerId: unknown): providerId is string {
+  return typeof providerId === "string" && providerId.startsWith(SYSTEMONE_COMPATIBLE_PREFIX);
+}
 
 export function isOpenAICompatibleProvider(providerId: unknown): providerId is string {
   return typeof providerId === "string" && providerId.startsWith(OPENAI_COMPATIBLE_PREFIX);

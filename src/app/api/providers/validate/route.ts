@@ -7,6 +7,7 @@ import {
   isClaudeCodeCompatibleProvider,
   isOpenAICompatibleProvider,
   isAnthropicCompatibleProvider,
+  isSystemOneCompatibleProvider,
 } from "@/shared/constants/providers";
 import { validateProviderApiKey } from "@/lib/providers/validation";
 import { getRequestPeerLocality } from "@/shared/utils/apiAuth";
@@ -117,6 +118,17 @@ export async function POST(request) {
         chatPath: node.chatPath,
         modelsPath: node.modelsPath,
       };
+    }
+
+    if (isSystemOneCompatibleProvider(provider)) {
+      const node: any = await getProviderNodeById(provider);
+      if (!node) {
+        return NextResponse.json(
+          { error: "System One Compatible node not found" },
+          { status: 404 }
+        );
+      }
+      providerSpecificData = { ...providerSpecificData, baseUrl: node.baseUrl };
     }
 
     const registryProxy = await resolveProxyForProvider(provider);

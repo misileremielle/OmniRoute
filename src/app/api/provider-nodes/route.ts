@@ -6,7 +6,12 @@ import {
   OPENAI_COMPATIBLE_PREFIX,
   ANTHROPIC_COMPATIBLE_PREFIX,
   CLAUDE_CODE_COMPATIBLE_PREFIX,
+  SYSTEMONE_COMPATIBLE_PREFIX,
 } from "@/shared/constants/providers";
+import {
+  SYSTEMONE_COMPATIBLE_DEFAULT_BASE_URL,
+  sanitizeSystemOneBaseUrl,
+} from "@omniroute/open-sse/config/systemOneRegistry.ts";
 import { generateId } from "@/shared/utils";
 import { isCcCompatibleProviderEnabled } from "@/shared/utils/featureFlags";
 import { createProviderNodeSchema, paginationSchema } from "@/shared/validation/schemas";
@@ -240,6 +245,32 @@ export async function POST(request) {
           dailyQuotaResetHour === 0 || dailyQuotaResetHour != null ? dailyQuotaResetHour : null,
       });
       await registerMoonshotFetchersForCreatedNode(node);
+      return NextResponse.json({ node }, { status: 201 });
+    }
+
+    if (nodeType === "systemone-compatible") {
+      // System One (Jev) decision endpoint: POST <root>/v1/systemone only — no chat,
+      // models path, api type or custom chat path. The initial root is OpenRouter's.
+      const sanitizedBaseUrl = sanitizeSystemOneBaseUrl(
+        baseUrl || SYSTEMONE_COMPATIBLE_DEFAULT_BASE_URL
+      );
+      const baseUrlError = validateProviderNodeBaseUrl(sanitizedBaseUrl);
+      if (baseUrlError) return baseUrlError;
+
+      const node = await createProviderNode({
+        id: `${SYSTEMONE_COMPATIBLE_PREFIX}${idSuffix}`,
+        type: "systemone-compatible",
+        prefix: (prefix || "").trim(),
+        baseUrl: sanitizedBaseUrl,
+        name: (name || "").trim(),
+        chatPath: null,
+        modelsPath: null,
+        iconUrl: iconUrl?.trim() || null,
+        customHeaders: customHeaders || null,
+        dailyQuotaResetTimezone: dailyQuotaResetTimezone?.trim() || null,
+        dailyQuotaResetHour:
+          dailyQuotaResetHour === 0 || dailyQuotaResetHour != null ? dailyQuotaResetHour : null,
+      });
       return NextResponse.json({ node }, { status: 201 });
     }
 

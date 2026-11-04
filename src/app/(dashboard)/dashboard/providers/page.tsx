@@ -240,6 +240,7 @@ function ProvidersPageContent() {
   const [showAddCompatibleModal, setShowAddCompatibleModal] = useState(false);
   const [showAddAnthropicCompatibleModal, setShowAddAnthropicCompatibleModal] = useState(false);
   const [showAddCcCompatibleModal, setShowAddCcCompatibleModal] = useState(false);
+  const [showAddSystemOneCompatibleModal, setShowAddSystemOneCompatibleModal] = useState(false);
   const [openImportModal, setOpenImportModal] = useState<"file" | "oauth-export" | null>(null);
   const [testingMode, setTestingMode] = useState<string | null>(null);
   const [testResults, setTestResults] = useState<any>(null);
@@ -546,12 +547,14 @@ function ProvidersPageContent() {
         openaiCompatibleName: t("openaiCompatibleName"),
         anthropicCompatibleName: t("anthropicCompatibleName"),
         claudeCodeCompatibleName: ccCompatibleLabel,
+        systemOneCompatibleName: t("systemOneCompatibleName"),
       }),
     [ccCompatibleLabel, providerNodes, t]
   );
   const compatibleProviders = compatibleProviderGroups.openai;
   const anthropicCompatibleProviders = compatibleProviderGroups.anthropic;
   const ccCompatibleProviders = compatibleProviderGroups.claudeCode;
+  const systemOneCompatibleProviders = compatibleProviderGroups.systemOne;
 
   const effectiveProviderDisplayMode =
     providerDisplayMode === "configured" && connections.length === 0 ? "all" : providerDisplayMode;
@@ -758,6 +761,13 @@ function ProvidersPageContent() {
       toggleAuthType: "apikey" as const,
     })),
     ...ccCompatibleProviders.map((provider) => ({
+      providerId: provider.id,
+      provider,
+      stats: getProviderStats(provider.id, "apikey"),
+      displayAuthType: "compatible" as const,
+      toggleAuthType: "apikey" as const,
+    })),
+    ...systemOneCompatibleProviders.map((provider) => ({
       providerId: provider.id,
       provider,
       stats: getProviderStats(provider.id, "apikey"),
@@ -1062,6 +1072,13 @@ function ProvidersPageContent() {
                       >
                         {t("addAnthropicCompatible")}
                       </Button>
+                      <Button
+                        size="sm"
+                        icon="add"
+                        onClick={() => setShowAddSystemOneCompatibleModal(true)}
+                      >
+                        {t("addSystemOneCompatible")}
+                      </Button>
                       <Button size="sm" icon="add" onClick={() => setShowAddCompatibleModal(true)}>
                         {t("addOpenAICompatible")}
                       </Button>
@@ -1070,7 +1087,8 @@ function ProvidersPageContent() {
                 />
                 {compatibleProviders.length === 0 &&
                 anthropicCompatibleProviders.length === 0 &&
-                ccCompatibleProviders.length === 0 ? (
+                ccCompatibleProviders.length === 0 &&
+                systemOneCompatibleProviders.length === 0 ? (
                   <KitEmptyState
                     compact
                     icon={<Icon name="extension" size={18} />}
@@ -1863,6 +1881,16 @@ function ProvidersPageContent() {
             }}
           />
         )}
+        <AddCompatibleProviderModal
+          isOpen={showAddSystemOneCompatibleModal}
+          mode="systemone"
+          onClose={() => setShowAddSystemOneCompatibleModal(false)}
+          onCreated={(node) => {
+            setProviderNodes((prev) => upsertProviderNodeById(prev, node));
+            setShowAddSystemOneCompatibleModal(false);
+            router.push(`/dashboard/providers/${node.id}`);
+          }}
+        />
         <ProviderImportModals
           openModal={openImportModal}
           onClose={() => setOpenImportModal(null)}

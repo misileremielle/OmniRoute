@@ -3,6 +3,10 @@ import { after } from "next/server";
 import { getUnifiedModelsResponse } from "./catalog";
 import { getFilteredCatalogResponse } from "./catalogDiscovery";
 import { hasCatalogDiscoveryParams } from "./catalogFilters";
+import {
+  isTypeSafeSdkRequest,
+  typeSafeSdkModelsResponse,
+} from "@/app/api/v1/_shared/systemOneRoute";
 
 /**
  * Handle CORS preflight
@@ -38,6 +42,8 @@ export async function HEAD() {
  * `min_context`, `kind`, `q`. Without any of them the response is untouched.
  */
 export async function GET(request: Request) {
+  // TypeSafe SDK pointed at OmniRoute (baseURL): it expects { models: [...] }.
+  if (isTypeSafeSdkRequest(request)) return typeSafeSdkModelsResponse(request);
   if (hasCatalogDiscoveryParams(new URL(request.url).searchParams)) {
     return getFilteredCatalogResponse(request, (catalogRequest) =>
       getUnifiedModelsResponse(

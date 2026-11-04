@@ -12,7 +12,10 @@ import {
   getProviderCredentialsWithQuotaPreflight,
   clearRecoveredProviderState,
 } from "@/sse/services/auth";
-import { withInjectionGuard } from "@/middleware/promptInjectionGuard";
+import { createInjectionGuard, withInjectionGuard } from "@/middleware/promptInjectionGuard";
+import { getCachedProviderNodes } from "@/lib/db/readCache";
+import { CORS_HEADERS } from "@omniroute/open-sse/utils/cors.ts";
+import { decodeSystemOneRequest } from "./systemOneRequest";
 import { errorResponse } from "@omniroute/open-sse/utils/error.ts";
 import { HTTP_STATUS } from "@omniroute/open-sse/config/constants.ts";
 import { enforceApiKeyPolicy } from "@/shared/utils/apiKeyPolicy";
@@ -48,12 +51,81 @@ export function systemOneModelsGet(pathname: string) {
     });
 }
 
-async function postHandler(request: Request): Promise<Response> {
-  let rawBody: unknown;
+const injectionGuard = createInjectionGuard();
+
+/** Operator-added System One-compatible endpoints (custom `<prefix>/<model>` routing). */
+async function loadSystemOneCompatibleNodes() {
   try {
-    rawBody = await request.json();
+    const nodes = await getCachedProviderNodes();
+    return (Array.isArray(nodes) ? nodes : []).filter(
+      (node) => (node as { type?: unknown })?.type === "systemone-compatible"
+    ) as Array<{ id: string; prefix?: string | null; baseUrl?: string | null; type?: string }>;
   } catch {
-    return errorResponse(HTTP_STATUS.BAD_REQUEST, "Invalid JSON body");
+    return [];
+  }
+}
+
+/** Requests from the official TypeSafe SDKs carry `X-TypeSafe-SDK: typesafe-sdk/<version>`. */
+export function isTypeSafeSdkRequest(request: Request): boolean {
+  return request.headers.has("x-typesafe-sdk");
+}
+
+/**
+ * `client.models.list()` in the TypeSafe SDK reads GET {baseURL}/v1/models and
+ * requires `{ models: [{ name, description, release_date }] }`. Answer that shape
+ * (decisions models only) when the SDK asks, so OmniRoute works as its baseURL.
+ */
+export async function typeSafeSdkModelsResponse(request: Request): Promise<Response> {
+  const listed = await systemOneModelsGet("/v1/models")(request);
+  if (!listed.ok) return listed;
+  const payload = (await listed.json()) as { data?: Array<Record<string, unknown>> };
+  const models = (Array.isArray(payload.data) ? payload.data : []).map((entry) => {
+    const created = typeof entry.created === "number" ? entry.created : null;
+    return {
+      name: String(entry.id ?? ""),
+      description:
+        typeof entry.description === "string"
+          ? entry.description
+          : typeof entry.name === "string"
+            ? entry.name
+            : "",
+      release_date: created ? new Date(created * 1000).toISOString().slice(0, 10) : "",
+    };
+  });
+  return new Response(JSON.stringify({ models }), {
+    status: 200,
+    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+  });
+}
+
+async function postHandler(
+  request: Request,
+  _context?: unknown,
+  preParsedBody?: unknown
+): Promise<Response> {
+  // TypeSafe SDK bodies may be zstd-compressed and/or multipart (image assets).
+  const decoded = await decodeSystemOneRequest(request);
+  if (!decoded.ok) return errorResponse(decoded.status, decoded.message);
+  const rawBody = decoded.payload;
+
+  // withInjectionGuard only scans bodies it can read as plain JSON; run the same
+  // guard on the decoded payload when it could not (compressed / multipart).
+  if (preParsedBody == null && rawBody && typeof rawBody === "object") {
+    const { blocked, result }: { blocked: boolean; result: { detections: unknown[] } } =
+      injectionGuard(rawBody as Record<string, unknown>);
+    if (blocked) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: "Request blocked: potential prompt injection detected",
+            type: "injection_detected",
+            code: "SECURITY_001",
+            detections: result.detections.length,
+          },
+        }),
+        { status: 400, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+      );
+    }
   }
 
   const validation = validateBody(v1SystemOneSchema, rawBody);
@@ -63,12 +135,13 @@ async function postHandler(request: Request): Promise<Response> {
   const body = validation.data;
   const model = typeof body.model === "string" ? body.model.trim() : undefined;
 
-  const target = resolveSystemOneTarget(model);
+  const target = resolveSystemOneTarget(model, await loadSystemOneCompatibleNodes());
   if (!target) {
     return errorResponse(
       HTTP_STATUS.BAD_REQUEST,
       `Unknown decisions model: ${model ?? "(missing)"}. Use "typesafe/<model>", ` +
-        `a bare jev-* alias, or "openrouter/<vendor>/<model>" for OpenRouter-hosted decisions models.`
+        `a bare jev-* alias, "openrouter/<vendor>/<model>" for OpenRouter-hosted decisions ` +
+        `models, or "<prefix>/<model>" for a System One-compatible endpoint you added.`
     );
   }
 
@@ -101,10 +174,13 @@ async function postHandler(request: Request): Promise<Response> {
   const response = await handleSystemOneProxy({
     path: new URL(request.url).pathname,
     target,
-    body,
+    // Forward what the client sent, not the schema's normalized copy (the
+    // schema trims strings; a drop-in System One proxy must not alter `state`).
+    body: rawBody as typeof body,
     // The key-scope-blocked and all-rate-limited sentinels were refused above;
     // what is left is a real credential record.
     credentials: credentials as SystemOneCredentials,
+    assetParts: decoded.assetParts,
     requestedModel: model ?? null,
   });
   if (response.ok) {

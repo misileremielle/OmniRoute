@@ -3,6 +3,7 @@ import { getRegistryEntry } from "@omniroute/open-sse/config/providerRegistry.ts
 import {
   isClaudeCodeCompatibleProvider,
   isAnthropicCompatibleProvider,
+  isSystemOneCompatibleProvider,
   isLocalProvider,
   isOpenAICompatibleProvider,
   isSelfHostedChatProvider,
@@ -205,6 +206,26 @@ export async function validateProviderApiKey({
     } catch (error: any) {
       return toValidationErrorResult(error);
     }
+  }
+
+  if (isSystemOneCompatibleProvider(provider)) {
+    // Connection tests pass only the connection's own data; the endpoint root
+    // lives on the provider node.
+    let baseUrl = providerSpecificData?.baseUrl;
+    if (!baseUrl) {
+      const { getProviderNodeById } = await import("@/lib/db/providers");
+      const node = (await getProviderNodeById(provider)) as { baseUrl?: string } | null;
+      baseUrl = node?.baseUrl;
+    }
+    if (!baseUrl) {
+      return { valid: false, error: "System One Compatible node not found", unsupported: false };
+    }
+    return validateTypesafeProvider({
+      apiKey,
+      baseUrl,
+      model: providerSpecificData?.validationModelId,
+      label: "System One endpoint",
+    });
   }
 
   if (isAnthropicCompatibleProvider(provider)) {

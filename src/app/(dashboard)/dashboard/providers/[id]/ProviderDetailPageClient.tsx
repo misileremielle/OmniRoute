@@ -14,6 +14,7 @@ import {
   isOpenAICompatibleProvider,
   isAnthropicCompatibleProvider,
   isClaudeCodeCompatibleProvider,
+  isSystemOneCompatibleProvider,
   supportsApiKeyOnFreeProvider,
   supportsDualAuthProvider,
 } from "@/shared/constants/providers";
@@ -106,16 +107,22 @@ export default function ProviderDetailPageClient() {
   const isCommandCode = providerId === "command-code";
   const isAnthropicCompatible =
     isAnthropicCompatibleProvider(providerId) && !isClaudeCodeCompatibleProvider(providerId);
-  const isCompatible = isOpenAICompatible || isAnthropicCompatible || isCcCompatible;
+  // System One (Jev) decision endpoints: keys + node settings like any compatible
+  // node, but no chat model listing (POST /v1/systemone only).
+  const isSystemOneCompatible = isSystemOneCompatibleProvider(providerId);
+  const isCompatible =
+    isOpenAICompatible || isAnthropicCompatible || isCcCompatible || isSystemOneCompatible;
   const isAnthropicProtocolCompatible = isAnthropicCompatible || isCcCompatible;
   // #5420: hide model listing for tool-only providers, not just `-search` ids.
   const declaredServiceKinds = (
     resolveDashboardProviderInfo(providerId) as { serviceKinds?: readonly string[] } | null
   )?.serviceKinds;
-  const isSearchProvider = providerLacksModelListing(
-    providerId,
-    getProviderServiceKinds(providerId, declaredServiceKinds)
-  );
+  const isSearchProvider =
+    isSystemOneCompatible ||
+    providerLacksModelListing(
+      providerId,
+      getProviderServiceKinds(providerId, declaredServiceKinds)
+    );
   const usesCuratedModelsOnly = providerUsesCuratedModelsOnly(providerId);
   const {
     connections,
@@ -603,6 +610,7 @@ export default function ProviderDetailPageClient() {
           isCcCompatible={isCcCompatible}
           isAnthropicCompatible={isAnthropicCompatible}
           isAnthropicProtocolCompatible={isAnthropicProtocolCompatible}
+          isSystemOneCompatible={isSystemOneCompatible}
           gateConnectionFlow={gateConnectionFlow}
           openApiKeyAddFlow={openApiKeyAddFlow}
           onOpenEditNodeModal={() => setShowEditNodeModal(true)}
@@ -875,7 +883,9 @@ export default function ProviderDetailPageClient() {
       )}
 
       {/* Search provider info */}
-      {isSearchProvider && <SearchProviderCard providerId={providerId} t={t} />}
+      {isSearchProvider && !isSystemOneCompatible && (
+        <SearchProviderCard providerId={providerId} t={t} />
+      )}
 
       {/* Playground + param filters — extracted to components/ProviderExtraPanels.tsx (#6649) */}
       <ProviderExtraPanels providerId={providerId} />

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireManagementAuth } from "@/lib/api/requireManagementAuth";
 import { getAuditRequestContext, logAuditEvent } from "@/lib/compliance/index";
 import { validateClaudeCodeCompatibleProvider } from "@/lib/providers/validation";
+import { validateTypesafeProvider } from "@/lib/providers/validation/typesafe";
 import {
   SAFE_OUTBOUND_FETCH_PRESETS,
   SafeOutboundFetchError,
@@ -201,6 +202,29 @@ export async function POST(request) {
     const { baseUrl, apiKey, type, compatMode, apiType, chatPath, modelsPath, modelId } =
       validation.data;
     const trimmedModelId = typeof modelId === "string" ? modelId.trim() : "";
+
+    // System One (Jev) compatible validation: one tiny decision on POST /v1/systemone.
+    // The operator-entered URL goes through the same SSRF guard as the other probes.
+    if (type === "systemone-compatible") {
+      const result = await validateTypesafeProvider({
+        apiKey,
+        baseUrl,
+        model: trimmedModelId || null,
+        label: "System One endpoint",
+        fetchImpl: ((url: string | URL, init?: RequestInit) =>
+          safeOutboundFetch(String(url), {
+            ...init,
+            ...SAFE_OUTBOUND_FETCH_PRESETS.validationWrite,
+            guard: getProviderValidationGuard(),
+          })) as typeof fetch,
+      });
+      return NextResponse.json({
+        valid: !!result.valid,
+        error: result.valid ? null : result.error || "Invalid API key",
+        warning: (result as { warning?: string }).warning || null,
+        method: result.method || null,
+      });
+    }
 
     // Anthropic Compatible Validation
     if (type === "anthropic-compatible") {
