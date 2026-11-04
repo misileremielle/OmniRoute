@@ -935,11 +935,6 @@
       "model": "Филтрирај по моделу"
     }
   },
-  "radar": {
-    "description": "Прегледај и синхронизуј локалне Radar каталог фидове",
-    "status": "Прикажи локалне Radar подешавања и статус кеша фидова",
-    "sync": "Синхронизуј каталог, препоруке, понуде и Intel преко локалног сервера"
-  },
   "resilience": {
     "description": "Прегледај и управљај механизмима отпорности",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Naziv kombinacije koja se koristi",
     "system": "Sistemski prompt",
     "resume": "Nastavi sačuvanu sesiju po nazivu"
-  },
-  "plugin": {
-    "description": "Upravljanje CLI dodacima (omniroute-cmd-*)",
-    "list": "Prikaži instalirane dodatke",
-    "install": "Instaliraj dodatak sa npm-a ili lokalne putanje",
-    "remove": "Ukloni instalirani dodatak",
-    "info": "Prikaži detalje instaliranog dodatka",
-    "search": "Pretraži npm registar za dostupne dodatke",
-    "update": "Ažuriraj instalirane dodatke",
-    "scaffold": "Generiši osnovnu strukturu novog dodatka"
   },
   "launch": {
     "description": "Pokreni Claude Code usmeren na OmniRoute (lokalno ili udaljeno, sa --profile)",

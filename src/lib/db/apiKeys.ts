@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from "uuid";
 import { getDbInstance, rowToCamel } from "./core";
 import { backupDbFile } from "./backup";
 import { registerDbStateResetter } from "./stateReset";
-import { invalidateReasoningRoutingRuleCache } from "./reasoningRoutingRules";
 import { getKeyGroupsForApiKey, checkKeyModelAccess } from "./apiKeyGroups";
 import { ensureApiKeyFallbackColumns } from "./apiKeyColumnFallbacks";
 import { SYNTHETIC_ENV_API_KEY_ID } from "@/shared/constants/apiKeyIdentities";
@@ -65,7 +64,6 @@ import {
   parseIsBanned,
   parseStreamDefaultMode,
   parseCacheDefaultMode,
-  parseChaosModeEnabled,
   parseCompressionEnabled,
   parseAllowAutoCombos,
   parseAllowCcDiscoveryAliases,
@@ -146,7 +144,6 @@ interface ApiKeyMetadata {
   usageLimitEnabled: boolean;
   dailyUsageLimitUsd: number | null;
   weeklyUsageLimitUsd: number | null;
-  chaosModeEnabled: boolean;
   compressionEnabled: boolean;
   allowAutoCombos: boolean;
   allowCcDiscoveryAliases: boolean;
@@ -199,8 +196,6 @@ interface ApiKeyRow extends JsonRecord {
   dailyUsageLimitUsd?: unknown;
   weekly_usage_limit_usd?: unknown;
   weeklyUsageLimitUsd?: unknown;
-  chaos_mode_enabled?: unknown;
-  chaosModeEnabled?: unknown;
   compression_enabled?: unknown;
   compressionEnabled?: unknown;
   allow_auto_combos?: unknown;
@@ -261,7 +256,6 @@ interface ApiKeyView extends JsonRecord {
   usageLimitEnabled?: boolean;
   dailyUsageLimitUsd?: number | null;
   weeklyUsageLimitUsd?: number | null;
-  chaosModeEnabled?: boolean;
   compressionEnabled: boolean;
   allowAutoCombos: boolean;
   allowCcDiscoveryAliases: boolean;
@@ -498,7 +492,7 @@ function getPreparedStatements(db: ApiKeysDbLike): ApiKeysStatements {
       "SELECT id, expires_at, revoked_at, is_active, is_banned FROM api_keys WHERE key_hash = ?"
     );
     _stmtGetKeyMetadata = db.prepare<ApiKeyRow>(
-      "SELECT id, name, machine_id, model_access_mode, allowed_models, blocked_models, allowed_combos, allowed_connections, preferred_connections, allowed_quotas, no_log, auto_resolve, is_active, access_schedule, max_requests_per_day, max_requests_per_minute, throttle_delay_ms, max_sessions, revoked_at, expires_at, ip_allowlist, scopes, rate_limits, is_banned, key_hash, allowed_endpoints, stream_default_mode, cache_default_mode, codex_service_mode, disable_non_public_models, allow_usage_command, usage_limit_enabled, daily_usage_limit_usd, weekly_usage_limit_usd, chaos_mode_enabled, compression_enabled, allow_auto_combos, allow_cc_discovery_aliases, catalog_scope, forced_model, proxy_id FROM api_keys WHERE key_hash = ?"
+      "SELECT id, name, machine_id, model_access_mode, allowed_models, blocked_models, allowed_combos, allowed_connections, preferred_connections, allowed_quotas, no_log, auto_resolve, is_active, access_schedule, max_requests_per_day, max_requests_per_minute, throttle_delay_ms, max_sessions, revoked_at, expires_at, ip_allowlist, scopes, rate_limits, is_banned, key_hash, allowed_endpoints, stream_default_mode, cache_default_mode, codex_service_mode, disable_non_public_models, allow_usage_command, usage_limit_enabled, daily_usage_limit_usd, weekly_usage_limit_usd, compression_enabled, allow_auto_combos, allow_cc_discovery_aliases, catalog_scope, forced_model, proxy_id FROM api_keys WHERE key_hash = ?"
     );
     _stmtInsertKey = db.prepare(
       "INSERT INTO api_keys (id, name, key, machine_id, model_access_mode, allowed_models, allowed_combos, allowed_connections, preferred_connections, no_log, created_at, key_prefix, key_hash, scopes, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -582,7 +576,6 @@ export async function getApiKeys(limit?: number, offset?: number) {
       (camelRow as JsonRecord).disableNonPublicModels
     );
     camelRow.allowUsageCommand = parseAllowUsageCommand((camelRow as JsonRecord).allowUsageCommand);
-    camelRow.chaosModeEnabled = parseChaosModeEnabled((camelRow as JsonRecord).chaosModeEnabled);
     camelRow.compressionEnabled = parseCompressionEnabled(
       (camelRow as JsonRecord).compressionEnabled
     );
@@ -731,7 +724,6 @@ export async function getApiKeyById(id: string) {
     (camelRow as JsonRecord).disableNonPublicModels
   );
   camelRow.allowUsageCommand = parseAllowUsageCommand((camelRow as JsonRecord).allowUsageCommand);
-  camelRow.chaosModeEnabled = parseChaosModeEnabled((camelRow as JsonRecord).chaosModeEnabled);
   camelRow.compressionEnabled = parseCompressionEnabled(
     (camelRow as JsonRecord).compressionEnabled
   );
@@ -908,7 +900,6 @@ export async function updateApiKeyPermissions(
     (normalized as Record<string, unknown>).cacheDefaultMode === undefined &&
     normalized.disableNonPublicModels === undefined &&
     normalized.allowUsageCommand === undefined &&
-    normalized.chaosModeEnabled === undefined &&
     normalized.compressionEnabled === undefined &&
     normalized.allowAutoCombos === undefined &&
     normalized.allowCcDiscoveryAliases === undefined &&
@@ -951,7 +942,6 @@ export async function updateApiKeyPermissions(
     usageLimitEnabled?: number;
     dailyUsageLimitUsd?: number | null;
     weeklyUsageLimitUsd?: number | null;
-    chaosModeEnabled?: number;
     compressionEnabled?: number;
     allowAutoCombos?: number;
     allowCcDiscoveryAliases?: number;
@@ -1067,11 +1057,6 @@ export async function updateApiKeyPermissions(
   if (normalized.allowUsageCommand !== undefined) {
     updates.push("allow_usage_command = @allowUsageCommand");
     params.allowUsageCommand = normalized.allowUsageCommand ? 1 : 0;
-  }
-
-  if (normalized.chaosModeEnabled !== undefined) {
-    updates.push("chaos_mode_enabled = @chaosModeEnabled");
-    params.chaosModeEnabled = normalized.chaosModeEnabled ? 1 : 0;
   }
 
   if (normalized.compressionEnabled !== undefined) {
@@ -1306,7 +1291,6 @@ export async function deleteApiKey(id: string) {
 
   // Invalidate caches since a key was removed
   invalidateCaches();
-  invalidateReasoningRoutingRuleCache();
   await deleteRedisAuthCacheEntry(row?.key_hash);
 
   backupDbFile("pre-write");
@@ -1512,7 +1496,6 @@ export async function getApiKeyMetadata(
       usageLimitEnabled: false,
       dailyUsageLimitUsd: null,
       weeklyUsageLimitUsd: null,
-      chaosModeEnabled: false,
       compressionEnabled: true,
       allowAutoCombos: true,
       allowCcDiscoveryAliases: true,
@@ -1605,9 +1588,6 @@ export async function getApiKeyMetadata(
     ),
     allowUsageCommand: parseAllowUsageCommand(
       (record as JsonRecord).allow_usage_command ?? (record as JsonRecord).allowUsageCommand
-    ),
-    chaosModeEnabled: parseChaosModeEnabled(
-      (record as JsonRecord).chaos_mode_enabled ?? (record as JsonRecord).chaosModeEnabled
     ),
     compressionEnabled: parseCompressionEnabled(
       (record as JsonRecord).compression_enabled ?? (record as JsonRecord).compressionEnabled

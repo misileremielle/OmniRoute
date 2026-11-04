@@ -1410,7 +1410,6 @@ and the precedence chains in `src/lib/modelCapabilityLimits.ts`.
 | `allowUsageCommand`                         | boolean                                                              |                                                                                                                        |
 | `usageLimitEnabled`                         | boolean                                                              |                                                                                                                        |
 | `dailyUsageLimitUsd`, `weeklyUsageLimitUsd` | number >= 0 or `null`                                                |                                                                                                                        |
-| `chaosModeEnabled`                          | boolean                                                              |                                                                                                                        |
 
 ```bash
 curl -X PATCH "$OMNIROUTE_URL/api/keys/$KEY_ID" \

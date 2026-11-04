@@ -935,11 +935,6 @@
       "model": "Filter berdasarkan model"
     }
   },
-  "radar": {
-    "description": "Periksa dan sinkronkan feed katalog Radar lokal",
-    "status": "Tampilkan pengaturan Radar lokal dan status cache feed",
-    "sync": "Sinkronkan katalog, rujukan, penawaran, dan Intel melalui server lokal"
-  },
   "resilience": {
     "description": "Periksa dan kelola mekanisme ketahanan",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Nama kombinasi yang akan digunakan",
     "system": "Prompt sistem",
     "resume": "Lanjutkan sesi tersimpan berdasarkan nama"
-  },
-  "plugin": {
-    "description": "Kelola plugin CLI (omniroute-cmd-*)",
-    "list": "Cantumkan plugin yang terinstal",
-    "install": "Instal plugin dari npm atau jalur lokal",
-    "remove": "Hapus plugin yang terinstal",
-    "info": "Tampilkan detail plugin yang terinstal",
-    "search": "Cari plugin yang tersedia di registri npm",
-    "update": "Perbarui plugin yang terinstal",
-    "scaffold": "Buat kerangka boilerplate plugin baru"
   },
   "launch": {
     "description": "Luncurkan Claude Code yang diarahkan ke OmniRoute (lokal atau jarak jauh, dengan --profile)",

@@ -935,11 +935,6 @@
       "model": "Model boʻyicha filtrlash"
     }
   },
-  "radar": {
-    "description": "Mahalliy Radar katalog tasmalarini tekshirish va sinxronlash",
-    "status": "Mahalliy Radar sozlamalari va tasma keshi holatini koʻrsatish",
-    "sync": "Katalog, yoʻnaltirmalar, takliflar va Intel maʼlumotlarini mahalliy server orqali sinxronlash"
-  },
   "resilience": {
     "description": "Barqarorlik mexanizmlarini tekshirish va boshqarish",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Foydalaniladigan kombo nomi",
     "system": "Tizim prompti",
     "resume": "Saqlangan sessiyani nomi bo‘yicha davom ettirish"
-  },
-  "plugin": {
-    "description": "CLI plaginlarini boshqarish (omniroute-cmd-*)",
-    "list": "O‘rnatilgan plaginlar ro‘yxatini ko‘rsatish",
-    "install": "npm yoki mahalliy yo‘ldan plagin o‘rnatish",
-    "remove": "O‘rnatilgan plaginni olib tashlash",
-    "info": "O‘rnatilgan plagin tafsilotlarini ko‘rsatish",
-    "search": "Mavjud plaginlarni npm reyestridan qidirish",
-    "update": "O‘rnatilgan plagin(lar)ni yangilash",
-    "scaffold": "Yangi plagin uchun boshlang‘ich shablon yaratish"
   },
   "launch": {
     "description": "OmniRoute’ga yo‘naltirilgan Claude Code’ni ishga tushirish (mahalliy yoki masofaviy, --profile bilan)",

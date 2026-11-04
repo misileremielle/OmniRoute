@@ -935,11 +935,6 @@
       "model": "Filtrera efter modell"
     }
   },
-  "radar": {
-    "description": "Inspektera och synkronisera de lokala Radar-katalogflödena",
-    "status": "Visa lokala Radar-inställningar och status för flödescachen",
-    "sync": "Synkronisera katalog, hänvisningar, erbjudanden och Intel via den lokala servern"
-  },
   "resilience": {
     "description": "Inspektera och hantera resiliensmekanismer",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Kombinationsnamn som ska användas",
     "system": "Systemprompt",
     "resume": "Återuppta en sparad session efter namn"
-  },
-  "plugin": {
-    "description": "Hantera CLI-insticksprogram (omniroute-cmd-*)",
-    "list": "Lista installerade insticksprogram",
-    "install": "Installera ett insticksprogram från npm eller en lokal sökväg",
-    "remove": "Ta bort ett installerat insticksprogram",
-    "info": "Visa information om ett installerat insticksprogram",
-    "search": "Sök i npm-registret efter tillgängliga insticksprogram",
-    "update": "Uppdatera installerade insticksprogram",
-    "scaffold": "Skapa en grundstruktur för ett nytt insticksprogram"
   },
   "launch": {
     "description": "Starta Claude Code ansluten till OmniRoute (lokalt eller på distans, med --profile)",

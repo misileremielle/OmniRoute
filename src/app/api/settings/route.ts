@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import {
   getSettings,
   getSettingsRevision,
@@ -15,7 +14,6 @@ import {
 } from "@/shared/constants/securityImpactingSettings";
 import { isValidationFailure, validateBody } from "@/shared/validation/helpers";
 import { getConsistentMachineId } from "@/shared/utils/machineId";
-import { isFeatureFlagEnabled } from "@/shared/utils/featureFlags";
 import { resolveModelLockoutSettings } from "@/lib/resilience/modelLockoutSettings";
 import {
   validateProxyUrl,
@@ -36,7 +34,6 @@ import { requireOperatorCredential } from "@/lib/api/operatorCredential";
 import { isPaidModelTarget } from "@/shared/utils/freeModels";
 import { getAuditRequestContext, logAuditEvent } from "@/lib/compliance";
 import { deriveSettingsAuditActor, emitSettingsFailureAudit } from "@/lib/api/settingsAudit";
-import { isAuthRequired } from "@/shared/utils/apiAuth";
 import {
   DASHBOARD_SESSION_COOKIE,
   REVOKED_SESSIONS_SETTING,
@@ -45,12 +42,6 @@ import {
   mintDashboardSessionToken,
   verifyDashboardSessionToken,
 } from "@/shared/utils/dashboardSessionToken";
-import { getRadarAdminUrl } from "@/lib/radar/links";
-import {
-  AUTHZ_HEADER_AUTH_ID,
-  AUTHZ_HEADER_AUTH_KIND,
-  AUTHZ_HEADER_PEER_LOCALITY,
-} from "@/server/authz/headers";
 
 /**
  * Force this route to run dynamically per-request and never be cached/prerendered.
@@ -70,27 +61,6 @@ function settingsResponseHeaders(settingsRevision: number): Record<string, strin
     ...SETTINGS_RESPONSE_HEADERS,
     ETag: String(settingsRevision),
   };
-}
-
-const RadarAdminOwnerSubjectSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("dashboard_session"), id: z.literal("dashboard") }).strict(),
-  z.object({ kind: z.literal("anonymous"), id: z.literal("anonymous") }).strict(),
-]);
-
-export async function resolveOwnerRadarAdminUrl(request: Request): Promise<string | null> {
-  const subject = RadarAdminOwnerSubjectSchema.safeParse({
-    kind: request.headers.get(AUTHZ_HEADER_AUTH_KIND),
-    id: request.headers.get(AUTHZ_HEADER_AUTH_ID),
-  });
-  if (!subject.success) return null;
-  if (subject.data.kind === "dashboard_session") return getRadarAdminUrl();
-
-  // Fresh local installs can intentionally run without login. In that mode,
-  // only the pipeline's non-forgeable loopback verdict represents the owner;
-  // CLI/internal/manage-scope credentials must not receive the private URL.
-  if (request.headers.get(AUTHZ_HEADER_PEER_LOCALITY) !== "loopback") return null;
-  if (await isAuthRequired(request)) return null;
-  return getRadarAdminUrl();
 }
 
 /** Parse opt-in CAS token from If-Match (preferred) or PATCH body. */
@@ -227,15 +197,6 @@ export async function GET(request: Request) {
         cloudConfigured: Boolean(cloudUrl),
         cloudUrl,
         machineId,
-        // Sidebar.tsx has no server-side feature-flag access (client component);
-        // this piggy-backs the RADAR_ENABLED gate onto the settings payload the
-        // sidebar already fetches on mount, so the "radar" item can hide itself
-        // without a dedicated round trip. See sidebarVisibility.ts's
-        // `isSidebarItemVisibleForFlags()`.
-        radarEnabled: isFeatureFlagEnabled("RADAR_ENABLED"),
-        // Owner-only operational link. This route is management-authenticated;
-        // the URL has no public default and is omitted from static client code.
-        radarAdminUrl: await resolveOwnerRadarAdminUrl(request),
         ...(cliproxyapiModelMapping !== null
           ? { cliproxyapi_model_mapping: cliproxyapiModelMapping }
           : {}),

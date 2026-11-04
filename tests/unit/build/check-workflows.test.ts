@@ -54,7 +54,6 @@ const EXPECTED_SCHEDULED_WORKFLOWS = [
   "nightly-release-green.yml",
   "nightly-resilience.yml",
   "nightly-schemathesis.yml",
-  "radar-export.yml",
   "scorecard.yml",
   "test-quarantine.yml",
 ];

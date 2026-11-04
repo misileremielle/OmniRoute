@@ -73,7 +73,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
   for (const prefix of [
     "/api/cli-tools/runtime/",
     "/api/services/",
-    "/api/plugins/",
     "/api/local/",
     "/api/skills/collect/",
     "/api/headroom/start",

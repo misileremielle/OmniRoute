@@ -8,7 +8,7 @@
  * connectionId) rather than "per user". See the Open Question in the #7819
  * plan for the follow-up decision on whether this should instead be global.
  *
- * Mirrors the relational style of `reasoningRoutingRules.ts` / `apiKeyGroups.ts`
+ * Mirrors the relational style of `apiKeyGroups.ts`
  * rather than the key_value JSON-blob pattern — exclusions are a simple
  * row-per-candidate set, which is simpler to index and reason about than a
  * JSON array column.

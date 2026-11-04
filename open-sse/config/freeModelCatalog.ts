@@ -239,10 +239,9 @@ export function computeFreeModelTotals(
   opts: {
     excludeTosAvoid?: boolean;
     /**
-     * The catalog to aggregate. Defaults to the static release baseline, so
-     * every existing caller is unchanged. Callers that resolve a fresher
-     * catalog (e.g. the Radar overlay) pass their entries here; an entry with
-     * `enabled: false` contributes nothing, exactly as if it were absent.
+     * The catalog to aggregate. Defaults to the static release baseline. An
+     * entry with `enabled: false` contributes nothing, exactly as if it were
+     * absent.
      */
     entries?: Array<FreeModelBudget & { enabled?: boolean }>;
   } = {}

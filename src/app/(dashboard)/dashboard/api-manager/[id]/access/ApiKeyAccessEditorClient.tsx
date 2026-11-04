@@ -408,7 +408,6 @@ function AccessBehaviourPanelPanelContent({ context }: { context: AccessFormCont
       setAutoResolve={form.setAutoResolve}
       setStreamDefaultMode={form.setStreamDefaultMode}
       setCompressionEnabled={form.setCompressionEnabled}
-      setChaosModeEnabled={form.setChaosModeEnabled}
       setAllowUsageCommand={form.setAllowUsageCommand}
       setBypassProviderQuotaPolicyEnabled={form.setBypassProviderQuotaPolicyEnabled}
       errors={form.tabErrors.behaviour}

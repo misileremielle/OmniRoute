@@ -935,11 +935,6 @@
       "model": "按模型篩選"
     }
   },
-  "radar": {
-    "description": "檢查並同步本機 Radar 目錄訂閱來源",
-    "status": "顯示本機 Radar 設定和訂閱來源快取狀態",
-    "sync": "透過本機伺服器同步目錄、推薦、優惠和 Intel"
-  },
   "resilience": {
     "description": "檢查和管理彈性機制",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "要使用的組合名稱",
     "system": "系統提示",
     "resume": "按名稱恢復儲存的會話"
-  },
-  "plugin": {
-    "description": "管理 CLI 外掛（omniroute-cmd-*）",
-    "list": "列出已安裝的外掛",
-    "install": "從 npm 或本地路徑安裝外掛",
-    "remove": "刪除已安裝的外掛",
-    "info": "顯示已安裝外掛的詳情",
-    "search": "搜尋 npm 登錄檔中的可用外掛",
-    "update": "更新已安裝的外掛",
-    "scaffold": "搭建新的外掛模板"
   },
   "launch": {
     "description": "啟動指向 OmniRoute 的 Claude Code（本機或遠端，使用 --profile）",

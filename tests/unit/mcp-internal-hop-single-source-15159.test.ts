@@ -53,9 +53,8 @@ const CALLERS = [
   "open-sse/mcp-server/server.ts",
   "open-sse/mcp-server/tools/advancedTools.ts",
   "open-sse/mcp-server/tools/pickFastestModel.ts",
-  // The two catalogs. These are the cycle offenders.
+  // The catalog. This is the cycle offender.
   "open-sse/mcp-server/catalog.ts",
-  "open-sse/mcp-server/radarCatalog.ts",
 ];
 
 test("M-06: the shared hop exists as its own module", () => {
@@ -97,8 +96,8 @@ test("M-06: every caller imports the hop from the shared module", () => {
   );
 });
 
-test("M-06: the catalogs no longer reach the hop through server.ts", () => {
-  // This is the cycle. `catalog.ts` and `radarCatalog.ts` are imported BY server.ts, so a
+test("M-06: the catalog no longer reaches the hop through server.ts", () => {
+  // This is the cycle. `catalog.ts` is imported BY server.ts, so a
   // static import back into server.ts would close a cycle — the original author worked
   // around it with `import("./server.ts")`, which closes the same edge for dpdm. With the
   // hop in its own leaf module the workaround is unnecessary and must be gone.

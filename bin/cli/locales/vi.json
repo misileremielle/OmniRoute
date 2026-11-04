@@ -935,11 +935,6 @@
       "model": "Lọc theo mô hình"
     }
   },
-  "radar": {
-    "description": "Kiểm tra và đồng bộ hóa các nguồn cấp danh mục Radar cục bộ",
-    "status": "Hiển thị cài đặt Radar cục bộ và trạng thái bộ nhớ đệm nguồn cấp",
-    "sync": "Đồng bộ hóa danh mục, giới thiệu, ưu đãi và Intel thông qua máy chủ cục bộ"
-  },
   "resilience": {
     "description": "Kiểm tra và quản lý các cơ chế phục hồi",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Tên tổ hợp cần dùng",
     "system": "Lời nhắc hệ thống",
     "resume": "Tiếp tục một phiên đã lưu theo tên"
-  },
-  "plugin": {
-    "description": "Quản lý plugin CLI (omniroute-cmd-*)",
-    "list": "Liệt kê các plugin đã cài đặt",
-    "install": "Cài đặt plugin từ npm hoặc đường dẫn cục bộ",
-    "remove": "Gỡ bỏ plugin đã cài đặt",
-    "info": "Hiển thị chi tiết về plugin đã cài đặt",
-    "search": "Tìm kiếm các plugin có sẵn trong sổ đăng ký npm",
-    "update": "Cập nhật (các) plugin đã cài đặt",
-    "scaffold": "Tạo khung mã mẫu cho plugin mới"
   },
   "launch": {
     "description": "Khởi chạy Claude Code trỏ đến OmniRoute (cục bộ hoặc từ xa, với --profile)",

@@ -2,7 +2,7 @@
  * getAllToolDefinitions — unified catalog of all MCP tool definitions.
  *
  * Aggregates the same collections referenced by TOTAL_MCP_TOOL_COUNT in server.ts:
- *   MCP_TOOLS + poolTools + gamificationTools + pluginTools + notionTools + obsidianTools +
+ *   MCP_TOOLS + poolTools + notionTools + obsidianTools +
  *   localCorpusTools + compressionTools
  *
  * Tolerates both Array and Record shapes. Deduplicates by name (first wins).
@@ -10,8 +10,6 @@
 
 import { MCP_TOOLS } from "../schemas/tools.ts";
 import { poolTools } from "../tools/poolTools.ts";
-import { gamificationTools } from "../tools/gamificationTools.ts";
-import { pluginTools } from "../tools/pluginTools.ts";
 import { notionTools } from "../tools/notionTools.ts";
 import { obsidianTools } from "../tools/obsidianTools.ts";
 import { localCorpusTools } from "../tools/localCorpusTools.ts";
@@ -67,8 +65,6 @@ export function getAllToolDefinitions(): ToolCatalogEntry[] {
   const collections: unknown[] = [
     MCP_TOOLS,
     poolTools,
-    gamificationTools,
-    pluginTools,
     notionTools,
     obsidianTools,
     localCorpusTools,

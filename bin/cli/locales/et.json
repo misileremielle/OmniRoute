@@ -935,11 +935,6 @@
       "model": "Filtreeri mudeli järgi"
     }
   },
-  "radar": {
-    "description": "Uuri ja sünkroonib kohalikku Radar-kataloogi vooge",
-    "status": "Näita kohalikke Radar-seadeid ja voo vahemälu olekut",
-    "sync": "Sünkroonib kataloogi, suunamised, pakkumised ja Intel kohaliku serveri kaudu"
-  },
   "resilience": {
     "description": "Uuri ja halda vastupidavusmehhanisme",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Kasutatav combo nimi",
     "system": "Süsteemi juhis (system prompt)",
     "resume": "Jätka salvestatud seanssi nime järgi"
-  },
-  "plugin": {
-    "description": "Halda CLI pluginaid (omniroute-cmd-*)",
-    "list": "Kuva installitud pluginad",
-    "install": "Installi plugin npm-ist või kohalikust asukohast",
-    "remove": "Eemalda installitud plugin",
-    "info": "Kuva installitud plugina üksikasjad",
-    "search": "Otsi npm registrist saadaolevaid pluginaid",
-    "update": "Uuenda installitud plugina(id)",
-    "scaffold": "Loo uue plugina põhistruktuur"
   },
   "launch": {
     "description": "Käivita Claude Code, mis suunatakse OmniRoute'i (kohalik või kaug, koos lipuga --profile)",

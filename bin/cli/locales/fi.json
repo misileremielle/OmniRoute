@@ -935,11 +935,6 @@
       "model": "Suodata mallin mukaan"
     }
   },
-  "radar": {
-    "description": "Tarkastele ja synkronoi paikallisia Radar-luettelosyötteitä",
-    "status": "Näytä paikalliset Radar-asetukset ja syötevälimuistin tila",
-    "sync": "Synkronoi luettelo, suosittelut, tarjoukset ja Intel paikallisen palvelimen kautta"
-  },
   "resilience": {
     "description": "Tarkastele ja hallitse vikasietoisuusmekanismeja",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Käytettävän yhdistelmän nimi",
     "system": "Järjestelmäkehote",
     "resume": "Jatka tallennettua istuntoa nimellä"
-  },
-  "plugin": {
-    "description": "Hallitse CLI-liitännäisiä (omniroute-cmd-*)",
-    "list": "Luettele asennetut liitännäiset",
-    "install": "Asenna liitännäinen npm:stä tai paikallisesta polusta",
-    "remove": "Poista asennettu liitännäinen",
-    "info": "Näytä asennetun liitännäisen tiedot",
-    "search": "Etsi saatavilla olevia liitännäisiä npm-rekisteristä",
-    "update": "Päivitä asennetut liitännäiset",
-    "scaffold": "Luo uuden liitännäisen perusrakenne"
   },
   "launch": {
     "description": "Käynnistä Claude Code OmniRouteen yhdistettynä (paikallinen tai etäyhteys, --profile-valinnalla)",

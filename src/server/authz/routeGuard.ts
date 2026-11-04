@@ -68,8 +68,6 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
   "/dashboard/providers/services/", // T-07: reverse proxy to embedded service UIs
   "/api/copilot/", // unauthenticated LLM driver — CLI-only by default; admins can opt-in to remote access via manage-scope bypass
   "/api/issue-agent/", // Issue Agent: recorded/local triage executor surface; keep loopback/LAN until sandbox + audit hardening is complete
-  "/api/plugins/", // plugins: load/execute via worker_threads + child_process (Hard Rules #15 + #17)
-  "/api/plugins", // bare path: GET list + POST install also trigger plugin loading
   "/api/middleware/", // SECURITY_AUDIT M8: middleware hooks compile+run arbitrary JS via new vm.Script (src/lib/middleware/registry.ts) on the request hot path — same code-exec class as /api/plugins/, so loopback-gate it for parity (Hard Rules #15 + #17)
   "/api/system/version", // auto-update: spawns git checkout + npm install — RCE-via-tunnel surface (Hard Rules #15 + #17, found by 6A.8 route-guard gate)
   "/api/db-backups/exportAll", // spawns tar for export archive (Hard Rules #15 + #17, found by 6A.8 route-guard gate)

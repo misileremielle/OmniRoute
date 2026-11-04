@@ -460,16 +460,8 @@ export function isInputBoundRequestFailure(error?: {
  * #7177: whether handleSingleModelChat should skip the connection-level cooldown
  * (markAccountUnavailable) for a failed attempt — client disconnects, a 401 when the
  * connection has extra keys to rotate through, a known request-scoped upstream failure
- * (e.g. context overflow — not a connection health signal), a plugin refusing the
- * request (our own policy, not a provider fault — see below), or our own
- * self-inflicted timeout all mean the connection itself is healthy and should not be
- * cooled down.
- *
- * A plugin block (`plugin_block`) is our own policy decision, not the provider
- * rejecting us. Banning the account here would let a working security plugin destroy
- * the connection it protects — one block would ban the provider for every later
- * request, valid ones included — and would trigger a pointless retry loop across other
- * accounts the plugin would refuse identically.
+ * (e.g. context overflow — not a connection health signal), or our own self-inflicted
+ * timeout all mean the connection itself is healthy and should not be cooled down.
  */
 export function shouldSkipConnDisable(
   result: {
@@ -522,8 +514,6 @@ export function shouldSkipConnDisable(
     isLocalStreamLifecycleError(result.error) ||
     isLocalExecutionError(result.error) ||
     (result.response ? getTrustedLocalRateLimitResponse(result.response) !== null : false) ||
-    result.errorCode === "plugin_block" ||
-    result.errorType === "plugin_block" ||
     // #14815: translation fails locally on the client's body — no account is at fault.
     result.errorCode === TRANSLATION_FAILURE_CODE ||
     (is401 && hasExtraKeys) ||

@@ -389,22 +389,6 @@ export const OPTIONAL_BOOT_SUBSYSTEMS: ReadonlyArray<OptionalBootSubsystem> = [
           console.warn("[STARTUP] Arena ELO sync failed to start (non-fatal):", msg);
         }),
   },
-  // Radar daily feed sync: only arms itself when RADAR_ENABLED AND the user
-  // opt-in are already on (flag-off boot stays timer-free — Radar inertia
-  // contract). Non-blocking, never fatal.
-  {
-    name: "radar-sync",
-    start: () =>
-      import("@/lib/radar/scheduler")
-        .then((m) => {
-          const started = m.initRadarSyncScheduler();
-          if (started) console.log("[STARTUP] Radar sync scheduler initialized");
-        })
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn("[STARTUP] Radar sync scheduler failed to start (non-fatal):", msg);
-        }),
-  },
   // Pricing sync: opt-in external pricing data (self-gated by PRICING_SYNC_ENABLED inside
   // initPricingSync). Non-blocking, never fatal.
   {

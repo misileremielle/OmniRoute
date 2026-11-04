@@ -332,36 +332,6 @@ export async function cleanupCompressionCacheStats(): Promise<CleanupResult> {
 }
 
 /**
- * Clean up old xp_audit_log based on retention settings.
- */
-export async function cleanupXpAuditLog(): Promise<CleanupResult> {
-  const db = getDbInstance();
-  const retention = getRetentionSettings();
-
-  const retentionDays = retention.xpAuditLog;
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
-  const cutoffISO = cutoffDate.toISOString();
-
-  const result: CleanupResult = { deleted: 0, errors: 0 };
-
-  try {
-    const stmt = db.prepare("DELETE FROM xp_audit_log WHERE created_at < ?");
-    const runResult = stmt.run(cutoffISO);
-    result.deleted = runResult.changes;
-
-    console.log(
-      `[Cleanup] Deleted ${result.deleted} xp_audit_log older than ${retentionDays} days`
-    );
-  } catch (err: unknown) {
-    console.error("[Cleanup] Error cleaning xp_audit_log:", err);
-    result.errors++;
-  }
-
-  return result;
-}
-
-/**
  * Clean up old compression_run_telemetry based on retention settings. (#6848)
  * The `timestamp` column stores epoch milliseconds (recordCompressionRun stamps
  * Date.now()), so the cutoff must be in milliseconds to match. Same unit bug as
@@ -626,7 +596,6 @@ export async function runAutoCleanup(): Promise<{
     configAudit: await cleanupConfigAudit(),
     domainCostHistory: await cleanupDomainCostHistory(),
     compressionCacheStats: await cleanupCompressionCacheStats(),
-    xpAuditLog: await cleanupXpAuditLog(),
     compressionRunTelemetry: await cleanupCompressionRunTelemetry(),
     proxyLogs: await cleanupProxyLogs(),
     ccrBlocks: await cleanupCcrBlocks(),
@@ -760,12 +729,6 @@ export interface ResetUsageHistoryResult extends CleanupResult {
   deletedCompressionRunTelemetry: number;
   deletedRoutingDecisions: number;
   deletedQuotaConsumption: number;
-  /**
-   * Always 0. `token_ledger` is the transfer record behind token balances and
-   * idempotency keys, not usage analytics, so a usage reset never deletes it.
-   * The field stays so the response shape of the purge API does not change.
-   */
-  deletedTokenLedger: number;
   deletedConversationTurnNodes: number;
   deletedAgenticConversations: number;
 }
@@ -893,7 +856,6 @@ export async function resetUsageHistory(period: string): Promise<ResetUsageHisto
     deletedCompressionRunTelemetry: 0,
     deletedRoutingDecisions: 0,
     deletedQuotaConsumption: 0,
-    deletedTokenLedger: 0,
     deletedConversationTurnNodes: 0,
     deletedAgenticConversations: 0,
     deletedArtifacts: 0,

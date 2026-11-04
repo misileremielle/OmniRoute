@@ -8,7 +8,6 @@ import { getProviderConnectionById } from "../db/providers";
 import { assertValidationSnapshot, type ValidationSnapshot } from "../db/validatedModels";
 import { createValidationDispatchFence } from "./dispatchFence";
 import { assertSelectedCredentialsCurrent } from "./credentials";
-import { assertRequestPluginsIdle } from "../plugins/executionGuard";
 import { isConnectionUnavailableToAuxiliaryActivity } from "../exclusiveLeaseIsolation";
 import { ModelValidationError, type ValidationInput } from "./http";
 import { abortable, readProof, proofFailed, deadline } from "./proofs";
@@ -99,7 +98,6 @@ export async function createProofRunner(
         expectedExecutor,
         expectedCredentials: credentials,
         assertFresh: () => {
-          assertRequestPluginsIdle();
           assertValidationSnapshot(snapshot);
         },
       });

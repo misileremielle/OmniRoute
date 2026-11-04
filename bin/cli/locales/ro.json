@@ -935,11 +935,6 @@
       "model": "Filtrează după model"
     }
   },
-  "radar": {
-    "description": "Inspectează și sincronizează fluxurile catalogului Radar local",
-    "status": "Afișează setările Radar locale și starea cache-ului fluxurilor",
-    "sync": "Sincronizează catalogul, recomandările, ofertele și Intel prin serverul local"
-  },
   "resilience": {
     "description": "Inspectează și gestionează mecanismele de reziliență",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Numele combinației de utilizat",
     "system": "Prompt de sistem",
     "resume": "Reia o sesiune salvată după nume"
-  },
-  "plugin": {
-    "description": "Gestionează pluginurile CLI (omniroute-cmd-*)",
-    "list": "Listează pluginurile instalate",
-    "install": "Instalează un plugin din npm sau dintr-o cale locală",
-    "remove": "Elimină un plugin instalat",
-    "info": "Afișează detalii despre un plugin instalat",
-    "search": "Caută pluginuri disponibile în registrul npm",
-    "update": "Actualizează pluginurile instalate",
-    "scaffold": "Generează structura de bază pentru un plugin nou"
   },
   "launch": {
     "description": "Lansează Claude Code configurat pentru OmniRoute (local sau la distanță, cu --profile)",

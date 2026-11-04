@@ -82,7 +82,7 @@ export function buildNodeAliasModels(
  *
  * A native `confirm()` — not a bespoke modal — matches the existing bulk /
  * destructive-action pattern already used in this codebase (e.g.
- * `ReasoningRoutingRules.tsx::deleteConfirm`, `combos/page.tsx::deleteConfirm`),
+ * `combos/page.tsx::deleteConfirm`),
  * so no new UI primitive is needed for this one interaction.
  */
 export const SELECT_ALL_CONFIRM_THRESHOLD = 20;

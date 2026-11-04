@@ -935,11 +935,6 @@
       "model": "Filtrer efter model"
     }
   },
-  "radar": {
-    "description": "Inspicér og synkroniser de lokale Radar-katalogfeeds",
-    "status": "Vis lokale Radar-indstillinger og status for feedcachen",
-    "sync": "Synkroniser katalog, henvisninger, tilbud og Intel via den lokale server"
-  },
   "resilience": {
     "description": "Inspicér og administrer robusthedsmekanismer",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Navn på kombination, der skal bruges",
     "system": "Systemprompt",
     "resume": "Genoptag en gemt session efter navn"
-  },
-  "plugin": {
-    "description": "Administrer CLI-plugins (omniroute-cmd-*)",
-    "list": "Vis installerede plugins",
-    "install": "Installer et plugin fra npm eller en lokal sti",
-    "remove": "Fjern et installeret plugin",
-    "info": "Vis oplysninger om et installeret plugin",
-    "search": "Søg i npm-registret efter tilgængelige plugins",
-    "update": "Opdater installerede plugins",
-    "scaffold": "Opret en skabelon til et nyt plugin"
   },
   "launch": {
     "description": "Start Claude Code med forbindelse til OmniRoute (lokalt eller eksternt, med --profile)",

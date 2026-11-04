@@ -631,9 +631,7 @@ export function sanitizeReasoningEffortForProvider(
   //   Validation error: Invalid option: expected one of
   //   "low"|"medium"|"high"|"xhigh"|"max" at "params.reasoning_effort"
   // Command Code rejects the OpenAI no-thinking carrier `none` with the same
-  // error. That matters because a `force` + `none` reasoning-routing rule now
-  // emits `reasoning_effort: "none"` (src/lib/reasoningRouting/policy.ts) so
-  // that providers whose thinking defaults ON actually turn it off.
+  // error.
   // Map both to the closest supported value (`low`) for command-code only;
   // other providers (codex etc.) keep their native `minimal` handling.
   // Exception: a Responses-shaped body (`input`, no `messages`) is routed to

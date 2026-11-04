@@ -14,10 +14,8 @@ function makeLog() {
 // Command Code rejects the OpenAI no-thinking carrier outright:
 //   Validation error: Invalid option: expected one of
 //   "low"|"medium"|"high"|"xhigh"|"max" at "params.reasoning_effort"
-// A `force` + `none` reasoning-routing rule now emits `reasoning_effort: "none"`
-// (src/lib/reasoningRouting/policy.ts) so providers whose thinking defaults ON
-// actually stop thinking, so Command Code must clamp it to its floor (`low`)
-// instead of burning a combo fallback attempt on a guaranteed 400.
+// Command Code must clamp it to its floor (`low`) instead of burning a combo
+// fallback attempt on a guaranteed 400.
 test("command-code clamps the OpenAI no-thinking carrier none to low", () => {
   const log = makeLog();
   const body = {

@@ -70,7 +70,6 @@
 | 🌐 Providers              |            352            |   **358**   |          380          |
 | 🧠 Unique chat model IDs  |           1320            |  **1374**   |         1491          |
 | 🖼️ Modality Bridge        | 🆕 vision + audio + video |      ✓      |           ✓           |
-| 📡 Radar free catalog     |         🆕 opt-in         |      ✓      |           ✓           |
 | ⚖️ Quota-aware scheduling |      🆕 Quota-Share       |      ✓      |           ✓           |
 | 📊 Quota telemetry        |          🆕 live          |      ✓      |           ✓           |
 | 🧰 Headless mode          |             —             |      —      | 🆕 `serve --headless` |
@@ -505,23 +504,6 @@ Pix copia-e-cola:
 
 <p><strong>Developer notes:</strong> The project may generate a local <code>.env</code> file during npm install/postinstall for developer convenience. This file is intentionally ignored via <code>.gitignore</code> (see <code>.gitignore</code>) and must never be committed — if accidentally committed, rotate any exposed secrets and remove the file from history. See <a href="docs/DEVELOPER-ENVIRONMENT.md">docs/DEVELOPER-ENVIRONMENT.md</a> for guidance on managing local environment files and secrets.</p>
 
-## 📡 OmniRoute Radar
-
-The main free-tier headline remains **~1.62B tokens/month** from the documented,
-pool-deduplicated catalog above. Temporary provider signup credits can separately lift the first
-month to **~2.22B**. Radar is an optional, signed catalog overlay for people who want fresher
-free-model availability between OmniRoute releases; the community catalog and every existing free
-feature remain free.
-
-Supporters can receive the live catalog and additional provider opportunities. Its separate,
-mutable ceiling is **approximately 3B tokens/month at most**, depending on provider availability.
-That ceiling is not a guarantee: providers can change quotas, eligibility, models, or regions at
-any time.
-
-Radar is opt-in and GET-only. The OmniRoute client does not upload prompts, traffic, provider
-configuration, usage telemetry, or local announcement-dismiss state. Learn about eligibility and
-the current catalog at **[radar.omniroute.online/planos](https://radar.omniroute.online/planos)**.
-
 <br/>
 
 <div align="center">
@@ -557,7 +539,7 @@ the current catalog at **[radar.omniroute.online/planos](https://radar.omniroute
 - **🤝 More providers & agents** — cloud agents (Codex Cloud, Cursor, Devin, Jules), Grok Build (xAI) with browser + OAuth login, Ollama first-class card, Claude Opus 5 & Sonnet 5, Kimi official partnership (Code/Web/Moonshot), Zed, Requesty, SenseNova, Yuanbao, Agnes AI… and a refreshed **380-provider catalog**. → [Providers](docs/reference/PROVIDER_REFERENCE.md)
 - **📡 Routing transparency** — every response carries an `X-OmniRoute-Decision` header naming the strategy/provider/latency that served it, a new `cache-optimized` combo strategy + Auto-Combo `cacheAffinity` factor route repeat requests back to the connection holding the cached prefix, and a read-only `/v1/auto-combo/{channel}/candidates` endpoint exposes an `auto/*` channel's live candidate pool. → [Auto-Combo](docs/routing/AUTO-COMBO.md)
 - **⚡ Local performance & infra** — one-click local Redis, Cloudflare Workers / Deno Deploy relay deployers, Bifrost & Mux as supervised embedded services. → [Embedded Services](docs/frameworks/EMBEDDED-SERVICES.md)
-- **🧩 Also in the box** — plugin framework + marketplace, Omni/Agent/GitHub skills frameworks, Obsidian vault integration (22 MCP tools), OpenAI-compatible Batch & Files APIs, semantic response cache, gamification with leaderboards, ACP agent discovery (15 built-in agents), scheduled log export to BigQuery, `auto/chaos` parallel multi-model fan-out, a Telegram bot bridge, an in-app version manager and LMArena-ELO free-provider rankings. → [Docs](docs/README.md)
+- **🧩 Also in the box** — plugin framework + marketplace, Omni/Agent/GitHub skills frameworks, Obsidian vault integration (22 MCP tools), OpenAI-compatible Batch & Files APIs, semantic response cache, ACP agent discovery (15 built-in agents), scheduled log export to BigQuery, `auto/chaos` parallel multi-model fan-out, a Telegram bot bridge, an in-app version manager and LMArena-ELO free-provider rankings. → [Docs](docs/README.md)
 
 <br/>
 

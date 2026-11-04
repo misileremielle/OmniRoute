@@ -935,11 +935,6 @@
       "model": "မော်ဒယ်အလိုက် စစ်ထုတ်ပါ"
     }
   },
-  "radar": {
-    "description": "စက်တွင်း Radar ကတ်တလောက် feed များကို စစ်ဆေးပြီး ထပ်တူပြုပါ",
-    "status": "စက်တွင်း Radar ဆက်တင်များနှင့် feed cache အခြေအနေကို ပြပါ",
-    "sync": "စက်တွင်းဆာဗာမှတစ်ဆင့် ကတ်တလောက်၊ referrals၊ ကမ်းလှမ်းချက်များနှင့် Intel ကို ထပ်တူပြုပါ"
-  },
   "resilience": {
     "description": "ပြန်လည်ခံနိုင်ရည်ယန္တရားများကို စစ်ဆေးပြီး စီမံပါ",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "အသုံးပြုမည့် Combo အမည်",
     "system": "စနစ်ညွှန်ကြားချက်",
     "resume": "သိမ်းဆည်းထားသော session ကို အမည်ဖြင့် ပြန်လည်စတင်ရန်"
-  },
-  "plugin": {
-    "description": "CLI plugin များကို စီမံရန် (omniroute-cmd-*)",
-    "list": "ထည့်သွင်းထားသော plugin များကို စာရင်းပြရန်",
-    "install": "npm သို့မဟုတ် local path မှ plugin တစ်ခုကို ထည့်သွင်းရန်",
-    "remove": "ထည့်သွင်းထားသော plugin တစ်ခုကို ဖယ်ရှားရန်",
-    "info": "ထည့်သွင်းထားသော plugin တစ်ခု၏ အသေးစိတ်အချက်အလက်များကို ပြရန်",
-    "search": "ရရှိနိုင်သော plugin များအတွက် npm registry တွင် ရှာဖွေရန်",
-    "update": "ထည့်သွင်းထားသော plugin များကို အပ်ဒိတ်လုပ်ရန်",
-    "scaffold": "plugin boilerplate အသစ်တစ်ခုကို ဖန်တီးရန်"
   },
   "launch": {
     "description": "OmniRoute သို့ ချိတ်ဆက်ထားသော Claude Code ကို စတင်ရန် (local သို့မဟုတ် remote၊ --profile ဖြင့်)",

@@ -20,7 +20,6 @@ process.env.NODE_ENV = "test";
 process.env.DISABLE_SQLITE_AUTO_BACKUP = "true";
 
 const core = await import("../../../src/lib/db/core.ts");
-const radarDb = await import("../../../src/lib/db/radar.ts");
 
 function resetDb() {
   core.resetDbInstance();
@@ -49,32 +48,4 @@ test("migration 163 — radar_feed_cache carries generated_at exactly once", () 
     1,
     "generated_at must be added once, whatever the number of migration runs"
   );
-});
-
-test("migration 163 — a row from the previous schema keeps its data and reads no build date", () => {
-  const db = core.getDbInstance();
-
-  // Exactly the INSERT the previous schema could write: no generated_at column.
-  db.prepare(
-    `INSERT INTO radar_feed_cache (id, version, tier, payload, signature, fetched_at)
-     VALUES (1, ?, ?, ?, ?, ?)`
-  ).run(
-    "2026.08.02.1",
-    "community",
-    '{"feed":"omniroute-radar"}',
-    "sig",
-    "2026-08-24T07:00:00.000Z"
-  );
-
-  const cache = radarDb.getRadarCache();
-
-  assert.ok(cache);
-  assert.equal(
-    cache.generatedAt,
-    null,
-    "an upgraded row has no build date, and must not invent one"
-  );
-  assert.equal(cache.version, "2026.08.02.1", "the pre-migration data must survive untouched");
-  assert.equal(cache.tier, "community");
-  assert.equal(cache.fetchedAt, "2026-08-24T07:00:00.000Z");
 });

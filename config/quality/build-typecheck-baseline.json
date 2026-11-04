@@ -220,9 +220,6 @@
   "src/app/api/providers/volcengine-plan/connect/route.ts": {
     "TS2739": 1
   },
-  "src/app/api/radar/local-model-state/route.ts": {
-    "TS2339": 4
-  },
   "src/app/api/resilience/model-cooldowns/route.ts": {
     "TS2339": 1
   },
@@ -250,16 +247,6 @@
   },
   "src/app/api/settings/proxy/vercel-deploy/route.ts": {
     "TS2322": 3
-  },
-  "src/app/api/settings/reasoning-routing-rules/[id]/route.ts": {
-    "TS2339": 1
-  },
-  "src/app/api/settings/reasoning-routing-rules/route.ts": {
-    "TS2339": 1
-  },
-  "src/app/api/settings/reasoning-routing-rules/simulate/route.ts": {
-    "TS2322": 1,
-    "TS2339": 1
   },
   "src/app/api/system/env/repair/route.ts": {
     "TS2578": 1,

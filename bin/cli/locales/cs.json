@@ -935,11 +935,6 @@
       "model": "Filtrovat podle modelu"
     }
   },
-  "radar": {
-    "description": "Zkontrolovat a synchronizovat místní zdroje katalogu Radar",
-    "status": "Zobrazit místní nastavení Radar a stav mezipaměti zdrojů",
-    "sync": "Synchronizovat katalog, doporučení, nabídky a Intel prostřednictvím místního serveru"
-  },
   "resilience": {
     "description": "Kontrolovat a spravovat mechanismy odolnosti",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Název kombinace, která se má použít",
     "system": "Systémová výzva",
     "resume": "Pokračovat v uložené relaci podle názvu"
-  },
-  "plugin": {
-    "description": "Spravovat pluginy CLI (omniroute-cmd-*)",
-    "list": "Vypsat nainstalované pluginy",
-    "install": "Nainstalovat plugin z npm nebo místní cesty",
-    "remove": "Odstranit nainstalovaný plugin",
-    "info": "Zobrazit podrobnosti o nainstalovaném pluginu",
-    "search": "Vyhledat dostupné pluginy v registru npm",
-    "update": "Aktualizovat nainstalované pluginy",
-    "scaffold": "Vygenerovat základní strukturu nového pluginu"
   },
   "launch": {
     "description": "Spustit Claude Code nasměrovaný na OmniRoute (místní nebo vzdálený, s --profile)",

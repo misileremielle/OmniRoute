@@ -935,11 +935,6 @@
       "model": "Filtruoti pagal modelį"
     }
   },
-  "radar": {
-    "description": "Tikrinti ir sinchronizuoti vietinius Radar katalogo kanalus",
-    "status": "Rodyti vietinius Radar nustatymus ir kanalų podėlio būseną",
-    "sync": "Sinchronizuoti katalogą, rekomendacijas, pasiūlymus ir Intel per vietinį serverį"
-  },
   "resilience": {
     "description": "Tikrinti ir valdyti atsparumo mechanizmus",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Naudotino derinio pavadinimas",
     "system": "Sistemos raginimas",
     "resume": "Tęsti išsaugotą seansą pagal pavadinimą"
-  },
-  "plugin": {
-    "description": "Valdyti CLI papildinius (omniroute-cmd-*)",
-    "list": "Pateikti įdiegtų papildinių sąrašą",
-    "install": "Įdiegti papildinį iš npm arba vietinio kelio",
-    "remove": "Pašalinti įdiegtą papildinį",
-    "info": "Rodyti išsamią informaciją apie įdiegtą papildinį",
-    "search": "Ieškoti galimų papildinių npm registre",
-    "update": "Atnaujinti įdiegtą (-us) papildinį (-ius)",
-    "scaffold": "Sukurti naujo papildinio pradinį šabloną"
   },
   "launch": {
     "description": "Paleisti Claude Code, nukreiptą į OmniRoute (vietinį arba nuotolinį, naudojant --profile)",

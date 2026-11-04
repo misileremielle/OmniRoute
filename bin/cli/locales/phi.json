@@ -935,11 +935,6 @@
       "model": "I-filter ayon sa modelo"
     }
   },
-  "radar": {
-    "description": "Suriin at i-synchronize ang mga lokal na feed ng catalog ng Radar",
-    "status": "Ipakita ang mga lokal na setting ng Radar at status ng feed cache",
-    "sync": "I-synchronize ang catalog, mga referral, mga alok, at Intel sa pamamagitan ng lokal na server"
-  },
   "resilience": {
     "description": "Suriin at pamahalaan ang mga mekanismo ng resilience",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Pangalan ng combo na gagamitin",
     "system": "System prompt",
     "resume": "Ipagpatuloy ang naka-save na session ayon sa pangalan"
-  },
-  "plugin": {
-    "description": "Pamahalaan ang mga CLI plugin (omniroute-cmd-*)",
-    "list": "Ilista ang mga naka-install na plugin",
-    "install": "Mag-install ng plugin mula sa npm o lokal na path",
-    "remove": "Alisin ang naka-install na plugin",
-    "info": "Ipakita ang mga detalye ng naka-install na plugin",
-    "search": "Maghanap sa npm registry ng mga available na plugin",
-    "update": "I-update ang (mga) naka-install na plugin",
-    "scaffold": "Bumuo ng boilerplate para sa bagong plugin"
   },
   "launch": {
     "description": "Ilunsad ang Claude Code na nakaturo sa OmniRoute (lokal o remote, gamit ang --profile)",

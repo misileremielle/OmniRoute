@@ -935,11 +935,6 @@
       "model": "Filtruj według modelu"
     }
   },
-  "radar": {
-    "description": "Sprawdź i zsynchronizuj lokalne źródła katalogu Radar",
-    "status": "Pokaż lokalne ustawienia Radar i stan pamięci podręcznej źródeł",
-    "sync": "Zsynchronizuj katalog, polecenia, oferty i Intel za pośrednictwem lokalnego serwera"
-  },
   "resilience": {
     "description": "Sprawdź mechanizmy odporności i zarządzaj nimi",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Nazwa kombinacji do użycia",
     "system": "Monit systemowy",
     "resume": "Wznów zapisaną sesję według nazwy"
-  },
-  "plugin": {
-    "description": "Zarządzaj wtyczkami CLI (omniroute-cmd-*)",
-    "list": "Wyświetl zainstalowane wtyczki",
-    "install": "Zainstaluj wtyczkę z npm lub ścieżki lokalnej",
-    "remove": "Usuń zainstalowaną wtyczkę",
-    "info": "Pokaż szczegóły zainstalowanej wtyczki",
-    "search": "Przeszukaj rejestr npm pod kątem dostępnych wtyczek",
-    "update": "Zaktualizuj zainstalowane wtyczki",
-    "scaffold": "Wygeneruj szablon nowej wtyczki"
   },
   "launch": {
     "description": "Uruchom Claude Code skonfigurowany do pracy z OmniRoute (lokalnym lub zdalnym, z --profile)",

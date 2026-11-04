@@ -57,8 +57,6 @@ test("stripInternalBodyFields strips every _omniroute* marker by prefix", () => 
   // without editing an allowlist, so it cannot become the next upstream 400.
   const body: Record<string, unknown> = {
     model: "m",
-    _omnirouteReasoningRouteTrace: { decision: "x" },
-    _omnirouteReasoningRule: { rule: "y" },
     _omnirouteResponsesStore: "auto",
     _omnirouteCopilotReasoningSummary: "summarized",
     _omnirouteSomeFutureMarkerNotYetWritten: true,

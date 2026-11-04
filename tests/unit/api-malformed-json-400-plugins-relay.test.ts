@@ -1,14 +1,13 @@
 /**
- * Regression tests: POST /api/plugins and PATCH /api/relay/tokens/[id] must return 400
+ * Regression tests: PATCH /api/relay/tokens/[id] must return 400
  * (not an unhandled error) on a malformed JSON request body.
  *
- * Before the fix both handlers called `await request.json()` with no try/catch, so a
+ * Before the fix the handler called `await request.json()` with no try/catch, so a
  * body that is not JSON made the handler reject instead of answering. A malformed body
  * must surface as a clean 400, while a well-formed body keeps its existing behavior.
  *
  * DB setup mirrors tests/unit/api-malformed-json-400.test.ts: a temp DATA_DIR with no
- * configured password, so POST /api/plugins needs no login. PATCH /api/relay/tokens/[id]
- * always requires management auth, so its requests carry a manage-scoped API key, as in
+ * configured password. PATCH /api/relay/tokens/[id] always requires management auth, so its requests carry a manage-scoped API key, as in
  * tests/unit/relay-tokens-always-protected.test.ts, and target a seeded token. DB handles
  * are released in test.after (resetDbInstance), as unreleased SQLite handles hang the runner.
  */
@@ -31,7 +30,6 @@ delete process.env.INITIAL_PASSWORD;
 const core = await import("../../src/lib/db/core.ts");
 const apiKeysDb = await import("../../src/lib/db/apiKeys.ts");
 const relayDb = await import("../../src/lib/db/relayProxies.ts");
-const pluginsRoute = await import("../../src/app/api/plugins/route.ts");
 const relayTokenRoute = await import("../../src/app/api/relay/tokens/[id]/route.ts");
 
 function jsonRequest(url: string, method: string, body: string): Request {
@@ -65,22 +63,6 @@ test.after(() => {
   else process.env.API_KEY_SECRET = ORIGINAL_API_KEY_SECRET;
   if (ORIGINAL_INITIAL_PASSWORD !== undefined)
     process.env.INITIAL_PASSWORD = ORIGINAL_INITIAL_PASSWORD;
-});
-
-test("POST /api/plugins — malformed JSON body returns 400", async () => {
-  const res = await pluginsRoute.POST(
-    jsonRequest("http://localhost/api/plugins", "POST", "not-json") as never
-  );
-  assert.equal(res.status, 400);
-});
-
-test("POST /api/plugins — well-formed but invalid body still returns 400", async () => {
-  const res = await pluginsRoute.POST(
-    jsonRequest("http://localhost/api/plugins", "POST", JSON.stringify({})) as never
-  );
-  assert.equal(res.status, 400);
-  const body = (await res.json()) as { error?: string };
-  assert.equal(body.error, "Invalid request");
 });
 
 test("PATCH /api/relay/tokens/[id] — malformed JSON body returns 400", async () => {

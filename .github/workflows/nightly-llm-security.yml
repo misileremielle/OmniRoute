@@ -34,10 +34,8 @@ jobs:
         id: runtime
         run: |
           data_dir=$(mktemp -d "$RUNNER_TEMP/omniroute-llm-security.XXXXXX")
-          mkdir "$data_dir/plugins"
           {
             echo "DATA_DIR=$data_dir"
-            echo "OMNIROUTE_PLUGINS_DIR=$data_dir/plugins"
           } >> "$GITHUB_ENV"
       - run: npm ci
         env:
@@ -133,10 +131,8 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: |
           data_dir=$(mktemp -d "$RUNNER_TEMP/omniroute-llm-security.XXXXXX")
-          mkdir "$data_dir/plugins"
           {
             echo "DATA_DIR=$data_dir"
-            echo "OMNIROUTE_PLUGINS_DIR=$data_dir/plugins"
           } >> "$GITHUB_ENV"
       - run: npm ci
         env:

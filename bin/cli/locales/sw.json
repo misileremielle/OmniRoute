@@ -935,11 +935,6 @@
       "model": "Chuja kwa modeli"
     }
   },
-  "radar": {
-    "description": "Kagua na usawazishe milisho ya katalogi ya Radar ya ndani",
-    "status": "Onyesha mipangilio ya Radar ya ndani na hali ya akiba ya milisho",
-    "sync": "Sawazisha katalogi, marejeleo, ofa na Intel kupitia seva ya ndani"
-  },
   "resilience": {
     "description": "Kagua na udhibiti mbinu za ustahimilivu",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Jina la mchanganyiko la kutumia",
     "system": "Kidokezo cha mfumo",
     "resume": "Endelea na kipindi kilichohifadhiwa kwa jina"
-  },
-  "plugin": {
-    "description": "Dhibiti programu-jalizi za CLI (omniroute-cmd-*)",
-    "list": "Orodhesha programu-jalizi zilizosakinishwa",
-    "install": "Sakinisha programu-jalizi kutoka npm au njia ya ndani",
-    "remove": "Ondoa programu-jalizi iliyosakinishwa",
-    "info": "Onyesha maelezo ya programu-jalizi iliyosakinishwa",
-    "search": "Tafuta programu-jalizi zinazopatikana katika sajili ya npm",
-    "update": "Sasisha programu-jalizi zilizosakinishwa",
-    "scaffold": "Unda kiolezo cha msingi cha programu-jalizi mpya"
   },
   "launch": {
     "description": "Zindua Claude Code ikielekezwa kwenye OmniRoute (ya ndani au ya mbali, kwa kutumia --profile)",

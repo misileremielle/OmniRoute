@@ -688,7 +688,7 @@ class ResponsesWsSession {
 
   // #8052: shared by ensureUpstream() (first turn — also owns socket creation) and
   // forwardClientMessage() (subsequent turns on a reused connection). Calls the internal
-  // "prepare" action — auth/policy/memory/reasoning-routing/compression — and refreshes
+  // "prepare" action — auth/policy/memory/compression — and refreshes
   // preparedContext, but never touches this.upstream/this.upstreamReady; the caller decides
   // whether a new upstream socket is needed.
   async runPrepare(message, responseBody) {
@@ -727,12 +727,6 @@ class ResponsesWsSession {
       provider: toStringOrNull(prepared.json?.provider) || "codex",
       model: toStringOrNull(prepared.json?.model) || toStringOrNull(responseBody.model),
       requestedModel: toStringOrNull(responseBody.model),
-      reasoningRouting:
-        prepared.json?.reasoningRouting &&
-        typeof prepared.json.reasoningRouting === "object" &&
-        !Array.isArray(prepared.json.reasoningRouting)
-          ? prepared.json.reasoningRouting
-          : null,
       serviceTier:
         toStringOrNull(responseBody.service_tier) || toStringOrNull(responseBody.serviceTier),
     };

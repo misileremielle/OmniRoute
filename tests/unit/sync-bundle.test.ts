@@ -87,7 +87,6 @@ test("config sync bundle is deterministic, strips auth settings, and ignores vol
   assert.equal(first.bundle.modelAliases["smart-default"], "openai/gpt-4o-mini");
   assert.equal(first.bundle.apiKeys[0].modelAccessMode, "restricted");
   assert.deepEqual(first.bundle.apiKeys[0].allowedModels, []);
-  assert.deepEqual(first.bundle.reasoningRoutingRules, []);
 
   await providersDb.updateProviderConnection((connection as any).id, {
     lastError: "temporary upstream failure",

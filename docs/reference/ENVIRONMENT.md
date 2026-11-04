@@ -43,7 +43,6 @@ lastUpdated: 2026-10-11
 - [22. Debugging](#22-debugging)
 - [23. GitHub Integration](#23-github-integration)
 - [24. Skills Sandbox (v3.8.0+)](#24-skills-sandbox-v380)
-- [27. Radar Feed (Self-Hosting)](#27-radar-feed-self-hosting)
 - [Deployment Scenarios](#deployment-scenarios)
 - [Audit: Removed / Dead Variables](#audit-removed--dead-variables)
 
@@ -1737,32 +1736,6 @@ that should be able to run the docs translator.
 | `OMNIROUTE_TRANSLATION_GOOGLE_CONCURRENCY` | `6` | `scripts/i18n/lib/google-translate.mjs` | Parallel Google requests shared by every locale of a run. |
 | `OMNIROUTE_TRANSLATION_GOOGLE_TIMEOUT_MS` | `30000` | `scripts/i18n/lib/google-translate.mjs` | Per-request timeout for the Google engine, in milliseconds. |
 | `UI_KIT_READ_TOKEN` | _(unset)_ | `scripts/check/check-ui-kit-upstream.mjs` | Read-only token for the private upstream UI kit repo, used by `npm run check:ui-kit-upstream` and the weekly "UI Kit upstream watch" workflow. Locally the check uses your git credentials. |
-
----
-
-## 27. Radar Feed (Self-Hosting)
-
-Optional add-on gated by the RADAR_ENABLED feature flag (default off — a feature
-flag toggled via Settings/DB, not an env var; see
-[docs/frameworks/RADAR.md](../frameworks/RADAR.md#flag-radar_enabled-default-off)).
-The first four variables below are optional overrides for a self-hosted or forked feed and
-supporter-key flows. The fifth, `RADAR_ADMIN_URL`, is a separate default-free link to the owner's
-private operations panel. See [docs/frameworks/RADAR.md](../frameworks/RADAR.md) for the full
-module doc and its
-[end-to-end activation and guided-setup sequence](../frameworks/RADAR.md#end-to-end-activation-and-guided-setup).
-
-The generic Home/Changelog announcement reader is not configured by an environment
-variable and does not depend on the RADAR_ENABLED feature flag. It reads the public repository
-`news.json` URL declared in `src/shared/utils/releaseNotes.ts` by
-GET only; dismissal IDs remain in browser local storage.
-
-| Variable                      | Default                                      | Source File                                                  | Description                                                                                                                                             |
-| ----------------------------- | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `RADAR_FEED_URL`              | `https://radar.omniroute.online`             | `src/lib/radar/{sync,referralsSync,offersSync,intelSync}.ts` | Base URL shared by the separately signed catalog, referrals, supporter-offers, and Intel feeds. Override to point at a self-hosted or forked service.   |
-| `RADAR_FEED_PUBKEY`           | _(pinned default key)_                       | `src/lib/radar/pinnedKeys.ts`                                | Ed25519 public key (base64-DER SPKI or PEM) used to verify feed signatures from a custom feed.                                                          |
-| `RADAR_CONTRIBUTOR_CLAIM_URL` | `https://radar.omniroute.online/auth/github` | `src/lib/radar/links.ts`                                     | URL the "I'm a contributor" dashboard button opens (GitHub OAuth supporter-key claim flow).                                                             |
-| `RADAR_SUPPORTER_PLANS_URL`   | `https://radar.omniroute.online/planos`      | `src/lib/radar/links.ts`                                     | URL the "Support the project" dashboard button opens (payment/plans page).                                                                              |
-| `RADAR_ADMIN_URL`             | _(unset)_                                    | `src/lib/radar/links.ts`                                     | Owner-only private operations-panel link. HTTPS is required except for an HTTP loopback SSH forward; unset or invalid values create no navigation item. |
 
 ---
 

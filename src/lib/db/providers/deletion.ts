@@ -18,7 +18,6 @@ import {
   removeConnectionIndex,
 } from "@omniroute/open-sse/services/apiKeyRotator.ts";
 import { invalidateDbCache } from "../readCache";
-import { invalidateReasoningRoutingRuleCache } from "../reasoningRoutingRules";
 import { bumpProxyConfigGeneration } from "../settings";
 import { deleteSyncedAvailableModelsForProvider } from "../models/syncedAvailableModelPersistence";
 import {
@@ -143,7 +142,6 @@ export async function deleteProviderConnection(id: string) {
   reorderConnections(db, providerId);
   backupDbFile("pre-write");
   invalidateDbCache("connections"); // Bust connections read cache
-  invalidateReasoningRoutingRuleCache();
   return true;
 }
 
@@ -192,7 +190,6 @@ export async function deleteProviderConnections(ids: string[]): Promise<number> 
 
   backupDbFile("pre-write");
   invalidateDbCache("connections");
-  invalidateReasoningRoutingRuleCache();
 
   return deletedCount;
 }
@@ -234,7 +231,6 @@ export async function deleteProviderConnectionsByProvider(providerId: string) {
   }
   backupDbFile("pre-write");
   invalidateDbCache("connections");
-  invalidateReasoningRoutingRuleCache();
   bumpProxyConfigGeneration();
   try {
     await deleteSyncedAvailableModelsForProvider(providerId);

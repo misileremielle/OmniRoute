@@ -9,7 +9,6 @@ import { Checkbox, CheckboxGroup } from "@omniroute/ui-kit/checkbox";
 import Input from "@/shared/components/Input";
 import { ENDPOINT_CATEGORIES } from "@/shared/constants/endpointCategories";
 import { toLocalDateTimeInputValue } from "@/app/(dashboard)/dashboard/api-manager/apiManagerPageUtils";
-import RoutingEntryLink from "@/shared/components/routing/RoutingEntryLink";
 import {
   MAX_KEY_NAME_LENGTH,
   type ApiKeyAccessData,
@@ -342,8 +341,6 @@ export default function GeneralTab({
       <TabErrorList errors={errors?.filter((message) => message !== nameError)} />
 
       <KeyNameField formState={formState} setName={setName} nameError={nameError} />
-
-      {apiKey?.id && <RoutingEntryLink apiKeyId={apiKey.id} />}
 
       <ExclusiveLeaseNotice apiKey={apiKey} />
       <KeyActiveToggle formState={formState} setIsActive={setIsActive} />

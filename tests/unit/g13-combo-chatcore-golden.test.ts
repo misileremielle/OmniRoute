@@ -121,7 +121,7 @@ function snapshotCombo(overrides: GoldenOverrides): Record<string, unknown> {
   });
   const connDisableMatrix = cartesian({
     status: [401, 408, 499, 502],
-    errorCode: [null, "client_disconnected", "plugin_block", "context_length_exceeded"],
+    errorCode: [null, "client_disconnected", "context_length_exceeded"],
     is401: [false, true],
     hasExtraKeys: [false, true],
     provider: ["openai", "codex"],

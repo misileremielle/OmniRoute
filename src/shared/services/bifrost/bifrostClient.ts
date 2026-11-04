@@ -1,5 +1,4 @@
 import { finalizeReadableStream } from "@/app/api/v1/relay/chat/completions/streamFinalizer";
-import { getProviderPluginManifestHeader } from "@omniroute/open-sse/config/providerPluginManifestUrl.ts";
 import { buildErrorBody, sanitizeErrorMessage } from "@omniroute/open-sse/utils/error.ts";
 import {
   stripSensitiveResponseHeaders,
@@ -25,10 +24,8 @@ function buildUpstreamHeaders(
   request: Request,
   config: BifrostRoutingConfig
 ): Record<string, string> {
-  const origin = new URL(request.url).origin;
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...getProviderPluginManifestHeader(origin),
   };
 
   // Anthropic-compatible endpoint (/v1/messages fast-path) needs the client's protocol headers.

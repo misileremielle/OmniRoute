@@ -89,7 +89,6 @@ export function applyClaudeClassifierReasoningDefault(
     outputConfig?.effort !== undefined ||
     templateKwargs?.thinking !== undefined ||
     templateKwargs?.enable_thinking !== undefined ||
-    body._omnirouteReasoningRule !== undefined ||
     (headerEffort !== undefined && EXPLICIT_EFFORT_HEADERS.has(headerEffort)) ||
     (headerThinking !== undefined && EXPLICIT_THINKING_HEADERS.has(headerThinking)) ||
     (typeof context.resolvedThinkingEffort === "string" &&

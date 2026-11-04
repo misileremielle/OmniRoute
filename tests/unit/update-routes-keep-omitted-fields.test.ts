@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 
 // Three update routes merged the parsed body over the stored row, and zod 4 filled every
-// omitted field with its creation default: a rename re-enabled a disabled reasoning rule,
+// omitted field with its creation default:
 // wiped a playground preset's params and reset a proxy's address family. A partial update
 // must only change what the client sent.
 
@@ -14,8 +14,6 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 process.env.API_KEY_SECRET = "test-secret";
 
 const core = await import("../../src/lib/db/core.ts");
-const rulesDb = await import("../../src/lib/db/reasoningRoutingRules.ts");
-const ruleRoute = await import("../../src/app/api/settings/reasoning-routing-rules/[id]/route.ts");
 const presetsDb = await import("../../src/lib/db/playgroundPresets.ts");
 const presetRoute = await import("../../src/app/api/playground/presets/[id]/route.ts");
 const proxiesDb = await import("../../src/lib/db/proxies.ts");
@@ -34,36 +32,6 @@ function jsonRequest(method: string, body: unknown) {
     body: JSON.stringify(body),
   });
 }
-
-test("renaming a disabled reasoning rule keeps it disabled and keeps its settings", async () => {
-  rulesDb.invalidateReasoningRoutingRuleCache();
-  const rule = await rulesDb.createReasoningRoutingRule({
-    name: "before",
-    description: "keep me",
-    scope: "global",
-    sourceEffort: "any",
-    requestTags: ["coding"],
-    tagMatchMode: "all",
-    effortMode: "inherit",
-    targetKind: "keep",
-    budgetAction: "preserve",
-    priority: 7,
-    enabled: false,
-  });
-
-  const response = await ruleRoute.PATCH(jsonRequest("PATCH", { name: "after" }), {
-    params: Promise.resolve({ id: rule.id }),
-  });
-
-  assert.equal(response.status, 200);
-  const stored = await rulesDb.getReasoningRoutingRuleById(rule.id);
-  assert.equal(stored?.name, "after");
-  assert.equal(stored?.enabled, false);
-  assert.equal(stored?.priority, 7);
-  assert.equal(stored?.description, "keep me");
-  assert.deepEqual(stored?.requestTags, ["coding"]);
-  assert.equal(stored?.tagMatchMode, "all");
-});
 
 test("renaming a playground preset keeps its params", async () => {
   const preset = presetsDb.createPlaygroundPreset({

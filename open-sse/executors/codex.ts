@@ -41,7 +41,6 @@ import { getAccessToken } from "../services/tokenRefresh.ts";
 import { isUnrecoverableRefreshError } from "../services/tokenRefresh/shared.ts";
 import { sanitizeCodexResponsesInput } from "../services/responsesInputSanitizer.ts";
 import { applyReasoningInputPolicy } from "../services/reasoningInputPolicy.ts";
-import { getForcedReasoningEffort } from "../utils/reasoningRuleContext.ts";
 import { normalizeCodexVerbosity } from "../services/codexVerbosity.ts";
 import { getThinkingBudgetConfig, ThinkingMode } from "../services/thinkingBudget.ts";
 import { CORS_HEADERS } from "../utils/cors.ts";
@@ -849,23 +848,6 @@ export class CodexExecutor extends BaseExecutor {
       requestInput.body
     );
     const nextInput = { ...requestInput, credentials };
-    const forcedEffort = getForcedReasoningEffort(credentials);
-    if (forcedEffort) {
-      const nextBody =
-        nextInput.body && typeof nextInput.body === "object"
-          ? (nextInput.body as Record<string, unknown>)
-          : {};
-      nextInput.body = {
-        ...nextBody,
-        reasoning: {
-          ...(nextBody.reasoning && typeof nextBody.reasoning === "object"
-            ? nextBody.reasoning
-            : {}),
-          effort: forcedEffort,
-        },
-      };
-    }
-
     if (isCodexAppServerRequired(nextInput.credentials)) {
       // The app-server adapter does not forward service tiers. Never silently
       // ignore an API-key override (especially a cost-controlling Standard mode).
@@ -1511,8 +1493,7 @@ export class CodexExecutor extends BaseExecutor {
       body,
       credentials.providerSpecificData?._omnirouteCodexThinking,
       allowConnectionReasoningDefaults ? requestDefaults.reasoningEffort : undefined,
-      allowConnectionReasoningDefaults,
-      getForcedReasoningEffort(credentials)
+      allowConnectionReasoningDefaults
     );
     // Native passthrough keeps the client's reasoning object as sent (a summary it did not
     // ask for is a rewrite); translated clients get summaries unless #18124 opted them out.

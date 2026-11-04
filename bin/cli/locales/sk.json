@@ -935,11 +935,6 @@
       "model": "Filtrovať podľa modelu"
     }
   },
-  "radar": {
-    "description": "Skontrolovať a synchronizovať lokálne kanály katalógu Radar",
-    "status": "Zobraziť lokálne nastavenia Radar a stav vyrovnávacej pamäte kanálov",
-    "sync": "Synchronizovať katalóg, odporúčania, ponuky a Intel prostredníctvom lokálneho servera"
-  },
   "resilience": {
     "description": "Skontrolovať a spravovať mechanizmy odolnosti",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Názov kombinácie, ktorá sa má použiť",
     "system": "Systémová výzva",
     "resume": "Pokračovať v uloženej relácii podľa názvu"
-  },
-  "plugin": {
-    "description": "Spravovať doplnky CLI (omniroute-cmd-*)",
-    "list": "Zobraziť nainštalované doplnky",
-    "install": "Nainštalovať doplnok z npm alebo lokálnej cesty",
-    "remove": "Odstrániť nainštalovaný doplnok",
-    "info": "Zobraziť podrobnosti o nainštalovanom doplnku",
-    "search": "Vyhľadať dostupné doplnky v registri npm",
-    "update": "Aktualizovať nainštalované doplnky",
-    "scaffold": "Vytvoriť základnú štruktúru nového doplnku"
   },
   "launch": {
     "description": "Spustiť Claude Code nasmerovaný na OmniRoute (lokálne alebo vzdialene, s --profile)",

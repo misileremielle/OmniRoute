@@ -6,9 +6,7 @@
  * Claude→OpenAI→Claude double translation was lossy and corrupted payloads at high context
  * (150+ msgs, 100+ tools; #1359). Claude Code sends well-formed Messages API payloads, so they are
  * trusted regardless of combo strategy or cache_control settings; only the Anthropic-specific
- * hygiene below is applied. Returns the body to dispatch. The reasoning-rule directive helper
- * (src/lib/reasoningRouting) is injected by the handler so this engine leaf takes no new
- * open-sse → src import edge.
+ * hygiene below is applied. Returns the body to dispatch.
  */
 
 import { shouldUseMidConversationSystem } from "../../executors/claudeIdentity.ts";
@@ -41,7 +39,6 @@ export function buildClaudePassthroughBody({
   targetFormat,
   preserveCacheControl,
   normalizeClaudeUpstreamMessages,
-  applyReasoningRuleDirective,
   log,
 }: {
   body: Record<string, unknown>;
@@ -55,17 +52,10 @@ export function buildClaudePassthroughBody({
     payload: Record<string, unknown>,
     options?: { preserveToolResultBlocks?: boolean }
   ) => void;
-  applyReasoningRuleDirective: (bodyInput: unknown, targetFormat?: "claude") => unknown;
   log?: LoggerLike;
 }): Record<string, unknown> {
-  // applyReasoningRuleDirective returns unknown; the hoist helper requires a record.
-  const claudePassthroughBody = applyReasoningRuleDirective({ ...body }, "claude");
   const translatedBody = hoistDeferredToolsForTarget(
-    claudePassthroughBody !== null &&
-      typeof claudePassthroughBody === "object" &&
-      !Array.isArray(claudePassthroughBody)
-      ? (claudePassthroughBody as Record<string, unknown>)
-      : { ...(body as Record<string, unknown>) },
+    { ...(body as Record<string, unknown>) },
     provider
   );
   translatedBody._disableToolPrefix = true;

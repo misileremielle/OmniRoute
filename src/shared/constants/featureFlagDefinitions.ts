@@ -554,18 +554,6 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     warningLevel: "caution",
   },
   {
-    key: "RADAR_ENABLED",
-    label: "Radar",
-    description:
-      "Enable the OmniRoute Radar module (catalog feed screens and sync). Off by default; enabling only unlocks the UI — data sync remains a separate opt-in.",
-    descriptionI18nKey: "featureFlagRadarEnabledDescription",
-    category: "policies",
-    defaultValue: "false",
-    type: "boolean",
-    requiresRestart: false,
-    warningLevel: "info",
-  },
-  {
     key: "MODEL_ENDPOINT_CAPABILITY_GATE_ENABLED",
     label: "Model Endpoint Capability Gate",
     description:

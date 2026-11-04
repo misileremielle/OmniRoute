@@ -55,11 +55,7 @@ if (!process.env.DATA_DIR) {
   });
 }
 
-// Plugin-dir guard: the plugin scanner (src/lib/plugins/scanner.ts) resolves its directory
-// from OMNIROUTE_PLUGINS_DIR, else from HOME, which would point every test process at the
-// developer's real ~/.omniroute/plugins (scanned, and loaded, by the chat pipeline). Keep it
-// under the isolated DATA_DIR unless the caller already chose a directory; a blank value
-// counts as unset, matching the scanner's own trim.
+// Subprocess fixtures assert this is set as their proof of running under this setup.
 process.env.OMNIROUTE_PLUGINS_DIR =
   process.env.OMNIROUTE_PLUGINS_DIR?.trim() || path.join(process.env.DATA_DIR!, "plugins");
 

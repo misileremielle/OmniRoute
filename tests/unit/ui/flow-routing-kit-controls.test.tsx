@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
 /**
  * RTL coverage for the shared flow/routing components moved onto the CI UI Kit (KEA-7886,
- * lote 6): ReorderControl (compact kit ghost icon buttons), RoutingEntryLink (kit outline
- * button link), ModelRoutingSection (kit Card header action, labelled kit fields, EmptyState,
- * axe on the open form).
+ * lote 6): ReorderControl (compact kit ghost icon buttons), ModelRoutingSection (kit Card
+ * header action, labelled kit fields, EmptyState, axe on the open form).
  */
 import React from "react";
 import axe from "axe-core";
@@ -11,7 +10,6 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import ReorderControl from "@/shared/components/ReorderControl";
-import RoutingEntryLink from "@/shared/components/routing/RoutingEntryLink";
 import ModelRoutingSection from "@/shared/components/ModelRoutingSection";
 import messages from "../../../src/i18n/messages/en.json";
 
@@ -64,15 +62,6 @@ describe("ReorderControl", () => {
     fireEvent.click(downBtn);
     expect(down).toHaveBeenCalledTimes(1);
     expect(up).not.toHaveBeenCalled();
-  });
-});
-
-describe("RoutingEntryLink", () => {
-  it("links to the key-scoped routing editor with the kit outline button look", () => {
-    wrap(<RoutingEntryLink apiKeyId="key 1" />);
-    const link = screen.getByRole("link", { name: messages.reasoningRouting.editor.configure });
-    expect(link.getAttribute("href")).toBe("/dashboard/api-manager/routing?apiKeyId=key%201");
-    expect(link.className).toContain("ci-button--outline");
   });
 });
 

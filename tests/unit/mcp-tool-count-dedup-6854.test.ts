@@ -17,8 +17,6 @@ const { skillTools } = await import("../../open-sse/mcp-server/tools/skillTools.
 const { agentSkillTools } = await import("../../open-sse/mcp-server/tools/agentSkillTools.ts");
 const { githubSkillTools } = await import("../../open-sse/mcp-server/tools/githubSkillTools.ts");
 const { poolTools } = await import("../../open-sse/mcp-server/tools/poolTools.ts");
-const { gamificationTools } = await import("../../open-sse/mcp-server/tools/gamificationTools.ts");
-const { pluginTools } = await import("../../open-sse/mcp-server/tools/pluginTools.ts");
 const { notionTools } = await import("../../open-sse/mcp-server/tools/notionTools.ts");
 const { obsidianTools } = await import("../../open-sse/mcp-server/tools/obsidianTools.ts");
 const { localCorpusTools } = await import("../../open-sse/mcp-server/tools/localCorpusTools.ts");
@@ -51,8 +49,6 @@ test("#6854: countUniqueMcpTools de-duplicates tools registered in multiple coll
     agentSkillTools: agentSkillTools as unknown as Record<string, NamedTool>,
     githubSkillTools: githubSkillTools as unknown as Record<string, NamedTool>,
     poolTools: poolTools as unknown as Record<string, NamedTool>,
-    gamificationTools: gamificationTools as unknown as NamedTool[],
-    pluginTools: pluginTools as unknown as NamedTool[],
     notionTools: notionTools as unknown as NamedTool[],
     obsidianTools: obsidianTools as unknown as NamedTool[],
     localCorpusTools: localCorpusTools as unknown as NamedTool[],

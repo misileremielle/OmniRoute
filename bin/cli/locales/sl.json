@@ -935,11 +935,6 @@
       "model": "Filtriraj po modelu"
     }
   },
-  "radar": {
-    "description": "Preglej in sinhroniziraj vire lokalnega kataloga Radar",
-    "status": "Prikaži lokalne nastavitve Radar in stanje predpomnilnika virov",
-    "sync": "Sinhroniziraj katalog, napotitve, ponudbe in Intel prek lokalnega strežnika"
-  },
   "resilience": {
     "description": "Preglej in upravljaj mehanizme odpornosti",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Ime kombinacije za uporabo",
     "system": "Sistemski poziv",
     "resume": "Nadaljuj shranjeno sejo po imenu"
-  },
-  "plugin": {
-    "description": "Upravljaj vtičnike CLI (omniroute-cmd-*)",
-    "list": "Prikaži seznam nameščenih vtičnikov",
-    "install": "Namesti vtičnik iz npm ali lokalne poti",
-    "remove": "Odstrani nameščeni vtičnik",
-    "info": "Prikaži podrobnosti o nameščenem vtičniku",
-    "search": "V registru npm poišči razpoložljive vtičnike",
-    "update": "Posodobi nameščene vtičnike",
-    "scaffold": "Ustvari osnovno ogrodje novega vtičnika"
   },
   "launch": {
     "description": "Zaženi Claude Code, usmerjen na OmniRoute (lokalno ali oddaljeno, z --profile)",

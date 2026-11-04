@@ -91,8 +91,6 @@ export {
   ccrStatsTool,
 } from "./tools.ts";
 
-export { radarCatalogInput, radarCatalogOutput, radarCatalogTool } from "./radarCatalog.ts";
-
 // Audit types
 export {
   type McpAuditEntry,

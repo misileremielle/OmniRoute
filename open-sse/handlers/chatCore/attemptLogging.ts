@@ -518,9 +518,7 @@ export function persistAttemptLogs(args: PersistAttemptLogsArgs, ctx: PersistAtt
     ? null
     : detailedLoggingEnabled
       ? (capturedPipeline ?? {})
-      : capturedPipeline?.routeDecision
-        ? { routeDecision: capturedPipeline.routeDecision }
-        : null;
+      : null;
 
   // The external keepalive buffer can contain error frames that quote a
   // transcript. Since this attempt omits the pipeline artifact, drop those

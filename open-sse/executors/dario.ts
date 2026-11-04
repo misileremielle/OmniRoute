@@ -32,7 +32,6 @@ import {
 } from "./base.ts";
 import { stripInternalBodyFields } from "../config/cliFingerprints.ts";
 import { HTTP_STATUS, FETCH_TIMEOUT_MS } from "../config/constants.ts";
-import { getProviderPluginManifestHeader } from "../config/providerPluginManifestUrl.ts";
 
 const DEFAULT_PORT = 3456;
 const DEFAULT_HOST = "127.0.0.1";
@@ -185,7 +184,6 @@ export class DarioExecutor extends BaseExecutor {
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      ...getProviderPluginManifestHeader(),
     };
 
     headers["Authorization"] = `Bearer ${key}`;

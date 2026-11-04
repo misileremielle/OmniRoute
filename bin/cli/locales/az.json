@@ -935,11 +935,6 @@
       "model": "Modelə görə filtrlə"
     }
   },
-  "radar": {
-    "description": "Lokal Radar kataloq lentlərini yoxla və sinxronlaşdır",
-    "status": "Lokal Radar parametrlərini və lent keşinin vəziyyətini göstər",
-    "sync": "Kataloqu, yönləndirmələri, təklifləri və Intel-i lokal server vasitəsilə sinxronlaşdır"
-  },
   "resilience": {
     "description": "Dayanıqlılıq mexanizmlərini yoxla və idarə et",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "İstifadə ediləcək kombinasiya adı",
     "system": "Sistem sorğusu",
     "resume": "Saxlanılmış sessiyanı adına görə davam etdirin"
-  },
-  "plugin": {
-    "description": "CLI plaginlərini idarə edin (omniroute-cmd-*)",
-    "list": "Quraşdırılmış plaginləri siyahıya alın",
-    "install": "npm-dən və ya lokal yoldan plagin quraşdırın",
-    "remove": "Quraşdırılmış plagini silin",
-    "info": "Quraşdırılmış plagin haqqında ətraflı məlumat göstərin",
-    "search": "Mövcud plaginlər üçün npm reyestrində axtarış aparın",
-    "update": "Quraşdırılmış plagin(lər)i yeniləyin",
-    "scaffold": "Yeni plagin üçün başlanğıc şablonu yaradın"
   },
   "launch": {
     "description": "OmniRoute-a yönləndirilmiş Claude Code-u işə salın (lokal və ya uzaqdan, --profile ilə)",

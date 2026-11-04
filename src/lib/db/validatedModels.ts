@@ -74,7 +74,6 @@ function readState(input: Pick<ValidationInput, "provider" | "connectionId" | "m
   );
   // Legacy compatible connections can reference a node type, not its concrete id.
   const nodes = db.prepare("SELECT * FROM provider_nodes ORDER BY id").all();
-  const plugins = db.prepare("SELECT * FROM plugins ORDER BY id").all();
   const settings = db
     .prepare(
       "SELECT namespace, key, value FROM key_value WHERE namespace IN ('settings', 'proxyConfig') ORDER BY namespace, key"
@@ -93,7 +92,7 @@ function readState(input: Pick<ValidationInput, "provider" | "connectionId" | "m
     );
   }
   const fingerprint = createHash("sha256")
-    .update(JSON.stringify({ stableConnection, nodes, settings, proxy, plugins }))
+    .update(JSON.stringify({ stableConnection, nodes, settings, proxy }))
     .digest("hex");
   return { fingerprint, models };
 }

@@ -935,11 +935,6 @@
       "model": "Filtrar por modelo"
     }
   },
-  "radar": {
-    "description": "Inspecionar e sincronizar os feeds do catálogo Radar local",
-    "status": "Mostrar as definições locais do Radar e o estado da cache dos feeds",
-    "sync": "Sincronizar catálogo, referências, ofertas e Intel através do servidor local"
-  },
   "resilience": {
     "description": "Inspecionar e gerir mecanismos de resiliência",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Nome da combinação a utilizar",
     "system": "Prompt de sistema",
     "resume": "Retomar uma sessão guardada pelo nome"
-  },
-  "plugin": {
-    "description": "Gerir plugins da CLI (omniroute-cmd-*)",
-    "list": "Listar plugins instalados",
-    "install": "Instalar um plugin a partir do npm ou de um caminho local",
-    "remove": "Remover um plugin instalado",
-    "info": "Mostrar detalhes de um plugin instalado",
-    "search": "Pesquisar plugins disponíveis no registo do npm",
-    "update": "Atualizar plugins instalados",
-    "scaffold": "Gerar a estrutura base de um novo plugin"
   },
   "launch": {
     "description": "Iniciar o Claude Code configurado para o OmniRoute (local ou remoto, com --profile)",

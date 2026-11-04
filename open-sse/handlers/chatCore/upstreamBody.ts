@@ -22,7 +22,6 @@ import { FORMATS } from "../../translator/formats.ts";
 import { stripInternalBodyFields } from "../../config/cliFingerprints.ts";
 import { readBodyReasoningEffort } from "../../executors/base/reasoningEffort.ts";
 import { sanitizeRequestForResolvedTarget } from "../../services/targetRequestSanitizer.ts";
-import { getForcedReasoningEffort } from "../../utils/reasoningRuleContext.ts";
 import { resolveReasoningControl } from "../../utils/reasoningControl.ts";
 import { normalizeThinkingForModel } from "@/shared/constants/modelSpecs.ts";
 import {
@@ -79,7 +78,6 @@ function applyConfiguredReasoningControl(
   body: Body,
   provider: string | null | undefined,
   targetFormat: string,
-  credentials: CredentialsLike,
   reasoningControl: "chat-template" | "openai"
 ): { body: Body; requiresNativeOff: boolean } {
   if (
@@ -92,10 +90,8 @@ function applyConfiguredReasoningControl(
     return { body, requiresNativeOff: false };
   }
 
-  const forcedEffort = getForcedReasoningEffort(credentials);
-  const requestedEffort = readBodyReasoningEffort(body);
-  const effectiveEffort = (forcedEffort ?? requestedEffort)?.trim().toLowerCase();
-  if (!forcedEffort && effectiveEffort !== "none") {
+  const effectiveEffort = readBodyReasoningEffort(body)?.trim().toLowerCase();
+  if (effectiveEffort !== "none") {
     return { body, requiresNativeOff: false };
   }
 
@@ -104,7 +100,7 @@ function applyConfiguredReasoningControl(
     rawTemplateKwargs && typeof rawTemplateKwargs === "object" && !Array.isArray(rawTemplateKwargs)
       ? (rawTemplateKwargs as Body)
       : null;
-  if (rawTemplateKwargs !== undefined && !templateKwargs && !forcedEffort) {
+  if (rawTemplateKwargs !== undefined && !templateKwargs) {
     const error = new Error(
       'chat_template_kwargs must be an object when reasoningControl is "chat-template"'
     ) as Error & { statusCode: number; errorType: string };
@@ -113,13 +109,9 @@ function applyConfiguredReasoningControl(
     throw error;
   }
 
-  const thinkingEnabled = effectiveEffort !== "none";
-  const nextTemplateKwargs = forcedEffort
-    ? { ...(templateKwargs ?? {}), thinking: thinkingEnabled, enable_thinking: thinkingEnabled }
-    : { thinking: false, enable_thinking: false, ...(templateKwargs ?? {}) };
+  const nextTemplateKwargs = { thinking: false, enable_thinking: false, ...(templateKwargs ?? {}) };
 
   const next: Body = { ...body, chat_template_kwargs: nextTemplateKwargs };
-  if (effectiveEffort !== "none") return { body: next, requiresNativeOff: false };
 
   delete next.reasoning_effort;
   if (next.reasoning && typeof next.reasoning === "object" && !Array.isArray(next.reasoning)) {
@@ -138,10 +130,8 @@ function applyConfiguredReasoningControl(
     if (Object.keys(outputConfig).length === 0) delete next.output_config;
     else next.output_config = outputConfig;
   }
-  const requiresNativeOff = Boolean(
-    forcedEffort === "none" ||
-    (nextTemplateKwargs.thinking !== true && nextTemplateKwargs.enable_thinking !== true)
-  );
+  const requiresNativeOff =
+    nextTemplateKwargs.thinking !== true && nextTemplateKwargs.enable_thinking !== true;
   return { body: next, requiresNativeOff };
 }
 
@@ -475,7 +465,6 @@ export async function prepareUpstreamBody(opts: PrepareUpstreamBodyOptions): Pro
     bodyToSend,
     provider,
     targetFormat,
-    credentials,
     finalReasoningControl
   );
   bodyToSend = reasoningControlResult.body;

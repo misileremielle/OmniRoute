@@ -209,8 +209,7 @@ export function replaceRedactedAdvisorResults<T>(body: T): { body: T; replaced: 
 /** Immutably drop request fields Groq rejects with a 400. */
 export function stripGroqUnsupportedFields<T extends Record<string, unknown>>(
   body: T,
-  model?: string,
-  forcedEffort?: string
+  model?: string
 ): T {
   if (!body || typeof body !== "object") return body;
   const next: Record<string, unknown> = { ...body };
@@ -219,7 +218,6 @@ export function stripGroqUnsupportedFields<T extends Record<string, unknown>>(
   delete next.top_logprobs;
   // Groq Chat Completions accepts reasoning_effort, not the other protocol envelopes.
   const requestedEffort =
-    forcedEffort ??
     next.reasoning_effort ??
     (next.reasoning as Record<string, unknown> | undefined)?.effort ??
     (next.output_config as Record<string, unknown> | undefined)?.effort;

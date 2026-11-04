@@ -935,11 +935,6 @@
       "model": "Filteren op model"
     }
   },
-  "radar": {
-    "description": "Lokale Radar-catalogusfeeds inspecteren en synchroniseren",
-    "status": "Lokale Radar-instellingen en cachestatus van feeds tonen",
-    "sync": "Catalogus, verwijzingen, aanbiedingen en Intel synchroniseren via de lokale server"
-  },
   "resilience": {
     "description": "Veerkrachtmechanismen inspecteren en beheren",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Te gebruiken combinatienaam",
     "system": "Systeemprompt",
     "resume": "Hervat een opgeslagen sessie op naam"
-  },
-  "plugin": {
-    "description": "Beheer CLI-plug-ins (omniroute-cmd-*)",
-    "list": "Geef geïnstalleerde plug-ins weer",
-    "install": "Installeer een plug-in vanuit npm of een lokaal pad",
-    "remove": "Verwijder een geïnstalleerde plug-in",
-    "info": "Toon details van een geïnstalleerde plug-in",
-    "search": "Doorzoek het npm-register naar beschikbare plug-ins",
-    "update": "Werk geïnstalleerde plug-in(s) bij",
-    "scaffold": "Genereer de basisstructuur voor een nieuwe plug-in"
   },
   "launch": {
     "description": "Start Claude Code, gericht op OmniRoute (lokaal of extern, met --profile)",

@@ -235,7 +235,6 @@ PUBLIC_API_ROUTES_EXACT = new Set([
   "/api/sync/bundle",
   "/api/cli/connect",
   "/api/usage/om-usage",
-  "/api/skills/collect/chaos",
 ]);
 
 // Read-only single routes that also take the CORS origin relaxation.

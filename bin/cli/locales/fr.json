@@ -935,11 +935,6 @@
       "model": "Filtrer par modèle"
     }
   },
-  "radar": {
-    "description": "Inspecter et synchroniser les flux du catalogue Radar local",
-    "status": "Afficher les paramètres Radar locaux et l’état du cache des flux",
-    "sync": "Synchroniser le catalogue, les parrainages, les offres et Intel via le serveur local"
-  },
   "resilience": {
     "description": "Inspecter et gérer les mécanismes de résilience",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Nom du combo à utiliser",
     "system": "Prompt système",
     "resume": "Reprendre une session enregistrée par son nom"
-  },
-  "plugin": {
-    "description": "Gérer les plugins CLI (omniroute-cmd-*)",
-    "list": "Répertorier les plugins installés",
-    "install": "Installer un plugin depuis npm ou un chemin local",
-    "remove": "Supprimer un plugin installé",
-    "info": "Afficher les détails d’un plugin installé",
-    "search": "Rechercher les plugins disponibles dans le registre npm",
-    "update": "Mettre à jour les plugins installés",
-    "scaffold": "Générer la structure de base d’un nouveau plugin"
   },
   "launch": {
     "description": "Lancer Claude Code en le connectant à OmniRoute (local ou distant, avec --profile)",

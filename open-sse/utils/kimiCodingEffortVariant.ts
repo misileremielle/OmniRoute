@@ -1,13 +1,12 @@
 /**
- * Kimi Coding effort-variant splitter (#16985), shared by the chatCore dispatch strip
- * (handlers/chatCore/kimiCodingEffortVariant.ts) and reasoning-rule intent matching
- * (src/lib/reasoningRouting/policy.ts) so both agree on what is a variant.
+ * Kimi Coding effort-variant splitter (#16985), used by the chatCore dispatch strip
+ * (handlers/chatCore/kimiCodingEffortVariant.ts).
  *
  * Scoped to `kimi-coding` / `kimi-coding-apikey`. A suffix is stripped only when the id
  * is not itself a registry id and the remaining base is a registry id or a spec alias
  * of one (`kimi-k3` → wire `k3`). Cursor's genuine `kimi-k3-high` never qualifies: it
  * belongs to another provider. A bare spec alias has `effort: null`: dispatch can still
- * normalize its wire id, while reasoning intent must not infer an effort suffix.
+ * normalize its wire id.
  */
 
 import { getProviderModels } from "../config/providerModels.ts";

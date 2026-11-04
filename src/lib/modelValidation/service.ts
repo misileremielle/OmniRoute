@@ -3,8 +3,6 @@ import { createValidationSnapshot, commitValidatedModel } from "../db/validatedM
 import { ModelValidationError, type ValidationInput } from "./http";
 import { proofFailed, deadline, abortable, type ProofMessage } from "./proofs";
 import { createProofRunner, type ProofRunner } from "./runner";
-import { createValidationPluginFence } from "./pluginFence";
-import { withPluginExecutionGuard } from "../plugins/executionGuard";
 
 const TOOL_NAME = "omniroute_validation_echo";
 const activeConnections = new Set<string>();
@@ -90,17 +88,13 @@ export async function validateAndAddModel(input: ValidationInput, clientSignal: 
   const signal = operation.signal;
   try {
     signal.throwIfAborted();
-    const pluginFence = createValidationPluginFence();
-    pluginFence.assertIdle();
     const snapshot = createValidationSnapshot(input);
     await abortable(
-      withPluginExecutionGuard(pluginFence, async () =>
-        runProofs(await abortable(createProofRunner(input, snapshot, signal), signal))
-      ),
+      (async () =>
+        runProofs(await abortable(createProofRunner(input, snapshot, signal), signal)))(),
       signal
     );
     signal.throwIfAborted();
-    pluginFence.assertIdle();
     const validation = {
       id: randomUUID(),
       status: "passed",

@@ -935,11 +935,6 @@
       "model": "Filtrar skont il-mudell"
     }
   },
-  "radar": {
-    "description": "Ispezzjona u sunkronizza l-alimentazzjonijiet tal-katalgu Radar lokali",
-    "status": "Uri l-istatus tal-settings lokali u l-cache tal-alimentazzjonijiet",
-    "sync": "Sınkraniżizza katalgu, referenzi, offerti, u Intel permezz tal-server lokali"
-  },
   "resilience": {
     "description": "Ispezzjona u immaniġġa l-mekkaniżmi tal-resiljenza",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Isem tal-combo biex tuża",
     "system": "Prompt tas-sistema",
     "resume": "Kompli sessjoni ssejvjata bl-isem"
-  },
-  "plugin": {
-    "description": "Immaniġġja l-plugins tal-CLI (omniroute-cmd-*)",
-    "list": "Elenca l-plugins installati",
-    "install": "Installa plugin minn npm jew minn path lokali",
-    "remove": "Neħħi plugin installat",
-    "info": "Uri d-dettalji ta' plugin installat",
-    "search": "Fittex fir-reġistru npm għal plugins disponibbli",
-    "update": "Aġġorna l-plugins installati",
-    "scaffold": "Oħloq boilerplate ta' plugin ġdid"
   },
   "launch": {
     "description": "Ibbda Claude Code indirizzat lejn OmniRoute (lokali jew remot, b'--profile)",

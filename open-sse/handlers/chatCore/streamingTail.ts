@@ -36,10 +36,8 @@ import { hasActiveClaudeThinking } from "../../utils/thinkingBudget.ts";
 import { buildCacheUsageLogMeta } from "./cacheUsageMeta.ts";
 import { recordContextEditingTelemetryHook } from "./contextEditingTelemetry.ts";
 import { readCpaAuthIndex } from "./failureUsage.ts";
-import { emitRequestGamificationEvent } from "./gamificationEvent.ts";
 import { maybeConvertJsonBodyToSse } from "./jsonBodyToSse.ts";
 import { mergeResponseToolNameMap } from "./passthroughToolNames.ts";
-import { runPluginOnResponseHook, runPluginOnStreamCompleteHook } from "./pluginOnResponse.ts";
 import { wrapReadableStreamWithFinalize } from "./streamFinalize.ts";
 import { buildStreamLedgerDetails, recordStreamingCost } from "./streamingCost.ts";
 import { assembleStreamingPipeline, resolvePiiGate } from "./streamingPipeline.ts";
@@ -612,20 +610,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
       log,
       videoTranscriptSensitive: videoBridgeObserved,
     });
-
-    // Plugin onStreamComplete hook — fire-and-forget, fail-open (#9571)
-    // Pass traceId as requestId so plugins can correlate the stream-completion event
-    // with the originating request (the same id used for onRequest/onResponse). (#11825)
-    runPluginOnStreamCompleteHook({
-      status: normalizedStreamStatus,
-      usage: streamUsage as Record<string, unknown> | undefined,
-      ttft,
-      model,
-      provider,
-      errorCode: streamErrorCode,
-      startTime,
-      requestId: traceId,
-    });
   };
 
   const streamFailureFinalizers = streamFailure.createStreamFailureFinalizers({
@@ -823,20 +807,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     ),
   });
   const clientFacingStream = wrapReadableStreamWithFinalize(finalStream, releaseTurnExecution);
-
-  // ── Gamification event (fire-and-forget) ──
-  await emitRequestGamificationEvent({ apiKeyId: apiKeyInfo?.id, model, provider });
-
-  // ── Plugin onResponse hook (fire-and-forget) ──
-  await runPluginOnResponseHook({
-    requestId: traceId,
-    body,
-    model,
-    provider,
-    apiKeyInfo,
-    headers: clientRawRequest?.headers,
-    response: { status: 200, streamed: true },
-  });
 
   const response = inheritEmptyTurnPolicy(
     providerResponse,

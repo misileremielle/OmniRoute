@@ -935,11 +935,6 @@
       "model": "Tace ta model"
     }
   },
-  "radar": {
-    "description": "Bincika kuma daidaita feeds na katalogin Radar na cikin gida",
-    "status": "Nuna saitunan Radar na cikin gida da matsayin cache na feed",
-    "sync": "Daidaita katalogi, referrals, offers, da Intel ta hanyar sabar cikin gida"
-  },
   "resilience": {
     "description": "Bincika kuma sarrafa hanyoyin jure matsala",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Sunan combo da za a yi amfani da shi",
     "system": "Umarnin tsarin",
     "resume": "Ci gaba da zaman da aka adana ta sunansa"
-  },
-  "plugin": {
-    "description": "Sarrafa plugins na CLI (omniroute-cmd-*)",
-    "list": "Jera plugins da aka shigar",
-    "install": "Shigar da plugin daga npm ko hanyar fayil ta gida",
-    "remove": "Cire plugin da aka shigar",
-    "info": "Nuna cikakkun bayanai na plugin da aka shigar",
-    "search": "Bincika rajistar npm don plugins da ake da su",
-    "update": "Sabunta plugin(s) da aka shigar",
-    "scaffold": "Ƙirƙiri samfurin farko na sabon plugin"
   },
   "launch": {
     "description": "Ƙaddamar da Claude Code da aka nuna masa OmniRoute (na gida ko na nesa, tare da --profile)",

@@ -63,13 +63,6 @@ const PUBLIC_API_ROUTES_EXACT = new Set([
   // and the allowUsageCommand flag — it must not be gated by management auth.
   // EXACT: the sibling `/api/usage/[connectionId]` has no auth of its own.
   "/api/usage/om-usage",
-  // Chaos Mode external dispatch endpoint (POST /api/skills/collect/chaos).
-  // This entry only bypasses the dashboard requireLogin (cookie) gate — the
-  // handler enforces its own Bearer-token auth (validateApiKey +
-  // chaosModeEnabled check) before doing any work. See src/app/api/skills/
-  // collect/chaos/route.ts. Do not widen it to other /api/skills/collect/*
-  // routes without the same per-handler auth.
-  "/api/skills/collect/chaos",
 ]);
 
 // Read-only single routes that ALSO take the CORS origin relaxation: they

@@ -5,7 +5,7 @@
  * modular compression pipeline (settings → strategy selection → applyCompressionAsync →
  * compression_analytics/compression_engine_breakdown writes) before dispatching upstream. The
  * Codex Responses WebSocket bridge (`prepare()` in ./route.ts) never called any of that — it
- * authenticated, injected memory, applied reasoning-routing, then went straight to
+ * authenticated, injected memory, then went straight to
  * `executor.transformRequest()`.
  *
  * This module wires the same core pipeline (settings resolution, mode selection via

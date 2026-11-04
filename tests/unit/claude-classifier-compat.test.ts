@@ -267,13 +267,6 @@ test("ordinary requests and explicit classifier reasoning controls stay unchange
     { reasoning_effort: "high" },
     { output_config: { effort: "high" } },
     { chat_template_kwargs: { enable_thinking: true, custom_flag: "kept" } },
-    {
-      _omnirouteReasoningRule: {
-        id: "force-high",
-        effortMode: "force",
-        targetEffort: "high",
-      },
-    },
   ]) {
     const body = { ...structuredClone(CLASSIFIER_BODY), ...explicit };
     assert.equal(applyClaudeClassifierReasoningDefault!(FORMATS.CLAUDE, body), body);

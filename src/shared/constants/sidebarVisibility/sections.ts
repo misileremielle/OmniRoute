@@ -474,21 +474,6 @@ const COSTS_ITEMS: readonly SidebarItemDefinition[] = [
     subtitleKey: "costsFreeTiersSubtitle",
     icon: "request_quote",
   },
-  {
-    id: "free-provider-rankings",
-    href: "/dashboard/free-provider-rankings",
-    i18nKey: "freeProviderRankings",
-    subtitleKey: "freeProviderRankingsSubtitle",
-    icon: "leaderboard",
-  },
-  {
-    id: "radar",
-    href: "/dashboard/radar",
-    i18nKey: "radar",
-    subtitleKey: "radarSubtitle",
-    icon: "radar",
-    featureFlagKey: "RADAR_ENABLED",
-  },
 ];
 
 const AUDIT_GROUP: SidebarItemGroup = {
@@ -546,62 +531,7 @@ const MCP_ITEM: SidebarItemDefinition = {
   icon: "hub",
 };
 
-const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
-  {
-    id: "chaos-config",
-    href: "/dashboard/chaos",
-    i18nKey: "chaosConfig",
-    labelFallback: "Chaos Mode",
-    subtitleKey: "chaosConfigSubtitle",
-    subtitleFallback: "Multi-model parallel execution",
-    icon: "blender",
-  },
-  MCP_ITEM,
-  {
-    id: "plugins",
-    href: "/dashboard/plugins",
-    i18nKey: "plugins",
-    subtitleKey: "pluginsSubtitle",
-    icon: "extension",
-  },
-];
-
-const GAMIFICATION_GROUP: SidebarItemGroup = {
-  type: "group",
-  id: "gamification",
-  titleKey: "gamificationGroup",
-  titleFallback: "Gamification",
-  items: [
-    {
-      id: "leaderboard",
-      href: "/dashboard/leaderboard",
-      i18nKey: "leaderboard",
-      subtitleKey: "leaderboardSubtitle",
-      icon: "emoji_events",
-    },
-    {
-      id: "profile",
-      href: "/dashboard/profile",
-      i18nKey: "profile",
-      subtitleKey: "profileSubtitle",
-      icon: "person",
-    },
-    {
-      id: "tokens",
-      href: "/dashboard/tokens",
-      i18nKey: "tokens",
-      subtitleKey: "tokensSubtitle",
-      icon: "toll",
-    },
-    {
-      id: "gamification-admin",
-      href: "/dashboard/gamification/admin",
-      i18nKey: "gamificationAdmin",
-      subtitleKey: "gamificationAdminSubtitle",
-      icon: "admin_panel_settings",
-    },
-  ],
-};
+const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [MCP_ITEM];
 
 const OTHER_FEATURES_ITEMS: readonly SidebarItemDefinition[] = [
   {
@@ -806,7 +736,7 @@ export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
     id: "other-features",
     titleKey: "otherFeaturesSection",
     titleFallback: "Other Features",
-    children: [GAMIFICATION_GROUP, ...OTHER_FEATURES_ITEMS, BATCH_GROUP],
+    children: [...OTHER_FEATURES_ITEMS, BATCH_GROUP],
   },
   {
     id: "configuration",

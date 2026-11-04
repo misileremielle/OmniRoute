@@ -27,7 +27,7 @@
 //       novos não falham — apenas são reportados — para não bloquear adições legítimas.
 //
 //   (4) MCP TOOLS — todos os tools registrados em createMcpServer() (base MCP_TOOLS +
-//       gamificationTools + pluginTools + notionTools + obsidianTools) DEVEM ter ao menos um escopo atribuído (scope-enforcement). Os
+//       notionTools + obsidianTools) must each have an assigned scope.
 //       nomes são congelados em KNOWN_MCP_TOOL_NAMES. Catraca: tool removido = fail.
 //       Tool novo = report (não bloqueia adições legítimas).
 //
@@ -274,9 +274,7 @@ export function findNewMcpTools(frozen: readonly string[], live: Set<string>): s
  * the reason in the commit message.
  *
  * Sources:
- *   - MCP_TOOLS (31 base tools: omniroute_* + compression)
- *   - gamificationTools (8): gamification_*
- *   - pluginTools (8): plugin_*
+ *   - MCP_TOOLS (base tools: omniroute_* + compression)
  *   - notionTools (6): notion_*
  *   - obsidianTools (22): obsidian_*
  * compressionTools are included in MCP_TOOLS.
@@ -314,24 +312,6 @@ export const KNOWN_MCP_TOOL_NAMES: readonly string[] = [
   "omniroute_oneproxy_fetch",
   "omniroute_oneproxy_rotate",
   "omniroute_oneproxy_stats",
-  // gamificationTools (8)
-  "gamification_leaderboard",
-  "gamification_rank",
-  "gamification_profile",
-  "gamification_badges",
-  "gamification_transfer",
-  "gamification_invite",
-  "gamification_servers",
-  "gamification_anomalies",
-  // pluginTools (8)
-  "plugin_list",
-  "plugin_install",
-  "plugin_activate",
-  "plugin_deactivate",
-  "plugin_uninstall",
-  "plugin_configure",
-  "plugin_executions",
-  "plugin_scan",
   // notionTools (6)
   "notion_search",
   "notion_get_page",
@@ -485,17 +465,12 @@ async function main(): Promise<void> {
 
   // ── (4) MCP tools scope + snapshot ───────────────────────────────────────
   const { MCP_TOOLS } = await import("@omniroute/open-sse/mcp-server/schemas/tools.ts");
-  const { gamificationTools } =
-    await import("@omniroute/open-sse/mcp-server/tools/gamificationTools.ts");
-  const { pluginTools } = await import("@omniroute/open-sse/mcp-server/tools/pluginTools.ts");
   const { notionTools } = await import("@omniroute/open-sse/mcp-server/tools/notionTools.ts");
   const { obsidianTools } = await import("@omniroute/open-sse/mcp-server/tools/obsidianTools.ts");
 
   // Build the full live set of registered tools (compressionTools are already in MCP_TOOLS).
   const liveMcpTools: McpToolLike[] = [
     ...(MCP_TOOLS as unknown as McpToolLike[]),
-    ...(gamificationTools as unknown as McpToolLike[]),
-    ...(pluginTools as unknown as McpToolLike[]),
     ...(notionTools as unknown as McpToolLike[]),
     ...(obsidianTools as unknown as McpToolLike[]),
   ];

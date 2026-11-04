@@ -70,7 +70,6 @@ headless mode too.
 | `embed-ws-proxy`            | WebSocket proxy for embedded service UIs                               |
 | `conductor-bridge`          | Mirrors OmniConductor hub tasks into A2A (opt-in, `CONDUCTOR_HUB_URL`) |
 | `arena-elo-sync`            | Arena ELO leaderboard sync for the Free Provider Rankings page         |
-| `radar-sync`                | Radar daily feed sync (opt-in)                                         |
 | `pricing-sync`              | External pricing data sync (opt-in, `PRICING_SYNC_ENABLED`)            |
 | `openrouter-provider-stats` | Provider directory / popularity enrichment for the dashboard           |
 | `models-dev-sync`           | models.dev capability sync (opt-in in settings)                        |
@@ -179,7 +178,7 @@ After building and starting with a persistent data directory:
   `/api/*` management routes keep their normal authorization tiers, so the `omniroute` CLI
   (and remote mode) keep working. It is not a security boundary — keep using
   `REQUIRE_API_KEY` and a loopback bind (`OMNIROUTE_SERVER_HOST`) where appropriate.
-- **Route-loaded features still load on demand.** MCP, A2A, evals, gamification, webhooks and
+- **Route-loaded features still load on demand.** MCP, A2A, evals and
   cloud agents have no boot-time init; they start lazily when their routes are called, in both
   modes.
 - **Memory stays on.** Memory is cross-cutting to the request pipeline (`/v1` injects and

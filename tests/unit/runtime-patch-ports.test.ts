@@ -70,11 +70,6 @@ test("request translation failures log the stack without exposing it", async () 
   const error = new Error("bad tool schema");
   const result = await buildRequestTranslationErrorResult({
     error,
-    traceId: "t1",
-    body: {},
-    model: "m",
-    provider: "p",
-    apiKeyInfo: null,
     log: { warn: (_tag: string, message: string) => warnings.push(message) },
   });
   assert.match(warnings.join("\n"), /Request translation failed: .*\n.*at /s);

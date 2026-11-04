@@ -1232,6 +1232,495 @@
     "tests/unit/windows-cert-identity-7275.test.ts": {
       "sourceRemoved": ["src/mitm/cert/install.ts"],
       "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/reasoning-routing-pipeline.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts",
+        "src/sse/handlers/reasoningRouting.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/integration/reasoning-routing-reliability.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts",
+        "src/sse/handlers/reasoningRouting.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/dashboard/reasoning-routing-efforts.test.ts": {
+      "sourceRemoved": ["src/shared/reasoning/reasoningRoutingEfforts.ts"],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/luna-reasoning-effort-400.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/reasoning-routing-api.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/settings/reasoning-routing-rules/route.ts",
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/reasoning-routing-codex-extended-effort.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/reasoning-routing-decision-guards.test.ts": {
+      "sourceRemoved": ["src/sse/handlers/reasoningRouting.ts"],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/reasoning-routing.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts",
+        "src/sse/handlers/reasoningRouting.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/api-key-routing-editor.test.tsx": {
+      "sourceRemoved": [
+        "src/shared/components/ReasoningRoutingRules.tsx",
+        "src/app/(dashboard)/dashboard/api-manager/routing/page.tsx"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/badge-sse-aborted-signal-13103.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/characterization-gamification.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/chatcore-gamification-event.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/db-cleanup-xp-audit-log.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/db-gamification-federation-3500.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification-admin-sidebar-i18n.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification-display-contract.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/action-count-durable-12546.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/aggregate-profile-3484.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/anti-cheat-invalid-amount.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/antiCheat.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/badge-criteria-recovery-16195.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/badge-rank-criteria.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/badge-unlock-once-3472.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/badges.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/db-gamification.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/early-adopter-utc.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/events.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/federation-auth.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/invite-max-uses.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/invites.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/leaderboard-limit-validation.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/leaderboard-route-names.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/leaderboard-stream-cleanup.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/leaderboard.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/level-route-streak.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/malformed-json-400.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/sharing.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/streak-badge-xp.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/streak-concurrent-advance.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/streak-day-counts.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/streaks.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/transfer-history-order.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/transfer-validation-16198.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/xp-progress-inputs-16202.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/xp.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/gamification/zero-reward-leaderboard-16200.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/radar-supporter-gamification.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/gamification-admin-page.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/leaderboard-api-key-names.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-accessibility-semantics.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-badge-dialog.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-hidden-badge-confidentiality.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-locked-badge-contrast.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-streak.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/profile-xp-locale.test.tsx": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "tests/unit/usage-history-reset-token-ledger.test.ts": {
+      "sourceRemoved": ["src/lib/gamification/index.ts", "src/lib/db/gamification.ts"],
+      "reason": "Gamification removed (refactor: remove gamification): src/lib/gamification, src/lib/db/gamification.ts, /api/gamification/**, the leaderboard/profile/tokens/gamification dashboard pages, the chat-path request event and the MCP gamification tools no longer exist, so there is no code left to test."
+    },
+    "open-sse/mcp-server/__tests__/radarCatalogTool.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/e2e/radar-guided-setup.spec.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/cli-radar-commands.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/dashboard/radar-catalog-table-limits-training.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/free-tier-summary-radar-overlay.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/free-verdict-no-radar-resolution.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/provider-header-referral-link.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-admin-sidebar.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-admin-sidebar.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-api-routes.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-apply-feed.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-auto-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-bounded-bytes.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-catalog-capabilities.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-claim-buttons.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-combo-suggestions.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-combos-page.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-db.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-export.test.mjs": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-feed-cache-generated-at.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-feed-eligibility-gate.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-flag-default.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-guided-setup-action.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-inertia.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-intel-db.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-intel-page.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-intel-routes.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-intel-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-key-input.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-links.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-local-state-db.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-local-state-route.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-local-state-ui.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-localized-feed.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-accessor.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-contract.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-db.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-page.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-routes.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-offers-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-optin-page.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-optin-rules-copy.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-page-state.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-referrals-page-tab.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-referrals-route.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-referrals-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-referrals.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-scheduler.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-setup-connections.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-supporter-key-format.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-sync-request.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-sync-response-limit.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/radar-sync.test.ts": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/ui/free-provider-rankings-page-authtype-6915.test.tsx": {
+      "sourceRemoved": ["src/app/(dashboard)/dashboard/free-provider-rankings/page.tsx"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/ui/free-provider-rankings-page-usage.test.tsx": {
+      "sourceRemoved": ["src/app/(dashboard)/dashboard/free-provider-rankings/page.tsx"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/ui/providerPageHeaderPartnerLink.test.tsx": {
+      "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
+      "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/chaos-api-routes.test.ts": {
+      "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
+      "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
+    },
+    "tests/unit/chaos-config.test.ts": {
+      "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
+      "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
+    },
+    "tests/unit/chaos-executor.test.ts": {
+      "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
+      "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
+    },
+    "tests/unit/chaos-malformed-json-400.test.ts": {
+      "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
+      "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -1299,5 +1788,22 @@
   "tests/unit/materialize-bundled-symlinks.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (syncRebuiltNativeModuleIntoHashedEntries(), the Electron-ABI rebuild helper deleted with prepare-electron-standalone.mjs); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
   "tests/unit/optional-packs.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (electron/main.js prepending installed pack dirs to the server NODE_PATH); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
   "tests/unit/select-impacted-tests.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (an electron/ path classification case); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
-  "tests/unit/ui/header-kit.test.tsx": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (the macOS Electron title-bar safe-area inset); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened."
+  "tests/unit/ui/header-kit.test.tsx": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (the macOS Electron title-bar safe-area inset); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
+  "tests/unit/backup-export-portability-16527.test.mjs": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (reasoning-routing-rules.json in the export archive); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/chatcore-reasoning-control.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (force-mode reasoning rule directives and withReasoningRuleContext()); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/codex-ws-policy-enforcement-6564.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (reasoning rules on the Codex WS bridge); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/effort-thinking-standardization-6241.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (extractReasoningIntent() over normalized bodies); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/hidden-model-dispatch.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (a rule redirecting to a hidden model); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/kimi-effort-suffix-split.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (extractReasoningIntent() suffix parsing); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/release-green-docs-drift-7253.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the deleted REASONING_ROUTING.md page); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/sync-bundle.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the reasoningRoutingRules bundle field); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/ui/flow-routing-kit-controls.test.tsx": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the RoutingEntryLink component); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/update-routes-keep-omitted-fields.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (PATCH of a reasoning rule); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/telemetry-auto-cleanup-6848.test.ts": "Gamification removal (refactor: remove gamification): the removed asserts pinned cleanupXpAuditLog() and the xpAuditLog retention key; that source no longer exists. The other telemetry cleanups keep their asserts.",
+  "tests/unit/db/migration-163.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts read the row back through src/lib/db/radar.ts, which no longer exists. The migration itself is kept and its schema assert stays.",
+  "tests/unit/news-feed-contract.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned the radar-launch news item, which no longer exists. The feed-schema and banner asserts stay.",
+  "tests/unit/settings-cas-7784.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned radarAdminUrl exposure on GET /api/settings; that source no longer exists. The settings CAS asserts are unchanged.",
+  "tests/unit/sidebar-costs-section.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned the radar item, its RADAR_ENABLED gate and isSidebarItemVisibleForFlags(); that source no longer exists.",
+  "tests/unit/internal-management-auth-16593.test.ts": "Chaos Mode removal (refactor: remove Chaos Mode): the removed asserts pinned dashboard Chaos Mode dispatch auth; that source no longer exists. auto/chaos and config.chaos stay and keep their own tests.",
+  "tests/unit/open-mode-management-credential-mint.test.ts": "Chaos Mode removal (refactor: remove Chaos Mode): the removed asserts pinned the chaosModeEnabled key field; that source no longer exists. auto/chaos and config.chaos stay and keep their own tests."
 }

@@ -49,7 +49,6 @@ test("sibling paths shadowed by an exact route are NOT public", () => {
     "/api/cli/connect-token",
     "/api/usage/om-usage-x",
     "/api/usage/om-usageZZZ",
-    "/api/skills/collect/chaos-report",
     "/api/health/pings",
     "/api/monitoring/health-detail",
     "/api/settings/require-login-policy",

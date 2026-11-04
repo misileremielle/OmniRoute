@@ -3,7 +3,7 @@
  *
  * Tests the proxy pipeline wiring: format detection, credential retry loop,
  * circuit breaker integration, and the new Phase 2 modules (DI container,
- * prompt versioning, plugin architecture, eval cleanup).
+ * prompt versioning, eval cleanup).
  *
  * @module tests/integration/proxy-pipeline.test.ts
  */
@@ -234,123 +234,6 @@ describe("DI Container — container.ts", () => {
     assert.equal(container.resolve("testOverwrite"), "v1");
     container.register("testOverwrite", () => "v2");
     assert.equal(container.resolve("testOverwrite"), "v2");
-  });
-});
-
-// ═══════════════════════════════════════════════════
-// 3. Plugin Architecture (L-8) — hooks.ts registry
-// ═══════════════════════════════════════════════════
-
-describe("Plugin Architecture — plugins/hooks.ts", () => {
-  let hooks;
-
-  beforeEach(async () => {
-    hooks = await import("../../src/lib/plugins/hooks.ts");
-    hooks.resetHooks();
-  });
-
-  afterEach(() => {
-    hooks.resetHooks();
-  });
-
-  it("should register hooks for events", () => {
-    hooks.registerHook("onRequest", "test-logger", () => {}, 10);
-    const list = hooks.getHooks("onRequest");
-    assert.equal(list.length, 1);
-    assert.equal(list[0].pluginName, "test-logger");
-    assert.equal(list[0].priority, 10);
-  });
-
-  it("should sort hooks by priority", () => {
-    hooks.registerHook("onRequest", "low", () => {}, 200);
-    hooks.registerHook("onRequest", "high", () => {}, 1);
-    hooks.registerHook("onRequest", "mid", () => {}, 50);
-
-    const list = hooks.getHooks("onRequest");
-    assert.deepEqual(
-      list.map((r) => r.pluginName),
-      ["high", "mid", "low"]
-    );
-  });
-
-  it("should run onRequest hooks in priority order", async () => {
-    const order = [];
-    hooks.registerHook(
-      "onRequest",
-      "first",
-      () => {
-        order.push("first");
-      },
-      1
-    );
-    hooks.registerHook(
-      "onRequest",
-      "second",
-      () => {
-        order.push("second");
-      },
-      2
-    );
-
-    const ctx = { requestId: "r1", body: {}, model: "test", metadata: {} };
-    await hooks.runOnRequest(ctx);
-    assert.deepEqual(order, ["first", "second"]);
-  });
-
-  it("should support request blocking via emitHookBlocking", async () => {
-    hooks.registerHook(
-      "onRequest",
-      "blocker",
-      () => ({
-        blocked: true,
-        response: { error: "denied" },
-      }),
-      1
-    );
-    hooks.registerHook(
-      "onRequest",
-      "never-runs",
-      () => {
-        throw new Error("should not run");
-      },
-      2
-    );
-
-    const ctx = { requestId: "r2", body: {}, model: "test", metadata: {} };
-    const result = await hooks.emitHookBlocking("onRequest", ctx);
-    assert.equal(result.blocked, true);
-    assert.deepEqual(result.response, { error: "denied" });
-  });
-
-  it("should unregister all hooks for a plugin", () => {
-    hooks.registerHook("onRequest", "removable", () => {});
-    hooks.registerHook("onResponse", "removable", () => {});
-    assert.equal(hooks.getHooks("onRequest").length, 1);
-    hooks.unregisterHooks("removable");
-    assert.equal(hooks.getHooks("onRequest").length, 0);
-    assert.equal(hooks.getHooks("onResponse").length, 0);
-  });
-
-  it("should run onResponse hooks", async () => {
-    hooks.registerHook("onResponse", "response-modifier", (payload) => ({
-      response: { ...payload.response, modified: true },
-    }));
-
-    const ctx = { requestId: "r3", body: {}, model: "test", metadata: {} };
-    const result = await hooks.runOnResponse(ctx, { data: "original" });
-    assert.equal(result.modified, true);
-    assert.equal(result.data, "original");
-  });
-
-  it("should fire onError hooks", async () => {
-    let caught = false;
-    hooks.registerHook("onError", "error-handler", () => {
-      caught = true;
-    });
-
-    const ctx = { requestId: "r4", body: {}, model: "test", metadata: {} };
-    await hooks.runOnError(ctx, new Error("test error"));
-    assert.equal(caught, true);
   });
 });
 

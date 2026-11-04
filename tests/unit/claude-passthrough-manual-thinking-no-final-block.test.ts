@@ -39,7 +39,6 @@ function build(body: Record<string, unknown>) {
     targetFormat: "claude",
     preserveCacheControl: true,
     normalizeClaudeUpstreamMessages: () => {},
-    applyReasoningRuleDirective: (b) => b,
     log: null,
   }) as { thinking?: unknown; messages: Array<{ role: string; content: Array<{ type: string }> }> };
 }

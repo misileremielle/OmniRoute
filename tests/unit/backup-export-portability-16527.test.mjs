@@ -110,7 +110,6 @@ test(
       });
       assert.match(listing, /storage\.sqlite/);
       assert.match(listing, /metadata\.json/);
-      assert.match(listing, /reasoning-routing-rules\.json/);
       assert.deepEqual(fs.readdirSync(colonTemp), []);
     } finally {
       process.chdir(previousCwd);

@@ -935,11 +935,6 @@
       "model": "Tapis mengikut model"
     }
   },
-  "radar": {
-    "description": "Periksa dan segerakkan suapan katalog Radar setempat",
-    "status": "Tunjukkan tetapan Radar setempat dan status cache suapan",
-    "sync": "Segerakkan katalog, rujukan, tawaran dan Intel melalui pelayan setempat"
-  },
   "resilience": {
     "description": "Periksa dan urus mekanisme daya tahan",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Nama kombo untuk digunakan",
     "system": "Gesaan sistem",
     "resume": "Sambung semula sesi tersimpan mengikut nama"
-  },
-  "plugin": {
-    "description": "Urus pemalam CLI (omniroute-cmd-*)",
-    "list": "Senaraikan pemalam yang dipasang",
-    "install": "Pasang pemalam daripada npm atau laluan setempat",
-    "remove": "Alih keluar pemalam yang dipasang",
-    "info": "Tunjukkan butiran pemalam yang dipasang",
-    "search": "Cari pendaftaran npm untuk pemalam yang tersedia",
-    "update": "Kemas kini pemalam yang dipasang",
-    "scaffold": "Jana rangka asas pemalam baharu"
   },
   "launch": {
     "description": "Lancarkan Claude Code yang diarahkan ke OmniRoute (setempat atau jauh, dengan --profile)",

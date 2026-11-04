@@ -935,11 +935,6 @@
       "model": "モデルで絞り込む"
     }
   },
-  "radar": {
-    "description": "ローカルのRadarカタログフィードを確認して同期",
-    "status": "ローカルのRadar設定とフィードキャッシュの状態を表示",
-    "sync": "ローカルサーバー経由でカタログ、紹介、オファー、Intelを同期"
-  },
   "resilience": {
     "description": "レジリエンス機構を確認・管理",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "使用するコンボ名",
     "system": "システムプロンプト",
     "resume": "名前を指定して保存済みセッションを再開"
-  },
-  "plugin": {
-    "description": "CLIプラグイン（omniroute-cmd-*）を管理",
-    "list": "インストール済みプラグインを一覧表示",
-    "install": "npmまたはローカルパスからプラグインをインストール",
-    "remove": "インストール済みプラグインを削除",
-    "info": "インストール済みプラグインの詳細を表示",
-    "search": "利用可能なプラグインをnpmレジストリで検索",
-    "update": "インストール済みプラグインを更新",
-    "scaffold": "新しいプラグインのボイラープレートを生成"
   },
   "launch": {
     "description": "OmniRouteを参照するClaude Codeを起動（ローカルまたはリモート、--profile対応）",

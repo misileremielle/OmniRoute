@@ -31,15 +31,6 @@ export const { acquireTurnExecution, getTurnExecutionSnapshot } =
   await import("../../../open-sse/handlers/chatCore/turnExecutionGuard.ts");
 export const { clearGeminiThoughtSignatures } =
   await import("../../../open-sse/services/geminiThoughtSignatureStore.ts");
-// Request events run in the background; preload their imports so fixture writes drain before teardown.
-await Promise.all([
-  import("../../../src/lib/gamification/events.ts"),
-  import("../../../src/lib/gamification/antiCheat.ts"),
-  import("../../../src/lib/gamification/streaks.ts"),
-  import("../../../src/lib/gamification/leaderboard.ts"),
-  import("../../../src/lib/gamification/notifications.ts"),
-  import("../../../src/lib/db/gamification.ts"),
-]);
 
 export function captureOwner(id: string) {
   return "capturePendingRequestOwner" in history ? history.capturePendingRequestOwner(id) : id;

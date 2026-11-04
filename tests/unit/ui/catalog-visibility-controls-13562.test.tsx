@@ -36,7 +36,6 @@ vi.mock("@/app/(dashboard)/dashboard/settings/components/BackgroundDegradationTa
   default: () => null,
 }));
 vi.mock("@/shared/components/ModelRoutingSection", () => ({ default: () => null }));
-vi.mock("@/shared/components/routing/RoutingEntryLink", () => ({ default: () => null }));
 
 const { default: SettingsRoutingPage } =
   await import("@/app/(dashboard)/dashboard/settings/routing/page");

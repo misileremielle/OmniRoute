@@ -935,11 +935,6 @@
       "model": "Filtrēt pēc modeļa"
     }
   },
-  "radar": {
-    "description": "Pārbaudīt un sinhronizēt lokālos Radar katalogu plūsmas",
-    "status": "Rādīt lokālos Radar iestatījumus un plūsmas kešatmiņas statusu",
-    "sync": "Sinhronizēt katalogu, ieteikumus, piedāvājumus un Intel caur lokālo serveri"
-  },
   "resilience": {
     "description": "Pārbaudīt un pārvaldīt noturības mehānismus",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Lietojamā kombo nosaukums",
     "system": "Sistēmas mudinājums",
     "resume": "Turpināt saglabātu sesiju pēc nosaukuma"
-  },
-  "plugin": {
-    "description": "Pārvaldīt CLI spraudņus (omniroute-cmd-*)",
-    "list": "Uzskaitīt instalētos spraudņus",
-    "install": "Instalēt spraudni no npm vai lokālā ceļa",
-    "remove": "Izņemt instalētu spraudni",
-    "info": "Rādīt datus par instalētu spraudni",
-    "search": "Meklēt npm reģistrā pieejamos spraudņus",
-    "update": "Atjaunināt instalēto(s) spraudni(s)",
-    "scaffold": "Izveidot jauna spraudņa veidni"
   },
   "launch": {
     "description": "Palaist Claude Code, norādot uz OmniRoute (vietējo vai attālinātu, ar --profile)",

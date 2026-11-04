@@ -30,7 +30,7 @@ Simple guides for using OmniRoute — no technical background needed.
 - [USER_GUIDE.md](guides/USER_GUIDE.md) — daily usage of the dashboard and API.
 - [THINKING_BUDGET.md](guides/THINKING_BUDGET.md) — thinking/reasoning budget modes (passthrough vs auto-strip).
 - [FEATURES.md](guides/FEATURES.md) — dashboard feature gallery.
-- [CHAOS-MODE.md](guides/CHAOS-MODE.md) — multi-model parallel/collaborative execution (setup, permissions, API).
+- [CHAOS-MODE.md](guides/CHAOS-MODE.md) — `auto/chaos` parallel fan-out.
 - [TIERS.md](guides/TIERS.md) — OmniRoute tiers explained (user guide).
 - [USAGE_QUOTA_GUIDE.md](guides/USAGE_QUOTA_GUIDE.md) — usage, quota & spend tracking.
 - [COST_TRACKING.md](guides/COST_TRACKING.md) — cost and spend tracking.
@@ -106,7 +106,6 @@ Pluggable subsystems exposed to clients, agents, and operators.
 - [MEMORY.md](frameworks/MEMORY.md) — persistent memory (FTS5 + Qdrant).
 - [WEBHOOKS.md](frameworks/WEBHOOKS.md) — webhook events and dispatch.
 - [EVALS.md](frameworks/EVALS.md) — eval suites.
-- [GAMIFICATION.md](frameworks/GAMIFICATION.md) — gamification & leaderboard system.
 - [EMBEDDED-SERVICES.md](frameworks/EMBEDDED-SERVICES.md) — embedded sidecar services (9Router, CLIProxyAPI).
 - [NOTION_CONTEXT.md](frameworks/NOTION_CONTEXT.md) — Notion context source.
 - [OBSIDIAN_CONTEXT.md](frameworks/OBSIDIAN_CONTEXT.md) — Obsidian context source.
@@ -118,7 +117,6 @@ Pluggable subsystems exposed to clients, agents, and operators.
 - [PLUGINS.md](frameworks/PLUGINS.md) — CLI plugin system overview.
 - [PLUGIN_SDK.md](frameworks/PLUGIN_SDK.md) — plugin SDK reference.
 - [PLUGIN_MARKETPLACE.md](frameworks/PLUGIN_MARKETPLACE.md) — plugin marketplace.
-- [RADAR.md](frameworks/RADAR.md) — Radar free-model catalog overlay (optional, off by default).
 
 ## routing/
 
@@ -127,7 +125,6 @@ Combo routing, scoring, and replay.
 - [AUTO-COMBO.md](routing/AUTO-COMBO.md) — Auto-Combo (multi-factor scoring, 20 strategies).
 - [QUOTA_SHARE.md](routing/QUOTA_SHARE.md) — quota sharing engine.
 - [REASONING_REPLAY.md](routing/REASONING_REPLAY.md) — reasoning replay cache.
-- [REASONING_ROUTING.md](routing/REASONING_ROUTING.md) — reasoning routing rules (effort/budget rule engine).
 
 ## security/
 

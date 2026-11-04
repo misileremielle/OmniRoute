@@ -935,11 +935,6 @@
       "model": "Modele göre filtrele"
     }
   },
-  "radar": {
-    "description": "Yerel Radar katalog akışlarını incele ve senkronize et",
-    "status": "Yerel Radar ayarlarını ve akış önbelleği durumunu göster",
-    "sync": "Kataloğu, yönlendirmeleri, teklifleri ve Intel'i yerel sunucu üzerinden senkronize et"
-  },
   "resilience": {
     "description": "Dayanıklılık mekanizmalarını incele ve yönet",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Kullanılacak kombinasyon adı",
     "system": "Sistem istemi",
     "resume": "Kaydedilmiş bir oturumu adına göre sürdür"
-  },
-  "plugin": {
-    "description": "CLI eklentilerini (omniroute-cmd-*) yönet",
-    "list": "Yüklü eklentileri listele",
-    "install": "npm'den veya yerel yoldan bir eklenti yükle",
-    "remove": "Yüklü bir eklentiyi kaldır",
-    "info": "Yüklü bir eklentinin ayrıntılarını göster",
-    "search": "Kullanılabilir eklentiler için npm kayıt defterinde ara",
-    "update": "Yüklü eklentileri güncelle",
-    "scaffold": "Yeni bir eklenti için başlangıç şablonu oluştur"
   },
   "launch": {
     "description": "OmniRoute'u hedefleyen Claude Code'u başlat (yerel veya uzak, --profile ile)",

@@ -72,7 +72,6 @@ const LEGACY_FLAT_KEYS: {
     usageHistory: ["usageHistory"],
     domainCostHistory: ["domainCostHistory"],
     compressionCacheStats: ["compressionCacheStats"],
-    xpAuditLog: ["xpAuditLog"],
     compressionRunTelemetry: ["compressionRunTelemetry"],
     autoCleanupEnabled: ["autoCleanupEnabled"],
   },

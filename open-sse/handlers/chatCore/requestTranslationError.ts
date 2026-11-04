@@ -19,33 +19,11 @@ type ThrownLike = { statusCode?: unknown; message?: unknown; errorType?: unknown
 
 export async function buildRequestTranslationErrorResult({
   error,
-  traceId,
-  body,
-  model,
-  provider,
-  apiKeyInfo,
   log,
 }: {
   error: unknown;
-  traceId: string;
-  body: unknown;
-  model: string;
-  provider: string;
-  apiKeyInfo: unknown;
   log?: LoggerLike;
 }): Promise<ReturnType<typeof createTranslationFailureResult>> {
-  // ── Plugin onError hook ──
-  try {
-    const { runOnError } = await import("@/lib/plugins/hooks");
-    await runOnError(
-      { requestId: traceId, body, model, provider, apiKeyInfo, metadata: {} },
-      error instanceof Error ? error : new Error(String(error))
-    );
-  } catch (pluginErr) {
-    const pluginErrorMessage = sanitizeErrorMessage(pluginErr) || "Plugin onError hook failed";
-    log?.debug?.("PLUGIN", `onError hook error (non-fatal): ${pluginErrorMessage}`);
-  }
-
   const thrown = error as ThrownLike;
   let parsedStatus = Number.NaN;
   try {

@@ -935,11 +935,6 @@
       "model": "Szűrés modell szerint"
     }
   },
-  "radar": {
-    "description": "A helyi Radar-katalógusforrások vizsgálata és szinkronizálása",
-    "status": "A helyi Radar-beállítások és a forrásgyorsítótár állapotának megjelenítése",
-    "sync": "A katalógus, az ajánlások, az ajánlatok és az Intel szinkronizálása a helyi szerveren keresztül"
-  },
   "resilience": {
     "description": "Ellenálló képességi mechanizmusok vizsgálata és kezelése",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Használandó kombináció neve",
     "system": "Rendszerüzenet",
     "resume": "Mentett munkamenet folytatása név alapján"
-  },
-  "plugin": {
-    "description": "CLI-bővítmények kezelése (omniroute-cmd-*)",
-    "list": "Telepített bővítmények listázása",
-    "install": "Bővítmény telepítése npm-csomagból vagy helyi elérési útról",
-    "remove": "Telepített bővítmény eltávolítása",
-    "info": "Telepített bővítmény részleteinek megjelenítése",
-    "search": "Elérhető bővítmények keresése az npm-jegyzékben",
-    "update": "Telepített bővítmény(ek) frissítése",
-    "scaffold": "Új bővítmény sablonjának létrehozása"
   },
   "launch": {
     "description": "A Claude Code indítása az OmniRoute használatával (helyileg vagy távolról, --profile kapcsolóval)",

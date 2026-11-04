@@ -46,7 +46,6 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/cli-tools/whycodes-settings", // GET probes the `whycodes` binary via getCliRuntimeStatus()
   "/api/services/", // T-10: can run npm install + spawn node processes
   "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #17)
-  "/api/plugins/", // plugins: load/execute via worker_threads + child_process (Hard Rules #15 + #17)
   "/api/local/", // T-12: 1-click local service launchers (Redis today) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17)
   "/api/skills/collect/", // Chaos Mode dispatch prefix — must never be whitelistable via manage-scope bypass
   "/api/headroom/start", // spawns headroom-ai python CLI — must never be bypassable (Hard Rules #15 + #17)

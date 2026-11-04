@@ -3,7 +3,6 @@
  * JSON request body.
  *
  * Before the fix, both handlers called `await request.json()` on a raw body:
- *   - PUT /api/plugins/[name]/config had no try/catch → unhandled 500.
  *   - POST /api/model-combo-mappings parsed inside the outer try whose catch
  *     returns a generic 500.
  * A malformed body must instead surface as a clean 400 with the standard error
@@ -38,7 +37,6 @@ const core = await import("../../src/lib/db/core.ts");
 const combosDb = await import("../../src/lib/db/combos.ts");
 
 // Import routes AFTER env vars are set
-const pluginConfigRoute = await import("../../src/app/api/plugins/[name]/config/route.ts");
 const modelComboRoute = await import("../../src/app/api/model-combo-mappings/route.ts");
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -75,41 +73,6 @@ test.after(() => {
 
   if (ORIGINAL_INITIAL_PASSWORD === undefined) delete process.env.INITIAL_PASSWORD;
   else process.env.INITIAL_PASSWORD = ORIGINAL_INITIAL_PASSWORD;
-});
-
-// ═════════════════════════════════════════════════════════════════════════════
-// PUT /api/plugins/[name]/config
-// ═════════════════════════════════════════════════════════════════════════════
-
-test("PUT /api/plugins/[name]/config — malformed JSON body returns 400 (was 500)", async () => {
-  const req = malformedJsonRequest("http://localhost/api/plugins/demo/config", "PUT");
-  const res = await pluginConfigRoute.PUT(req, {
-    params: Promise.resolve({ name: "demo" }),
-  });
-
-  assert.equal(res.status, 400, "malformed JSON must yield 400, not an unhandled 500");
-  const body = (await res.json()) as { error?: { message?: string } };
-  assert.ok(body.error, "response must carry a structured error envelope");
-  assert.equal(typeof body.error.message, "string");
-  // Hard rule #12: no stack trace leaked in the error message.
-  assert.ok(!body.error.message?.includes("at /"), "error message must not leak a stack trace");
-});
-
-test("PUT /api/plugins/[name]/config — valid body does NOT 400 on parse (404 for unknown plugin)", async () => {
-  // Well-formed body against a plugin that does not exist: the handler must get
-  // PAST body parsing/validation and reach the not-found branch (404) — proving
-  // the happy path is unregressed.
-  const req = jsonRequest(
-    "http://localhost/api/plugins/does-not-exist/config",
-    { config: { foo: "bar" } },
-    "PUT"
-  );
-  const res = await pluginConfigRoute.PUT(req, {
-    params: Promise.resolve({ name: "does-not-exist" }),
-  });
-
-  assert.notEqual(res.status, 400, "a well-formed body must not be rejected as invalid JSON");
-  assert.equal(res.status, 404, "unknown plugin should surface as 404, past the parse guard");
 });
 
 // ═════════════════════════════════════════════════════════════════════════════

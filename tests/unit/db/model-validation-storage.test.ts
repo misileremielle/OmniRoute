@@ -6,7 +6,6 @@ import {
   updateProviderConnection,
 } from "../../../src/lib/db/providers.ts";
 import { getCustomModels } from "../../../src/lib/db/models.ts";
-import { insertPlugin, deletePlugin } from "../../../src/lib/db/plugins.ts";
 import {
   createValidationSnapshot,
   commitValidatedModel,
@@ -64,39 +63,4 @@ test("commit reads back metadata and refuses duplicate insertion or expired evid
     "proof-receipt"
   );
   assert.throws(() => commitValidatedModel(snapshot, input, {}), /already exists/);
-});
-
-test("plugin configuration mutation invalidates transactional evidence", async () => {
-  const connection = await createProviderConnection({
-    provider: "openai",
-    authType: "apikey",
-    apiKey: "fake-plugin-config",
-    isActive: true,
-  });
-  const input = {
-    provider: "openai",
-    modelId: "plugin-config-proof",
-    connectionId: connection.id,
-    allowInference: true as const,
-    apiFormat: "chat-completions" as const,
-  };
-  const snapshot = createValidationSnapshot(input);
-  insertPlugin({
-    id: "changed-plugin",
-    name: "changed-plugin",
-    version: "1.0.0",
-    main: "absent.js",
-    pluginDir: "/nonexistent-validation-fixture",
-    manifest: {},
-    status: "inactive",
-  });
-  try {
-    assert.throws(() => commitValidatedModel(snapshot, input, {}), /changed|unavailable/);
-    assert.equal(
-      (await getCustomModels("openai")).some((model) => model.id === input.modelId),
-      false
-    );
-  } finally {
-    deletePlugin("changed-plugin");
-  }
 });

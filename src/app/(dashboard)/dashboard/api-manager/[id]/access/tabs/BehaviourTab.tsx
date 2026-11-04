@@ -6,7 +6,6 @@ import Toggle from "@/shared/components/Toggle";
 
 import { useTranslations } from "next-intl";
 import { ApiKeyCompressionToggle } from "@/app/(dashboard)/dashboard/api-manager/components/ApiKeyCompressionToggle";
-import { ChaosModeAccessToggle } from "@/app/(dashboard)/dashboard/api-manager/components/ChaosModeAccessToggle";
 import { BypassProviderQuotaToggle } from "@/app/(dashboard)/dashboard/api-manager/components/BypassProviderQuotaToggle";
 import type { ApiKeyAccessFormState, StreamDefaultMode } from "../useApiKeyAccessForm";
 import TabErrorList from "./TabErrorList";
@@ -17,7 +16,6 @@ interface BehaviourTabProps {
   setAutoResolve: (enabled: boolean) => void;
   setStreamDefaultMode: (mode: StreamDefaultMode) => void;
   setCompressionEnabled: (enabled: boolean) => void;
-  setChaosModeEnabled: (enabled: boolean) => void;
   setAllowUsageCommand: (enabled: boolean) => void;
   setBypassProviderQuotaPolicyEnabled: (enabled: boolean) => void;
   errors?: string[];
@@ -114,7 +112,6 @@ export default function BehaviourTab({
   setAutoResolve,
   setStreamDefaultMode,
   setCompressionEnabled,
-  setChaosModeEnabled,
   setAllowUsageCommand,
   setBypassProviderQuotaPolicyEnabled,
   errors,
@@ -141,12 +138,6 @@ export default function BehaviourTab({
       <ApiKeyCompressionToggle
         enabled={formState.compressionEnabled}
         onToggle={() => setCompressionEnabled(!formState.compressionEnabled)}
-      />
-
-      {/* Chaos Mode Access Toggle */}
-      <ChaosModeAccessToggle
-        enabled={formState.chaosModeEnabled}
-        onToggle={() => setChaosModeEnabled(!formState.chaosModeEnabled)}
       />
 
       {/* Local Usage Command Toggle */}

@@ -200,7 +200,6 @@ const directRootInstalls = [
   ["nightly-resilience", "k6-soak"],
   ["nightly-resilience", "a11y"],
   ["nightly-schemathesis", "schemathesis"],
-  ["radar-export", "publish-export"],
 ] as const;
 
 function installEnvironment(workflow: Workflow, jobName: string, step: InstallStep) {

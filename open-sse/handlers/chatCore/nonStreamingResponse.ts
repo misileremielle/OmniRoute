@@ -103,7 +103,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     echoModelInObject,
     effectiveModel,
     effectiveServiceTier: _effectiveServiceTier,
-    emitRequestGamificationEvent,
     endpointPath,
     executeProviderRequest,
     executeRefreshCredentials,
@@ -159,7 +158,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     reportMalformed200,
     reqLogger,
     resolveReportedServiceTier,
-    runPluginOnResponseHook,
     sanitizeErrorMessage,
     sanitizeUpstreamDetails,
     saveIdempotency,
@@ -1005,9 +1003,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     });
     // === /Quota Share POST-hook ===
 
-    // ── Gamification event (fire-and-forget) ──
-    await emitRequestGamificationEvent({ apiKeyId: apiKeyInfo?.id, model, provider });
-
     finalizePendingScope(pendingScope, {
       providerResponse: responseBody,
       clientResponse: translatedResponse,
@@ -1033,20 +1028,6 @@ export async function runNonStreamingResponse(deps: NonStreamingDeps) {
     if (responseModel) echoModelInObject(translatedResponse, responseModel);
     // #1311: echo the requested alias/combo name in the non-streaming response model.
     if (echoModel) echoModelInObject(translatedResponse, echoModel);
-
-    // ── Plugin onResponse hook (fire-and-forget) ──
-    // #8395: the streaming branch below already calls this; the non-streaming
-    // (stream:false) branch returned without it, so onResponse never fired for
-    // non-streaming requests at all.
-    await runPluginOnResponseHook({
-      requestId: traceId,
-      body,
-      model,
-      provider,
-      apiKeyInfo,
-      headers: clientRawRequest?.headers,
-      response: { status: 200, data: translatedResponse },
-    });
 
     // Routing event (feedback foundation) — fire-and-forget, cheap.
     void emitRoutingEvent(

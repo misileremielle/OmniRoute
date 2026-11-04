@@ -935,11 +935,6 @@
       "model": "按模型筛选"
     }
   },
-  "radar": {
-    "description": "检查并同步本地 Radar 目录订阅源",
-    "status": "显示本地 Radar 设置和订阅源缓存状态",
-    "sync": "通过本地服务器同步目录、推荐、优惠和 Intel"
-  },
   "resilience": {
     "description": "检查和管理弹性机制",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "要使用的组合名称",
     "system": "系统提示",
     "resume": "按名称恢复保存的会话"
-  },
-  "plugin": {
-    "description": "管理 CLI 插件（omniroute-cmd-*）",
-    "list": "列出已安装的插件",
-    "install": "从 npm 或本地路径安装插件",
-    "remove": "删除已安装的插件",
-    "info": "显示已安装插件的详情",
-    "search": "搜索 npm 注册表中的可用插件",
-    "update": "更新已安装的插件",
-    "scaffold": "搭建新的插件模板"
   },
   "launch": {
     "description": "启动指向 OmniRoute 的 Claude Code（本地或远程，使用 --profile）",

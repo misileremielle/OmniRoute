@@ -31,7 +31,6 @@ import { scopeGeminiThoughtSignatureNamespace } from "../services/geminiThoughtS
 import { extractResponsesWebSearchEvidence } from "./response/openai-responses/pureHelpers.ts";
 import { hasThinkingConfig, normalizeThinkingConfig } from "../services/provider.ts";
 import { applyThinkingBudget } from "../services/thinkingBudget.ts";
-import { applyReasoningRuleDirective } from "@/lib/reasoningRouting/policy";
 import { getModelPreserveVideoUrl } from "@/lib/db/models/modelPreserveVideoUrl";
 import { getResolvedModelCapabilities, supportsReasoning } from "../services/modelCapabilities.ts";
 import { normalizeRoles, resolvePreserveDeveloperRole } from "../services/roleNormalizer.ts";
@@ -401,9 +400,6 @@ export function translateRequest(
 
   // Phase 2: Apply thinking budget control before normalization
   result = applyThinkingBudget(result);
-  // Explicit reasoning-routing policies are final. The marker is internal and is
-  // consumed here before any provider translation can see it.
-  result = applyReasoningRuleDirective(result);
 
   // Normalize thinking config: remove if lastMessage is not user
   normalizeThinkingConfig(result);

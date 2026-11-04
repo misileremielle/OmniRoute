@@ -935,11 +935,6 @@
       "model": "Scag de réir samhla"
     }
   },
-  "radar": {
-    "description": "Déan iniúch agus sioncronaigh na beathaí áitiúla de chatalog Radar",
-    "status": "Taispeáin socruithe áitiúla Radar agus stádas taisce beatha",
-    "sync": "Sioncronaigh an chatalog, moltaí, tairiscintí, agus faisnéis trí an freastalaí áitiúil"
-  },
   "resilience": {
     "description": "Déan iniúch agus bainistigh meicníochtaí athléimneachta",
     "status": {
@@ -1267,16 +1262,6 @@
     "combo": "Ainm chomhá le húsáid",
     "system": "Prasír córas",
     "resume": "Atosaigh seisiún sábháilte de réir ainm"
-  },
-  "plugin": {
-    "description": "Bainistigh breiseáin CLI (omniroute-cmd-*)",
-    "list": "Liostaigh breiseáin shuiteáilte",
-    "install": "Suiteáil breiseán ó npm nó conair logánta",
-    "remove": "Bain breiseán shuiteáilte",
-    "info": "Taispeáin sonraí do bhreiseán shuiteáilte",
-    "search": "Cuardaigh reáiste npm le haghaidh breiseáin ar fáil",
-    "update": "Nuashonraigh breiseáin shuiteáilte",
-    "scaffold": "Creadum i mbunchaighde breiseáin nua"
   },
   "launch": {
     "description": "Seol Claude Code dírithe ar OmniRoute (logánta nó cianda, le --profile)",

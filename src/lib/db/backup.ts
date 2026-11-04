@@ -605,7 +605,6 @@ export interface ExportAllRows {
   combos: unknown[];
   providers: unknown[];
   apiKeys: unknown[];
-  reasoningRoutingRules: unknown[];
 }
 
 /**
@@ -670,14 +669,7 @@ export function exportAllSummaryRows(): ExportAllRows {
     // api_keys table might not exist
   }
 
-  const reasoningRoutingRules: unknown[] = [];
-  try {
-    reasoningRoutingRules.push(...db.prepare("SELECT * FROM reasoning_routing_rules").all());
-  } catch {
-    // reasoning_routing_rules table might not exist in an older backup
-  }
-
-  return { settings, combos, providers, apiKeys, reasoningRoutingRules };
+  return { settings, combos, providers, apiKeys };
 }
 
 // ──────────────── Import validation helpers (for /api/db-backups/import) ────────────────

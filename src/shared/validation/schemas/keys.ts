@@ -61,7 +61,6 @@ export const createKeySchema = z
     usageLimitEnabled: z.boolean().optional(),
     dailyUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
     weeklyUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
-    chaosModeEnabled: z.boolean().optional(),
     expiresAt: z.string().datetime().nullable().optional(),
     scopes: z.array(z.string().trim().min(1).max(64)).max(32).optional(),
     allowedConnections: z.array(z.string().uuid()).min(1).max(100).optional(),
@@ -205,7 +204,6 @@ export const updateKeyPermissionsSchema = z
     usageLimitEnabled: z.boolean().optional(),
     dailyUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
     weeklyUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
-    chaosModeEnabled: z.boolean().optional(),
   })
   .superRefine((value, ctx) => {
     if (value.modelAccessMode === "all" && value.allowedModels && value.allowedModels.length > 0) {
@@ -268,8 +266,7 @@ export const updateKeyPermissionsSchema = z
       value.allowUsageCommand === undefined &&
       value.usageLimitEnabled === undefined &&
       value.dailyUsageLimitUsd === undefined &&
-      value.weeklyUsageLimitUsd === undefined &&
-      value.chaosModeEnabled === undefined
+      value.weeklyUsageLimitUsd === undefined
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

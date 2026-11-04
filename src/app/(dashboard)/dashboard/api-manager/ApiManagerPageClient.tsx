@@ -39,7 +39,6 @@ import { readActiveOnlyPreference, writeActiveOnlyPreference } from "./apiManage
 import { buildApiKeyCreateScopes } from "./apiManagerScopes";
 import { extractApiErrorMessage } from "@/shared/http/apiErrorMessage";
 import { hasProviderQuotaBypassScope } from "@/shared/constants/apiKeyPolicyScopes";
-import RoutingEntryLink from "@/shared/components/routing/RoutingEntryLink";
 import { ALL_COMBOS_ACCESS_RULE } from "@/shared/constants/comboAccess";
 
 // Constants for validation
@@ -114,7 +113,6 @@ interface ApiKey {
   catalogScope?: string;
   disableNonPublicModels?: boolean;
   allowUsageCommand?: boolean;
-  chaosModeEnabled?: boolean;
   usageLimitEnabled?: boolean;
   dailyUsageLimitUsd?: number | null;
   weeklyUsageLimitUsd?: number | null;
@@ -643,8 +641,6 @@ export default function ApiManagerPageClient() {
           </span>
         </div>
       </div>
-
-      <RoutingEntryLink />
 
       {/* Filter Bar — shown when there are keys */}
       {keys.length > 0 && (
