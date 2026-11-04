@@ -14,7 +14,10 @@ import {
   getDefaultThinkingBudget,
   isAdaptiveThinkingOnly,
 } from "../../../src/shared/constants/modelSpecs.ts";
-import { fitThinkingToMaxTokens } from "./openai-to-claude/thinkingBudget.ts";
+import {
+  fitAdaptiveThinkingMaxTokens,
+  fitThinkingToMaxTokens,
+} from "./openai-to-claude/thinkingBudget.ts";
 import { enforceToolResultAdjacency } from "./openai-to-claude/toolResultAdjacency.ts";
 import { unwrapOpenAIToolDefinition } from "./openai-to-claude/unwrapToolDefinition.ts";
 import { resolveToolResultId } from "./openai-to-claude/sanitizeToolResultId.ts";
@@ -314,7 +317,19 @@ export function openaiToClaudeRequest(
   // Replaces the previous unconditional `budget + 8192` inflation, which
   // could exceed model caps (e.g. Opus 4.7's 128000 ceiling) and trigger
   // HTTP 400 from Anthropic.
-  if (!isKimiCoding) {
+  const clientMaxTokens = body.max_tokens ?? body.max_completion_tokens;
+  const hasExplicitClientCap = typeof clientMaxTokens === "number" && clientMaxTokens > 0;
+  if (!isKimiCoding && result.thinking?.type === "adaptive" && hasExplicitClientCap) {
+    // Adaptive thinking spends from max_tokens too; an answer-sized OpenAI cap must
+    // not become the whole thinking + answer budget (empty replies on Opus 4.8+).
+    result.max_tokens = fitAdaptiveThinkingMaxTokens(
+      model,
+      Number(result.max_tokens) || 0,
+      result.output_config?.effort,
+      routedProvider
+    );
+    result.thinking = applyCopilotSummarizedThinkingDisplay(result.thinking, body);
+  } else if (!isKimiCoding) {
     const fitted = fitThinkingToMaxTokens(
       model,
       Number(result.max_tokens) || 0,

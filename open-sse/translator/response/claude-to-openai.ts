@@ -122,6 +122,20 @@ export function claudeToOpenAIResponse(chunk, state) {
       const block = chunk.content_block;
       if (block?.type === "text") {
         state.textBlockStarted = true;
+        // Anthropic opens text blocks empty, but relays/compatible upstreams may put
+        // the first (or only) text on the start event. The SSE→JSON aggregator keeps
+        // it; dropping it here left OpenAI stream clients with no content at all.
+        if (typeof block.text === "string" && block.text.length > 0) {
+          const seeded = claudeToOpenAIResponse(
+            {
+              type: "content_block_delta",
+              index: chunk.index,
+              delta: { type: "text_delta", text: block.text },
+            },
+            state
+          );
+          if (seeded) results.push(...seeded);
+        }
       } else if (block?.type === "thinking") {
         thinkingBlocksOf(state).set(chunk.index, {
           type: "thinking",

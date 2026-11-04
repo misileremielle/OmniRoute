@@ -89,3 +89,40 @@ export function fitThinkingToMaxTokens(
   }
   return { maxTokens: target, thinking: adjustedThinking };
 }
+
+// Thinking room per adaptive effort level, matching the manual-budget buckets the
+// translator uses for the same OpenAI `reasoning_effort` values.
+const ADAPTIVE_THINKING_HEADROOM: Record<string, number> = {
+  low: 1024,
+  medium: 10240,
+  high: 131072,
+  xhigh: 131072,
+  max: 131072,
+};
+
+/**
+ * max_tokens for an adaptive-thinking request built from an explicit OpenAI cap.
+ *
+ * Adaptive thinking has no `budget_tokens`, yet its reasoning still counts against
+ * `max_tokens`. Forwarding a client's answer-sized cap unchanged (e.g. 2048 with
+ * reasoning_effort=high on Opus 4.8) lets the model spend the whole cap thinking and
+ * stop with `max_tokens` and no text — an empty reply for an OpenAI client, more so
+ * under the redact-thinking beta where the thinking block carries no text. Mirror the
+ * budgeted path: keep the client cap as answer room and add the effort's thinking
+ * room on top, bounded by the model output cap. Unknown cap → leave the value as is
+ * rather than risk a 400 above the real ceiling.
+ */
+export function fitAdaptiveThinkingMaxTokens(
+  model: string,
+  callerMaxTokens: number,
+  effort: unknown,
+  provider?: string | null
+): number {
+  const caller = Math.max(callerMaxTokens, 1);
+  const modelCap = safeCapMaxOutputTokens(model, provider);
+  if (modelCap === null) return caller;
+  const headroom =
+    ADAPTIVE_THINKING_HEADROOM[String(effort ?? "").toLowerCase()] ??
+    ADAPTIVE_THINKING_HEADROOM.high;
+  return Math.min(Math.max(caller, MIN_RESPONSE_ROOM) + headroom, modelCap);
+}
