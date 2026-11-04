@@ -10,7 +10,7 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 const tailscaleTunnel = await import("../../src/lib/tailscaleTunnel.ts");
 const settingsDb = await import("../../src/lib/db/settings.ts");
 const dbCore = await import("../../src/lib/db/core.ts");
-const mitmManager = await import("../../src/mitm/manager.ts");
+const sudoPasswordCache = await import("../../src/lib/system/sudoPasswordCache.ts");
 
 const originalEnv = {
   tailscaleBin: process.env.TAILSCALE_BIN,
@@ -80,7 +80,7 @@ function resetTailscaleTestEnv(fakeBinaryPath: string) {
 test.beforeEach(async () => {
   const fakeBinaryPath = await createFakeTailscaleBinary();
   resetTailscaleTestEnv(fakeBinaryPath);
-  mitmManager.clearCachedPassword();
+  sudoPasswordCache.clearCachedPassword();
   dbCore.resetDbInstance();
   await fs.rm(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   await fs.mkdir(TEST_DATA_DIR, { recursive: true });
@@ -90,7 +90,7 @@ test.beforeEach(async () => {
 
 test.after(async () => {
   dbCore.resetDbInstance();
-  mitmManager.clearCachedPassword();
+  sudoPasswordCache.clearCachedPassword();
   if (originalEnv.tailscaleBin === undefined) delete process.env.TAILSCALE_BIN;
   else process.env.TAILSCALE_BIN = originalEnv.tailscaleBin;
   if (originalEnv.tailscaledBin === undefined) delete process.env.TAILSCALED_BIN;

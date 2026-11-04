@@ -1,8 +1,7 @@
 /**
- * OSS-051 — the tunnel and MITM management routes returned raw `error.message`.
+ * OSS-051 — the tunnel management routes returned raw `error.message`.
  *
- * Two independent defects, both in `src/app/api/tunnels/**` and
- * `src/app/api/settings/mitm/route.ts`:
+ * Two independent defects, both in `src/app/api/tunnels/**`:
  *
  * 1. Fourteen catch blocks answered with
  *    `{ error: error instanceof Error ? error.message : "<fallback>" }`. Those
@@ -254,8 +253,8 @@ test("POST /api/tunnels/tailscale/enable answers 400 (not a framework 500) on an
 
 // ── Regression sweep over the whole surface this PR covers ────────────────
 
-test("no tunnel or MITM route echoes a raw error.message any more", () => {
-  const roots = ["src/app/api/tunnels", "src/app/api/settings/mitm"];
+test("no tunnel route echoes a raw error.message any more", () => {
+  const roots = ["src/app/api/tunnels"];
   const offenders: string[] = [];
 
   const walk = (dir: string) => {

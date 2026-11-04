@@ -280,6 +280,959 @@
     "tests/unit/sidebar-icon-accents-3812.test.ts": {
       "replacement": "tests/unit/sidebar-nav-contrast-aa.test.ts",
       "reason": "1e8125fe (KEA-7886, kit Sidebar family, 2026-10-20) removed the per-item curated icon accents (#3812): the kit Sidebar renders icons with the kit palette, so the accent map and its fallback hash no longer exist. The sidebar contrast test was rewritten in the same commit for the kit shell and pins the navigation colors that replaced the accents. Release-green base-red #17219 (test-masking vs main, 2026-10-24)."
+    },
+    "tests/e2e/agent-bridge-traffic-cross.spec.ts": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/page.tsx",
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/page.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/e2e/agent-bridge.spec.ts": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/page.tsx",
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/AgentBridgePageClient.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/e2e/traffic-inspector.spec.ts": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/page.tsx",
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/TrafficInspectorPageClient.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/agent-bridge-bypass-flow.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/bypass/route.ts",
+        "src/lib/db/agentBridgeBypass.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/agent-bridge-cert-flow.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/cert/download/route.ts",
+        "src/app/api/tools/agent-bridge/cert/regenerate/route.ts",
+        "src/app/api/tools/agent-bridge/cert/route.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/agent-bridge-mappings.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/agents/[id]/mappings/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/agent-bridge-routes.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/agents/[id]/detect/route.ts",
+        "src/app/api/tools/agent-bridge/agents/[id]/route.ts",
+        "src/app/api/tools/agent-bridge/agents/route.ts",
+        "src/app/api/tools/agent-bridge/server/route.ts",
+        "src/app/api/tools/agent-bridge/state/route.ts",
+        "src/app/api/tools/agent-bridge/upstream-ca/route.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-capture-modes.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/capture-modes/http-proxy/route.ts",
+        "src/app/api/tools/traffic-inspector/capture-modes/route.ts",
+        "src/app/api/tools/traffic-inspector/capture-modes/system-proxy/route.ts",
+        "src/lib/inspector/captureState.ts",
+        "src/mitm/inspector/httpProxyServer.ts",
+        "src/mitm/inspector/systemProxyConfig.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-error-sanitization.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/capture-modes/http-proxy/route.ts",
+        "src/app/api/tools/traffic-inspector/capture-modes/system-proxy/route.ts",
+        "src/app/api/tools/traffic-inspector/hosts/[host]/route.ts",
+        "src/app/api/tools/traffic-inspector/hosts/route.ts",
+        "src/app/api/tools/traffic-inspector/internal/ingest/route.ts",
+        "src/app/api/tools/traffic-inspector/requests/[id]/annotation/route.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-hosts.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/hosts/[host]/route.ts",
+        "src/app/api/tools/traffic-inspector/hosts/route.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-internal-ingest.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/internal/ingest/route.ts",
+        "src/mitm/inspector/buffer.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-localonly.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/traffic-inspector/requests/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-requests.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/requests/[id]/annotation/route.ts",
+        "src/app/api/tools/traffic-inspector/requests/[id]/route.ts",
+        "src/app/api/tools/traffic-inspector/requests/route.ts",
+        "src/mitm/inspector/buffer.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-session-requests.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/sessions/[id]/requests/route.ts",
+        "src/app/api/tools/traffic-inspector/sessions/[id]/route.ts",
+        "src/app/api/tools/traffic-inspector/sessions/route.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-sessions.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/sessions/[id]/export.har/route.ts",
+        "src/app/api/tools/traffic-inspector/sessions/[id]/route.ts",
+        "src/app/api/tools/traffic-inspector/sessions/route.ts",
+        "src/lib/db/inspectorSessions.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/traffic-inspector-ws.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/ws/route.ts",
+        "src/mitm/inspector/buffer.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-cert-download-active-ca.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/cert/download/route.ts",
+        "src/app/api/tools/agent-bridge/cert/route.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-cert-install-fallback-4546.test.ts": {
+      "sourceRemoved": ["src/mitm/cert/install.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-cert-regenerate-force-10467.test.ts": {
+      "sourceRemoved": ["src/mitm/cert/generate.ts", "src/mitm/targets/antigravity.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-cert-route-validation.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/cert/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-cert-trust-mismatch.test.ts": {
+      "sourceRemoved": [
+        "src/mitm/cert/activeCert.ts",
+        "src/mitm/cert/generate.ts",
+        "src/mitm/cert/install.ts",
+        "src/mitm/cert/migration.ts",
+        "src/mitm/cert/rootCa.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-cert-trust-sudo-gate.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/cert/route.ts",
+        "src/app/api/tools/agent-bridge/server/route.ts",
+        "src/mitm/dns/dnsConfig.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-config-portability.test.ts": {
+      "sourceRemoved": ["src/lib/inspector/configPortability.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-detected-models-8656.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/buffer.ts", "src/mitm/inspector/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-dns-params-7271.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/agents/[id]/dns/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-dns-per-agent-8466.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/agents/[id]/dns/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-dns-route-validation.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/agents/[id]/dns/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-dns-sudo-gate.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/agents/[id]/dns/route.ts",
+        "src/mitm/dns/dnsConfig.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-dns-toggle-method-7157.test.ts": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/AgentBridgePageClient.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-maintenance-api.test.ts": {
+      "sourceRemoved": ["src/lib/inspector/agentBridgeMaintenanceApi.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-mappings-sync-8656.test.ts": {
+      "sourceRemoved": ["src/lib/db/agentBridgeMappings.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-repair-route-validation.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/repair/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-repair-sudo-gate.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/repair/route.ts",
+        "src/mitm/dns/dnsConfig.ts",
+        "src/mitm/sudoGate.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-reset-route.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/agents/[id]/reset/route.ts",
+        "src/lib/db/agentBridgeMappings.ts",
+        "src/lib/db/agentBridgeState.ts",
+        "src/mitm/dns/dnsConfig.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-server-route-dynamic-import.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/server/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-state-full-payload-8656.test.ts": {
+      "sourceRemoved": [
+        "src/lib/db/agentBridgeBypass.ts",
+        "src/lib/db/agentBridgeMappings.ts",
+        "src/lib/db/agentBridgeState.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-state-normalize-3318.test.ts": {
+      "sourceRemoved": ["src/app/(dashboard)/dashboard/tools/agent-bridge/normalizeState.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agent-bridge-targets-serializable.test.ts": {
+      "sourceRemoved": ["src/mitm/targets/index.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agentbridge-antigravity-cert-hosts-6494.test.ts": {
+      "sourceRemoved": ["src/mitm/targets/antigravity.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/agentbridge-mitm-router-key-6403.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/server/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/antigravity-bridge-active-cert.test.ts": {
+      "sourceRemoved": [
+        "bin/antigravity-bridge.mjs",
+        "src/mitm/_internal/bridgeCert.cjs",
+        "src/mitm/_internal/rootCaShim.cjs",
+        "src/mitm/cert/migration.ts",
+        "src/mitm/dataDir.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/antigravity-bridge-routing.test.ts": {
+      "sourceRemoved": ["bin/antigravity-bridge.mjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/build/desktop-optional-pack-delivery-16538.test.ts": {
+      "sourceRemoved": ["scripts/release/collect-optional-packs.mjs"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/build/electron-release-latest-yml.repro.test.ts": {
+      "sourceRemoved": [".github/workflows/electron-release.yml"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/build/mitm-build-fail-closed.test.ts": {
+      "sourceRemoved": ["scripts/build/buildMitm.mjs", "src/mitm/server.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/build/mitm-server-bundle-contents.test.ts": {
+      "sourceRemoved": ["src/mitm/server.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/build/optional-pack-archive-delivery-16538.test.ts": {
+      "sourceRemoved": [
+        "scripts/build/optionalPackStaging.mjs",
+        "scripts/release/collect-optional-packs.mjs"
+      ],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/build/optional-pack-staging.test.ts": {
+      "sourceRemoved": ["scripts/build/optionalPackStaging.mjs"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/build/standalone-bundle.test.ts": {
+      "sourceRemoved": [
+        "scripts/build/standaloneBundle.mjs",
+        "scripts/build/standaloneManifest.mjs"
+      ],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/build/standalone-manifest-symlink-portability.test.ts": {
+      "sourceRemoved": ["scripts/build/standaloneManifest.mjs"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/cli-mitm-schema.test.ts": {
+      "sourceRemoved": ["src/app/api/cli-tools/antigravity-mitm/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/db-agent-bridge-bypass.test.ts": {
+      "sourceRemoved": ["src/lib/db/agentBridgeBypass.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/db-agent-bridge-mappings.test.ts": {
+      "sourceRemoved": ["src/lib/db/agentBridgeMappings.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/db-agent-bridge-state.test.ts": {
+      "sourceRemoved": ["src/lib/db/agentBridgeState.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/db-inspector-custom-hosts.test.ts": {
+      "sourceRemoved": ["src/lib/db/inspectorCustomHosts.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/db-inspector-sessions.test.ts": {
+      "sourceRemoved": ["src/lib/db/inspectorSessions.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/dns-config-generic.test.ts": {
+      "sourceRemoved": ["src/mitm/dns/dnsConfig.ts", "src/mitm/targets/index.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-artifact-name-10947.test.ts": {
+      "sourceRemoved": ["electron/package.json"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-health-watchdog.test.ts": {
+      "sourceRemoved": ["electron/lib/healthWatchdog.js", "electron/lib/serverReadiness.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-lazy-window.test.ts": {
+      "sourceRemoved": ["electron/lib/windowLifecycle.js", "electron/main.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-main.test.ts": {
+      "sourceRemoved": [
+        "electron/lib/serverReadiness.js",
+        "electron/main.js",
+        "electron/sqlite-inspection.js"
+      ],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-packaging.test.ts": {
+      "sourceRemoved": [
+        "electron/package.json",
+        "scripts/build/afterpack-copy-node-modules.mjs",
+        "scripts/build/electronRuntimeDocs.mjs",
+        "scripts/build/prepare-electron-standalone.mjs"
+      ],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-preload.test.ts": {
+      "sourceRemoved": ["electron/preload.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-processtree.test.ts": {
+      "sourceRemoved": ["electron/main.js", "electron/processTree.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-release-desktop-channel-8949.test.ts": {
+      "sourceRemoved": [".github/workflows/electron-release.yml"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-release-efficiency.test.ts": {
+      "sourceRemoved": [".github/workflows/electron-release.yml"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-remote-server.test.ts": {
+      "sourceRemoved": [
+        "electron/lib/remoteServerPreferences.js",
+        "electron/lib/resolveRemoteServerUrl.js",
+        "electron/main.js",
+        "electron/package.json"
+      ],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-resolve-node-executable-7941.test.ts": {
+      "sourceRemoved": ["electron/lib/resolveNodeHelper.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-resolve-server-entry.test.ts": {
+      "sourceRemoved": ["electron/lib/resolveServerEntry.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-server-env-private-modes.test.ts": {
+      "sourceRemoved": ["electron/main.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-server-readiness.test.ts": {
+      "sourceRemoved": ["electron/lib/serverReadiness.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-smoke-script.test.ts": {
+      "sourceRemoved": [
+        "scripts/build/optionalPackStaging.mjs",
+        "scripts/dev/smoke-electron-packaged.mjs"
+      ],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-sqlite-prebuild.test.ts": {
+      "sourceRemoved": ["scripts/build/electronRebuildPlan.mjs"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/electron-window-close-policy.test.ts": {
+      "sourceRemoved": ["electron/lib/windowClosePolicy.js", "electron/main.js"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-agent-bridge-hook.test.ts": {
+      "sourceRemoved": [
+        "src/lib/db/inspectorCustomHosts.ts",
+        "src/mitm/inspector/agentBridgeHook.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-buffer.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/buffer.ts", "src/mitm/inspector/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-context-key.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/contextKey.ts", "src/mitm/inspector/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-har-export.test.ts": {
+      "sourceRemoved": ["src/lib/inspector/harExport.ts", "src/mitm/inspector/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-http-proxy.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/buffer.ts", "src/mitm/inspector/httpProxyServer.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-kind-detector.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/kindDetector.ts", "src/mitm/inspector/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-llm-metadata.test.ts": {
+      "sourceRemoved": [
+        "src/mitm/inspector/llmMetadataExtractor.ts",
+        "src/mitm/inspector/types.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-pricing.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/pricing.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-process-attribution.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/processAttribution.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-system-proxy.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/systemProxyConfig.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/inspector-types.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/types.ts", "src/mitm/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mac-update-manifest-merge.test.ts": {
+      "sourceRemoved": ["scripts/release/merge-mac-update-manifest.mjs"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-alias-config-shim.test.ts": {
+      "sourceRemoved": ["src/mitm/_internal/aliasConfig.cjs", "src/mitm/aliasConfig.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-antigravity-reasoning-effort-override.test.ts": {
+      "sourceRemoved": ["src/mitm/aliasConfig.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-capture-before-chat-pattern-check-13920.test.ts": {
+      "sourceRemoved": ["src/mitm/server.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-cert-install-mode-9442.test.ts": {
+      "sourceRemoved": ["src/mitm/cert/install.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-cert-mac-fingerprint.test.ts": {
+      "sourceRemoved": ["src/mitm/cert/install.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-cert-migration-6684.test.ts": {
+      "sourceRemoved": ["src/mitm/cert/migration.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-cert-regenerate-mode-aware.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/cert/regenerate/route.ts",
+        "src/app/api/tools/agent-bridge/server/route.ts",
+        "src/mitm/cert/migration.ts",
+        "src/mitm/cert/regenerate.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-cert-removal-wiring.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/cert/route.ts", "src/mitm/cert/install.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-detection.test.ts": {
+      "sourceRemoved": ["src/mitm/detection/index.ts", "src/mitm/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-diagnostics.test.ts": {
+      "sourceRemoved": ["src/mitm/inspector/diagnostics.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-dns-graceful-degrade-6127.test.ts": {
+      "sourceRemoved": ["src/mitm/dns/provision.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-dns-rollback-failed-start.test.ts": {
+      "sourceRemoved": ["src/mitm/stopDnsTeardown.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-dns-win32-sudo-fold-11430.test.ts": {
+      "sourceRemoved": [
+        "src/mitm/dns/dnsConfig.ts",
+        "src/mitm/sudoGate.ts",
+        "src/mitm/systemCommands.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-dnsConfig.test.ts": {
+      "sourceRemoved": ["src/mitm/dns/dnsConfig.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-forward-target.test.ts": {
+      "sourceRemoved": ["src/mitm/_internal/forwardTarget.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-antigravity.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/antigravity.ts", "src/mitm/targets/antigravity.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-base.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/base.ts", "src/mitm/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-claudeCode.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/claudeCode.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-codex.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/codex.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-copilot.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/copilot.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-cursor.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/cursor.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-kiro.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/kiro.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-openCode.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/openCode.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-trae.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/trae.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-handler-zed.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/zed.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-hosts-cleanup-on-exit.test.ts": {
+      "sourceRemoved": ["src/mitm/manager.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-ingest-route-sanitize.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/internal/ingest/route.ts",
+        "src/mitm/inspector/buffer.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-ingest-shim.test.ts": {
+      "sourceRemoved": ["src/mitm/_internal/ingest.cjs", "src/mitm/inspector/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-manager-bypass-json.test.ts": {
+      "sourceRemoved": [
+        "src/lib/db/agentBridgeBypass.ts",
+        "src/mitm/manager.ts",
+        "src/mitm/server.cjs"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-manager-cleanup-symmetry.test.ts": {
+      "sourceRemoved": [
+        "src/lib/db/inspectorCustomHosts.ts",
+        "src/mitm/manager.ts",
+        "src/mitm/targets/index.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-manager-repair.test.ts": {
+      "sourceRemoved": ["src/mitm/manager.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-manager-stub.test.ts": {
+      "sourceRemoved": ["src/mitm/manager.stub.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-masksecrets.test.ts": {
+      "sourceRemoved": ["src/mitm/maskSecrets.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-passthrough-real-host-10479.test.ts": {
+      "sourceRemoved": ["src/mitm/server.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-passthrough.test.ts": {
+      "sourceRemoved": ["src/mitm/passthrough.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-pipe-bounded-collect-13395.test.ts": {
+      "sourceRemoved": ["src/mitm/handlers/base.ts", "src/mitm/server.cjs", "src/mitm/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-privileged-steps-sudo-gate.test.ts": {
+      "sourceRemoved": ["src/mitm/manager.ts", "src/mitm/sudoGate.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-root-ca-leaf-issuance-6684.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/dynamicCert.ts", "src/shared/constants/mitmToolHosts.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-root-ca-persistence-6684.test.ts": {
+      "sourceRemoved": ["src/mitm/cert/rootCa.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-sanitize-headers.test.ts": {
+      "sourceRemoved": ["src/mitm/sanitizeHeaders.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-server-cjs-backpressure-14528.test.ts": {
+      "sourceRemoved": ["src/mitm/_internal/writeBackpressure.cjs", "src/mitm/server.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-server-claude-code-routing.test.ts": {
+      "sourceRemoved": [
+        "src/mitm/_internal/aliasConfig.cjs",
+        "src/mitm/_internal/standaloneRouting.cjs"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-server-connect.test.ts": {
+      "sourceRemoved": ["src/mitm/_internal/bypass.cjs", "src/mitm/server.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-server-loop-guard.test.ts": {
+      "sourceRemoved": ["src/mitm/_internal/bypass.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-server-peer-guard-qxg2.test.ts": {
+      "sourceRemoved": ["src/mitm/_internal/peerGuard.cjs", "src/mitm/server.cjs"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-server-timeouts.test.ts": {
+      "sourceRemoved": ["src/mitm/socketTimeouts.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-settings-and-repair-active-ca.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/settings/mitm/route.ts",
+        "src/mitm/cert/migration.ts",
+        "src/mitm/repair.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-start-guard.test.ts": {
+      "sourceRemoved": ["src/mitm/manager.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-startup-error-3606.test.ts": {
+      "sourceRemoved": ["src/mitm/manager.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-stop-dns-before-kill-1809.test.ts": {
+      "sourceRemoved": ["src/mitm/manager.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-stub-alias-6344.test.mjs": {
+      "sourceRemoved": ["scripts/build/mitm-stub-flag.mjs", "src/mitm/manager.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-sudo-gate-822.test.ts": {
+      "sourceRemoved": ["src/mitm/dns/dnsConfig.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-system-commands-prefix-3641.test.ts": {
+      "sourceRemoved": ["src/mitm/systemCommands.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-targets-resolve.test.ts": {
+      "sourceRemoved": ["src/mitm/targets/index.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-targets-route.test.ts": {
+      "sourceRemoved": ["src/mitm/targets/index.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-tool-hosts.test.ts": {
+      "sourceRemoved": ["src/mitm/targets/index.ts", "src/shared/constants/mitmToolHosts.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-unexpected-child-exit.test.ts": {
+      "sourceRemoved": ["src/mitm/childExitCleanup.ts", "src/mitm/manager.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-upstream-ca-wiring.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/agent-bridge/upstream-ca/route.ts",
+        "src/mitm/upstreamTrust.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/mitm-upstream-trust.test.ts": {
+      "sourceRemoved": ["src/mitm/upstreamTrust.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/security/elevated-powershell-no-encoded.test.ts": {
+      "sourceRemoved": ["src/mitm/systemCommands.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/shared-schemas.test.ts": {
+      "sourceRemoved": ["src/shared/schemas/agentBridge.ts", "src/shared/schemas/inspector.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/singbox-tproxy-coexistence.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/commands.ts", "src/mitm/tproxy/setup.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/system-trust-test-guard.test.ts": {
+      "sourceRemoved": ["src/mitm/cert/install.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-build-native.test.ts": {
+      "sourceRemoved": ["scripts/build/build-tproxy-native.mjs"],
+      "reason": "Electron desktop app removed (refactor: remove electron desktop app): electron/, its packaging/release scripts and the electron-release workflow no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-ca-trust.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/caTrust.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-capture-api.test.ts": {
+      "sourceRemoved": ["src/lib/inspector/tproxyCaptureApi.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-capture-manager.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/captureManager.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-capture-mode.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/captureMode.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-commands.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/commands.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-dynamic-cert.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/dynamicCert.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-route.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/tproxy/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-setup.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/setup.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-tls-capture.test.ts": {
+      "sourceRemoved": [
+        "src/mitm/inspector/buffer.ts",
+        "src/mitm/tproxy/dynamicCert.ts",
+        "src/mitm/tproxy/tlsCapture.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/tproxy-transparent-socket.test.ts": {
+      "sourceRemoved": ["src/mitm/tproxy/transparentSocket.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/traffic-filter-live.test.ts": {
+      "sourceRemoved": ["src/lib/inspector/matchesTrafficFilter.ts", "src/mitm/inspector/types.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/traffic-inspector-beginner-header.test.ts": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/TrafficInspectorPageClient.tsx",
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/page.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/traffic-inspector-http-proxy-snippets.test.ts": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/httpProxySnippets.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/traffic-inspector-ws-subscriber-leak-13152.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/tools/traffic-inspector/ws/route.ts",
+        "src/mitm/inspector/buffer.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/AntigravityToolCard-model-aliases.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/cli-code/components/AntigravityToolCard.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/agent-bridge-page.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/components/BypassListEditor.tsx",
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/components/EmptyStateNoProviders.tsx",
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/components/RiskNoticeBanner.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/agent-bridge-server-card-a11y.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/components/AgentBridgeServerCard.tsx",
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/session/SessionRecorderBar.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/agent-card-risk-modal.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/components/AgentCard.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/agent-card.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/AgentBridgePageClient.tsx",
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/components/AgentCard.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/bypass-list-editor.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/components/BypassListEditor.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/cli-tools-no-mitm-tab.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/cli-code/components/AntigravityToolCard.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/conversation-tab-separators.test.tsx": {
+      "sourceRemoved": [
+        "src/mitm/inspector/conversationNormalizer.ts",
+        "src/mitm/inspector/types.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/conversation-tab.test.tsx": {
+      "sourceRemoved": [
+        "src/mitm/inspector/conversationNormalizer.ts",
+        "src/mitm/inspector/types.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/mitm-proxy-error-boundary.test.tsx": {
+      "sourceRemoved": ["src/app/(dashboard)/dashboard/system/mitm-proxy/error.tsx"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/mitm-proxy-moved-page.test.tsx": {
+      "sourceRemoved": ["src/app/(dashboard)/dashboard/system/mitm-proxy/page.tsx"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/same-context-filter.test.tsx": {
+      "sourceRemoved": ["src/lib/inspector/matchesTrafficFilter.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/session-recorder-bar.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/session/SessionRecorderBar.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/setup-wizard.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/agent-bridge/components/SetupWizard.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/stats-tab.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/tabs/StatsTab.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/timing-i18n.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/shared/TimingWaterfall.tsx",
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/tabs/TimingTab.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/traffic-inspector-page.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/TrafficInspectorPageClient.tsx"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/use-session-recorder.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/hooks/useSessionRecorder.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/use-system-proxy-exit-guard.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/hooks/useSystemProxyExitGuard.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/ui/use-traffic-stream.test.tsx": {
+      "sourceRemoved": [
+        "src/app/(dashboard)/dashboard/tools/traffic-inspector/hooks/useTrafficStream.ts"
+      ],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/upstream-ca-test-route-3488.test.ts": {
+      "sourceRemoved": ["src/app/api/tools/agent-bridge/upstream-ca/test/route.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/unit/windows-cert-identity-7275.test.ts": {
+      "sourceRemoved": ["src/mitm/cert/install.ts"],
+      "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -340,5 +1293,12 @@
   "@omniroute/opencode-plugin/tests/log-level.test.ts": "the v1 plugin no longer fetches /api/combos/auto on refresh; the retired fetcher 404 test and its import are removed with the source (21 to 19). Remaining level coverage unchanged.",
   "@omniroute/opencode-plugin/tests/config-shim.test.ts": "the v1 plugin no longer fetches /api/combos/auto on refresh; the retired twin-wins case and its fixtures are removed with the static publication block (162 to 159). Remaining builder coverage unchanged.",
   "tests/unit/stepfun-mono-fallback-and-sidebar-hydration-7743.test.ts": "ec27d84e (KEA-7886, F4, 2026-10-21): the legacy DashboardLayout and its synchronous localStorage collapse initializer were removed; the one dropped assert pinned that initializer. The replacement block pins the kit shell contract instead: no localStorage read in the layout files and the server passing the ci_sidebar_state cookie as sidebarDefaultOpen (3 new asserts in place of the old structure). Net count 9 -> 8 is the realignment, not a weakening. Release-green base-red #17219 (2026-10-24).",
-  "tests/unit/ui/rtl-logical-classes.test.tsx": "ec27d84e (KEA-7886, F4, 2026-10-21): the legacy mobile sidebar drawer (.dashboard-sidebar-mobile, start-0/-translate-x-full RTL rules) was removed with the legacy shell; its six drawer cases were replaced by the Kit shell block in the same file, which asserts the kit Sidebar Sheet anchoring by side. Net 21 -> 19 is the realignment, not a weakening. Release-green base-red #17219 (2026-10-24)."
+  "tests/unit/ui/rtl-logical-classes.test.tsx": "ec27d84e (KEA-7886, F4, 2026-10-21): the legacy mobile sidebar drawer (.dashboard-sidebar-mobile, start-0/-translate-x-full RTL rules) was removed with the legacy shell; its six drawer cases were replaced by the Kit shell block in the same file, which asserts the kit Sidebar Sheet anchoring by side. Net 21 -> 19 is the realignment, not a weakening. Release-green base-red #17219 (2026-10-24).",
+  "tests/unit/build/check-complexity.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (the complexity scan scope including the deleted electron/ directory); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
+  "tests/unit/check-deps.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (discovery of the deleted electron/package.json manifest); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
+  "tests/unit/datadir-legacy-before-xdg.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (electron/main.js resolveDataDir() ordering); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
+  "tests/unit/materialize-bundled-symlinks.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (syncRebuiltNativeModuleIntoHashedEntries(), the Electron-ABI rebuild helper deleted with prepare-electron-standalone.mjs); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
+  "tests/unit/optional-packs.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (electron/main.js prepending installed pack dirs to the server NODE_PATH); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
+  "tests/unit/select-impacted-tests.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (an electron/ path classification case); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
+  "tests/unit/ui/header-kit.test.tsx": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (the macOS Electron title-bar safe-area inset); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened."
 }

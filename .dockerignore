@@ -76,7 +76,6 @@ docs/superpowers/**
 # Operator-internal security writeups: git only, not the image or /docs catalog.
 docs/security/STEALTH_GUIDE.md
 docs/security/SOCKET_DEV_FINDINGS.md
-docs/security/MITM-TPROXY-DECRYPT.md
 docs/security/PUBLIC_CREDS.md
 docs/diagrams/**/*.png
 docs/diagrams/**/*.jpg

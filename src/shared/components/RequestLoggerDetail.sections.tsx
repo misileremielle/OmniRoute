@@ -3,9 +3,12 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { JsonView } from "@/shared/components/jsonView";
-import { ChatBubble } from "@/app/(dashboard)/dashboard/tools/traffic-inspector/components/chat/ChatBubble";
-import { buildRequestTurns, buildResponseTurns } from "@/mitm/inspector/conversationNormalizer";
-import type { InterceptedRequest, NormalizedTurn } from "@/mitm/inspector/types";
+import { ChatBubble } from "@/shared/components/conversation/ChatBubble";
+import {
+  buildRequestTurns,
+  buildResponseTurns,
+} from "@/shared/conversation/conversationNormalizer";
+import type { ConversationResponse, NormalizedTurn } from "@/shared/conversation/types";
 import { useTheme } from "@/shared/hooks/useTheme";
 import {
   useTimestampTitles,
@@ -173,29 +176,17 @@ export function PayloadSection({
 
 // ─── Conversation context section ───────────────────────────────────────────
 // Renders THIS request's own context (its request body's messages/input, plus
-// its response) — a plain single-request normalization, same shape as the
-// traffic-inspector's ConversationTab, no cross-request reconstruction. While
+// its response) — a plain single-request normalization, no cross-request
+// reconstruction. While
 // the request is still generating (detail.active === true) the response side
 // shows the partial text captured so far, refreshed on a short poll scoped to
 // just this section.
 const CONVERSATION_ACTIVE_POLL_INTERVAL_MS = 1200;
 
-function asInterceptedResponseBody(responseBody: unknown): InterceptedRequest {
+function asConversationResponse(responseBody: unknown): ConversationResponse {
   return {
-    id: "",
-    source: "custom-host",
-    timestamp: "",
-    method: "POST",
-    host: "",
-    path: "",
-    requestHeaders: {},
-    requestBody: null,
-    requestSize: 0,
     responseHeaders: {},
     responseBody: responseBody != null ? JSON.stringify(responseBody) : null,
-    responseSize: 0,
-    status: 0,
-    detectedKind: "llm",
   };
 }
 
@@ -280,7 +271,7 @@ export function ConversationContextSection({ log, detail }) {
   const responseBody = liveDetail?.responseBody ?? null;
   const responseTurns: NormalizedTurn[] =
     responseBody != null
-      ? buildResponseTurns(asInterceptedResponseBody(responseBody))
+      ? buildResponseTurns(asConversationResponse(responseBody))
       : liveDetail?.partialAssistantText
         ? [
             {

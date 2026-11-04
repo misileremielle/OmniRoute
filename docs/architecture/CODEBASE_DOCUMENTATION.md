@@ -80,7 +80,6 @@ src/
 ├── domain/               Pure domain layer (policy, fallback, cost, lockout, …)
 ├── server/               Server-only modules (authz, cors, auth)
 ├── shared/               Types, constants, validation, contracts, utils (cross-boundary safe)
-├── mitm/                 Man-in-the-middle proxy helpers for CLI integration
 ├── models/               Local model metadata / aliasing
 ├── sse/                  Legacy SSE handlers that still live under src/ (not open-sse/)
 ├── store/                Client-side state stores

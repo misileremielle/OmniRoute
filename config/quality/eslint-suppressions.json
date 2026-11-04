@@ -638,11 +638,6 @@
       "count": 4
     }
   },
-  "src/app/(dashboard)/dashboard/cli-code/components/AntigravityToolCard.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/(dashboard)/dashboard/cli-code/components/ClineToolCard.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -823,16 +818,6 @@
       "count": 1
     }
   },
-  "src/app/(dashboard)/dashboard/tools/agent-bridge/components/AgentList.tsx": {
-    "no-restricted-syntax": {
-      "count": 3
-    }
-  },
-  "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/TopBarControls.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/(dashboard)/dashboard/translator/components/ResultNarrated.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -989,11 +974,6 @@
     }
   },
   "src/app/api/telegram/update/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/app/api/tools/traffic-inspector/ws/route.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -1516,21 +1496,6 @@
       "count": 1
     }
   },
-  "src/mitm/cert/install.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
-    }
-  },
-  "src/mitm/dns/provision.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/mitm/manager.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "src/server/ws/liveServer.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 5
@@ -2034,11 +1999,6 @@
       "count": 1
     }
   },
-  "tests/integration/traffic-inspector-error-sanitization.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/integration/upstream-cli-smoke.int.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -2123,11 +2083,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 3
-    }
-  },
-  "tests/unit/agent-bridge-mappings-sync-8656.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/agent-skills-page.test.tsx": {
@@ -3121,21 +3076,6 @@
       "count": 1
     }
   },
-  "tests/unit/db-agent-bridge-bypass.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/db-agent-bridge-mappings.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/db-agent-bridge-state.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
   "tests/unit/db-backup-export-streaming-9045.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -3192,16 +3132,6 @@
   "tests/unit/db-health-route.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 7
-    }
-  },
-  "tests/unit/db-inspector-custom-hosts.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/db-inspector-sessions.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
     }
   },
   "tests/unit/db-migration-runner.test.ts": {
@@ -3316,11 +3246,6 @@
       "count": 4
     }
   },
-  "tests/unit/dns-config-generic.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/domain-branch-hardening.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
@@ -3355,16 +3280,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "tests/unit/electron-main.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "tests/unit/electron-preload.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "tests/unit/embedding-cooldown-integration-10347.test.ts": {
@@ -3592,11 +3507,6 @@
   "tests/unit/injection-guard-nonchat-route-logging.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
-    }
-  },
-  "tests/unit/inspector-agent-bridge-hook.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
     }
   },
   "tests/unit/json-size-exactness.test.ts": {
@@ -4873,11 +4783,6 @@
     }
   },
   "tests/unit/ui/use-stream-metrics.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/ui/use-traffic-stream.test.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }

@@ -310,7 +310,6 @@ src/                        # TypeScript (.ts / .tsx)
 │   ├── usage/              # Usage tracking and cost calculation
 │   └── localDb.ts          # Re-export layer only — never add logic here
 ├── middleware/              # Request middleware (promptInjectionGuard)
-├── mitm/                   # MITM proxy (cert, DNS, target routing)
 ├── shared/
 │   ├── components/         # React components (.tsx)
 │   ├── constants/          # Provider definitions (329), MCP scopes, 20 routing strategies

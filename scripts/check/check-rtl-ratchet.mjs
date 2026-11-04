@@ -46,8 +46,8 @@ const PHYSICAL =
 export function countViolations(source) {
   let count = 0;
   for (const line of source.split("\n")) {
-    const spansBothEdges = /(?<![\w-])left-[a-z0-9.[\]/]+/.test(line) &&
-      /(?<![\w-])right-[a-z0-9.[\]/]+/.test(line);
+    const spansBothEdges =
+      /(?<![\w-])left-[a-z0-9.[\]/]+/.test(line) && /(?<![\w-])right-[a-z0-9.[\]/]+/.test(line);
     for (const match of line.matchAll(PHYSICAL)) {
       const before = line.slice(0, match.index);
       if (/rtl:[\w-]*$/.test(before)) continue;
@@ -119,7 +119,7 @@ function main() {
     console.error(
       `RTL ratchet: ${total} physical directional classes, baseline ${baseline}. ` +
         `Use logical utilities (ms/me/ps/pe/start/end/text-start) so the layout ` +
-        `mirrors under dir=rtl, or re-baseline with justification.`,
+        `mirrors under dir=rtl, or re-baseline with justification.`
     );
     return 1;
   }

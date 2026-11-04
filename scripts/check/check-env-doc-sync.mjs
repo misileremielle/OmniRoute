@@ -359,12 +359,7 @@ export function parseEnvDocVars(text) {
 }
 
 /** Roots scanned for `process.env.X` references, relative to the repo root. */
-export const CODE_SCAN_ROOTS = [
-  "src",
-  "open-sse",
-  "bin",
-  "scripts",
-];
+export const CODE_SCAN_ROOTS = ["src", "open-sse", "bin", "scripts"];
 
 const CODE_ENV_REF = /process\.env\.([A-Z][A-Z0-9_]+)/g;
 

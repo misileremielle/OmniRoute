@@ -124,7 +124,6 @@ omniroute
 - This setup is server-only: use the browser dashboard.
 - Native dependencies may need local compilation.
 - Low-memory Android devices may need fewer concurrent requests.
-- MITM/system certificate features may require Android-level trust-store work outside Termux.
 
 ## Troubleshooting
 

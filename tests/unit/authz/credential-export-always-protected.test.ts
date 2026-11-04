@@ -117,15 +117,6 @@ const HARD_GATED_INVENTORY: ReadonlyArray<{ path: string; why: string }> = [
   { path: "/api/settings/transfer/import", why: "writes provider connections and credentials" },
   { path: "/api/settings/database", why: "irreversible database replace" },
   { path: "/api/shutdown", why: "stops the server" },
-  // ── Hard-gated by the LOCAL_ONLY tier instead ────────────────────────────
-  {
-    path: "/api/tools/traffic-inspector/export.har",
-    why: "captured traffic can contain Authorization headers (LOCAL_ONLY)",
-  },
-  {
-    path: "/api/tools/traffic-inspector/sessions/abc/export.har",
-    why: "same, per session (LOCAL_ONLY)",
-  },
 ];
 
 test("every credential/traffic export and CLI-config write is hard-gated", () => {

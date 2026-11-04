@@ -20,10 +20,8 @@ const FORBIDDEN = new Set(
     // to the connection between the client and OmniRoute (or its upstream
     // proxy), never to the request OmniRoute makes to the model provider —
     // forwarding `proxy-authorization` hands that proxy credential to the
-    // provider. `src/lib/services/reverseProxy.ts` (HOP_BY_HOP),
-    // `src/mitm/sanitizeHeaders.ts`, `src/mitm/inspector/httpProxyServer.ts`,
-    // `src/mitm/tproxy/tlsCapture.ts` and `src/app/api/openapi/try/route.ts`
-    // all already strip them; this list, the canonical one, did not.
+    // provider. `src/lib/services/reverseProxy.ts` (HOP_BY_HOP) and
+    // `src/app/api/openapi/try/route.ts` already strip them; this list, the canonical one, did not.
     "proxy-authenticate",
     "proxy-authorization",
     "transfer-encoding",

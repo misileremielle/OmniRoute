@@ -32,15 +32,12 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "cloud-agents",
   "conductor",
   "orchestration",
-  "agent-bridge",
-  "traffic-inspector",
   "discovery",
   // OmniProxy > Integrations
   "api-endpoints",
   "webhooks",
   "log-export",
   // OmniProxy — proxy tools
-  "mitm-proxy",
   "1proxy",
   // Analytics
   "analytics",

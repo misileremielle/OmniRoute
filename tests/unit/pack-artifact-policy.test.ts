@@ -198,7 +198,6 @@ test("build-next-isolated sibling imports are allowed in the published package",
   const buildDependencies = [
     "scripts/build/assembleStandalone.mjs",
     "scripts/build/backendOnlyPages.mjs",
-    "scripts/build/build-tproxy-native.mjs",
     "scripts/i18n/generate-global-error-messages.mjs",
   ];
 

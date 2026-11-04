@@ -2254,16 +2254,14 @@ Admin-only endpoints for operational management.
 Manage CLI tools that integrate with OmniRoute (antigravity, commandCode,
 devin-cli, etc.). See [Provider Reference](./PROVIDER_REFERENCE.md) for the full list.
 
-| Method | Path                                    | Description                                                                                                                                       |
-| ------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/cli-tools/all-statuses`           | Status of all CLI tools (installed, version, last seen)                                                                                           |
-| GET    | `/api/cli-tools/status`                 | Status detail for one CLI tool (`?tool=` query)                                                                                                   |
-| POST   | `/api/cli-tools/apply`                  | Write a tool's generated config (`dryRun` previews; `422` + `containerEphemeralTarget` when containerized; `migration` notes a legacy Codex YAML) |
-| GET    | `/api/cli-tools/backups`                | List CLI tool configuration backups                                                                                                               |
-| POST   | `/api/cli-tools/backups`                | Create a backup of all CLI tool configurations                                                                                                    |
-| POST   | `/api/cli-tools/backups`                | Restore: same endpoint with `{tool, backupId}` in the body restores that backup                                                                   |
-| GET    | `/api/cli-tools/antigravity-mitm`       | Antigravity MITM proxy status (the "antigravity-mitm" CLI tool)                                                                                   |
-| POST   | `/api/cli-tools/antigravity-mitm/alias` | Configure antigravity-mitm aliases                                                                                                                |
+| Method | Path                          | Description                                                                                                                                       |
+| ------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/cli-tools/all-statuses` | Status of all CLI tools (installed, version, last seen)                                                                                           |
+| GET    | `/api/cli-tools/status`       | Status detail for one CLI tool (`?tool=` query)                                                                                                   |
+| POST   | `/api/cli-tools/apply`        | Write a tool's generated config (`dryRun` previews; `422` + `containerEphemeralTarget` when containerized; `migration` notes a legacy Codex YAML) |
+| GET    | `/api/cli-tools/backups`      | List CLI tool configuration backups                                                                                                               |
+| POST   | `/api/cli-tools/backups`      | Create a backup of all CLI tool configurations                                                                                                    |
+| POST   | `/api/cli-tools/backups`      | Restore: same endpoint with `{tool, backupId}` in the body restores that backup                                                                   |
 
 **Auth:** Requires management session.
 

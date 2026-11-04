@@ -8,9 +8,8 @@
 //
 // `proxy-authorization` is the one that costs something: it authenticates the
 // hop to the operator's own proxy, so forwarding it hands that credential to
-// the model provider. Five other modules in this repo already strip it
-// (reverseProxy HOP_BY_HOP, mitm/sanitizeHeaders, inspector/httpProxyServer,
-// tproxy/tlsCapture, openapi/try) — the canonical list did not.
+// the model provider. Other modules in this repo already strip it
+// (reverseProxy HOP_BY_HOP, openapi/try) — the canonical list did not.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 

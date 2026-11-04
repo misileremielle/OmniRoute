@@ -72,12 +72,6 @@
   "src/app/(dashboard)/dashboard/quota/page.tsx": {
     "TS2339": 4
   },
-  "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/CustomHostsManager.tsx": {
-    "TS2339": 1
-  },
-  "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/tabs/ResponseBodyTab.tsx": {
-    "TS2339": 5
-  },
   "src/app/(dashboard)/dashboard/translator/components/MonitorTab.tsx": {
     "TS2345": 1
   },
@@ -270,12 +264,6 @@
   "src/app/api/system/env/repair/route.ts": {
     "TS2578": 1,
     "TS2353": 3
-  },
-  "src/app/api/tools/agent-bridge/agents/[id]/detected-models/route.ts": {
-    "TS2769": 1
-  },
-  "src/app/api/tools/traffic-inspector/ws/route.ts": {
-    "TS2578": 1
   },
   "src/app/api/translator/send/route.ts": {
     "TS2345": 1,

@@ -6,7 +6,7 @@ lastUpdated: 2026-09-02
 
 # Stealth Guide
 
-> **Source of truth:** `open-sse/utils/tlsClient.ts`, `open-sse/services/{tlsClientBase,claudeTlsClient,perplexityTlsClient,grokTlsClient,notionTlsClient,lmarenaTlsClient,claudeCodeCCH,claudeCodeFingerprint,claudeCodeObfuscation,claudeCodeCompatible}.ts`, `open-sse/config/cliFingerprints.ts`, `src/mitm/`
+> **Source of truth:** `open-sse/utils/tlsClient.ts`, `open-sse/services/{tlsClientBase,claudeTlsClient,perplexityTlsClient,grokTlsClient,notionTlsClient,lmarenaTlsClient,claudeCodeCCH,claudeCodeFingerprint,claudeCodeObfuscation,claudeCodeCompatible}.ts`, `open-sse/config/cliFingerprints.ts`
 > **Last updated:** 2026-09-02 — v3.8.51
 > **Audience:** Engineers maintaining provider-specific stealth integrations.
 
@@ -196,64 +196,16 @@ Toggle per provider via env (see below). When disabled, headers/body keys appear
 
 ---
 
-## MITM Proxy (Antigravity, Linux/macOS/Windows)
-
-For CLIs whose binaries cannot be redirected via `OPENAI_BASE_URL`, OmniRoute runs a local TLS-terminating proxy. Endpoints live under `src/app/api/cli-tools/antigravity-mitm/`.
-
-| Method | Endpoint                                | Purpose                                          |
-| ------ | --------------------------------------- | ------------------------------------------------ |
-| GET    | `/api/cli-tools/antigravity-mitm`       | Status — running, pid, dnsConfigured, certExists |
-| POST   | `/api/cli-tools/antigravity-mitm`       | Start MITM (requires `apiKey` + `sudoPassword`)  |
-| DELETE | `/api/cli-tools/antigravity-mitm`       | Stop MITM                                        |
-| GET    | `/api/cli-tools/antigravity-mitm/alias` | List model aliases                               |
-| PUT    | `/api/cli-tools/antigravity-mitm/alias` | Save model aliases for a tool                    |
-
-Target intercepted host: **`daily-cloudcode-pa.googleapis.com`** (Antigravity's upstream).
-
-### Start sequence (`src/mitm/manager.ts::startMitm`)
-
-1. Generate self-signed cert via `selfsigned` (RSA-2048, SHA-256, 1y) — `cert/generate.ts`
-2. Install cert to system trust store — `cert/install.ts`
-3. Add hosts entry `127.0.0.1 daily-cloudcode-pa.googleapis.com` — `dns/dnsConfig.ts`
-4. Spawn `src/mitm/server.cjs` with `ROUTER_API_KEY` + `MITM_LOCAL_PORT` (default `443`)
-5. Persist PID to `<DATA_DIR>/mitm/.mitm.pid`
-
-### Linux dynamic trust-store detection — `cert/install.ts`
-
-`getLinuxCertConfig()` walks a priority list and picks the first existing directory:
-
-| Distro family            | Directory                                   | Update command           |
-| ------------------------ | ------------------------------------------- | ------------------------ |
-| Debian / Ubuntu          | `/usr/local/share/ca-certificates`          | `update-ca-certificates` |
-| Arch / CachyOS / Manjaro | `/etc/ca-certificates/trust-source/anchors` | `update-ca-trust`        |
-| Fedora / RHEL / CentOS   | `/etc/pki/ca-trust/source/anchors`          | `update-ca-trust`        |
-| openSUSE                 | `/etc/pki/trust/anchors`                    | `update-ca-certificates` |
-
-Cert filename: `omniroute-mitm.crt`. Fingerprint match via `getCertFingerprint()` (SHA-1 of DER).
-
-Additionally, `updateNssDatabases()` installs into per-user NSS DBs when `certutil` is available: `~/.pki/nssdb`, `~/snap/chromium/.../nssdb`, all Firefox profiles (including snap), under the nickname **`OmniRoute MITM Root CA`**.
-
-### macOS / Windows
-
-- **macOS:** `security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain`
-- **Windows:** elevated PowerShell → `certutil -addstore Root`
-
-### Auth
-
-All MITM endpoints require management auth (`requireCliToolsAuth`). The sudo password is cached in module scope (never `globalThis`) and cleared on `stopMitm()`.
-
----
-
 ## User-Agent Overrides — env vars (`.env.example` section 12)
 
-| Variable                 | Default                                                         |
-| ------------------------ | --------------------------------------------------------------- |
-| `CLAUDE_USER_AGENT`      | `claude-cli/2.1.280 (external, cli)`                            |
-| `CODEX_USER_AGENT`       | `codex-cli/0.155.0 (Windows 10.0.26200; x64)`                   |
-| `GITHUB_USER_AGENT`      | `GitHubCopilotChat/0.54.0`                                      |
-| `KIRO_USER_AGENT`        | `AWS-SDK-JS/3.0.0 kiro-ide/1.0.0`                               |
-| `QODER_USER_AGENT`       | `Qoder-Cli`                                                     |
-| `CURSOR_USER_AGENT`      | `Cursor/3.4`                                                    |
+| Variable            | Default                                       |
+| ------------------- | --------------------------------------------- |
+| `CLAUDE_USER_AGENT` | `claude-cli/2.1.280 (external, cli)`          |
+| `CODEX_USER_AGENT`  | `codex-cli/0.155.0 (Windows 10.0.26200; x64)` |
+| `GITHUB_USER_AGENT` | `GitHubCopilotChat/0.54.0`                    |
+| `KIRO_USER_AGENT`   | `AWS-SDK-JS/3.0.0 kiro-ide/1.0.0`             |
+| `QODER_USER_AGENT`  | `Qoder-Cli`                                   |
+| `CURSOR_USER_AGENT` | `Cursor/3.4`                                  |
 
 Consumed by `open-sse/executors/base.ts::buildHeaders()` via dynamic lookup. **Bump these when providers release new CLI versions** — stale UA strings start getting rejected as outdated clients.
 
@@ -307,4 +259,4 @@ OmniRoute scrubs inbound client headers before forwarding so a request that arri
 - [RESILIENCE_GUIDE.md](../architecture/RESILIENCE_GUIDE.md) — what happens when a stealth path gets a `403`
 - [TROUBLESHOOTING.md](../guides/TROUBLESHOOTING.md)
 - [ENVIRONMENT.md](../reference/ENVIRONMENT.md) — full env reference
-- [CLI-TOOLS.md](../reference/CLI-TOOLS.md) — operator view of the MITM workflow
+- [CLI-TOOLS.md](../reference/CLI-TOOLS.md) — CLI tool integrations

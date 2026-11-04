@@ -1,5 +1,5 @@
 /**
- * Public-safe error bodies for the tunnel and MITM management routes.
+ * Public-safe error bodies for the tunnel management routes.
  *
  * Hard Rule #12 forbids returning a raw `err.message` in an HTTP body, and
  * `sanitizeErrorMessage()` is the repo's general answer. It is not enough here:
@@ -21,8 +21,7 @@
  * `/api/tunnels/tailscale` and `/api/tunnels/tailscale/check` are NOT in
  * `LOCAL_ONLY_API_PREFIXES`, and `GET /api/tunnels/cloudflared` is explicitly
  * exempted through `LOCAL_ONLY_API_GET_EXEMPTIONS` (#11531), so those bodies can
- * reach a non-loopback caller. The remaining tunnel routes and
- * `/api/settings/mitm` are loopback-gated; they are covered here for one
+ * reach a non-loopback caller. The remaining tunnel routes are loopback-gated; they are covered here for one
  * consistent contract, not because they are remotely reachable.
  *
  * The contract deliberately does NOT try to scrub the upstream text. It returns
@@ -77,7 +76,7 @@ export function classifyTunnelError(error: unknown): PublicSafeTunnelErrorReason
 }
 
 /**
- * Build the 500 body for a tunnel/MITM route.
+ * Build the 500 body for a tunnel route.
  *
  * @param error    The caught value. Never echoed.
  * @param fallback Operator-facing sentence describing what failed. Must be a

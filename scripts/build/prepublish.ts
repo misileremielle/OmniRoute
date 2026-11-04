@@ -27,7 +27,6 @@ import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { assembleStandalone } from "./assembleStandalone.mjs";
-import { buildMitmUtilities } from "./buildMitm.mjs";
 import { isNativeExecutable, resolveLocalBinEntry } from "./buildToolRunner.mjs";
 import { resolveBundledNpmEntry } from "./resolveNpmEntry.ts";
 import { getPrepublishDistDirRefusal } from "./prepublishPathSafety.ts";
@@ -203,7 +202,7 @@ console.log("  ✅ Standalone artifact present:", standaloneServerJs);
 
 // ── Step 3–7: Assemble standalone into dist/ ───────────────
 // All shared copy/sync/sanitize/chunk-patch operations are delegated to
-// assembleStandalone.  npm-UNIQUE steps (MITM, MCP, CLI, sidecars) follow.
+// assembleStandalone.  npm-UNIQUE steps (MCP, CLI, sidecars) follow.
 console.log("  📋 Assembling standalone bundle into dist/...");
 assembleStandalone({
   distDir: join(ROOT, NEXT_DIST),
@@ -228,12 +227,6 @@ if (existsSync(distServer)) {
     console.log("  ✅ Patched dist/server.js with HTTP method guard.");
   }
 }
-
-// ── Step 8: Compile + copy MITM cert utilities ─────────────
-const mitmDest = join(DIST_DIR, "src", "mitm");
-console.log("  🔨 Typechecking and bundling MITM utilities...");
-await buildMitmUtilities({ projectRoot: ROOT, destination: mitmDest });
-console.log("  ✅ MITM utilities compiled to dist/src/mitm/");
 
 // ── Step 8.5: Bundle MCP server ────────────────────────────
 const mcpSrcFile = join(ROOT, "open-sse", "mcp-server", "server.ts");

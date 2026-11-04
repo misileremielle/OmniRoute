@@ -208,13 +208,6 @@ export const KNOWN_UNCLASSIFIED_SOURCE_SPAWN: Record<string, string> = {
   // are now classified in LOCAL_ONLY_API_PREFIXES (loopback-enforced before auth).
   // The stale-enforcement guard requires this set to stay empty until a NEW
   // unclassified spawn-capable route appears.
-  // NOTE: cli-tools/antigravity-mitm/route.ts triggers child_process INDIRECTLY via
-  // dynamic import to @/mitm/manager.runtime, but does NOT directly import child_process.
-  // The source-scan gate covers DIRECT imports/calls only; this route is NOT in the
-  // spawn-capable set by source analysis. Kept as a comment for documentation but
-  // NOT in the allowlist (stale-enforcement would flag it). The route has requireCliToolsAuth()
-  // for auth gating; the underlying spawn happens in mitm/manager.runtime.
-  // If /api/cli-tools/ is ever added to LOCAL_ONLY_API_PREFIXES, revisit this note.
 };
 
 // --- G-09 (#15159, #15965): transitive spawn detection through the import graph ---
@@ -294,14 +287,10 @@ export const KNOWN_TRANSITIVE_SPAWN_SINKS: Record<string, string> = {
   "src/lib/proxySubscription/coreConfig/reload.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/skills/containerProvider.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/skills/sandbox.ts": `${G09_BASELINE} (child_process)`,
+  "src/lib/system/systemCommands.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/tailscaleTunnel.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/versionManager/binaryManager.ts": `${G09_BASELINE} (child_process)`,
   "src/lib/vncSession/service.ts": `${G09_BASELINE} (child_process)`,
-  "src/mitm/cert/install.ts": `${G09_BASELINE} (child_process)`,
-  "src/mitm/dns/dnsConfig.ts": `${G09_BASELINE} (child_process)`,
-  "src/mitm/inspector/systemProxyConfig.ts": `${G09_BASELINE} (child_process)`,
-  "src/mitm/manager.ts": `${G09_BASELINE} (child_process)`,
-  "src/mitm/systemCommands.ts": `${G09_BASELINE} (child_process)`,
   "src/shared/services/cliRuntime.ts": `${G09_BASELINE} (child_process)`,
   "src/shared/services/cliRuntimeNpmPrefix.ts": `${G09_BASELINE} (child_process)`,
   "src/shared/services/loginShellPath.ts": `${G09_BASELINE} (child_process)`,

@@ -196,7 +196,7 @@ public URL has the shape `https://<machine>.<tailnet>.ts.net/`.
 
 On Linux and macOS the daemon (`tailscaled`) requires `sudo` to control. The
 POST endpoints accept an optional `sudoPassword` field which is forwarded to
-OmniRoute's MITM password cache (`getCachedPassword` / `setCachedPassword`) for
+OmniRoute's sudo password cache (`src/lib/system/sudoPasswordCache.ts`) for
 the duration of the call. Windows uses the default service install at
 `C:\Program Files\Tailscale\tailscale.exe`.
 

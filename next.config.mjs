@@ -3,7 +3,6 @@ import { createMDX } from "fumadocs-mdx/next";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { betterSqlite3AliasFor } from "./scripts/build/better-sqlite3-stub-flag.mjs";
-import { mitmManagerAliasFor } from "./scripts/build/mitm-stub-flag.mjs";
 import { normalizeBasePath } from "./scripts/build/normalizeBasePath.mjs";
 import { macosDevExperimentalOverrides } from "./scripts/build/macosDevWorkaround.mjs";
 import {
@@ -71,9 +70,9 @@ const securityHeaders = [
   },
 ];
 
-// OMNIROUTE_BUILD_PROFILE=minimal physically removes four optional privileged
-// modules (MITM cert install, Zed keychain import, Cloud Sync, 9router
-// installer) from the built bundle by aliasing them to feature-disabled stubs.
+// OMNIROUTE_BUILD_PROFILE=minimal physically removes three optional privileged
+// modules (Zed keychain import, Cloud Sync, 9router installer) from the built
+// bundle by aliasing them to feature-disabled stubs.
 // The resulting artifact is intended to be published as `omniroute-secure`
 // for security-sensitive environments. See docs/security/SOCKET_DEV_FINDINGS.md.
 const isMinimalBuild = process.env.OMNIROUTE_BUILD_PROFILE === "minimal";
@@ -85,7 +84,6 @@ const dashboardEmbedMode = resolveDashboardEmbedMode(process.env);
 
 const minimalBuildAliases = isMinimalBuild
   ? {
-      "@/mitm/cert/install": "./src/mitm/cert/install.stub.ts",
       "@/lib/zed-oauth/keychain-reader": "./src/lib/zed-oauth/keychain-reader.stub.ts",
       "@/lib/cloudSync": "./src/lib/cloudSync.stub.ts",
       "@/lib/services/installers/ninerouter": "./src/lib/services/installers/ninerouter.stub.ts",
@@ -136,13 +134,6 @@ const nextConfig = {
   turbopack: {
     root: projectRoot,
     resolveAlias: {
-      // @/mitm/manager → stub ONLY where the runtime can't run the MITM stack
-      // (Docker sets OMNIROUTE_MITM_STUB=1 — #3390 graceful degradation). The
-      // alias used to be unconditional, which was fine while Docker was the
-      // only Turbopack consumer — but the v3.8.45 bundler-default flip shipped
-      // the stub to every npm/Electron/VPS artifact and broke Agent Bridge
-      // start for all non-Docker users (#6344). See scripts/build/mitm-stub-flag.mjs.
-      ...mitmManagerAliasFor(process.env),
       // better-sqlite3 → build-time stub ONLY where the build worker actually
       // aborts while tracing the native addon (SIGABRT at worker teardown,
       // #10060); opt in with OMNIROUTE_BETTER_SQLITE3_STUB=1. The alias used to
@@ -254,7 +245,6 @@ const nextConfig = {
     // runtime and are NOT always auto-traced by webpack/turbopack.
     "/*": [
       "./src/lib/db/migrations/**/*",
-      "./src/mitm/server.cjs",
       "./open-sse/services/compression/engines/rtk/filters/**/*.json",
       "./open-sse/services/compression/rules/**/*.json",
       "./open-sse/lib/deepseek-pow-hash.js",
@@ -480,7 +470,6 @@ const nextConfig = {
       // defined above) so this resolves correctly regardless of which file
       // does the importing.
       const replacements = [
-        [/^@\/mitm\/cert\/install$/, join(projectRoot, "src/mitm/cert/install.stub.ts")],
         [
           /^@\/lib\/zed-oauth\/keychain-reader$/,
           join(projectRoot, "src/lib/zed-oauth/keychain-reader.stub.ts"),

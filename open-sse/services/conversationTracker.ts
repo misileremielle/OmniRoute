@@ -50,7 +50,7 @@ interface CanonicalTurn {
   text: string;
   /** 'text' | 'tool_use' | 'tool_result' — carried through to
    * conversation_turn_nodes so the tree view (and any other consumer) can
-   * build the exact NormalizedBlock (src/mitm/inspector/types.ts) the
+   * build the exact NormalizedBlock (src/shared/conversation/types.ts) the
    * request-detail panel already builds from buildRequestTurns/
    * buildResponseTurns, rendering tool calls/results through the same
    * ChatBubble/MessageContent/ToolCallBlock/ToolResultBlock components

@@ -195,12 +195,6 @@
   "src/app/api/system/version/route.ts": {
     "TS2769": 1
   },
-  "src/app/api/tools/agent-bridge/agents/[id]/detected-models/route.ts": {
-    "TS2769": 1
-  },
-  "src/app/api/tools/traffic-inspector/ws/route.ts": {
-    "TS2578": 1
-  },
   "src/app/api/translator/send/route.ts": {
     "TS2345": 1,
     "TS2322": 1
@@ -396,7 +390,6 @@
     "open-sse/mcp-server/server.ts": 21,
     "open-sse/services/usage/qoder.ts": 1,
     "src/app/api/system/env/repair/route.ts": 1,
-    "src/app/api/tools/traffic-inspector/ws/route.ts": 1,
     "src/lib/cli-helper/claudeProfileAutoSync.ts": 1,
     "src/lib/cli-helper/codexProfileAutoSync.ts": 1
   }

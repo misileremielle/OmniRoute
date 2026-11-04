@@ -10,7 +10,6 @@ import Icon from "@/shared/components/Icon";
 import { CLI_TOOLS } from "@/shared/constants/cliTools";
 import { PROVIDER_ID_TO_ALIAS, getModelsByProviderId } from "@/shared/constants/models";
 import {
-  AntigravityToolCard,
   ClaudeToolCard,
   ClineToolCard,
   CodexToolCard,
@@ -280,14 +279,9 @@ export default function ToolDetailClient({ toolId, category }: ToolDetailClientP
         return <HermesAgentToolCard {...cardProps} />;
       case "grok-build":
         return <GrokBuildToolCard {...cardProps} />;
-      case "antigravity":
-        return <AntigravityToolCard {...cardProps} />;
       case "custom":
         return <CustomCliCard {...cardProps} />;
       default:
-        if (tool.configType === "mitm") {
-          return <AntigravityToolCard {...cardProps} />;
-        }
         return <DefaultToolCard toolId={toolId} {...cardProps} />;
     }
   };

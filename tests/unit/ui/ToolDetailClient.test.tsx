@@ -143,7 +143,6 @@ vi.mock("../../../src/app/(dashboard)/dashboard/cli-code/components/index", () =
   DefaultToolCard: ({ toolId }: { toolId: string }) => (
     <div data-testid="DefaultToolCard" data-toolid={toolId} />
   ),
-  AntigravityToolCard: () => <div data-testid="AntigravityToolCard" />,
   CopilotToolCard: () => <div data-testid="CopilotToolCard" />,
   CustomCliCard: () => <div data-testid="CustomCliCard" />,
   HermesAgentToolCard: () => <div data-testid="HermesAgentToolCard" />,

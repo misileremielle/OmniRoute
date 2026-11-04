@@ -2,8 +2,6 @@
   "_meta": "Relative weights for scripts/quality/balance-e2e-shards.mjs (LPT shard packing). Unitless \u2014 only ratios matter. Seeded from spec LOC (proxy) on 2026-07-13; replace values with real per-file durations (seconds) from a full CI run's reports whenever convenient. New specs without an entry get the median weight.",
   "a11y-resilience.spec.ts": 59,
   "a11y.spec.ts": 281,
-  "agent-bridge-traffic-cross.spec.ts": 155,
-  "agent-bridge.spec.ts": 160,
   "agent-skills-page.spec.ts": 205,
   "analytics-tabs.spec.ts": 334,
   "api-key-access-flow.spec.ts": 396,
@@ -39,7 +37,6 @@
   "settings-toggles.spec.ts": 127,
   "skills-marketplace.spec.ts": 209,
   "smoke.spec.ts": 33,
-  "traffic-inspector.spec.ts": 212,
   "translator-friendly.spec.ts": 115,
   "visual-resilience-smoke.spec.ts": 20,
   "rtl-font-loading.spec.ts": 114

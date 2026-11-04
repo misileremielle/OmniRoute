@@ -681,11 +681,7 @@ export default function Sidebar(_props: SidebarProps = {}) {
           {/* The shell Header owns the collapse/expand trigger (one per page). Only the mobile
               drawer needs its own control: the modal Sheet hides the header while it is open. */}
           {isMobile && (
-            <SidebarTrigger
-              aria-label={tc("close")}
-              title={tc("close")}
-              className="shrink-0"
-            >
+            <SidebarTrigger aria-label={tc("close")} title={tc("close")} className="shrink-0">
               <Icon name="close" />
             </SidebarTrigger>
           )}

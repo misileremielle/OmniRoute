@@ -7,8 +7,8 @@ import { promisify } from "util";
 import { getSettings, updateSettings } from "@/lib/db/settings";
 import { resolveDataDir } from "@/lib/dataPaths";
 import { getRuntimePorts } from "@/lib/runtime/ports";
-import { getCachedPassword, setCachedPassword } from "@/mitm/manager";
-import { execFileWithPassword } from "@/mitm/systemCommands";
+import { getCachedPassword, setCachedPassword } from "@/lib/system/sudoPasswordCache";
+import { execFileWithPassword } from "@/lib/system/systemCommands";
 import { getConsistentMachineId } from "@/shared/utils/machineId";
 
 const execFileAsync = promisify(execFile);

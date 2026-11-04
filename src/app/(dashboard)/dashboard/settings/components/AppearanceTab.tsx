@@ -652,7 +652,6 @@ export default function AppearanceTab() {
                 </div>
               )}
             </div>
-
           </div>
         </div>
       </div>

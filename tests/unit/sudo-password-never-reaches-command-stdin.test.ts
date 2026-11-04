@@ -12,7 +12,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
 
-const { planSudoSteps, execFileWithPassword } = await import("../../src/mitm/systemCommands.ts");
+const { planSudoSteps, execFileWithPassword } =
+  await import("../../src/lib/system/systemCommands.ts");
 
 const PASSWORD = "PROBE-PASSWORD-9f3a";
 const DATA = "127.0.0.1 example.test\n";

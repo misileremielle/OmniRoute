@@ -114,8 +114,8 @@ export function detectFormatFromEndpoint(body, endpointPath = "") {
     return "claude";
   }
 
-  // Antigravity/cloudcode-compatible inbound endpoint (D4): the AgentBridge
-  // proxy forwards the IDE's cloudcode envelope here. Path-based detection
+  // Antigravity/cloudcode-compatible inbound endpoint (D4): clients post the
+  // IDE's cloudcode envelope here. Path-based detection
   // (mirrors /messages → claude) makes the pipeline translate the request
   // antigravity→openai and the response openai→antigravity, so the IDE gets
   // a cloudcode reply regardless of which provider actually served it.

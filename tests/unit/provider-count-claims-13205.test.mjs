@@ -35,7 +35,6 @@ test("checks all reported documentation and skill surfaces", () => {
     "docs/architecture/REPOSITORY_MAP.md",
     "docs/frameworks/A2A-SERVER.md",
     "docs/frameworks/ACP.md",
-    "docs/frameworks/AGENTBRIDGE.md",
     "docs/frameworks/OPEN_SSE_ARCHITECTURE.md",
     "docs/getting-started/FREE-TIERS-GUIDE.md",
     "docs/comparison/OMNIROUTE_VS_ALTERNATIVES.md",

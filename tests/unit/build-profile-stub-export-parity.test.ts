@@ -70,11 +70,4 @@ describe("build-profile stub export parity (#12806, #12807)", () => {
       "../../src/lib/services/installers/ninerouter.stub.ts"
     );
   });
-
-  it("mitm/cert/install.stub.ts exports everything real consumers import from @/mitm/cert/install", async () => {
-    await assertStubCoversRealConsumerImports(
-      "@/mitm/cert/install",
-      "../../src/mitm/cert/install.stub.ts"
-    );
-  });
 });

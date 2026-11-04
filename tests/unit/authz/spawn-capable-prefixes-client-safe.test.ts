@@ -73,8 +73,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
   for (const prefix of [
     "/api/cli-tools/runtime/",
     "/api/services/",
-    "/api/tools/agent-bridge/",
-    "/api/tools/traffic-inspector/",
     "/api/plugins/",
     "/api/local/",
     "/api/skills/collect/",
@@ -82,8 +80,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
     "/api/headroom/stop",
     "/api/vnc-session",
     "/api/modality-bridge/video/",
-    "/api/settings/mitm",
-    "/api/cli-tools/antigravity-mitm",
     "/api/tunnels/cloudflared",
     "/api/tunnels/tailscale/disable",
     "/api/tunnels/tailscale/enable",
@@ -141,5 +137,5 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
   // + 1 host-credential read (/api/oauth/kiro/auto-import) that must never be bypassable.
   // + 1 (whycodes-settings, #14107).
   // qwen-settings is the one pre-existing entry not enumerated above.
-  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 53);
+  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 49);
 });

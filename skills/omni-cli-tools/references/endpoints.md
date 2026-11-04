@@ -8,11 +8,6 @@
 - [`POST /api/cli-tools/backups`](#post-apicli-toolsbackups)
 - [`GET /api/cli-tools/runtime/{toolId}`](#get-apicli-toolsruntimetoolid)
 - [`GET /api/cli-tools/guide-settings/{toolId}`](#get-apicli-toolsguide-settingstoolid)
-- [`GET /api/cli-tools/antigravity-mitm`](#get-apicli-toolsantigravity-mitm)
-- [`POST /api/cli-tools/antigravity-mitm`](#post-apicli-toolsantigravity-mitm)
-- [`DELETE /api/cli-tools/antigravity-mitm`](#delete-apicli-toolsantigravity-mitm)
-- [`GET /api/cli-tools/antigravity-mitm/alias`](#get-apicli-toolsantigravity-mitmalias)
-- [`PUT /api/cli-tools/antigravity-mitm/alias`](#put-apicli-toolsantigravity-mitmalias)
 - [`GET /api/cli-tools/claude-settings`](#get-apicli-toolsclaude-settings)
 - [`POST /api/cli-tools/claude-settings`](#post-apicli-toolsclaude-settings)
 - [`DELETE /api/cli-tools/claude-settings`](#delete-apicli-toolsclaude-settings)
@@ -116,55 +111,6 @@ Get guide settings for a tool
 ```bash
 curl http://localhost:20128/api/cli-tools/guide-settings/{toolId} \
   -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### GET /api/cli-tools/antigravity-mitm
-
-Get Antigravity MITM proxy settings
-
-```bash
-curl http://localhost:20128/api/cli-tools/antigravity-mitm \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### POST /api/cli-tools/antigravity-mitm
-
-Update Antigravity MITM proxy settings
-
-```bash
-curl -X POST http://localhost:20128/api/cli-tools/antigravity-mitm \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-### DELETE /api/cli-tools/antigravity-mitm
-
-Reset Antigravity MITM proxy settings
-
-```bash
-curl -X DELETE http://localhost:20128/api/cli-tools/antigravity-mitm \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### GET /api/cli-tools/antigravity-mitm/alias
-
-Get Antigravity MITM alias configuration
-
-```bash
-curl http://localhost:20128/api/cli-tools/antigravity-mitm/alias \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### PUT /api/cli-tools/antigravity-mitm/alias
-
-Update Antigravity MITM alias configuration
-
-```bash
-curl -X PUT http://localhost:20128/api/cli-tools/antigravity-mitm/alias \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
 ```
 
 ### GET /api/cli-tools/claude-settings

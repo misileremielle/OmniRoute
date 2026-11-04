@@ -180,7 +180,7 @@ async function initUnixTray(options: TrayOptions): Promise<TrayInstance | null> 
       /* systray2 does not support runtime tooltip change */
     },
     // Pass false so systray2's kill does NOT call process.exit(0) before the
-    // rest of cleanup (server SIGKILL, MITM/tunnel cleanup) runs. (PR #1080)
+    // rest of cleanup (server SIGKILL, tunnel cleanup) runs. (PR #1080)
     destroy: () => systray.kill(false),
   };
 }

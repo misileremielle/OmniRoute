@@ -4,8 +4,6 @@ import type { CliCatalogEntry } from "@/shared/schemas/cliCatalog";
 import { GROK_BUILD_CLI_TOOL } from "@/shared/constants/cliToolsGrokBuild";
 
 const _cc = getClaudeCodeDefaultModels();
-type CliModel = NonNullable<CliCatalogEntry["defaultModels"]>[number];
-const createCliModel = (id: string, name: string): CliModel => ({ id, name, alias: id });
 
 export const CLI_TOOLS: Record<string, CliCatalogEntry> = {
   claude: {
@@ -228,40 +226,6 @@ export const CLI_TOOLS: Record<string, CliCatalogEntry> = {
 }`,
     },
   },
-  antigravity: {
-    id: "antigravity",
-    name: "Antigravity",
-    color: "#4285F4",
-    description: "Google Antigravity IDE — MITM intercept required (plan 11 backlog)",
-    docsUrl: "/docs?section=cli-tools&tool=antigravity",
-    // configType:"mitm" — fluxo MITM; baseUrlSupport:"none" → excluído das listas,
-    // acessível só via legacy /[id] route após F8
-    configType: "mitm",
-    category: "code",
-    vendor: "Google",
-    acpSpawnable: false,
-    baseUrlSupport: "none",
-    modelAliases: [
-      "gemini-3.8-flash-high",
-      "gemini-3.8-flash-medium",
-      "gemini-3.8-flash-low",
-      "claude-opus-4-6-thinking",
-      "claude-sonnet-4-6",
-      "gemini-pro-agent",
-      "gemini-3.1-pro-low",
-      "gpt-oss-120b-medium",
-    ],
-    defaultModels: [
-      createCliModel("gemini-3.8-flash-high", "Gemini 3.8 Flash High"),
-      createCliModel("gemini-3.8-flash-medium", "Gemini 3.8 Flash Medium"),
-      createCliModel("gemini-3.8-flash-low", "Gemini 3.8 Flash Low"),
-      createCliModel("gemini-pro-agent", "Gemini 3.1 Pro High"),
-      createCliModel("gemini-3.1-pro-low", "Gemini 3.1 Pro Low"),
-      createCliModel("claude-sonnet-4-6", "Claude Sonnet 4.6"),
-      createCliModel("claude-opus-4-6-thinking", "Claude Opus 4.6 Thinking"),
-      createCliModel("gpt-oss-120b-medium", "GPT OSS 120B Medium"),
-    ],
-  },
   copilot: {
     id: "copilot",
     name: "GitHub Copilot",
@@ -399,28 +363,6 @@ export const CLI_TOOLS: Record<string, CliCatalogEntry> = {
     acpSpawnable: false,
     baseUrlSupport: "full",
     defaultCommand: "hermes",
-  },
-  kiro: {
-    id: "kiro",
-    name: "Kiro AI",
-    image: "/providers/kiro.svg",
-    icon: "psychology_alt",
-    color: "#FF6B35",
-    description: "Amazon Kiro — AI-powered IDE with MITM intercept (plan 11 backlog)",
-    docsUrl: "/docs?section=cli-tools&tool=kiro",
-    // configType:"mitm" — fluxo MITM; baseUrlSupport:"none" → excluído das listas,
-    // acessível só via legacy /[id] route após F8
-    configType: "mitm",
-    category: "code",
-    vendor: "Amazon",
-    acpSpawnable: false,
-    baseUrlSupport: "none",
-    guideSteps: [
-      { step: 1, title: "Open Kiro Settings", desc: "Go to Settings → AI Provider" },
-      { step: 2, title: "Base URL", value: "{{baseUrl}}", copyable: true },
-      { step: 3, title: "API Key", type: "apiKeySelector" },
-      { step: 4, title: "Select Model", type: "modelSelector" },
-    ],
   },
   qwen: {
     id: "qwen",

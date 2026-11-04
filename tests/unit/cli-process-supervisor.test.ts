@@ -30,21 +30,6 @@ function makeChildFactory(exitCodes: (number | null)[]) {
   };
 }
 
-// --- detectMitmCrash ---
-
-test("detectMitmCrash retorna true quando >=2 sinais MITM presentes", async () => {
-  const { detectMitmCrash } = await import("../../bin/cli/runtime/processSupervisor.mjs");
-  assert.ok(detectMitmCrash(["mitm proxy failed", "certificate error in tls socket"]));
-  assert.ok(detectMitmCrash(["TLS Socket closed", "certificate invalid"]));
-});
-
-test("detectMitmCrash retorna false com menos de 2 sinais", async () => {
-  const { detectMitmCrash } = await import("../../bin/cli/runtime/processSupervisor.mjs");
-  assert.ok(!detectMitmCrash(["certificate error"]));
-  assert.ok(!detectMitmCrash(["generic error"]));
-  assert.ok(!detectMitmCrash([]));
-});
-
 // --- ServerSupervisor: lógica de restart ---
 
 test("ServerSupervisor.handleExit com code=0 espontâneo reinicia em vez de sair (#4425)", async () => {
@@ -183,29 +168,6 @@ test("ServerSupervisor chama onCrashCallback após maxRestarts atingido", async 
   assert.equal(exits[0], 1);
 });
 
-test("ServerSupervisor retorna 'disable-mitm-and-retry' chama start() novamente", async () => {
-  const { ServerSupervisor } = await import("../../bin/cli/runtime/processSupervisor.mjs");
-
-  let startCalls = 0;
-  const supervisor = new ServerSupervisor({
-    serverPath: "/fake/server.js",
-    env: {},
-    maxRestarts: 2,
-    onCrashCallback: () => "disable-mitm-and-retry",
-  });
-  supervisor.start = () => {
-    startCalls++;
-    return null as any;
-  };
-
-  supervisor.restartCount = 2;
-  supervisor.startedAt = Date.now() - 100;
-  supervisor.handleExit(1);
-
-  assert.equal(startCalls, 1);
-  assert.equal(supervisor.restartCount, 0); // foi resetado
-});
-
 test("ServerSupervisor reseta restartCount após viver >= RESTART_RESET_MS (#4425: 60s)", async () => {
   const { ServerSupervisor } = await import("../../bin/cli/runtime/processSupervisor.mjs");
 
@@ -265,17 +227,17 @@ test("writePidFile/readPidFile/cleanupPidFile operam por service", async () => {
   writePidFile("server", 12345);
   assert.equal(readPidFile("server"), 12345);
 
-  writePidFile("mitm", 99999);
-  assert.equal(readPidFile("mitm"), 99999);
+  writePidFile("tunnel/cloudflared", 99999);
+  assert.equal(readPidFile("tunnel/cloudflared"), 99999);
 
   // Services são independentes
   assert.equal(readPidFile("server"), 12345);
 
   cleanupPidFile("server");
   assert.equal(readPidFile("server"), null);
-  assert.equal(readPidFile("mitm"), 99999); // mitm não foi afetado
+  assert.equal(readPidFile("tunnel/cloudflared"), 99999); // tunnel não foi afetado
 
-  cleanupPidFile("mitm");
+  cleanupPidFile("tunnel/cloudflared");
   delete process.env.DATA_DIR;
 });
 

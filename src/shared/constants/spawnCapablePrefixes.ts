@@ -1,6 +1,6 @@
 /**
  * Compile-time deny-list: route prefixes whose handlers can spawn arbitrary local
- * subprocesses (npm install, node, MITM server, python CLIs) on behalf of the
+ * subprocesses (npm install, node, python CLIs) on behalf of the
  * caller. These MUST NEVER appear in the manage-scope bypass list — regardless of
  * DB state — because reaching them from non-loopback would re-introduce the
  * GHSA-fhh6-4qxv-rpqj surface that the LOCAL_ONLY tier exists to close.
@@ -52,10 +52,6 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/tunnels/tailscale/install", // downloads/installs Tailscale and starts its daemon
   "/api/tunnels/tailscale/login", // spawns `tailscale up`
   "/api/tunnels/tailscale/start-daemon", // starts tailscaled/Tailscale service
-  "/api/tools/agent-bridge/", // start/stop MITM server + DNS edits (Hard Rules #15 + #17)
-  "/api/settings/mitm", // installs a system trusted root CA + /etc/hosts DNS overrides via src/mitm/* — must never be whitelistable via manage-scope bypass (GHSA-x7vm-hp44-9p79, Hard Rules #15 + #17)
-  "/api/cli-tools/antigravity-mitm", // same privileged CA-trust + DNS surface as /api/settings/mitm (GHSA-x7vm-hp44-9p79, Hard Rules #15 + #17)
-  "/api/tools/traffic-inspector/", // http-proxy listener + system proxy (Hard Rules #15 + #17)
   "/api/plugins/", // plugins: load/execute via worker_threads + child_process (Hard Rules #15 + #17)
   "/api/local/", // T-12: 1-click local service launchers (Redis today) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17)
   "/api/skills/collect/", // Skill Collector CLI detection: GET .../detect spawns a child process per CLI_TOOL_IDS entry — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17, PR #6294 review)

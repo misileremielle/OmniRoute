@@ -29,7 +29,7 @@ function referencing(re: RegExp): string[] {
   );
 }
 
-test("P2: the orphan settings MitmProxyTab stays deleted (live screen is /dashboard/system/mitm-proxy)", () => {
+test("P2: the orphan settings MitmProxyTab stays deleted", () => {
   const file = "src/app/(dashboard)/dashboard/settings/components/MitmProxyTab.tsx";
   assert.equal(fs.existsSync(path.join(ROOT, file)), false, `${file} must not come back`);
   assert.deepEqual(referencing(/settings\/components\/MitmProxyTab|\bMitmProxyTab\b/), []);

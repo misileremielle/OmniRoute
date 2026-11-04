@@ -5,7 +5,7 @@ import type { RegistryEntry } from "../../shared.ts";
  * Anthropic/OpenAI/Google/xAI depending on the requested model).
  *
  * Distinct from the pre-existing `zed` provider id (Zed IDE local
- * credential-import surface — src/lib/zed-oauth/ + src/mitm/detection/zed.ts).
+ * credential-import surface — src/lib/zed-oauth/).
  * This entry is the new cloud-proxy capability; `zed-hosted` avoids an id clash.
  *
  * `models: []` + `modelsUrl` intentionally — Zed's hosted catalog changes

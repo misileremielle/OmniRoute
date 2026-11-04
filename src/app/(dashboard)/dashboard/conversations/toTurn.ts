@@ -1,4 +1,4 @@
-import type { NormalizedBlock, NormalizedTurn } from "@/mitm/inspector/types";
+import type { NormalizedBlock, NormalizedTurn } from "@/shared/conversation/types";
 
 export interface ConversationTurn {
   seq: number;
@@ -12,7 +12,7 @@ export interface ConversationTurn {
 }
 
 /**
- * Builds the exact NormalizedBlock (src/mitm/inspector/types.ts) the
+ * Builds the exact NormalizedBlock (src/shared/conversation/types.ts) the
  * request-detail panel already builds from buildRequestTurns/
  * buildResponseTurns, so a tool call/result renders through the very same
  * ChatBubble → MessageContent → ToolCallBlock/ToolResultBlock pipeline as

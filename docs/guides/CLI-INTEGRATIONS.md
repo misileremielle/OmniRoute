@@ -136,8 +136,8 @@ omniroute configure qwen --model qwen/qwen3.8-max-preview --yes
 
 `configure` currently delegates to the tested recipes for `codex`, `claude`,
 `opencode`, `qwen`, `aider`, `goose`, `cline`, `continue`, `kilo`, and `5dive`.
-IDE-only,
-MITM, and guide-only catalog entries remain explicit `setup-*`/manual flows and
+IDE-only
+and guide-only catalog entries remain explicit `setup-*`/manual flows and
 are not presented as launchable targets.
 
 > `setup-opencode` is the **lightweight openai-compatible** OpenCode integration.

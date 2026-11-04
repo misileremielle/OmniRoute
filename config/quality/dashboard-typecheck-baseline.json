@@ -64,12 +64,6 @@
   "src/app/(dashboard)/dashboard/settings/components/AppearanceTab.tsx": {
     "TS2339": 4
   },
-  "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/CustomHostsManager.tsx": {
-    "TS2339": 1
-  },
-  "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/tabs/ResponseBodyTab.tsx": {
-    "TS2339": 5
-  },
   "src/app/(dashboard)/dashboard/translator/components/MonitorTab.tsx": {
     "TS2345": 1
   },
@@ -95,8 +89,5 @@
   },
   "src/shared/components/analytics/rechartsDonuts.tsx": {
     "TS2739": 2
-  },
-  "src/shared/hooks/useElectron.ts": {
-    "TS2339": 19
   }
 }

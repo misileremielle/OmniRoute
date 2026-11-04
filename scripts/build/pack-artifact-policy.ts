@@ -94,7 +94,6 @@ export const APP_STAGING_ALLOWED_PATH_PREFIXES: string[] = [
   "open-sse/services/compression/rules/",
   "public/",
   "src/lib/db/migrations/",
-  "src/mitm/",
 ];
 
 export const PACK_ARTIFACT_ALLOWED_EXACT_PATHS: string[] = APP_STAGING_ALLOWED_EXACT_PATHS.map(
@@ -114,10 +113,6 @@ export const PACK_ARTIFACT_ROOT_ALLOWED_EXACT_PATHS: string[] = [
   "config/release/wreq-js-rust-license-inventory.json",
   "config/release/wreq-js-rust-notices.md",
   "bin/aliasResolver.mjs",
-  // #14006: Antigravity MITM bridge (operator tool for the Antigravity IDE/CLI).
-  // Shipped via package.json "files": ["bin/"]; its only local import is the CJS shim
-  // ../src/mitm/_internal/bridgeCert.cjs (shipped via "src/mitm/").
-  "bin/antigravity-bridge.mjs",
   "bin/chatgpt-web-codex-mcp.mjs",
   // #7808: ESM loader hook split out of bin/aliasResolver.mjs to silence CodeQL
   // js/incomplete-url-substring-sanitization (the old code built a
@@ -163,7 +158,6 @@ export const PACK_ARTIFACT_ROOT_ALLOWED_EXACT_PATHS: string[] = [
   "package.json",
   "scripts/build/assembleStandalone.mjs",
   "scripts/build/backendOnlyPages.mjs",
-  "scripts/build/build-tproxy-native.mjs",
   "scripts/build/build-next-isolated.mjs",
   "scripts/i18n/generate-global-error-messages.mjs",
   "scripts/check/check-supported-node-runtime.ts",
@@ -208,7 +202,6 @@ export const PACK_ARTIFACT_ROOT_ALLOWED_PATH_PREFIXES: string[] = [
   "src/domain/",
   "src/lib/",
   "src/models/",
-  "src/mitm/",
   "src/server/",
   "src/shared/",
   "src/sse/",
