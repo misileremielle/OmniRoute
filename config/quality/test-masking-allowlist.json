@@ -1232,6 +1232,67 @@
     "tests/unit/windows-cert-identity-7275.test.ts": {
       "sourceRemoved": ["src/mitm/cert/install.ts"],
       "reason": "MITM / Agent Bridge / Traffic Inspector removed (refactor: remove MITM, Agent Bridge and Traffic Inspector): src/mitm, src/lib/inspector, the tools/* dashboard pages and /api/tools/{agent-bridge,traffic-inspector}, /api/settings/mitm and /api/cli-tools/antigravity-mitm no longer exist, so there is no source left to test."
+    },
+    "tests/integration/reasoning-routing-pipeline.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts",
+        "src/sse/handlers/reasoningRouting.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/integration/reasoning-routing-reliability.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts",
+        "src/sse/handlers/reasoningRouting.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/dashboard/reasoning-routing-efforts.test.ts": {
+      "sourceRemoved": ["src/shared/reasoning/reasoningRoutingEfforts.ts"],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/luna-reasoning-effort-400.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/reasoning-routing-api.test.ts": {
+      "sourceRemoved": [
+        "src/app/api/settings/reasoning-routing-rules/route.ts",
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/reasoning-routing-codex-extended-effort.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/reasoning-routing-decision-guards.test.ts": {
+      "sourceRemoved": ["src/sse/handlers/reasoningRouting.ts"],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/reasoning-routing.test.ts": {
+      "sourceRemoved": [
+        "src/lib/reasoningRouting/policy.ts",
+        "src/lib/db/reasoningRoutingRules.ts",
+        "src/sse/handlers/reasoningRouting.ts"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
+    },
+    "tests/unit/ui/api-key-routing-editor.test.tsx": {
+      "sourceRemoved": [
+        "src/shared/components/ReasoningRoutingRules.tsx",
+        "src/app/(dashboard)/dashboard/api-manager/routing/page.tsx"
+      ],
+      "reason": "API-key routing removed (refactor: remove API-key routing): the reasoning routing rule engine (src/lib/reasoningRouting, src/lib/db/reasoningRoutingRules.ts, src/sse/handlers/reasoningRouting.ts), its /api/settings/reasoning-routing-rules routes and the api-manager/routing page no longer exist, so there is no code left to test."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -1299,5 +1360,15 @@
   "tests/unit/materialize-bundled-symlinks.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (syncRebuiltNativeModuleIntoHashedEntries(), the Electron-ABI rebuild helper deleted with prepare-electron-standalone.mjs); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
   "tests/unit/optional-packs.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (electron/main.js prepending installed pack dirs to the server NODE_PATH); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
   "tests/unit/select-impacted-tests.test.ts": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (an electron/ path classification case); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
-  "tests/unit/ui/header-kit.test.tsx": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (the macOS Electron title-bar safe-area inset); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened."
+  "tests/unit/ui/header-kit.test.tsx": "Electron desktop app removal (refactor: remove electron desktop app): the removed asserts pinned electron-only behaviour (the macOS Electron title-bar safe-area inset); that source no longer exists. The remaining asserts in this file are unchanged. Feature removed, not weakened.",
+  "tests/unit/backup-export-portability-16527.test.mjs": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (reasoning-routing-rules.json in the export archive); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/chatcore-reasoning-control.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (force-mode reasoning rule directives and withReasoningRuleContext()); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/codex-ws-policy-enforcement-6564.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (reasoning rules on the Codex WS bridge); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/effort-thinking-standardization-6241.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (extractReasoningIntent() over normalized bodies); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/hidden-model-dispatch.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (a rule redirecting to a hidden model); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/kimi-effort-suffix-split.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (extractReasoningIntent() suffix parsing); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/release-green-docs-drift-7253.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the deleted REASONING_ROUTING.md page); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/sync-bundle.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the reasoningRoutingRules bundle field); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/ui/flow-routing-kit-controls.test.tsx": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (the RoutingEntryLink component); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts.",
+  "tests/unit/update-routes-keep-omitted-fields.test.ts": "API-key routing removal (refactor: remove API-key routing): the removed asserts pinned reasoning routing rule behaviour (PATCH of a reasoning rule); that source no longer exists. Behaviour without a rule is unchanged and stays covered by the remaining asserts."
 }

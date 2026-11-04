@@ -212,7 +212,6 @@ function buildCallLogEntry(body: JsonRecord, context: ResponsesWsHistoryContext)
     responseBody: context.responseBody ?? context.terminalMessage,
     error: context.errorMessage ? { code: context.errorCode, message: context.errorMessage } : null,
     pipelinePayloads: {
-      ...(isRecord(body.reasoningRouting) ? { routeDecision: body.reasoningRouting } : {}),
       clientRequest: context.requestBody,
       providerRequest: context.requestBody,
       providerResponse: context.responseBody,

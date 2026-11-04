@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from "uuid";
 import { getDbInstance, rowToCamel } from "./core";
 import { backupDbFile } from "./backup";
 import { registerDbStateResetter } from "./stateReset";
-import { invalidateReasoningRoutingRuleCache } from "./reasoningRoutingRules";
 import { getKeyGroupsForApiKey, checkKeyModelAccess } from "./apiKeyGroups";
 import { ensureApiKeyFallbackColumns } from "./apiKeyColumnFallbacks";
 import { SYNTHETIC_ENV_API_KEY_ID } from "@/shared/constants/apiKeyIdentities";
@@ -1306,7 +1305,6 @@ export async function deleteApiKey(id: string) {
 
   // Invalidate caches since a key was removed
   invalidateCaches();
-  invalidateReasoningRoutingRuleCache();
   await deleteRedisAuthCacheEntry(row?.key_hash);
 
   backupDbFile("pre-write");

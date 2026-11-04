@@ -67,18 +67,16 @@ function whitelistWireReasoning(body: RecordValue): void {
 
 /**
  * Apply a catalog-resolved selection without parsing a real upstream ID twice, then
- * whitelist the wire `reasoning` object. `forcedEffort` is a server-selected force rule
- * and outranks every request-side source.
+ * whitelist the wire `reasoning` object.
  */
 export function applyCodexReasoningSelection(
   model: string,
   body: RecordValue,
   metadataInput: unknown,
   connectionDefault: string | undefined,
-  allowDefaults: boolean,
-  forcedEffort?: string
+  allowDefaults: boolean
 ): void {
-  selectCodexReasoning(model, body, metadataInput, connectionDefault, allowDefaults, forcedEffort);
+  selectCodexReasoning(model, body, metadataInput, connectionDefault, allowDefaults);
   whitelistWireReasoning(body);
 }
 
@@ -133,8 +131,7 @@ function selectCodexReasoning(
   body: RecordValue,
   metadataInput: unknown,
   connectionDefault: string | undefined,
-  allowDefaults: boolean,
-  forcedEffort: string | undefined
+  allowDefaults: boolean
 ): void {
   const metadata = asRecord(metadataInput);
   const requestedModel = typeof body.model === "string" ? body.model : model;
@@ -145,7 +142,6 @@ function selectCodexReasoning(
   const reasoning = asRecord(body.reasoning);
   const requested = requestedEffort(metadata, reasoning, body, hasCatalog && allowDefaults);
   const selected =
-    effort(forcedEffort) ||
     split.effort ||
     requested ||
     fallbackEffort(reasoning, metadata, connectionDefault, allowDefaults);

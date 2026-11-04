@@ -100,8 +100,6 @@ import { usesClaudeBridge } from "./chatCore/agentRouterProtocol.ts";
 import { normalizeUpstreamRequestParams } from "./chatCore/upstreamRequestParams.ts";
 import { applyProviderSystemTransforms } from "../services/systemTransforms.ts";
 import { translateRequest } from "../translator/index.ts";
-import { applyReasoningRuleDirective } from "@/lib/reasoningRouting/policy";
-import { withReasoningRuleContext } from "../utils/reasoningRuleContext.ts";
 import { FORMATS } from "../translator/formats.ts";
 import { collectCustomToolNamesForSourceFormat } from "../translator/request/openai-responses/additionalTools.ts";
 import { THINKING_MARKER_HEADER } from "../utils/thinkCloseMarker.ts";
@@ -413,9 +411,6 @@ async function handleChatCoreInner({
   let { provider, model, extendedContext } = modelInfo;
   const getExecutorClientHeaders = () =>
     buildExecutorClientHeaders(clientRawRequest?.headers, userAgent, { provider, body });
-  // Keep the selected rule across format conversion, retries and refreshed credentials.
-  // Each combo leg gets its own execution context; nothing is written to shared accounts.
-  const reasoningRuleDirective = body?._omnirouteReasoningRule;
   // #12150 P1b: true iff the video-bridge guardrail rendered >=1 transcript
   // cue into a replaced part of this request. Gates both request- and
   // response-derived Memory extraction
@@ -1080,33 +1075,7 @@ async function handleChatCoreInner({
   // 0. Log client raw request (before format conversion) — redacts video transcript
   // cues in the logged copy only; see videoBridgeSnapshotRedaction.ts.
   logClientRawRequestRedacted(reqLogger, clientRawRequest, videoBridgeObserved);
-  const reasoningRouteDecision =
-    body && typeof body === "object"
-      ? (body as Record<string, unknown>)._omnirouteReasoningRouteTrace
-      : null;
-  if (reasoningRouteDecision) {
-    reqLogger.logRouteDecision(reasoningRouteDecision);
-    body = { ...(body as Record<string, unknown>) };
-    delete (body as Record<string, unknown>)._omnirouteReasoningRouteTrace;
-  }
-
   log?.debug?.("FORMAT", `${sourceFormat} → ${targetFormat} | stream=${stream}`);
-
-  if (reasoningRuleDirective) {
-    // Cache identity must use the effective effort, not the overridden client value.
-    // Retain the directive for the translation step, where general thinking defaults run.
-    body = {
-      ...(applyReasoningRuleDirective(
-        body,
-        sourceFormat === FORMATS.OPENAI_RESPONSES
-          ? "openai-responses"
-          : sourceFormat === FORMATS.CLAUDE
-            ? "claude"
-            : undefined
-      ) as Record<string, unknown>),
-      _omnirouteReasoningRule: reasoningRuleDirective,
-    };
-  }
 
   // Preserve original body for cache signature — the body variable is mutated
   // multiple times below (sanitization, memory/skills injection) before the
@@ -2163,7 +2132,7 @@ async function handleChatCoreInner({
   try {
     if (nativeResponsesPassthrough) {
       translatedBody = stampNativeResponsesPassthroughBody(
-        applyReasoningRuleDirective(body, "openai-responses") as Record<string, unknown>,
+        body as Record<string, unknown>,
         nativeCodexPassthrough
           ? "codex"
           : nativeXaiResponsesPassthrough
@@ -2198,7 +2167,6 @@ async function handleChatCoreInner({
         reasoningCacheScope,
         videoBridgeObserved,
         normalizeClaudeUpstreamMessages,
-        applyReasoningRuleDirective,
         getModelNormalizeToolCallId,
         getModelPreserveOpenAIDeveloperRole,
         log,
@@ -2215,7 +2183,6 @@ async function handleChatCoreInner({
         targetFormat,
         preserveCacheControl,
         normalizeClaudeUpstreamMessages,
-        applyReasoningRuleDirective,
         log,
       });
     } else {
@@ -2462,19 +2429,16 @@ async function handleChatCoreInner({
   const getExecutionCredentials = () => {
     const executionCredentials = withApiKeyCodexServiceMode(
       provider,
-      withReasoningRuleContext(
-        resolveExecutionCredentialsFor({
-          credentials,
-          nativeCodexPassthrough: nativeResponsesPassthrough,
-          endpointPath,
-          targetFormat,
-          provider,
-          ccSessionId,
-          modelInfo,
-          requestBody: body,
-        }),
-        reasoningRuleDirective
-      ),
+      resolveExecutionCredentialsFor({
+        credentials,
+        nativeCodexPassthrough: nativeResponsesPassthrough,
+        endpointPath,
+        targetFormat,
+        provider,
+        ccSessionId,
+        modelInfo,
+        requestBody: body,
+      }),
       apiKeyCodexServiceMode
     );
     beforeUpstreamAttempt?.(executionCredentials);

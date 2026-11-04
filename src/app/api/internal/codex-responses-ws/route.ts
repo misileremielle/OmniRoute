@@ -29,21 +29,8 @@ import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error.ts";
 import { logger } from "@omniroute/open-sse/utils/logger.ts";
 import { resolveProxyForConnection } from "@/lib/db/settings";
 import { withCodexFingerprintCredentials } from "@omniroute/open-sse/config/codexIdentity.ts";
-import { withReasoningRuleContext } from "@omniroute/open-sse/utils/reasoningRuleContext.ts";
 import { proxyConfigToUrl } from "@omniroute/open-sse/utils/proxyDispatcher.ts";
-import {
-  attachReasoningRuleDirective,
-  applyReasoningRuleDirective,
-  extractReasoningIntent,
-  resolveReasoningSourceModels,
-  resolveReasoningRoutingRule,
-  validateCodexWsDecision,
-} from "@/lib/reasoningRouting/policy";
-import { resolveRequestRoutingTags } from "@/domain/tagRouter";
-import {
-  validateApiKeyRoutingTarget,
-  type ApiKeyMetadata as PolicyApiKeyMetadata,
-} from "@/shared/utils/apiKeyPolicy";
+import type { ApiKeyMetadata as PolicyApiKeyMetadata } from "@/shared/utils/apiKeyPolicy";
 import { persistResponsesWsCallHistory } from "./history";
 import { applyResponsesWsCompression } from "./compression";
 import { getComboByName } from "@/lib/db/combos";
@@ -79,19 +66,12 @@ type ApiKeyMetadata = PolicyApiKeyMetadata | null;
  */
 type CodexWsFailure = { error: Response };
 
-type CodexWsReasoningRoute = {
-  decision: Awaited<ReturnType<typeof resolveReasoningRoutingRule>>;
-  intent: ReturnType<typeof extractReasoningIntent>;
-  sourceModels: Awaited<ReturnType<typeof resolveReasoningSourceModels>>;
-  routingTags: ReturnType<typeof resolveRequestRoutingTags>;
-};
-
 type CodexWsCredentials = {
   credentials: NonNullable<Awaited<ReturnType<typeof checkAndRefreshToken>>>;
   leaseId: string;
 };
 
-type CodexWsRequestContext = CodexWsReasoningRoute & {
+type CodexWsRequestContext = {
   authRequest: Request;
   apiKey: string | null;
   responseBody: JsonRecord;
@@ -105,7 +85,6 @@ type CodexWsUpstreamContext = CodexWsRequestContext &
   CodexWsCredentials & {
     provider: string;
     model: string;
-    reasoningDecision: Awaited<ReturnType<typeof resolveReasoningRoutingRule>>;
   };
 
 const bridgePayloadSchema = z
@@ -397,53 +376,6 @@ async function enforceCodexWsApiKeyPolicy(
   return { rejection: policy.rejection, apiKeyInfo: policy.apiKeyInfo };
 }
 
-async function prepareReasoningRoute(
-  authRequest: Request,
-  apiKey: string | null,
-  metadata: ApiKeyMetadata,
-  requestedModel: string,
-  responseBody: JsonRecord
-): Promise<CodexWsFailure | CodexWsReasoningRoute> {
-  const reasoningIntent = extractReasoningIntent(requestedModel, responseBody);
-  const sourceModels = await resolveReasoningSourceModels(reasoningIntent.model, (model) =>
-    resolveCodexWsModelInfo(model, getModelInfo)
-  );
-  reasoningIntent.model = sourceModels.normalized;
-  const routingTags = resolveRequestRoutingTags(responseBody);
-  const routeInput = {
-    sourceModel: reasoningIntent.model,
-    sourceModelAliases: sourceModels.aliases,
-    sourceEffort: reasoningIntent.sourceEffort,
-    hasReasoningSignal: reasoningIntent.hasReasoningSignal,
-    hasThinkingBudget: reasoningIntent.hasThinkingBudget,
-    apiKeyId: metadata?.id ?? null,
-    requestTags: routingTags.tags,
-  };
-  let decision = await resolveReasoningRoutingRule(routeInput);
-  if (decision) {
-    const transportError = validateCodexWsDecision(decision);
-    if (transportError)
-      return { error: jsonError(400, "reasoning_route_transport", transportError) };
-    if (decision.capability === "unsupported") {
-      return {
-        error: jsonError(
-          400,
-          "reasoning_effort_unsupported",
-          "The configured reasoning effort is not supported by the target model"
-        ),
-      };
-    }
-    const rejection = await validateApiKeyRoutingTarget(
-      authRequest,
-      apiKey,
-      metadata,
-      decision.targetModel
-    );
-    if (rejection) return { error: rejection };
-  }
-  return { decision, intent: reasoningIntent, sourceModels, routingTags };
-}
-
 async function resolveCodexCredentials(
   provider: string,
   model: string,
@@ -547,14 +479,6 @@ async function resolveCodexRequestContext(
     metadata && Array.isArray(metadata.allowedConnections) && metadata.allowedConnections.length > 0
       ? metadata.allowedConnections
       : null;
-  const reasoningRoute = await prepareReasoningRoute(
-    authRequest,
-    apiKey,
-    metadata,
-    requestedModel,
-    responseBody
-  );
-  if ("error" in reasoningRoute) return reasoningRoute;
   return {
     authRequest,
     apiKey,
@@ -563,7 +487,6 @@ async function resolveCodexRequestContext(
     clientHeaders: Object.fromEntries(authRequest.headers.entries()),
     metadata,
     allowedConnections,
-    ...reasoningRoute,
   };
 }
 
@@ -571,8 +494,7 @@ async function resolveCodexUpstreamContext(
   context: CodexWsFailure | CodexWsRequestContext
 ): Promise<CodexWsFailure | CodexWsUpstreamContext> {
   if ("error" in context) return context;
-  const routedModel = context.decision?.targetModel ?? context.requestedModel;
-  const modelInfo = await resolveCodexWsModelInfo(routedModel, getModelInfo);
+  const modelInfo = await resolveCodexWsModelInfo(context.requestedModel, getModelInfo);
   const provider = modelInfo.provider;
   const model = modelInfo.model || context.requestedModel;
   if (provider !== "codex") {
@@ -590,49 +512,12 @@ async function resolveCodexUpstreamContext(
     context.allowedConnections
   );
   if ("error" in credentialResult) return credentialResult;
-  let reasoningDecision = context.decision;
-  if (!reasoningDecision) {
-    try {
-      reasoningDecision = await resolveReasoningRoutingRule({
-        sourceModel: context.intent.model,
-        sourceModelAliases: context.sourceModels.aliases,
-        sourceEffort: context.intent.sourceEffort,
-        hasReasoningSignal: context.intent.hasReasoningSignal,
-        hasThinkingBudget: context.intent.hasThinkingBudget,
-        apiKeyId: context.metadata?.id ?? null,
-        connectionId: credentialResult.credentials.connectionId,
-        requestTags: context.routingTags.tags,
-        connectionOnly: true,
-        capabilityModel: `codex/${model}`,
-      });
-    } catch (error) {
-      releaseCodexWsLease(credentialResult.leaseId);
-      return {
-        error: jsonError(
-          502,
-          "codex_ws_prepare_failed",
-          sanitizeErrorMessage(error instanceof Error ? error.message : String(error))
-        ),
-      };
-    }
-    if (reasoningDecision?.capability === "unsupported") {
-      releaseCodexWsLease(credentialResult.leaseId);
-      return {
-        error: jsonError(
-          400,
-          "reasoning_effort_unsupported",
-          "The configured reasoning effort is not supported by the selected Codex connection model"
-        ),
-      };
-    }
-  }
   return {
     ...context,
     provider,
     model,
     credentials: credentialResult.credentials,
     leaseId: credentialResult.leaseId,
-    reasoningDecision,
   };
 }
 
@@ -701,27 +586,12 @@ async function prepare(body: JsonRecord) {
     credentials: refreshedCredentials,
     leaseId,
   } = upstream;
-  const reasoningDecision = upstream.reasoningDecision;
 
   let responseBodyWithMemory: JsonRecord;
-  let reasoningRouting: JsonRecord | null = null;
   let transformed: JsonRecord;
   let credentialsWithFingerprint: typeof refreshedCredentials;
-  let reasoningRuleDirective: unknown;
   try {
     responseBodyWithMemory = await maybeInjectResponsesWsMemory(responseBody, metadata);
-    if (reasoningDecision) {
-      const withDirective = attachReasoningRuleDirective(responseBodyWithMemory, reasoningDecision);
-      reasoningRuleDirective = withDirective._omnirouteReasoningRule;
-      reasoningRouting = isRecord(withDirective._omnirouteReasoningRouteTrace)
-        ? withDirective._omnirouteReasoningRouteTrace
-        : null;
-      responseBodyWithMemory = applyReasoningRuleDirective(
-        withDirective,
-        "openai-responses"
-      ) as JsonRecord;
-      delete responseBodyWithMemory._omnirouteReasoningRouteTrace;
-    }
     // #8052: the WS bridge previously skipped the whole prompt-compression pipeline that the
     // HTTP/SSE path (chatCore.ts) runs on every request — wire the same core pipeline in here,
     // per logical turn, before handing off to the executor.
@@ -736,11 +606,7 @@ async function prepare(body: JsonRecord) {
       metadata?.codexServiceMode
     );
     credentialsWithFingerprint = withCodexFingerprintCredentials(
-      withApiKeyCodexServiceMode(
-        provider,
-        withReasoningRuleContext(refreshedCredentials, reasoningRuleDirective),
-        metadata?.codexServiceMode
-      ),
+      withApiKeyCodexServiceMode(provider, refreshedCredentials, metadata?.codexServiceMode),
       context.clientHeaders,
       responseBodyWithMemory
     );
@@ -808,7 +674,6 @@ async function prepare(body: JsonRecord) {
     model,
     headers,
     proxy,
-    reasoningRouting,
     response: transformed,
   });
 }

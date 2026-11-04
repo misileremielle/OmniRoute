@@ -55,16 +55,11 @@ async function buildFullExportResponse(): Promise<Response> {
       await db.backup(dbBackupPath);
 
       // 2–5. Export settings, combos, provider connections, API keys (via db module)
-      const { settings, combos, providers, apiKeys, reasoningRoutingRules } =
-        exportAllSummaryRows();
+      const { settings, combos, providers, apiKeys } = exportAllSummaryRows();
       fs.writeFileSync(path.join(payloadDir, "settings.json"), JSON.stringify(settings, null, 2));
       fs.writeFileSync(path.join(payloadDir, "combos.json"), JSON.stringify(combos, null, 2));
       fs.writeFileSync(path.join(payloadDir, "providers.json"), JSON.stringify(providers, null, 2));
       fs.writeFileSync(path.join(payloadDir, "api-keys.json"), JSON.stringify(apiKeys, null, 2));
-      fs.writeFileSync(
-        path.join(payloadDir, "reasoning-routing-rules.json"),
-        JSON.stringify(reasoningRoutingRules, null, 2)
-      );
 
       // 6. Export call log artifacts directory
       const callLogsDir = getCallLogsDir();
@@ -83,7 +78,6 @@ async function buildFullExportResponse(): Promise<Response> {
           "combos.json - Combo configurations",
           "providers.json - Provider connections (no credentials)",
           "api-keys.json - API key metadata (masked)",
-          "reasoning-routing-rules.json - Reasoning routing policies",
           "call_logs/ - Detailed call log artifacts",
         ],
       };

@@ -5,7 +5,6 @@ import { getModelAliases } from "@/lib/db/models";
 import { getProviderConnections } from "@/lib/db/providers";
 import { getCachedProviderNodes } from "@/lib/db/readCache";
 import { getSettings } from "@/lib/db/settings";
-import { getReasoningRoutingRules } from "@/lib/db/reasoningRoutingRules";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -16,7 +15,6 @@ export interface ConfigSyncBundle {
   modelAliases: JsonRecord;
   combos: JsonRecord[];
   apiKeys: JsonRecord[];
-  reasoningRoutingRules: JsonRecord[];
 }
 
 function asRecord(value: unknown): JsonRecord {
@@ -132,34 +130,6 @@ function sanitizeApiKeyForSync(apiKey: unknown): JsonRecord {
   ]);
 }
 
-function sanitizeReasoningRuleForSync(rule: unknown): JsonRecord {
-  const record = asRecord(rule);
-  return pickDefined(record, [
-    "id",
-    "name",
-    "description",
-    "scope",
-    "apiKeyId",
-    "comboId",
-    "connectionId",
-    "modelPattern",
-    "sourceEffort",
-    "requestTags",
-    "tagMatchMode",
-    "effortMode",
-    "targetEffort",
-    "targetKind",
-    "targetModel",
-    "targetComboId",
-    "budgetAction",
-    "budgetTokens",
-    "priority",
-    "enabled",
-    "createdAt",
-    "updatedAt",
-  ]);
-}
-
 function canonicalizeJson(value: unknown): unknown {
   if (Array.isArray(value)) {
     return value.map((entry) => canonicalizeJson(entry));
@@ -185,23 +155,15 @@ export function computeConfigSyncVersion(bundle: ConfigSyncBundle) {
 }
 
 export async function buildConfigSyncBundle(): Promise<ConfigSyncBundle> {
-  const [
-    settings,
-    providerConnections,
-    providerNodes,
-    modelAliases,
-    combos,
-    apiKeys,
-    reasoningRoutingRules,
-  ] = await Promise.all([
-    getSettings(),
-    getProviderConnections(),
-    getCachedProviderNodes(),
-    getModelAliases(),
-    getCombos(),
-    getApiKeys(),
-    getReasoningRoutingRules(),
-  ]);
+  const [settings, providerConnections, providerNodes, modelAliases, combos, apiKeys] =
+    await Promise.all([
+      getSettings(),
+      getProviderConnections(),
+      getCachedProviderNodes(),
+      getModelAliases(),
+      getCombos(),
+      getApiKeys(),
+    ]);
 
   return {
     settings: sanitizeSettingsForSync(settings),
@@ -221,10 +183,6 @@ export async function buildConfigSyncBundle(): Promise<ConfigSyncBundle> {
     apiKeys: sortByStringKeys(
       apiKeys.map((apiKey) => sanitizeApiKeyForSync(apiKey)),
       ["name", "id"]
-    ),
-    reasoningRoutingRules: sortByStringKeys(
-      reasoningRoutingRules.map((rule) => sanitizeReasoningRuleForSync(rule)),
-      ["scope", "priority", "createdAt", "id"]
     ),
   };
 }
@@ -246,7 +204,6 @@ export function toLegacyCloudSyncPayload(bundle: ConfigSyncBundle) {
     combos: bundle.combos,
     apiKeys: bundle.apiKeys,
     settings: bundle.settings,
-    reasoningRoutingRules: bundle.reasoningRoutingRules,
   };
 }
 

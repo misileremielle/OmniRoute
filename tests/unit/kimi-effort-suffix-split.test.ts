@@ -10,7 +10,6 @@ const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-kimi-suff
 process.env.DATA_DIR = TEST_DATA_DIR;
 
 const core = await import("../../src/lib/db/core.ts");
-const { extractReasoningIntent } = await import("../../src/lib/reasoningRouting/policy.ts");
 const { splitKimiCodingEffortVariant } =
   await import("../../open-sse/utils/kimiCodingEffortVariant.ts");
 const { applyKimiCodingEffortVariant } =
@@ -149,47 +148,6 @@ test("the splitter never touches another provider's genuine suffixed ids", () =>
   });
 });
 
-// ── Reasoning-rule intent mirrors the dispatch split, only for Kimi Coding prefixes ─────
-
-test("kimi-coding / kmc prefixed ids split into the base model + request effort", () => {
-  const intent = extractReasoningIntent("kimi-coding/kimi-k3-high", {});
-  assert.equal(intent.model, "kimi-coding/kimi-k3");
-  assert.equal(intent.effort, "high");
-
-  const kmc = extractReasoningIntent("kmc/kimi-k3-high", {});
-  assert.equal(kmc.model, "kmc/kimi-k3");
-  assert.equal(kmc.effort, "high");
-});
-
-test("bare or foreign-prefixed suffixed ids are not split (Cursor's kimi-k3-high)", () => {
-  for (const id of ["kimi-k3-high", "k3-high", "cursor/kimi-k3-high", "cu/kimi-k3-low"]) {
-    const intent = extractReasoningIntent(id, {});
-    assert.equal(intent.model, id);
-    assert.equal(intent.effort, null);
-  }
-});
-
-test("real kimi wire ids pass through unsplit", () => {
-  for (const id of [
-    "kimi-coding/k3",
-    "kimi-coding/kimi-for-coding",
-    "kimi-coding/kimi-for-coding-highspeed",
-    "kimi-coding/kimi-k3-xhigh",
-  ]) {
-    const intent = extractReasoningIntent(id, {});
-    assert.equal(intent.model, id);
-    assert.equal(intent.effort, null);
-  }
-});
-
-test("explicit request effort still wins over the suffix", () => {
-  const intent = extractReasoningIntent("kimi-coding/kimi-k3-high", {
-    reasoning_effort: "low",
-  });
-  assert.equal(intent.model, "kimi-coding/kimi-k3");
-  assert.equal(intent.effort, "low");
-});
-
 test("K3.1 alias normalization does not synthesize effort before dispatch", () => {
   for (const provider of ["kimi-coding", "kimi-coding-apikey"]) {
     for (const [requested, wireModel] of [
@@ -290,30 +248,4 @@ test("bare K3.1 Coding ids preserve enable_thinking false through both translato
       assert.equal(body.enable_thinking, undefined, label);
     }
   }
-});
-
-test("K3.1 canonical aliases stay intact in reasoning intent without fabricated effort", () => {
-  for (const prefix of ["kimi-coding", "kmc", "kimi-coding-apikey", "kmca"]) {
-    for (const model of ["kimi-k3.1-pro", "kimi-k3.1-pro-highspeed"]) {
-      const id = `${prefix}/${model}`;
-      const intent = extractReasoningIntent(id, {});
-      assert.equal(intent.model, id);
-      assert.equal(intent.effort, null);
-      assert.equal(intent.sourceEffort, "missing");
-      assert.equal(intent.hasReasoningSignal, false);
-    }
-  }
-  const explicit = extractReasoningIntent("kmc/kimi-k3.1-pro", { reasoning_effort: "low" });
-  assert.equal(explicit.model, "kmc/kimi-k3.1-pro");
-  assert.equal(explicit.effort, "low");
-});
-
-test("K3.1 effort suffixes still split into the canonical model and request effort", () => {
-  const high = extractReasoningIntent("kmc/kimi-k3.1-pro-high", {});
-  assert.equal(high.model, "kmc/kimi-k3.1-pro");
-  assert.equal(high.effort, "high");
-
-  const low = extractReasoningIntent("kmca/kimi-k3.1-pro-highspeed-low", {});
-  assert.equal(low.model, "kmca/kimi-k3.1-pro-highspeed");
-  assert.equal(low.effort, "low");
 });

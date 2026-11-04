@@ -141,16 +141,6 @@ import { connectionHasExtraKeys } from "@omniroute/open-sse/services/apiKeyRotat
 import { wrapResponseWithOAuthSessionRelease } from "@omniroute/open-sse/services/oauthSessionOccupancy.ts";
 import { inheritProviderProbeResponse, inheritResponsePolicies } from "./chat/responsePolicies.ts";
 import { resolveProviderId } from "@/shared/constants/providers";
-import {
-  extractReasoningIntent,
-  type ExtractedReasoningIntent,
-  type ReasoningRuleDecision,
-} from "@/lib/reasoningRouting/policy";
-import {
-  applyConnectionReasoningRule,
-  applyReasoningRouting,
-  filterReasoningCombo,
-} from "./reasoningRouting";
 import { createVirtualAutoCombo, resolveAutoRoutingState } from "./autoRouting";
 import { getComboFailureLogError } from "./comboFailureLogging";
 import {
@@ -410,12 +400,9 @@ async function handleChatImplementation(
   }
 
   if ((body = rejectPayload(body, request, reqId)) instanceof Response) return body;
-  // Only the server's policy resolver may attach execution directives or route traces.
-  // Discard lookalike JSON fields supplied by callers before evaluating any rule.
+  // Only the server may set the resume marker: discard a lookalike field from callers.
   if (body && typeof body === "object") {
     body = { ...body };
-    delete body._omnirouteReasoningRule;
-    delete body._omnirouteReasoningRouteTrace;
     delete body._omniroutePreviousResponseResumed;
   }
 
@@ -616,13 +603,9 @@ async function handleChatImplementation(
     modelStr = ccAliasStrip.model;
   }
 
-  // Freeze the client-facing model and reasoning intent before automatic routers
-  // mutate the working request. Reasoning policies always match this stable input.
-  const reasoningIntent = extractReasoningIntent(modelStr, body);
-
-  // Fold canonical and OpenRouter-style controls onto the common effort carriers only
-  // after routing captures the raw intent. This keeps a Codex model suffix stronger than
-  // the fallback `reasoning.enabled:false`, matching the Codex executor's precedence.
+  // Fold canonical and OpenRouter-style controls onto the common effort carriers. A Codex
+  // model suffix stays stronger than the fallback `reasoning.enabled:false`, matching the
+  // Codex executor's precedence.
   body = normalizeReasoningRequest(body);
 
   // Align body.model with the routing model immediately (see applyRoutingModelAlignment).
@@ -1023,31 +1006,12 @@ async function handleChatImplementation(
     }
   }
 
-  // Explicit reasoning-routing policies are the final model-routing layer before
-  // combo/provider resolution. Existing behavior is untouched when no rule matches.
-  let reasoningDecision: ReasoningRuleDecision | null = null;
-  let requestRoutingTags: { tags: string[] } = { tags: [] };
-  const reasoningRouting = await applyReasoningRouting({
-    request,
-    body,
-    modelStr: resolvedModelStr,
-    policy,
-    apiKeyInfo,
-    reasoningIntent,
-  });
-  if (reasoningRouting.response) return reasoningRouting.response;
-  body = reasoningRouting.body;
-  resolvedModelStr = reasoningRouting.modelStr;
-  reasoningDecision = reasoningRouting.reasoningDecision;
-  requestRoutingTags = reasoningRouting.requestRoutingTags;
-
   const autoRouting = await resolveAutoRoutingState(resolvedModelStr);
   if (autoRouting.response) return autoRouting.response;
 
   // Check if model is a combo (has multiple models with fallback)
   telemetry.startPhase("resolve");
   let combo: any = await getComboForModel(resolvedModelStr);
-  if (reasoningDecision?.targetCombo) combo = reasoningDecision.targetCombo;
 
   // "auto" prefix fuzzy matching: "auto/fast" → "auto/best-fast", etc.
   // parseModel splits "auto/fast" into provider="auto" which isn't a real provider.
@@ -1066,11 +1030,6 @@ async function handleChatImplementation(
   if (virtualCombo instanceof Response) return virtualCombo;
   combo = virtualCombo;
   if (combo) {
-    if (reasoningDecision) {
-      const filtered = filterReasoningCombo(combo, reasoningDecision);
-      if (filtered instanceof Response) return filtered;
-      combo = filtered;
-    }
     const [settings, allCombos] = await Promise.all([
       getCachedSettings().catch(() => ({})),
       getCombosCachedForChat(),
@@ -1259,9 +1218,6 @@ async function handleChatImplementation(
             conversationId,
             modelPinned: (target as any)?.modelPinned ?? false,
             reasoningTransportFallback,
-            reasoningDecision,
-            reasoningIntent,
-            reasoningRequestTags: requestRoutingTags.tags,
             managedLease,
             videoBridgeLog,
             // #7360 follow-up: without this, a target dispatch abandoned by
@@ -1429,9 +1385,6 @@ async function handleChatImplementation(
       correlationId: reqId,
       conversationId,
       routingComboId,
-      reasoningDecision,
-      reasoningIntent,
-      reasoningRequestTags: requestRoutingTags.tags,
       managedLease,
       videoBridgeLog,
       previousResponseResumed:
@@ -1489,9 +1442,6 @@ async function handleSingleModelChat(
     conversationId?: string | null;
     routingComboId?: string | null;
     modelPinned?: boolean;
-    reasoningDecision?: ReasoningRuleDecision | null;
-    reasoningIntent?: ExtractedReasoningIntent | null;
-    reasoningRequestTags?: string[];
     reasoningTransportFallback?: "skip" | "drop";
     authorizationContextModel?: string | null; // admitted combo/alias (resolvedModelPolicy.ts)
     comboGrantsTargets?: boolean; // server-computed allowedCombos grant (#14197)
@@ -2013,25 +1963,7 @@ async function handleSingleModelChat(
         effectiveModel = modelStr;
         requestBody = { ...body, model: modelStr };
       }
-      if (!runtimeOptions.reasoningDecision && runtimeOptions.reasoningIntent) {
-        const connectionRouting = await applyConnectionReasoningRule({
-          requestBody,
-          provider,
-          effectiveModel,
-          credentials,
-          apiKeyInfo,
-          reasoningIntent: runtimeOptions.reasoningIntent,
-          reasoningDecision: runtimeOptions.reasoningDecision,
-          requestRoutingTags: runtimeOptions.reasoningRequestTags,
-        }).catch(agyLease.releasingRethrow(leaseId));
-        if (connectionRouting.response) {
-          releaseOAuthSession();
-          agyLease.release(leaseId);
-          return connectionRouting.response;
-        }
-        requestBody = connectionRouting.body;
-      }
-      // Connection defaults / reasoning rules can swap the admitted model: recheck pre-dispatch.
+      // Connection defaults can swap the admitted model: recheck pre-dispatch.
       const effectivePolicyRejection = await resolvedModelGate(
         resolvedPolicy.effectivePolicyTargets(
           provider,

@@ -260,39 +260,6 @@ test("the HTTP combo route sends only visible siblings and returns404 when all a
   assert.equal((await response.json()).error.code, "model_not_found");
 });
 
-test("a global reasoning rule cannot redirect a visible model to a hidden target", async () => {
-  const rules = await import("../../src/lib/db/reasoningRoutingRules.ts");
-  rules.invalidateReasoningRoutingRuleCache();
-  await rules.createReasoningRoutingRule({
-    name: "Hidden target fixture",
-    description: "",
-    scope: "global",
-    apiKeyId: null,
-    comboId: null,
-    connectionId: null,
-    modelPattern: null,
-    sourceEffort: "any",
-    requestTags: [],
-    tagMatchMode: "any",
-    effortMode: "inherit",
-    targetEffort: null,
-    targetKind: "model",
-    targetModel: "openai/gpt-4o-mini",
-    targetComboId: null,
-    budgetAction: "preserve",
-    budgetTokens: null,
-    priority: 0,
-    enabled: true,
-  });
-  assert.equal((await chat("openai/gpt-4o")).status, 200);
-  assert.deepEqual(dispatchedModels, ["gpt-4o-mini"]);
-  dispatchedModels.length = 0;
-  models.mergeModelCompatOverride("openai", "gpt-4o-mini", { isHidden: true });
-  assert.equal((await chat("openai/gpt-4o")).status, 404);
-  assert.deepEqual(dispatchedModels, []);
-  rules.invalidateReasoningRoutingRuleCache();
-});
-
 test("withHiddenModelGate keeps agy and antigravity visibility independent despite provider canonicalization", async () => {
   const { createVisibleResolvedModelGate } =
     await import("../../src/sse/handlers/chat/resolvedModelPolicy.ts");

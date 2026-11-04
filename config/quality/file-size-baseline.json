@@ -309,7 +309,6 @@
     "tests/unit/batch_api.test.ts": 1624,
     "tests/unit/cc-compatible-provider.test.ts": 1470,
     "tests/unit/chatcore-translation-paths.test.ts": 4270,
-    "tests/unit/chatgpt-web.test.ts": 5894,
     "tests/unit/combo-routing-engine.test.ts": 4396,
     "tests/unit/combo/quota-weighted-strategy.test.ts": 1461,
     "tests/unit/db-migration-runner.test.ts": 1811,

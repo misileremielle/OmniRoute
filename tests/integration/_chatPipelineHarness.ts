@@ -21,7 +21,6 @@ export async function createChatPipelineHarness(prefix) {
   const combosDb = await import("../../src/lib/db/combos.ts");
   const settingsDb = await import("../../src/lib/db/settings.ts");
   const apiKeysDb = await import("../../src/lib/db/apiKeys.ts");
-  const reasoningRulesDb = await import("../../src/lib/db/reasoningRoutingRules.ts");
   const callLogsDb = await import("../../src/lib/usage/callLogs.ts");
   const modelComboMappingsDb = await import("../../src/lib/db/modelComboMappings.ts");
   const readCacheDb = await import("../../src/lib/db/readCache.ts");
@@ -281,7 +280,6 @@ export async function createChatPipelineHarness(prefix) {
     resetAllCircuitBreakers();
     apiKeysDb.resetApiKeyState();
     readCacheDb.invalidateDbCache();
-    reasoningRulesDb.invalidateReasoningRoutingRuleCache();
     invalidateMemorySettingsCache();
     clearSkillState();
     await new Promise((resolve) => setTimeout(resolve, 20));
@@ -388,7 +386,6 @@ export async function createChatPipelineHarness(prefix) {
     seedApiKey,
     seedConnection,
     settingsDb,
-    reasoningRulesDb,
     skillByIdRouteModule,
     skillExecutor,
     skillRegistry,

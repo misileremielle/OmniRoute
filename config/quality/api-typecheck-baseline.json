@@ -178,16 +178,6 @@
   "src/app/api/settings/proxy/vercel-deploy/route.ts": {
     "TS2322": 3
   },
-  "src/app/api/settings/reasoning-routing-rules/[id]/route.ts": {
-    "TS2339": 1
-  },
-  "src/app/api/settings/reasoning-routing-rules/route.ts": {
-    "TS2339": 1
-  },
-  "src/app/api/settings/reasoning-routing-rules/simulate/route.ts": {
-    "TS2322": 1,
-    "TS2339": 1
-  },
   "src/app/api/system/env/repair/route.ts": {
     "TS2578": 1,
     "TS2353": 3
@@ -302,18 +292,11 @@
   },
   "_program": {
     "files": 4372,
-    "include": [
-      "src/app/api/**/*.ts",
-      "src/app/api/**/*.tsx"
-    ],
+    "include": ["src/app/api/**/*.ts", "src/app/api/**/*.tsx"],
     "exclude": [],
     "compilerOptions": {
       "target": "ES2022",
-      "lib": [
-        "dom",
-        "dom.iterable",
-        "esnext"
-      ],
+      "lib": ["dom", "dom.iterable", "esnext"],
       "allowJs": true,
       "checkJs": false,
       "skipLibCheck": true,
@@ -329,24 +312,12 @@
       "incremental": true,
       "forceConsistentCasingInFileNames": true,
       "paths": {
-        "@/*": [
-          "./src/*"
-        ],
-        "@omniroute/open-sse": [
-          "./open-sse"
-        ],
-        "@omniroute/open-sse/*": [
-          "./open-sse/*"
-        ],
-        "@omniroute/browser-pool": [
-          "./packages/browser-pool/src"
-        ],
-        "@omniroute/ui-kit": [
-          "./packages/ui-kit/src"
-        ],
-        "@omniroute/ui-kit/*": [
-          "./packages/ui-kit/src/*"
-        ]
+        "@/*": ["./src/*"],
+        "@omniroute/open-sse": ["./open-sse"],
+        "@omniroute/open-sse/*": ["./open-sse/*"],
+        "@omniroute/browser-pool": ["./packages/browser-pool/src"],
+        "@omniroute/ui-kit": ["./packages/ui-kit/src"],
+        "@omniroute/ui-kit/*": ["./packages/ui-kit/src/*"]
       },
       "plugins": [
         {

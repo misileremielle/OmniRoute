@@ -6,9 +6,8 @@
  * role/text/max_tokens/effort are extracted from an OpenAI-like view first; the bridge request is
  * then assembled by buildClaudeCodeCompatibleRequest. Returns the dispatch body plus the resolved
  * Claude Code session id, which the handler threads into the execution credentials. The model
- * flag lookups (src/lib/db/models) and the reasoning-rule directive helper
- * (src/lib/reasoningRouting) are injected by the handler so this engine leaf takes no new
- * open-sse → src import edges.
+ * flag lookups (src/lib/db/models) are injected by the handler so this engine leaf takes no
+ * new open-sse → src import edges.
  */
 
 import { getClaudeCodeCompatibleRequestDefaults } from "@/lib/providers/requestDefaults";
@@ -39,7 +38,6 @@ export function buildClaudeCodeBridgeBody({
   reasoningCacheScope,
   videoBridgeObserved,
   normalizeClaudeUpstreamMessages,
-  applyReasoningRuleDirective,
   getModelNormalizeToolCallId,
   getModelPreserveOpenAIDeveloperRole,
   log,
@@ -63,7 +61,6 @@ export function buildClaudeCodeBridgeBody({
     payload: Record<string, unknown>,
     options?: { preserveToolResultBlocks?: boolean }
   ) => void;
-  applyReasoningRuleDirective: (bodyInput: unknown, targetFormat?: "claude") => unknown;
   getModelNormalizeToolCallId: (
     providerId: string,
     modelId: string,
@@ -81,10 +78,6 @@ export function buildClaudeCodeBridgeBody({
   // Claude Code-compatible providers expect Anthropic Messages-shaped payloads,
   // but we extract only role/text/max_tokens/effort from an OpenAI-like view first.
   if (sourceFormat === FORMATS.CLAUDE && isClaudeCodeSemanticPassthrough) {
-    normalizedForCc = applyReasoningRuleDirective(
-      normalizedForCc,
-      "claude"
-    ) as typeof normalizedForCc;
     log?.debug?.("FORMAT", "claude-code semantic passthrough enabled for compatible bridge");
   } else if (sourceFormat !== FORMATS.OPENAI) {
     const normalizeToolCallId = getModelNormalizeToolCallId(
@@ -121,10 +114,6 @@ export function buildClaudeCodeBridgeBody({
   const ccRequestDefaults = getClaudeCodeCompatibleRequestDefaults(
     credentials?.providerSpecificData
   );
-  // OpenAI-shaped bridge requests skip translateRequest too.
-  if (sourceFormat === FORMATS.OPENAI) {
-    normalizedForCc = applyReasoningRuleDirective(normalizedForCc) as typeof normalizedForCc;
-  }
   const translatedBody = buildClaudeCodeCompatibleRequest({
     sourceBody: body,
     normalizedBody: normalizedForCc,

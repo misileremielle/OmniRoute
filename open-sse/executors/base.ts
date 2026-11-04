@@ -49,7 +49,6 @@ import { resolveKeyForRequest } from "../services/apiKeyRotator.ts";
 import type { KeyHealth } from "../services/apiKeyRotator.ts";
 import { getOpenAICompatibleType, isClaudeCodeCompatible } from "../services/provider.ts";
 import { usesCcWireImage } from "../services/ccWireImageBuiltins.ts";
-import { getForcedReasoningEffort } from "../utils/reasoningRuleContext.ts";
 import {
   runWithOnPersist,
   getRefreshLeadMs,
@@ -942,8 +941,7 @@ export class BaseExecutor {
       if (this.provider === "groq") {
         transformedBody = stripGroqUnsupportedFields(
           transformedBody as Record<string, unknown>,
-          model,
-          getForcedReasoningEffort(requestCredentials)
+          model
         ) as typeof transformedBody;
       }
       // A previous URL in this execute() already hit a thinking_budget 400 and

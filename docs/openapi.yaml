@@ -13407,51 +13407,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/settings/reasoning-routing-rules:
-    get:
-      tags:
-        - Settings
-      summary: "GET settings › reasoning routing rules"
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Settings
-      summary: "POST settings › reasoning routing rules"
-      responses:
-        "200":
-          description: OK
-  /api/settings/reasoning-routing-rules/{id}:
-    delete:
-      tags:
-        - Settings
-      summary: "DELETE settings › reasoning routing rules › <id>"
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - Settings
-      summary: "GET settings › reasoning routing rules › <id>"
-      responses:
-        "200":
-          description: OK
-    patch:
-      tags:
-        - Settings
-      summary: "PATCH settings › reasoning routing rules › <id>"
-      responses:
-        "200":
-          description: OK
-  /api/settings/reasoning-routing-rules/simulate:
-    post:
-      tags:
-        - Settings
-      summary: "POST settings › reasoning routing rules › simulate"
-      responses:
-        "200":
-          description: OK
   /api/settings/task-routing:
     get:
       tags:

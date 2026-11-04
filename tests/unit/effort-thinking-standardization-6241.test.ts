@@ -16,7 +16,6 @@ const { providerChatCompletionSchema } =
 const core = await import("../../src/lib/db/core.ts");
 const modelsDevSync = await import("../../src/lib/modelsDevSync.ts");
 const registry = await import("../../src/lib/modelMetadataRegistry.ts");
-const { extractReasoningIntent } = await import("../../src/lib/reasoningRouting/policy.ts");
 
 async function resetStorage() {
   core.resetDbInstance();
@@ -147,38 +146,10 @@ test("OpenRouter reasoning.enabled false normalizes to none without mutating the
   assert.deepEqual(out.reasoning, { summary: "auto", effort: "none" });
   assert.deepEqual(body, before);
 
-  const intent = extractReasoningIntent(body.model, out);
-  assert.equal(intent.effort, "none");
-  assert.equal(intent.hasThinkingBudget, false);
-
   const ambiguous = { reasoning: { enabled: false, max_tokens: 2048 } };
-  const rawIntent = extractReasoningIntent(body.model, ambiguous);
-  assert.equal(rawIntent.effort, null);
-  assert.equal(rawIntent.sourceEffort, "signal");
-  assert.equal(rawIntent.hasThinkingBudget, true);
   const preservedBudget = normalizeReasoningRequest(ambiguous) as Record<string, unknown>;
   assert.equal(preservedBudget.reasoning_effort, undefined);
   assert.deepEqual(preservedBudget.reasoning, { max_tokens: 2048 });
-
-  const suffixed = extractReasoningIntent("codex/gpt-6-astra-high", {
-    reasoning: { enabled: false },
-  });
-  assert.equal(suffixed.effort, "high");
-  assert.equal(
-    extractReasoningIntent(body.model, {
-      reasoning: { enabled: false },
-      thinking: { type: "enabled", budget_tokens: 2048 },
-    }).sourceEffort,
-    "signal"
-  );
-  assert.equal(
-    extractReasoningIntent(body.model, {
-      reasoning: { enabled: false },
-      chat_template_kwargs: { enable_thinking: true },
-    }).sourceEffort,
-    "missing"
-  );
-  assert.equal(extractReasoningIntent(body.model, { effort: "extra" }).effort, "xhigh");
 });
 
 test("explicit effort beats reasoning.enabled false; true and non-boolean flags are untouched", () => {

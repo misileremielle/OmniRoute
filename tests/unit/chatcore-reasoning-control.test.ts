@@ -11,7 +11,6 @@ const coreDb = await import("../../src/lib/db/core.ts");
 const { prepareUpstreamBody } = await import("../../open-sse/handlers/chatCore/upstreamBody.ts");
 const { translateRequest } = await import("../../open-sse/translator/index.ts");
 const { FORMATS } = await import("../../open-sse/translator/formats.ts");
-const { withReasoningRuleContext } = await import("../../open-sse/utils/reasoningRuleContext.ts");
 const { getReasoningControlEndpointFingerprint } =
   await import("../../open-sse/utils/reasoningControl.ts");
 const { setParamFilterConfig, deleteParamFilterConfig } =
@@ -333,71 +332,6 @@ test("chat-template reasoning control removes every none carrier and preserves n
   });
 });
 
-test("forced reasoning rules override conflicting native chat-template switches", async () => {
-  const forcedNoneCredentials = withReasoningRuleContext(templateControlCredentials, {
-    id: "force-none",
-    effortMode: "force",
-    targetEffort: "none",
-  });
-  const forcedNone = await prepareUpstreamBody({
-    translatedBody: {
-      messages: [{ role: "user", content: "hi" }],
-      reasoning_effort: "none",
-      chat_template_kwargs: { thinking: true, enable_thinking: true, custom_flag: 1 },
-    },
-    modelToCall: "forced-model",
-    provider: templateControlProvider,
-    targetFormat: FORMATS.OPENAI,
-    credentials: forcedNoneCredentials,
-  });
-  assert.equal(forcedNone.reasoning_effort, undefined);
-  assert.deepEqual(forcedNone.chat_template_kwargs, {
-    thinking: false,
-    enable_thinking: false,
-    custom_flag: 1,
-  });
-
-  const forcedHighCredentials = withReasoningRuleContext(templateControlCredentials, {
-    id: "force-high",
-    effortMode: "force",
-    targetEffort: "high",
-  });
-  const forcedHigh = await prepareUpstreamBody({
-    translatedBody: {
-      messages: [{ role: "user", content: "hi" }],
-      reasoning_effort: "high",
-      chat_template_kwargs: { thinking: false, enable_thinking: false, custom_flag: 2 },
-    },
-    modelToCall: "forced-model",
-    provider: templateControlProvider,
-    targetFormat: FORMATS.OPENAI,
-    credentials: forcedHighCredentials,
-  });
-  assert.equal(forcedHigh.reasoning_effort, "high");
-  assert.deepEqual(forcedHigh.chat_template_kwargs, {
-    thinking: true,
-    enable_thinking: true,
-    custom_flag: 2,
-  });
-
-  const forcedMalformed = await prepareUpstreamBody({
-    translatedBody: {
-      messages: [{ role: "user", content: "hi" }],
-      reasoning_effort: "none",
-      chat_template_kwargs: "invalid",
-    },
-    modelToCall: "forced-model",
-    provider: templateControlProvider,
-    targetFormat: FORMATS.OPENAI,
-    credentials: forcedNoneCredentials,
-  });
-  assert.equal(forcedMalformed.reasoning_effort, undefined);
-  assert.deepEqual(forcedMalformed.chat_template_kwargs, {
-    thinking: false,
-    enable_thinking: false,
-  });
-});
-
 test("chat-template reasoning control rejects malformed native kwargs for an explicit opt-out", async () => {
   await assert.rejects(
     prepareUpstreamBody({
@@ -561,18 +495,6 @@ test("reasoning.enabled false crosses shared OpenAI and Claude translation as ex
     thinking: { type: "enabled", budget_tokens: 2048 },
   });
   assert.equal(thinkingOverride.reasoning_effort, "medium");
-
-  const forced = translateReasoning(FORMATS.OPENAI, FORMATS.OPENAI, {
-    ...structuredClone(source),
-    _omnirouteReasoningRule: {
-      id: "force-high",
-      effortMode: "force",
-      targetEffort: "high",
-      budgetAction: "preserve",
-    },
-  });
-  assert.equal(forced.reasoning_effort, "high");
-  assert.deepEqual(forced.reasoning, { summary: "auto", effort: "high" });
 });
 
 test("reasoning.enabled false reaches chat-template dispatch as native off switches", async () => {
