@@ -2,6 +2,7 @@
  * db/settings.js — Settings, pricing, and proxy config.
  */
 
+import { createHash } from "node:crypto";
 import { getDbInstance } from "./core";
 import { backupDbFile } from "./backup";
 import { PROVIDER_ID_TO_ALIAS } from "@omniroute/open-sse/config/providerModels.ts";
@@ -140,6 +141,28 @@ function readSettingsRevision(db: ReturnType<typeof getDbInstance>): number {
 
 export async function getSettingsRevision(): Promise<number> {
   return readSettingsRevision(getDbInstance());
+}
+
+/**
+ * Cheap change detector for the raw `settings` namespace: a hash of every row's
+ * key and stored (still encrypted / JSON-encoded) value. `getSettings()` is a pure
+ * function of these rows plus process env, so an unchanged fingerprint means an
+ * unchanged result — without paying for its per-row JSON.parse + decrypt. Unlike
+ * `_settingsRevision`, this also sees writers that bypass `updateSettings()` (the
+ * CLI settings store, `setActiveCombo`, databaseSettings mirrors, manual edits).
+ */
+export function getSettingsRowsFingerprint(): string {
+  const rows = getDbInstance()
+    .prepare("SELECT key, value FROM key_value WHERE namespace = 'settings' ORDER BY key")
+    .all() as Array<{ key: string; value: string | null }>;
+  const hash = createHash("sha1");
+  for (const row of rows) {
+    hash.update(row.key);
+    hash.update("\0");
+    hash.update(row.value ?? "");
+    hash.update("\u0001");
+  }
+  return hash.digest("hex");
 }
 
 /**

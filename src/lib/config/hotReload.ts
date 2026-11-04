@@ -1,16 +1,23 @@
 import fs from "node:fs";
 import path from "node:path";
 import { SQLITE_FILE } from "@/lib/db/core";
-import { getSettings } from "@/lib/db/settings";
+import { getSettings, getSettingsRowsFingerprint } from "@/lib/db/settings";
 import { applyRuntimeSettings, type RuntimeReloadChange } from "./runtimeSettings";
 
 const DEFAULT_POLL_INTERVAL_MS = 5_000;
 const MIN_POLL_INTERVAL_MS = 1_000;
+// The fs watcher fires on every write to the SQLite WAL (call logs, usage rows,
+// quota snapshots…), i.e. continuously under traffic. Coalesce bursts.
+const FS_WATCH_DEBOUNCE_MS = 500;
 
 let activeCheck: Promise<void> | null = null;
 let queuedSource: string | null = null;
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 let sqliteWatcher: fs.FSWatcher | null = null;
+let fsWatchDebounce: ReturnType<typeof setTimeout> | null = null;
+// Fingerprint of the raw settings rows last applied by this module. null forces
+// the next check to run (startup, tests).
+let lastAppliedFingerprint: string | null = null;
 
 function getPollIntervalMs() {
   const parsed = Number.parseInt(process.env.OMNIROUTE_CONFIG_HOT_RELOAD_MS || "", 10);
@@ -36,9 +43,25 @@ function logChanges(source: string, changes: RuntimeReloadChange[]) {
 }
 
 async function runHotReloadCheck(source: string) {
+  // getSettings() JSON-parses and decrypts every settings row and
+  // applyRuntimeSettings() serializes ~18 sections twice; skip both when the raw
+  // rows are byte-identical to the last applied state (the overwhelmingly common
+  // case for both the poll and WAL-write wakeups).
+  const fingerprint = getSettingsRowsFingerprint();
+  if (fingerprint === lastAppliedFingerprint) return;
   const settings = await getSettings();
   const changes = await applyRuntimeSettings(settings, { source });
+  lastAppliedFingerprint = fingerprint;
   logChanges(source, changes);
+}
+
+function scheduleFsWatchCheck() {
+  if (fsWatchDebounce) return;
+  fsWatchDebounce = setTimeout(() => {
+    fsWatchDebounce = null;
+    queueHotReloadCheck("hot-reload:fs-watch");
+  }, FS_WATCH_DEBOUNCE_MS);
+  fsWatchDebounce.unref?.();
 }
 
 function queueHotReloadCheck(source: string) {
@@ -83,7 +106,7 @@ export function startRuntimeConfigHotReload(options: { pollIntervalMs?: number }
       sqliteWatcher = fs.watch(path.dirname(SQLITE_FILE), (_eventType, filename) => {
         const normalizedFilename = typeof filename === "string" ? filename : filename?.toString();
         if (isRelevantSqliteChange(normalizedFilename || null)) {
-          queueHotReloadCheck("hot-reload:fs-watch");
+          scheduleFsWatchCheck();
         }
       });
     } catch (error) {
@@ -110,6 +133,11 @@ export function stopRuntimeConfigHotReloadForTests() {
   }
   sqliteWatcher?.close();
   sqliteWatcher = null;
+  if (fsWatchDebounce) {
+    clearTimeout(fsWatchDebounce);
+    fsWatchDebounce = null;
+  }
+  lastAppliedFingerprint = null;
   queuedSource = null;
   activeCheck = null;
 }

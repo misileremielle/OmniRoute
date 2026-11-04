@@ -195,3 +195,25 @@ test("hot-reload watcher picks up external sqlite changes via polling fallback",
       getGeminiThoughtSignatureMode() === "bypass-strict"
   );
 });
+
+// The hot-reload poll (5s) and the SQLite fs watcher (every WAL write) used to run the
+// full getSettings() parse/decrypt + applyRuntimeSettings() diff each time. They now
+// gate on this fingerprint, so it must be stable for unchanged rows and must move for
+// raw writes that do not bump _settingsRevision (CLI store, setActiveCombo, manual edits).
+test("settings rows fingerprint is stable when unchanged and moves on raw external writes", async () => {
+  await settingsDb.getSettings();
+  const first = settingsDb.getSettingsRowsFingerprint();
+  assert.equal(settingsDb.getSettingsRowsFingerprint(), first);
+  const revisionBefore = await settingsDb.getSettingsRevision();
+
+  getDbInstance()
+    .prepare(
+      "INSERT OR REPLACE INTO key_value (namespace, key, value) VALUES ('settings', 'cliCompatProviders', ?)"
+    )
+    .run(JSON.stringify(["github"]));
+
+  assert.equal(await settingsDb.getSettingsRevision(), revisionBefore);
+  const second = settingsDb.getSettingsRowsFingerprint();
+  assert.notEqual(second, first);
+  assert.equal(settingsDb.getSettingsRowsFingerprint(), second);
+});
