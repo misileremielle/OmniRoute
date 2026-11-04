@@ -83,7 +83,6 @@ All requests require a valid Bearer token or session cookie. Obtain a token via 
 - [`DELETE /api/v1/batches/delete-completed`](references/endpoints.md#delete-apiv1batchesdelete-completed)
 - [`POST /api/v1/classify`](references/endpoints.md#post-apiv1classify)
 - [`GET /api/v1/combos`](references/endpoints.md#get-apiv1combos)
-- [`POST /api/v1/completions`](references/endpoints.md#post-apiv1completions)
 - [`GET /api/v1/files`](references/endpoints.md#get-apiv1files)
 - [`POST /api/v1/files`](references/endpoints.md#post-apiv1files)
 - [`GET /api/v1/files/{id}`](references/endpoints.md#get-apiv1filesid)

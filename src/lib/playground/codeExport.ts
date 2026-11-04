@@ -13,7 +13,6 @@ import { z } from "zod";
 export type PlaygroundEndpoint =
   | "chat.completions"
   | "responses"
-  | "completions"
   | "embeddings"
   | "images"
   | "audio.transcriptions"
@@ -53,7 +52,7 @@ export interface PlaygroundState {
   model?: string; // não aplicável a web.fetch
   systemPrompt?: string;
   messages?: ChatMessage[]; // chat/completions
-  prompt?: string; // completions/embeddings
+  prompt?: string; // embeddings
   query?: string; // search/rerank
   url?: string; // web.fetch
   params?: Partial<{
@@ -85,7 +84,6 @@ export const PlaygroundStateSchema = z.object({
   endpoint: z.enum([
     "chat.completions",
     "responses",
-    "completions",
     "embeddings",
     "images",
     "audio.transcriptions",
@@ -130,7 +128,6 @@ export function endpointToPath(endpoint: PlaygroundEndpoint): string {
   const map: Record<PlaygroundEndpoint, string> = {
     "chat.completions": "/v1/chat/completions",
     responses: "/v1/responses",
-    completions: "/v1/completions",
     embeddings: "/v1/embeddings",
     images: "/v1/images/generations",
     "audio.transcriptions": "/v1/audio/transcriptions",
@@ -184,16 +181,6 @@ function buildBody(state: PlaygroundState): Record<string, unknown> {
       if (state.systemPrompt) body.instructions = state.systemPrompt;
       if (params) Object.assign(body, params);
       if (tools && tools.length > 0) body.tools = tools;
-      return body;
-    }
-
-    case "completions": {
-      const body: Record<string, unknown> = {
-        model: model ?? "gpt-3.5-turbo-instruct",
-        prompt: state.prompt ?? "Hello,",
-        stream: stream ?? false,
-      };
-      if (params) Object.assign(body, params);
       return body;
     }
 

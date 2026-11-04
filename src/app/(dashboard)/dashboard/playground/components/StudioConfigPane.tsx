@@ -49,7 +49,6 @@ interface StudioConfigPaneProps {
 const ENDPOINT_OPTIONS: Array<{ value: PlaygroundEndpoint; labelKey: string }> = [
   { value: "chat.completions", labelKey: "chat" },
   { value: "responses", labelKey: "responses" },
-  { value: "completions", labelKey: "completions" },
   { value: "embeddings", labelKey: "embeddings" },
   { value: "images", labelKey: "images" },
   { value: "audio.transcriptions", labelKey: "transcription" },

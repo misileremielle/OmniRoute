@@ -1,9 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-const { exportCode, exportAllLanguages, endpointToPath, API_KEY_PLACEHOLDER } = await import(
-  "../../src/lib/playground/codeExport.ts"
-);
+const { exportCode, exportAllLanguages, endpointToPath, API_KEY_PLACEHOLDER } =
+  await import("../../src/lib/playground/codeExport.ts");
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -14,12 +13,12 @@ function assertSecurityInvariants(generated: string, label: string) {
   assert.doesNotMatch(
     generated,
     /sk-[A-Za-z0-9_\-]{16,}/,
-    `${label}: must not contain real API keys`,
+    `${label}: must not contain real API keys`
   );
   assert.doesNotMatch(
     generated,
     /Bearer\s+[A-Za-z0-9_\-]{20,}\s/,
-    `${label}: must not contain real Bearer tokens`,
+    `${label}: must not contain real Bearer tokens`
   );
 }
 
@@ -28,7 +27,6 @@ function assertSecurityInvariants(generated: string, label: string) {
 test("endpointToPath: maps all 13 endpoints correctly (D4-rev2)", () => {
   assert.equal(endpointToPath("chat.completions"), "/v1/chat/completions");
   assert.equal(endpointToPath("responses"), "/v1/responses");
-  assert.equal(endpointToPath("completions"), "/v1/completions");
   assert.equal(endpointToPath("embeddings"), "/v1/embeddings");
   assert.equal(endpointToPath("images"), "/v1/images/generations");
   assert.equal(endpointToPath("audio.transcriptions"), "/v1/audio/transcriptions");
@@ -93,28 +91,11 @@ test("chat.completions: uses systemPrompt when messages is empty", () => {
 test("chat.completions: uses messages when provided", () => {
   const state = {
     ...baseState,
-    messages: [
-      { role: "user" as const, content: "My custom message" },
-    ],
+    messages: [{ role: "user" as const, content: "My custom message" }],
   };
   for (const lang of ["curl", "python", "typescript"] as const) {
     const generated = exportCode(state, lang);
     assert.ok(generated.includes("My custom message"), `${lang}: message in output`);
-  }
-});
-
-// ── completions ────────────────────────────────────────────────────────────────
-
-test("completions × all languages: security + path", () => {
-  const state = {
-    endpoint: "completions" as const,
-    baseUrl: "http://localhost:20128",
-    model: "gpt-3.5-turbo-instruct",
-  };
-  for (const lang of ["curl", "python", "typescript"] as const) {
-    const generated = exportCode(state, lang);
-    assertSecurityInvariants(generated, `completions/${lang}`);
-    assert.ok(generated.includes("/v1/completions"), `${lang}: correct path`);
   }
 });
 
@@ -261,7 +242,7 @@ test("exportAllLanguages returns all 3 snippets with valid content", () => {
   assert.ok(typeof result.python === "string" && result.python.length > 0, "python non-empty");
   assert.ok(
     typeof result.typescript === "string" && result.typescript.length > 0,
-    "typescript non-empty",
+    "typescript non-empty"
   );
 
   for (const [lang, snippet] of Object.entries(result)) {
@@ -321,7 +302,10 @@ test("chat.completions: defaults model when not provided", () => {
     // default prompt "Hello!" should appear (no messages, no systemPrompt, no prompt)
     assert.ok(generated.includes("Hello!"), `${lang}: default prompt fallback`);
     // default stream=false
-    assert.ok(generated.includes("false") || generated.includes("stream"), `${lang}: stream default`);
+    assert.ok(
+      generated.includes("false") || generated.includes("stream"),
+      `${lang}: stream default`
+    );
   }
 });
 
@@ -335,20 +319,6 @@ test("chat.completions: no messages, no systemPrompt — builds default user mes
   for (const lang of ["curl", "python", "typescript"] as const) {
     const generated = exportCode(state, lang);
     assert.ok(generated.includes("Hello!"), `${lang}: default Hello! prompt`);
-  }
-});
-
-test("completions: defaults model when not provided", () => {
-  const state = {
-    endpoint: "completions" as const,
-    baseUrl: "http://localhost:20128",
-    // no model, no prompt, no stream
-  };
-  for (const lang of ["curl", "python", "typescript"] as const) {
-    const generated = exportCode(state, lang);
-    assertSecurityInvariants(generated, `completions/defaults/${lang}`);
-    assert.ok(generated.includes("gpt-3.5-turbo-instruct"), `${lang}: default model`);
-    assert.ok(generated.includes("Hello,"), `${lang}: default prompt`);
   }
 });
 
@@ -582,21 +552,6 @@ test("chat.completions: with params in state", () => {
   };
   for (const lang of ["curl", "python", "typescript"] as const) {
     const generated = exportCode(state, lang);
-    assert.ok(generated.includes("temperature"), `${lang}: params included`);
-  }
-});
-
-test("completions: with params in state", () => {
-  const state = {
-    endpoint: "completions" as const,
-    baseUrl: "http://localhost:20128",
-    model: "gpt-3.5-turbo-instruct",
-    prompt: "Say hello",
-    params: { temperature: 0.5, max_tokens: 100 },
-  };
-  for (const lang of ["curl", "python", "typescript"] as const) {
-    const generated = exportCode(state, lang);
-    assertSecurityInvariants(generated, `completions/params/${lang}`);
     assert.ok(generated.includes("temperature"), `${lang}: params included`);
   }
 });

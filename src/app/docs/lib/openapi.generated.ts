@@ -351,16 +351,6 @@ export const OPENAPI_ENDPOINTS: OpenApiEndpoint[] = [
     hasRequestBody: false,
   },
   {
-    path: "/api/v1/completions",
-    method: "POST",
-    summary: "POST completions",
-    description: "",
-    tag: "V1 Completions",
-    tags: ["V1 Completions"],
-    requiresAuth: false,
-    hasRequestBody: false,
-  },
-  {
     path: "/api/v1/embeddings",
     method: "POST",
     summary: "Create embeddings",

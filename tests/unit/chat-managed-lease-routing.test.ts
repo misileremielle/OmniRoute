@@ -16,7 +16,6 @@ const {
 const leaseDb = await import("../../src/lib/db/exclusiveConnectionLeases.ts");
 const providersDb = await import("../../src/lib/db/providers.ts");
 const accountSemaphores = await import("../../open-sse/services/accountSemaphore.ts");
-const { POST: handleCompletions } = await import("../../src/app/api/v1/completions/route.ts");
 
 const OWNER = "vlo_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const OWNER_B = "vlo_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB";
@@ -293,7 +292,7 @@ test("changing prompt, tools, and request model does not change the owner bindin
   assert.equal(dispatches, 3);
 });
 
-test("legacy completions and messages-compatible paths use the managed lease handler", async () => {
+test("messages-compatible paths use the managed lease handler", async () => {
   const connection = await seedConnection("openai");
   const key = await seedManagedKey([connection.id]);
   const acquired = leaseDb.acquireExclusiveConnectionLease({
@@ -308,18 +307,8 @@ test("legacy completions and messages-compatible paths use the managed lease han
   let dispatches = 0;
   globalThis.fetch = async () => {
     dispatches += 1;
-    return buildOpenAIResponse("legacy fenced");
+    return buildOpenAIResponse("messages fenced");
   };
-  const completions = await handleCompletions(
-    managedRequest(
-      key.key,
-      acquired.lease.generation,
-      {},
-      { prompt: "legacy completion", messages: undefined },
-      OWNER,
-      "http://localhost/v1/completions"
-    )
-  );
   const messages = await handleChat(
     managedRequest(
       key.key,
@@ -331,9 +320,8 @@ test("legacy completions and messages-compatible paths use the managed lease han
     )
   );
 
-  assert.equal(completions.status, 200);
   assert.equal(messages.status, 200);
-  assert.equal(dispatches, 2);
+  assert.equal(dispatches, 1);
   assert.equal(leaseDb.getActiveExclusiveConnectionLease(OWNER)?.connectionId, connection.id);
 });
 

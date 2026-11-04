@@ -38,7 +38,6 @@ const chatCompletionsRoute = await import("../../src/app/api/v1/chat/completions
 const messagesRoute = await import("../../src/app/api/v1/messages/route.ts");
 const responsesRoute = await import("../../src/app/api/v1/responses/route.ts");
 const responsesCatchAllRoute = await import("../../src/app/api/v1/responses/[...path]/route.ts");
-const completionsRoute = await import("../../src/app/api/v1/completions/route.ts");
 const ollamaRoute = await import("../../src/app/api/v1/api/chat/route.ts");
 const antigravityRoute = await import("../../src/app/api/v1/antigravity/route.ts");
 const providerPinnedRoute =
@@ -105,14 +104,6 @@ function responsesBody(label: string) {
   };
 }
 
-function completionsBody(label: string) {
-  return {
-    model: MODEL,
-    stream: false,
-    prompt: padContent(label, 3072),
-  };
-}
-
 function antigravityBody(label: string) {
   return {
     model: MODEL,
@@ -161,7 +152,13 @@ function reloadNormalResourcePressure() {
         availableBytes: null,
         constrainedBytes: null,
       },
-      cgroup: { currentBytes: null, maxBytes: null, highBytes: null, fileBytes: null, events: null },
+      cgroup: {
+        currentBytes: null,
+        maxBytes: null,
+        highBytes: null,
+        fileBytes: null,
+        events: null,
+      },
       psi: null,
     }),
   });
@@ -261,12 +258,6 @@ const ROUTE_CASES: RouteCase[] = [
         responsesBody("responses-catch-all"),
         { Accept: "application/json" }
       ),
-  },
-  {
-    name: "completions.legacy",
-    invoke: (request) => completionsRoute.POST(request),
-    buildRequest: () =>
-      jsonRequest("http://localhost/v1/completions", completionsBody("legacy-completions")),
   },
   {
     name: "ollama.api.chat",

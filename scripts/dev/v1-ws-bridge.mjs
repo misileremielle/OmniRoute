@@ -10,8 +10,6 @@ export const WS_ALLOWED_ENDPOINTS = new Set([
   "/api/v1/messages",
   "/v1/responses",
   "/api/v1/responses",
-  "/v1/completions",
-  "/api/v1/completions",
 ]);
 
 const HANDSHAKE_PATH = "/api/v1/ws";

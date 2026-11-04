@@ -73,7 +73,6 @@
 - [`DELETE /api/v1/batches/delete-completed`](#delete-apiv1batchesdelete-completed)
 - [`POST /api/v1/classify`](#post-apiv1classify)
 - [`GET /api/v1/combos`](#get-apiv1combos)
-- [`POST /api/v1/completions`](#post-apiv1completions)
 - [`GET /api/v1/files`](#get-apiv1files)
 - [`POST /api/v1/files`](#post-apiv1files)
 - [`GET /api/v1/files/{id}`](#get-apiv1filesid)
@@ -899,17 +898,6 @@ GET combos
 ```bash
 curl http://localhost:20128/api/v1/combos \
   -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### POST /api/v1/completions
-
-POST completions
-
-```bash
-curl -X POST http://localhost:20128/api/v1/completions \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
 ```
 
 ### GET /api/v1/files

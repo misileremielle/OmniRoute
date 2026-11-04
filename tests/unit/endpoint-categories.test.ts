@@ -19,10 +19,6 @@ test("resolveEndpointCategory: maps /v1/chat/completions to 'chat'", () => {
   assert.equal(resolveEndpointCategory("/v1/chat/completions"), "chat");
 });
 
-test("resolveEndpointCategory: maps /v1/completions to 'chat'", () => {
-  assert.equal(resolveEndpointCategory("/v1/completions"), "chat");
-});
-
 test("resolveEndpointCategory: maps /v1/messages to 'chat'", () => {
   assert.equal(resolveEndpointCategory("/v1/messages"), "chat");
 });

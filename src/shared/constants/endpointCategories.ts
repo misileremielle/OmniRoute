@@ -21,8 +21,8 @@ export const ENDPOINT_CATEGORIES: readonly EndpointCategory[] = [
   {
     id: "chat",
     label: "Chat / Messages",
-    description: "Chat completions, text completions, messages, and responses",
-    prefixes: ["/v1/chat/completions", "/v1/completions", "/v1/messages", "/v1/responses"],
+    description: "Chat completions, messages, and responses",
+    prefixes: ["/v1/chat/completions", "/v1/messages", "/v1/responses"],
   },
   {
     id: "search",

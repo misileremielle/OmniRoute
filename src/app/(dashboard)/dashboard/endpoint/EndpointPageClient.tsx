@@ -717,18 +717,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
               modelsLoading={modelsLoading}
             />
             <EndpointCard
-              icon="text_fields"
-              iconColor="text-warning"
-              iconBg="bg-warning/10"
-              title={t("completionsLegacy")}
-              path="/v1/completions"
-              models={endpointData.chat}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
               icon="psychology"
               iconColor="text-chart-3"
               iconBg="bg-chart-3/10"
