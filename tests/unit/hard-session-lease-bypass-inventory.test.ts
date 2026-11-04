@@ -69,7 +69,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/app/api/v1/images/generations/route.ts": 3,
     "src/app/api/v1/images/upscale/route.ts": 1,
     "src/app/api/v1/messages/count_tokens/route.ts": 1,
-    "src/app/api/v1/moderations/route.ts": 1,
     // GHSA-3w2r: the local-override lookup now reuses the shared
     // resolveLocalOverrideCredentials (_shared/videoModelResolution.ts), 2->1.
     "src/app/api/v1/music/generations/route.ts": 1,

@@ -13,7 +13,7 @@
 // `open-sse/utils/upstreamErrorResponse.ts:39-41` — *"Non-JSON is an opaque upstream
 // body. Do not echo even sanitized fragments: provider HTML/plaintext can contain
 // credentials or implementation details outside the patterns the canonical sanitizer
-// knows about."* — and `moderations.ts` / `ocr.ts` already use its sanctioned
+// knows about."* — and `ocr.ts` already uses its sanctioned
 // `buildSanitizedUpstreamErrorResponse`. The audio surface never adopted it.
 //
 // The catalog did not report this. It is the largest remaining Hard Rule #12 surface.

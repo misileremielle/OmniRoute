@@ -230,7 +230,7 @@ export const CURATED_SKILLS: CuratedSkillEntry[] = [
     id: "omni-inference",
     name: "Inference (OpenAI-compatible)",
     description:
-      "The core OpenAI-compatible inference endpoints: chat completions, embeddings, images, audio (TTS/STT), moderations, rerank, and the Responses API. The primary integration surface for AI agents.",
+      "The core OpenAI-compatible inference endpoints: chat completions, embeddings, images, audio (TTS/STT), rerank, and the Responses API. The primary integration surface for AI agents.",
     category: "api",
     area: "inference",
     icon: "hub",

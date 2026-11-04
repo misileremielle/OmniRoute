@@ -35,7 +35,6 @@ export const CATALOG_KIND_FILTERS = [
   "audio",
   "embedding",
   "image",
-  "moderation",
   "music",
   "rerank",
   "video",

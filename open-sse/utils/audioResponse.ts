@@ -37,7 +37,7 @@ function extractUpstreamErrorMessage(parsed) {
  * a stack frame, an absolute path, a credential echoed in its own error text — reached
  * the client verbatim. That is what the repo's own rule forbids:
  * `upstreamErrorResponse.ts:39-41` says an opaque body must not be echoed "even
- * sanitized fragments", and `moderations.ts` / `ocr.ts` already comply.
+ * sanitized fragments", and `ocr.ts` already complies.
  *
  * Now:
  *  - a JSON body keeps its shape through `buildSanitizedUpstreamErrorResponse`, which

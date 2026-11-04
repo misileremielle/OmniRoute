@@ -13,7 +13,6 @@ const core = await import("../../src/lib/db/core.ts");
 const { OMNIROUTE_RESPONSE_HEADERS } = await import("../../src/shared/constants/headers.ts");
 const { saveSyncedPricing } = await import("../../src/lib/pricingSync.ts");
 const rerankHandler = await import("../../open-sse/handlers/rerank.ts");
-const moderationHandler = await import("../../open-sse/handlers/moderations.ts");
 const speechRoute = await import("../../src/app/api/v1/audio/speech/route.ts");
 const transcriptionRoute = await import("../../src/app/api/v1/audio/transcriptions/route.ts");
 const videoRoute = await import("../../src/app/api/v1/videos/generations/route.ts");
@@ -174,35 +173,6 @@ test("rerank NVIDIA-format success Response reflects synthesized search unit in 
     response.headers.get(OMNIROUTE_RESPONSE_HEADERS.responseCost),
     "0.0020000000",
     "NVIDIA rerank cost must reflect the synthesized 1 search unit read from result"
-  );
-});
-
-test("moderation handler success Response carries cost telemetry headers (cost 0)", async () => {
-  globalThis.fetch = (async (url: unknown) => {
-    const stringUrl = String(url);
-    if (stringUrl === "https://api.openai.com/v1/moderations") {
-      return new Response(
-        JSON.stringify({
-          id: "modr-1",
-          model: "omni-moderation-latest",
-          results: [{ flagged: false }],
-        }),
-        { status: 200, headers: { "content-type": "application/json" } }
-      );
-    }
-    throw new Error(`Unexpected URL: ${stringUrl}`);
-  }) as typeof fetch;
-
-  const response = (await moderationHandler.handleModeration({
-    body: { model: "omni-moderation-latest", input: "telemetry moderation" },
-    credentials: { apiKey: "test-key" },
-  })) as Response;
-
-  assertCostTelemetryHeaders(response);
-  assert.equal(
-    response.headers.get(OMNIROUTE_RESPONSE_HEADERS.responseCost),
-    "0.0000000000",
-    "moderation is free → cost must be exactly 0"
   );
 });
 

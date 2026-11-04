@@ -241,7 +241,6 @@ v1/
 ├── management/{proxies}/                Management-scoped routes inside v1
 ├── messages/{count_tokens}/             Anthropic-style messages compat
 ├── models/                              Model listing (`route.ts`, `catalog.ts`)
-├── moderations/                         Moderation
 ├── music/                               Music gen
 ├── providers/[provider]/                Per-provider operations
 ├── quotas/{check}                       Quota probes
@@ -475,7 +474,6 @@ open-sse/
 | `videoGeneration.ts`    | Video generation                                                         |
 | `musicGeneration.ts`    | Music generation                                                         |
 | `rerank.ts`             | Reranking                                                                |
-| `moderations.ts`        | Moderation                                                               |
 | `search.ts`             | Web search                                                               |
 | `sseParser.ts`          | SSE event parser                                                         |
 | `usageExtractor.ts`     | Pull token counts out of upstream streams                                |
@@ -561,7 +559,7 @@ Highlights (full list under `open-sse/services/`):
 
 Provider registries (`providerRegistry.ts`, `providerModels.ts`,
 `providerHeaderProfiles.ts`), per-format model registries (`audioRegistry.ts`,
-`embeddingRegistry.ts`, `imageRegistry.ts`, `moderationRegistry.ts`,
+`embeddingRegistry.ts`, `imageRegistry.ts`,
 `musicRegistry.ts`, `rerankRegistry.ts`, `searchRegistry.ts`, `videoRegistry.ts`),
 identity helpers (`codexIdentity.ts`, `codexInstructions.ts`,
 `anthropicHeaders.ts`, `antigravityUpstream.ts`, `antigravityModelAliases.ts`,

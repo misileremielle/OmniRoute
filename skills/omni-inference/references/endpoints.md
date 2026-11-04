@@ -22,7 +22,6 @@
 - [`POST /api/v1/providers/{provider}/images/generations`](#post-apiv1providersproviderimagesgenerations)
 - [`POST /api/v1/audio/speech`](#post-apiv1audiospeech)
 - [`POST /api/v1/audio/transcriptions`](#post-apiv1audiotranscriptions)
-- [`POST /api/v1/moderations`](#post-apiv1moderations)
 - [`POST /api/v1/rerank`](#post-apiv1rerank)
 - [`GET /api/v1`](#get-apiv1)
 - [`GET /api/v1/providers/{provider}/models`](#get-apiv1providersprovidermodels)
@@ -336,19 +335,6 @@ Audio-to-text transcription endpoint.
 
 ```bash
 curl -X POST http://localhost:20128/api/v1/audio/transcriptions \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-### POST /api/v1/moderations
-
-Create moderation
-
-Content moderation endpoint. Routes to configured moderation providers.
-
-```bash
-curl -X POST http://localhost:20128/api/v1/moderations \
   -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{}'

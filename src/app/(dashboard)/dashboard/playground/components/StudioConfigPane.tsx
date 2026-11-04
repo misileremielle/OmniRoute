@@ -55,7 +55,6 @@ const ENDPOINT_OPTIONS: Array<{ value: PlaygroundEndpoint; labelKey: string }> =
   { value: "audio.speech", labelKey: "speech" },
   { value: "video", labelKey: "video" },
   { value: "music", labelKey: "music" },
-  { value: "moderations", labelKey: "moderations" },
   { value: "rerank", labelKey: "rerank" },
   { value: "search", labelKey: "search" },
   { value: "web.fetch", labelKey: "webFetch" },

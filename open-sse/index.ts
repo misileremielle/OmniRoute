@@ -135,15 +135,6 @@ export {
   getAllAudioModels,
 } from "./config/audioRegistry.ts";
 
-// Moderations
-export { handleModeration } from "./handlers/moderations.ts";
-export {
-  MODERATION_PROVIDERS,
-  getModerationProvider,
-  parseModerationModel,
-  getAllModerationModels,
-} from "./config/moderationRegistry.ts";
-
 // Video Generation
 export { handleVideoGeneration } from "./handlers/videoGeneration.ts";
 export {

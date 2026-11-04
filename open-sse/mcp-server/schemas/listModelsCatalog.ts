@@ -5,7 +5,7 @@ import type { McpToolDefinition } from "./toolDefinition.ts";
 export const listModelsCatalogInput = z.object({
   provider: z.string().optional().describe("Filter by provider name"),
   capability: z
-    .enum(["chat", "embedding", "image", "audio", "video", "rerank", "moderation"])
+    .enum(["chat", "embedding", "image", "audio", "video", "rerank"])
     .optional()
     .describe("Filter by model capability"),
   query: z

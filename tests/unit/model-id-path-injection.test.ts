@@ -12,7 +12,6 @@ const { DefaultExecutor } = await import("../../open-sse/executors/default.ts");
 const image = await import("../../open-sse/config/imageRegistry.ts");
 const embedding = await import("../../open-sse/config/embeddingRegistry.ts");
 const rerank = await import("../../open-sse/config/rerankRegistry.ts");
-const moderation = await import("../../open-sse/config/moderationRegistry.ts");
 const ocr = await import("../../open-sse/config/ocrRegistry.ts");
 const video = await import("../../open-sse/config/videoRegistry.ts");
 const music = await import("../../open-sse/config/musicRegistry.ts");
@@ -110,7 +109,6 @@ test("every registry parser refuses the same ids", () => {
     ["image", image.parseImageModel],
     ["embedding", (v) => embedding.parseEmbeddingModel(v)],
     ["rerank", rerank.parseRerankModel],
-    ["moderation", moderation.parseModerationModel],
     ["ocr", ocr.parseOcrModel],
     ["video", video.parseVideoModel],
     ["music", music.parseMusicModel],

@@ -137,7 +137,7 @@ src/
 
 | Path                                                                         | Purpose                                                                                                                                                                                                                                                                                                            |
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `app/api/v1/`                                                                | Public OpenAI-compat API (~25 sub-routes: chat, embeddings, files, batches, audio, images, videos, music, rerank, moderations, search, ws, agents, accounts, providers, etc.)                                                                                                                                      |
+| `app/api/v1/`                                                                | Public OpenAI-compat API (~25 sub-routes: chat, embeddings, files, batches, audio, images, videos, music, rerank, search, ws, agents, accounts, providers, etc.)                                                                                                                                                   |
 | `app/api/v1beta/`                                                            | Gemini-style API endpoints                                                                                                                                                                                                                                                                                         |
 | `app/api/playground/`                                                        | Playground Studio routes: `improve-prompt/` (POST — LLM prompt rewriter), `presets/` (GET list / POST create), `presets/[id]/` (GET / PUT / DELETE) — see `docs/frameworks/PLAYGROUND_STUDIO.md`                                                                                                                   |
 | `app/api/` (non-v1)                                                          | Management/admin routes (~60 directories: providers, combos, settings, mcp, a2a, evals, memory, skills, webhooks, compliance, resilience, monitoring, tunnels, cli-tools, etc.)                                                                                                                                    |
@@ -257,7 +257,7 @@ Separate npm workspace (`@omniroute/open-sse`). Handles request processing + pro
 
 ```
 open-sse/
-├── handlers/            # 16 files (12 handlers + 4 helpers): chatCore, responsesHandler, embeddings, audio, image, video, music, rerank, moderations, search, etc.
+├── handlers/            # 16 files (12 handlers + 4 helpers): chatCore, responsesHandler, embeddings, audio, image, video, music, rerank, search, etc.
 ├── executors/           # 150 executor modules (classes extending BaseExecutor + per-provider helpers)
 ├── translator/          # Format converters (9 request, 9 response, 9 helpers)
 ├── transformer/         # Responses API ↔ Chat Completions (TransformStream)

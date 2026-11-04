@@ -33,7 +33,7 @@ model selection.
 | `GET /v1/models`                | OpenAI model list       | No                                   | —                                                                               | Lists visible chat, media, embedding models, and combos. Use `?prefix=alias`, `dual`, or `canonical` to select id presentation.                               | [`v1-contracts-behavior.test.ts`](../../tests/integration/v1-contracts-behavior.test.ts), [`provider-journey.contract.test.ts`](../../tests/integration/provider-journey.contract.test.ts)                                                   |
 
 Other compatibility surfaces are listed in [API Reference](./API_REFERENCE.md),
-including `/v1/messages`, `/v1/rerank`, `/v1/moderations`, video/music routes,
+including `/v1/messages`, `/v1/rerank`, video/music routes,
 Files and Batches.
 
 ## Chat request fields

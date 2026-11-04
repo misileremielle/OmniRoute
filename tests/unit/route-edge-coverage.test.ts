@@ -25,7 +25,6 @@ const managementProxiesRoute = await import("../../src/app/api/v1/management/pro
 const embeddingsRoute = await import("../../src/app/api/v1/embeddings/route.ts");
 const audioSpeechRoute = await import("../../src/app/api/v1/audio/speech/route.ts");
 const audioTranscriptionsRoute = await import("../../src/app/api/v1/audio/transcriptions/route.ts");
-const moderationsRoute = await import("../../src/app/api/v1/moderations/route.ts");
 const rerankRoute = await import("../../src/app/api/v1/rerank/route.ts");
 const searchRoute = await import("../../src/app/api/v1/search/route.ts");
 const videosRoute = await import("../../src/app/api/v1/videos/generations/route.ts");
@@ -852,13 +851,6 @@ test("v1 routes surface provider-rate-limit sentinels instead of missing credent
   transcriptionForm.set("model", "openai/whisper-1");
 
   const responses = [
-    await moderationsRoute.POST(
-      makeRequest("http://localhost/v1/moderations", {
-        method: "POST",
-        token,
-        body: { model: "openai/omni-moderation-latest", input: "hello" },
-      })
-    ),
     await audioSpeechRoute.POST(
       makeRequest("http://localhost/v1/audio/speech", {
         method: "POST",

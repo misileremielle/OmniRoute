@@ -173,7 +173,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
     const audioSpeech = allModels.filter(
       (m) => m.type === "audio" && m.subtype === "speech" && !m.parent
     );
-    const moderation = allModels.filter((m) => m.type === "moderation" && !m.parent);
     const music = allModels.filter((m) => m.type === "music" && !m.parent);
     return {
       chat,
@@ -183,7 +182,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       rerank,
       audioTranscription,
       audioSpeech,
-      moderation,
       music,
     };
   }, [allModels]);
@@ -194,7 +192,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
   );
 
   const availableEndpointCount = useMemo(() => {
-    const chatCount = endpointData.chat.length > 0 ? 4 : 0; // chat + responses + completions + messages
+    const chatCount = endpointData.chat.length > 0 ? 3 : 0; // chat + responses + messages
     const imageCount = endpointData.images.length > 0 ? 2 : 0; // image gen + image edits
     const otherMedia = [
       endpointData.embeddings,
@@ -204,8 +202,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       endpointData.video,
     ].filter((m) => m.length > 0).length;
     const utilityFixed = 3; // batch + files + list models (always available)
-    const modelUtility =
-      (endpointData.rerank.length > 0 ? 1 : 0) + (endpointData.moderation.length > 0 ? 1 : 0);
+    const modelUtility = endpointData.rerank.length > 0 ? 1 : 0;
     const searchCount = searchProviders.length > 0 ? 1 : 0;
     return chatCount + imageCount + otherMedia + utilityFixed + modelUtility + searchCount;
   }, [endpointData, searchProviders]);
@@ -871,18 +868,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
               title={t("rerank")}
               path="/v1/rerank"
               models={endpointData.rerank}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-              modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="shield"
-              iconColor="text-warning"
-              iconBg="bg-warning/10"
-              title={t("moderations")}
-              path="/v1/moderations"
-              models={endpointData.moderation}
               copy={copy}
               copied={copied}
               baseUrl={currentEndpoint}

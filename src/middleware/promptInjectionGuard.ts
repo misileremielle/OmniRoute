@@ -35,7 +35,7 @@ export function createInjectionGuard(options: PromptInjectionGuardrailOptions = 
       // controlled disabledGuardrails. Registry-managed guardrails use those
       // channels independently; never pass them into this middleware.
       // Omitted logger → console fallback: for middleware-only routes (embeddings,
-      // images, audio, moderations, …) this guard is the ONLY injection evaluation,
+      // rerank, search, …) this guard is the ONLY injection evaluation,
       // so a silent guard would leave blocked requests with zero server-side trace.
       // Chat-family routes are re-evaluated by the guardrail registry with a pino
       // logger and opt out of the duplicate line with `logger: null` (#11936).
@@ -95,10 +95,7 @@ export function withInjectionGuard(handler: any, options: any = {}) {
         if (result.flagged) {
           try {
             request.headers.set("X-Injection-Flagged", "true");
-            request.headers.set(
-              "X-Injection-Detections",
-              String(result.detections.length)
-            );
+            request.headers.set("X-Injection-Detections", String(result.detections.length));
           } catch {
             // immutable headers: detection still applied; metadata is best-effort
           }

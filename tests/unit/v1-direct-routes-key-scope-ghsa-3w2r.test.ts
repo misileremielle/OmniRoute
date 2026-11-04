@@ -47,7 +47,6 @@ const segmentRoute = await import("../../src/app/api/v1/segment/route.ts");
 const classifyRoute = await import("../../src/app/api/v1/classify/route.ts");
 const alphaSearchRoute = await import("../../src/app/api/v1/alpha/search/route.ts");
 const searchRoute = await import("../../src/app/api/v1/search/route.ts");
-const moderationsRoute = await import("../../src/app/api/v1/moderations/route.ts");
 const ocrRoute = await import("../../src/app/api/v1/ocr/route.ts");
 const musicRoute = await import("../../src/app/api/v1/music/generations/route.ts");
 const providerEmbeddingsRoute =
@@ -300,12 +299,6 @@ const ROUTE_CASES: RouteCase[] = [
     provider: () => selectProvider(undefined, "web")!.id,
     call: (bearer) =>
       searchRoute.POST(jsonRequest("/v1/search", bearer, { query: "lighthouse" }), noContext),
-  },
-  {
-    name: "POST /v1/moderations",
-    provider: "openai",
-    call: (bearer) =>
-      moderationsRoute.POST(jsonRequest("/v1/moderations", bearer, { input: "hello" }), noContext),
   },
   {
     name: "POST /v1/ocr",

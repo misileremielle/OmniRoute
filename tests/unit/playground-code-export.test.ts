@@ -33,7 +33,6 @@ test("endpointToPath: maps all 13 endpoints correctly (D4-rev2)", () => {
   assert.equal(endpointToPath("audio.speech"), "/v1/audio/speech");
   assert.equal(endpointToPath("video"), "/v1/videos/generations");
   assert.equal(endpointToPath("music"), "/v1/music/generations");
-  assert.equal(endpointToPath("moderations"), "/v1/moderations");
   assert.equal(endpointToPath("rerank"), "/v1/rerank");
   assert.equal(endpointToPath("search"), "/v1/search");
   assert.equal(endpointToPath("web.fetch"), "/v1/web/fetch");
@@ -213,22 +212,6 @@ test("audio.speech × all languages: security + path", () => {
     const generated = exportCode(state, lang);
     assertSecurityInvariants(generated, `audio.speech/${lang}`);
     assert.ok(generated.includes("/v1/audio/speech"), `${lang}: correct path`);
-  }
-});
-
-// ── moderations ───────────────────────────────────────────────────────────────
-
-test("moderations × all languages: security + path", () => {
-  const state = {
-    endpoint: "moderations" as const,
-    baseUrl: "http://localhost:20128",
-    model: "text-moderation-latest",
-    prompt: "Hello world",
-  };
-  for (const lang of ["curl", "python", "typescript"] as const) {
-    const generated = exportCode(state, lang);
-    assertSecurityInvariants(generated, `moderations/${lang}`);
-    assert.ok(generated.includes("/v1/moderations"), `${lang}: correct path`);
   }
 });
 
@@ -463,19 +446,6 @@ test("music: defaults when no model/prompt provided", () => {
     const generated = exportCode(state, lang);
     assertSecurityInvariants(generated, `music/defaults/${lang}`);
     assert.ok(generated.includes("music-1"), `${lang}: default model`);
-  }
-});
-
-test("moderations: defaults model and prompt when not provided", () => {
-  const state = {
-    endpoint: "moderations" as const,
-    baseUrl: "http://localhost:20128",
-    // no model, no prompt
-  };
-  for (const lang of ["curl", "python", "typescript"] as const) {
-    const generated = exportCode(state, lang);
-    assertSecurityInvariants(generated, `moderations/defaults/${lang}`);
-    assert.ok(generated.includes("text-moderation-latest"), `${lang}: default model`);
   }
 });
 

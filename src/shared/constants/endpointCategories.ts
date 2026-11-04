@@ -85,12 +85,6 @@ export const ENDPOINT_CATEGORIES: readonly EndpointCategory[] = [
     prefixes: ["/v1/models"],
   },
   {
-    id: "moderations",
-    label: "Moderations",
-    description: "Content moderation",
-    prefixes: ["/v1/moderations"],
-  },
-  {
     id: "ocr",
     label: "OCR",
     description: "Optical character recognition",

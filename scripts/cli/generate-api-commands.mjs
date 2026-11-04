@@ -25,7 +25,6 @@ const IGNORED_OP_IDS = new Set([
   "createImageVariation",
   "createTranscription",
   "createSpeech",
-  "createModeration",
 ]);
 
 function kebab(s) {

@@ -977,7 +977,7 @@ deliberately when the behavior changes.
 
 - **Media, embeddings and data routes** (`/v1/images/*`, `/v1/embeddings`,
   `/v1/audio/*`, `/v1/videos/generations`, `/v1/music/generations`,
-  `/v1/rerank`, `/v1/search`, `/v1/moderations`) never reach the registry. No
+  `/v1/rerank`, `/v1/search`) never reach the registry. No
   PII masking, credential masking or modality bridge runs there. Their only
   check is the legacy injection-guard middleware.
 - **Streamed responses** get no post-call guardrails: no `pii-masker` or
@@ -1111,13 +1111,13 @@ that accept user prompts. It respects `INJECTION_GUARD_MODE` (default `warn` = l
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
 | Text (existing) | `/v1/chat/completions`, `/v1/relay/chat/completions`                                                                                                 | warn         |
 | Generative      | `/v1/messages`, `/v1/responses`, `/v1/images/generations`, `/v1/images/edits`, `/v1/videos/generations`, `/v1/music/generations`, `/v1/audio/speech` | warn         |
-| Data            | `/v1/embeddings`, `/v1/rerank`, `/v1/search`, `/v1/moderations`                                                                                      | warn         |
+| Data            | `/v1/embeddings`, `/v1/rerank`, `/v1/search`                                                                                                         | warn         |
 
 Text extraction (`extractMessageContents`) covers `messages`/`input`/`prompt`/`query`+`documents`/`instructions`/`system`.
 
 **Red-team (nightly, `nightly-llm-security.yml`):** promptfoo validates that each route blocks
 the OWASP-LLM corpus in `INJECTION_GUARD_MODE=block`; garak runs probes (skips without secret).
-`moderations` is included for consistency. Block mode is a mandatory boundary: `evaluatePromptInjection()`
+Block mode is a mandatory boundary: `evaluatePromptInjection()`
 ignores the per-request disable list the middleware passes it, so `disabledGuardrails` does
 **not** exempt a route from it ([#16413](https://github.com/diegosouzapw/OmniRoute/issues/16413)).
 

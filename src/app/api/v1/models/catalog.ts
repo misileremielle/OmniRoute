@@ -21,7 +21,6 @@ import {
 import { aiHordeImageCatalog } from "@omniroute/open-sse/services/aihordeImageCatalog";
 import { getAllRerankModels } from "@omniroute/open-sse/config/rerankRegistry";
 import { getAllAudioModels } from "@omniroute/open-sse/config/audioRegistry";
-import { getAllModerationModels } from "@omniroute/open-sse/config/moderationRegistry";
 import { getAllVideoModels } from "@omniroute/open-sse/config/videoRegistry";
 import { getAllMusicModels } from "@omniroute/open-sse/config/musicRegistry";
 import {
@@ -1739,22 +1738,6 @@ async function buildUnifiedModelsResponseCore(
         owned_by: audioModel.provider,
         type: "audio",
         subtype: audioModel.subtype,
-      });
-    }
-
-    // Add moderation models (filtered by active providers)
-    for (const modModel of getAllModerationModels()) {
-      await maybeYieldCatalogBuild();
-      if (!isProviderActive(modModel.provider)) continue;
-      const rawModelId = getSpecialtyModelRelativeId(modModel.id, modModel.provider);
-      if (!providerSupportsModel(modModel.provider, rawModelId)) continue;
-      if (isModelHiddenBulk(modModel.provider, rawModelId, null, "moderation")) continue;
-      models.push({
-        id: modModel.id,
-        object: "model",
-        created: timestamp,
-        owned_by: modModel.provider,
-        type: "moderation",
       });
     }
 

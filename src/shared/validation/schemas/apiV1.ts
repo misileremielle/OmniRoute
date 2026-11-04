@@ -456,18 +456,6 @@ export const v1AudioSpeechSchema = z
   })
   .catchall(z.unknown());
 
-export const v1ModerationSchema = z
-  .object({
-    model: modelIdSchema.optional(),
-    input: z.unknown().refine((value) => {
-      if (value === undefined || value === null) return false;
-      if (typeof value === "string") return value.trim().length > 0;
-      if (Array.isArray(value)) return value.length > 0;
-      return true;
-    }, "Input is required"),
-  })
-  .catchall(z.unknown());
-
 // Mistral OCR: `document` is a { type, document_url | image_url } object.
 // Keep the schema permissive-but-typed — validate model + that a non-empty
 // `document` object (or a document_url/image_url string shorthand) is present.

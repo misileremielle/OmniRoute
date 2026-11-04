@@ -75,10 +75,6 @@ test("resolveEndpointCategory: maps /v1/models to 'models'", () => {
   assert.equal(resolveEndpointCategory("/v1/models"), "models");
 });
 
-test("resolveEndpointCategory: maps /v1/moderations to 'moderations'", () => {
-  assert.equal(resolveEndpointCategory("/v1/moderations"), "moderations");
-});
-
 test("resolveEndpointCategory: maps /v1/ocr to 'ocr'", () => {
   assert.equal(resolveEndpointCategory("/v1/ocr"), "ocr");
 });

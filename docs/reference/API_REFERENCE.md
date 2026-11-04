@@ -136,7 +136,7 @@ account per project:
 Source: `src/sse/handlers/chat.ts` (header read), `src/sse/services/auth.ts` and
 `src/sse/services/sessionAffinityPin.ts` (pin release and the missing-from-pool check).
 
-> **Cost telemetry headers:** non-streaming success responses also carry the `X-OmniRoute-*` cost-telemetry set — `X-OmniRoute-Response-Cost` (USD, fixed 10 decimals; `0.0000000000` for free/unpriced), `X-OmniRoute-Tokens-In` / `X-OmniRoute-Tokens-Out`, `X-OmniRoute-Model`, `X-OmniRoute-Provider`, `X-OmniRoute-Latency-Ms`, `X-OmniRoute-Cache-Hit`, and `X-OmniRoute-Fallback-Attempts` (only when > 0), plus `X-OmniRoute-Request-Id` and `X-OmniRoute-Version`. These are emitted by chat completions, `/v1/responses`, `/v1/messages`, **and the media endpoints** — `/v1/embeddings`, `/v1/images/generations`, `/v1/audio/speech`, `/v1/audio/transcriptions`, `/v1/rerank`, `/v1/videos/generations`, `/v1/music/generations`, and `/v1/moderations` (always cost `0`). Media cost is computed per modality (per-image, per-second, per-character, per search-unit) when pricing is available, otherwise `0` (fail-open).
+> **Cost telemetry headers:** non-streaming success responses also carry the `X-OmniRoute-*` cost-telemetry set — `X-OmniRoute-Response-Cost` (USD, fixed 10 decimals; `0.0000000000` for free/unpriced), `X-OmniRoute-Tokens-In` / `X-OmniRoute-Tokens-Out`, `X-OmniRoute-Model`, `X-OmniRoute-Provider`, `X-OmniRoute-Latency-Ms`, `X-OmniRoute-Cache-Hit`, and `X-OmniRoute-Fallback-Attempts` (only when > 0), plus `X-OmniRoute-Request-Id` and `X-OmniRoute-Version`. These are emitted by chat completions, `/v1/responses`, `/v1/messages`, **and the media endpoints** — `/v1/embeddings`, `/v1/images/generations`, `/v1/audio/speech`, `/v1/audio/transcriptions`, `/v1/rerank`, `/v1/videos/generations`, and `/v1/music/generations`. Media cost is computed per modality (per-image, per-second, per-character, per search-unit) when pricing is available, otherwise `0` (fail-open).
 
 > **Cache-hit cost semantics:** on a semantic-cache HIT (`X-OmniRoute-Cache-Hit: true`) no upstream call is made, so `X-OmniRoute-Response-Cost` is `0.0000000000` (the **incremental** cost of serving the hit). The original/would-have-been cost is reported separately in `X-OmniRoute-Cost-Saved`. Billing consumers should sum `X-OmniRoute-Response-Cost` (hits cost nothing); cache analytics can aggregate `X-OmniRoute-Cost-Saved`.
 
@@ -562,7 +562,7 @@ GET /v1/models?q=sonnet&limit=10                           # case-insensitive ma
 | ------------- | --------------------------------------------------------------------------------------------------- |
 | `capability`  | `attachment`, `reasoning`, `structured_output`, `temperature`, `thinking`, `tool_calling`, `vision` |
 | `min_context` | non-negative integer, compared with `context_length`                                                |
-| `kind`        | `chat`, `audio`, `embedding`, `image`, `moderation`, `music`, `rerank`, `video`                     |
+| `kind`        | `chat`, `audio`, `embedding`, `image`, `music`, `rerank`, `video`                                   |
 | `q`           | 1–200 characters                                                                                    |
 
 An unknown value, or a `min_context` that is not a non-negative integer (for example `1.5`),
@@ -725,7 +725,6 @@ Upstream contracts: [sound effects](https://elevenlabs.io/docs/api-reference/tex
 | POST   | `/v1/rerank`                | Cohere/Voyage-style rerank         |
 | POST   | `/v1/classify`              | Jina classify (`api.jina.ai`)      |
 | POST   | `/v1/segment`               | Jina segmenter (`segment.jina.ai`) |
-| POST   | `/v1/moderations`           | OpenAI Moderations                 |
 | GET    | `/v1/models`                | OpenAI                             |
 | POST   | `/v1/models/query`          | Filtered model shortlist           |
 | POST   | `/v1/messages/count_tokens` | Anthropic                          |
@@ -733,7 +732,7 @@ Upstream contracts: [sound effects](https://elevenlabs.io/docs/api-reference/tex
 | POST   | `/v1beta/models/{...path}`  | Gemini generateContent             |
 | POST   | `/v1/api/chat`              | Ollama                             |
 
-All POST routes follow the same shape: `Bearer your-api-key` + Zod-validated JSON body (`v1RerankSchema`, `v1ModerationSchema`, `v1AudioSpeechSchema`, etc., see `src/shared/validation/schemas.ts`). 4xx is returned on schema failure.
+All POST routes follow the same shape: `Bearer your-api-key` + Zod-validated JSON body (`v1RerankSchema`, `v1AudioSpeechSchema`, etc., see `src/shared/validation/schemas.ts`). 4xx is returned on schema failure.
 
 ```bash
 # Rerank (cloud registry provider, or an OpenAI-compatible provider node as "<prefix>/<model>")
@@ -747,9 +746,6 @@ POST /v1/segment     { "content": "...", "return_chunks": true }
 
 # Jina search (s.jina.ai; provider aliases: jina-search, jina-ai, jina)
 POST /v1/search      { "query": "...", "provider": "jina-search" }
-
-# Moderations
-POST /v1/moderations { "model": "omni-moderation-latest", "input": "..." }
 
 # TTS — returns audio/mpeg (or requested format) body
 POST /v1/audio/speech { "model": "openai/tts-1", "input": "Hello", "voice": "alloy" }

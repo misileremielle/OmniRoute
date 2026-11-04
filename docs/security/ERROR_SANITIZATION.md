@@ -227,7 +227,7 @@ without an upstream body.
 Selective upstream 4xx passthrough preserves the provider's safe JSON shape and wording required by
 client auto-recovery, but it is not byte-for-byte passthrough: the recursive sanitizer always runs
 before serialization. Cyclic, BigInt-bearing, or hostile `toJSON()` bodies fail closed and are not
-eligible for passthrough. OCR and moderation apply the same rule; non-JSON, blank, or mislabeled
+eligible for passthrough. OCR applies the same rule; non-JSON, blank, or mislabeled
 upstream bodies are converted to the canonical OmniRoute JSON error envelope.
 
 ## Known CodeQL limitation: custom sanitizers not recognized

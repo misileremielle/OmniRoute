@@ -712,16 +712,6 @@ export const OPENAPI_ENDPOINTS: OpenApiEndpoint[] = [
     hasRequestBody: true,
   },
   {
-    path: "/api/v1/moderations",
-    method: "POST",
-    summary: "Create moderation",
-    description: "Content moderation endpoint. Routes to configured moderation providers.",
-    tag: "Moderations",
-    tags: ["Moderations"],
-    requiresAuth: true,
-    hasRequestBody: true,
-  },
-  {
     path: "/api/v1/multimodal-embeddings",
     method: "GET",
     summary: "List embedding models (Jina multimodal-embeddings alias)",

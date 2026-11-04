@@ -31,7 +31,6 @@ Core capabilities:
 - Video generation via `/v1/videos/generations` (ComfyUI + SD WebUI)
 - Music generation via `/v1/music/generations` (ComfyUI)
 - Web search via `/v1/search` (20 providers)
-- Moderations via `/v1/moderations`
 - Reranking via `/v1/rerank`
 - Think tag parsing (`<think>...</think>`) for reasoning models
 - Response sanitization for strict OpenAI SDK compatibility

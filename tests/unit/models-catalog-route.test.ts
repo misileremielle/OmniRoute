@@ -963,7 +963,7 @@ test("v1 models catalog preserves GLM-5.2 limits alongside GitHub Copilot Astra"
   }
 });
 
-test("v1 models catalog includes media, moderation, rerank, video, and music models for active providers", async () => {
+test("v1 models catalog includes media, rerank, video, and music models for active providers", async () => {
   await seedConnection("openai", { name: "openai-media" });
   await seedConnection("cohere", { name: "cohere-rerank" });
   await seedConnection("comfyui", {
@@ -982,7 +982,6 @@ test("v1 models catalog includes media, moderation, rerank, video, and music mod
   assert.equal((byId.get("openai/gpt-image-2") as any).type, "image");
   assert.equal((byId.get("openai/whisper-1") as any).type, "audio");
   assert.equal((byId.get("openai/whisper-1") as any).subtype, "transcription");
-  assert.equal((byId.get("openai/omni-moderation-latest") as any).type, "moderation");
   assert.equal((byId.get("cohere/rerank-v3.5") as any).type, "rerank");
   assert.equal((byId.get("comfyui/animatediff") as any).type, "video");
   assert.equal((byId.get("comfyui/stable-audio-open") as any).type, "music");

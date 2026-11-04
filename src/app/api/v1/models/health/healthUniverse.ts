@@ -125,8 +125,6 @@ async function loadModalityRows(): Promise<ModalityRow[]> {
     async () => (await import("@omniroute/open-sse/config/imageRegistry")).getAllImageModels(),
     async () => (await import("@omniroute/open-sse/config/rerankRegistry")).getAllRerankModels(),
     async () => (await import("@omniroute/open-sse/config/audioRegistry")).getAllAudioModels(),
-    async () =>
-      (await import("@omniroute/open-sse/config/moderationRegistry")).getAllModerationModels(),
     async () => (await import("@omniroute/open-sse/config/videoRegistry")).getAllVideoModels(),
     async () => (await import("@omniroute/open-sse/config/musicRegistry")).getAllMusicModels(),
   ];

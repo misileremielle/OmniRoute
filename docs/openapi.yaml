@@ -1990,34 +1990,6 @@ paths:
             transcription cost is computed per second when pricing is available,
             otherwise `0` (fail-open).
 
-  /api/v1/moderations:
-    post:
-      tags: [Moderations]
-      summary: Create moderation
-      description: Content moderation endpoint. Routes to configured moderation providers.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [input]
-              properties:
-                input:
-                  oneOf:
-                    - type: string
-                    - type: array
-                      items:
-                        type: string
-      responses:
-        "200":
-          description: >-
-            Moderation result. Success responses carry the `X-OmniRoute-*`
-            cost-telemetry headers (see `POST /api/v1/chat/completions`);
-            moderations are always cost `0` (free).
-
   /api/v1/rerank:
     post:
       tags: [Rerank]

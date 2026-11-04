@@ -88,7 +88,6 @@ const budget = [
   { file: "open-sse/handlers/audioSpeech.ts", maxAny: 0 },
   { file: "open-sse/handlers/embeddings.ts", maxAny: 0 },
   { file: "open-sse/handlers/imageGeneration.ts", maxAny: 3 },
-  { file: "open-sse/handlers/moderations.ts", maxAny: 0 },
   { file: "open-sse/handlers/rerank.ts", maxAny: 0 },
   { file: "open-sse/handlers/responsesHandler.ts", maxAny: 0 },
   { file: "open-sse/mcp-server/__tests__/advancedTools.test.ts", maxAny: 0 },

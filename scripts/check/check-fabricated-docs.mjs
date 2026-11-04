@@ -343,7 +343,6 @@ const ENDPOINT_ALLOWLIST = new Set([
   "/api/v1/audio/speech",
   "/api/v1/videos/generations",
   "/api/v1/music/generations",
-  "/api/v1/moderations",
   "/api/v1/rerank",
   "/api/v1/search",
   "/api/v1/messages",
