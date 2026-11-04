@@ -29,7 +29,7 @@ const QUIET = process.argv.includes("--quiet");
 const LIST = process.argv.includes("--list");
 const RATCHET = process.argv.includes("--ratchet");
 const BASELINE_PATH = path.join(ROOT, "config/quality/quality-baseline.json");
-const SCAN_DIRS = ["src", "electron"];
+const SCAN_DIRS = ["src"];
 const SKIP = new Set(["node_modules", ".next", "dist", "build", "out", "coverage", ".git"]);
 
 // Physical utilities that govern placement and do not mirror under dir=rtl.

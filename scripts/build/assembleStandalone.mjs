@@ -1110,44 +1110,6 @@ export function materializeHashedModuleAliases(nodeModulesDir) {
 }
 
 /**
- * Sync an Electron-ABI-rebuilt native module into any hashed/plain copies of
- * that module already materialized inside a nested node_modules dir.
- *
- * materializeBundledSymlinks() turns Turbopack hashed-module symlinks (e.g.
- * `better-sqlite3-90e2652d1716b047`) into real directory copies of the
- * Node-ABI build. A later step in prepare-electron-standalone.mjs rebuilds
- * better-sqlite3 against the Electron ABI at the bundle root — but the
- * hashed copy under the nested node_modules still holds the stale Node-ABI
- * build, and the server's hashed `require("better-sqlite3-<hash>")` resolves
- * to it, not the rebuilt root module. Previously that hashed copy was simply
- * deleted, which caused MODULE_NOT_FOUND and a silent fallback to the sql.js
- * WASM driver in the packaged app (issue #6794 follow-up). Overwriting each
- * matching entry with the rebuilt root module keeps the hashed require
- * resolving to a working, ABI-correct native driver instead.
- *
- * @param {string} rootModuleDir - absolute path to the already-rebuilt module (e.g. <standalone>/node_modules/better-sqlite3)
- * @param {string} nodeModulesDir - absolute path to the nested node_modules dir to scan
- * @returns {{ synced: number }}
- */
-export function syncRebuiltNativeModuleIntoHashedEntries(rootModuleDir, nodeModulesDir) {
-  const summary = { synced: 0 };
-  if (!fsSync.existsSync(rootModuleDir) || !fsSync.existsSync(nodeModulesDir)) return summary;
-
-  const baseName = path.basename(rootModuleDir);
-  const pattern = new RegExp(`^${baseName}(-[0-9a-f]{8,})?$`, "i");
-
-  for (const name of fsSync.readdirSync(nodeModulesDir)) {
-    if (!pattern.test(name)) continue;
-    const entryPath = path.join(nodeModulesDir, name);
-    fsSync.rmSync(entryPath, { recursive: true, force: true });
-    fsSync.cpSync(rootModuleDir, entryPath, { recursive: true, dereference: true });
-    summary.synced += 1;
-  }
-
-  return summary;
-}
-
-/**
  * The two node_modules locations a standalone bundle can carry: the top-level one, and — for
  * projects with a custom distDir (see next.config.mjs) — the nested <relDistDir>/node_modules the
  * tracer mirrors alongside the traced server chunks. The server chunks and the externals chunk

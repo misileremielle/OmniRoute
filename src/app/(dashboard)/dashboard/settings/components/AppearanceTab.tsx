@@ -6,7 +6,6 @@ import { RadioGroup, RadioGroupItem } from "@omniroute/ui-kit/radio-group";
 import { Button, Card, Input, Toggle } from "@/shared/components";
 import Icon from "@/shared/components/Icon";
 import { useTheme } from "@/shared/hooks/useTheme";
-import { useIsElectron } from "@/shared/hooks/useElectron";
 import {
   COMBO_CONFIG_MODE_SETTING_KEY,
   normalizeComboConfigMode,
@@ -18,16 +17,9 @@ export default function AppearanceTab() {
   const { theme, setTheme, isDark } = useTheme();
   const t = useTranslations("settings");
 
-  const isElectron = useIsElectron();
-  const [autostartEnabled, setAutostartEnabled] = useState(false);
   const logoFileRef = useRef<HTMLInputElement>(null);
   const faviconFileRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (isElectron && window.electronAPI) {
-      window.electronAPI.getAutostartStatus().then(setAutostartEnabled).catch(console.error);
-    }
-  }, [isElectron]);
   const [settings, setSettings] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [uploadError, setUploadError] = useState<{
@@ -661,27 +653,6 @@ export default function AppearanceTab() {
               )}
             </div>
 
-            {isElectron && (
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div>
-                  <p className="font-medium">{t("startOnLogin")}</p>
-                  <p className="text-xs text-text-muted mt-0.5">{t("startOnLoginDesc")}</p>
-                </div>
-                <Toggle
-                  checked={autostartEnabled}
-                  ariaLabel={t("startOnLogin")}
-                  onChange={async (checked) => {
-                    if (checked) {
-                      const success = await window.electronAPI?.enableAutostart();
-                      if (success) setAutostartEnabled(true);
-                    } else {
-                      const success = await window.electronAPI?.disableAutostart();
-                      if (success) setAutostartEnabled(false);
-                    }
-                  }}
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>

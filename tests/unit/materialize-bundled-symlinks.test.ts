@@ -13,10 +13,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 // @ts-expect-error - JS build helper without type declarations
-import {
-  materializeBundledSymlinks,
-  syncRebuiltNativeModuleIntoHashedEntries,
-} from "../../scripts/build/assembleStandalone.mjs";
+import { materializeBundledSymlinks } from "../../scripts/build/assembleStandalone.mjs";
 
 function makePkg(dir: string, name: string, marker: string) {
   const pkgDir = join(dir, name);
@@ -132,93 +129,6 @@ test("materializeBundledSymlinks leaves real directories untouched and no-ops on
 
     const missing = materializeBundledSymlinks(join(root, "does-not-exist"));
     assert.deepEqual(missing, { materialized: 0, relinked: 0, removed: 0 });
-  } finally {
-    rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-  }
-});
-
-test("syncRebuiltNativeModuleIntoHashedEntries overwrites a hashed entry with the rebuilt root module", () => {
-  const root = mkdtempSync(join(tmpdir(), "sync-hashed-"));
-  try {
-    const rootModule = makePkg(root, "better-sqlite3", "electron-abi-rebuilt");
-
-    const nm = join(root, "nested", "node_modules");
-    makePkg(nm, "better-sqlite3-90e2652d1716b047", "stale-node-abi");
-
-    const summary = syncRebuiltNativeModuleIntoHashedEntries(rootModule, nm);
-
-    assert.equal(summary.synced, 1);
-    const target = join(nm, "better-sqlite3-90e2652d1716b047");
-    assert.equal(
-      JSON.parse(readFileSync(join(target, "package.json"), "utf8")).marker,
-      "electron-abi-rebuilt"
-    );
-  } finally {
-    rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-  }
-});
-
-test("syncRebuiltNativeModuleIntoHashedEntries overwrites a plain-named entry too", () => {
-  const root = mkdtempSync(join(tmpdir(), "sync-plain-"));
-  try {
-    const rootModule = makePkg(root, "better-sqlite3", "electron-abi-rebuilt");
-
-    const nm = join(root, "nested", "node_modules");
-    makePkg(nm, "better-sqlite3", "stale-node-abi");
-
-    const summary = syncRebuiltNativeModuleIntoHashedEntries(rootModule, nm);
-
-    assert.equal(summary.synced, 1);
-    assert.equal(
-      JSON.parse(readFileSync(join(nm, "better-sqlite3", "package.json"), "utf8")).marker,
-      "electron-abi-rebuilt"
-    );
-  } finally {
-    rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-  }
-});
-
-test("syncRebuiltNativeModuleIntoHashedEntries no-ops when root module or nested node_modules is missing", () => {
-  const root = mkdtempSync(join(tmpdir(), "sync-noop-"));
-  try {
-    const rootModule = join(root, "does-not-exist", "better-sqlite3");
-    const nm = join(root, "nested", "node_modules");
-    makePkg(nm, "better-sqlite3", "stale-node-abi");
-
-    const missingRoot = syncRebuiltNativeModuleIntoHashedEntries(rootModule, nm);
-    assert.deepEqual(missingRoot, { synced: 0 });
-
-    const realRootModule = makePkg(root, "better-sqlite3", "electron-abi-rebuilt");
-    const missingNm = syncRebuiltNativeModuleIntoHashedEntries(
-      realRootModule,
-      join(root, "does-not-exist-nm")
-    );
-    assert.deepEqual(missingNm, { synced: 0 });
-  } finally {
-    rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-  }
-});
-
-test("syncRebuiltNativeModuleIntoHashedEntries leaves unrelated entries untouched", () => {
-  const root = mkdtempSync(join(tmpdir(), "sync-unrelated-"));
-  try {
-    const rootModule = makePkg(root, "better-sqlite3", "electron-abi-rebuilt");
-
-    const nm = join(root, "nested", "node_modules");
-    makePkg(nm, "pino", "real-pino");
-    makePkg(nm, "better-sqlite3-helper", "unrelated-package");
-
-    const summary = syncRebuiltNativeModuleIntoHashedEntries(rootModule, nm);
-
-    assert.deepEqual(summary, { synced: 0 });
-    assert.equal(
-      JSON.parse(readFileSync(join(nm, "pino", "package.json"), "utf8")).marker,
-      "real-pino"
-    );
-    assert.equal(
-      JSON.parse(readFileSync(join(nm, "better-sqlite3-helper", "package.json"), "utf8")).marker,
-      "unrelated-package"
-    );
   } finally {
     rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }

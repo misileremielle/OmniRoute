@@ -76,7 +76,6 @@ export function classifyPaths(files) {
       f.startsWith("src/") ||
       f.startsWith("open-sse/") ||
       f.startsWith("bin/") ||
-      f.startsWith("electron/") ||
       f.startsWith("tests/") ||
       f.startsWith("scripts/") ||
       f.startsWith("db/") ||

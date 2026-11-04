@@ -214,7 +214,7 @@ docker run -d \
 
 ## Dependencies
 
-- Run `npm audit` regularly (`npm run audit:deps` covers main + electron)
+- Run `npm audit` regularly (`npm run audit:deps`)
 - Keep dependencies updated
 - The project uses `husky` + `lint-staged` for pre-commit checks (lint-staged + check-docs-sync + check:any-budget:t11)
 - CI pipeline runs ESLint security rules on every push (`no-eval`, `no-implied-eval`, `no-new-func` = error)

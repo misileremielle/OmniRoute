@@ -2,9 +2,7 @@
 # scripts/release/preflight-build.sh — /generate-release Phase 0: the build checks that explode
 # only on the tag, run BEFORE the freeze (v3.8.52 lessons, 2026-10-20).
 #
-# Why this exists: the PR CI never exercises the three surfaces that broke the v3.8.52 tag —
-#   • `npm ci` in electron/ (electron-release.yml installs with `ci`; the CI smoke uses `install`,
-#     which repairs a stale lock silently — #15157 on v3.8.51, #17212 on v3.8.52);
+# Why this exists: the PR CI never exercises the surfaces that broke the v3.8.52 tag —
 #   • the Bun `runner-web` image's apt list (best-effort stage, `continue-on-error` — dead packages
 #     only surfaced through the manifest guard on the release run, #17223 / #17236);
 #   • the README/llm.txt current-version claims the cycle bump used to skip (#17237).
@@ -66,8 +64,6 @@ run "version claims (README.md, llm.txt)" 60 \
   node scripts/release/bump-version-claims.mjs --check --to "$VERSION"
 run "root lockfile in sync (npm ci --dry-run)" 300 \
   npm ci --dry-run --ignore-scripts
-run "electron lockfile in sync (npm ci --dry-run)" 300 \
-  bash -c 'cd electron && npm ci --dry-run --ignore-scripts'
 
 if [ "$QUICK" -eq 0 ]; then
   run "vitest (MCP, autoCombo, cache)" 1200 npm run test:vitest

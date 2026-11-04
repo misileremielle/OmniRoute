@@ -254,7 +254,7 @@ Check that it is active after a restart:
 systemctl --user show omniroute -p WatchdogUSec -p WatchdogTimestamp
 ```
 
-`WatchdogUSec` shows the configured delay and `WatchdogTimestamp` moves forward every minute. A restart caused by the watchdog is recorded as `Result=watchdog`. To turn the pings off while keeping the unit as it is, set `OMNIROUTE_DISABLE_SD_NOTIFY=1`; without a `NOTIFY_SOCKET` (terminal, Docker, Electron, Windows) nothing is sent.
+`WatchdogUSec` shows the configured delay and `WatchdogTimestamp` moves forward every minute. A restart caused by the watchdog is recorded as `Result=watchdog`. To turn the pings off while keeping the unit as it is, set `OMNIROUTE_DISABLE_SD_NOTIFY=1`; without a `NOTIFY_SOCKET` (terminal, Docker, Windows) nothing is sent.
 
 The watchdog only checks that the event loop keeps running. A server that is slow but still turning is not restarted.
 

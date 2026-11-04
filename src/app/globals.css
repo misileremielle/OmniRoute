@@ -271,11 +271,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body.electron-macos {
-  --desktop-safe-top: 30px;
-  --desktop-safe-bottom: 8px;
-}
-
 /* iOS standalone PWA safe-area — keeps dashboard below the status bar */
 @media (display-mode: standalone) {
   @supports (padding-top: env(safe-area-inset-top)) {

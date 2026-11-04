@@ -7,7 +7,7 @@
 // inexistentes; 43% dos nomes alucinados reaparecem, registráveis por atacantes).
 // A revisão humana ao adicionar à allowlist é o ponto de controle.
 //
-// 6A.8: Expandido de 2 manifests hardcoded (package.json + electron/package.json)
+// 6A.8: Expandido de 2 manifests hardcoded (package.json + o extinto electron/package.json)
 // para descoberta automática de TODOS os package.json do repo, excluindo:
 //   - node_modules/ (dep tree)
 //   - .next/, .build/, dist/, dist-electron/ (build artefatos)

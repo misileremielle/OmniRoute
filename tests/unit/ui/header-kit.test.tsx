@@ -9,11 +9,6 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/dashboard/providers",
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }));
-let isElectron = false;
-vi.mock("@/shared/hooks/useElectron", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/hooks/useElectron")>()),
-  useIsElectron: () => isElectron,
-}));
 vi.mock("@/shared/components/LanguageSelector", () => ({
   default: () => <div data-testid="lang" />,
 }));
@@ -23,8 +18,6 @@ const { default: ThemeToggle } = await import("@/shared/components/ThemeToggle")
 
 afterEach(() => {
   cleanup();
-  isElectron = false;
-  delete (window as unknown as { electronAPI?: unknown }).electronAPI;
 });
 
 describe("Header on the kit shell", () => {
@@ -118,29 +111,15 @@ describe("Header on the kit shell", () => {
     "grows the kit header by the safe-area inset instead of squeezing its controls",
     { timeout: 20_000 },
     () => {
-      const { unmount } = render(
-        <SidebarProvider>
-          <Header />
-        </SidebarProvider>
-      );
-      let style = document.querySelector("header")!.getAttribute("style") ?? "";
-      expect(style).toContain("padding-top: var(--ios-safe-top, 0px)");
-      expect(style).toContain(
-        "height: calc(4rem + var(--ci-border-default) + var(--ios-safe-top, 0px))"
-      );
-      unmount();
-
-      isElectron = true;
-      (window as unknown as { electronAPI?: unknown }).electronAPI = { platform: "darwin" };
       render(
         <SidebarProvider>
           <Header />
         </SidebarProvider>
       );
-      style = document.querySelector("header")!.getAttribute("style") ?? "";
-      expect(style).toContain("padding-top: var(--desktop-safe-top)");
+      const style = document.querySelector("header")!.getAttribute("style") ?? "";
+      expect(style).toContain("padding-top: var(--ios-safe-top, 0px)");
       expect(style).toContain(
-        "height: calc(4rem + var(--ci-border-default) + var(--desktop-safe-top))"
+        "height: calc(4rem + var(--ci-border-default) + var(--ios-safe-top, 0px))"
       );
     }
   );

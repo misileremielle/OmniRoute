@@ -9,7 +9,6 @@ import Breadcrumbs from "../Breadcrumbs";
 import MaintenanceBanner from "../MaintenanceBanner";
 import CommandPalette from "../CommandPalette";
 import NavigationProgress from "../NavigationProgress";
-import { useIsElectron } from "@/shared/hooks/useElectron";
 import {
   installDashboardCsrfFetch,
   prefetchDashboardCsrfToken,
@@ -33,21 +32,7 @@ export default function DashboardShell({
   sidebarDefaultOpen?: boolean;
 }) {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const isElectron = useIsElectron();
   const t = useTranslations("sidebar");
-  const isMacElectron =
-    isElectron &&
-    typeof globalThis.window !== "undefined" &&
-    globalThis.electronAPI?.platform === "darwin";
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    document.body.classList.toggle("electron-macos", isMacElectron);
-    return () => {
-      document.body.classList.remove("electron-macos");
-    };
-  }, [isMacElectron]);
-
   useInsertionEffect(() => {
     // basePath rewrite must wrap native fetch first so CSRF's originalFetch
     // chain (and bare `fetch("/api/...")` call sites) hit the subpath.
@@ -95,9 +80,8 @@ export default function DashboardShell({
         collapsible="icon"
         side={useSidebarSide()}
         mobileLabel={t("mainNavigation")}
-        style={{ paddingTop: isMacElectron ? "var(--desktop-safe-top)" : undefined }}
       >
-        <Sidebar isMacElectron={isMacElectron} />
+        <Sidebar />
       </KitSidebar>
       <SidebarInset
         id="main-content"

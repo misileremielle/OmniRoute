@@ -21,7 +21,7 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-const SOURCES = ["src", "open-sse", "electron", "bin"].flatMap((d) => walk(path.join(ROOT, d)));
+const SOURCES = ["src", "open-sse", "bin"].flatMap((d) => walk(path.join(ROOT, d)));
 
 function referencing(re: RegExp): string[] {
   return SOURCES.filter((f) => re.test(fs.readFileSync(f, "utf8"))).map((f) =>

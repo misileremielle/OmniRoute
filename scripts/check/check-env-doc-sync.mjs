@@ -364,8 +364,6 @@ export const CODE_SCAN_ROOTS = [
   "open-sse",
   "bin",
   "scripts",
-  "electron/main.js",
-  "electron/preload.js",
 ];
 
 const CODE_ENV_REF = /process\.env\.([A-Z][A-Z0-9_]+)/g;

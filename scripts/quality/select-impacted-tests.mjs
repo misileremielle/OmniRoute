@@ -30,9 +30,9 @@ export function selectImpacted({ changed, map }) {
     // #16068: path-literal edges (workflows/configs/docs read as files) are ADDITIVE — they
     // never escalate to __RUN_ALL__.
     map.artifacts?.[f]?.forEach((t) => out.add(t));
-    // Impact map only indexes imports under src/ + open-sse/. electron/ and bin/
-    // are not unit-mapped; treating them as unmapped used to force __RUN_ALL__ and
-    // a full unit suite for pure CLI/desktop PRs. Package/smoke jobs cover those.
+    // Impact map only indexes imports under src/ + open-sse/. bin/ is not
+    // unit-mapped; treating it as unmapped used to force __RUN_ALL__ and a full
+    // unit suite for pure CLI PRs. Package/smoke jobs cover those.
     const isSource = f.startsWith("src/") || f.startsWith("open-sse/");
     if (!isSource) continue;
     const hits = map.sources[f];

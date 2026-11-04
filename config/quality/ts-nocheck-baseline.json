@@ -24,7 +24,6 @@
   "_program": {
     "files": 6072,
     "include": [
-      "electron/**/*.d.ts",
       "src/**/*.ts",
       "src/**/*.tsx",
       "open-sse/**/*.ts",

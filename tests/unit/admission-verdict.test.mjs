@@ -359,7 +359,7 @@ const FULL_LANE = Object.entries(policy.profiles.ci.jobs)
   .map(([id]) => id);
 
 test("full-matrix lanes cover the heavy jobs and nothing the fast lane needs", () => {
-  for (const id of ["test-e2e", "electron-package-smoke", "package-artifact", "test-integration"])
+  for (const id of ["test-e2e", "package-artifact", "test-integration"])
     assert.ok(FULL_LANE.includes(id), `${id} belongs to the full-matrix lane`);
   for (const id of ["lint", "build", "test-unit", "test-vitest", "test-coverage", "test-security"])
     assert.ok(!FULL_LANE.includes(id), `${id} must keep running on every code PR`);

@@ -5,7 +5,7 @@
 // Approach: STATIC SOURCE ASSERTIONS. Driving handleChat / handleChatCore end to end needs the
 // full provider/executor/DB stack, so behavioral coverage of "which routes hit the hooks" and
 // "what runs before/after post-call" is impractical and brittle. Instead this file:
-//   3. scans every non-test source file under src/, open-sse/, bin/ and electron/ for callers
+//   3. scans every non-test source file under src/, open-sse/ and bin/ for callers
 //      of runPreCallHooks / runPostCallHooks and for importers of the chat handler, and pins
 //      the exact sets — so a new caller or a new chat-family route fails here on purpose;
 //   4. asserts the textual order of the post-call block in nonStreamingResponse.ts (memory
@@ -35,7 +35,7 @@ function walk(relDir: string, out: string[] = []): string[] {
   return out;
 }
 
-const SOURCE_FILES = ["src", "open-sse", "bin", "electron"].flatMap((dir) => walk(dir));
+const SOURCE_FILES = ["src", "open-sse", "bin"].flatMap((dir) => walk(dir));
 
 function filesMatching(pattern: RegExp) {
   return SOURCE_FILES.filter((file) => pattern.test(read(file))).sort();

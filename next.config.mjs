@@ -292,7 +292,6 @@ const nextConfig = {
       "**/.slim/**",
       "**/packages/**",
       "**/.tmp/**",
-      "**/electron/**",
       "**/docs/**",
     ],
   },
@@ -574,11 +573,6 @@ const nextConfig = {
       },
       // Guides
       { source: "/docs/docker-guide", destination: "/docs/guides/docker-guide", permanent: true },
-      {
-        source: "/docs/electron-guide",
-        destination: "/docs/guides/electron-guide",
-        permanent: true,
-      },
       { source: "/docs/features", destination: "/docs/guides/features", permanent: true },
       { source: "/docs/i18n", destination: "/docs/guides/i18n", permanent: true },
       { source: "/docs/kiro-setup", destination: "/docs/guides/kiro-setup", permanent: true },
