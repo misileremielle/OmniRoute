@@ -135,19 +135,6 @@ vi.mock("next-intl", () => ({
       "endpoint.categoryCore": "Core APIs",
       "endpoint.categoryMedia": "Media APIs",
       "endpoint.categoryUtility": "Utility APIs",
-      "endpoint.vscodeAliasTitle": "VS Code Token Alias",
-      "endpoint.vscodeAliasDescriptionReady":
-        "Ready-to-paste compatibility URLs using the /api/v1/vscode/{token}/... endpoint.",
-      "endpoint.vscodeAliasDescriptionError":
-        "Showing placeholder URLs because CLI keys could not be loaded in this session.",
-      "endpoint.vscodeAliasDescriptionLoading":
-        "Loading CLI keys. Placeholder URLs are shown until a key is available.",
-      "endpoint.vscodeAliasDescriptionPlaceholder":
-        "Showing placeholder URLs. Create or activate an API key in CLI Tools to replace {token}.",
-      "endpoint.vscodeAliasManage": "CLI Tools",
-      "endpoint.vscodeAliasBaseLabel": "VS Code base",
-      "endpoint.vscodeAliasModelsLabel": "VS Code models",
-      "endpoint.vscodeAliasChatLabel": "VS Code chat",
       "endpoint.machineId": "Machine {id}",
       "endpoint.usingLocalServer": "Using local server",
       "common.copy": "Copy",
@@ -415,9 +402,6 @@ describe("EndpointPageClient", () => {
     );
 
     await waitForText("2 models across");
-    await waitForText("/api/v1/vscode/sk-test-1234/models");
-    expect(document.body.textContent).toContain("VS Code Token Alias");
-    expect(document.body.textContent).toContain("/api/v1/vscode/sk-test-1234/models");
   });
 
   it("does not start background endpoint requests after unmounting during settings load", async () => {

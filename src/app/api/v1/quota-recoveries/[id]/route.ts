@@ -10,7 +10,7 @@ import { CORS_HEADERS } from "@/shared/utils/cors";
 type RouteContext = { params: Promise<{ id: string }> };
 
 async function principal(request: Request): Promise<string | null> {
-  const apiKey = extractApiKey(request, { allowUrl: false });
+  const apiKey = extractApiKey(request);
   if (!apiKey || !(await isValidApiKey(apiKey))) return null;
   const metadata = await getApiKeyMetadata(apiKey);
   if (!metadata?.id || metadata.isActive === false || metadata.isBanned === true) return null;

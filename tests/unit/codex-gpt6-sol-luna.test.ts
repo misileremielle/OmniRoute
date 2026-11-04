@@ -7,7 +7,6 @@ import { openaiToOpenAIResponsesRequest } from "../../open-sse/translator/reques
 import { getPricingForModel } from "../../src/shared/constants/pricing.ts";
 import { getCodexFastCostMultiplier } from "../../src/lib/usage/costCalculator.ts";
 import { extendCodexGpt56EffortValues } from "../../src/shared/reasoning/effortStandardization.ts";
-import * as reasoningMetadata from "../../src/lib/vscode/reasoningMetadata.ts";
 
 // The live Codex catalog (client 0.155.1) advertises Sol at low..ultra and Luna at
 // low..max, mirroring the GPT-5.6 Sol/Luna split.
@@ -116,37 +115,6 @@ test("Catalog effort tiers follow the live Codex levels for GPT-6 models", () =>
   }
   // Kiro's GPT-5.6 max extension does not reach models Kiro does not serve.
   assert.deepEqual(extendCodexGpt56EffortValues("kiro", "gpt-6-sol", base), base);
-});
-
-test("VS Code reasoning metadata knows GPT-6 Sol and Luna efforts and defaults", () => {
-  const model = (id: string) => ({ id, owned_by: "codex", capabilities: { reasoning: true } });
-  const sol = model("cx/gpt-6-sol");
-  const luna = model("cx/gpt-6-luna");
-  const solValues = reasoningMetadata.getReasoningEffortValues(sol);
-  assert.deepEqual(solValues, ["low", "medium", "high", "xhigh", "max", "ultra"]);
-  assert.deepEqual(reasoningMetadata.getReasoningEffortValues(luna), [
-    "low",
-    "medium",
-    "high",
-    "xhigh",
-    "max",
-  ]);
-  // The live catalog's default_reasoning_level is medium for every GPT-6 model.
-  for (const id of ["cx/gpt-6-astra", "cx/gpt-6-sol", "cx/gpt-6-luna"]) {
-    assert.equal(reasoningMetadata.getDefaultReasoningEffort(model(id)), "medium", id);
-  }
-  assert.equal(
-    reasoningMetadata.inferSelectedReasoningEffort(model("cx/gpt-6-sol-ultra"), solValues),
-    "ultra"
-  );
-  assert.equal(
-    reasoningMetadata.getReasoningVariantBaseModelId("cx/gpt-6-sol-max"),
-    "cx/gpt-6-sol"
-  );
-  assert.equal(
-    reasoningMetadata.getReasoningVariantBaseModelId("cx/gpt-6-luna-max"),
-    "cx/gpt-6-luna"
-  );
 });
 
 test("Parenthesized Sol and Luna effort overrides keep the reasoning summary", () => {

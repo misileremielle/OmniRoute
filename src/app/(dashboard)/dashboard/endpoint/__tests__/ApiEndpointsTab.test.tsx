@@ -29,19 +29,6 @@ vi.mock("next-intl", () => ({
       "endpoint.tierPublic": "Public",
       "endpoint.showInternal": "Show internal",
       "endpoint.hideInternal": "Hide internal",
-      "endpoint.vscodeAliasTitle": "VS Code Token Alias",
-      "endpoint.vscodeAliasDescriptionReady":
-        "Ready-to-paste compatibility URLs using the /api/v1/vscode/{token}/... endpoint.",
-      "endpoint.vscodeAliasDescriptionError":
-        "Showing placeholder URLs because CLI keys could not be loaded in this session.",
-      "endpoint.vscodeAliasDescriptionLoading":
-        "Loading CLI keys. Placeholder URLs are shown until a key is available.",
-      "endpoint.vscodeAliasDescriptionPlaceholder":
-        "Showing placeholder URLs. Create or activate an API key in CLI Tools to replace {token}.",
-      "endpoint.vscodeAliasManage": "CLI Tools",
-      "endpoint.vscodeAliasBaseLabel": "VS Code base",
-      "endpoint.vscodeAliasModelsLabel": "VS Code models",
-      "endpoint.vscodeAliasChatLabel": "VS Code chat",
       "endpoint.tryIt": "Try it",
       "endpoint.parameters": "Parameters",
       "endpoint.responses": "Responses",
@@ -141,10 +128,8 @@ describe("ApiEndpointsTab", () => {
 
     renderApiEndpointsTab();
 
-    await waitForText("VS Code Token Alias");
     await waitForText("API catalog unavailable");
     expect(document.body.textContent).toContain("openapi.yaml not found");
-    expect(document.body.textContent).toContain("/api/v1/vscode/{token}/models");
     expect(document.body.textContent).toContain("Open JSON response");
   });
 
@@ -179,12 +164,9 @@ describe("ApiEndpointsTab", () => {
 
     renderApiEndpointsTab();
 
-    await waitForText("VS Code Token Alias");
     await waitForText("OmniRoute API");
     await waitForText("1 endpoints across 1 categories");
-    await waitForText("/api/v1/vscode/sk-live-123/models");
     expect(document.body.textContent).toContain("1 endpoints across 1 categories");
-    expect(document.body.textContent).toContain("/api/v1/vscode/sk-live-123/models");
     expect(document.body.textContent).toContain("/api/v1/chat/completions");
   });
 

@@ -12,8 +12,6 @@ import {
 } from "../../src/lib/usage/costCalculator.ts";
 import { extendCodexGpt56EffortValues } from "../../src/shared/reasoning/effortStandardization.ts";
 import { isCodexExtendedEffortBaseModel } from "../../src/shared/reasoning/codexExtendedEffort.ts";
-import * as reasoningMetadata from "../../src/lib/vscode/reasoningMetadata.ts";
-import { supportsVscodeServiceTierVariants } from "../../src/lib/vscode/serviceTierVariants.ts";
 
 const MODEL = "gpt-6.1-sol";
 const EFFORTS = ["low", "medium", "high", "xhigh", "max", "ultra"];
@@ -91,15 +89,6 @@ test("GPT-6.1 Sol uses the catalog medium default without changing explicit effo
   assert.equal(transform("gpt-6-sol").reasoning.effort, "medium");
   for (const provider of ["codex", "cx"]) {
     assert.deepEqual(extendCodexGpt56EffortValues(provider, MODEL, ["none", "high"]), EFFORTS);
-    const model = {
-      id: `${provider}/${MODEL}`,
-      owned_by: provider,
-      capabilities: { reasoning: true },
-    };
-    assert.deepEqual(reasoningMetadata.getReasoningEffortValues(model), EFFORTS);
-    assert.equal(reasoningMetadata.getDefaultReasoningEffort(model), "medium");
-    assert.equal(reasoningMetadata.getReasoningVariantBaseModelId(`${model.id}-ultra`), model.id);
-    assert.equal(supportsVscodeServiceTierVariants(model), true);
   }
   assert.deepEqual(extendCodexGpt56EffortValues("kiro", MODEL, ["high"]), ["high"]);
   assert.deepEqual(

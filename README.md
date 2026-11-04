@@ -726,40 +726,10 @@ of your shell history. → [CLI Integrations](docs/guides/CLI-INTEGRATIONS.md)
   <tr><td align="left" nowrap>📱 <b>Android (Termux)</b></td><td align="left" nowrap><code>pkg install nodejs && npx -y omniroute</code></td><td align="left">Runs <b>on your phone</b>, 24/7, no root</td></tr>
   <tr><td align="left" nowrap>📲 <b>PWA</b></td><td align="left" nowrap>"Add to Home Screen"</td><td align="left">Fullscreen, offline, installable from browser</td></tr>
   <tr><td align="left" nowrap>🧩 <b>OpenCode plugin</b></td><td align="left" nowrap><code>@omniroute/opencode-provider</code></td><td align="left">Native OpenCode integration</td></tr>
-  <tr><td align="left" nowrap>🤖 <b>VS Code Copilot Chat</b></td><td align="left" nowrap>install <b>OmniCopilot</b> extension</td><td align="left">Every OmniRoute model in the native Copilot Chat picker — stable &amp; Insiders</td></tr>
   <tr><td align="left" nowrap>🛠️ <b>From source</b></td><td align="left" nowrap><code>npm install && npm run dev</code></td><td align="left">Hack on it, contribute</td></tr>
 </table>
 
 <sub>📖 [Docker Guide](docs/guides/DOCKER_GUIDE.md) · [Desktop](electron/README.md) · [Menu-bar tray](https://github.com/zoispag/omniroute-tray) · [Termux](docs/guides/TERMUX_GUIDE.md) · [PWA](docs/guides/PWA_GUIDE.md) · [OpenCode](docs/frameworks/OPENCODE.md)</sub>
-
-<br/>
-
-<div align="center">
-
-### 🧩 New: OmniRoute inside VS Code's native Copilot Chat
-
-</div>
-
-> No new sidebar, no new chat UI — every model OmniRoute serves shows up right in the
-> **Copilot Chat model picker you already use**. Since VS Code 1.122, provider models work
-> without a GitHub sign-in or a Copilot subscription — agent mode, tool calling and vision, for
-> free.
-
-Install the **[OmniCopilot](https://github.com/diegosouzapw/OmniCopilot)** extension, point it
-at your OmniRoute server (defaults to `localhost:20128`), then open Copilot Chat → model picker
-→ **Manage Models…** → **OmniRoute**.
-
-<table>
-  <tr><th align="left">Store</th><th align="left">Link</th><th align="left">Works with</th></tr>
-  <tr><td align="left" nowrap>🧩 <b>VS Code Marketplace</b></td><td align="left"><a href="https://marketplace.visualstudio.com/items?itemName=diegosouzapw.omnicopilot">Install →</a></td><td align="left">VS Code — stable &amp; Insiders</td></tr>
-  <tr><td align="left" nowrap>🔓 <b>Open VSX Registry</b></td><td align="left"><a href="https://open-vsx.org/extension/diegosouzapw/omnicopilot">Install →</a></td><td align="left">Cursor, Windsurf, VSCodium, Theia, code-server, Gitpod, Antigravity, Kiro…</td></tr>
-</table>
-
-From inside the editor: open the **Extensions** view, search **"OmniRoute"**, click **Install**
-— works the same way on both stores. Source, issues and the publishing runbook live at
-[diegosouzapw/OmniCopilot](https://github.com/diegosouzapw/OmniCopilot).
-
-<sub>📖 [VS Code Copilot Chat guide](docs/guides/VSCODE-COPILOT.md) — setup, what the picker shows, dashboard-in-a-tab, troubleshooting</sub>
 
 <br/>
 

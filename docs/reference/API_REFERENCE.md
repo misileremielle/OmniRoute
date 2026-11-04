@@ -543,8 +543,7 @@ GET /v1/models?prefix=canonical    # only the full provider-id prefix
 A `dual`-mode mirror can also be recognised without the query parameter: it carries a `parent`
 field pointing at the primary id.
 
-Clients that render a model picker should request `?prefix=alias` — this is what the
-[OmniCopilot VS Code extension](../guides/VSCODE-COPILOT.md) does.
+Clients that render a model picker should request `?prefix=alias`.
 
 ### Discovery filters (`?capability=`, `?min_context=`, `?kind=`, `?q=`)
 
@@ -711,38 +710,30 @@ Upstream contracts: [sound effects](https://elevenlabs.io/docs/api-reference/tex
 
 ## Compatibility Endpoints
 
-| Method | Path                                      | Format                             |
-| ------ | ----------------------------------------- | ---------------------------------- |
-| POST   | `/v1/chat/completions`                    | OpenAI                             |
-| POST   | `/v1/messages`                            | Anthropic                          |
-| POST   | `/v1/responses`                           | OpenAI Responses                   |
-| POST   | `/v1/embeddings`                          | OpenAI                             |
-| POST   | `/v1/images/generations`                  | OpenAI Images                      |
-| POST   | `/v1/images/edits`                        | OpenAI Images (edit/inpaint)       |
-| POST   | `/v1/videos/generations`                  | OpenAI-style video generation      |
-| POST   | `/v1/music/generations`                   | OpenAI-style music generation      |
-| POST   | `/v1/audio/transcriptions`                | OpenAI Audio (STT)                 |
-| POST   | `/v1/audio/speech`                        | OpenAI TTS (returns audio body)    |
-| POST   | `/v1/rerank`                              | Cohere/Voyage-style rerank         |
-| POST   | `/v1/classify`                            | Jina classify (`api.jina.ai`)      |
-| POST   | `/v1/segment`                             | Jina segmenter (`segment.jina.ai`) |
-| POST   | `/v1/moderations`                         | OpenAI Moderations                 |
-| GET    | `/v1/models`                              | OpenAI                             |
-| POST   | `/v1/models/query`                        | Filtered model shortlist           |
-| POST   | `/v1/messages/count_tokens`               | Anthropic                          |
-| GET    | `/v1beta/models`                          | Gemini                             |
-| POST   | `/v1beta/models/{...path}`                | Gemini generateContent             |
-| POST   | `/v1/api/chat`                            | Ollama                             |
-| GET    | `/api/v1/vscode/{token}/`                 | OpenAI catalog alias               |
-| GET    | `/api/v1/vscode/{token}/models`           | OpenAI models alias                |
-| POST   | `/api/v1/vscode/{token}/chat/completions` | OpenAI tokenized alias             |
-| POST   | `/api/v1/vscode/{token}/responses`        | OpenAI Responses tokenized alias   |
-| POST   | `/api/v1/vscode/{token}/api/chat`         | Ollama tokenized alias             |
-| GET    | `/api/v1/vscode/{token}/api/tags`         | Ollama tags tokenized alias        |
+| Method | Path                        | Format                             |
+| ------ | --------------------------- | ---------------------------------- |
+| POST   | `/v1/chat/completions`      | OpenAI                             |
+| POST   | `/v1/messages`              | Anthropic                          |
+| POST   | `/v1/responses`             | OpenAI Responses                   |
+| POST   | `/v1/embeddings`            | OpenAI                             |
+| POST   | `/v1/images/generations`    | OpenAI Images                      |
+| POST   | `/v1/images/edits`          | OpenAI Images (edit/inpaint)       |
+| POST   | `/v1/videos/generations`    | OpenAI-style video generation      |
+| POST   | `/v1/music/generations`     | OpenAI-style music generation      |
+| POST   | `/v1/audio/transcriptions`  | OpenAI Audio (STT)                 |
+| POST   | `/v1/audio/speech`          | OpenAI TTS (returns audio body)    |
+| POST   | `/v1/rerank`                | Cohere/Voyage-style rerank         |
+| POST   | `/v1/classify`              | Jina classify (`api.jina.ai`)      |
+| POST   | `/v1/segment`               | Jina segmenter (`segment.jina.ai`) |
+| POST   | `/v1/moderations`           | OpenAI Moderations                 |
+| GET    | `/v1/models`                | OpenAI                             |
+| POST   | `/v1/models/query`          | Filtered model shortlist           |
+| POST   | `/v1/messages/count_tokens` | Anthropic                          |
+| GET    | `/v1beta/models`            | Gemini                             |
+| POST   | `/v1beta/models/{...path}`  | Gemini generateContent             |
+| POST   | `/v1/api/chat`              | Ollama                             |
 
 All POST routes follow the same shape: `Bearer your-api-key` + Zod-validated JSON body (`v1RerankSchema`, `v1ModerationSchema`, `v1AudioSpeechSchema`, etc., see `src/shared/validation/schemas.ts`). 4xx is returned on schema failure.
-
-For clients that cannot attach `Authorization: Bearer ...`, OmniRoute also accepts API keys in the URL via either query-string compatibility (`?token=...`, `?apiKey=...`, `?api_key=...`, `?key=...`) or the dedicated `/api/v1/vscode/{token}/...` endpoints documented below.
 
 ```bash
 # Rerank (cloud registry provider, or an OpenAI-compatible provider node as "<prefix>/<model>")
@@ -1056,7 +1047,7 @@ instead of being sent twice. Source: `src/lib/quota/quotaSessionRecovery.ts`.
 ## Self-service usage (`/api/usage/om-usage`)
 
 Any API key can read **its own** usage and quotas — no management auth. This is the endpoint a
-client (CLI, the OmniCopilot panel) uses to show a key holder their spend.
+client (e.g. the CLI) uses to show a key holder their spend.
 
 ```bash
 # Text form (the historical contract — plain text for a terminal)
@@ -1709,39 +1700,6 @@ GET /api/tags
 ```
 
 Requests are automatically translated between Ollama and internal formats.
-
-## Tokenized VS Code / Headerless Aliases
-
-Use these aliases when an integration cannot inject an `Authorization` header and needs the API key embedded in the base URL.
-
-```bash
-# OpenAI-style catalog alias
-GET /api/v1/vscode/{token}/
-GET /api/v1/vscode/{token}/models
-
-# OpenAI-style chat aliases
-POST /api/v1/vscode/{token}/chat/completions
-POST /api/v1/vscode/{token}/responses
-
-# Ollama-style aliases
-POST /api/v1/vscode/{token}/api/chat
-GET /api/v1/vscode/{token}/api/tags
-```
-
-Example:
-
-```bash
-curl https://your-host.example/api/v1/vscode/YOUR_API_KEY/models
-curl -X POST https://your-host.example/api/v1/vscode/YOUR_API_KEY/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model":"auto","messages":[{"role":"user","content":"hello"}]}'
-```
-
-Notes:
-
-- The tokenized aliases reuse the same handlers as `/v1/*` and `/api/tags`; response shapes stay identical.
-- Prefer `Authorization: Bearer ...` whenever the client supports custom headers.
-- URL-based tokens may appear in reverse-proxy logs, browser history, and telemetry outside OmniRoute. Treat them as a compatibility option, not the default authentication mode.
 
 ---
 

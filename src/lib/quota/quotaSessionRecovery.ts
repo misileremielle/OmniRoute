@@ -103,7 +103,7 @@ function readOptInRecoveryTurn(request: Request, body: unknown): RecoveryTurn | 
 
 /** Only an active, unbanned, logging-enabled key may own a durable recovery ticket. */
 async function resolveRecoveryOwner(request: Request): Promise<RecoveryOwner | null> {
-  const apiKey = extractApiKey(request, { allowUrl: false });
+  const apiKey = extractApiKey(request);
   if (!apiKey || !(await isValidApiKey(apiKey))) return null;
   const metadata = await getApiKeyMetadata(apiKey);
   if (

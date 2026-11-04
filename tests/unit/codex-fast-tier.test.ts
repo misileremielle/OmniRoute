@@ -9,10 +9,6 @@ import {
   isCodexGlobalFastServiceTierEnabled,
   resolveCodexGlobalFastServiceTier,
 } from "../../src/lib/providers/codexFastTier.ts";
-import {
-  expandVscodeServiceTierModels,
-  resolveVscodeServiceTierRequest,
-} from "../../src/lib/vscode/serviceTierVariants.ts";
 
 test("Codex global fast tier recognizes legacy and current setting shapes", () => {
   assert.equal(isCodexGlobalFastServiceTierEnabled({ codexServiceTier: { enabled: true } }), true);
@@ -244,20 +240,5 @@ test("GPT-6 Fast defaults preserve explicit tiers and operator model selections"
       credentials
     );
     assert.equal(body.service_tier, undefined);
-  }
-});
-
-test("GPT-6 VS Code service-tier choices rewrite Fast variants to priority requests", () => {
-  for (const model of ["gpt-6-astra", "gpt-6-sol", "gpt-6-luna"]) {
-    const id = `codex/${model}`;
-    const variants = expandVscodeServiceTierModels([{ id, owned_by: "codex" }]);
-    assert.deepEqual(
-      variants.map((entry) => entry.id),
-      [id, `${id}__tier_priority`, `${id}__tier_flex`]
-    );
-    assert.deepEqual(resolveVscodeServiceTierRequest({ model: `${id}__tier_priority` }), {
-      model: id,
-      service_tier: "priority",
-    });
   }
 });

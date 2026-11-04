@@ -97,21 +97,6 @@ test("extractApiKey parses bearer headers and isValidApiKey validates persisted 
     auth.extractApiKey(new Request(`http://localhost/v1/chat/completions?token=${created.key}`)),
     null
   );
-  // The path-scoped `/vscode/<token>/…` form (VS Code integration) still works.
-  assert.equal(
-    auth.extractApiKey(
-      new Request(`http://localhost/api/v1/vscode/${created.key}/chat/completions`)
-    ),
-    created.key
-  );
-  // …but never when the caller opts out of URL extraction (management auth path).
-  assert.equal(
-    auth.extractApiKey(
-      new Request(`http://localhost/api/v1/vscode/${created.key}/chat/completions`),
-      { allowUrl: false }
-    ),
-    null
-  );
   assert.equal(await auth.isValidApiKey(created.key), true);
   assert.equal(await auth.isValidApiKey("sk-missing"), false);
   assert.equal(await auth.isValidApiKey(""), false);

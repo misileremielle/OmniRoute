@@ -16,33 +16,26 @@
  * @module sse/services/clientApiKeyResolver
  */
 
-import { extractApiKey, isValidApiKey, readNonEmptyUrlToken } from "./auth.ts";
+import { extractApiKey, isValidApiKey } from "./auth.ts";
 import { extractGoogApiKeyHeader } from "./googApiKeyAuth.ts";
 import { readHeaderValue, type AuthRequestHeaders } from "./headerReader.ts";
 
 type ClientAuthRequestLike = {
   headers?: AuthRequestHeaders | null;
-  url?: string | null;
 };
-
-type CandidateOptions = { allowUrl?: boolean };
 
 export type ResolvedClientApiKey = { apiKey: string | null; valid: boolean };
 
 /**
  * Every client credential the request presents, in precedence order and
- * deduplicated: `Authorization: Bearer`, `x-api-key`, `x-goog-api-key`, then the
- * path-scoped `/vscode/<key>/…` token (only when `opts.allowUrl !== false`).
- * At most 4 candidates.
+ * deduplicated: `Authorization: Bearer`, `x-api-key`, `x-goog-api-key`.
+ * At most 3 candidates.
  *
  * Unlike `extractApiKey()`, the `x-api-key` candidate is NOT gated on
  * `anthropic-version` (#2225): a candidate only becomes an identity after it
  * validates, so placeholder values sent by local-mode clients are just skipped.
  */
-export function extractApiKeyCandidates(
-  request: ClientAuthRequestLike,
-  opts?: CandidateOptions
-): string[] {
+export function extractApiKeyCandidates(request: ClientAuthRequestLike): string[] {
   const candidates: string[] = [];
   const push = (value: unknown) => {
     if (typeof value !== "string") return;
@@ -61,7 +54,6 @@ export function extractApiKeyCandidates(
     readHeaderValue(request?.headers, "x-api-key") || readHeaderValue(request?.headers, "X-Api-Key")
   );
   push(extractGoogApiKeyHeader(request?.headers));
-  if (opts?.allowUrl !== false) push(readNonEmptyUrlToken(request));
 
   return candidates;
 }
@@ -72,16 +64,15 @@ export function extractApiKeyCandidates(
  * Returns `{ apiKey, valid: true }` with the FIRST candidate (precedence order of
  * `extractApiKeyCandidates()`) that passes `isValidApiKey()` — use it for key
  * identity, policy and usage attribution. When nothing validates, returns
- * `{ apiKey: extractApiKey(request, opts), valid: false }`, so the invalid path
+ * `{ apiKey: extractApiKey(request), valid: false }`, so the invalid path
  * keeps the legacy Bearer-first identity byte-for-byte and an unvalidated,
  * ungated `x-api-key` never surfaces as an identity.
  */
 export async function resolveClientApiKey(
-  request: ClientAuthRequestLike,
-  opts?: CandidateOptions
+  request: ClientAuthRequestLike
 ): Promise<ResolvedClientApiKey> {
-  for (const candidate of extractApiKeyCandidates(request, opts)) {
+  for (const candidate of extractApiKeyCandidates(request)) {
     if (await isValidApiKey(candidate)) return { apiKey: candidate, valid: true };
   }
-  return { apiKey: extractApiKey(request, opts), valid: false };
+  return { apiKey: extractApiKey(request), valid: false };
 }

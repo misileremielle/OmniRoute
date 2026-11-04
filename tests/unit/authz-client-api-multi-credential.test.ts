@@ -190,15 +190,9 @@ test("extractApiKeyCandidates lists every presented credential in precedence ord
       "x-api-key": "header-key",
       "x-goog-api-key": "google-key",
     },
-    "http://localhost/vscode/path-key/v1/chat/completions"
+    "http://localhost/path-key/v1/chat/completions"
   );
   assert.deepEqual(resolver.extractApiKeyCandidates(req), [
-    "bearer-key",
-    "header-key",
-    "google-key",
-    "path-key",
-  ]);
-  assert.deepEqual(resolver.extractApiKeyCandidates(req, { allowUrl: false }), [
     "bearer-key",
     "header-key",
     "google-key",
@@ -243,14 +237,10 @@ test("resolveClientApiKey falls back to the legacy extractor result when nothing
   assert.deepEqual(none, { apiKey: null, valid: false });
 });
 
-test("resolveClientApiKey honors allowUrl:false (no URL-token credential)", async () => {
+test("resolveClientApiKey never reads a URL-path credential", async () => {
   const valid = await createKey("resolve-url");
-  const req = makeRequest({}, `http://localhost/vscode/${valid.key}/v1/chat/completions`);
-  assert.deepEqual(await resolver.resolveClientApiKey(req), { apiKey: valid.key, valid: true });
-  assert.deepEqual(await resolver.resolveClientApiKey(req, { allowUrl: false }), {
-    apiKey: null,
-    valid: false,
-  });
+  const req = makeRequest({}, `http://localhost/${valid.key}/v1/chat/completions`);
+  assert.deepEqual(await resolver.resolveClientApiKey(req), { apiKey: null, valid: false });
 });
 
 test("extractApiKey keeps its Bearer-first contract (unchanged by the multi-credential path)", async () => {

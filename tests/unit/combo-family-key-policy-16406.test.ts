@@ -9,7 +9,6 @@ process.env.DATA_DIR = directory;
 process.env.API_KEY_SECRET = "combo-family-policy-fixture-only";
 const { handleComboChat } = await import("../../open-sse/services/combo.ts");
 const { enforceApiKeyPolicy } = await import("../../src/shared/utils/apiKeyPolicy.ts");
-const { withPathTokenApiKey } = await import("../../src/lib/vscode/tokenizedRequest.ts");
 const keys = await import("../../src/lib/db/apiKeys.ts");
 const combos = await import("../../src/lib/db/combos.ts");
 const providers = await import("../../src/lib/db/providers.ts");
@@ -31,7 +30,7 @@ test.after(() => {
   rmSync(directory, { recursive: true, force: true });
 });
 
-for (const transport of ["bearer", "path-token"] as const) {
+for (const transport of ["bearer"] as const) {
   for (const mode of ["implicit-denied", "explicit-target", "directly-allowed"] as const) {
     test(`stored combo grant: ${mode} via ${transport}`, async () => {
       const name = `family-policy-${mode}-${transport}`;
@@ -43,14 +42,7 @@ for (const transport of ["bearer", "path-token"] as const) {
         blockedModels: mode === "directly-allowed" ? [high] : [high, max],
         allowedCombos: [name],
       });
-      const headers =
-        transport === "bearer"
-          ? new Headers({ authorization: `Bearer ${key.key}` })
-          : withPathTokenApiKey(
-              new Request(
-                `http://localhost/api/v1/vscode/${encodeURIComponent(key.key)}/chat/completions`
-              )
-            ).headers;
+      const headers = new Headers({ authorization: `Bearer ${key.key}` });
       const admitted = await enforceApiKeyPolicy(
         new Request("http://localhost/v1/chat/completions", { headers }),
         name

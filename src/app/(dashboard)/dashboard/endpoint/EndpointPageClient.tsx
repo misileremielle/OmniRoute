@@ -22,7 +22,6 @@ import A2ADashboardPage from "./components/A2ADashboard";
 import McpDashboardPage from "./components/MCPDashboard";
 import NotionSourceCard from "./components/NotionSourceCard";
 import ObsidianSourceCard from "./components/ObsidianSourceCard";
-import VscodeTokenAliasCard from "./VscodeTokenAliasCard";
 
 const BUILD_TIME_CLOUD_URL = process.env.NEXT_PUBLIC_CLOUD_URL || null;
 const CLOUD_ACTION_TIMEOUT_MS = 15000;
@@ -2116,8 +2115,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
               baseUrl={currentEndpoint}
             />
           </div>
-
-          <VscodeTokenAliasCard className="mt-4" />
         </div>
       </Card>
 

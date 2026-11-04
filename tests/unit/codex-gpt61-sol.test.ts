@@ -10,7 +10,6 @@ import { getCodexFastCostMultiplier } from "../../src/lib/usage/costCalculator.t
 import { DEFAULT_CODEX_CLIENT_VERSION } from "../../src/shared/constants/codexClient.ts";
 import { parseUpstreamError } from "../../open-sse/utils/error.ts";
 import { extendCodexGpt56EffortValues } from "../../src/shared/reasoning/effortStandardization.ts";
-import * as reasoningMetadata from "../../src/lib/vscode/reasoningMetadata.ts";
 
 const MODEL = "gpt-6.1-sol";
 const EFFORTS = ["ultra", "max", "xhigh", "high", "medium", "low"] as const;
@@ -120,13 +119,6 @@ test("Catalog effort tiers follow the live Codex levels for GPT-6.1 Sol", () => 
   for (const provider of ["codex", "cx"]) {
     assert.deepEqual(extendCodexGpt56EffortValues(provider, MODEL, base), withUltra);
   }
-});
-
-test("VS Code reasoning metadata knows GPT-6.1 Sol efforts and defaults", () => {
-  const model = { id: `cx/${MODEL}`, owned_by: "codex", capabilities: { reasoning: true } };
-  const values = reasoningMetadata.getReasoningEffortValues(model);
-  assert.deepEqual(values, ["low", "medium", "high", "xhigh", "max", "ultra"]);
-  assert.equal(reasoningMetadata.getDefaultReasoningEffort(model), "medium");
 });
 
 test("Parenthesized Sol effort overrides keep the reasoning summary", () => {

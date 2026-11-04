@@ -116,7 +116,7 @@ export async function requireManagementAuth(
 
   // Management auth never honours a URL-borne credential (header-only) — a token
   // in the path/query must not authenticate a management route. See #3300 follow-up.
-  const apiKey = extractApiKey(request, { allowUrl: false });
+  const apiKey = extractApiKey(request);
   if (apiKey) {
     let meta: Awaited<ReturnType<typeof getApiKeyMetadata>>;
     try {

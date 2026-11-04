@@ -132,25 +132,6 @@ test("extractApiKey does not require anthropic-version for the x-goog-api-key fa
   assert.equal(extractApiKey(req), "sk-goog-no-version-needed");
 });
 
-test("extractApiKey extracts a path-scoped token from /api/v1/vscode/<token>/...", () => {
-  const req = new Request("https://omniroute.test/api/v1/vscode/sk-test-path-token/models");
-  assert.equal(extractApiKey(req), "sk-test-path-token");
-});
-
-test("extractApiKey extracts a path-scoped token from /api/v1/vscode/raw/<token>/...", () => {
-  const req = new Request(
-    "https://omniroute.test/api/v1/vscode/raw/sk-test-path-token/api/version"
-  );
-  assert.equal(extractApiKey(req), "sk-test-path-token");
-});
-
-test("extractApiKey extracts a path-scoped token from /api/v1/vscode/combos/<token>/...", () => {
-  const req = new Request(
-    "https://omniroute.test/api/v1/vscode/combos/sk-test-path-token/api/version"
-  );
-  assert.equal(extractApiKey(req), "sk-test-path-token");
-});
-
 test("extractApiKey accepts x-api-key without anthropic-version when User-Agent is claude-code (#8655)", () => {
   const req = makeRequest({
     "x-api-key": "sk-omniroute-test-key",
@@ -176,12 +157,7 @@ test("extractApiKey does NOT extract a query-string token (#3300 security follow
   }
 });
 
-test("extractApiKey skips the path-scoped token when allowUrl is false (management auth)", () => {
-  const req = new Request("https://omniroute.test/api/v1/vscode/sk-test-path-token/models");
-  assert.equal(extractApiKey(req, { allowUrl: false }), null);
-  // Headers still work regardless of allowUrl.
-  const withHeader = new Request("https://omniroute.test/api/v1/vscode/sk-test-path-token/models", {
-    headers: { Authorization: "Bearer sk-header-wins" },
-  });
-  assert.equal(extractApiKey(withHeader, { allowUrl: false }), "sk-header-wins");
+test("extractApiKey never extracts a credential from the URL path", () => {
+  const req = new Request("https://omniroute.test/api/v1/sk-test-path-token/models");
+  assert.equal(extractApiKey(req), null);
 });
