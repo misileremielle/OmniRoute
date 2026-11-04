@@ -15,7 +15,7 @@ export const CliCatalogEntrySchema = z.object({
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   description: z.string().min(1),
   docsUrl: z.string().min(1),
-  configType: z.enum(["env", "custom", "guide", "custom-builder", "mitm"]),
+  configType: z.enum(["env", "custom", "guide", "custom-builder"]),
   envVars: z.record(z.string(), z.string()).optional(),
   modelAliases: z.array(z.string()).optional(),
   settingsFile: z.string().optional(),

@@ -75,9 +75,6 @@
 - [`GET /api/settings/local-corpus`](#get-apisettingslocal-corpus)
 - [`POST /api/settings/local-corpus`](#post-apisettingslocal-corpus)
 - [`DELETE /api/settings/local-corpus`](#delete-apisettingslocal-corpus)
-- [`GET /api/settings/mitm`](#get-apisettingsmitm)
-- [`POST /api/settings/mitm`](#post-apisettingsmitm)
-- [`PUT /api/settings/mitm`](#put-apisettingsmitm)
 - [`GET /api/settings/model-aliases`](#get-apisettingsmodel-aliases)
 - [`POST /api/settings/model-aliases`](#post-apisettingsmodel-aliases)
 - [`PUT /api/settings/model-aliases`](#put-apisettingsmodel-aliases)
@@ -917,37 +914,6 @@ DELETE settings › local corpus
 ```bash
 curl -X DELETE http://localhost:20128/api/settings/local-corpus \
   -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### GET /api/settings/mitm
-
-GET settings › mitm
-
-```bash
-curl http://localhost:20128/api/settings/mitm \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN"
-```
-
-### POST /api/settings/mitm
-
-POST settings › mitm
-
-```bash
-curl -X POST http://localhost:20128/api/settings/mitm \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-### PUT /api/settings/mitm
-
-PUT settings › mitm
-
-```bash
-curl -X PUT http://localhost:20128/api/settings/mitm \
-  -H "Authorization: Bearer $OMNIROUTE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
 ```
 
 ### GET /api/settings/model-aliases

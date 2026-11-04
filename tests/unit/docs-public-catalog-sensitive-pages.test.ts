@@ -21,7 +21,6 @@ const DOCKERIGNORE_PATH = path.join(REPO_ROOT, ".dockerignore");
 export const SENSITIVE_PUBLIC_DOCS = [
   "docs/security/STEALTH_GUIDE.md",
   "docs/security/SOCKET_DEV_FINDINGS.md",
-  "docs/security/MITM-TPROXY-DECRYPT.md",
   "docs/security/PUBLIC_CREDS.md",
 ] as const;
 
@@ -190,7 +189,7 @@ test("security nav meta.json does not list sensitive pages", () => {
   const meta = JSON.parse(fs.readFileSync(META_PATH, "utf-8")) as {
     pages: string[];
   };
-  const forbidden = ["STEALTH_GUIDE", "SOCKET_DEV_FINDINGS", "MITM-TPROXY-DECRYPT", "PUBLIC_CREDS"];
+  const forbidden = ["STEALTH_GUIDE", "SOCKET_DEV_FINDINGS", "PUBLIC_CREDS"];
   const listed = forbidden.filter((id) => meta.pages.includes(id));
   assert.deepEqual(
     listed,

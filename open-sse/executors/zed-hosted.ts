@@ -4,7 +4,7 @@
  * Anthropic/OpenAI/Google/xAI depending on the requested model.
  *
  * Distinct from the pre-existing `zed` provider id, which is a Zed IDE
- * credential-import surface (src/lib/zed-oauth/ + src/mitm/detection/zed.ts) —
+ * credential-import surface (src/lib/zed-oauth/) —
  * that surface only detects/imports local Zed IDE keychain credentials, it does
  * not proxy chat completions. This executor is the NEW cloud-proxy
  * capability; registry id `zed-hosted` avoids colliding with the IDE id.
@@ -529,7 +529,8 @@ export class ZedHostedExecutor extends BaseExecutor {
           Accept: "application/x-ndjson, text/event-stream, */*",
           "User-Agent": `OmniRoute/zed-hosted`,
           "x-zed-version":
-            (this.config as Record<string, unknown>)?.appVersion?.toString() || getZedClientVersion(),
+            (this.config as Record<string, unknown>)?.appVersion?.toString() ||
+            getZedClientVersion(),
           [ZED_HEADERS.clientSupportsStatus]: "true",
           [ZED_HEADERS.clientSupportsStreamEnded]: "true",
         },

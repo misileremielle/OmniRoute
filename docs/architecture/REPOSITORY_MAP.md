@@ -18,7 +18,6 @@ OmniRoute/
 ├── src/                  # Next.js 16 application (UI + API routes + libs + domain + server)
 ├── open-sse/             # Streaming engine workspace (handlers, executors, translator, MCP server)
 ├── packages/            # npm workspaces: ui-kit (vendored Keak CI UI Kit) and browser-pool
-├── electron/             # Desktop wrapper (Electron 41 + electron-builder 26.10)
 ├── bin/                  # CLI entry point and command handlers
 ├── scripts/              # Build, check, sync, and one-off scripts
 ├── docs/                 # Public documentation (you are here)
@@ -124,9 +123,6 @@ src/
 ├── shared/              # Shared between server and client where safe (constants, types, validation, contracts, utils)
 ├── i18n/                # next-intl config + per-locale message JSON (67 locales)
 ├── middleware/          # Next.js middleware (request enrichment, locale detection)
-├── mitm/                # MITM proxy core: cert gen/install, handlers, targets, inspector, masks, passthrough
-│   ├── handlers/        # 9 IDE-agent handler classes extending MitmHandlerBase (antigravity, kiro, copilot, codex, cursor, zed, claudeCode, openCode, trae)
-│   └── inspector/       # Traffic capture layer: buffer (in-memory ring), sseMerger, conversationNormalizer, kindDetector, contextKey, httpProxyServer, systemProxyConfig
 ├── models/              # Model adapter glue (legacy shim)
 ├── scripts/             # In-tree maintenance scripts (e.g., backfillAggregation)
 ├── sse/                 # Legacy SSE handlers/services (chat.ts, chatHelpers.ts, services/auth.ts)
@@ -145,15 +141,11 @@ src/
 | `app/api/v1beta/`                                                            | Gemini-style API endpoints                                                                                                                                                                                                                                                                                         |
 | `app/api/playground/`                                                        | Playground Studio routes: `improve-prompt/` (POST — LLM prompt rewriter), `presets/` (GET list / POST create), `presets/[id]/` (GET / PUT / DELETE) — see `docs/frameworks/PLAYGROUND_STUDIO.md`                                                                                                                   |
 | `app/api/` (non-v1)                                                          | Management/admin routes (~60 directories: providers, combos, settings, mcp, a2a, evals, memory, skills, webhooks, compliance, resilience, monitoring, tunnels, cli-tools, etc.)                                                                                                                                    |
-| `app/api/tools/agent-bridge/`                                                | AgentBridge REST API — 12 routes (server control, agent state/DNS/mappings, bypass, cert, upstream-CA). LOCAL_ONLY + SPAWN_CAPABLE. See `docs/frameworks/AGENTBRIDGE.md §7`.                                                                                                                                       |
-| `app/api/tools/traffic-inspector/`                                           | Traffic Inspector REST + WS API — 16+ routes (requests, sessions, hosts, capture-modes, export, ws). LOCAL_ONLY + SPAWN_CAPABLE. See `docs/frameworks/TRAFFIC_INSPECTOR.md §8`.                                                                                                                                    |
 | `app/a2a/`                                                                   | A2A JSON-RPC 2.0 entry point (`POST /a2a`)                                                                                                                                                                                                                                                                         |
 | `app/.well-known/agent.json/`                                                | A2A Agent Card (discovery)                                                                                                                                                                                                                                                                                         |
 | `app/(dashboard)/dashboard/`                                                 | Dashboard UI pages (50+ sections, ~118 page.tsx files: providers, combos, settings, memory, skills, webhooks, evals, audit, batch, cache, costs, health, system, activity, etc.)                                                                                                                                   |
 | `app/(dashboard)/dashboard/search-tools/`                                    | Search Tools Studio UI (3 tabs: Search/Scrape/Compare + SearchConceptCard + ProviderCatalog) — see `docs/frameworks/SEARCH_TOOLS_STUDIO.md`                                                                                                                                                                        |
 | `app/(dashboard)/dashboard/memory/`                                          | Memory Studio (plan 21): `page.tsx` (3-tab shell), `components/` (MemoryConceptCard, MemoryEngineStatus, EmbeddingSourceSelector, EditMemoryModal, RetrievePreview, QdrantConfigCard, RerankConfigCard), `components/tabs/` (MemoriesTab, PlaygroundTab, EngineTab), `hooks/` (useEngineStatus, useMemorySettings) |
-| `app/(dashboard)/dashboard/tools/agent-bridge/`                              | AgentBridge dashboard page — server card, 9 agent cards, setup wizard, model mapping, bypass list. i18n PT-BR + EN. See `docs/frameworks/AGENTBRIDGE.md`.                                                                                                                                                          |
-| `app/(dashboard)/dashboard/tools/traffic-inspector/`                         | Traffic Inspector dashboard page — DevTools split, 7 detail tabs, 4 capture mode toggles, session recorder, context colorization. i18n PT-BR + EN. See `docs/frameworks/TRAFFIC_INSPECTOR.md`.                                                                                                                     |
 | `app/(dashboard)/dashboard/activity/`                                        | Activity feed page (Group B): `page.tsx` (server) + `ActivityFeedClient.tsx` + `components/{ActivityFeed,ActivityItem,DayHeader,EventTypeFilter}.tsx` — see `docs/architecture/MONITORING_SECTIONS.md`                                                                                                             |
 | `app/(dashboard)/dashboard/costs/quota-share/`                               | Quota Sharing page (Group B): `QuotaSharePageClient.tsx` + `components/{PoolCard,DimensionBar,AllocationTable,BurnRateChart,QuotaConceptCard,CreatePoolModal,EditAllocationsModal}.tsx` + `hooks/{usePools,usePoolUsage,useLocalStoragePoolMigration}.ts`                                                          |
 | `app/(dashboard)/dashboard/costs/quota-share/plans/`                         | Provider plan config page (Group B): `page.tsx` + `ProviderPlanConfigClient.tsx` — quota dimensions per connection override                                                                                                                                                                                        |
@@ -307,20 +299,6 @@ open-sse/
 
 ---
 
-## `electron/` — Desktop Wrapper
-
-| File             | Purpose                                                                           |
-| ---------------- | --------------------------------------------------------------------------------- |
-| `main.js`        | Electron main process (BrowserWindow, embedded Next.js server, tray, auto-update) |
-| `preload.js`     | IPC bridge (contextBridge → `window.omniroute`)                                   |
-| `package.json`   | electron-builder config + Electron 41 + electron-builder 26.10 deps               |
-| `assets/`        | App icons (Windows .ico, macOS .icns, Linux .png)                                 |
-| `dist-electron/` | Build output (gitignored)                                                         |
-| `types.d.ts`     | Type declarations for renderer bridge                                             |
-| `README.md`      | Internal Electron README (see also `docs/guides/ELECTRON_GUIDE.md`)               |
-
----
-
 ## `bin/` — CLI
 
 | File                                                                                                        | Purpose                                                                                                                    |
@@ -376,8 +354,7 @@ open-sse/
 | `run-protocol-clients-tests.mjs`    | MCP/A2A E2E runner                                                         |
 | `run-ecosystem-tests.mjs`           | Ecosystem (provider integration) tests                                     |
 | `test-report-summary.mjs`           | Generate coverage summary markdown                                         |
-| `smoke-electron-packaged.mjs`       | Smoke-test packaged Electron build                                         |
-| `native-binary-compat.mjs`          | Validate native deps (`better-sqlite3`) match Electron's Node              |
+| `native-binary-compat.mjs`          | Validate native deps (`better-sqlite3`) match the runtime Node             |
 | `validate-pack-artifact.ts`         | Validate npm pack output                                                   |
 | `responses-ws-proxy.mjs`            | WebSocket bridge for Codex Responses API                                   |
 | `v1-ws-bridge.mjs`                  | WebSocket bridge for `/api/v1/ws` endpoint                                 |
@@ -404,7 +381,7 @@ open-sse/
 | `USER_GUIDE.md`             | End-user manual (setup, models, combos, CLIs, audio, etc.)                            |
 | `API_REFERENCE.md`          | API endpoint reference with auth model                                                |
 | `openapi.yaml`              | OpenAPI 3.0 spec (121 paths)                                                          |
-| `SETUP_GUIDE.md`            | Install methods (npm, npx, Docker, Electron, Termux, source)                          |
+| `SETUP_GUIDE.md`            | Install methods (npm, npx, Docker, Termux, source)                                    |
 | `ENVIRONMENT.md`            | All env vars (~800 documented, ~3,050 lines `.env.example`)                           |
 | `TROUBLESHOOTING.md`        | Common errors + v3.8.0 known issues                                                   |
 | `RELEASE_CHECKLIST.md`      | Full release flow (skills, husky, conventional commits, deploy)                       |
@@ -433,7 +410,7 @@ open-sse/
 | `REASONING_REPLAY.md`                       | Hybrid memory/SQLite cache for `reasoning_content`                   |
 | `AUTHZ_GUIDE.md`                            | Authorization pipeline (`classify` → `policies` → `enforce`)         |
 | `RESILIENCE_GUIDE.md`                       | Circuit breaker + cooldown + model lockout                           |
-| `docs/security/STEALTH_GUIDE.md` (git only) | TLS fingerprinting (JA3/JA4), Claude Code CCH, MITM cert             |
+| `docs/security/STEALTH_GUIDE.md` (git only) | TLS fingerprinting (JA3/JA4), Claude Code CCH                        |
 | `AUTO-COMBO.md`                             | Auto Combo engine (16-factor scoring, 6 mode packs, virtual factory) |
 
 ### Compression
@@ -455,7 +432,6 @@ open-sse/
 | `FLY_IO_DEPLOYMENT_GUIDE.md` | Fly.io deployment (currently Chinese-only)                        |
 | `TERMUX_GUIDE.md`            | Android headless via Termux                                       |
 | `PWA_GUIDE.md`               | Progressive Web App install + service worker                      |
-| `ELECTRON_GUIDE.md`          | Desktop app build + sign + distribute                             |
 | `PROXY_GUIDE.md`             | 4-level outbound proxy + 1proxy marketplace                       |
 
 ### Subdirectories

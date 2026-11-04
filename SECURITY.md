@@ -214,7 +214,7 @@ docker run -d \
 
 ## Dependencies
 
-- Run `npm audit` regularly (`npm run audit:deps` covers main + electron)
+- Run `npm audit` regularly (`npm run audit:deps`)
 - Keep dependencies updated
 - The project uses `husky` + `lint-staged` for pre-commit checks (lint-staged + check-docs-sync + check:any-budget:t11)
 - CI pipeline runs ESLint security rules on every push (`no-eval`, `no-implied-eval`, `no-new-func` = error)
@@ -234,7 +234,7 @@ These rules are enforced by tooling and reviewers:
 7. **Encrypt credentials at rest** — AES-256-GCM via `src/lib/db/encryption.ts`
 8. **Public upstream OAuth identifiers via `resolvePublicCred()`** — never embed `AIza…` / `GOCSPX-…` / `…apps.googleusercontent.com` literals in source. See [`docs/security/PUBLIC_CREDS.md`](docs/security/PUBLIC_CREDS.md).
 9. **Error responses through `buildErrorBody()` / `sanitizeErrorMessage()`** — never put raw `err.stack` / `err.message` in HTTP / SSE / executor / MCP response bodies. See [`docs/security/ERROR_SANITIZATION.md`](docs/security/ERROR_SANITIZATION.md).
-10. **`exec()` / `spawn()` runtime values via the `env` option** — never string-interpolate external paths or untrusted values into shell-passed scripts. Reference: `src/mitm/cert/install.ts::updateNssDatabases`.
+10. **`exec()` / `spawn()` runtime values via the `env` option** — never string-interpolate external paths or untrusted values into shell-passed scripts. Reference: `bin/cli/npm-exec.mjs`.
 11. **Prefer secure-by-default libraries** — see [tldrsec/awesome-secure-defaults](https://github.com/tldrsec/awesome-secure-defaults) (Helmet.js, DOMPurify, ssrf-req-filter, safe-regex, Google Tink). Reach for them before rolling your own.
 
 ## Supply-chain scanner findings (Socket.dev / Snyk / similar)
@@ -243,7 +243,7 @@ These rules are enforced by tooling and reviewers:
 
 The published `omniroute` npm artifact bundles the Next.js `output: "standalone"`
 build, which means every route handler — including documented privileged
-features (MITM, Zed import, Cloud Sync, embedded service supervisor) — ends
+features (Zed import, Cloud Sync, embedded service supervisor) — ends
 up in `.next/server/*.js` minified chunks. Heuristic supply-chain scanners
 frequently pattern-match those chunks against malware signatures.
 

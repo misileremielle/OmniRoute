@@ -43,7 +43,7 @@ Eight services are embedded:
 | **Dario**       | `@askalf/dario`                    |     3456     | Claude-subscription proxy — alternative/failover to CLIProxyAPI for Claude-Code-shaped traffic; the injected key becomes `DARIO_ADMIN_TOKEN` gating its `/admin/*` OAuth control plane                                                                                                                                           |
 | **open-wa**     | `@open-wa/wa-automate`             |     8323     | WhatsApp Web automation (headless Chromium via Puppeteer). Lifecycle-managed only — not a routing target.                                                                                                                                                                                                                        |
 | **LLMLingua**   | `@atjsh/llmlingua-2`               |    20135     | Prompt-compression sidecar — real LLMLingua-2 ONNX model (JS/TS port of Microsoft's algorithm). `open-sse/services/compression/engines/llmlingua/index.ts` dispatches `/compress` over HTTP to it, falling back to the in-process worker-thread backend when the sidecar is down. Lifecycle-managed only — not a routing target. |
-| **sing-box**    | GitHub release binary (`singbox`)  |    20140     | TPROXY sidecar backing `applyTproxy()`'s transparent-proxy interception (`src/mitm/tproxy/setup.ts`). Installer downloads the pinned, checksum-verified release. Lifecycle-managed only — not a routing target (no LLM proxying)                                                                                                 |
+| **sing-box**    | GitHub release binary (`singbox`)  |    20140     | Proxy core for subscription egress (`src/lib/proxySubscription/coreConfig/`). Installer downloads the pinned, checksum-verified release. Lifecycle-managed only — not a routing target (no LLM proxying)                                                                                                                         |
 
 All eight follow the same supervisory model:
 
@@ -597,13 +597,6 @@ requested version is rejected.
 | `POST` | `/api/services/singbox/auto-restart-adopted` | Toggle auto-restart for an adopted (pre-existing) process |
 | `GET`  | `/api/services/singbox/logs`                 | SSE log tail (via shared `[name]/logs` dynamic route)     |
 
-**TPROXY wiring:** `ensureSingboxTproxy()` (`src/mitm/tproxy/setup.ts`) writes
-`config.json` and starts the supervisor before `applyTproxy()` installs the
-TPROXY firewall rules. If the supervisor is missing or fails to reach `running`,
-it now logs at error level (rather than silently swallowing the failure) so an
-operator can tell the TPROXY rules were applied without a working listener
-behind them.
-
 ---
 
 ### 4.9 Reverse proxy (9Router dashboard embed)
@@ -787,7 +780,7 @@ Delegate all error responses through `createErrorResponse()` / `buildErrorBody()
 ### Step 5 — Add to LOCAL_ONLY_API_PREFIXES
 
 In `src/server/authz/routeGuard.ts`, verify that `/api/services/` is already listed.
-If you introduce a new prefix (e.g., `/api/tools/`), add it to both
+If you introduce a new route prefix, add it to both
 `LOCAL_ONLY_API_PREFIXES` and, if it spawns processes, to `SPAWN_CAPABLE_PREFIXES`.
 Add a test in `tests/unit/authz/routeGuard.test.ts`.
 

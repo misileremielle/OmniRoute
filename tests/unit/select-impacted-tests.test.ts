@@ -123,12 +123,7 @@ test("nested .test.mjs outside UNIT_SUBDIRS → run itself", () => {
   assert.deepEqual(sel, ["tests/unit/misc/nested/deep.test.mjs"]);
 });
 
-// electron/bin are outside the import-graph map roots — must NOT force __RUN_ALL__.
-test("changed electron/ file alone → empty (not unit fail-safe)", () => {
-  const sel = selectImpacted({ changed: ["electron/main.js"], map: MAP });
-  assert.deepEqual(sel, []);
-});
-
+// bin/ is outside the import-graph map roots — must NOT force __RUN_ALL__.
 test("changed bin/ file alone → empty (not unit fail-safe)", () => {
   const sel = selectImpacted({ changed: ["bin/omniroute.js"], map: MAP });
   assert.deepEqual(sel, []);

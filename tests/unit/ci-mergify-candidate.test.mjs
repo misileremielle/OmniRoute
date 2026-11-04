@@ -126,7 +126,6 @@ test("an official queue draft enables every applicable required CI lane", () => 
   // Full-matrix lane (2026-10-27): the build-dependent heavy jobs also read the classifier
   // so an ordinary PR skips them and the queue candidate runs them.
   assert.deepEqual(workflow.jobs["package-artifact"].needs, ["build", "changes"]);
-  assert.deepEqual(workflow.jobs["electron-package-smoke"].needs, ["build", "changes"]);
   assert.deepEqual(workflow.jobs["test-coverage"].needs, "test-unit");
 });
 

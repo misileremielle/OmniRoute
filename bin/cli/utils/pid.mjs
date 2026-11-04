@@ -4,7 +4,7 @@ import { resolveDataDir } from "../data-dir.mjs";
 
 // #9455: "supervisor" must be tracked so killAllSubprocesses() can stop the
 // supervisor process, not just the child server it spawned (and respawns).
-const SERVICES = ["server", "supervisor", "mitm"];
+const SERVICES = ["server", "supervisor"];
 
 function getServicePidPath(service) {
   return join(resolveDataDir(), service, ".pid");

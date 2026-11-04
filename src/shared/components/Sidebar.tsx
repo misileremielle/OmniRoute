@@ -83,7 +83,6 @@ type SidebarProps = {
   onClose?: () => void;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
-  isMacElectron?: boolean;
 };
 
 function parseStoredArray<T>(raw: string | null, fallback: T): T {
@@ -137,7 +136,7 @@ function readStoredPinnedItemsRaw() {
  * does that): the collapsed/mobile state comes from `useSidebar()`. `collapsed`, `onToggleCollapse`
  * and `onClose` stay in the props type for older callers and are ignored.
  */
-export default function Sidebar({ isMacElectron = false }: SidebarProps) {
+export default function Sidebar(_props: SidebarProps = {}) {
   const navigationId = useId();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
@@ -682,11 +681,7 @@ export default function Sidebar({ isMacElectron = false }: SidebarProps) {
           {/* The shell Header owns the collapse/expand trigger (one per page). Only the mobile
               drawer needs its own control: the modal Sheet hides the header while it is open. */}
           {isMobile && (
-            <SidebarTrigger
-              aria-label={tc("close")}
-              title={tc("close")}
-              className={cn("shrink-0", isMacElectron && "ms-auto")}
-            >
+            <SidebarTrigger aria-label={tc("close")} title={tc("close")} className="shrink-0">
               <Icon name="close" />
             </SidebarTrigger>
           )}
@@ -808,11 +803,7 @@ export default function Sidebar({ isMacElectron = false }: SidebarProps) {
         </nav>
       </SidebarContent>
 
-      <SidebarFooter
-        style={{
-          paddingBottom: isMacElectron ? "calc(0.5rem + var(--desktop-safe-bottom))" : undefined,
-        }}
-      >
+      <SidebarFooter>
         {!isE2EMode && <CloudSyncStatus collapsed={collapsed} />}
         {/* One full-width row per action: side by side, "Shutdown" truncated at the 16 rem width
             (and longer locales truncate both). */}

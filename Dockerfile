@@ -172,11 +172,6 @@ ENV OMNIROUTE_USE_TURBOPACK="${OMNIROUTE_USE_TURBOPACK}"
 ARG OMNIROUTE_BASE_PATH=""
 ENV OMNIROUTE_BASE_PATH=$OMNIROUTE_BASE_PATH
 
-# Docker containers cannot run the MITM/Agent-Bridge stack (no host DNS/cert
-# access), so keep @/mitm/manager on the graceful stub (#3390). This flag is
-# Docker-only: npm/Electron/VPS builds must bundle the REAL manager (#6344).
-ENV OMNIROUTE_MITM_STUB=1
-
 # Raise the V8 heap ceiling for the build. The webpack production optimization
 # pass needs more than V8's default ceiling (~2 GB) for a codebase this size; a
 # memory-constrained Docker build otherwise dies with "FATAL ERROR: ... JavaScript

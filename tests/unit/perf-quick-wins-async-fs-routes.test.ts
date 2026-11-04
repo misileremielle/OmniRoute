@@ -9,11 +9,7 @@ import path from "node:path";
 //
 // logs/console and cli-tools/logs are intentionally not listed: they serve a
 // bounded tail read (#16301) whose fd-based reader is covered by its own tests.
-const ROUTE_FILES = [
-  "src/app/api/openapi/spec/route.ts",
-  "src/app/api/settings/mitm/route.ts",
-  "src/app/api/storage/health/route.ts",
-];
+const ROUTE_FILES = ["src/app/api/openapi/spec/route.ts", "src/app/api/storage/health/route.ts"];
 
 const SYNC_FS_CALL = /\w+Sync\s*\(/;
 

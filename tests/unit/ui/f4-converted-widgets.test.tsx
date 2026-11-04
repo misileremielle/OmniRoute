@@ -2,8 +2,7 @@
 /**
  * F4 (KEA-7886, review M-4): render tests for widgets the F4 sweep moved onto the kit adapters —
  * MaintenanceBanner, CloudSyncStatus. Each must render without Material ligatures, with token
- * colours and the adapter controls. (The orphan settings MitmProxyTab was deleted in F5-A / P2 —
- * the live screen is /dashboard/system/mitm-proxy.)
+ * colours and the adapter controls. (The orphan settings MitmProxyTab was deleted in F5-A / P2.)
  */
 import React from "react";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";

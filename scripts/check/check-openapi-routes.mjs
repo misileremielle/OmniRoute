@@ -17,10 +17,7 @@ const ROOT = process.cwd();
 const OPENAPI_PATH = path.join(ROOT, "docs", "openapi.yaml");
 
 // Entradas da spec sem rota real, congeladas para triagem (catraca: bloqueia NOVAS).
-export const KNOWN_STALE_SPEC = new Set([
-  // openapi.yaml documenta um state por-agente, mas a rota real é o state GLOBAL
-  // (/api/tools/agent-bridge/state); por-agente só há /{id}, /{id}/detect, /mappings, /dns.
-]);
+export const KNOWN_STALE_SPEC = new Set([]);
 
 /** Normaliza qualquer {param} para {} para casar independente do nome do parâmetro. */
 export function normalizeParams(p) {

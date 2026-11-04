@@ -171,24 +171,6 @@
             "workflow"
           ]
         },
-        "electron-package-smoke": {
-          "when": "full-code",
-          "disposition": "required",
-          "domains": [
-            "build",
-            "catalog",
-            "cli",
-            "core",
-            "db",
-            "docs",
-            "i18n",
-            "provider",
-            "routing",
-            "tests",
-            "ui",
-            "workflow"
-          ]
-        },
         "test-unit": {
           "when": "code",
           "disposition": "required",

@@ -59,7 +59,6 @@ import {
   type SidebarItemDefinition,
   type HideableSidebarItemId,
 } from "@/shared/constants/sidebarVisibility";
-import { useIsElectron } from "@/shared/hooks/useElectron";
 import { KEAK_ACTIVE_PRODUCT, KEAK_PRODUCT_LINKS } from "@/shared/constants/keakProducts";
 import Button from "./Button";
 import Icon from "./Icon";
@@ -137,7 +136,6 @@ const HEADER_DESCRIPTIONS: Partial<
   "settings-cache": "settingsCacheDescription",
   "settings-advanced": "settingsAdvancedDescription",
   // Proxy sub-pages
-  "mitm-proxy": "mitmProxyDescription",
   "1proxy": "oneProxyDescription",
 };
 
@@ -223,7 +221,6 @@ export default function Header({ onOpenCommandPalette }: HeaderProps) {
   );
   const pathname = usePathname();
   const router = useRouter();
-  const isElectron = useIsElectron();
   const t = useTranslations("header");
   const tc = useTranslations("common");
   const ts = useTranslations("sidebar");
@@ -236,11 +233,7 @@ export default function Header({ onOpenCommandPalette }: HeaderProps) {
       ? ts("collapseSidebar")
       : ts("expandSidebar");
   const { title, description, icon, providerId } = usePageInfo(pathname);
-  const isMacElectron =
-    isElectron &&
-    typeof window !== "undefined" &&
-    (window as any).electronAPI?.platform === "darwin";
-  const safeTop = isMacElectron ? "var(--desktop-safe-top)" : "var(--ios-safe-top, 0px)";
+  const safeTop = "var(--ios-safe-top, 0px)";
 
   const handleLogout = async () => {
     try {
@@ -257,7 +250,7 @@ export default function Header({ onOpenCommandPalette }: HeaderProps) {
   return (
     // No explicit role="banner": the kit shell mounts this inside SidebarInset's <main>, and a
     // banner landmark must stay top-level. The kit header has a fixed height, so the safe-area
-    // inset (macOS Electron title bar / iOS standalone notch) is added to it, not carved out of it.
+    // inset (iOS standalone notch) is added to it, not carved out of it.
     <header
       className="ci-sidebar-shell-header sticky top-0 z-10 bg-bg"
       style={{ paddingTop: safeTop, height: `calc(4rem + var(--ci-border-default) + ${safeTop})` }}

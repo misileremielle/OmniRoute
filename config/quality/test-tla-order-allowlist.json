@@ -2,7 +2,6 @@
   "$comment": "Pre-existing tests/unit files that register a top-level test, then hit a top-level await, then register more tests (#18045). Delete-only: scripts/check/check-test-tla-order.mjs fails on a new offender and on an entry that is already fixed. Fix a file by moving its top-level awaits above the first test(), then delete its entry. Three entries (credential-scope-diagnostics-15889, db-migration-missing-physical-schema, repro-13999-mid-stream-error) are if/else false positives: the check does not track branches.",
   "files": [
     "tests/unit/account-fallback-retry-after-json.test.ts",
-    "tests/unit/agent-bridge-repair-sudo-gate.test.ts",
     "tests/unit/agy-provider.test.ts",
     "tests/unit/audio-transcriptions-combo-resolution.test.ts",
     "tests/unit/bailian-coding-plan-provider.test.ts",

@@ -190,7 +190,7 @@ const CANONICAL_BUILDER = new RegExp(`\\b(?:${CANONICAL_BUILDER_NAMES.join("|")}
 // precisely the E-09 hole.
 // Both sanctioned builder modules: `open-sse/utils/error.ts` and
 // `src/lib/api/errorResponse.ts`. The second exists because route handlers outside
-// open-sse (auth, proxies, services, agent-bridge …) use it, and it sanitizes too.
+// open-sse (auth, proxies, services …) use it, and it sanitizes too.
 //
 // The group MUST be parenthesized: an ungrouped `a|b` splices a top-level alternation
 // into the surrounding regex, the `import … from …` prefix stops applying to the second

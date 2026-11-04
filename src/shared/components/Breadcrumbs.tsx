@@ -112,8 +112,6 @@ const PATH_LABELS = {
   sidebar: "sidebar",
   tokens: "tokens",
   tools: "tools",
-  "agent-bridge": "agentBridge",
-  "traffic-inspector": "trafficInspector",
   usage: "usage",
 };
 

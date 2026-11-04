@@ -9,9 +9,7 @@
         "src/middleware.ts",
         "src/instrumentation.ts",
         "bin/**/*.{mjs,ts}",
-        "scripts/**/*.{mjs,ts}",
-        "electron/main.js",
-        "electron/preload.js"
+        "scripts/**/*.{mjs,ts}"
       ],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.{ts,tsx}"],
       "ignore": [
@@ -33,7 +31,6 @@
         "lint-staged",
         "cross-env",
         "concurrently",
-        "wait-on",
         "c8",
         "source-map-support"
       ],
@@ -67,7 +64,6 @@
     "dist/**",
     "coverage/**",
     "**/.next/**",
-    "electron/dist-electron/**",
     "scripts/**"
   ]
 }

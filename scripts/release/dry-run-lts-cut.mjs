@@ -72,7 +72,6 @@ const PRECONDITION_IDS = [
 const BUMP_FILES = Object.freeze([
   "package.json",
   "open-sse/package.json",
-  "electron/package.json",
   "package-lock.json",
   "docs/openapi.yaml",
 ]);
@@ -395,7 +394,6 @@ export function bumpOpenApi(text, version) {
 const BUMPERS = Object.freeze({
   "package.json": bumpManifest,
   "open-sse/package.json": bumpManifest,
-  "electron/package.json": bumpManifest,
   "package-lock.json": bumpLockfile,
   "docs/openapi.yaml": bumpOpenApi,
 });

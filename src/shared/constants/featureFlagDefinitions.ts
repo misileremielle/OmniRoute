@@ -445,17 +445,6 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     warningLevel: "caution",
   },
   {
-    key: "MITM_DISABLE_TLS_VERIFY",
-    label: "Disable TLS Verify (MITM)",
-    description: "Disable TLS certificate verification for MITM proxy",
-    descriptionI18nKey: "featureFlagMitmDisableTlsVerifyDescription",
-    category: "network",
-    defaultValue: "false",
-    type: "boolean",
-    requiresRestart: true,
-    warningLevel: "danger",
-  },
-  {
     key: "OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS",
     label: "Allow Private Provider URLs",
     description:

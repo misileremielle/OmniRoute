@@ -13,7 +13,6 @@ import {
 import { AGY_PUBLIC_MODELS, isUserCallableAgyModelId } from "../../open-sse/config/agyModels.ts";
 import { FREE_MODEL_BUDGETS } from "../../open-sse/config/freeModelCatalog.data.ts";
 import { getDefaultPricing } from "../../src/shared/constants/pricing.ts";
-import { CLI_TOOLS } from "../../src/shared/constants/cliTools.ts";
 
 const RETIRED_PUBLIC_MODELS = [
   "gemini-3-pro-preview",
@@ -115,8 +114,6 @@ test("Antigravity and AGY expose gemini-pro-agent and gemini-3.1-pro-high as cal
 test("Antigravity support catalogs expose every live Gemini 3.8 Flash tier", () => {
   const antigravityModelIds = new Set(ANTIGRAVITY_PUBLIC_MODELS.map((model) => model.id));
   const agyModelIds = new Set(AGY_PUBLIC_MODELS.map((model) => model.id));
-  const cliAliases = new Set(CLI_TOOLS.antigravity.modelAliases);
-  const cliModelIds = new Set(CLI_TOOLS.antigravity.defaultModels.map((model) => model.id));
   const agyFreeModelIds = new Set(
     FREE_MODEL_BUDGETS.filter((model) => model.provider === "agy").map((model) => model.modelId)
   );
@@ -124,39 +121,28 @@ test("Antigravity support catalogs expose every live Gemini 3.8 Flash tier", () 
   for (const modelId of ACTIVE_FLASH_MODEL_IDS) {
     assert.equal(antigravityModelIds.has(modelId), true, `${modelId} missing from Antigravity`);
     assert.equal(agyModelIds.has(modelId), true, `${modelId} missing from AGY`);
-    assert.equal(cliAliases.has(modelId), true, `${modelId} missing from CLI aliases`);
-    assert.equal(cliModelIds.has(modelId), true, `${modelId} missing from CLI defaults`);
     assert.equal(agyFreeModelIds.has(modelId), true, `${modelId} missing from AGY metadata`);
   }
 });
 
 test("Antigravity support catalogs no longer advertise or price the rejected High id", () => {
-  const cliModelIds = CLI_TOOLS.antigravity.defaultModels.map((model) => model.id);
   const pricing = getDefaultPricing().ag;
 
-  assert.equal(cliModelIds.includes("gemini-3.1-pro-high"), false);
-  assert.equal(cliModelIds.includes("gemini-pro-agent"), true);
   assert.equal(pricing["gemini-3.1-pro-high"], undefined);
   assert.ok(pricing["gemini-pro-agent"]);
 });
 
 test("Antigravity and AGY support metadata excludes retired Flash ids", () => {
-  const cliAliases = CLI_TOOLS.antigravity.modelAliases;
-  const cliModelIds = CLI_TOOLS.antigravity.defaultModels.map((model) => model.id);
   const agyFreeModelIds = FREE_MODEL_BUDGETS.filter((model) => model.provider === "agy").map(
     (model) => model.modelId
   );
   const pricing = getDefaultPricing().ag;
 
-  assert.equal(cliAliases.includes("gemini-3-flash"), false);
-  assert.equal(cliModelIds.includes("gemini-3-flash"), false);
   assert.equal(agyFreeModelIds.includes("gemini-3-flash"), false);
   // Removed from static support metadata, but live discovery still admits it: keep it billable (#16570).
   assert.ok(pricing["gemini-3-flash"], "gemini-3-flash must retain Antigravity billing coverage");
 
   for (const modelId of ACTIVE_FLASH_MODEL_IDS) {
-    assert.equal(cliAliases.includes(modelId), true, `${modelId} must remain selectable`);
-    assert.equal(cliModelIds.includes(modelId), true, `${modelId} must remain a CLI default`);
     assert.equal(agyFreeModelIds.includes(modelId), true, `${modelId} must remain in AGY metadata`);
     assert.ok(pricing[modelId], `${modelId} must retain Antigravity pricing`);
   }

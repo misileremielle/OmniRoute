@@ -39,8 +39,7 @@ export async function OPTIONS() {
  * sourceFormat "antigravity" (mirrors `/v1/messages` → claude), so `handleChat`
  * translates the request antigravity→openai, routes it to the resolved
  * provider/model, and translates the response openai→antigravity — reusing the
- * already-registered bidirectional translators. The AgentBridge MITM proxy
- * (`server.cjs`) forwards the IDE's intercepted cloudcode request here.
+ * already-registered bidirectional translators.
  */
 async function postHandler(request: Request): Promise<Response> {
   await ensureInitialized();

@@ -241,15 +241,7 @@ export class ServerSupervisor {
     if (this.restartCount >= this.maxRestarts) {
       const summary = `Server crashed ${this.maxRestarts} times in <30s.`;
       console.error(`\n⚠ ${summary}`);
-      if (this.onCrashCallback) {
-        const action = this.onCrashCallback(this.crashLog);
-        if (action === "disable-mitm-and-retry") {
-          console.error("⚠ Disabling MITM and retrying...\n");
-          this.restartCount = 0;
-          this.start();
-          return;
-        }
-      }
+      if (this.onCrashCallback) this.onCrashCallback(this.crashLog);
       this.dumpCrashLog();
       // #13538: the give-up path used to only console.error() this diagnostic.
       // In `--tray`/`--tray-worker` mode this process is launched detached with
@@ -312,10 +304,4 @@ export class ServerSupervisor {
     }
     killAllSubprocesses();
   }
-}
-
-export function detectMitmCrash(crashLog) {
-  const text = crashLog.join("\n").toLowerCase();
-  const signals = ["mitm", "tls socket", "certificate", "hosts", "eaccess"];
-  return signals.filter((s) => text.includes(s)).length >= 2;
 }

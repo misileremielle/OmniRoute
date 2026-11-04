@@ -76,7 +76,7 @@ The monolith is intentionally disassembled on `develop`:
 - **`@omniroute/sdk`** — one typed contract: hooks, extension points, two-phase lifecycle,
   UI contributions. The five extension systems that exist today (plugins, CLI plugins,
   skills, MCP tools, A2A skills) collapse into one declarative manifest.
-- **Modules** (`@omniroute/mod-*`) — cloud agents, traffic inspection (MITM), evals,
+- **Modules** (`@omniroute/mod-*`) — cloud agents, evals,
   webhooks, memory, guardrails, observability and more move out of the core, each with its
   own version and lifecycle.
 - **Providers as plugins** — adding a provider stops touching the core.

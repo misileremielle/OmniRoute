@@ -67,7 +67,7 @@ These files have the lowest line coverage today (< 60%) and offer the best retur
 | 5   | `src/app/docs/components/DocCodeBlocks.tsx`                  |  10.63% |
 | 6   | `open-sse/services/compression/engines/rtk/lineFilter.ts`    |  10.96% |
 | 7   | `open-sse/services/specificityRules.ts`                      |  11.28% |
-| 8   | `src/mitm/systemCommands.ts`                                 |  12.19% |
+| 8   | `src/lib/system/systemCommands.ts`                           |  12.19% |
 | 9   | `open-sse/services/compression/aggressive.ts`                |  12.77% |
 | 10  | `src/app/api/v1/batches/[id]/cancel/route.ts`                |  12.98% |
 | 11  | `open-sse/services/compression/progressiveAging.ts`          |  13.26% |
@@ -86,7 +86,7 @@ Themes for Phases 6-7:
 - `open-sse/services/compression/**` is the densest cluster of low coverage and dominates the remaining gap.
 - Batch and rerank API routes (`src/app/api/v1/batches/**`, `src/app/api/v1/rerank/route.ts`) need handler-level tests.
 - Cloud agent adapters (`src/lib/cloudAgent/agents/jules.ts`, `codex.ts`) and `tierResolver.ts` need scenario tests.
-- Docs UI components and `src/mitm/systemCommands.ts` are lower priority but cheap branch wins.
+- Docs UI components and `src/lib/system/systemCommands.ts` are lower priority but cheap branch wins.
 
 ## Execution checklist
 

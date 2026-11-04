@@ -14,7 +14,7 @@ const CONDITIONS = new Set([
   "code-or-i18n",
   "code-e2e",
   "pr",
-  // Full matrix (2026-10-27): the heavy lanes (E2E, Electron, package, integration,
+  // Full matrix (2026-10-27): the heavy lanes (E2E, package, integration,
   // ecosystem, protocol clients, Bun) run on push / dispatch / merge_group and on the
   // Mergify merge-queue candidate, not on every push to an ordinary PR. The org's Free
   // plan caps hosted runners at 20 concurrent jobs and those lanes were ~18 of each

@@ -73,8 +73,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
   for (const prefix of [
     "/api/cli-tools/runtime/",
     "/api/services/",
-    "/api/tools/agent-bridge/",
-    "/api/tools/traffic-inspector/",
     "/api/plugins/",
     "/api/local/",
     "/api/skills/collect/",
@@ -82,8 +80,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
     "/api/headroom/stop",
     "/api/vnc-session",
     "/api/modality-bridge/video/",
-    "/api/settings/mitm",
-    "/api/cli-tools/antigravity-mitm",
     // GHSA-35fw-cv32-2373: the 14 cli-tools routes that reach the same
     // getCliRuntimeStatus() / detectAllTools() spawn as their gated siblings.
     "/api/cli-tools/all-statuses",
@@ -136,5 +132,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
   // + 1 (whycodes-settings, #14107).
   // qwen-settings is the one pre-existing entry not enumerated above.
   // - 6 tunnel routes (Cloudflare/Tailscale tunnel feature removed).
-  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 47);
+  // - 4 MITM / Agent Bridge / Traffic Inspector routes (feature removed).
+  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 43);
 });

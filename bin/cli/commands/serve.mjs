@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { platform, totalmem } from "node:os";
 import { t } from "../i18n.mjs";
 import {
@@ -12,11 +12,7 @@ import {
   probePortFree,
   resolveReadyTimeoutMs,
 } from "../utils/pid.mjs";
-import {
-  ServerSupervisor,
-  detectMitmCrash,
-  BUN_PRELOAD_PATH,
-} from "../runtime/processSupervisor.mjs";
+import { ServerSupervisor, BUN_PRELOAD_PATH } from "../runtime/processSupervisor.mjs";
 import { isTermux } from "../../../scripts/build/postinstallSupport.mjs";
 import {
   ensureAndroidCacheDir,
@@ -329,7 +325,7 @@ export async function runServe(opts = {}) {
       NODE_ENV: "production",
       // #5238: preserve a user-set NODE_OPTIONS (incl. their own
       // `--max-old-space-size=…`) instead of clobbering it with the calibrated
-      // default — mirror the Electron/standalone launchers.
+      // default — mirror the standalone launcher.
       NODE_OPTIONS: buildServerNodeOptions(process.env, memoryLimit),
       ...(tlsCert ? { OMNIROUTE_TLS_CERT: tlsCert } : {}),
       ...(tlsKey ? { OMNIROUTE_TLS_KEY: tlsKey } : {}),
@@ -554,19 +550,6 @@ async function runWithSupervisor(
     env,
     memoryLimit,
     maxRestarts,
-    onCrashCallback: async (crashLog) => {
-      if (detectMitmCrash(crashLog)) {
-        try {
-          const PROJECT_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-          const { updateSettings } = await import(
-            pathToFileURL(join(PROJECT_ROOT, "src/lib/db/settings.ts")).href
-          );
-          updateSettings({ mitmEnabled: false });
-        } catch {}
-        return "disable-mitm-and-retry";
-      }
-      return null;
-    },
   });
 
   supervisor.start();

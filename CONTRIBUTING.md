@@ -221,7 +221,7 @@ Coverage notes:
 
 - `npm run test:coverage` measures source coverage for the main unit test suite, excludes `tests/**`, and includes `open-sse/**`
 - Pull requests must keep the coverage gate at **60%+** statements/lines/functions/branches
-- If a PR changes production code in `src/`, `open-sse/`, `electron/`, or `bin/`, it must add or update automated tests in the same PR
+- If a PR changes production code in `src/`, `open-sse/`, or `bin/`, it must add or update automated tests in the same PR
 - `npm run coverage:report` prints the detailed file-by-file report from the latest coverage run
 - `npm run test:coverage:legacy` preserves the older metric for historical comparison
 - See `docs/ops/COVERAGE_PLAN.md` for the phased coverage improvement roadmap
@@ -310,7 +310,6 @@ src/                        # TypeScript (.ts / .tsx)
 │   ├── usage/              # Usage tracking and cost calculation
 │   └── localDb.ts          # Re-export layer only — never add logic here
 ├── middleware/              # Request middleware (promptInjectionGuard)
-├── mitm/                   # MITM proxy (cert, DNS, target routing)
 ├── shared/
 │   ├── components/         # React components (.tsx)
 │   ├── constants/          # Provider definitions (329), MCP scopes, 20 routing strategies
@@ -327,7 +326,6 @@ open-sse/                   # @omniroute/open-sse workspace
 ├── transformer/            # Responses API transformer
 └── utils/                  # 22 utility modules (stream, TLS, proxy, logging)
 
-electron/                   # Electron desktop app (cross-platform)
 
 tests/
 ├── unit/                   # Node.js test runner (1,574 test files)

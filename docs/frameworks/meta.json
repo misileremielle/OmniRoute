@@ -6,7 +6,6 @@
     "AGENT_PROTOCOLS_GUIDE",
     "ACP",
     "AGENT-SKILLS",
-    "AGENTBRIDGE",
     "CLOUD_AGENT",
     "EMBEDDED-SERVICES",
     "EVALS",
@@ -24,7 +23,6 @@
     "RADAR",
     "SEARCH_TOOLS_STUDIO",
     "SKILLS",
-    "TRAFFIC_INSPECTOR",
     "WEBHOOKS",
     "LOG-EXPORT"
   ]

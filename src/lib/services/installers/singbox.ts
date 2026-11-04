@@ -88,22 +88,6 @@ export function getConfigPath(): string {
 }
 
 /**
- * Picks the port for sing-box's tproxy inbound (its mixed inbound takes +1) so that
- * NEITHER ever equals `reservedPort` — the port the native IP_TRANSPARENT listener
- * binds and the PREROUTING `TPROXY --on-port` rule targets. Two listeners on that
- * port would make one of them fail with EADDRINUSE or let sing-box swallow the
- * traffic the MITM is meant to receive.
- */
-export function resolveSingboxListenPort(
-  reservedPort: number,
-  basePort = SINGBOX_DEFAULT_PORT
-): number {
-  let port = basePort;
-  while (port === reservedPort || port + 1 === reservedPort) port += 2;
-  return port;
-}
-
-/**
  * @param tproxyPort listen port of the tproxy inbound (the mixed inbound uses +1)
  * @param bypassMark SO_MARK stamped on every outbound (`routing_mark`). It MUST be the
  *   mark the `mangle OUTPUT` rule excludes (`! --mark <bypassMark>`), otherwise

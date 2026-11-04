@@ -124,7 +124,7 @@ matrix automatically, without any label.
 ### Version & Changelog
 
 - [ ] Run `/version-bump-cc <patch|minor|major>` (Claude Code skill)
-  - Bumps `package.json`, `electron/package.json`
+  - Bumps `package.json`
   - Regenerates `CHANGELOG.md` from git commits since last tag
   - Updates README.md badges
 - [ ] Manually review CHANGELOG.md and clean up commit messages if needed
@@ -218,16 +218,6 @@ Breaking changes: add `BREAKING CHANGE:` footer or `!` after the scope (e.g. `fe
 - [ ] Models registered in `open-sse/config/providerRegistry.ts`
 - [ ] Unit tests in `tests/unit/` cover provider classification and routing
 
-### Desktop (Electron)
-
-If `electron/` changed:
-
-- [ ] `npm run electron:smoke:packaged` passes
-- [ ] Builds tested for at least one of `:win`, `:mac`, `:linux`
-- [ ] Code signing certs not expired (if signing)
-- [ ] `electron/package.json` version matches root `package.json`
-- [ ] Auto-update channel pointer updated if releasing to `stable`
-
 ### Build Layout
 
 The repository uses three distinct output directories — never mix them up:
@@ -268,7 +258,6 @@ Do NOT run `npm run build` followed by a separate `npm run build:cli` for deploy
   - Creates tag `vX.Y.Z`
   - Pushes tag and branch
   - Opens GitHub Release with changelog body
-  - Attaches Electron installers (if built)
 - [ ] Or manually:
   ```bash
   git tag -a vX.Y.Z -m "Release vX.Y.Z"
@@ -441,8 +430,8 @@ node scripts/release/dry-run-lts-cut.mjs --execute --rollback --remote rehearsal
 ```
 
 The develop bump commit is built with git plumbing (no working tree is touched) and bumps
-the same five files as a cycle-open commit: `package.json`, `open-sse/package.json`,
-`electron/package.json`, `package-lock.json` and `docs/openapi.yaml`. The `[4.0.0]`
+the same four files as a cycle-open commit: `package.json`, `open-sse/package.json`,
+`package-lock.json` and `docs/openapi.yaml`. The `[4.0.0]`
 CHANGELOG section and its i18n mirrors are opened on `develop` afterwards, before its first
 PR. The script never changes npm dist-tags — rehearse those on a scratch package.
 
@@ -510,7 +499,7 @@ If release has critical issue:
 - Never skip Husky hooks (`--no-verify`)
 - Never commit secrets, credentials, or `.env` files
 - Coverage must stay ≥60/60/60/60 (statements/lines/functions/branches)
-- Always include or update tests when changing production code in `src/`, `open-sse/`, `electron/`, or `bin/`
+- Always include or update tests when changing production code in `src/`, `open-sse/`, or `bin/`
 
 ## Automated Sync Check
 

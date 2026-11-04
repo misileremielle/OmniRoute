@@ -17,7 +17,6 @@
  * pino-pretty -> outDir/node_modules/pino-pretty              Y               -           -    SHARED (extra module)
  * split2 -> outDir/node_modules/split2                        Y               -           -    SHARED (extra module)
  * src/lib/db/migrations -> outDir/migrations                  Y               Y           -    SHARED (extra module)
- * src/mitm/server.cjs -> outDir/src/mitm/server.cjs           Y               -           -    SHARED (extra module)
  * scripts/dev/run-standalone.mjs -> outDir/dev/run-standalone Y               -           -    SHARED (extra module)
  * scripts/dev/standalone-server-ws.mjs -> outDir/server-ws    Y               Y           -    SHARED (extra module)
  * scripts/dev/peer-stamp.mjs -> outDir/peer-stamp.mjs         Y               Y           -    SHARED (extra module)
@@ -33,7 +32,6 @@
  * abs-path sanitization in server.js + required-server-files  -               Y           Y    SHARED (opt-in: sanitizePaths)
  * Turbopack hashed-chunk patch (.next/server/ *.js)           -               Y           -    SHARED (opt-in: patchTurbopackChunks)
  * --- npm-UNIQUE ---
- * MITM typecheck + bundle -> app/src/mitm/                    -               Y           -    UNIQUE (prepublish)
  * MCP server esbuild -> dist/open-sse/mcp-server/server.js    -               Y           -    UNIQUE (prepublish)
  * CLI esbuild -> bin/omniroute.mjs                            -               Y           -    UNIQUE (prepublish)
  * sidecar/doc copies (.env.example, docs/, sync-env, etc.)    -               Y           -    UNIQUE (prepublish)
@@ -100,15 +98,6 @@ export const NATIVE_ASSET_ENTRIES = [
     label: "onnxruntime-node native binaries (libonnxruntime .so + .node addon)",
     src: ["node_modules", "onnxruntime-node", "bin"],
     dest: ["node_modules", "onnxruntime-node", "bin"],
-  },
-  {
-    // TPROXY IP_TRANSPARENT addon (Fase 3 / Epic A). Built by build-tproxy-native
-    // before assembly; Linux-only + opt-in, so the source is absent on non-Linux
-    // builds → syncNativeAssetsToDir skips it gracefully. The runtime loader
-    // (transparentSocket.ts) resolves it cwd-relative to this same dest.
-    label: "TPROXY transparent-socket addon (Linux-only, opt-in)",
-    src: ["src", "mitm", "tproxy", "native", "build", "Release", "transparent.node"],
-    dest: ["src", "mitm", "tproxy", "native", "build", "Release", "transparent.node"],
   },
 ];
 
@@ -302,26 +291,6 @@ export const EXTRA_MODULE_ENTRIES = [
     dest: ["node_modules", "bcryptjs"],
   },
   { label: "migrations", src: ["src", "lib", "db", "migrations"], dest: ["migrations"] },
-  { label: "MITM server", src: ["src", "mitm", "server.cjs"], dest: ["src", "mitm", "server.cjs"] },
-  {
-    // #9451: server.cjs requires 6 shims from ./_internal/ (bypass, ingest,
-    // forwardTarget, aliasConfig, standaloneRouting, rootCaShim) which the MITM
-    // child process loads via require(). Next.js's standalone tracer never sees
-    // them (server.cjs is a separate node process, not imported by the main
-    // server), so the _internal/ directory must be copied explicitly or the MITM
-    // child crashes with MODULE_NOT_FOUND at boot.
-    label: "MITM _internal shims (#9451)",
-    src: ["src", "mitm", "_internal"],
-    dest: ["src", "mitm", "_internal"],
-  },
-  {
-    // #9451: rootCaShim.cjs does `await import("selfsigned")` for dynamic SSL
-    // certificate generation. The MITM child is not traced by Next.js, so the
-    // package is absent from the Docker standalone bundle without this entry.
-    label: "selfsigned (MITM rootCaShim dynamic import — #9451)",
-    src: ["node_modules", "selfsigned"],
-    dest: ["node_modules", "selfsigned"],
-  },
   {
     label: "run-standalone script",
     src: ["scripts", "dev", "run-standalone.mjs"],
@@ -480,7 +449,7 @@ export const EXTRA_MODULE_ENTRIES = [
 ];
 
 /**
- * Copy native standalone assets (better-sqlite3 build/prebuilds and TPROXY).
+ * Copy native standalone assets (better-sqlite3 build/prebuilds).
  *
  * The destination is derived as <rootDir>/<distDir>/standalone/node_modules/...
  * for backward compatibility with existing callers and tests.
@@ -818,8 +787,8 @@ function clearStaleDest(dest) {
 }
 
 /**
- * Copy native assets (better-sqlite3 and TPROXY) and extra runtime modules/sidecars
- * (wreq-js, pino, migrations, MITM server, helper scripts, sqlite-vec platform packages, …)
+ * Copy native assets (better-sqlite3) and extra runtime modules/sidecars
+ * (wreq-js, pino, migrations, helper scripts, sqlite-vec platform packages, …)
  * into the assembled bundle. Missing sources are skipped silently.
  *
  * @param {string} projectRoot
@@ -1104,44 +1073,6 @@ export function materializeHashedModuleAliases(nodeModulesDir) {
     }
     summary.aliased += 1;
     summary.packages.push(baseName);
-  }
-
-  return summary;
-}
-
-/**
- * Sync an Electron-ABI-rebuilt native module into any hashed/plain copies of
- * that module already materialized inside a nested node_modules dir.
- *
- * materializeBundledSymlinks() turns Turbopack hashed-module symlinks (e.g.
- * `better-sqlite3-90e2652d1716b047`) into real directory copies of the
- * Node-ABI build. A later step in prepare-electron-standalone.mjs rebuilds
- * better-sqlite3 against the Electron ABI at the bundle root — but the
- * hashed copy under the nested node_modules still holds the stale Node-ABI
- * build, and the server's hashed `require("better-sqlite3-<hash>")` resolves
- * to it, not the rebuilt root module. Previously that hashed copy was simply
- * deleted, which caused MODULE_NOT_FOUND and a silent fallback to the sql.js
- * WASM driver in the packaged app (issue #6794 follow-up). Overwriting each
- * matching entry with the rebuilt root module keeps the hashed require
- * resolving to a working, ABI-correct native driver instead.
- *
- * @param {string} rootModuleDir - absolute path to the already-rebuilt module (e.g. <standalone>/node_modules/better-sqlite3)
- * @param {string} nodeModulesDir - absolute path to the nested node_modules dir to scan
- * @returns {{ synced: number }}
- */
-export function syncRebuiltNativeModuleIntoHashedEntries(rootModuleDir, nodeModulesDir) {
-  const summary = { synced: 0 };
-  if (!fsSync.existsSync(rootModuleDir) || !fsSync.existsSync(nodeModulesDir)) return summary;
-
-  const baseName = path.basename(rootModuleDir);
-  const pattern = new RegExp(`^${baseName}(-[0-9a-f]{8,})?$`, "i");
-
-  for (const name of fsSync.readdirSync(nodeModulesDir)) {
-    if (!pattern.test(name)) continue;
-    const entryPath = path.join(nodeModulesDir, name);
-    fsSync.rmSync(entryPath, { recursive: true, force: true });
-    fsSync.cpSync(rootModuleDir, entryPath, { recursive: true, dereference: true });
-    summary.synced += 1;
   }
 
   return summary;

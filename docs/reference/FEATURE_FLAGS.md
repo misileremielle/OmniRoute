@@ -46,7 +46,7 @@ A boolean flag is considered **enabled** when its effective value is `"true"`,
 
 ## Flag Catalog
 
-115 flags across 6 categories. **Default** is the definition default — the value
+114 flags across 6 categories. **Default** is the definition default — the value
 used when neither a DB override nor an environment variable is present.
 
 ### Security (11)
@@ -65,7 +65,7 @@ used when neither a DB override nor an environment variable is present.
 | `OMNIROUTE_OIDC_DISABLE_PASSWORD_LOGIN` | boolean | `false`  | When OIDC is enabled, disable password login so users can only authenticate via OIDC Single Sign-On. When disabled (default), both password login and OIDC are available.                                                                                                     |
 | `API_KEY_AUDIT_CLIENT_DETAILS_ENABLED`  | boolean | `false`  | Record the caller's IP address and user-agent on the `api_key.auth.touch` audit-log rows written for successful API-key metadata and discovery reads (#17982). Off by default: those rows still record which key was used, when, and on which path, without IP or user-agent. |
 
-### Network (29)
+### Network (28)
 
 | Key                                             | Type    | Default | Restart | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | ----------------------------------------------- | ------- | ------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -89,7 +89,6 @@ used when neither a DB override nor an environment variable is present.
 | `EMPTY_STREAM_SIBLING_RECOVERY_ENABLED`         | boolean | `false` |         | Claude/Codex streaming: after the first lifecycle event, briefly probe (up to 1s / 64 KiB) for usable output; a stream that ends with no content becomes an `empty_content` failure that spends the existing bounded retry on another eligible connection (no cooldown, no model lockout), and round-robin combos stop retrying once the client disconnects. Also treats `refusal`, `pause_turn` and `model_context_window_exceeded` as legitimate empty terminals inside the probe. Off by default: readiness, empty-content handling and combo retries stay exactly as before. |
 | `OPENCODE_POOL_RESELECT`                        | boolean | `false` |         | OpenCode rotation: after a 429 from an egress-bucketed provider on a proxy-less account under an ambient pool context, ask the connection pool for another member for the next attempt instead of retrying the same egress address. Orders, never excludes: an exhausted pool keeps the current behavior. Off by default: every 429 rotates to the next account exactly as before.                                                                                                                                                                                               |
 | `OPENCODE_RATE_LIMITED_429_EARLY_STOP`          | boolean | `false` |         | OpenCode rotation: stop the account wave at the first 429 classified as a real rate limit (parseable `Retry-After`, or a body naming a rate/usage limit) and return that upstream 429 unchanged. Unclassified 429s keep rotating. Off by default: the free tier is limited per egress IP (#9611), so every 429 rotates and an exhausted wave returns the last upstream 429.                                                                                                                                                                                                      |
-| `MITM_DISABLE_TLS_VERIFY`                       | boolean | `false` | ✓       | Disable TLS certificate verification for the MITM proxy. **Danger.**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS`         | boolean | `false` |         | Turns off the outbound URL guard's host checks, cloud-metadata block included, on provider URL validation, model discovery, provider-node base URLs, and the proxy-fallback test, and allows private webhook targets. Local and LAN URLs already pass by default on the validation, discovery, and provider-node paths (`OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS`); the proxy-fallback test and private webhook targets consult only `OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS` and block local/LAN hosts while it is off.                                                              |
 | `OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS`           | boolean | `true`  |         | Allow provider URLs on local/private addresses (127.0.0.1, localhost, LAN). On by default (local-first): the guard then blocks cloud-metadata endpoints (all of 169.254.0.0/16 plus the known metadata hostnames). Disable for strict public-only blocking: private and loopback hosts are blocked too.                                                                                                                                                                                                                                                                          |
 | `ENABLE_CC_COMPATIBLE_PROVIDER`                 | boolean | `false` | ✓       | Enable Claude Code compatible provider mode.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
@@ -266,10 +265,10 @@ Returns every flag with its effective value, source, and a summary.
       "requiresRestart": false,
       "warningLevel": "caution",
     },
-    // ... all 115 flags
+    // ... all 114 flags
   ],
   "summary": {
-    "total": 115,
+    "total": 114,
     "active": 0,
     "inactive": 0,
     "overriddenByDb": 0,

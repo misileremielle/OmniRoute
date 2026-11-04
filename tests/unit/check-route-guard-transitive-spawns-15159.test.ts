@@ -99,7 +99,7 @@ test("G-09: extracts runtime specifiers (static, side-effect, re-export, require
       'export { y } from "../shared/thing";',
       'export * from "@omniroute/open-sse/utils/z";',
       'const r = require("./required");',
-      'const d = await import("@/mitm/manager.runtime");',
+      'const d = await import("@/lib/dynamicOnly.runtime");',
       'import type { T } from "@/types/only";',
       'export type { U } from "@/types/alsoOnly";',
       '// import { gone } from "@/commented/out";',
@@ -111,7 +111,7 @@ test("G-09: extracts runtime specifiers (static, side-effect, re-export, require
     "../shared/thing",
     "@omniroute/open-sse/utils/z",
     "./required",
-    "@/mitm/manager.runtime",
+    "@/lib/dynamicOnly.runtime",
   ]) {
     assert.ok(specs.includes(expected), `missing ${expected} in ${JSON.stringify(specs)}`);
   }

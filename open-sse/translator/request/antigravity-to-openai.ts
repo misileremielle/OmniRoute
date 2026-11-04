@@ -23,8 +23,7 @@ export function antigravityToOpenAIRequest(model, body, stream) {
     stream: stream,
   };
 
-  // Explicit per-alias reasoning-effort override (Antigravity MITM layer only —
-  // `src/mitm/aliasConfig.ts` / `src/mitm/_internal/aliasConfig.cjs`). Set at the same
+  // Explicit reasoning-effort override carried on the cloudcode envelope. Set at the same
   // envelope level as `model` (top-level `body`, sibling of `.request`), so it survives
   // regardless of which cloudcode envelope shape the caller used. When present it takes
   // priority over the thinkingConfig-derived value below: an explicit "none" suppresses
@@ -126,8 +125,7 @@ export function antigravityToOpenAIRequest(model, body, stream) {
   // `claude-opus-4.6`) rejects with `unexpected tool_use_id found in tool_result blocks`.
   // `fixToolPairs` strips only genuine orphans and is idempotent on well-formed histories,
   // so paired functionCall/functionResponse turns pass through unchanged. This mirrors the
-  // executor-side guard in `executors/base.ts` / `services/claudeCodeCompatible.ts`; the
-  // Antigravity MITM path did not run it (no `fixToolPairs` under `src/mitm/`). We do NOT
+  // executor-side guard in `executors/base.ts` / `services/claudeCodeCompatible.ts`. We do NOT
   // run `fixToolAdjacency` here because this stage still emits OpenAI-format messages and
   // Claude's adjacency rule is enforced downstream per provider.
   result.messages = fixToolPairs(result.messages) as JsonRecord[];

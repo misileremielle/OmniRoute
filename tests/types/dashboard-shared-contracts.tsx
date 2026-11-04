@@ -12,7 +12,6 @@ import {
   type ProviderEntry,
 } from "../../src/app/(dashboard)/dashboard/providers/providerPageUtils";
 
-// Compile with the canonical Electron ambient declaration; no local duplicate interface.
 export const dashboardCards: ReactElement[] = [
   <SkillsConceptCard key="agent" variant="agent" />,
   <SkillsConceptCard key="omni" variant="omni" />,

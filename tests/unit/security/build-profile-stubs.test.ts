@@ -1,6 +1,6 @@
 /**
  * Regression: when OMNIROUTE_BUILD_PROFILE=minimal is the resolved build
- * profile, the four stub modules throw FeatureDisabledError instead of
+ * profile, the stub modules throw FeatureDisabledError instead of
  * performing their privileged operations.
  * See docs/security/SOCKET_DEV_FINDINGS.md.
  */
@@ -15,14 +15,6 @@ test("featureDisabledError carries the featureName", async () => {
   assert.match(err.message, /minimal/);
   assert.equal("OMNIROUTE_BUILD_PROFILE" in mod, false);
   assert.equal("IS_MINIMAL_BUILD" in mod, false);
-});
-
-test("install.stub.ts: installCert / uninstallCert throw FeatureDisabledError", async () => {
-  const stub = await import("../../../src/mitm/cert/install.stub.ts");
-  await assert.rejects(() => stub.installCert("pw", "/tmp/x"), /mitm-cert-install/);
-  await assert.rejects(() => stub.uninstallCert("pw", "/tmp/x"), /mitm-cert-install/);
-  // checkCertInstalled returns false (does not throw — used by render paths)
-  assert.equal(await stub.checkCertInstalled("/tmp/x"), false);
 });
 
 test("keychain-reader.stub.ts: discoverZedCredentials / getZedCredential throw", async () => {

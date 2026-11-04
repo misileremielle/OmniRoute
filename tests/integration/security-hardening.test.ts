@@ -269,8 +269,6 @@ test("T06 route payload validation uses validateBody in critical endpoints", () 
     "src/app/api/providers/test-batch/route.ts",
     "src/app/api/providers/validate/route.ts",
     "src/app/api/v1beta/models/[...path]/route.ts",
-    "src/app/api/cli-tools/antigravity-mitm/route.ts",
-    "src/app/api/cli-tools/antigravity-mitm/alias/route.ts",
     "src/app/api/cli-tools/backups/route.ts",
     "src/app/api/cli-tools/claude-settings/route.ts",
     "src/app/api/cli-tools/cline-settings/route.ts",

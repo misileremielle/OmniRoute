@@ -29,7 +29,6 @@ without inventing new modules.
 | Language      | **TypeScript 6.0+** — target `ES2022`, `module: esnext`, `moduleResolution: bundler`, `strict: false`                    |
 | Runtime       | **Node.js** `>=22.22.2 <23` or `>=24.0.0 <27` (enforced via `engines` + `SUPPORTED_NODE_RANGE`)                          |
 | Database      | **SQLite** via `better-sqlite3` (singleton, WAL journaling)                                                              |
-| Desktop       | **Electron 41** + `electron-builder` 26.10 (separate workspace at `electron/`)                                           |
 | Tests         | **Node native test runner** (unit/integration), **Vitest** (MCP, autoCombo, cache), **Playwright** (e2e + protocols-e2e) |
 | Build         | Next.js standalone via `scripts/build/build-next-isolated.mjs`                                                           |
 | Lint/format   | ESLint flat config + Prettier (`lint-staged` via Husky pre-commit)                                                       |
@@ -56,7 +55,6 @@ OmniRoute/
 ├── src/                  Next.js application (App Router, libs, domain, server, shared)
 ├── open-sse/             Streaming engine workspace (@omniroute/open-sse)
 ├── packages/             Workspaces: ui-kit (vendored Keak CI UI Kit), browser-pool
-├── electron/             Desktop wrapper (Electron 41 main + preload)
 ├── bin/                  CLI entry points (omniroute, reset-password)
 ├── tests/                Unit, integration, e2e, protocols-e2e, translator, security, fixtures
 ├── scripts/              Build, sync, check, migration, and runtime helper scripts
@@ -82,7 +80,6 @@ src/
 ├── domain/               Pure domain layer (policy, fallback, cost, lockout, …)
 ├── server/               Server-only modules (authz, cors, auth)
 ├── shared/               Types, constants, validation, contracts, utils (cross-boundary safe)
-├── mitm/                 Man-in-the-middle proxy helpers for CLI integration
 ├── models/               Local model metadata / aliasing
 ├── sse/                  Legacy SSE handlers that still live under src/ (not open-sse/)
 ├── store/                Client-side state stores
@@ -589,27 +586,7 @@ Streaming primitives and provider helpers: `stream.ts`, `streamHandler.ts`,
 
 ---
 
-## 5. `electron/` — Desktop wrapper
-
-```
-electron/
-├── main.js                  Electron main process
-├── preload.js               Preload bridge (contextIsolation enabled)
-├── types.d.ts
-├── package.json             electron-builder config, version 3.8.51
-├── README.md
-├── assets/                  Build resources (icons, entitlements, …)
-├── node_modules/            Dedicated node_modules (better-sqlite3, electron-updater)
-└── dist-electron/           Build output (not committed)
-```
-
-Five npm scripts at the workspace root: `electron:dev`, `electron:build`,
-`electron:build:{win,mac,linux}`, `electron:smoke:packaged`. Auto-update is via
-`electron-updater` pointing at the GitHub release feed.
-
----
-
-## 6. `bin/` — CLI
+## 5. `bin/` — CLI
 
 ```
 bin/
@@ -641,7 +618,7 @@ Two binaries are exposed in `package.json` → `bin`:
 
 ---
 
-## 7. `tests/`
+## 6. `tests/`
 
 | Directory                                            | Type                                                                                        |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -668,18 +645,18 @@ Common commands:
 
 ---
 
-## 8. `scripts/`
+## 7. `scripts/`
 
 Organized into 6 subfolders by purpose.
 
 - **`scripts/build/`** — `build-next-isolated.mjs`, `prepublish.ts`,
-  `prepare-electron-standalone.mjs`, `pack-artifact-policy.ts`,
+  `pack-artifact-policy.ts`,
   `validate-pack-artifact.ts`, `postinstall.mjs`, `postinstallSupport.mjs`,
   `uninstall.mjs`, `bootstrap-env.mjs`, `runtime-env.mjs`,
   `native-binary-compat.mjs`.
 - **`scripts/dev/`** — `run-next.mjs`, `run-next-playwright.mjs`,
   `run-standalone.mjs`, `standalone-server-ws.mjs`, `responses-ws-proxy.mjs`,
-  `v1-ws-bridge.mjs`, `smoke-electron-packaged.mjs`,
+  `v1-ws-bridge.mjs`,
   `run-playwright-tests.mjs`, `run-ecosystem-tests.mjs`,
   `run-protocol-clients-tests.mjs`, `sync-env.mjs`, `healthcheck.mjs`,
   `system-info.mjs`, plus the read-only PR babysitting helpers
@@ -702,7 +679,7 @@ Organized into 6 subfolders by purpose.
 
 ---
 
-## 9. Request Pipeline (Summary)
+## 8. Request Pipeline (Summary)
 
 ![Request pipeline (/v1/chat/completions)](../diagrams/exported/request-pipeline.svg)
 
@@ -744,7 +721,7 @@ See [RESILIENCE_GUIDE.md](./RESILIENCE_GUIDE.md) and the dedicated section in
 
 ---
 
-## 10. How to Contribute
+## 9. How to Contribute
 
 ### Add a new provider
 
@@ -793,7 +770,7 @@ See [A2A-SERVER.md § Adding a New Skill](../frameworks/A2A-SERVER.md). Skills l
 
 ---
 
-## 11. Conventions
+## 10. Conventions
 
 - **Code style**: 2-space indent, double quotes, 100 char width, semicolons,
   `es5` trailing commas — enforced by Prettier via `lint-staged`.
@@ -836,7 +813,7 @@ See [A2A-SERVER.md § Adding a New Skill](../frameworks/A2A-SERVER.md). Skills l
 
 ---
 
-## 12. Hard Rules (from CLAUDE.md)
+## 11. Hard Rules (from CLAUDE.md)
 
 1. Never commit secrets or credentials.
 2. Never barrel-import — use specific `src/lib/db/*` modules directly.
@@ -850,7 +827,7 @@ See [A2A-SERVER.md § Adding a New Skill](../frameworks/A2A-SERVER.md). Skills l
 
 ---
 
-## 13. See Also
+## 12. See Also
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — high-level architecture and module
   responsibilities.
@@ -863,7 +840,7 @@ See [A2A-SERVER.md § Adding a New Skill](../frameworks/A2A-SERVER.md). Skills l
 - [A2A-SERVER.md](../frameworks/A2A-SERVER.md) — A2A protocol skills and discovery.
 - [COMPRESSION_GUIDE.md](../compression/COMPRESSION_GUIDE.md) — RTK + Caveman compression.
 - [CLI-TOOLS.md](../reference/CLI-TOOLS.md) — CLI integrations.
-- [ELECTRON_GUIDE.md](../guides/ELECTRON_GUIDE.md) (if present), [DOCKER_GUIDE.md](../guides/DOCKER_GUIDE.md), [FLY_IO_DEPLOYMENT_GUIDE.md](../ops/FLY_IO_DEPLOYMENT_GUIDE.md), [VM_DEPLOYMENT_GUIDE.md](../ops/VM_DEPLOYMENT_GUIDE.md), [TERMUX_GUIDE.md](../guides/TERMUX_GUIDE.md), [PWA_GUIDE.md](../guides/PWA_GUIDE.md) — deployment targets.
+- [DOCKER_GUIDE.md](../guides/DOCKER_GUIDE.md), [FLY_IO_DEPLOYMENT_GUIDE.md](../ops/FLY_IO_DEPLOYMENT_GUIDE.md), [VM_DEPLOYMENT_GUIDE.md](../ops/VM_DEPLOYMENT_GUIDE.md), [TERMUX_GUIDE.md](../guides/TERMUX_GUIDE.md), [PWA_GUIDE.md](../guides/PWA_GUIDE.md) — deployment targets.
 - [TROUBLESHOOTING.md](../guides/TROUBLESHOOTING.md) — common operational issues.
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) — contributor workflow.
 - [CLAUDE.md](../../CLAUDE.md) — repo rules for Claude Code (the source of truth

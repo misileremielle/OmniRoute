@@ -190,8 +190,6 @@ type Workflow = {
 
 const directRootInstalls = [
   ["build", "build"],
-  ["electron-release", "web-build"],
-  ["electron-release", "build"],
   ["mutation-redundancy", "stryker-nobail"],
   ["nightly-llm-security", "promptfoo-guard"],
   ["nightly-llm-security", "garak"],

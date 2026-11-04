@@ -488,7 +488,7 @@ test("quality admission covers both bases and delegates required build/package c
       "utf8"
     )
   );
-  for (const job of ["build", "package-artifact", "electron-package-smoke"]) {
+  for (const job of ["build", "package-artifact"]) {
     assert.equal(policy.profiles.ci.jobs[job].disposition, "required", job);
     assert.match(ci, new RegExp("\\n  " + job + ":\\n"), "CI implements " + job);
   }

@@ -5,7 +5,6 @@ export { default as OpenClawToolCard } from "./OpenClawToolCard";
 export { default as ClineToolCard } from "./ClineToolCard";
 export { default as KiloToolCard } from "./KiloToolCard";
 export { default as DefaultToolCard } from "./DefaultToolCard";
-export { default as AntigravityToolCard } from "./AntigravityToolCard";
 export { default as CopilotToolCard } from "./CopilotToolCard";
 export { default as CustomCliCard } from "./CustomCliCard";
 export { default as HermesAgentToolCard } from "./HermesAgentToolCard";

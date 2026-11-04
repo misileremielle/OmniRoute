@@ -3,7 +3,7 @@
  *
  * Final defense-in-depth layer: scrubs credentials that slip into log MESSAGES or
  * arbitrary object/error values, regardless of call site. It complements — does not
- * replace — the call-site maskers (`src/mitm/maskSecrets.ts`, `src/lib/logPayloads.ts`),
+ * replace — the call-site maskers (`src/lib/logPayloads.ts`),
  * and runs in the pino `hooks.logMethod` (main thread, so it works with transports).
  *
  * Patterns are strictly bounded (single, non-overlapping character classes with `{n,}`

@@ -115,16 +115,16 @@ The unified catalog lives in `src/shared/constants/cliTools.ts` as `CLI_TOOLS: R
 
 Each entry has these fields (defined in `src/shared/schemas/cliCatalog.ts`):
 
-| Field                                           | Type                                                         | Description                                            |
-| ----------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
-| `category`                                      | `"code" \| "agent"`                                          | Which page the tool appears on                         |
-| `vendor`                                        | `string`                                                     | Tool origin ("Anthropic", "OSS (P. Gauthier)")         |
-| `acpSpawnable`                                  | `boolean`                                                    | Also usable as an ACP Agent (badge shown)              |
-| `baseUrlSupport`                                | `"full" \| "partial" \| "none"`                              | Custom endpoint support level. `"none"` = MITM backlog |
-| `configType`                                    | `"env" \| "custom" \| "guide" \| "custom-builder" \| "mitm"` | Configuration mechanism                                |
-| `id`, `name`, `color`, `description`, `docsUrl` | standard                                                     | Core display fields                                    |
+| Field                                           | Type                                               | Description                                          |
+| ----------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------- |
+| `category`                                      | `"code" \| "agent"`                                | Which page the tool appears on                       |
+| `vendor`                                        | `string`                                           | Tool origin ("Anthropic", "OSS (P. Gauthier)")       |
+| `acpSpawnable`                                  | `boolean`                                          | Also usable as an ACP Agent (badge shown)            |
+| `baseUrlSupport`                                | `"full" \| "partial" \| "none"`                    | Custom endpoint support level. `"none"` = not listed |
+| `configType`                                    | `"env" \| "custom" \| "guide" \| "custom-builder"` | Configuration mechanism                              |
+| `id`, `name`, `color`, `description`, `docsUrl` | standard                                           | Core display fields                                  |
 
-Entries with `baseUrlSupport: "none"` are **not shown** in the dashboard pages — they are registered in the MITM backlog for plan 11 (see `_tasks/features-v3.8.6/refactorpages/_orchestration/_plan11-mitm-backlog.md`).
+Entries with `baseUrlSupport: "none"` are **not shown** in the dashboard pages.
 
 ### Capability tiers (cataloged × detectable × configurable × launchable)
 
@@ -148,9 +148,9 @@ one surface without the others fails the suite instead of drifting silently.
 
 ---
 
-## 1. CLI Code's Catalog (28 tools)
+## 1. CLI Code's Catalog (26 tools)
 
-All tools that appear in `/dashboard/cli-code`. Those with `baseUrlSupport: none` are wired through MITM or a manual guide instead of a custom base URL:
+All tools that appear in `/dashboard/cli-code`. Those with `baseUrlSupport: none` are wired through a manual guide instead of a custom base URL:
 
 | id           | name                    | vendor              | baseUrlSupport | configType     | acpSpawnable |
 | ------------ | ----------------------- | ------------------- | -------------- | -------------- | ------------ |
@@ -178,9 +178,7 @@ All tools that appear in `/dashboard/cli-code`. Those with `baseUrlSupport: none
 | openclaude   | OpenClaude              | Gitlawb (OSS)       | full           | guide          | false        |
 | zed          | Zed                     | Zed Industries      | full           | guide          | false        |
 | cursor       | Cursor                  | Anysphere           | none           | guide          | false        |
-| antigravity  | Antigravity             | Google              | none           | mitm           | false        |
 | hermes       | Hermes                  | Nous Research       | none           | guide          | false        |
-| kiro         | Kiro AI                 | Amazon              | none           | mitm           | false        |
 | custom       | Custom CLI              | —                   | full           | custom-builder | false        |
 
 Tools with `baseUrlSupport: "partial"` show a badge "⚠ Base URL parcial" in the dashboard card.
@@ -212,9 +210,9 @@ This page (renamed from `/dashboard/agents`) shows CLIs that OmniRoute can **spa
 
 ---
 
-## 4. MITM Backlog (not shown in dashboard)
+## 4. Unsupported CLIs (not shown in dashboard)
 
-The following CLIs do not support custom base URL natively and are **not listed** in CLI Code's or CLI Agents pages. They are candidates for MITM interception in plan 11:
+The following CLIs do not support custom base URL natively and are **not listed** in CLI Code's or CLI Agents pages. They need a native custom-endpoint option before they can be integrated.
 
 | CLI                 | Reason                                                     |
 | ------------------- | ---------------------------------------------------------- |
@@ -222,8 +220,6 @@ The following CLIs do not support custom base URL natively and are **not listed*
 | amp                 | Closed ecosystem (Sourcegraph)                             |
 | amazon-q / kiro-cli | AWS SSO auth, no custom URL                                |
 | cowork              | Anthropic Desktop, no configurable endpoint                |
-
-See `_tasks/features-v3.8.6/refactorpages/_orchestration/_plan11-mitm-backlog.md` for the full cross-reference.
 
 ---
 
@@ -606,9 +602,6 @@ kiro-cli login
 # Use kiro-cli alongside OmniRoute for other tools.
 kiro-cli status
 ```
-
-For the **Kiro IDE** desktop app, use the MITM endpoint exposed by OmniRoute
-under `/dashboard/cli-tools → Kiro`.
 
 ---
 

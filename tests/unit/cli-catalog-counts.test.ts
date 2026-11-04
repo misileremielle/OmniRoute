@@ -30,24 +30,24 @@ test(`CLI_TOOLS has exactly ${EXPECTED_AGENT_COUNT} agent entries`, () => {
   );
 });
 
-test("CLI_TOOLS total code entries (including none) equals 28 (23 visible + 5 none)", () => {
-  // code-none entries: antigravity, kiro, cursor (app), hermes, and zcode.
+test("CLI_TOOLS total code entries (including none) equals 26 (23 visible + 3 none)", () => {
+  // code-none entries: cursor (app), hermes, and zcode.
   const codeNone = codeAll.filter((t) => t.baseUrlSupport === "none");
   assert.equal(
     codeNone.length,
-    5,
-    `Expected 5 code entries with baseUrlSupport='none', got ${codeNone.length}: ${codeNone.map((t) => t.id).join(", ")}`
+    3,
+    `Expected 3 code entries with baseUrlSupport='none', got ${codeNone.length}: ${codeNone.map((t) => t.id).join(", ")}`
   );
-  assert.equal(codeAll.length, 28, `Expected 28 total code entries, got ${codeAll.length}`);
+  assert.equal(codeAll.length, 26, `Expected 26 total code entries, got ${codeAll.length}`);
 });
 
-test("CLI_TOOLS total (code + agent) = 39", () => {
-  assert.equal(all.length, 39, `Expected 39 total entries, got ${all.length}`);
+test("CLI_TOOLS total (code + agent) = 37", () => {
+  assert.equal(all.length, 37, `Expected 37 total entries, got ${all.length}`);
 });
 
-test("All code-none entries have configType mitm OR are legacy excluded entries", () => {
+test("All code-none entries are legacy excluded entries", () => {
   const codeNone = codeAll.filter((t) => t.baseUrlSupport === "none");
-  const allowedIds = new Set(["antigravity", "kiro", "cursor", "hermes", "zcode"]);
+  const allowedIds = new Set(["cursor", "hermes", "zcode"]);
   for (const entry of codeNone) {
     assert.ok(
       allowedIds.has(entry.id),

@@ -21,7 +21,7 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-const SOURCES = ["src", "open-sse", "electron", "bin"].flatMap((d) => walk(path.join(ROOT, d)));
+const SOURCES = ["src", "open-sse", "bin"].flatMap((d) => walk(path.join(ROOT, d)));
 
 function referencing(re: RegExp): string[] {
   return SOURCES.filter((f) => re.test(fs.readFileSync(f, "utf8"))).map((f) =>
@@ -29,7 +29,7 @@ function referencing(re: RegExp): string[] {
   );
 }
 
-test("P2: the orphan settings MitmProxyTab stays deleted (live screen is /dashboard/system/mitm-proxy)", () => {
+test("P2: the orphan settings MitmProxyTab stays deleted", () => {
   const file = "src/app/(dashboard)/dashboard/settings/components/MitmProxyTab.tsx";
   assert.equal(fs.existsSync(path.join(ROOT, file)), false, `${file} must not come back`);
   assert.deepEqual(referencing(/settings\/components\/MitmProxyTab|\bMitmProxyTab\b/), []);

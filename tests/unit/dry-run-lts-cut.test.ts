@@ -223,7 +223,7 @@ test("--advisory downgrades a check to a warning without hiding it", () => {
 // ── develop bump (pure, applied to the real files of this checkout) ───────
 
 test("bumpManifest changes only the top-level version of the real package.json files", () => {
-  for (const file of ["package.json", "open-sse/package.json", "electron/package.json"]) {
+  for (const file of ["package.json", "open-sse/package.json"]) {
     const before = fs.readFileSync(path.join(repoRoot, file), "utf8");
     const after = bumpManifest(before, "4.0.0");
     assert.equal(JSON.parse(after).version, "4.0.0", file);
@@ -287,7 +287,6 @@ test("the plan orders the cut and only ever pushes to the selected remote", () =
   assert.deepEqual(plan.bumpFiles, [
     "package.json",
     "open-sse/package.json",
-    "electron/package.json",
     "package-lock.json",
     "docs/openapi.yaml",
   ]);

@@ -54,11 +54,6 @@ describe("persistLocale — flips <html> direction immediately on switch", () =>
 describe("Sidebar — collapse toggle button uses logical margin", () => {
   const code = src("src/shared/components/Sidebar.tsx");
 
-  it("uses ms-auto (not ml-auto) for the macOS collapse-toggle alignment", () => {
-    // ml-auto is a physical class; ms-auto mirrors in RTL.
-    expect(code).toContain("ms-auto");
-  });
-
   it("does not use bare ml-auto in the collapse-toggle className", () => {
     expect(code).not.toContain("ml-auto");
   });

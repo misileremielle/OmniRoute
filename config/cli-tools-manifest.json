@@ -111,18 +111,6 @@
         "generate": false
       }
     },
-    "antigravity": {
-      "displayName": "Antigravity",
-      "aliases": [],
-      "binaries": [],
-      "surfaces": {
-        "catalog": true,
-        "detect": false,
-        "run": false,
-        "configure": false,
-        "generate": false
-      }
-    },
     "claude": {
       "displayName": "Claude Code",
       "aliases": ["claude-code", "cc", "anthropic"],
@@ -479,18 +467,6 @@
         "mode": "module",
         "module": "./setup-kilo.mjs",
         "exportName": "runSetupKiloCommand"
-      }
-    },
-    "kiro": {
-      "displayName": "Kiro AI",
-      "aliases": [],
-      "binaries": [],
-      "surfaces": {
-        "catalog": true,
-        "detect": false,
-        "run": false,
-        "configure": false,
-        "generate": false
       }
     },
     "letta": {

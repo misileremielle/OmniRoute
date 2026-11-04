@@ -8,12 +8,10 @@ const files = pkg.files || [];
 // #9633: `build-next-isolated.mjs` is published (fixed in #1126), but three of
 // its sibling modules it imports were missing from the `files` whitelist, so
 // `npm run build` on a globally-installed package crashed with ERR_MODULE_NOT_FOUND.
-// The dynamic import of `build-tproxy-native.mjs` (~line 308) and the static
-// imports of `assembleStandalone.mjs` / `backendOnlyPages.mjs` must ship too.
+// The static imports of `assembleStandalone.mjs` / `backendOnlyPages.mjs` must ship too.
 const NEEDED = [
   "scripts/build/assembleStandalone.mjs",
   "scripts/build/backendOnlyPages.mjs",
-  "scripts/build/build-tproxy-native.mjs",
   "scripts/build/colocateOptionals.mjs",
 ];
 

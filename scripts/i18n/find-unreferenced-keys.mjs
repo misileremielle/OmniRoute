@@ -12,7 +12,7 @@
 //
 // "Referenced" is deliberately generous (a false "referenced" keeps a key, which is safe):
 //   - the leaf name, the full dotted path, or the path without its namespace appears as a
-//     quoted string literal ("x", 'x' or `x`) anywhere under src/, open-sse/, electron/ or
+//     quoted string literal ("x", 'x' or `x`) anywhere under src/, open-sse/ or
 //     bin/ (catalogs excluded) — this covers t("leaf"), t("ns.leaf"), key arrays and maps;
 //   - a template literal prefix of 3+ characters such as t(`theme${name}`) or
 //     t(`strategy.${id}`) marks every key whose leaf (or dotted path) starts with that prefix
@@ -31,7 +31,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const SOURCE_ROOTS = ["src", "open-sse", "electron", "bin"];
+const SOURCE_ROOTS = ["src", "open-sse", "bin"];
 // .json covers generated maps such as src/i18n/routeNamespaces.generated.json (namespaces
 // loaded per route); the catalogs themselves are excluded by directory.
 const SOURCE_EXT = /\.(ts|tsx|js|jsx|mjs|cjs|json)$/;
