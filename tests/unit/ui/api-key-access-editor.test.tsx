@@ -67,7 +67,6 @@ const sampleKey = {
   usageLimitEnabled: false,
   dailyUsageLimitUsd: null,
   weeklyUsageLimitUsd: null,
-  chaosModeEnabled: false,
 };
 
 type KeyRecord = typeof sampleKey;
@@ -443,7 +442,6 @@ describe("ApiKeyAccessEditorClient", () => {
       usageLimitEnabled: false,
       dailyUsageLimitUsd: null,
       weeklyUsageLimitUsd: null,
-      chaosModeEnabled: false,
       forcedModel: null,
     });
   });

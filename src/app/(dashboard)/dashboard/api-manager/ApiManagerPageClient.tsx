@@ -113,7 +113,6 @@ interface ApiKey {
   catalogScope?: string;
   disableNonPublicModels?: boolean;
   allowUsageCommand?: boolean;
-  chaosModeEnabled?: boolean;
   usageLimitEnabled?: boolean;
   dailyUsageLimitUsd?: number | null;
   weeklyUsageLimitUsd?: number | null;

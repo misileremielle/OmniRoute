@@ -43,7 +43,6 @@ function createPermissionOverrides(data: {
   usageLimitEnabled?: boolean;
   dailyUsageLimitUsd?: number | null;
   weeklyUsageLimitUsd?: number | null;
-  chaosModeEnabled?: boolean;
 }) {
   const overrides = {
     ...(data.noLog === true && { noLog: true }),
@@ -53,7 +52,6 @@ function createPermissionOverrides(data: {
     ...(data.weeklyUsageLimitUsd !== undefined && {
       weeklyUsageLimitUsd: data.weeklyUsageLimitUsd,
     }),
-    ...(data.chaosModeEnabled === true && { chaosModeEnabled: true }),
   };
   return Object.keys(overrides).length > 0 ? overrides : null;
 }
@@ -110,7 +108,6 @@ export async function POST(request) {
       usageLimitEnabled,
       dailyUsageLimitUsd,
       weeklyUsageLimitUsd,
-      chaosModeEnabled,
       expiresAt,
     } = validation.data;
 
@@ -157,7 +154,6 @@ export async function POST(request) {
         usageLimitEnabled: usageLimitEnabled === true,
         dailyUsageLimitUsd: dailyUsageLimitUsd ?? null,
         weeklyUsageLimitUsd: weeklyUsageLimitUsd ?? null,
-        chaosModeEnabled: chaosModeEnabled === true,
         expiresAt: expiresAt ?? null,
         streamDefaultMode: "legacy",
         compressionEnabled: true,

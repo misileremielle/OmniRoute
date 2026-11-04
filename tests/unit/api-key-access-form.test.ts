@@ -65,7 +65,6 @@ const keyUnrestricted: ApiKeyAccessData = {
   usageLimitEnabled: false,
   dailyUsageLimitUsd: null,
   weeklyUsageLimitUsd: null,
-  chaosModeEnabled: false,
 };
 
 const keyRestrictedModelsCombos: ApiKeyAccessData = {
@@ -142,7 +141,6 @@ const keyBehaviourToggles: ApiKeyAccessData = {
   catalogScope: "combos",
   disableNonPublicModels: true,
   allowUsageCommand: true,
-  chaosModeEnabled: true,
 };
 
 // ── Legacy modal initial state for each fixture (literal) ──────────────────
@@ -186,7 +184,6 @@ const unrestrictedState: ApiKeyAccessFormState = {
   usageLimitEnabled: false,
   dailyUsageLimitUsd: "",
   weeklyUsageLimitUsd: "",
-  chaosModeEnabled: false,
   forcedModel: "",
 };
 
@@ -277,7 +274,6 @@ test("initial state matches the legacy modal: behaviour toggles", () => {
     catalogScope: "combos",
     disableNonPublicModels: true,
     allowUsageCommand: true,
-    chaosModeEnabled: true,
   });
 });
 
@@ -382,7 +378,6 @@ test("PATCH body matches the legacy handler: unrestricted key", () => {
     usageLimitEnabled: false,
     dailyUsageLimitUsd: null,
     weeklyUsageLimitUsd: null,
-    chaosModeEnabled: false,
     forcedModel: null,
   });
 });
@@ -423,7 +418,6 @@ test("PATCH body matches the legacy handler: restricted models + combos", () => 
     usageLimitEnabled: false,
     dailyUsageLimitUsd: null,
     weeklyUsageLimitUsd: null,
-    chaosModeEnabled: false,
     forcedModel: null,
   });
 });
@@ -463,7 +457,6 @@ test("PATCH body matches the legacy handler: connections restricted", () => {
     usageLimitEnabled: false,
     dailyUsageLimitUsd: null,
     weeklyUsageLimitUsd: null,
-    chaosModeEnabled: false,
     forcedModel: null,
   });
 });
@@ -512,7 +505,6 @@ test("PATCH body matches the legacy handler: limits + schedule", () => {
     usageLimitEnabled: true,
     dailyUsageLimitUsd: 25.5,
     weeklyUsageLimitUsd: 150,
-    chaosModeEnabled: false,
     forcedModel: null,
   });
 });
@@ -552,7 +544,6 @@ test("PATCH body matches the legacy handler: behaviour toggles", () => {
     usageLimitEnabled: false,
     dailyUsageLimitUsd: null,
     weeklyUsageLimitUsd: null,
-    chaosModeEnabled: true,
     forcedModel: null,
   });
 });
@@ -613,7 +604,6 @@ test("PATCH body matches the legacy handler after edits (sanitize, clamp, filter
     usageLimitEnabled: true,
     dailyUsageLimitUsd: null,
     weeklyUsageLimitUsd: null,
-    chaosModeEnabled: false,
     forcedModel: null,
   });
 });

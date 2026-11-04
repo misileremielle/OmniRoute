@@ -129,7 +129,6 @@ export interface ApiKeyAccessData {
   usageLimitEnabled?: boolean | null;
   dailyUsageLimitUsd?: number | null;
   weeklyUsageLimitUsd?: number | null;
-  chaosModeEnabled?: boolean | null;
   createdAt?: string;
   lastUsedAt?: string | null;
   totalRequests?: number;
@@ -179,7 +178,6 @@ export interface ApiKeyAccessFormState {
   usageLimitEnabled: boolean;
   dailyUsageLimitUsd: string;
   weeklyUsageLimitUsd: string;
-  chaosModeEnabled: boolean;
 }
 
 export function sanitizeInput(input: string): string {
@@ -319,8 +317,7 @@ type UsageBehaviourField =
   | "allowUsageCommand"
   | "usageLimitEnabled"
   | "dailyUsageLimitUsd"
-  | "weeklyUsageLimitUsd"
-  | "chaosModeEnabled";
+  | "weeklyUsageLimitUsd";
 
 type BehaviourStateField = CatalogBehaviourField | UsageBehaviourField;
 
@@ -346,7 +343,6 @@ function initialUsageBehaviourState(
     usageLimitEnabled: apiKey?.usageLimitEnabled === true,
     dailyUsageLimitUsd: positiveUsdLimitText(apiKey?.dailyUsageLimitUsd),
     weeklyUsageLimitUsd: positiveUsdLimitText(apiKey?.weeklyUsageLimitUsd),
-    chaosModeEnabled: apiKey?.chaosModeEnabled === true,
   };
 }
 
@@ -524,7 +520,6 @@ export function buildApiKeyAccessPayload(
     usageLimitEnabled: formState.usageLimitEnabled,
     dailyUsageLimitUsd: parseUsdLimitInput(formState.dailyUsageLimitUsd),
     weeklyUsageLimitUsd: parseUsdLimitInput(formState.weeklyUsageLimitUsd),
-    chaosModeEnabled: formState.chaosModeEnabled,
     forcedModel: formState.forcedModel.trim() || null,
   };
 }
@@ -1093,13 +1088,6 @@ function useBehaviourSetters(setFormState: FormStateSetter) {
     [setFormState]
   );
 
-  const setChaosModeEnabled = useCallback(
-    (chaosModeEnabled: boolean) => {
-      setFormState((prev) => ({ ...prev, chaosModeEnabled }));
-    },
-    [setFormState]
-  );
-
   const setAllowUsageCommand = useCallback(
     (allowUsageCommand: boolean) => {
       setFormState((prev) => ({ ...prev, allowUsageCommand }));
@@ -1119,7 +1107,6 @@ function useBehaviourSetters(setFormState: FormStateSetter) {
     setAutoResolve,
     setStreamDefaultMode,
     setCompressionEnabled,
-    setChaosModeEnabled,
     setAllowUsageCommand,
     setBypassProviderQuotaPolicyEnabled,
   };

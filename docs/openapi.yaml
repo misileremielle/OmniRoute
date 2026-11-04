@@ -113,8 +113,6 @@ tags:
     description: Batches endpoints (generated route coverage)
   - name: Cache
     description: Cache endpoints (generated route coverage)
-  - name: Chaos
-    description: Chaos endpoints (generated route coverage)
   - name: Codex
     description: Codex endpoints (generated route coverage)
   - name: Conductor
@@ -10019,36 +10017,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/chaos/config:
-    delete:
-      tags:
-        - Chaos
-      summary: "DELETE chaos › config"
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - Chaos
-      summary: "GET chaos › config"
-      responses:
-        "200":
-          description: OK
-    put:
-      tags:
-        - Chaos
-      summary: "PUT chaos › config"
-      responses:
-        "200":
-          description: OK
-  /api/chaos/run:
-    post:
-      tags:
-        - Chaos
-      summary: "POST chaos › run"
-      responses:
-        "200":
-          description: OK
   /api/cli-tools/all-statuses:
     get:
       tags:
@@ -13324,15 +13292,6 @@ paths:
       tags:
         - Skills
       summary: "PUT skills › <id>"
-      responses:
-        "200":
-          description: OK
-  /api/skills/collect/chaos:
-    post:
-      tags:
-        - Skills
-      summary: "POST skills › collect › chaos"
-      x-loopback-only: true
       responses:
         "200":
           description: OK

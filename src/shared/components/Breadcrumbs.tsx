@@ -76,7 +76,6 @@ const PATH_LABELS = {
   media: "media",
   cache: "cache",
   changelog: "changelog",
-  chaos: "chaos",
   "cloud-agents": "cloudAgents",
   live: "live",
   studio: "studio",

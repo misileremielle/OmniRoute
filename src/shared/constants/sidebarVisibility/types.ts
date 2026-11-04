@@ -79,7 +79,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "memory",
   "skills",
   "agent-skills",
-  "chaos-config",
   "mcp",
   "a2a",
   "plugins",

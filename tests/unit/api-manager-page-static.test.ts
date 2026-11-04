@@ -150,7 +150,6 @@ test("access editor switches never submit the form (kit Switch via the Toggle ad
   // The extracted toggle components keep the same invariant.
   for (const rel of [
     "src/app/(dashboard)/dashboard/api-manager/components/BypassProviderQuotaToggle.tsx",
-    "src/app/(dashboard)/dashboard/api-manager/components/ChaosModeAccessToggle.tsx",
     "src/app/(dashboard)/dashboard/api-manager/components/ApiKeyCompressionToggle.tsx",
   ]) {
     const componentSource = fs.readFileSync(path.join(repoRoot, rel), "utf8");

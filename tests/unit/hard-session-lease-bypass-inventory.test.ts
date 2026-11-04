@@ -233,7 +233,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/app/api/v1beta/models/route.ts": 1,
     "src/instrumentation-node.ts": 1,
     "src/lib/a2a/skills/providerDiscovery.ts": 1,
-    "src/lib/chaos/chaosExecutor.ts": 1,
     // #17999: CLIProxyAPI management compat (/v0/management/api-call) re-resolves the
     // connection named by auth_index and sends the allowlisted usage request with its
     // stored OAuth token, so it is a direct dispatch site (class B) and carries the

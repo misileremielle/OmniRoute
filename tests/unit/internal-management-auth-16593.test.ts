@@ -77,38 +77,6 @@ test("recorded triage authenticates its internal chat call without importing mem
   assert.equal(noMemory, "true");
 });
 
-test("dashboard chaos dispatch passes required authentication without a selected key", async () => {
-  const providers = await import("../../src/lib/db/providers.ts");
-  const chaos = await import("../../src/lib/chaos/chaosExecutor.ts");
-  await providers.createProviderConnection({
-    provider: "openai",
-    authType: "apikey",
-    name: "Internal auth regression",
-    apiKey: "upstream-fixture-only",
-    defaultModel: "gpt-4o-mini",
-  });
-  let noMemory: string | null = null;
-  const dispatch = mock.method(
-    chaos.chatDispatch,
-    "postChatCompletion",
-    async (request: Request) => {
-      noMemory = request.headers.get("x-omniroute-no-memory");
-      return (
-        (await enforceClientApiRouteAuth(request)) ??
-        Response.json({ choices: [{ message: { content: "ok" } }] })
-      );
-    }
-  );
-  try {
-    const result = await chaos.executeChaosRun({ task: "test internal auth" });
-    assert.equal(result.models.length, 1);
-    assert.equal(result.models[0].status, "success");
-    assert.equal(noMemory, "true");
-  } finally {
-    dispatch.mock.restore();
-  }
-});
-
 test("generated internal identity remains restricted to chat and audio", async () => {
   const { getApiKeyMetadata } = await import("../../src/lib/db/apiKeys.ts");
   const request = buildEvalCaseRequest({ input: {} }, { type: "suite-default" }, null);

@@ -1705,6 +1705,22 @@
     "tests/unit/ui/providerPageHeaderPartnerLink.test.tsx": {
       "sourceRemoved": ["src/lib/radar/index.ts", "src/lib/db/radar.ts"],
       "reason": "Radar removed (refactor: remove Radar and the free-tier rankings page): src/lib/radar, src/lib/db/radar.ts, /api/radar/**, the dashboard radar pages, the scheduler, the MCP catalog tool and the CLI command no longer exist; the free-provider-rankings dashboard page is gone too (its API stays for the combo score sort). There is no code left to test."
+    },
+    "tests/unit/chaos-api-routes.test.ts": {
+      "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
+      "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
+    },
+    "tests/unit/chaos-config.test.ts": {
+      "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
+      "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
+    },
+    "tests/unit/chaos-executor.test.ts": {
+      "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
+      "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
+    },
+    "tests/unit/chaos-malformed-json-400.test.ts": {
+      "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
+      "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -1787,5 +1803,7 @@
   "tests/unit/db/migration-163.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts read the row back through src/lib/db/radar.ts, which no longer exists. The migration itself is kept and its schema assert stays.",
   "tests/unit/news-feed-contract.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned the radar-launch news item, which no longer exists. The feed-schema and banner asserts stay.",
   "tests/unit/settings-cas-7784.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned radarAdminUrl exposure on GET /api/settings; that source no longer exists. The settings CAS asserts are unchanged.",
-  "tests/unit/sidebar-costs-section.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned the radar item, its RADAR_ENABLED gate and isSidebarItemVisibleForFlags(); that source no longer exists."
+  "tests/unit/sidebar-costs-section.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned the radar item, its RADAR_ENABLED gate and isSidebarItemVisibleForFlags(); that source no longer exists.",
+  "tests/unit/internal-management-auth-16593.test.ts": "Chaos Mode removal (refactor: remove Chaos Mode): the removed asserts pinned dashboard Chaos Mode dispatch auth; that source no longer exists. auto/chaos and config.chaos stay and keep their own tests.",
+  "tests/unit/open-mode-management-credential-mint.test.ts": "Chaos Mode removal (refactor: remove Chaos Mode): the removed asserts pinned the chaosModeEnabled key field; that source no longer exists. auto/chaos and config.chaos stay and keep their own tests."
 }

@@ -242,7 +242,6 @@ test("creating a key still applies its create-time permission flags", async () =
       usageLimitEnabled: true,
       dailyUsageLimitUsd: 5,
       weeklyUsageLimitUsd: 20,
-      chaosModeEnabled: true,
     })
   );
   assert.equal(response.status, 201);
@@ -252,11 +251,9 @@ test("creating a key still applies its create-time permission flags", async () =
   assert.equal(Boolean(stored?.usageLimitEnabled), true);
   assert.equal(Number(stored?.dailyUsageLimitUsd), 5);
   assert.equal(Number(stored?.weeklyUsageLimitUsd), 20);
-  assert.equal(Boolean(stored?.chaosModeEnabled), true);
 
   const plain = await keysRoute.POST(anonymous(KEYS_URL, "POST", { name: "plain" }));
   const defaults = await apiKeysDb.getApiKeyById(((await plain.json()) as { id: string }).id);
   assert.equal(Boolean(defaults?.noLog), false);
   assert.equal(Boolean(defaults?.usageLimitEnabled), false);
-  assert.equal(Boolean(defaults?.chaosModeEnabled), false);
 });
