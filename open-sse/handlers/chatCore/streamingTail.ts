@@ -1,4 +1,4 @@
-import { inheritEmptyTurnPolicy } from "../../utils/emptyTurnPolicy.ts";
+import { hasTrustedEmptyTurn, inheritEmptyTurnPolicy } from "../../utils/emptyTurnPolicy.ts";
 import { getCodexClientSessionId } from "../../config/codexIdentity.ts";
 import { modelAfterFamilyFallback } from "../../services/modelFamilyFallbackPolicy.ts";
 import {
@@ -704,6 +704,13 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
   // DSML tool-call markers as plain text → incomplete `stop` finish).
   const requestedThinking = hasActiveClaudeThinking((body ?? {}) as Record<string, unknown>);
 
+  // Same trusted-native verdict streamHandler applies to OpenAI clients after
+  // translation; the Claude-client translator needs it per event, before it would
+  // abort a clean empty end_turn (Codex encrypted-reasoning-only turn) with a 502.
+  // Reads the latest providerResponse binding (it is re-wrapped above, with the
+  // policy inherited).
+  const permitsTrustedEmptyTurn = () => hasTrustedEmptyTurn(providerResponse);
+
   streamTimingOriginOffsetMs = Date.now() - startTime;
   if (needsResponsesTranslation) {
     // Provider returns openai-responses, translate to openai (Chat Completions) that clients expect
@@ -730,7 +737,8 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
       requestToolIdentityMap,
       null,
       undefined,
-      pendingRequestOwner ?? pendingRequestId
+      pendingRequestOwner ?? pendingRequestId,
+      permitsTrustedEmptyTurn
     );
   } else if (needsTranslation(targetFormat, clientResponseFormat)) {
     // Standard translation for other providers
@@ -766,7 +774,8 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
       // tool-name casing back from any provider (OpenCode `read`, Claude Code `Read`).
       (body as Record<string, unknown> | null | undefined)?.tools ?? null,
       undefined,
-      pendingRequestOwner ?? pendingRequestId
+      pendingRequestOwner ?? pendingRequestId,
+      permitsTrustedEmptyTurn
     );
   } else {
     log?.debug?.("STREAM", `Standard passthrough mode`);

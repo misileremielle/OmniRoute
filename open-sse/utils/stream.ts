@@ -236,6 +236,14 @@ type StreamOptions = {
    */
   requestToolIdentityMap?: Map<string, { namespace: string; name: string }> | null;
   pendingRequestId?: StreamPendingRequestIdentity | null;
+  /**
+   * Trusted native empty-turn verdict for the executed upstream
+   * (emptyTurnPolicy.hasTrustedEmptyTurn). When it holds, a translated Claude
+   * stream forwards a clean empty `end_turn` / `stop_sequence` (e.g. a Codex turn
+   * that produced only encrypted reasoning) instead of aborting with a 502 —
+   * the same verdict the OpenAI-client path already honours in streamHandler.
+   */
+  permitsEmptyTurn?: (() => boolean) | null;
 };
 
 type TranslateState = ReturnType<typeof initState> & {
@@ -584,6 +592,19 @@ function shouldInjectClaudeEmptyResponseBeforeCurrentEvent(
   return type === "message_delta" || type === "message_stop";
 }
 
+const CLEAN_EMPTY_CLAUDE_STOP_REASONS = new Set(["end_turn", "stop_sequence"]);
+
+function isCleanEmptyClaudeStop(
+  lifecycle: ClaudeEmptyResponseLifecycle,
+  payload: unknown
+): boolean {
+  const delta = (payload as JsonRecord | null)?.delta;
+  const stopReason =
+    (delta && typeof delta === "object" ? (delta as JsonRecord).stop_reason : null) ??
+    lifecycle.stopReason;
+  return typeof stopReason === "string" && CLEAN_EMPTY_CLAUDE_STOP_REASONS.has(stopReason);
+}
+
 function shouldInjectClaudeMissingFinalizersOnFlush(
   lifecycle: ClaudeEmptyResponseLifecycle
 ): boolean {
@@ -784,6 +805,7 @@ export function createSSEStream(options: StreamOptions = {}) {
     requestToolIdentityMap = null,
     streamBufferBytes = DEFAULT_STREAM_BUFFER_BYTES,
     pendingRequestId = null,
+    permitsEmptyTurn = null,
   } = options;
   // Request-body-size metric (for monitoring payload size distribution & correlation with TTFT).
   // The size is JSON-serialised byte count; stored as a performance mark detail so monitoring
@@ -1184,10 +1206,16 @@ export function createSSEStream(options: StreamOptions = {}) {
     });
   };
 
+  // The per-event check can fire on message_delta and again on the same batch's
+  // message_stop; a second abort would forward onto the already-errored controller
+  // ("Unable to enqueue") and reject the upstream writer.
+  let claudeEmptyAbortEmitted = false;
   const emitClaudeEmptyStreamErrorAndAbort = (
     controller: TransformStreamDefaultController,
     decrementPendingRequest = true
   ) => {
+    if (claudeEmptyAbortEmitted) return;
+    claudeEmptyAbortEmitted = true;
     clearIdleTimer();
     const msg = "Claude returned an empty response (no content block)";
     console.warn(
@@ -1264,7 +1292,14 @@ export function createSSEStream(options: StreamOptions = {}) {
 
     if (
       sourceFormat === FORMATS.CLAUDE &&
-      shouldInjectClaudeEmptyResponseBeforeCurrentEvent(claudeEmptyResponseLifecycle, itemSanitized)
+      shouldInjectClaudeEmptyResponseBeforeCurrentEvent(
+        claudeEmptyResponseLifecycle,
+        itemSanitized
+      ) &&
+      !(
+        isCleanEmptyClaudeStop(claudeEmptyResponseLifecycle, itemSanitized) &&
+        permitsEmptyTurn?.() === true
+      )
     ) {
       emitClaudeEmptyStreamErrorAndAbort(controller);
       return;
@@ -3452,7 +3487,8 @@ export function createSSETransformStreamWithLogger(
   requestToolIdentityMap: Map<string, { namespace: string; name: string }> | null = null,
   clientTools: unknown = null,
   streamBufferBytes: number = DEFAULT_STREAM_BUFFER_BYTES,
-  pendingRequestId: StreamPendingRequestIdentity | null = null
+  pendingRequestId: StreamPendingRequestIdentity | null = null,
+  permitsEmptyTurn: (() => boolean) | null = null
 ) {
   return createSSEStream({
     mode: STREAM_MODE.TRANSLATE,
@@ -3475,6 +3511,7 @@ export function createSSETransformStreamWithLogger(
     streamBufferBytes,
     clientTools,
     pendingRequestId,
+    permitsEmptyTurn,
   });
 }
 
