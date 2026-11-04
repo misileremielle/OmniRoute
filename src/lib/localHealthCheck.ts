@@ -119,6 +119,15 @@ function getNextInterval(failures: number): number {
  * result here: a temporarily unhealthy but still-active local provider must
  * continue to be probed so recovery remains observable.
  */
+/** True when any provider node points at a loopback base URL. */
+export function hasLocalhostProviderNode(rawNodes: unknown[]): boolean {
+  return rawNodes.some((value) => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    const baseUrl = (value as Record<string, unknown>).baseUrl;
+    return typeof baseUrl === "string" && isLocalhostUrl(baseUrl);
+  });
+}
+
 export function selectRoutableLocalNodes(
   rawNodes: unknown[],
   rawConnections: unknown[],
@@ -235,17 +244,26 @@ export async function sweep(): Promise<void> {
   try {
     let nodes: LocalProviderNode[];
     try {
-      const [rawNodes, rawConnections, customModels, syncedModels] = await Promise.all([
-        getCachedProviderNodes(),
-        getCachedRawProviderConnections({ isActive: true }),
-        getAllCustomModels(),
-        getAllSyncedAvailableModels(),
-      ]);
-      nodes = selectRoutableLocalNodes(
-        Array.isArray(rawNodes) ? rawNodes : [],
-        Array.isArray(rawConnections) ? rawConnections : [],
-        collectModelBackedProviderIds(customModels, syncedModels)
-      );
+      const rawNodes = await getCachedProviderNodes();
+      const nodeList = Array.isArray(rawNodes) ? rawNodes : [];
+      // Most installs have no localhost provider node. Bail out before loading
+      // the model catalogs: getAllSyncedAvailableModels() parses and normalizes
+      // every connection's synced catalog, and this sweep repeats every 30s for
+      // the life of the process once the health endpoint has been hit.
+      if (!hasLocalhostProviderNode(nodeList)) {
+        nodes = [];
+      } else {
+        const [rawConnections, customModels, syncedModels] = await Promise.all([
+          getCachedRawProviderConnections({ isActive: true }),
+          getAllCustomModels(),
+          getAllSyncedAvailableModels(),
+        ]);
+        nodes = selectRoutableLocalNodes(
+          nodeList,
+          Array.isArray(rawConnections) ? rawConnections : [],
+          collectModelBackedProviderIds(customModels, syncedModels)
+        );
+      }
     } catch (err) {
       console.error(LOG_PREFIX, "Failed to load local provider routing state:", err);
       return;

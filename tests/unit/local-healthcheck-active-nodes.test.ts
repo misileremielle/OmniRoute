@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   collectModelBackedProviderIds,
+  hasLocalhostProviderNode,
   selectRoutableLocalNodes,
 } from "../../src/lib/localHealthCheck.ts";
 
@@ -108,4 +109,15 @@ test("remote and malformed nodes remain outside the local health-check set", () 
   );
 
   assert.deepEqual(selected, []);
+});
+
+// The 30s sweep used to parse every connection's synced model catalog before
+// discovering there was nothing local to probe. It now short-circuits on this check.
+test("hasLocalhostProviderNode gates the catalog load to installs with loopback nodes", () => {
+  assert.equal(hasLocalhostProviderNode([]), false);
+  assert.equal(
+    hasLocalhostProviderNode([{ ...ACTIVE_NODE, baseUrl: "https://remote.example/v1" }, null]),
+    false
+  );
+  assert.equal(hasLocalhostProviderNode([STALE_NODE]), true);
 });
