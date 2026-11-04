@@ -1,7 +1,7 @@
 // Re-export from open-sse with localDb integration
 import { getModelAliases, getCustomModels } from "@/lib/db/models";
 import { getComboById, getComboByNameInsensitive } from "@/lib/db/combos";
-import { getCachedComboByName } from "@/lib/db/readCache";
+import { getCachedComboByName, getCachedComboForModel } from "@/lib/db/readCache";
 import { getCachedProviderNodes, getCachedSettings } from "@/lib/db/readCache";
 
 import { getSyncedAutoAliases } from "@/lib/providerModels/syncedAutoAliases.ts";
@@ -802,8 +802,10 @@ export async function getComboForModel(modelStr) {
 
   // 2. NEW — check model-combo mappings table (pattern match)
   try {
-    const { resolveComboForModel } = await import("@/lib/db/modelComboMappings");
-    const mapped = await resolveComboForModel(baseModelStr || modelStr);
+    // Version-keyed cache (busted by combo/mapping writes): the raw lookup runs a
+    // JOIN, compiles a glob RegExp per mapping row and parses the combo JSON, and
+    // this path runs for every non-combo model on every request.
+    const mapped = await getCachedComboForModel(baseModelStr || modelStr);
     if (mapped && (mapped as any).models?.length > 0) {
       return mapped;
     }
