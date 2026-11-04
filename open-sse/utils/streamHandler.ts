@@ -180,6 +180,17 @@ function isDeadlineAbortReason(reason: unknown): reason is Error {
   );
 }
 
+const OPENAI_DONE_FRAME = /(?:^|\r?\n)data:\s*\[DONE\]/;
+
+/** Byte offset where the `data: [DONE]` frame starts in `chunk`, or -1. */
+function indexOfOpenAiDoneFrame(chunk: Uint8Array): number {
+  // latin1 keeps a 1:1 byte↔char mapping, so the match index is a byte offset.
+  const text = Buffer.from(chunk.buffer, chunk.byteOffset, chunk.byteLength).toString("latin1");
+  const match = OPENAI_DONE_FRAME.exec(text);
+  if (!match) return -1;
+  return match.index + (match[0].length - match[0].trimStart().length);
+}
+
 function hasClientTerminalSseMarker(text: string, clientResponseFormat?: string | null): boolean {
   if (/(?:^|\r?\n)data:\s*\[DONE\]\s*(?:\r?\n|$)/.test(text)) {
     return true;
@@ -709,6 +720,61 @@ export function createDisconnectAwareStream(
 
   const highWaterMark = options.highWaterMark ?? 16384;
 
+  const emitSilentCloseError = (
+    controller: ReadableStreamDefaultController,
+    silentClose: { kind: "error"; reason: string }
+  ) => {
+    console.warn(
+      `[STREAM] detector=post-translation reason=${
+        silentClose.reason === "Provider returned empty content"
+          ? "empty-content"
+          : "missing-terminal"
+      } native=${JSON.stringify(
+        options.emptyTurnDiagnostics?.() ?? { nativeExecutionObserved: false }
+      )}`
+    );
+    streamController.handleError(Object.assign(new Error(silentClose.reason), { statusCode: 502 }));
+    try {
+      for (const chunk of buildStreamErrorChunks(
+        silentClose.reason,
+        502,
+        streamController.clientResponseFormat
+      )) {
+        controller.enqueue(chunk);
+      }
+    } catch {
+      // downstream may have closed; original error already recorded
+    }
+  };
+
+  // OpenAI chat clients stop reading at `data: [DONE]`. The empty-content verdict
+  // used to run only when the upstream closed — after the translator had already
+  // forwarded `finish_reason: "stop"` + `[DONE]` — so the error frame landed after
+  // the client stopped listening and an empty turn looked like a silent success.
+  // `[DONE]` is the last frame and every earlier frame is already inspected, so
+  // decide there instead: forward what precedes it, then the error (which carries
+  // its own `[DONE]`), and discard the remainder of the upstream.
+  const maybeEmitEmptyVerdictAtDone = (
+    controller: ReadableStreamDefaultController,
+    value: Uint8Array
+  ): boolean => {
+    if (streamController.clientResponseFormat !== FORMATS.OPENAI) return false;
+    if (!clientTerminalSeen || contentWatcher.sawContent()) return false;
+    const doneAt = indexOfOpenAiDoneFrame(value);
+    if (doneAt < 0) return false;
+    const silentClose = resolveSilentCloseOutcome({
+      bytesWereForwarded,
+      clientTerminalSeen,
+      clientResponseFormat: streamController.clientResponseFormat,
+      contentWatcher,
+      permitsEmptyTurn: options.permitsEmptyTurn,
+    });
+    if (silentClose?.kind !== "error") return false;
+    if (doneAt > 0) controller.enqueue(value.subarray(0, doneAt));
+    emitSilentCloseError(controller, silentClose);
+    return true;
+  };
+
   return new ReadableStream(
     {
       async pull(controller) {
@@ -757,29 +823,7 @@ export function createDisconnectAwareStream(
                 // downstream may have closed; stream already marked complete
               }
             } else if (silentClose) {
-              console.warn(
-                `[STREAM] detector=post-translation reason=${
-                  silentClose.reason === "Provider returned empty content"
-                    ? "empty-content"
-                    : "missing-terminal"
-                } native=${JSON.stringify(
-                  options.emptyTurnDiagnostics?.() ?? { nativeExecutionObserved: false }
-                )}`
-              );
-              streamController.handleError(
-                Object.assign(new Error(silentClose.reason), { statusCode: 502 })
-              );
-              try {
-                for (const chunk of buildStreamErrorChunks(
-                  silentClose.reason,
-                  502,
-                  streamController.clientResponseFormat
-                )) {
-                  controller.enqueue(chunk);
-                }
-              } catch {
-                // downstream may have closed; original error already recorded
-              }
+              emitSilentCloseError(controller, silentClose);
             } else {
               streamController.handleComplete();
             }
@@ -790,8 +834,22 @@ export function createDisconnectAwareStream(
             }
             return;
           }
-          controller.enqueue(value);
           noteClientChunk(value);
+          if (value instanceof Uint8Array && maybeEmitEmptyVerdictAtDone(controller, value)) {
+            // The client already has the error + [DONE]. Drain (not cancel) the rest
+            // so the translator still flushes and records usage, then close.
+            for (;;) {
+              const rest = await reader.read();
+              if (rest.done) break;
+            }
+            try {
+              controller.close();
+            } catch {
+              // Expected: downstream may have already closed
+            }
+            return;
+          }
+          controller.enqueue(value);
         } catch (error) {
           if (!streamController.isConnected()) {
             // A pending pull can lose enqueue to cancellation after the drain takes ownership.
