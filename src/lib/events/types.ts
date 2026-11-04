@@ -19,8 +19,7 @@ export type DashboardEventName =
   | "proxy.set_aside"
   | "proxy.pool.exhausted"
   | "compression.completed"
-  | "compression.step"
-  | "agent.task.updated";
+  | "compression.step";
 
 // ── Event Payloads ────────────────────────────────────────────────────────
 
@@ -163,18 +162,6 @@ export interface CompressionStepPayload {
   timestamp: number;
 }
 
-/**
- * Real-time transition of an orchestrated task tracked by the orchestration dashboard
- * (Fase 2). `source` distinguishes which subsystem raised the transition so the canvas can
- * route it to the right node type.
- */
-export interface AgentTaskUpdatedPayload {
-  source: "cloud-agent" | "a2a" | "conductor";
-  taskId: string;
-  state: string;
-  timestamp: number;
-}
-
 // ── Event Map ─────────────────────────────────────────────────────────────
 
 export interface DashboardEventMap {
@@ -190,7 +177,6 @@ export interface DashboardEventMap {
   "proxy.pool.exhausted": ProxyPoolExhaustedPayload;
   "compression.completed": CompressionCompletedPayload;
   "compression.step": CompressionStepPayload;
-  "agent.task.updated": AgentTaskUpdatedPayload;
 }
 
 // ── Event Bus Listener ────────────────────────────────────────────────────
@@ -202,8 +188,7 @@ export type DashboardEventListener<E extends DashboardEventName> = (
 // ── Channel Definitions ───────────────────────────────────────────────────
 
 /** Available subscription channels */
-export type DashboardChannel =
-  "requests" | "combo" | "credentials" | "proxy" | "compression" | "agents";
+export type DashboardChannel = "requests" | "combo" | "credentials" | "proxy" | "compression";
 
 /** Map channels to their events */
 export const CHANNEL_EVENTS: Record<DashboardChannel, DashboardEventName[]> = {
@@ -212,7 +197,6 @@ export const CHANNEL_EVENTS: Record<DashboardChannel, DashboardEventName[]> = {
   credentials: ["credential.health.changed"],
   proxy: ["proxy.set_aside", "proxy.pool.exhausted"],
   compression: ["compression.completed", "compression.step"],
-  agents: ["agent.task.updated"],
 };
 
 /** Get channel for an event */

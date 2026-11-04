@@ -87,8 +87,6 @@ const HEADER_DESCRIPTIONS: Partial<
   media: "mediaDescription",
   "cli-code": "cliToolsDescription",
   "cli-agents": "agentsDescription",
-  "acp-agents": "agentsDescription",
-  "cloud-agents": "cloudAgentsDescription",
   memory: "memoryDescription",
   skills: "skillsDescription",
   "agent-skills": "agentSkillsDescription",
@@ -107,7 +105,6 @@ const HEADER_DESCRIPTIONS: Partial<
   changelog: "changelogDescription",
   // Protocols
   mcp: "mcpDescription",
-  a2a: "a2aDescription",
   "api-endpoints": "apiEndpointsDescription",
   // Agents & AI sub-pages
   "batch-files": "batchFilesDescription",

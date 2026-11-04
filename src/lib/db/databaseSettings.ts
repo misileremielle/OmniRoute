@@ -67,7 +67,6 @@ const LEGACY_FLAT_KEYS: {
     compressionAnalytics: ["compressionAnalytics"],
     mcpAudit: ["mcpAudit"],
     configAudit: ["configAudit"],
-    a2aEvents: ["a2aEvents"],
     callLogs: ["callLogs"],
     conversationTurnNodes: ["conversationTurnNodes"],
     usageHistory: ["usageHistory"],

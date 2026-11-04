@@ -914,7 +914,6 @@ export default function SystemStorageTab() {
       ["quotaSnapshots", t("retentionQuotaSnapshots"), 7],
       ["compressionAnalytics", t("retentionCompressionAnalytics"), 30],
       ["mcpAudit", t("retentionMcpAudit"), 30],
-      ["a2aEvents", t("retentionA2aEvents"), 30],
       ["callLogs", t("retentionCallLogs"), 30],
       ["conversationTurnNodes", t("retentionConversationTurnNodes"), 30],
       ["usageHistory", t("retentionUsageHistory"), 30],

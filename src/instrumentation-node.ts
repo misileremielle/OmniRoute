@@ -375,20 +375,6 @@ export const OPTIONAL_BOOT_SUBSYSTEMS: ReadonlyArray<OptionalBootSubsystem> = [
           console.warn("[STARTUP] Embed WS proxy failed to start (non-fatal):", msg);
         }),
   },
-  // Conductor bridge (PRD Conductor RF1): mirrors OmniConductor hub tasks into the
-  // A2A TaskManager via the hub SSE. Opt-in — self-gated on CONDUCTOR_HUB_URL.
-  {
-    name: "conductor-bridge",
-    start: () =>
-      import("@/lib/conductor/boot")
-        .then((m) => {
-          if (m.initConductorBridge()) console.log("[STARTUP] Conductor bridge started");
-        })
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn("[STARTUP] Conductor bridge failed to start (non-fatal):", msg);
-        }),
-  },
   // Arena ELO sync: model intelligence from the Arena AI leaderboard, powering the
   // Free Provider Rankings page. On by default; non-blocking, never fatal.
   {

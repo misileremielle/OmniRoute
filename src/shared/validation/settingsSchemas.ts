@@ -435,7 +435,6 @@ export const updateSettingsSchema = z.object({
   // Protocol toggles (default: disabled)
   mcpEnabled: z.boolean().optional(),
   mcpTransport: z.enum(["stdio", "sse", "streamable-http"]).optional(),
-  a2aEnabled: z.boolean().optional(),
   wsAuth: z.boolean().optional(),
   // CLI Fingerprint compatibility (per-provider)
   cliCompatProviders: z.array(z.string().max(100)).optional(),
@@ -483,20 +482,6 @@ export const updateSettingsSchema = z.object({
   // Usage token buffer — safety margin added to reported prompt/input token counts.
   // Prevents CLI tools from overrunning context windows. Set to 0 to disable.
   usageTokenBuffer: z.number().int().min(0).max(50000).optional(),
-  // Custom CLI agent definitions for ACP
-  customAgents: z
-    .array(
-      z.object({
-        id: z.string().max(50),
-        name: z.string().max(100),
-        binary: z.string().max(200),
-        versionCommand: z.string().max(300),
-        providerAlias: z.string().max(50),
-        spawnArgs: z.array(z.string().max(200)),
-        protocol: z.enum(["stdio", "http"]),
-      })
-    )
-    .optional(),
   // SkillsMP marketplace API key
   skillsmpApiKey: z.string().max(200).optional(),
   // Active skills provider (single source of truth for skills page)
@@ -669,7 +654,6 @@ export const databaseSettingsSchema = z
       compressionAnalytics: z.number().int().min(1).max(365),
       mcpAudit: z.number().int().min(1).max(365),
       configAudit: z.number().int().min(1).max(365).optional(),
-      a2aEvents: z.number().int().min(1).max(365),
       callLogs: z.number().int().min(1).max(3650),
       conversationTurnNodes: z.number().int().min(1).max(3650).optional(),
       usageHistory: z.number().int().min(1).max(3650),

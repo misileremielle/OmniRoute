@@ -61,7 +61,6 @@ export interface DatabaseSettings {
     compressionAnalytics: number;
     mcpAudit: number;
     configAudit: number;
-    a2aEvents: number;
     callLogs: number;
     conversationTurnNodes: number;
     usageHistory: number;
@@ -153,7 +152,6 @@ export const DEFAULT_DATABASE_SETTINGS: Omit<DatabaseSettings, "location" | "sta
     compressionAnalytics: 30,
     mcpAudit: 30,
     configAudit: 30,
-    a2aEvents: 30,
     callLogs: 30,
     // Default matches callLogs (30) so merging this knob changes no behavior for
     // existing installs — operators can lower it independently if they want a

@@ -271,36 +271,6 @@ export async function cleanupConfigAudit(
 }
 
 /**
- * Clean up old a2a_task_events based on retention settings.
- */
-export async function cleanupA2aEvents(): Promise<CleanupResult> {
-  const db = getDbInstance();
-  const retention = getRetentionSettings();
-
-  const retentionDays = retention.a2aEvents;
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
-  const cutoffISO = cutoffDate.toISOString();
-
-  const result: CleanupResult = { deleted: 0, errors: 0 };
-
-  try {
-    const stmt = db.prepare("DELETE FROM a2a_task_events WHERE created_at < ?");
-    const runResult = stmt.run(cutoffISO);
-    result.deleted = runResult.changes;
-
-    console.log(
-      `[Cleanup] Deleted ${result.deleted} a2a_task_events older than ${retentionDays} days`
-    );
-  } catch (err: unknown) {
-    console.error("[Cleanup] Error cleaning a2a_task_events:", err);
-    result.errors++;
-  }
-
-  return result;
-}
-
-/**
  * Clean up old memory_entries based on retention settings.
  */
 export async function cleanupMemoryEntries(): Promise<CleanupResult> {
@@ -695,7 +665,6 @@ export async function runAutoCleanup(): Promise<{
     compressionEngineBreakdown: await cleanupCompressionEngineBreakdown(),
     mcpAudit: await cleanupMcpAudit(),
     configAudit: await cleanupConfigAudit(),
-    a2aEvents: await cleanupA2aEvents(),
     memoryEntries: await cleanupMemoryEntries(),
     domainCostHistory: await cleanupDomainCostHistory(),
     compressionCacheStats: await cleanupCompressionCacheStats(),

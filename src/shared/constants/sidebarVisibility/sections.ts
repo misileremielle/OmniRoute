@@ -239,36 +239,6 @@ const TOOLS_GROUP: SidebarItemGroup = {
       icon: "smart_toy",
     },
     {
-      id: "acp-agents",
-      href: "/dashboard/acp-agents",
-      i18nKey: "acpAgents",
-      subtitleKey: "acpAgentsSubtitle",
-      icon: "device_hub",
-    },
-    {
-      id: "cloud-agents",
-      href: "/dashboard/cloud-agents",
-      i18nKey: "cloudAgents",
-      subtitleKey: "cloudAgentsSubtitle",
-      icon: "cloud",
-    },
-    {
-      id: "conductor",
-      href: "/dashboard/conductor",
-      i18nKey: "conductor",
-      subtitleKey: "conductorSubtitle",
-      icon: "account_tree",
-      labelFallback: "Conductor",
-      subtitleFallback: "CLI-agent fleet",
-    },
-    {
-      id: "orchestration",
-      href: "/dashboard/orchestration",
-      i18nKey: "orchestration",
-      subtitleKey: "orchestrationSubtitle",
-      icon: "account_tree",
-    },
-    {
       id: "discovery",
       href: "/dashboard/discovery",
       i18nKey: "discovery",
@@ -541,13 +511,6 @@ const AUDIT_GROUP: SidebarItemGroup = {
       subtitleKey: "auditMcpSubtitle",
       icon: "security",
     },
-    {
-      id: "audit-a2a",
-      href: "/dashboard/audit/a2a",
-      i18nKey: "auditA2a",
-      subtitleKey: "auditA2aSubtitle",
-      icon: "device_hub",
-    },
   ],
 };
 
@@ -615,13 +578,6 @@ const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
     icon: "auto_fix_high",
   },
   MCP_ITEM,
-  {
-    id: "a2a",
-    href: "/dashboard/a2a",
-    i18nKey: "a2a",
-    subtitleKey: "a2aSubtitle",
-    icon: "device_hub",
-  },
   {
     id: "plugins",
     href: "/dashboard/plugins",

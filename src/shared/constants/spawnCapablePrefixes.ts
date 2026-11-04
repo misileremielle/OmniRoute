@@ -60,7 +60,6 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   // either listed here or reviewed as bypass-eligible — drift guard:
   // tests/unit/authz/local-only-bypass-spawn-denylist.test.ts (Hard Rules #15 + #17).
   "/api/middleware/", // middleware hooks compile + run caller-supplied JS via new vm.Script (src/lib/middleware/registry.ts)
-  "/api/acp/agents", // detectInstalledAgents() -> execFileSync(probe.command, probe.args, { shell }) (src/lib/acp/registry.ts)
   "/api/system/version", // POST auto-update spawns git checkout + npm install
   "/api/db-backups/exportAll", // spawns tar for the export archive
   "/api/db/health", // runManagedDbHealthCheck() forks native diagnostics (healthCheckRunner.ts)

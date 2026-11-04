@@ -29,7 +29,6 @@ DeepSeek, Groq, xAI, Mistral, and many more). It supports:
 - **Smart routing**: Combos with 14 strategies (priority, weighted, round-robin, auto, etc.)
 - **Resilience**: Circuit breakers, retry with exponential backoff, account fallback
 - **MCP Server**: 110 tools across 3 transports (stdio, SSE, Streamable HTTP)
-- **A2A Protocol**: Agent-to-Agent communication v0.3
 - **Compression**: Prompt compression (lite, caveman, RTK, stacked)
 - **Dashboard**: Web UI for monitoring and configuration
 - **CLI**: Full command-line interface for headless operations

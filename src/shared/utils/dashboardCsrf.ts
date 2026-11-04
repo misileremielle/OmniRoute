@@ -12,7 +12,6 @@ let originalFetch: typeof fetch | null = null;
 let installCount = 0;
 
 const CLIENT_API_ALIAS_PREFIXES = ["/chat/completions", "/responses", "/models", "/codex"];
-const TOP_LEVEL_MANAGEMENT_PATH_PREFIXES = ["/a2a"];
 
 export function __resetDashboardCsrfTokenForTests(): void {
   cachedToken = null;
@@ -114,14 +113,6 @@ function isClientApiPath(pathname: string): boolean {
 }
 
 function shouldAttachDashboardCsrf(url: URL, method: string): boolean {
-  if (
-    TOP_LEVEL_MANAGEMENT_PATH_PREFIXES.some(
-      (prefix) => url.pathname === prefix || url.pathname.startsWith(prefix + "/")
-    )
-  ) {
-    return true;
-  }
-
   return (
     url.pathname.startsWith("/api/") &&
     url.pathname !== "/api/auth/csrf" &&

@@ -129,7 +129,6 @@ _omniroute() {
     'quota:Show provider quotas'
     'cache:Manage response cache'
     'mcp:MCP server management'
-    'a2a:A2A server management'
     'env:Environment variables'
     'test:Test provider connection'
     'update:Check for updates'
@@ -230,7 +229,7 @@ _omniroute() {
   COMPREPLY=()
   cur="\${COMP_WORDS[COMP_CWORD]}"
   prev="\${COMP_WORDS[COMP_CWORD-1]}"
-  cmds="setup doctor status logs providers config test update serve stop restart keys models combo chat stream completion dashboard open backup restore health quota cache mcp a2a env memory skills connect contexts configure launch launch-codex run runtime repair"
+  cmds="setup doctor status logs providers config test update serve stop restart keys models combo chat stream completion dashboard open backup restore health quota cache mcp env memory skills connect contexts configure launch launch-codex run runtime repair"
 
   case "\${prev}" in
     combo)       COMPREPLY=($(compgen -W "list switch create delete show suggest" -- "\${cur}")); return 0 ;;
@@ -269,7 +268,7 @@ function generateFishScript(modelCommands) {
   return `# OmniRoute CLI fish completion (dynamic)
 complete -c omniroute -f
 
-set -l commands serve stop restart setup doctor status logs providers config keys models combo chat stream completion dashboard open backup restore health quota cache mcp a2a env memory skills connect contexts configure launch launch-codex update test run runtime repair
+set -l commands serve stop restart setup doctor status logs providers config keys models combo chat stream completion dashboard open backup restore health quota cache mcp env memory skills connect contexts configure launch launch-codex update test run runtime repair
 
 for cmd in $commands
   complete -c omniroute -n '__fish_is_nth_token 1' -a $cmd

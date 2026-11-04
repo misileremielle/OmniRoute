@@ -236,7 +236,6 @@ export async function getSettings() {
     entraGraphFallbackEnabled: false,
     entraGraphClientSecret: "",
     mcpEnabled: false,
-    a2aEnabled: false,
     hiddenSidebarItems: [],
     hiddenSidebarGroupLabels: [],
     sidebarSectionOrder: [],

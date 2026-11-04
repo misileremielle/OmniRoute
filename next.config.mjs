@@ -566,13 +566,11 @@ const nextConfig = {
         permanent: true,
       },
       // Frameworks
-      { source: "/docs/a2a-server", destination: "/docs/frameworks/a2a-server", permanent: true },
       {
         source: "/docs/agent-protocols-guide",
         destination: "/docs/frameworks/agent-protocols-guide",
         permanent: true,
       },
-      { source: "/docs/cloud-agent", destination: "/docs/frameworks/cloud-agent", permanent: true },
       { source: "/docs/evals", destination: "/docs/frameworks/evals", permanent: true },
       {
         source: "/docs/gamification",
