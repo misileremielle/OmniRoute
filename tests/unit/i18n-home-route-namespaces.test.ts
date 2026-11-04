@@ -80,8 +80,6 @@ test("the keys from the bug report resolve to real copy", () => {
     ["home", "quickStart"],
     ["home", "step1Title"],
     ["home", "fullDocs"],
-    ["kimiSponsorBanner", "cta"],
-    ["cheaperInferenceSponsorBanner", "cta"],
     ["vscodeCopilotBanner", "cta"],
   ];
   for (const [namespace, key] of reported) {

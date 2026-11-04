@@ -78,7 +78,7 @@ test("the /home route mounts a SectionI18nProvider layout (#16321)", () => {
 
 test("/home's own namespaces stay out of chrome — that is why its layout is required (#16321)", () => {
   const { chrome, home } = JSON.parse(readFileSync(MAP_PATH, "utf8"));
-  for (const ns of ["home", "cheaperInferenceSponsorBanner", "vscodeCopilotBanner"]) {
+  for (const ns of ["home", "vscodeCopilotBanner"]) {
     assert.ok(home.includes(ns), `home namespace set must include "${ns}"`);
     assert.ok(
       !chrome.includes(ns),

@@ -785,7 +785,7 @@ export const IMAGE_PROVIDERS: Record<string, ImageProviderConfig> = {
     supportedSizes: [],
   },
 
-  // Cheaper Inference (OSS-sponsor gateway). Declared AFTER adobe-firefly on
+  // Cheaper Inference (gateway). Declared AFTER adobe-firefly on
   // purpose: it shares the nano-banana-pro / nano-banana-2 ids, and parseImageModel
   // resolves a bare id by first-match over this object's iteration order, so
   // Firefly keeps the bare ids and these are prefix-only. See the module for the

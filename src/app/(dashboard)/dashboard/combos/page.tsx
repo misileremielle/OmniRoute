@@ -99,8 +99,6 @@ import {
   getI18nOrFallback,
 } from "./comboPageHelpers";
 import ComboStepTestButton from "./ComboStepTestButton";
-import KimiComboPresetCard from "./KimiComboPresetCard";
-import { KIMI_CODING_PRESET, hasKimiCodingPreset } from "./kimiComboPreset";
 import BuilderIntelligentStep from "./BuilderIntelligentStep";
 import IntelligentComboPanel from "./IntelligentComboPanel";
 import { ComboSortSelect } from "./ComboSortSelect";
@@ -904,7 +902,6 @@ function CombosPageContent() {
   const [usageGuideHiddenForNow, setUsageGuideHiddenForNow] = useState(false);
   const showUsageGuide = usageGuideNotDismissed && !usageGuideHiddenForNow;
   const [recentlyCreatedCombo, setRecentlyCreatedCombo] = useState("");
-  const [creatingKimiPreset, setCreatingKimiPreset] = useState(false);
   const [comboDragIndex, setComboDragIndex] = useState(null);
   const [comboDragOverIndex, setComboDragOverIndex] = useState(null);
   const [savingComboOrder, setSavingComboOrder] = useState(false);
@@ -1089,18 +1086,6 @@ function CombosPageContent() {
     };
 
     await handleCreate(data);
-  };
-
-  // Kimi Coding preset (2026-07 partnership) — one-click create, mirrors
-  // handleDuplicate's directness (no separate confirmation modal). See
-  // KimiComboPresetCard.tsx for why this bypasses the combo builder wizard.
-  const handleCreateKimiPreset = async () => {
-    setCreatingKimiPreset(true);
-    try {
-      await handleCreate(KIMI_CODING_PRESET);
-    } finally {
-      setCreatingKimiPreset(false);
-    }
   };
 
   const handleTestCombo = async (combo) => {
@@ -1320,12 +1305,6 @@ function CombosPageContent() {
         onComboCreated={handleComboCreated}
         onTestCombo={handleTestCombo}
         testingName={testingCombo}
-      />
-
-      <KimiComboPresetCard
-        alreadyCreated={hasKimiCodingPreset(combos)}
-        creating={creatingKimiPreset}
-        onCreate={handleCreateKimiPreset}
       />
 
       {showUsageGuide && (

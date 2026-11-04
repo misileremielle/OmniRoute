@@ -1,4 +1,4 @@
-// Cheaper Inference (api.cheaperinference.com) — OSS-sponsor gateway provider.
+// Cheaper Inference (api.cheaperinference.com) — gateway provider.
 // Locks the canonical catalog entry so the id/alias/brand cannot drift, and
 // guards the two invariants the provider gates enforce (Zod shape + a registry
 // entry that maps back to a canonical provider).

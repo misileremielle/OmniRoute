@@ -4797,11 +4797,6 @@
       "count": 1
     }
   },
-  "tests/unit/ui/cheaperInferenceSponsorBanner.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/ui/cli-code-detail-page.test.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
