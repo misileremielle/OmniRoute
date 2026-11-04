@@ -38,6 +38,7 @@ import {
 import {
   validateMuseSparkWebProvider,
   validateAdaptaWebProvider,
+  validateKagiAssistantProvider,
   validateTinyCmsWebProvider,
   validateClaudeWebProvider,
   validateGeminiWebProvider,
@@ -384,6 +385,7 @@ export async function validateProviderApiKey({
     "muse-spark-web": validateMuseSparkWebProvider,
     "inner-ai": validateInnerAiProvider,
     "adapta-web": validateAdaptaWebProvider,
+    "kagi-assistant": validateKagiAssistantProvider,
     "tinycms-web": validateTinyCmsWebProvider,
     "claude-web": validateClaudeWebProvider,
     "gemini-web": validateGeminiWebProvider,

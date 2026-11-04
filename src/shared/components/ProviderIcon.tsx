@@ -291,6 +291,8 @@ const GENERIC_PROVIDER_IDS = new Set([
   "ironclaw",
   "kie",
   "lemonade",
+  "kagi-assistant",
+  "kagi-search",
   "linkup-search",
   "llamafile",
   "llamagate",

@@ -10,6 +10,7 @@ import { syntheticProvider } from "./registry/synthetic/index.ts";
 import { ideogramProvider } from "./registry/ideogram/index.ts";
 import { friendliaiProvider } from "./registry/friendliai/index.ts";
 import { adapta_webProvider } from "./registry/adapta-web/index.ts";
+import { kagi_assistantProvider } from "./registry/kagi-assistant/index.ts";
 import { notion_webProvider } from "./registry/notion-web/index.ts";
 import { anthropicProvider } from "./registry/anthropic/index.ts";
 import { sambanovaProvider } from "./registry/sambanova/index.ts";
@@ -303,6 +304,7 @@ export const REGISTRY: Record<string, RegistryEntry> = {
   ideogram: ideogramProvider,
   friendliai: friendliaiProvider,
   "adapta-web": adapta_webProvider,
+  "kagi-assistant": kagi_assistantProvider,
   "notion-web": notion_webProvider,
   anthropic: anthropicProvider,
   sambanova: sambanovaProvider,

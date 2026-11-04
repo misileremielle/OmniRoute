@@ -137,6 +137,8 @@ const lazyExecutors: Record<string, () => Promise<BaseExecutor>> = {
   "notrack-web": () => import("./notrack-web.ts").then((m) => new m.NotrackWebExecutor()),
   ntw: () => import("./notrack-web.ts").then((m) => new m.NotrackWebExecutor()), // Alias
   "poe-web": () => import("./poe-web.ts").then((m) => new m.PoeWebExecutor()),
+  "kagi-assistant": () => import("./kagi-assistant.ts").then((m) => new m.KagiAssistantExecutor()),
+  kagi: () => import("./kagi-assistant.ts").then((m) => new m.KagiAssistantExecutor()), // Alias
   // #8969: do NOT alias canonical `poe` (API-key / api.poe.com) to PoeWebExecutor.
   // Registry declares executor:"default"; the hard-coded map previously won and
   // routed API-key traffic to GraphQL /api/gql_POST → HTTP 405.

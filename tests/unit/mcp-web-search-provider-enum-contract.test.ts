@@ -7,9 +7,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-const { getActiveSearchProviders } = await import("../../open-sse/mcp-server/schemas/providerEnums.ts");
+const { getActiveSearchProviders } =
+  await import("../../open-sse/mcp-server/schemas/providerEnums.ts");
 const { SEARCH_PROVIDERS } = await import("../../open-sse/config/searchRegistry.ts");
-const { webSearchInput, webSearchTool } = await import("../../open-sse/mcp-server/schemas/tools.ts");
+const { webSearchInput, webSearchTool } =
+  await import("../../open-sse/mcp-server/schemas/tools.ts");
 
 // The provider set the tool historically exposed to MCP clients (the hardcoded
 // enum this PR replaced). Every one of these MUST keep parsing so existing
@@ -21,6 +23,7 @@ const LEGACY_CONTRACT_PROVIDERS = [
   "exa-search",
   "tavily-search",
   "google-pse-search",
+  "kagi-search",
   "linkup-search",
   "searchapi-search",
   "searxng-search",
@@ -70,5 +73,8 @@ test("unknown provider values are rejected (contract stays tight)", () => {
 test("tool registration + scope are unaffected by the dynamic enum", () => {
   assert.equal(webSearchTool.name, "omniroute_web_search");
   assert.equal(webSearchTool.inputSchema, webSearchInput);
-  assert.ok(webSearchTool.scopes.includes("execute:search"), "web search tool scope must be retained");
+  assert.ok(
+    webSearchTool.scopes.includes("execute:search"),
+    "web search tool scope must be retained"
+  );
 });

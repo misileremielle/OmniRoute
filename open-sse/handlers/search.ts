@@ -574,6 +574,29 @@ function buildGooglePseRequest(
   };
 }
 
+function buildKagiRequest(
+  config: SearchProviderConfig,
+  params: SearchRequestParams
+): { url: string; init: RequestInit } {
+  if (!params.token) throw new Error("Kagi Search requires an API key");
+  const days = { day: 1, week: 7, month: 30, year: 365 }[String(params.timeRange)];
+  const after = days
+    ? new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10)
+    : undefined;
+  return {
+    url: config.baseUrl,
+    init: {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${params.token}` },
+      body: JSON.stringify({
+        query: params.query,
+        limit: params.maxResults,
+        ...(after ? { filters: { after } } : {}),
+      }),
+    },
+  };
+}
+
 function buildLinkupRequest(
   config: SearchProviderConfig,
   params: SearchRequestParams
@@ -768,6 +791,7 @@ const requestBuilders: Record<string, SearchRequestBuilder> = {
   "nimble-search": buildNimbleRequest,
   firecrawl: fcSearch.buildFirecrawlSearchRequest,
   "google-pse-search": buildGooglePseRequest,
+  "kagi-search": buildKagiRequest,
   "linkup-search": buildLinkupRequest,
   "searchapi-search": buildSearchApiRequest,
   "youcom-search": buildYouComRequest,
@@ -974,6 +998,32 @@ function normalizeGooglePseResponse(
     results,
     totalResults: Number.isFinite(totalResults) ? totalResults : null,
   };
+}
+
+type KagiSearchItem = { title?: string; url?: string; snippet?: string; time?: string };
+
+function normalizeKagiResponse(
+  payload: { data?: { search?: KagiSearchItem[] } },
+  _query: string,
+  _searchType: string
+): { results: SearchResult[]; totalResults: number | null } {
+  const now = new Date().toISOString();
+  const items = Array.isArray(payload?.data?.search) ? payload.data.search : [];
+  const results = items.map((item, idx) =>
+    makeResult(
+      "kagi-search",
+      {
+        title: item.title,
+        url: item.url,
+        snippet: item.snippet || "",
+        published_at: item.time,
+      },
+      idx,
+      now
+    )
+  );
+
+  return { results, totalResults: results.length };
 }
 
 function normalizeLinkupResponse(
@@ -1402,6 +1452,7 @@ const responseNormalizers: Record<string, SearchResponseNormalizer> = {
   firecrawl: (data: FirecrawlSearchEnvelope, _query: string, searchType: string) =>
     fcSearch.normalizeFirecrawlSearchResponse(data, searchType, makeResult),
   "google-pse-search": normalizeGooglePseResponse,
+  "kagi-search": normalizeKagiResponse,
   "linkup-search": normalizeLinkupResponse,
   "searchapi-search": normalizeSearchApiResponse,
   "youcom-search": normalizeYouComResponse,

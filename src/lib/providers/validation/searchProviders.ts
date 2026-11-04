@@ -152,6 +152,14 @@ export const SEARCH_VALIDATOR_CONFIGS: Record<
       body: JSON.stringify({ mode: "fast" }),
     },
   }),
+  "kagi-search": (apiKey) => ({
+    url: "https://kagi.com/api/v1/search",
+    init: {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({ query: "test", limit: 1 }),
+    },
+  }),
   "linkup-search": (apiKey) => ({
     url: "https://api.linkup.so/v1/search",
     init: {

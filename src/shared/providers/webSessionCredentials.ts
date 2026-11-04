@@ -219,6 +219,13 @@ export const WEB_SESSION_CREDENTIAL_REQUIREMENTS = {
     acceptsFullCookieHeader: true,
     storageKeys: ["cookie", "uid", "si_usr_id", "si_ses_id", "nt_session"],
   },
+  "kagi-assistant": {
+    kind: "cookie",
+    credentialName: "kagi_session",
+    placeholder: "https://kagi.com/search?token=... or kagi_session=...",
+    acceptsFullCookieHeader: true,
+    storageKeys: ["cookie", "kagi_session"],
+  },
   "poe-web": {
     kind: "cookie",
     credentialName: "p-b",

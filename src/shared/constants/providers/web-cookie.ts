@@ -285,6 +285,20 @@ export const WEB_COOKIE_PROVIDERS = {
       "Paste the full Cookie header from huggingface.co/chat (DevTools → Network → /chat/conversation → Request Headers → Cookie). It should include hf-chat and may also include token / aws-waf-token.",
     riskNoticeVariant: "webCookie",
   },
+  "kagi-assistant": {
+    id: "kagi-assistant",
+    serviceKinds: ["llm"],
+    alias: "kagi",
+    name: "Kagi Assistant (Subscription)",
+    icon: "auto_awesome",
+    color: "#FFB319",
+    textIcon: "KA",
+    website: "https://kagi.com/assistant",
+    authHint:
+      "Paste your Session Link or its token from kagi.com/settings/user_details (Session Link). Each request appears as a thread in your Assistant history.",
+    subscriptionRisk: true,
+    riskNoticeVariant: "webCookie",
+  },
   "poe-web": {
     id: "poe-web",
     serviceKinds: ["llm"],

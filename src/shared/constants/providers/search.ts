@@ -125,6 +125,17 @@ export const SEARCH_PROVIDERS = {
     authHint: "API key from platform.parallel.ai (sent as x-api-key)",
     serviceKinds: ["webSearch", "webFetch"],
   },
+  "kagi-search": {
+    id: "kagi-search",
+    serviceKinds: ["webSearch"],
+    alias: "kagi-web-search",
+    name: "Kagi Search",
+    icon: "public",
+    color: "#FFB319",
+    textIcon: "KS",
+    website: "https://kagi.com/api/docs",
+    authHint: "Bearer API key from kagi.com/api/keys",
+  },
   "linkup-search": {
     id: "linkup-search",
     serviceKinds: ["webSearch"],

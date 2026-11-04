@@ -90,6 +90,7 @@ const STATIC_MODEL_PROVIDERS: Record<string, () => Array<{ id: string; name: str
     // hard "does not support models listing" failure (#7820).
     { id: "amazon-q", name: "Amazon Q Developer" },
   ],
+  "kagi-search": () => [{ id: "web", name: "Kagi web search" }],
   "linkup-search": () => [
     // Linkup web search — the "model" is the search depth (docs.linkup.so #5571).
     { id: "standard", name: "Standard (single-iteration agentic search)" },

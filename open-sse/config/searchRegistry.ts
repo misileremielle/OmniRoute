@@ -235,6 +235,23 @@ export const SEARCH_PROVIDERS: Record<string, SearchProviderConfig> = {
     cacheTTLMs: 5 * 60 * 1000,
   },
 
+  "kagi-search": {
+    id: "kagi-search",
+    name: "Kagi Search",
+    baseUrl: "https://kagi.com/api/v1/search",
+    method: "POST",
+    authType: "apikey",
+    authHeader: "bearer",
+    // Kagi's v1 docs publish no rate; $25 per 1000 is its long-standing Search API price.
+    costPerQuery: 0.025,
+    freeMonthlyQuota: 0,
+    searchTypes: ["web"],
+    defaultMaxResults: 5,
+    maxMaxResults: 50,
+    timeoutMs: 10_000,
+    cacheTTLMs: 5 * 60 * 1000,
+  },
+
   "linkup-search": {
     id: "linkup-search",
     name: "Linkup Search",
@@ -525,6 +542,7 @@ export const SEARCH_PROVIDER_ALIASES: Record<string, string> = {
   exa: "exa-search",
   tavily: "tavily-search",
   "google-pse": "google-pse-search",
+  "kagi-web-search": "kagi-search",
   linkup: "linkup-search",
   ollama: "ollama-search",
   searchapi: "searchapi-search",

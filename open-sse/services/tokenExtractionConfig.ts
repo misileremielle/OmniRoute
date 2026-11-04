@@ -201,6 +201,17 @@ const RAW_CONFIGS: TokenExtractionConfig[] = [
     { cookieDomain: ".blackbox.ai" }
   ),
 
+  // ── Kagi Assistant ────────────────────────────────────────
+  config(
+    "kagi-assistant",
+    "Kagi Assistant",
+    "https://kagi.com/signin",
+    "https://kagi.com/assistant",
+    [{ type: "cookie", name: "kagi_session", domain: ".kagi.com" }],
+    "Log in to Kagi at kagi.com. The session cookie will be extracted.",
+    { cookieDomain: ".kagi.com" }
+  ),
+
   // ── Poe Web ───────────────────────────────────────────────
   config(
     "poe-web",

@@ -20,6 +20,10 @@ import {
   syntxAuthHeaders,
 } from "@omniroute/open-sse/services/syntxAuth.ts";
 import { SYNTX_MODELS_URL } from "@omniroute/open-sse/services/syntxModels.ts";
+import {
+  KAGI_ASSISTANT_URL,
+  normalizeKagiSessionToken,
+} from "@omniroute/open-sse/executors/kagi-assistant.ts";
 import { buildJulesApiUrl } from "@/lib/cloudAgent/julesApi.ts";
 import {
   META_AI_ASBD_ID,
@@ -89,6 +93,26 @@ export async function validateMuseSparkWebProvider({ apiKey, providerSpecificDat
     }
 
     return { valid: false, error: `Validation failed: ${response.status}` };
+  } catch (error: any) {
+    return toValidationErrorResult(error);
+  }
+}
+
+export async function validateKagiAssistantProvider({ apiKey, providerSpecificData = {} }: any) {
+  try {
+    const token = normalizeKagiSessionToken(apiKey);
+    if (!token) return { valid: false, error: "Paste your Kagi Session Link or token" };
+    const response = await validationRead(`${KAGI_ASSISTANT_URL}/api/init`, {
+      headers: applyCustomUserAgent(
+        { Cookie: `kagi_session=${token}`, Accept: "application/json" },
+        providerSpecificData
+      ),
+    });
+    if (response.status === 401 || response.status === 403) {
+      return { valid: false, error: "Invalid or expired Kagi session token" };
+    }
+    if (!response.ok) return { valid: false, error: `Kagi returned HTTP ${response.status}` };
+    return { valid: true, error: null, method: "kagi_assistant_init" };
   } catch (error: any) {
     return toValidationErrorResult(error);
   }
