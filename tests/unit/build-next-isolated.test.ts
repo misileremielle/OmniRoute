@@ -8,6 +8,8 @@ import {
   getTransientBuildPaths,
   movePath,
   pruneStandaloneArtifacts,
+  resolveBuildHeapMb,
+  resolveBuildWorkerTotal,
   resolveNextBuildEnv,
   shouldBuildStandalone,
   syncStandaloneExtraModules,
@@ -136,6 +138,47 @@ test("resolveNextBuildEnv does not clobber an existing --max-old-space-size (Doc
 test("resolveNextBuildEnv honors the OMNIROUTE_BUILD_MEMORY_MB override", () => {
   const env = resolveNextBuildEnv({ OMNIROUTE_BUILD_MEMORY_MB: "6144" });
   assert.match(env.NODE_OPTIONS, /--max-old-space-size=6144/);
+});
+
+const GiB = 1024 ** 3;
+
+// Next 16 forks `cpus - 1` page-data workers (or CIRCLE_NODE_TOTAL - 1) regardless of RAM;
+// each one can peak at ~4.5 GB RSS (#7518). Only the Dockerfile capped the pool, so a
+// local `npm run build` on a 12-core / 16 GB desktop forked 11 workers and swapped.
+test("resolveBuildWorkerTotal caps the page-data pool by RAM, not just cores", () => {
+  // 16 GiB, 12 cores: 0.75 * 16384 / 4500 = 2 processes -> 1 worker (+1 parent).
+  assert.equal(resolveBuildWorkerTotal({}, 16 * GiB, 12), 2);
+  // 64 GiB, 12 cores: 10 processes -> 9 workers.
+  assert.equal(resolveBuildWorkerTotal({}, 64 * GiB, 12), 10);
+  // 64 GiB, 4 cores: core-bound at cpus - 1 = 3 workers.
+  assert.equal(resolveBuildWorkerTotal({}, 64 * GiB, 4), 4);
+  // Tiny host still gets one worker; unknown RAM falls back to one worker.
+  assert.equal(resolveBuildWorkerTotal({}, 4 * GiB, 8), 2);
+  assert.equal(resolveBuildWorkerTotal({}, null, 8), 2);
+});
+
+test("resolveBuildWorkerTotal keeps explicit operator choices", () => {
+  assert.equal(resolveBuildWorkerTotal({ CIRCLE_NODE_TOTAL: "8" }, 16 * GiB, 12), null);
+  assert.equal(resolveBuildWorkerTotal({ OMNIROUTE_BUILD_WORKERS: "6" }, 16 * GiB, 12), 7);
+});
+
+test("resolveNextBuildEnv wires the worker cap into CIRCLE_NODE_TOTAL", () => {
+  const env = resolveNextBuildEnv({}, "linux", { memoryBytes: 16 * GiB, cpuCount: 12 });
+  assert.equal(env.CIRCLE_NODE_TOTAL, "2");
+  const preserved = resolveNextBuildEnv({ CIRCLE_NODE_TOTAL: "5" }, "linux", {
+    memoryBytes: 16 * GiB,
+    cpuCount: 12,
+  });
+  assert.equal(preserved.CIRCLE_NODE_TOTAL, "5");
+});
+
+test("resolveBuildHeapMb scales the default heap with RAM inside [4096, 8192]", () => {
+  assert.equal(resolveBuildHeapMb(4 * GiB), 4096);
+  assert.equal(resolveBuildHeapMb(8 * GiB), 4915);
+  assert.equal(resolveBuildHeapMb(32 * GiB), 8192);
+  assert.equal(resolveBuildHeapMb(null), 8192);
+  const env = resolveNextBuildEnv({}, "linux", { memoryBytes: 8 * GiB, cpuCount: 4 });
+  assert.match(env.NODE_OPTIONS, /--max-old-space-size=4915/);
 });
 
 test("getTransientBuildPaths leaves _tasks in place by default", () => {

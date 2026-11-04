@@ -205,7 +205,60 @@ export function getWindowsBuildProfileDir() {
   return path.join(os.tmpdir(), `omniroute-build-winhome-${process.pid}`);
 }
 
-export function resolveNextBuildEnv(baseEnv = process.env, platform = process.platform) {
+// Measured peak RSS of ONE `next build` process (parent or page-data worker) —
+// dmesg OOM-killer report in #7518; the same figure pins the Docker budget in
+// tests/unit/docker-build-memory-budget.test.ts.
+export const BUILD_PROCESS_PEAK_RSS_MB = 4500;
+// Share of the effective RAM the build may plan for; the rest stays for the OS,
+// the editor/browser and the page cache.
+const BUILD_MEMORY_BUDGET_FRACTION = 0.75;
+const BUILD_HEAP_FLOOR_MB = 4096;
+const BUILD_HEAP_CEILING_MB = 8192;
+
+/**
+ * Next 16 sizes its page-data / static-generation pool at `os.cpus().length - 1`
+ * (or `CIRCLE_NODE_TOTAL - 1`) with no regard for RAM. Each worker is a full Node
+ * process that inherits the raised build heap, so an 8-16 core desktop forks 7-15
+ * workers at up to ~4.5 GB each and swaps or gets OOM-killed right after
+ * "Collecting page data". The Dockerfile already caps this through
+ * CIRCLE_NODE_TOTAL; this does the same for the local/npm build path, deriving the
+ * worker count from the effective RAM budget (and never more than cpus - 1).
+ *
+ * Returns the value for CIRCLE_NODE_TOTAL (workers + 1), or null to keep an
+ * explicit operator choice.
+ */
+export function resolveBuildWorkerTotal(
+  baseEnv = process.env,
+  memoryBytes = getEffectiveBuildMemoryBytes(),
+  cpuCount = os.availableParallelism?.() ?? os.cpus().length
+) {
+  if (baseEnv.CIRCLE_NODE_TOTAL) return null;
+  const override = Number(baseEnv.OMNIROUTE_BUILD_WORKERS);
+  if (Number.isSafeInteger(override) && override > 0) return override + 1;
+  const cpuWorkers = Math.max(1, (Number(cpuCount) || 1) - 1);
+  if (!Number.isSafeInteger(memoryBytes) || memoryBytes <= 0) return 2; // unknown RAM: 1 worker
+  const budgetMb = (memoryBytes / 1024 ** 2) * BUILD_MEMORY_BUDGET_FRACTION;
+  // The parent process takes one slot of the budget; the rest are workers.
+  const memoryWorkers = Math.floor(budgetMb / BUILD_PROCESS_PEAK_RSS_MB) - 1;
+  return Math.max(1, Math.min(cpuWorkers, memoryWorkers)) + 1;
+}
+
+/**
+ * Default V8 heap ceiling for the build: 60% of effective RAM, clamped to
+ * [4096, 8192] MB. A fixed 8 GB ceiling on an 8 GB machine lets V8 defer GC
+ * until the host is already swapping; the clean graph peaks around 3.9 GB.
+ */
+export function resolveBuildHeapMb(memoryBytes = getEffectiveBuildMemoryBytes()) {
+  if (!Number.isSafeInteger(memoryBytes) || memoryBytes <= 0) return BUILD_HEAP_CEILING_MB;
+  const proportional = Math.floor((memoryBytes / 1024 ** 2) * 0.6);
+  return Math.min(BUILD_HEAP_CEILING_MB, Math.max(BUILD_HEAP_FLOOR_MB, proportional));
+}
+
+export function resolveNextBuildEnv(
+  baseEnv = process.env,
+  platform = process.platform,
+  { memoryBytes = getEffectiveBuildMemoryBytes(), cpuCount } = {}
+) {
   const env = {
     ...baseEnv,
     NEXT_PRIVATE_BUILD_WORKER: baseEnv.NEXT_PRIVATE_BUILD_WORKER || "0",
@@ -273,9 +326,12 @@ export function resolveNextBuildEnv(baseEnv = process.env, platform = process.pl
     // headroom without risk. NOTE: heap size does NOT fix a poisoned scope — if the build
     // OOMs/livelocks far above this, check for worktrees/cruft leaking into the tsconfig
     // scope (run `npm run check:build-scope`), not for "more heap". See incident 2026-06-25.
-    const heapMb = Number(baseEnv.OMNIROUTE_BUILD_MEMORY_MB) || 8192;
+    const heapMb = Number(baseEnv.OMNIROUTE_BUILD_MEMORY_MB) || resolveBuildHeapMb(memoryBytes);
     env.NODE_OPTIONS = `${env.NODE_OPTIONS || ""} --max-old-space-size=${heapMb}`.trim();
   }
+
+  const workerTotal = resolveBuildWorkerTotal(baseEnv, memoryBytes, cpuCount);
+  if (workerTotal !== null) env.CIRCLE_NODE_TOTAL = String(workerTotal);
 
   return env;
 }
