@@ -63,7 +63,7 @@ fi
 SEL=$(printf '%s\n' "$CHANGED" | node "$REPO_ROOT/scripts/quality/select-impacted-tests.mjs" --stdin)
 
 if echo "$SEL" | grep -q "__RUN_ALL__"; then
-  echo "[test:scoped] Hub file or unmapped source changed — run the full suite: npm run test:unit"
+  echo "[test:scoped] Hub file or unmapped source changed — run the full suite: npm run test:unit:full"
   echo "[test:scoped] (if you just added a source file, rebuild the map: npm run test:scoped:full)"
   exit 1
 fi

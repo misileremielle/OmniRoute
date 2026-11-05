@@ -134,8 +134,8 @@ test("fast mode's UNIT_SUBDIRS allowlist mirrors package.json test:unit exactly"
   const scriptList = script.match(/UNIT_SUBDIRS=",([^"]+),"/)?.[1];
   assert.ok(scriptList, "merge-train.sh must declare the UNIT_SUBDIRS allowlist");
   const pkg = JSON.parse(await readFile(new URL("../../package.json", import.meta.url), "utf8"));
-  const pkgList = pkg.scripts["test:unit"].match(/tests\/unit\/\{([^}]+)\}/)?.[1];
-  assert.ok(pkgList, "package.json test:unit must carry the {subdir} allowlist glob");
+  const pkgList = pkg.scripts["test:unit:full"].match(/tests\/unit\/\{([^}]+)\}/)?.[1];
+  assert.ok(pkgList, "package.json test:unit:full must carry the {subdir} allowlist glob");
   assert.equal(
     scriptList,
     pkgList,

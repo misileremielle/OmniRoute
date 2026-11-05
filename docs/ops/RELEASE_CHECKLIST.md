@@ -144,7 +144,7 @@ matrix automatically, without any label.
 
 ### Testing
 
-- [ ] `npm run test:unit` — pass
+- [ ] `npm run test:unit:full` — pass
 - [ ] `npm run test:vitest` — pass (MCP server, autoCombo, cache)
 - [ ] `npm run test:coverage` — gate 60/60/60/60 satisfied (statements/lines/functions/branches)
 - [ ] `npm run test:integration` — pass (if changes touch DB / handlers)
@@ -161,7 +161,7 @@ Husky hooks live in `.husky/` and run automatically on git operations.
 
 - **pre-commit:** `npx lint-staged + node scripts/check/check-docs-sync.mjs + npm run check:any-budget:t11`
 - **pre-push:** fast deterministic gates — `npm run check:any-budget:t11 && npm run check:tracked-artifacts` (activated 2026-06-13). Intentionally excludes `test:unit` (slow; covered by the CI `test-unit` job).
-  - Run `npm run test:unit` manually before pushing release branches.
+  - Run `npm run test:unit:full` manually before pushing release branches.
 
 If a hook fails: fix the underlying issue, don't bypass with `--no-verify`.
 

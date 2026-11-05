@@ -179,6 +179,13 @@ Scopes (v3.8): `db`, `sse`, `oauth`, `dashboard`, `api`, `cli`, `docker`, `ci`, 
 # All tests (unit + vitest + ecosystem + e2e)
 npm run test:all
 
+# Core unit suite (~480 files: request path, routing/resilience, translation, DB, auth/security;
+# a few minutes) — selection lives in scripts/test/run-unit-core.mjs
+npm run test:unit
+
+# Full unit suite (~7k files; what CI runs)
+npm run test:unit:full
+
 # Single test file (Node.js native test runner — most tests use this)
 node --import tsx/esm --test tests/unit/your-file.test.ts
 

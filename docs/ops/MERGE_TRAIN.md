@@ -45,7 +45,7 @@ one day during the v3.8.47 cycle:
    heads locally, then run the release-equivalent suite
    (`npm run check:release-green`, add `--with-build` before a release).
    `scripts/release/merge-train.sh <base> <PR#>…` automates steps 1–2 (conflicting
-   PRs eject, the train continues). Full mode runs `npm run test:unit` — the
+   PRs eject, the train continues). Full mode runs `npm run test:unit:full` — the
    box-tuned runner (`--test-concurrency=20`), **not** the two sequential 4-core CI
    shards, which drove the dominant phase at ~25% of a 16-core box (fixed
    2026-07-18). `--fast` (intra-day mega-train drains, owner-approved 2026-07-18)

@@ -19,10 +19,10 @@
 #              node:test files CHANGED by the boarded PRs + vitest, instead of the
 #              full unit suite. For intra-day mega-train drains. The FULL suite must
 #              still run at least once per day on the accumulated tip (one train
-#              without --fast, or `npm run test:unit` on the tip) — fast evidence
+#              without --fast, or `npm run test:unit:full` on the tip) — fast evidence
 #              lines say so explicitly.
 #
-# Speed note (2026-07-18): full mode runs `npm run test:unit` (box-tuned,
+# Speed note (2026-07-18): full mode runs `npm run test:unit:full` (box-tuned,
 # --test-concurrency=20). The previous two SEQUENTIAL `test:unit:ci:shard` runs
 # (--test-concurrency=4 each, sized for 4-core GH runners) drove the dominant phase
 # at ~25% of a 16-core devbox (~2.5h suite → ~30-40min).
@@ -111,7 +111,7 @@ FULL_ONLY_GATES=(
 )
 # Full mode: the box-speed runner (same coverage as the two CI shards combined —
 # main + dashboard + serial groups — at local concurrency instead of runner-sized).
-UNIT_FULL="npm run test:unit"
+UNIT_FULL="npm run test:unit:full"
 VITEST="npm run test:vitest"
 
 if [ "$PLAN" = "1" ]; then
