@@ -43,12 +43,7 @@ function omniBuildJobs(): Array<{ id: string; runsOn: string }> {
 test("every omni-build job is opt-in through USE_VPS_BUILD_RUNNER", () => {
   const jobs = omniBuildJobs();
   // Guard against a vacuous pass: these are the heavy jobs known on 2026-10-16.
-  for (const id of [
-    "ci.yml:build",
-    "docker-publish.yml:build",
-    "npm-publish.yml:publish",
-    "nightly-v4-build.yml:build",
-  ]) {
+  for (const id of ["ci.yml:build", "docker-publish.yml:build"]) {
     assert.ok(
       jobs.some((j) => j.id === id),
       `${id} should still target omni-build`

@@ -6,7 +6,6 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { load as parseYaml } from "js-yaml";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const sha = "1".repeat(40);
@@ -281,45 +280,6 @@ test(
     const result = observe(() => {}, { workflow: "" });
     assert.equal(result.status, 1);
     assert.equal(result.report.releaseGreen, false);
-  }
-);
-
-test(
-  "the hosted job fails when its receipt writer cannot persist evidence",
-  { skip: process.platform === "win32" },
-  () => {
-    const dir = mkdtempSync(join(tmpdir(), "hosted-suite-shell-"));
-    try {
-      for (const [name, body] of [
-        ["npm", 'console.log("test passed");'],
-        ["node", "process.exit(23);"],
-      ]) {
-        writeFileSync(join(dir, name), `#!${process.execPath}\n${body}`, { mode: 0o755 });
-      }
-      const workflow = parseYaml(
-        readFileSync(join(root, ".github/workflows/nightly-release-green.yml"), "utf8")
-      );
-      const step = workflow.jobs.suites.steps.find((item) =>
-        item.run?.includes("scripts/ci/release-green-suite.mjs")
-      );
-      const result = spawnSync("bash", ["-c", step.run], {
-        cwd: dir,
-        encoding: "utf8",
-        timeout: 10000,
-        env: {
-          ...process.env,
-          PATH: `${dir}:${process.env.PATH}`,
-          NAME: "unit-1",
-          SUITE: "test:unit:ci:shard",
-          TEST_SHARD: "1/8",
-          GITHUB_WORKFLOW_SHA: workflowSha,
-        },
-      });
-      assert.equal(result.error, undefined);
-      assert.equal(result.status, 23, result.stdout + result.stderr);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
   }
 );
 

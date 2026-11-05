@@ -300,7 +300,7 @@ for (const [files, legacy, domains] of LEGACY_STDOUT_CASES) {
 
 // Push / dispatch events skip the classifier and enable every lane; the inline
 // `domains=` literal in both workflows must therefore be the full domain set.
-for (const wf of ["ci.yml", "quality.yml"]) {
+for (const wf of ["ci.yml"]) {
   test(`workflow ${wf}: changes job exposes outputs.domains and the push literal is the full set`, () => {
     const src = fs.readFileSync(path.join(REPO_ROOT, ".github", "workflows", wf), "utf8");
     assert.match(src, /^ {6}domains: \$\{\{ steps\.classify\.outputs\.domains \}\}$/m);

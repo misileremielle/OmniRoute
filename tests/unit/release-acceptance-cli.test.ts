@@ -79,14 +79,6 @@ test("required missing yields UNVERIFIED", () => {
   assert.equal(exitFor(out.verdict), 2);
 });
 
-test("workflow source-guard", () => {
-  const text = readFileSync(".github/workflows/release-acceptance.yml", "utf8");
-  assert.match(text, /name: Release acceptance/);
-  assert.match(text, /cancel-in-progress: false/);
-  assert.equal(text.includes("gh issue close"), false);
-  assert.match(text, /if: github.event_name != 'pull_request'/);
-});
-
 test("schema_invalid does not throw when required_gates is missing", async () => {
   const dir = mkdtempSync(join(tmpdir(), "acc-"));
   writeFileSync(

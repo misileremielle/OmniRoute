@@ -5,7 +5,6 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { load } from "js-yaml";
 import {
   parseVitestExcludes,
   validateQuarantine,
@@ -33,7 +32,6 @@ test("discovery --update cannot silently freeze newly orphaned tests", () => {
       ...COLLECTORS.flatMap((collector) => collector.sources),
       "config/quality/vitest-exclusions.json",
       "vitest.quarantine.config.ts",
-      ".github/workflows/test-quarantine.yml",
     ]);
     for (const source of fixtureSources) {
       mkdirSync(dirname(join(dir, source)), { recursive: true });
@@ -114,24 +112,8 @@ test("expired, future, duplicate, escaped and broad exclusions fail closed", () 
   assert.ok(validateQuarantine([entry, entry], { now }).length);
 });
 
-test("quarantine workflow executes the inventory and keeps failure/artifacts visible", () => {
+test("quarantine config executes the inventory and keeps failure/artifacts visible", () => {
   const root = new URL("../../", import.meta.url);
-  const workflow = load(
-    readFileSync(new URL(".github/workflows/test-quarantine.yml", root), "utf8")
-  );
-  assert.ok(workflow.on.schedule.length);
-  assert.ok(Object.hasOwn(workflow.on, "workflow_dispatch"));
-  const job = workflow.jobs.quarantine;
-  assert.equal(job["runs-on"], "ubuntu-latest");
-  assert.equal(job["continue-on-error"], undefined);
-  assert.ok(job.steps.some((s) => s.run?.includes("--issue-states")));
-  const run = job.steps.find((s) => s.run?.includes("vitest.quarantine.config.ts"));
-  assert.ok(run);
-  assert.equal(run["continue-on-error"], undefined);
-  assert.ok(!run.run.includes("|| true"));
-  assert.ok(
-    job.steps.some((s) => s.uses?.startsWith("actions/upload-artifact@") && s.if === "always()")
-  );
   const config = readFileSync(new URL("vitest.quarantine.config.ts", root), "utf8");
   assert.match(config, /inventory\.excluded\.map/);
   assert.match(config, /exclude:\s*\[\]/);

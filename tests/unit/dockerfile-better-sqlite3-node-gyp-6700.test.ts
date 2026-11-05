@@ -106,7 +106,7 @@ fs.appendFileSync(process.env.PROBE_LOG, JSON.stringify({ command, args, cwd: pr
 }
 
 function executeInstall(command: string, mirror = ""): Invocation[] {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "docker-gyp-6700-"));
+  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "docker-gyp-6700-")));
   try {
     const bin = path.join(root, "bin");
     fs.mkdirSync(bin);

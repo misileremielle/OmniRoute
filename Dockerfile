@@ -109,6 +109,8 @@ COPY package*.json ./
 # Without this, `npm ci` skips them and the application build fails with "Module not
 # found" (root cause of the v3.8.39 Docker build break). workspaces = ["open-sse"].
 COPY open-sse/package.json ./open-sse/package.json
+COPY packages/browser-pool/package.json ./packages/browser-pool/package.json
+COPY packages/ui-kit/package.json ./packages/ui-kit/package.json
 COPY scripts/build/postinstall.mjs ./scripts/build/postinstall.mjs
 COPY scripts/build/postinstallSupport.mjs ./scripts/build/postinstallSupport.mjs
 COPY scripts/build/native-binary-compat.mjs ./scripts/build/native-binary-compat.mjs

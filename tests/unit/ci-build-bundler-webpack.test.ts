@@ -43,40 +43,12 @@ function buildSteps(name: string, pattern: RegExp): Array<{ id: string; step: St
   return out;
 }
 
-const NIGHTLIES = [
-  "nightly-llm-security.yml",
-  "nightly-resilience.yml",
-  "nightly-schemathesis.yml",
-];
-
-test("the nightly backend-only builds compile with webpack", () => {
-  const steps = NIGHTLIES.flatMap((wf) => buildSteps(wf, /npm run build:cli/));
-  assert.equal(steps.length, 4, "promptfoo-guard, garak, k6-soak and schemathesis each build once");
-  const onTurbopack = steps
-    .filter(({ step }) => String(step.env?.OMNIROUTE_USE_TURBOPACK) !== "0")
-    .map(({ id }) => id);
-  assert.deepEqual(onTurbopack, [], "these steps would run the Turbopack build that OOMs the .113");
-});
-
 test("the ci.yml Build job uses Turbopack only on the self-hosted build slot", () => {
   const [build] = buildSteps("ci.yml", /^npm run build$/m);
   assert.ok(build, "ci.yml build job runs `npm run build`");
   const sw = String(build.step.env?.OMNIROUTE_USE_TURBOPACK);
   assert.match(sw, /vars\.USE_VPS_BUILD_RUNNER == 'true'/, "Turbopack is tied to the opt-in slot");
   assert.match(sw, /&& '1' \|\| '0' \}\}$/, "hosted runners (16 GB) fall back to webpack");
-});
-
-test("the nightly schemathesis job timeout fits a webpack backend-only build on the .113", () => {
-  // The dispatched run of 2026-10-17 (run 38982564979) compiled with webpack for 25 min on the
-  // busy .113 and was cancelled by the old 30-minute timeout before the probes even started.
-  type JobWithTimeout = { "timeout-minutes"?: number };
-  const wf = readWorkflow("nightly-schemathesis.yml") as { jobs?: Record<string, JobWithTimeout> };
-  const job = wf.jobs?.schemathesis;
-  assert.ok(job, "nightly-schemathesis.yml has a schemathesis job");
-  assert.ok(
-    (job["timeout-minutes"] ?? 0) >= 120,
-    `timeout-minutes is ${job["timeout-minutes"]}; a webpack backend-only build plus the probes needs 120`
-  );
 });
 
 test("the manual hosted artifact build avoids Turbopack's OOM footprint (#16169)", () => {

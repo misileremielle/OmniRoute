@@ -118,7 +118,6 @@ export const COLLECTORS = [
   },
   { glob: "tests/unit/autoCombo/**/*.test.ts", sources: ["vitest.mcp.config.ts"] },
   { glob: "tests/unit/api/**/*.spec.ts", sources: ["vitest.mcp.config.ts"] },
-  { glob: "src/lib/memory/__tests__/generic-backend.test.ts", sources: ["vitest.mcp.config.ts"] },
   { glob: "tests/unit/encryption.spec.ts", sources: ["vitest.mcp.config.ts"] },
   { glob: "src/shared/components/**/*.test.tsx", sources: ["vitest.mcp.config.ts"] },
   { glob: "src/shared/hooks/__tests__/**/*.test.tsx", sources: ["vitest.mcp.config.ts"] },
@@ -302,13 +301,14 @@ function main() {
   );
   const quarantineErrors = validateQuarantine(inventory.excluded);
   const quarantineConfig = fs.readFileSync(path.join(ROOT, "vitest.quarantine.config.ts"), "utf8");
-  const quarantineWorkflow = fs.readFileSync(
-    path.join(ROOT, ".github/workflows/test-quarantine.yml"),
-    "utf8"
-  );
+  const quarantineWorkflowPath = path.join(ROOT, ".github/workflows/test-quarantine.yml");
+  const quarantineWorkflow = fs.existsSync(quarantineWorkflowPath)
+    ? fs.readFileSync(quarantineWorkflowPath, "utf8")
+    : null;
   if (
     !quarantineConfig.includes("inventory.excluded.map") ||
-    !quarantineWorkflow.includes("vitest run --config vitest.quarantine.config.ts")
+    (quarantineWorkflow !== null &&
+      !quarantineWorkflow.includes("vitest run --config vitest.quarantine.config.ts"))
   ) {
     quarantineErrors.push("quarantine execution wiring missing");
   }

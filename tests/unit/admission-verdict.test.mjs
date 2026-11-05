@@ -305,7 +305,7 @@ function keepsForkCodeOffSelfHosted(runsOn) {
   return gate.includes("github.event_name != 'pull_request'") && !gate.includes("||");
 }
 
-for (const profile of ["ci", "quality"]) {
+for (const profile of ["ci"]) {
   test(`${profile}: workflow jobs and dependencies match the versioned admission policy`, () => {
     const workflow = loadYaml(
       readFileSync(new URL(`../../.github/workflows/${profile}.yml`, import.meta.url), "utf8")

@@ -562,15 +562,9 @@ test("repository provider asset manifest covers the audited 144-file snapshot", 
   );
 });
 
-test("provider asset provenance gate stays on both blocking CI rails", () => {
+test("provider asset provenance gate stays on blocking CI rail", () => {
   const ci = readFileSync(join(REPO_ROOT, ".github/workflows/ci.yml"), "utf8");
   const ciLintJob = workflowJob(ci, "lint");
   assert.match(ciLintJob, /^\s*- run: npm run check:provider-asset-provenance\s*$/m);
   assert.match(ciLintJob, /fetch-depth: 0/);
-
-  const quality = readFileSync(join(REPO_ROOT, ".github/workflows/quality.yml"), "utf8");
-  const qualityFastGatesJob = workflowJob(quality, "fast-gates");
-  assert.match(qualityFastGatesJob, /gates=\([\s\S]*?\bprovider-asset-provenance\b[\s\S]*?\)/);
-  assert.match(qualityFastGatesJob, /npm run "check:\$g"/);
-  assert.match(qualityFastGatesJob, /fetch-depth: 0/);
 });

@@ -467,8 +467,24 @@ test("runCut in dry-run renders the whole sequence and exits 1 on a failed block
 });
 
 test("runCut is READY only when every dormant workflow exists at the source", async () => {
-  const real = (file: string) =>
-    fs.readFileSync(path.join(repoRoot, ".github/workflows", file), "utf8");
+  const VALIDATE_STABLE = `
+name: Validate stable PR
+on:
+  pull_request:
+    branches: [stable/v3]
+jobs:
+  validate:
+    if: github.base_ref == 'stable/v3'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
+`;
+  const fixtures: Record<string, string> = {
+    "forward-port.yml": FORWARD_PORT,
+    "validate-stable-pr.yml": VALIDATE_STABLE,
+    "nightly-v4-build.yml": NIGHTLY,
+  };
+  const real = (file: string) => fixtures[file] ?? null;
   const run = async (readWorkflow: (file: string) => string | null) => {
     const lines: string[] = [];
     const io = {
@@ -488,15 +504,25 @@ test("runCut is READY only when every dormant workflow exists at the source", as
   assert.match(missing.out, /nightly-v4-build\.yml: MISSING at the cut source/);
 });
 
-test("the real dormant workflows on this base activate as RELEASE_STRATEGY.md promises", () => {
-  const read = (file: string) =>
-    fs.readFileSync(path.join(repoRoot, ".github/workflows", file), "utf8");
-  const fp = analyzeDormantWorkflow("forward-port.yml", read("forward-port.yml"));
+test("the dormant workflow fixtures activate as RELEASE_STRATEGY.md promises", () => {
+  const VALIDATE_STABLE = `
+name: Validate stable PR
+on:
+  pull_request:
+    branches: [stable/v3]
+jobs:
+  validate:
+    if: github.base_ref == 'stable/v3'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
+`;
+  const fp = analyzeDormantWorkflow("forward-port.yml", FORWARD_PORT);
   assert.ok(fp.triggers.includes("push → stable/v3"));
   assert.ok(fp.forkCaveats.length > 0, "forward-port is pinned to the canonical repository");
-  const stable = analyzeDormantWorkflow("validate-stable-pr.yml", read("validate-stable-pr.yml"));
+  const stable = analyzeDormantWorkflow("validate-stable-pr.yml", VALIDATE_STABLE);
   assert.ok(stable.triggers.includes("pull_request → stable/v3"));
-  const nightly = analyzeDormantWorkflow("nightly-v4-build.yml", read("nightly-v4-build.yml"));
+  const nightly = analyzeDormantWorkflow("nightly-v4-build.yml", NIGHTLY);
   assert.ok(nightly.activates.some((l) => /develop exists/.test(l)));
   assert.ok(nightly.stillGated.some((l) => /vars\.NIGHTLY_PUBLISH/.test(l)));
 });

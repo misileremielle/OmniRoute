@@ -204,13 +204,13 @@ test("#10408 regression: changed quality.yml names check-workflows.test.ts in ga
   assert.deepEqual(selected, [pinned]);
 });
 
-test("the real check-workflows test is linked to the real quality.yml", () => {
+test("the real check-workflows test is linked to the real ci.yml", () => {
   const artifacts = extractPathLiteralEdges({
     root: REPO_ROOT,
     testFiles: ["tests/unit/build/check-workflows.test.ts"],
   });
   assert.ok(
-    artifacts[".github/workflows/quality.yml"]?.includes("tests/unit/build/check-workflows.test.ts")
+    artifacts[".github/workflows/ci.yml"]?.includes("tests/unit/build/check-workflows.test.ts")
   );
 });
 

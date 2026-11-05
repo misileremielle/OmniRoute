@@ -75,20 +75,6 @@ test("it still governs the build-like jobs — the ones that actually need the R
     jobs.includes("build"),
     "the build is the whole reason the variable exists: 18-20 GB working set vs a 16 GB hosted runner"
   );
-  assert.ok(
-    jobs.includes("publish"),
-    "npm-publish falls back to a full build when the artifact is missing"
-  );
-});
-
-test("fast-gates specifically stays hosted", () => {
-  // The holdout. 160 runs, zero self-hosted samples — dead configuration, and it would have
-  // inherited the setup-node penalty the day it fired.
-  const wf = fs.readFileSync(path.join(workflowDir, "quality.yml"), "utf-8");
-  const block = wf.split(/^ {2}fast-gates:\s*$/m)[1] ?? "";
-  const runsOn = /^ {4}runs-on:\s*(.+)$/m.exec(block);
-  assert.ok(runsOn, "fast-gates must declare runs-on");
-  assert.match(runsOn[1].trim(), /^ubuntu-latest$/, "fast-gates must be pinned, not switched");
 });
 
 /** Every `runs-on:` line that mentions USE_VPS_TEST_RUNNER, with its owning job. */

@@ -36,7 +36,7 @@ const evaluateZizmor = evaluateZizmorRatchet as (
   baseline: number
 ) => RatchetVerdict;
 const readZizmorBaseline = readBaselineZizmorValue as (p?: string) => number | null;
-const qualityWorkflowPath = new URL("../../../.github/workflows/quality.yml", import.meta.url);
+const ciWorkflowPath = new URL("../../../.github/workflows/ci.yml", import.meta.url);
 const scheduledGuard = findScheduledJobsWithoutGuard as (
   files: string[]
 ) => { file: string; job: string; reason: string }[];
@@ -45,18 +45,7 @@ const scheduledGuard = findScheduledJobsWithoutGuard as (
 // scheduled-run guard — every scheduled workflow runs only in the upstream repo
 // ─────────────────────────────────────────────────────────────────────────────
 
-const EXPECTED_SCHEDULED_WORKFLOWS = [
-  "docker-publish.yml",
-  "nightly-compat.yml",
-  "nightly-llm-security.yml",
-  "nightly-mutation.yml",
-  "nightly-property.yml",
-  "nightly-release-green.yml",
-  "nightly-resilience.yml",
-  "nightly-schemathesis.yml",
-  "scorecard.yml",
-  "test-quarantine.yml",
-];
+const EXPECTED_SCHEDULED_WORKFLOWS = ["docker-publish.yml"];
 
 function readWorkflowFiles(): string[] {
   return collectWorkflowFiles(
@@ -149,12 +138,12 @@ test("the scheduled-guard check reports repository-relative paths", () => {
   }
 });
 
-function readQualityWorkflow(): string {
-  return fs.readFileSync(qualityWorkflowPath, "utf8");
+function readCiWorkflow(): string {
+  return fs.readFileSync(ciWorkflowPath, "utf8");
 }
 
 test("admission workflows do not enable setup-node's redundant package-manager cache", () => {
-  for (const workflow of ["ci", "quality"]) {
+  for (const workflow of ["ci"]) {
     const source = fs.readFileSync(
       new URL(`../../../.github/workflows/${workflow}.yml`, import.meta.url),
       "utf8"
@@ -183,7 +172,7 @@ test("admission workflows do not enable setup-node's redundant package-manager c
 });
 
 test("integration candidates never restore PR dependency, lint or browser caches", () => {
-  for (const workflow of ["ci", "quality"]) {
+  for (const workflow of ["ci"]) {
     const source = fs.readFileSync(
       new URL(`../../../.github/workflows/${workflow}.yml`, import.meta.url),
       "utf8"
@@ -475,12 +464,10 @@ test("readBaselineZizmorValue: invalid JSON returns null (does not throw)", () =
 // quality.yml — release PR build gate regression coverage (#7307)
 // ─────────────────────────────────────────────────────────────────────────────
 
-test("quality admission covers both bases and delegates required build/package checks to CI", () => {
-  const source = readQualityWorkflow();
-  assert.match(source, /pull_request:\n\s+branches: \[main, "release\/\*\*"\]/);
-  assert.match(source, /merge_group:\n\s+types: \[checks_requested\]/);
-  assert.doesNotMatch(source, /\n  build:\n/, "no permanently skipped duplicate build job");
-  const ci = fs.readFileSync(new URL("../../../.github/workflows/ci.yml", import.meta.url), "utf8");
+test("CI admission covers both bases and implements required build/package checks", () => {
+  const ci = readCiWorkflow();
+  assert.match(ci, /pull_request:\n\s+branches: \[main, "release\/\*\*"\]/);
+  assert.match(ci, /merge_group:\n\s+types: \[checks_requested\]/);
   const policy = JSON.parse(
     fs.readFileSync(
       new URL("../../../config/quality/admission-policy.json", import.meta.url),

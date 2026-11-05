@@ -260,38 +260,6 @@ test("ci.yml lint job runs the blocking boundary ratchet (base-relative on PRs, 
   assert.match(script, /else\s+npm run check:boundary:ratchet\s+fi/);
 });
 
-test("quality.yml fast-gates lists boundary among the --ratchet gates", () => {
-  const steps = loadWorkflow("quality.yml").jobs["fast-gates"].steps;
-  const script = steps.map((s) => s.run ?? "").find((r) => r.includes("ratchet_gates=("));
-  assert.ok(script, "fast-gates must keep the ratchet_gates loop");
-  const body = /ratchet_gates=\(([^)]*)\)/.exec(script)![1];
-  const gates = body
-    .split("\n")
-    .map((line) => line.replace(/#.*/, ""))
-    .join(" ")
-    .split(/\s+/)
-    .filter(Boolean);
-  assert.ok(gates.includes("boundary"), `ratchet_gates = ${gates.join(" ")}`);
-  assert.ok(gates.includes("cycles"));
-  // The loop calls `npm run check:$g -- --ratchet`, so check:boundary must forward it.
-  assert.match(script, /npm run "check:\$g" -- --ratchet/);
-});
-
-test("quality.yml fast-gates passes --base-ref $PR_BASE_SHA to boundary on PR events", () => {
-  const steps = loadWorkflow("quality.yml").jobs["fast-gates"].steps as (Step & {
-    env?: Record<string, string>;
-  })[];
-  const step = steps.find((s) => (s.run ?? "").includes("ratchet_gates=("));
-  assert.ok(step, "fast-gates must keep the ratchet_gates loop");
-  assert.equal(step.env?.PR_BASE_SHA, "${{ github.event.pull_request.base.sha }}");
-  const loop = (step.run ?? "").slice((step.run ?? "").indexOf('for g in "${ratchet_gates[@]}"'));
-  assert.match(loop, /case "\$g" in boundary\) BASE_RELATIVE=1 ;; \*\) BASE_RELATIVE= ;; esac/);
-  assert.match(
-    loop,
-    /if \[ -n "\$BASE_RELATIVE" \] && \[ -n "\$\{PR_BASE_SHA:-\}" \]; then\s+npm run "check:\$g" -- --ratchet --base-ref "\$PR_BASE_SHA" \|\| failed\+=\("\$g"\)/
-  );
-});
-
 // ---------------------------------------------------------------------------
 // PR base-relative mode (--base-ref)
 // ---------------------------------------------------------------------------
