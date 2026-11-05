@@ -96,7 +96,6 @@ test("isRuntimeDocsMirrorPath accepts only mirrors the docs route can serve", ()
     "docs/i18n/pt-BR/docs/security/PUBLIC_CREDS.md",
     "docs/i18n/pt-BR/docs/security/STEALTH_GUIDE.md",
     "docs/i18n/pt-BR/docs/security/SOCKET_DEV_FINDINGS.md",
-    "docs/i18n/pt-BR/docs/security/MITM-TPROXY-DECRYPT.md",
     // not markdown, or not a mirror at all
     "docs/i18n/pt-BR/docs/guides/screenshot.png",
     "docs/i18n/pt-BR/docs/guides/meta.json",

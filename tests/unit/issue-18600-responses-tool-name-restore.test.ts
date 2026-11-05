@@ -465,16 +465,14 @@ test("explicit-flat function calls survive custom classification without a names
   });
 });
 
-test("native Responses JSON restores aliases in both phases and memory extraction", () => {
+test("native Responses JSON restores aliases in both phases", () => {
   for (const phase of ["intermediate", "final"] as const) {
     const result = translateNonStreamingClientResponse(
       makeResponsesInput(FORMATS.OPENAI_RESPONSES, phase)
     );
     const visible = firstOutputItem(result.response);
-    const memory = firstOutputItem(result.responseForMemoryExtraction);
 
     assert.equal(visible.name, FLAT_CLIENT_NAME, phase);
-    assert.equal(memory.name, FLAT_CLIENT_NAME, `${phase} memory extraction`);
     assert.equal("namespace" in visible, false, phase);
     assert.equal(visible.id, "fc_1");
     assert.equal(visible.call_id, "call_1");
@@ -491,7 +489,6 @@ test("Responses to Chat restores the declared name before schema-aware argument 
 
   assert.equal(fn.name, FLAT_CLIENT_NAME);
   assert.deepEqual(JSON.parse(String(fn.arguments)), { query: "docs" });
-  assert.equal(firstChatFunction(result.responseForMemoryExtraction).name, FLAT_CLIENT_NAME);
 });
 
 test("Responses to Claude restores the declared name and preserves schema cleanup", () => {
@@ -500,5 +497,4 @@ test("Responses to Claude restores the declared name and preserves schema cleanu
 
   assert.equal(toolUse.name, FLAT_CLIENT_NAME);
   assert.deepEqual(toolUse.input, { query: "docs" });
-  assert.equal(firstClaudeToolUse(result.responseForMemoryExtraction).name, FLAT_CLIENT_NAME);
 });

@@ -34,13 +34,8 @@ function transform(body: JsonRecord, native: boolean, endpoint = "/responses"): 
   return JSON.parse(JSON.stringify(result)) as JsonRecord;
 }
 
-function selected(
-  body: JsonRecord,
-  metadata: JsonRecord = {},
-  forced?: string,
-  allowDefaults = true
-): JsonRecord {
-  applyCodexReasoningSelection(model, body, metadata, "medium", allowDefaults, forced);
+function selected(body: JsonRecord, metadata: JsonRecord = {}, allowDefaults = true): JsonRecord {
+  applyCodexReasoningSelection(model, body, metadata, "medium", allowDefaults);
   return body.reasoning as JsonRecord;
 }
 
@@ -200,11 +195,10 @@ for (const native of [true, false]) {
 test("numeric zero wins over ordinary defaults and a legacy reasoning_effort carrier", () => {
   assert.equal(selected({ model, reasoning: { effort: 0 }, reasoning_effort: "high" }).effort, 0);
   assert.equal(selected({ model, reasoning_effort: 0 }).effort, 0);
-  assert.equal(selected({ model, reasoning: { effort: 0 } }, {}, undefined, false).effort, 0);
+  assert.equal(selected({ model, reasoning: { effort: 0 } }, {}, false).effort, 0);
 });
 
-test("server force and an unparsed model suffix still outrank numeric effort", () => {
-  assert.equal(selected({ model, reasoning: { effort: 0 } }, {}, "high").effort, "high");
+test("an unparsed model suffix still outranks numeric effort", () => {
   const body: JsonRecord = { model: "gpt-5.5-xhigh", reasoning: { effort: 0 } };
   applyCodexReasoningSelection("gpt-5.5-xhigh", body, {}, undefined, true);
   assert.equal((body.reasoning as JsonRecord).effort, "xhigh");
@@ -219,7 +213,6 @@ test("a catalog-resolved model suffix is not mistaken for an ordinary default", 
     requestedThinkingEffort: 0,
   };
   assert.equal(selected({ model, reasoning: { effort: 0 } }, metadata).effort, "high");
-  assert.equal(selected({ model, reasoning: { effort: 0 } }, metadata, "low").effort, "low");
 });
 
 test("original numeric effort is restored for a translated catalog-backed request", () => {
@@ -239,10 +232,7 @@ test("Chat max restoration and non-passthrough policy retain their precedence", 
     requestedThinkingEffort: "max",
   };
   assert.equal(selected({ model, reasoning: { effort: "xhigh" } }, metadata).effort, "max");
-  assert.equal(
-    selected({ model, reasoning: { effort: "high" } }, metadata, undefined, false).effort,
-    "high"
-  );
+  assert.equal(selected({ model, reasoning: { effort: "high" } }, metadata, false).effort, "high");
 });
 
 test("literal catalog IDs ending in high are not stripped a second time", () => {

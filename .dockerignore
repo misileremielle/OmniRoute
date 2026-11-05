@@ -87,7 +87,6 @@ docs/i18n/**
 !docs/i18n/*/docs/comparison/**/*.md
 docs/i18n/*/docs/security/STEALTH_GUIDE.md
 docs/i18n/*/docs/security/SOCKET_DEV_FINDINGS.md
-docs/i18n/*/docs/security/MITM-TPROXY-DECRYPT.md
 docs/i18n/*/docs/security/PUBLIC_CREDS.md
 # Internal planning artifacts (gitignored). `*.md` above only matches the root,
 # so without this rule these land in /app/docs and become readable through the

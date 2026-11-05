@@ -234,24 +234,21 @@ for (const allowDefaults of [true, false]) {
   });
 }
 
-for (const forcedEffort of [undefined, "low"]) {
-  test(`catalog suffix outranks explicit effort; server force outranks suffix (force=${forcedEffort})`, () => {
-    const body: Record<string, unknown> = {
-      model: "gpt-5.6-sol",
-      reasoning: { effort: "medium" },
-    };
-    applyCodexReasoningSelection(
-      "gpt-5.6-sol",
-      body,
-      { ...catalogThinking, requestedThinkingEffort: "medium", resolvedThinkingEffort: "high" },
-      "low",
-      true,
-      forcedEffort
-    );
-    assert.equal(body.model, "gpt-5.6-sol");
-    assert.deepEqual(body.reasoning, { effort: forcedEffort ?? "high" });
-  });
-}
+test("catalog suffix outranks explicit effort", () => {
+  const body: Record<string, unknown> = {
+    model: "gpt-5.6-sol",
+    reasoning: { effort: "medium" },
+  };
+  applyCodexReasoningSelection(
+    "gpt-5.6-sol",
+    body,
+    { ...catalogThinking, requestedThinkingEffort: "medium", resolvedThinkingEffort: "high" },
+    "low",
+    true
+  );
+  assert.equal(body.model, "gpt-5.6-sol");
+  assert.deepEqual(body.reasoning, { effort: "high" });
+});
 
 for (const disabled of [{ effort: "none" }, { enabled: false }]) {
   test(`explicit ${JSON.stringify(disabled)} beats connection defaults with unusable metadata`, () => {

@@ -32,7 +32,6 @@ export const DOCS_RUNTIME_SECTIONS = Object.freeze([
 export const DOCS_RUNTIME_EXCLUDED_PAGES = Object.freeze([
   "security/STEALTH_GUIDE.md",
   "security/SOCKET_DEV_FINDINGS.md",
-  "security/MITM-TPROXY-DECRYPT.md",
   "security/PUBLIC_CREDS.md",
 ]);
 

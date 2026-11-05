@@ -87,7 +87,11 @@ test.before(async () => {
     name: "claude-codex-effort-18746",
     accessToken: "test-only-codex-token",
     isActive: true,
-    providerSpecificData: { requestDefaults: { reasoningEffort: "low" } },
+    providerSpecificData: {
+      requestDefaults: { reasoningEffort: "low" },
+      // This fork routes Sol/Astra models only to paid Codex plans.
+      workspacePlanType: "pro",
+    },
   });
   await persistDiscoveredModels(
     "codex",
