@@ -83,6 +83,8 @@ function sanitize(headers: Record<string, unknown>): Record<string, unknown> {
         /(antigravity\/cli\/\d+\.\d+\.\d+ \(aidev_client; os_type=)[^;]+(; arch=)[^;]+(; auth_method=[^)]+\))/g,
         "$1<OS>$2<ARCH>$3"
       )
+      // Copilot's User-Agent embeds process.platform: "copilot/1.0.91 (darwin) term/unknown".
+      .replace(/(copilot\/[\d.]+ )\((?:darwin|linux|win32|freebsd|openbsd|aix|sunos)\)/g, "$1(<OS>)")
       .replace(/kimi-\d{10,}/g, "kimi-<TS>")
       .replace(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, "<UUID>");
     if (NODE_VERSION) s = s.split(NODE_VERSION).join("<NODE>");

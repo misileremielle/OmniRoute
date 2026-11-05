@@ -41,6 +41,25 @@ if (process.env.NODE_TEST_CONTEXT?.startsWith("child")) {
   )._handle?.setBlocking?.(true);
 }
 
+// Proxy isolation: a host-level HTTP(S)_PROXY (corporate proxies, sandboxes, CI egress
+// agents) leaks into every test process, and OmniRoute's own fetch layer honours it — so tests
+// of proxy routing, retries and loopback mocks failed or passed depending on the machine.
+// Tests that need a proxy set one themselves. OMNIROUTE_TEST_KEEP_HOST_PROXY=1 opts out.
+if (process.env.OMNIROUTE_TEST_KEEP_HOST_PROXY !== "1") {
+  for (const key of [
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "ALL_PROXY",
+    "NO_PROXY",
+    "http_proxy",
+    "https_proxy",
+    "all_proxy",
+    "no_proxy",
+  ]) {
+    delete process.env[key];
+  }
+}
+
 if (!process.env.DATA_DIR) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-test-"));
   process.env.DATA_DIR = dir;

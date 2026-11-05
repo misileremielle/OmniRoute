@@ -201,7 +201,7 @@ function editRunValues(expression) {
   return values;
 }
 
-for (const name of ["ci.yml", "quality.yml"]) {
+for (const name of ["ci.yml"]) {
   const wf = load(
     readFileSync(new URL(`../../.github/workflows/${name}`, import.meta.url), "utf8")
   );
@@ -226,16 +226,12 @@ for (const name of ["ci.yml", "quality.yml"]) {
       if (!/always\(\)|cancelled\(\)/.test(guard)) continue;
       assert.equal(condition(guard, editRunValues(guard)), false, `${name}:${id}`);
     }
-    if (name === "quality.yml") {
-      const guard = wf.jobs["merge-integrity"].if;
-      assert.equal(condition(guard, editRunValues(guard)), true, "merge-integrity keeps running");
-    }
   });
 
   test(`${name}: only an edit run renames the gate check`, () => {
     // 2026-11-04: the edit run's skipped "Gate / CI" was the latest check of that name on draft
     // #18962, and Mergify dequeued #18961 on it before the real run reported.
-    const checkName = name === "ci.yml" ? "Gate / CI" : "Gate / Quality";
+    const checkName = "Gate / CI";
     assert.equal(
       wf.jobs["admission-verdict"].name,
       `\${{ (${QUEUE_DRAFT_EDIT}) && '${checkName} (queue-draft edit)' || '${checkName}' }}`

@@ -20,6 +20,9 @@ import {
   serializeRefresh,
   setRefreshLaneMaxMsForTest,
 } from "../../open-sse/services/refreshSerializer.ts";
+import { keepEventLoopAliveDuringTests } from "../helpers/keepEventLoopAlive.ts";
+
+keepEventLoopAliveDuringTests();
 
 const silentLog = { info() {}, warn() {}, error() {} };
 const MUTEX_MS = 150;

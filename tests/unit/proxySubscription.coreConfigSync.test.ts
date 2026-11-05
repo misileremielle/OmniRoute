@@ -5,6 +5,9 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+// A read-only directory does not stop root, so the write-failure path cannot be provoked.
+const ROOT_IGNORES_PERMISSIONS = typeof process.getuid === "function" && process.getuid() === 0;
+
 test("empty path writes nothing and never calls the renderer", async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-core-empty-"));
   const sync = await import("../../src/lib/proxySubscription/coreConfig/sync.ts");
@@ -304,34 +307,38 @@ test("model or render failure reports internal_error and does not throw", async 
   }
 });
 
-test("disk failure still reports the write reason", async () => {
-  const sync = await import("../../src/lib/proxySubscription/coreConfig/sync.ts");
-  const missing = await sync.generateForSubscription(
-    {
-      coreConfigPath: path.join(os.tmpdir(), "omniroute-no-such-dir-xyz", "core.json"),
-      localCoreEndpoint: ENDPOINTS,
-    },
-    singBoxFeed()
-  );
-  assert.ok(missing?.includes("write_failed"));
-  assert.ok(!missing?.includes("internal_error"));
-
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-core-readonly-"));
-  const target = path.join(dir, "core.json");
-  fs.writeFileSync(target, JSON.stringify({ inbounds: [], outbounds: [] }));
-  fs.chmodSync(dir, 0o555);
-  try {
-    const res = await sync.generateForSubscription(
-      { coreConfigPath: target, localCoreEndpoint: ENDPOINTS },
+test(
+  "disk failure still reports the write reason",
+  { skip: ROOT_IGNORES_PERMISSIONS ? "root ignores directory permissions" : false },
+  async () => {
+    const sync = await import("../../src/lib/proxySubscription/coreConfig/sync.ts");
+    const missing = await sync.generateForSubscription(
+      {
+        coreConfigPath: path.join(os.tmpdir(), "omniroute-no-such-dir-xyz", "core.json"),
+        localCoreEndpoint: ENDPOINTS,
+      },
       singBoxFeed()
     );
-    assert.ok(res?.includes("write_failed"), `got: ${res}`);
-    assert.ok(!res?.includes("internal_error"));
-  } finally {
-    fs.chmodSync(dir, 0o755);
-    fs.rmSync(dir, { recursive: true, force: true });
+    assert.ok(missing?.includes("write_failed"));
+    assert.ok(!missing?.includes("internal_error"));
+
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-core-readonly-"));
+    const target = path.join(dir, "core.json");
+    fs.writeFileSync(target, JSON.stringify({ inbounds: [], outbounds: [] }));
+    fs.chmodSync(dir, 0o555);
+    try {
+      const res = await sync.generateForSubscription(
+        { coreConfigPath: target, localCoreEndpoint: ENDPOINTS },
+        singBoxFeed()
+      );
+      assert.ok(res?.includes("write_failed"), `got: ${res}`);
+      assert.ok(!res?.includes("internal_error"));
+    } finally {
+      fs.chmodSync(dir, 0o755);
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   }
-});
+);
 
 test("repeated generations leave no accumulated state", async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-core-bounded-"));

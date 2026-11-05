@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { keepEventLoopAliveDuringTests } from "../helpers/keepEventLoopAlive.ts";
+
+keepEventLoopAliveDuringTests();
 
 const concurrency = await import("../../open-sse/services/qoderCliConcurrency.ts");
 const qoderCli = await import("../../open-sse/services/qoderCli.ts");

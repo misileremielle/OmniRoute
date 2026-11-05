@@ -6,6 +6,9 @@ import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+// A read-only directory does not stop root, so the write-failure path cannot be provoked.
+const ROOT_IGNORES_PERMISSIONS = typeof process.getuid === "function" && process.getuid() === 0;
+
 // Issue #8181 companion coverage for the two write-path defects in consoleInterceptor:
 //
 //  * writeEntry appends with no rate limit, so a flood writes unbounded lines to disk. The
@@ -147,26 +150,30 @@ test("a log directory removed at runtime is recreated and logging recovers (#818
   );
 });
 
-test("the log-unavailable notice is emitted at most once, to the real stderr", () => {
-  const r = runChild([
-    `const { rmSync, mkdirSync, chmodSync } = await import("node:fs");`,
-    `const { dirname } = await import("node:path");`,
-    `M.initConsoleInterceptor();`,
-    // Make the directory unrecreatable so the retry fails and the notice path is exercised.
-    `const parent = dirname(dirname(LOG_FILE));`,
-    `rmSync(dirname(LOG_FILE), { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });`,
-    `chmodSync(parent, 0o500);`,
-    `for (let i = 0; i < 5; i++) console.error("unwritable " + i);`,
-    `chmodSync(parent, 0o700);`,
-    `setTimeout(() => process.exit(0), 200);`,
-  ]);
+test(
+  "the log-unavailable notice is emitted at most once, to the real stderr",
+  { skip: ROOT_IGNORES_PERMISSIONS ? "root ignores directory permissions" : false },
+  () => {
+    const r = runChild([
+      `const { rmSync, mkdirSync, chmodSync } = await import("node:fs");`,
+      `const { dirname } = await import("node:path");`,
+      `M.initConsoleInterceptor();`,
+      // Make the directory unrecreatable so the retry fails and the notice path is exercised.
+      `const parent = dirname(dirname(LOG_FILE));`,
+      `rmSync(dirname(LOG_FILE), { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });`,
+      `chmodSync(parent, 0o500);`,
+      `for (let i = 0; i < 5; i++) console.error("unwritable " + i);`,
+      `chmodSync(parent, 0o700);`,
+      `setTimeout(() => process.exit(0), 200);`,
+    ]);
 
-  assert.equal(r.status, 0, `child must exit cleanly: ${r.stderr.slice(0, 400)}`);
-  const notices = r.stderr.split("\n").filter((l) => l.includes("[consoleInterceptor]"));
-  assert.equal(
-    notices.length,
-    1,
-    `the notice must fire exactly once across repeated failures, got ${notices.length} — a ` +
-      "per-call notice would itself become a flood"
-  );
-});
+    assert.equal(r.status, 0, `child must exit cleanly: ${r.stderr.slice(0, 400)}`);
+    const notices = r.stderr.split("\n").filter((l) => l.includes("[consoleInterceptor]"));
+    assert.equal(
+      notices.length,
+      1,
+      `the notice must fire exactly once across repeated failures, got ${notices.length} — a ` +
+        "per-call notice would itself become a flood"
+    );
+  }
+);

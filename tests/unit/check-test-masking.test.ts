@@ -626,3 +626,15 @@ test("findReimplementedConditions: matches despite operator-spacing differences"
   assert.equal(flags.length, 1);
   assert.equal(flags[0].condition, "status >= 500");
 });
+
+test("evaluateDeletedFiles: an operator-pruned deletion needs a reason", () => {
+  const path = "tests/unit/low-value-regex.test.ts";
+  assert.deepEqual(
+    evaluateDeletedFiles([path], { [path]: { pruned: true, reason: "source-text regex test" } }),
+    []
+  );
+  const flags = evaluateDeletedFiles([path], { [path]: { pruned: true, reason: " " } });
+  assert.equal(flags.length, 1);
+  assert.match(flags[0], /pruned mas sem `reason`/);
+  assert.equal(evaluateDeletedFiles([path], { [path]: { pruned: "yes" } }).length, 1);
+});

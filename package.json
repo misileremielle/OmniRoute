@@ -590,7 +590,7 @@
       }
     },
     "@apidevtools/json-schema-ref-parser": {
-      "js-yaml": "^5.4.2"
+      "js-yaml": "^5.5.0"
     },
     "@eslint/eslintrc": {
       "js-yaml": "^4.3.1"

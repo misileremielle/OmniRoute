@@ -265,6 +265,10 @@ export function findReimplementedConditions(prodSources, testSource, testImports
  *      deleção devolve o arquivo ao seu fluxo dono (um PR/issue aberto). O
  *      gate verifica via git que o commit declarado é exatamente o que ADICIONOU
  *      o arquivo; o `reason` deve nomear o PR/issue dono para a revisão humana.
+ *   4. `pruned: true` + `reason` (não-vazio) — o operador decidiu retirar um teste de
+ *      baixo valor (asserção textual sobre o código-fonte, ferramenta de tradução/README)
+ *      cujo código ainda existe. Sem verificação automática além do `reason`: a decisão é
+ *      humana e fica registrada na entrada, visível na revisão do PR.
  * Qualquer entrada cuja condição declarada não se verifique continua flagada.
  */
 export function evaluateDeletedFiles(
@@ -305,6 +309,11 @@ export function evaluateDeletedFiles(
       flags.push(
         `${f}: deleção allowlistada como stray de ${declared} mas o commit que adicionou o arquivo é ${actual ?? "desconhecido"}`
       );
+      continue;
+    }
+    if (entry && entry.pruned === true) {
+      if (typeof entry.reason === "string" && entry.reason.trim()) continue;
+      flags.push(`${f}: deleção allowlistada como pruned mas sem \`reason\``);
       continue;
     }
     flags.push(

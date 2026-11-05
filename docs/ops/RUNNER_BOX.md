@@ -109,8 +109,7 @@ a time, only when idle**, with the idle check and the restart in the same comman
   slot was oversubscribed several times over and own-origin PR Builds waited for hours.
   `release-green` and `main-green` now target `omni-release` (`omniroute-113-6` only) with
   `OMNIROUTE_USE_TURBOPACK=0`, and a started run is no longer cancelled by a newer push (the
-  pending slot still collapses the storm). `tests/unit/build/runner-capacity-routing.test.ts`
-  pins the routing, the webpack switch and that nothing on `omni-release` builds with Turbopack.
+  pending slot still collapses the storm).
 - **Light pool: `omni-light`.** `omniroute-113` and `omniroute-113-2` run the nightlies that need
   a backend-only `next build` (~5–6 GB; webpack) and `quality.yml` `lint-guard`. `omniroute-113`
   had `MemoryHigh=4G` until 2026-10-18 — the promptfoo build reclaimed its way through 54 minutes
@@ -152,7 +151,7 @@ hours and PRs were merged without them. Nine workflows fired on every push to th
 | `ci.yml` (full matrix)                      |    up to 30 | cancelled by the next push, 24 of 24 in a day                  | not started on `release/**` pushes (PR run + Release-Green)              |
 | `quality.yml`                               |          ~6 | cancelled, 23 of 23                                            | not started on `release/**` pushes                                       |
 | `Release-Green` `--quick`                   |           0 | ran on `omni-build`, cancelled 97 of 100                       | `omni-release` slot, never cancelled, pending run collapses              |
-| `Lock released branch`, `OpenSSF Scorecard` |           2 | one queued run per push                                        | one run per ref (`tests/unit/build/hosted-lane-concurrency.test.ts`)     |
+| `Lock released branch`, `OpenSSF Scorecard` |           2 | one queued run per push                                        | one run per ref                                                          |
 | `Release acceptance` (shadow report)        |           1 | one hosted `npm ci` per push, never cancelled                  | unchanged — candidate for a `paths:` filter                              |
 | `Publish to Docker Hub` → `Deploy to VPS`   |           2 | cancelled per push; amd64 leg competes on `omni-build`         | unchanged — owner's deploy channel                                       |
 | CodeQL default setup (`dynamic`)            |           4 | `javascript-typescript`, `actions`, `c-cpp`, `python` per push | unchanged — Settings → Code security; `c-cpp`/`python` scan nothing here |

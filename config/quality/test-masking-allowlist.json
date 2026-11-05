@@ -1725,6 +1725,458 @@
     "tests/unit/call-log-artifact-worker-tsx-cache.test.ts": {
       "replacement": "tests/unit/call-log-artifact-worker-native.test.ts",
       "reason": "v3.8.53 #18511 (fix(call-logs): avoid esbuild zombies in source workers) removed the tsx-loader path for the call-log artifact worker: source workers now run natively without CLI preloads, so TSX_DISABLE_CACHE and the tsx disk-cache environment no longer exist. The native-worker test added in the same PR pins the replacement behavior (writes survive idle restarts and forced close without esbuild children; no inherited CLI preloads)."
+    },
+    "tests/integration/cli-runtime-compiled-platform-16547.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/11024-n-instance-scale-out-docs.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/api-manager-page-static.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/api-manager-quota-keys-section.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/api-manager-usage-command.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/batch-page-static.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/bedrock-client-contract.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/build-basepath-brand.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/build/sync-changelog-i18n.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/chat-safetynet-pin.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/cli-dashboard-port.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/cli-doctor-rooturl-windows-5844.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/cli-serve-port.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/cli-serve-version-banner.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/cli/cli-manifest-node-import.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/cli/windows-esm-import-paths.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/connection-row-connection-fields.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/cycle-docs-mirror-contract.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/dashboard-ckpt2-a11y.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/dashboard-lote7-page-headers.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/dashboard-skip-link.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/docs-mdx-components-default-export.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/docs-navigation-routes.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/docs/readme-diagrams-driver.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): README diagram generator / translated-docs mirror test; those generators are not part of this fork's CI."
+    },
+    "tests/unit/docs/readme-fonts.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): README diagram generator / translated-docs mirror test; those generators are not part of this fork's CI."
+    },
+    "tests/unit/docs/readme-glyph-coverage.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): README diagram generator / translated-docs mirror test; those generators are not part of this fork's CI."
+    },
+    "tests/unit/docs/readme-outline.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): README diagram generator / translated-docs mirror test; those generators are not part of this fork's CI."
+    },
+    "tests/unit/editions-warning-ink-contrast.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/glm-sse-transform-arity.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/home-page-client-hook-imports-4759.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/home-page-static.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/home-provider-topology-live-state.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/i18n-add-locale-helpers.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-block-extra-usage-copy.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-cc-alias-unclosed-tags.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-cc-onboarding-placeholder-12302.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-disabled-not-person-with-disability.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-find-unreferenced-keys.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-glossary-consistency-check.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-google-fallback-ui-keys.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-google-html-structure.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-google-translate.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-hardcoded-ui-regressions.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-home-recent-requests-topology-legend.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-icu-rich-text-regression.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-issue-ref-protection.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-locale-scaffold.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-provider-filter-keys-6290.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-provider-visibility-filter-keys-6694.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-retranslate-site.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-review-locale.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-run-translation-chunk-fallback.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-run-translation-chunking.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-run-translation-edited-mirror.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-run-translation-format.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-run-translation-heal-source-hash.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-run-translation-partial-18538.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-run-translation-sections.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-sync-ui-keys-catalog.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-sync-ui-keys-locales-per-request.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-sync-ui-keys-merge.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-sync-ui-keys-process-locale-write.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-sync-ui-keys-retranslate.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-translate-backend-fallback.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-translate-backend-icu-quotes.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-translate-backend.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-translation-drift-stale-targets.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-translation-output-guard.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-translation-ratio-gate.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-translation-state-adopt.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/i18n-translation-state-atomic.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/kiro-idc-profilearn-extradata.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/lib/jobRegistry/boot-wiring.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/models-catalog-cache-skip.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/muse-spark-cookie-copy-5449.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/onboarding-wizard-details-link-6145.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/openapi-ws-endpoint.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/perf-quick-wins-async-fs-routes.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/perf-quick-wins-limiter-settings-cap.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/pi-manual-config-sample-icu.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/pricing-sync-status-7955.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/provider-connection-row-mobile-layout.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/provider-connections-ui-regression.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/provider-learn-more-link.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/providers-chatgpt-web-codex-lazy-import-12355.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/quota-availability-i18n.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/quota-deactivate-toggle.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/quota-overview-drag-i18n.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/quota-trackers-batch-init.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/reactive-context-compaction-policy.test.mjs": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/readme-migration-count-14574.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): README diagram generator / translated-docs mirror test; those generators are not part of this fork's CI."
+    },
+    "tests/unit/rtl-font-stack.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/settings-ui-i18n-catalogs.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/shared/analytics-recharts-lazy.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/sidebar-essentials-static.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/small-vps-docs.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/sonar-quality-gate-fixes.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/stream-early-eof-affinity-8928.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/tls-client-wreq-residue.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/topology-filtering-and-click.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/translator-friendly-i18n-keys.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): test of the machine-translation / catalog-sync tooling or a single translated string, not of runtime i18n behavior."
+    },
+    "tests/unit/ui-kit-snapshot-gate.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/ui/home-update-error-render-5991.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/ui/home-update-step-warning-color-amber.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/uikit-dead-code-removed.test.ts": {
+      "pruned": true,
+      "reason": "Pruned (operator decision, test-suite cutback): source-text regex assertion over UI markup, import wiring or doc wording; it pins implementation text rather than behavior."
+    },
+    "tests/unit/build/hosted-lane-concurrency.test.ts": {
+      "sourceRemoved": [
+        ".github/workflows/lock-released-branch.yml",
+        ".github/workflows/scorecard.yml",
+        ".github/workflows/api-route-typecheck.yml",
+        ".github/workflows/semgrep.yml"
+      ],
+      "reason": "Feature removed in this fork; nothing left to test."
+    },
+    "tests/unit/workflow-scanner-installer.test.mjs": {
+      "sourceRemoved": [".github/workflows/quality.yml"],
+      "reason": "Feature removed in this fork; nothing left to test."
+    },
+    "tests/unit/leonardo-image-model-id.test.ts": {
+      "sourceRemoved": ["open-sse/handlers/imageGeneration/providers/leonardo.ts"],
+      "reason": "Feature removed in this fork; nothing left to test."
+    },
+    "tests/unit/leonardo-video-generation.test.ts": {
+      "sourceRemoved": [
+        "open-sse/handlers/videoGeneration/leonardoHandler.ts",
+        "open-sse/config/videoRegistry.ts"
+      ],
+      "reason": "Feature removed in this fork; nothing left to test."
+    },
+    "tests/unit/boundary-engine-usage-funnel.test.ts": {
+      "sourceRemoved": ["open-sse/handlers/imageResult.ts"],
+      "reason": "Feature removed in this fork; nothing left to test."
+    },
+    "tests/unit/migration-225-token-ledger-indexes.test.ts": {
+      "sourceRemoved": ["src/lib/db/gamification.ts"],
+      "reason": "Feature removed in this fork; nothing left to test."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -1809,5 +2261,9 @@
   "tests/unit/settings-cas-7784.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned radarAdminUrl exposure on GET /api/settings; that source no longer exists. The settings CAS asserts are unchanged.",
   "tests/unit/sidebar-costs-section.test.ts": "Radar removal (refactor: remove Radar and the free-tier rankings page): the removed asserts pinned the radar item, its RADAR_ENABLED gate and isSidebarItemVisibleForFlags(); that source no longer exists.",
   "tests/unit/internal-management-auth-16593.test.ts": "Chaos Mode removal (refactor: remove Chaos Mode): the removed asserts pinned dashboard Chaos Mode dispatch auth; that source no longer exists. auto/chaos and config.chaos stay and keep their own tests.",
-  "tests/unit/open-mode-management-credential-mint.test.ts": "Chaos Mode removal (refactor: remove Chaos Mode): the removed asserts pinned the chaosModeEnabled key field; that source no longer exists. auto/chaos and config.chaos stay and keep their own tests."
+  "tests/unit/open-mode-management-credential-mint.test.ts": "Chaos Mode removal (refactor: remove Chaos Mode): the removed asserts pinned the chaosModeEnabled key field; that source no longer exists. auto/chaos and config.chaos stay and keep their own tests.",
+  "tests/unit/build/backend-only-smoke-workflows.test.ts": "The removed asserts checked dast-smoke.yml, nightly-schemathesis.yml, nightly-resilience.yml, nightly-llm-security.yml and npm-publish.yml, which this fork deleted; the backend-only profile checks remain.",
+  "tests/unit/build/push-storm-diet.test.ts": "The removed asserts covered quality.yml and nightly-release-green.yml, which this fork deleted; the ci.yml push-trigger check remains.",
+  "tests/unit/check-docs-counts-rankings-catalog.test.ts": "Dropped a source-text assert that src/app/api/free-tier/summary/route.ts calls slice(0, 10); the merged upstream route passes FREE_CATALOG_CURATED_AT through unchanged.",
+  "tests/unit/management-auth-hardening.test.ts": "Dropped the memory-route case: src/app/api/memory/** was removed with the memory system."
 }

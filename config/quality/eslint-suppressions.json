@@ -1957,11 +1957,6 @@
       "count": 1
     }
   },
-  "tests/unit/batch-page-static.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/batch-processor.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 6

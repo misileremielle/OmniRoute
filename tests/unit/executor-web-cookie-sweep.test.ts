@@ -34,7 +34,12 @@ import { FAKE_CREDS } from "./fixtures/web-cookie-fake-creds.fixture.ts";
 type WebCookieId = keyof typeof WEB_COOKIE_PROVIDERS;
 type NoauthId = keyof typeof NOAUTH_PROVIDERS;
 
-const WEB_COOKIE_IDS = Object.keys(WEB_COOKIE_PROVIDERS) as WebCookieId[];
+// Providers with no service kind (e.g. adobe-firefly, whose media executor was removed with
+// image/video generation) have no chat executor to sweep.
+const WEB_COOKIE_IDS = (Object.keys(WEB_COOKIE_PROVIDERS) as WebCookieId[]).filter((id) => {
+  const kinds = (WEB_COOKIE_PROVIDERS[id] as { serviceKinds?: readonly string[] }).serviceKinds;
+  return !Array.isArray(kinds) || kinds.length > 0;
+});
 const NOAUTH_IDS = Object.keys(NOAUTH_PROVIDERS) as NoauthId[];
 
 const VALID_BODY = {
@@ -86,7 +91,7 @@ function assertExecutorWrapperShape(
 }
 
 describe("web-cookie + noauth executor wrapper contract sweep", () => {
-  describe("WEB_COOKIE_PROVIDERS (26)", () => {
+  describe("WEB_COOKIE_PROVIDERS", () => {
     for (const providerId of WEB_COOKIE_IDS) {
       it(`${providerId} executor returns wrapper shape`, async () => {
         const executor = await getExecutor(providerId);

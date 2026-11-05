@@ -42,7 +42,7 @@ function runIsolatedFixture(testRoot: string): Promise<FixtureResult> {
   delete childEnv.NODE_TEST_CONTEXT;
 
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, ["--import", "tsx/esm", "--test", FIXTURE], {
+    const child = spawn(process.execPath, ["--import", "tsx/esm", "--test", "--test-reporter=spec", FIXTURE], {
       cwd: REPO_ROOT,
       env: childEnv,
       stdio: ["ignore", "pipe", "pipe"],

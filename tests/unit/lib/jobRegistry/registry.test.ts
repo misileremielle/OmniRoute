@@ -761,7 +761,12 @@ for (const type of ["interval", "cron"] as const) {
     if (type === "cron") t.mock.timers.tick(1000);
     await settle();
     assert.equal(calls, 1);
-    assert.equal(errors.mock.callCount(), 1);
+    // Count the registry's own errors only: some Node versions also print the MockTimers
+    // ExperimentalWarning through console.error.
+    const registryErrors = errors.mock.calls.filter((call) =>
+      String(call.arguments[0]).startsWith("[JobRegistry]")
+    );
+    assert.equal(registryErrors.length, 1);
 
     fault.recover();
     t.mock.timers.tick(1000);

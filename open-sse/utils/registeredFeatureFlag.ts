@@ -25,3 +25,24 @@ export function isRegisteredFeatureFlagEnabled(
     return false;
   }
 }
+
+/**
+ * Same as isRegisteredFeatureFlagEnabled for a flag whose definition default is ON. Without a
+ * registered server resolver an unset environment variable means "on"; only an explicit
+ * false/0/no turns it off. Fails closed when the resolver throws.
+ */
+export function isRegisteredDefaultOnFeatureFlagEnabled(
+  key: string,
+  env: EnvLike = typeof process === "undefined" ? {} : process.env
+): boolean {
+  try {
+    const resolver = (globalThis as Record<symbol, unknown>)[FEATURE_FLAG_RESOLVER_KEY];
+    if (typeof resolver === "function") {
+      return (resolver as (flag: string) => boolean)(key) === true;
+    }
+    const raw = env[key]?.trim().toLowerCase();
+    return !(raw === "false" || raw === "0" || raw === "no" || raw === "off");
+  } catch {
+    return false;
+  }
+}

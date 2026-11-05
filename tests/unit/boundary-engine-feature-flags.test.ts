@@ -119,6 +119,34 @@ test("every flag read through the env-fallback helper defaults to off", () => {
   );
 });
 
+test("the default-on reader is used only for flags whose definition default is on", () => {
+  const sources = engineSources();
+  const constants = new Map<string, string>();
+  for (const src of sources.values()) {
+    for (const m of src.matchAll(/\bconst ([A-Z0-9_]+)\s*=\s*"([A-Z0-9_]+)"/g))
+      constants.set(m[1], m[2]);
+  }
+  const misused: string[] = [];
+  let reads = 0;
+  for (const [file, src] of sources) {
+    if (file === "open-sse/utils/registeredFeatureFlag.ts") continue;
+    for (const m of src.matchAll(
+      /\bisRegisteredDefaultOnFeatureFlagEnabled\(\s*(?:"([A-Z0-9_]+)"|([A-Za-z0-9_]+))/g
+    )) {
+      reads += 1;
+      const key = m[1] ?? constants.get(m[2]);
+      const def = FEATURE_FLAG_DEFINITIONS.find((d) => d.key === key);
+      if (def?.defaultValue !== "true") misused.push(`${key ?? m[2]} (${file})`);
+    }
+  }
+  assert.ok(reads > 0, "scan should find EMPTY_STREAM_SIBLING_RECOVERY_ENABLED");
+  assert.deepEqual(
+    misused,
+    [],
+    "a default-off flag must be read with isRegisteredFeatureFlagEnabled"
+  );
+});
+
 test("the DB layer always loads featureFlags.ts, which registers the resolver", () => {
   const coreSrc = fs.readFileSync("src/lib/db/core.ts", "utf8");
   assert.match(coreSrc, /^import \{[^}]*\} from "@\/shared\/utils\/featureFlags";$/m);
@@ -140,5 +168,25 @@ test("a dashboard override reaches a moved engine file", () => {
     featureFlagsDb.removeFeatureFlagOverride(key);
     if (savedEnv === undefined) delete process.env[key];
     else process.env[key] = savedEnv;
+  }
+});
+
+test("the default-on reader is on without a resolver unless the env turns it off", async () => {
+  const { isRegisteredDefaultOnFeatureFlagEnabled } =
+    await import("../../open-sse/utils/registeredFeatureFlag.ts");
+  const key = Symbol.for("omniroute.featureFlagResolver");
+  const owner = globalThis as Record<symbol, unknown>;
+  const saved = owner[key];
+  delete owner[key];
+  try {
+    assert.equal(isRegisteredDefaultOnFeatureFlagEnabled("X_FLAG", {}), true);
+    assert.equal(isRegisteredDefaultOnFeatureFlagEnabled("X_FLAG", { X_FLAG: "false" }), false);
+    assert.equal(isRegisteredDefaultOnFeatureFlagEnabled("X_FLAG", { X_FLAG: "0" }), false);
+    assert.equal(isRegisteredDefaultOnFeatureFlagEnabled("X_FLAG", { X_FLAG: "true" }), true);
+    owner[key] = () => false;
+    assert.equal(isRegisteredDefaultOnFeatureFlagEnabled("X_FLAG", {}), false);
+  } finally {
+    if (saved === undefined) delete owner[key];
+    else owner[key] = saved;
   }
 });

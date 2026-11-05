@@ -1,7 +1,7 @@
 // Per-model concurrency gate: generic, opt-in, per-connection.
 // Same-connection + same-model requests serialize at the configured cap;
 // different models gate independently; no map means unchanged behavior.
-import { afterEach, describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 const semaphore = await import("../../open-sse/services/accountSemaphore.ts");
@@ -128,6 +128,16 @@ describe("normalizeModelConcurrencyMap (credential propagation, fail-open)", () 
 });
 
 describe("composite gate behavior", () => {
+  // The gate waits on unref()'d timers; a ref'd timer keeps node:test from cancelling the
+  // test as soon as the event loop looks idle.
+  let keepAlive: ReturnType<typeof setInterval> | undefined;
+  beforeEach(() => {
+    keepAlive = setInterval(() => {}, 1_000);
+  });
+  afterEach(() => {
+    clearInterval(keepAlive);
+  });
+
   it("serializes same connection + same model at cap 1", async () => {
     const key = buildModelSemaphoreKey({ provider: "z", accountKey: "c1", model: "glm-5" });
     const first = await acquireMany([{ key, maxConcurrency: 1 }], { timeoutMs: 1000 });

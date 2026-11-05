@@ -10,6 +10,9 @@ import {
   composerAcceptedPrompt,
   isNewAssistantAnswer,
 } from "../../open-sse/utils/chatgptWebBrowserSession.ts";
+import { keepEventLoopAliveDuringTests } from "../helpers/keepEventLoopAlive.ts";
+
+keepEventLoopAliveDuringTests();
 
 const HANDOFF_SSE =
   'data: {"type":"resume_conversation_token","kind":"topic",' +

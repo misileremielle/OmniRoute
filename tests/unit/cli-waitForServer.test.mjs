@@ -79,31 +79,44 @@ test("waitForServer returns false when the port accepts TCP but never answers a 
   }
 });
 
-test("waitForServer detects IPv6 loopback health endpoint when IPv4 is unavailable (#11766)", async () => {
-  const port = await freePort();
-  const server = net.createServer((socket) => {
-    socket.on("data", (data) => {
-      const request = data.toString();
-      if (request.includes("GET /api/monitoring/health")) {
-        socket.end("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nok");
-      }
-    });
-  });
-
-  // Listen only on IPv6 loopback
-  await new Promise((resolve, reject) => {
-    server.once("error", reject);
-    server.listen(port, "::1", () => resolve());
-  });
-
-  try {
-    const result = await waitForServer(port, 8000);
-    assert.equal(
-      result,
-      true,
-      "expected waitForServer to detect health endpoint on IPv6 loopback even when IPv4 is unavailable"
-    );
-  } finally {
-    await new Promise((resolve) => server.close(() => resolve()));
-  }
+// Hosts without an IPv6 loopback (some containers and sandboxes) cannot bind ::1 at all.
+const ipv6LoopbackAvailable = await new Promise((resolve) => {
+  const probe = net.createServer();
+  probe.once("error", () => resolve(false));
+  probe.listen(0, "::1", () => probe.close(() => resolve(true)));
 });
+
+test(
+  "waitForServer detects IPv6 loopback health endpoint when IPv4 is unavailable (#11766)",
+  {
+    skip: ipv6LoopbackAvailable ? false : "no IPv6 loopback on this host",
+  },
+  async () => {
+    const port = await freePort();
+    const server = net.createServer((socket) => {
+      socket.on("data", (data) => {
+        const request = data.toString();
+        if (request.includes("GET /api/monitoring/health")) {
+          socket.end("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nok");
+        }
+      });
+    });
+
+    // Listen only on IPv6 loopback
+    await new Promise((resolve, reject) => {
+      server.once("error", reject);
+      server.listen(port, "::1", () => resolve());
+    });
+
+    try {
+      const result = await waitForServer(port, 8000);
+      assert.equal(
+        result,
+        true,
+        "expected waitForServer to detect health endpoint on IPv6 loopback even when IPv4 is unavailable"
+      );
+    } finally {
+      await new Promise((resolve) => server.close(() => resolve()));
+    }
+  }
+);

@@ -11,7 +11,10 @@
  * without real sockets. The ReadableStream wiring lives in `createRecoverableStream`.
  */
 import { STREAM_RECOVERY } from "../config/constants.ts";
-import { isRegisteredFeatureFlagEnabled } from "../utils/registeredFeatureFlag.ts";
+import {
+  isRegisteredDefaultOnFeatureFlagEnabled,
+  isRegisteredFeatureFlagEnabled,
+} from "../utils/registeredFeatureFlag.ts";
 import {
   createThroughputWatchdog,
   ThroughputWatchdogError,
@@ -37,12 +40,13 @@ function isToolcallOrderFixEnabled(): boolean {
 export const EMPTY_STREAM_SIBLING_RECOVERY_FLAG = "EMPTY_STREAM_SIBLING_RECOVERY_ENABLED";
 
 /**
- * #16438 opt-in: Claude/Codex empty-stream content probe plus a bounded retry on a
- * sibling connection. Fail-closed: any resolution failure keeps the release behavior.
+ * #16438: empty-stream content probe plus a bounded retry on a sibling connection. On by
+ * default: the default-on reader keeps it on when no server resolver is registered.
+ * Fail-closed: any resolution failure keeps the previous behavior.
  */
 export function isEmptyStreamSiblingRecoveryEnabled(): boolean {
   try {
-    return isRegisteredFeatureFlagEnabled(EMPTY_STREAM_SIBLING_RECOVERY_FLAG);
+    return isRegisteredDefaultOnFeatureFlagEnabled(EMPTY_STREAM_SIBLING_RECOVERY_FLAG);
   } catch {
     return false;
   }

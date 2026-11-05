@@ -88,7 +88,7 @@ test("a successful discovery carries neither the degraded state nor a reason", a
 });
 
 test("a provider whose static catalog is the intended source is not degraded", async () => {
-  const stored = await connection({ provider: "ideogram" });
+  const stored = await connection({ provider: "reka" });
   globalThis.fetch = async () => {
     assert.fail("a static-only provider must not call the upstream");
   };

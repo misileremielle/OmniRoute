@@ -377,14 +377,16 @@ export function startModelSyncScheduler(
   // Serve traffic first; cleanup's first pass is +30s, so stay past that window. A restart
   // within the interval of the last finished cycle skips this run: every cycle sends one
   // upstream /models request per account, and the regular interval below still covers it.
-  const startupDelay = setTimeout(() => {
-    void getLastModelSyncTime().then((lastRun) => {
-      if (isStartupModelSyncDue(lastRun, effectiveIntervalMs, Date.now())) {
-        return runSyncCycle(trustedApiBaseUrl);
-      }
-      console.log(`[ModelSync] Startup cycle skipped — last cycle at ${lastRun} is recent`);
-    });
-  }, MODEL_SYNC_STARTUP_DELAY_MS);
+  const startupDelay = setTimeout(
+    () =>
+      getLastModelSyncTime().then((lastRun) => {
+        if (isStartupModelSyncDue(lastRun, effectiveIntervalMs, Date.now())) {
+          return runSyncCycle(trustedApiBaseUrl);
+        }
+        console.log(`[ModelSync] Startup cycle skipped — last cycle at ${lastRun} is recent`);
+      }),
+    MODEL_SYNC_STARTUP_DELAY_MS
+  );
   startupDelay.unref?.();
 
   // Codex-only: revalidate catalog only on first-start or app upgrade (not every boot).

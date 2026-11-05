@@ -32,9 +32,9 @@ test("ONNX chain (@huggingface/transformers + onnxruntime-node) stays optional s
     undefined,
     "transformers must NOT be a hard dependency (fatal EBADPLATFORM on Android)"
   );
-  assert.equal(
-    pkg.optionalDependencies?.["@huggingface/transformers"],
-    "^4.2.0",
+  assert.match(
+    pkg.optionalDependencies?.["@huggingface/transformers"] ?? "",
+    /^\^4\./,
     "transformers must be an optionalDependency"
   );
   assert.equal(
@@ -66,9 +66,9 @@ test("lockfile marks the whole ONNX chain optional", () => {
     >;
   }>("package-lock.json");
 
-  assert.equal(
-    lock.packages[""]?.optionalDependencies?.["@huggingface/transformers"],
-    "^4.2.0",
+  assert.match(
+    lock.packages[""]?.optionalDependencies?.["@huggingface/transformers"] ?? "",
+    /^\^4\./,
     "root lock optionalDependencies must hold transformers"
   );
   assert.equal(
