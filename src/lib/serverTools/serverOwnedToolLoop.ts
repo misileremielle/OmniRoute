@@ -133,6 +133,7 @@ export async function runServerOwnedToolLoop(
     code = "internal_error"
   ) => ({
     kind: "error",
+    upstreamHttpSelection: null,
     errorResult: createErrorResult(status, msg, null, code) as unknown as ChatCoreErrorResult,
     cumulativeUsage: aggregateUsageOrNull(usages),
     totalCostUsd,
@@ -163,6 +164,7 @@ export async function runServerOwnedToolLoop(
       const termination = clientNative.length > 0 ? "client_tools" : "completed";
       return {
         kind: "ok",
+        upstreamHttpSelection: currentLeg.upstreamHttpSelection ?? null,
         response: currentLeg.kind === "ok" ? currentLeg.response : undefined,
         finalProviderBody: currentLeg.kind === "ok" ? currentLeg.providerBody : undefined,
         finalProviderRequest: currentLeg.kind === "ok" ? currentLeg.providerRequest : undefined,
@@ -180,6 +182,7 @@ export async function runServerOwnedToolLoop(
       if (options.abortSignal?.aborted) {
         return {
           kind: "error",
+          upstreamHttpSelection: null,
           errorResult: createErrorResult(
             499,
             "Client closed request",
@@ -219,6 +222,7 @@ export async function runServerOwnedToolLoop(
 
       return {
         kind: "ok",
+        upstreamHttpSelection: currentLeg.upstreamHttpSelection ?? null,
         response: formatted,
         finalProviderBody: currentLeg.kind === "ok" ? currentLeg.providerBody : undefined,
         finalProviderRequest: currentLeg.kind === "ok" ? currentLeg.providerRequest : undefined,
@@ -234,6 +238,7 @@ export async function runServerOwnedToolLoop(
     if (options.abortSignal?.aborted) {
       return {
         kind: "error",
+        upstreamHttpSelection: null,
         errorResult: createErrorResult(
           499,
           "Client closed request",
@@ -265,6 +270,7 @@ export async function runServerOwnedToolLoop(
         const termination = termMap[err.code] ?? "execution_error";
         return {
           kind: "error",
+          upstreamHttpSelection: null,
           errorResult: mapExecutionError(err),
           cumulativeUsage: aggregateUsageOrNull(usages),
           totalCostUsd,
@@ -308,6 +314,7 @@ export async function runServerOwnedToolLoop(
 
       return {
         kind: "ok",
+        upstreamHttpSelection: currentLeg.upstreamHttpSelection ?? null,
         response: formatted,
         finalProviderBody: currentLeg.kind === "ok" ? currentLeg.providerBody : undefined,
         finalProviderRequest: currentLeg.kind === "ok" ? currentLeg.providerRequest : undefined,
@@ -335,6 +342,7 @@ export async function runServerOwnedToolLoop(
     if (options.abortSignal?.aborted) {
       return {
         kind: "error",
+        upstreamHttpSelection: null,
         errorResult: createErrorResult(
           499,
           "Client closed request",
@@ -377,6 +385,7 @@ export async function runServerOwnedToolLoop(
 
       return {
         kind: "error",
+        upstreamHttpSelection: nextLeg.upstreamHttpSelection ?? null,
         errorResult: nextLeg.result,
         cumulativeUsage: aggregateUsageOrNull(usages),
         totalCostUsd,
@@ -394,6 +403,7 @@ export async function runServerOwnedToolLoop(
 
       return {
         kind: "error",
+        upstreamHttpSelection: null,
         errorResult: createErrorResult(
           409,
           "Follow-up connection does not match initial connection",

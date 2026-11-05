@@ -289,6 +289,7 @@ test("the plan orders the cut and only ever pushes to the selected remote", () =
     "open-sse/package.json",
     "package-lock.json",
     "docs/openapi.yaml",
+    "public/openapi.yaml",
   ]);
 });
 

@@ -1,5 +1,6 @@
 import { getEmptyTurnDiagnostics, hasTrustedEmptyTurn } from "./emptyTurnPolicy.ts";
 import { createCompletionDrain } from "./streamCompletionDrain.ts";
+import { createClientTerminalWatcher } from "./streamTerminal.ts";
 import type { StreamControllerOptions } from "./streamControllerTypes.ts";
 import { trackPendingRequest } from "@/lib/usageDb";
 import { STREAM_ACTIVE_TIMEOUT_MS, STREAM_IDLE_TIMEOUT_MS } from "../config/constants.ts";
@@ -13,6 +14,8 @@ import { createStallWatchdog } from "./streamStallWatchdog.ts";
 import {
   buildSyntheticResponsesFailureId,
   SYNTHETIC_RESPONSES_SEQUENCE_NUMBER,
+  withResponsesFailureContext,
+  type ResponsesStreamContext,
 } from "./responsesSequence.ts";
 
 // Stream handler with disconnect detection - shared for all providers
@@ -26,6 +29,7 @@ import {
 // the watchdog must track upstream byte activity instead. Ported from
 // decolua/9router#1243.
 const DEFAULT_STREAM_STALL_TIMEOUT_MS = STREAM_IDLE_TIMEOUT_MS;
+const SSE_EVENT_BOUNDARY = new TextEncoder().encode("\n\n");
 
 type StreamController = ReturnType<typeof createStreamController>;
 
@@ -189,36 +193,6 @@ function indexOfOpenAiDoneFrame(chunk: Uint8Array): number {
   const match = OPENAI_DONE_FRAME.exec(text);
   if (!match) return -1;
   return match.index + (match[0].length - match[0].trimStart().length);
-}
-
-function hasClientTerminalSseMarker(text: string, clientResponseFormat?: string | null): boolean {
-  if (/(?:^|\r?\n)data:\s*\[DONE\]\s*(?:\r?\n|$)/.test(text)) {
-    return true;
-  }
-
-  if (isResponsesClientFormat(clientResponseFormat)) {
-    return (
-      /(?:^|\r?\n)event:\s*response\.completed\s*(?:\r?\n|$)/.test(text) ||
-      /"type"\s*:\s*"response\.completed"/.test(text)
-    );
-  }
-
-  if (clientResponseFormat === FORMATS.CLAUDE) {
-    return (
-      /(?:^|\r?\n)event:\s*message_stop\s*(?:\r?\n|$)/.test(text) ||
-      /"type"\s*:\s*"message_stop"/.test(text)
-    );
-  }
-
-  // OpenAI chat completions: some providers omit `data: [DONE]` (already
-  // matched above) and terminate with a finish_reason chunk instead. A
-  // non-null finish_reason value is that terminal signal — a bare
-  // `finish_reason: null` delta chunk must NOT count (#10443).
-  if (clientResponseFormat === FORMATS.OPENAI) {
-    return /"finish_reason"\s*:\s*"[^"]+"/.test(text);
-  }
-
-  return false;
 }
 
 /**
@@ -474,7 +448,8 @@ export function createStreamController({
 export function buildStreamErrorChunks(
   errorMsg: string,
   statusCode: number,
-  clientResponseFormat?: string | null
+  clientResponseFormat?: string | null,
+  responsesContext: ResponsesStreamContext = {}
 ) {
   const statusMapping = getStreamErrorStatusMapping(statusCode);
   const publicErrorMessage = getPublicErrorMessage(errorMsg, statusCode);
@@ -489,6 +464,10 @@ export function buildStreamErrorChunks(
       sequence_number: SYNTHETIC_RESPONSES_SEQUENCE_NUMBER,
       response: {
         id: buildSyntheticResponsesFailureId(),
+        object: "response",
+        created_at: Math.floor(Date.now() / 1000),
+        model: "unknown",
+        output: [],
         status: "failed",
         error: {
           message: publicErrorMessage,
@@ -498,7 +477,9 @@ export function buildStreamErrorChunks(
       },
     };
 
-    return encodeSseEvent(errorEvent, { event: "response.failed" });
+    return encodeSseEvent(withResponsesFailureContext(errorEvent, responsesContext), {
+      event: "response.failed",
+    });
   }
 
   if (clientResponseFormat === FORMATS.CLAUDE) {
@@ -677,11 +658,11 @@ export function createDisconnectAwareStream(
   const reader = transformStream.readable.getReader();
   const writer = transformStream.writable.getWriter();
   const terminalDecoder = new TextDecoder();
+  const terminalWatcher = createClientTerminalWatcher(streamController.clientResponseFormat);
   const contentDecoder = new TextDecoder();
   const contentWatcher = createStreamContentWatcher();
   const completedToolHandoffWatcher = createCompletedResponsesToolHandoffWatcher();
   const toolHandoffDecoder = new TextDecoder();
-  let terminalTail = "";
   let clientTerminalSeen = false;
   let bytesWereForwarded = false;
   const completionDrain = createCompletionDrain(reader, writer, streamController, () =>
@@ -703,16 +684,7 @@ export function createDisconnectAwareStream(
     }
     if (clientTerminalSeen) return;
 
-    terminalTail += terminalDecoder.decode(chunk, { stream: true });
-    // Scan before bounding retained state: a compaction terminal frame can
-    // exceed the tail budget because encrypted_content is carried inline.
-    clientTerminalSeen = hasClientTerminalSseMarker(
-      terminalTail,
-      streamController.clientResponseFormat
-    );
-    if (terminalTail.length > 4096) {
-      terminalTail = terminalTail.slice(-4096);
-    }
+    clientTerminalSeen = terminalWatcher.note(terminalDecoder.decode(chunk, { stream: true }));
     if (clientTerminalSeen) {
       streamController.markClientTerminalSeen?.();
     }
@@ -735,10 +707,13 @@ export function createDisconnectAwareStream(
     );
     streamController.handleError(Object.assign(new Error(silentClose.reason), { statusCode: 502 }));
     try {
+      // Isolate generated failure from any unfinished provider data.
+      if (!terminalWatcher.atBoundary()) controller.enqueue(SSE_EVENT_BOUNDARY);
       for (const chunk of buildStreamErrorChunks(
         silentClose.reason,
         502,
-        streamController.clientResponseFormat
+        streamController.clientResponseFormat,
+        terminalWatcher.responsesContext()
       )) {
         controller.enqueue(chunk);
       }
@@ -882,10 +857,12 @@ export function createDisconnectAwareStream(
           const statusCode = getErrorStatusCode(error);
 
           try {
+            if (!terminalWatcher.atBoundary()) controller.enqueue(SSE_EVENT_BOUNDARY);
             for (const chunk of buildStreamErrorChunks(
               errorMsg,
               statusCode,
-              streamController.clientResponseFormat
+              streamController.clientResponseFormat,
+              terminalWatcher.responsesContext()
             )) {
               controller.enqueue(chunk);
             }

@@ -4,6 +4,7 @@ import HomePageClient from "../dashboard/HomePageClient";
 import BootstrapBanner from "../dashboard/BootstrapBanner";
 import NewsBanner from "../dashboard/NewsBanner";
 import FirstRunReadinessCard from "../dashboard/FirstRunReadinessCard";
+import HomeSystemMetricsCards from "./HomeSystemMetricsCards";
 import UnpricedUsageBanner from "../dashboard/UnpricedUsageBanner";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,9 @@ export default async function HomePage() {
       <FirstRunReadinessCard setupComplete={Boolean(settings.setupComplete)} />
       <UnpricedUsageBanner />
       <NewsBanner />
+      <div className="mb-4">
+        <HomeSystemMetricsCards />
+      </div>
       <HomePageClient machineId={machineId} />
     </>
   );

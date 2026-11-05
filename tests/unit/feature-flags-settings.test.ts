@@ -58,18 +58,23 @@ const {
 // tool_call wrapper repair, default on) to 86.
 // OPENCODE_PUBLISHED_CATALOG_ROUTING_ENABLED (#16798, OpenCode model surface from the
 // published catalog, default off) takes it to 87.
-// UNPRICED_USAGE_BUDGET_POLICY (#14604, default fail_closed) takes it to 114;
+// UNPRICED_USAGE_BUDGET_POLICY (#14604, default fail_closed) takes it to 113.
+// COMPRESSION_CACHE_AUTOMATIC_PREFIX_ESTIMATE (#17114, default off) takes it to 114.
 // API_KEY_AUDIT_CLIENT_DETAILS_ENABLED (#17982, client IP + user-agent on api_key.auth.touch
 // audit rows, default off) takes it to 115; removing MITM_DISABLE_TLS_VERIFY with the MITM
 // proxy takes it to 114.
-const EXPECTED_FEATURE_FLAG_COUNT = 111;
+// Upstream v3.8.53 merge: CLAUDE_CACHE_TAIL_TTL_1H (+1), ANTHROPIC_COMPATIBLE_MID_CONVERSATION_SYSTEM
+// moved to a per-connection opt-in (-1), PROXY_STRICT_POST_REPLAY_ENABLED +
+// RESPONSES_TRANSPORT_KEEPALIVE_ENABLED (#18312, +2), OPENCODE_FREE_TIER_EGRESS_PROBE (+1) and
+// PROXY_REFUSAL_MODEL_SCOPE (#18686, +1) take this fork from 111 to 115.
+const EXPECTED_FEATURE_FLAG_COUNT = 115;
 // tool_call wrapper repair, default on) to 86; OPENCODE_V2_CLIENT_FINGERPRINT_ENABLED
 // (#16571, OpenCode v2 client fingerprint, default off) to 87.
 // tool_call wrapper repair, default on) to 86; CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED
 // (#17003, lets Claude OAuth drop the redact-thinking beta for summarized thinking,
 // default off) to 87.
 // MODEL_ENDPOINT_CAPABILITY_GATE_ENABLED (#16929/#16956, default off) takes it to 88.
-// ANTHROPIC_COMPATIBLE_MID_CONVERSATION_SYSTEM (#16236, default off) takes it to 88.
+// ANTHROPIC_COMPATIBLE_MID_CONVERSATION_SYSTEM (#16236, moved to the per-connection keepMidConversationSystem opt-in) — 115 back to 114.
 // MODELS_DEV_EFFORT_TIERS_ENABLED (#15944, default off) takes it to 88.
 // default off) to 87; AUTO_REQUEST_RESOLVED_CAPABILITIES (#16419, resolved-capability
 // scoring inputs on the auto/* request path, default off) to 88.
@@ -289,6 +294,15 @@ describe("featureFlagDefinitions", () => {
   it("defines OPENCODE_USER_BLOCKED_ROTATION as an opt-in network boolean flag disabled by default", () => {
     const def = FEATURE_FLAG_DEFINITIONS.find((d) => d.key === "OPENCODE_USER_BLOCKED_ROTATION");
     assert.ok(def, "OPENCODE_USER_BLOCKED_ROTATION should exist");
+    assert.strictEqual(def.category, "network");
+    assert.strictEqual(def.type, "boolean");
+    assert.strictEqual(def.defaultValue, "false");
+    assert.strictEqual(def.requiresRestart, false);
+  });
+
+  it("defines OPENCODE_FREE_TIER_EGRESS_PROBE as an opt-in network boolean flag disabled by default", () => {
+    const def = FEATURE_FLAG_DEFINITIONS.find((d) => d.key === "OPENCODE_FREE_TIER_EGRESS_PROBE");
+    assert.ok(def, "OPENCODE_FREE_TIER_EGRESS_PROBE should exist");
     assert.strictEqual(def.category, "network");
     assert.strictEqual(def.type, "boolean");
     assert.strictEqual(def.defaultValue, "false");

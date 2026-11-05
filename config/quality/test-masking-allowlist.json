@@ -1721,6 +1721,10 @@
     "tests/unit/chaos-malformed-json-400.test.ts": {
       "sourceRemoved": ["src/lib/chaos/chaosExecutor.ts", "src/lib/chaos/chaosConfig.ts"],
       "reason": "Chaos Mode removed (refactor: remove Chaos Mode): src/lib/chaos, /api/chaos/**, /api/skills/collect/chaos, the dashboard chaos page and the per-key chaosModeEnabled permission no longer exist, so there is no code left to test. auto/chaos and config.chaos are separate routing features and stay."
+    },
+    "tests/unit/call-log-artifact-worker-tsx-cache.test.ts": {
+      "replacement": "tests/unit/call-log-artifact-worker-native.test.ts",
+      "reason": "v3.8.53 #18511 (fix(call-logs): avoid esbuild zombies in source workers) removed the tsx-loader path for the call-log artifact worker: source workers now run natively without CLI preloads, so TSX_DISABLE_CACHE and the tsx disk-cache environment no longer exist. The native-worker test added in the same PR pins the replacement behavior (writes survive idle restarts and forced close without esbuild children; no inherited CLI preloads)."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",

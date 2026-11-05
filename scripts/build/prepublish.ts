@@ -32,6 +32,7 @@ import { resolveBundledNpmEntry } from "./resolveNpmEntry.ts";
 import { getPrepublishDistDirRefusal } from "./prepublishPathSafety.ts";
 import {
   APP_STAGING_ALLOWED_EXACT_PATHS,
+  APP_STAGING_ALLOWED_PATH_MATCHERS,
   APP_STAGING_ALLOWED_PATH_PREFIXES,
   APP_STAGING_REMOVAL_PATHS,
   findUnexpectedArtifactPaths,
@@ -649,10 +650,13 @@ for (const relativePath of APP_STAGING_REMOVAL_PATHS) {
 // tarball gate, the staged dist/ legitimately contains node_modules (the
 // standalone server's runtime deps, including Turbopack-hashed packages whose
 // wasm files DB init requires). The allowlist prefixes above are the contract.
+// The path matchers keep the translated docs mirrors the /docs route reads (they arrive
+// with the standalone's docs/ copy) and drop every other docs/i18n file.
 const stagedFiles = walkFiles(DIST_DIR);
 const unexpectedStagedFiles = findUnexpectedArtifactPaths(stagedFiles, {
   exactPaths: APP_STAGING_ALLOWED_EXACT_PATHS,
   prefixPaths: APP_STAGING_ALLOWED_PATH_PREFIXES,
+  pathMatchers: APP_STAGING_ALLOWED_PATH_MATCHERS,
   neverAllowedSegments: [],
 });
 
@@ -668,6 +672,7 @@ if (unexpectedStagedFiles.length > 0) {
 const remainingUnexpectedFiles = findUnexpectedArtifactPaths(walkFiles(DIST_DIR), {
   exactPaths: APP_STAGING_ALLOWED_EXACT_PATHS,
   prefixPaths: APP_STAGING_ALLOWED_PATH_PREFIXES,
+  pathMatchers: APP_STAGING_ALLOWED_PATH_MATCHERS,
   neverAllowedSegments: [],
 });
 

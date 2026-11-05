@@ -65,6 +65,8 @@ export interface ComboTargetAttemptPayload {
   model: string;
   timestamp: number;
   strategy: string;
+  /** The account that served or attempted this target, when known (pooled targets learn it late). */
+  connectionId?: string;
 }
 
 export interface ComboTargetFailedPayload {
@@ -74,6 +76,8 @@ export interface ComboTargetFailedPayload {
   model: string;
   error: string;
   latencyMs: number;
+  /** The account that served or attempted this target, when known (pooled targets learn it late). */
+  connectionId?: string;
 }
 
 export interface ComboTargetSucceededPayload {
@@ -82,6 +86,8 @@ export interface ComboTargetSucceededPayload {
   provider: string;
   model: string;
   latencyMs: number;
+  /** The account that served or attempted this target, when known (pooled targets learn it late). */
+  connectionId?: string;
 }
 
 export interface CredentialHealthChangedPayload {

@@ -18,7 +18,7 @@ import {
 } from "@/shared/constants/modelSupportedEndpoints";
 import { isModelEndpointCapabilityGateEnabled } from "./endpointCapabilityGateFlag";
 
-export type RequestedEndpoint = "chat" | "embeddings" | "rerank";
+export type RequestedEndpoint = "chat" | "embeddings" | "rerank" | "ocr";
 
 type TaggedModel = {
   supportedEndpoints?: readonly string[];
@@ -29,6 +29,7 @@ const ENDPOINT_ROUTE: Record<string, string> = {
   responses: "/v1/responses",
   embeddings: "/v1/embeddings",
   rerank: "/v1/rerank",
+  ocr: "/v1/ocr",
 };
 
 function supportsRequestedEndpoint(supported: string[], requested: RequestedEndpoint): boolean {
