@@ -38,11 +38,10 @@ try {
 
   const sqliteFile = path.join(process.env.DATA_DIR, 'storage.sqlite');
   const raw = new Database(sqliteFile);
-  if (process.env.OMNIROUTE_TEST_DEFERRED === '1') {
-    raw.prepare(
-      "INSERT OR REPLACE INTO key_value (namespace, key, value) VALUES ('feature_flags', 'DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED', 'true')"
-    ).run();
-  }
+  // The flag defaults to on; the synchronous case pins it off explicitly.
+  raw.prepare(
+    "INSERT OR REPLACE INTO key_value (namespace, key, value) VALUES ('feature_flags', 'DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED', ?)"
+  ).run(process.env.OMNIROUTE_TEST_DEFERRED === '1' ? 'true' : 'false');
   raw.prepare(
     "INSERT INTO quota_snapshots (provider, connection_id, window_key, remaining_percentage, is_exhausted, created_at) VALUES (?, ?, ?, ?, ?, ?)"
   ).run('openai', 'missing-connection-id', 'monthly', 75, 0, new Date().toISOString());
@@ -132,10 +131,10 @@ function runCase(deferred: "0" | "1") {
   }
 }
 
-test("startup health check blocks getDbInstance() by default (DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED off)", () => {
+test("startup health check blocks getDbInstance() when DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED is off", () => {
   runCase("0");
 });
 
-test("startup health check is deferred past getDbInstance() when DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED is on", () => {
+test("startup health check is deferred past getDbInstance() when DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED is on (default)", () => {
   runCase("1");
 });

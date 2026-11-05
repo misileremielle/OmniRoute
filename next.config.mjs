@@ -189,6 +189,11 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: process.env.OMNIROUTE_SERVER_ACTIONS_BODY_LIMIT || "50mb",
     },
+    // Next preloads every route module at startup by default. With ~1000 pages and API routes
+    // that kept the event loop busy compiling modules for ~3s after boot (racing the first
+    // requests and the health probe) and pinned all of them in memory. Routes now load on first
+    // use; build with OMNIROUTE_PRELOAD_ENTRIES=1 to restore eager preloading.
+    preloadEntriesOnStart: process.env.OMNIROUTE_PRELOAD_ENTRIES === "1",
     // Reduce peak heap during production builds (Next.js 15+).
     webpackMemoryOptimizations: true,
     // Run webpack in a separate Node worker, lowering main-process memory.

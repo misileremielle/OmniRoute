@@ -271,7 +271,7 @@ test("runDbHealthCheck diagnosis does not request backups for combo-only issues"
   assert.equal(backupAttempts, 0);
 });
 
-test("getDbInstance runs the startup health check synchronously by default (DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED off, #13717)", async () => {
+test("getDbInstance runs the startup health check synchronously when DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED is off (#13717)", async () => {
   let db = core.getDbInstance();
   insertBrokenRows(db);
   core.resetDbInstance();
@@ -294,9 +294,11 @@ test("getDbInstance runs the startup health check synchronously by default (DB_H
   };
 
   const previousForce = process.env.OMNIROUTE_FORCE_DB_HEALTHCHECK;
+  const previousDeferred = process.env.DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED;
   process.env.OMNIROUTE_FORCE_DB_HEALTHCHECK = "1";
+  process.env.DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED = "false";
   try {
-    // DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED is off (default, #13717): the
+    // DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED is off (#13717): the
     // startup health check (and its backup-gated abort) has already run
     // synchronously by the time getDbInstance() returns — no polling needed.
     db = core.getDbInstance();
@@ -310,6 +312,11 @@ test("getDbInstance runs the startup health check synchronously by default (DB_H
       delete process.env.OMNIROUTE_FORCE_DB_HEALTHCHECK;
     } else {
       process.env.OMNIROUTE_FORCE_DB_HEALTHCHECK = previousForce;
+    }
+    if (previousDeferred === undefined) {
+      delete process.env.DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED;
+    } else {
+      process.env.DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED = previousDeferred;
     }
   }
 
