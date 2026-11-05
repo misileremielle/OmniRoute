@@ -194,10 +194,14 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     provider,
     model,
     log,
-    // #16438 opt-in: briefly probe Claude/Codex streams for usable output after the first
-    // lifecycle event so an empty turn can be retried on a sibling connection.
+    // #16438: briefly probe for usable output after the first lifecycle event so an empty
+    // turn is retried on a sibling connection before the response is committed. Claude/Codex
+    // upstreams always qualify; any upstream does when the client reads the Claude Messages
+    // format, because that client otherwise receives a mid-stream "Claude returned an empty
+    // response (no content block)" error that no retry can replace.
     contentProbeMs:
-      (provider === "claude" || provider === "codex") && isEmptyStreamSiblingRecoveryEnabled()
+      (provider === "claude" || provider === "codex" || clientResponseFormat === FORMATS.CLAUDE) &&
+      isEmptyStreamSiblingRecoveryEnabled()
         ? 1000
         : undefined,
   });

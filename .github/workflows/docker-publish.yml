@@ -131,7 +131,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          GHCR_IMAGE="ghcr.io/$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          GHCR_IMAGE="${GHCR_IMAGE_NAME:-ghcr.io/$(printf '%s' "${GITHUB_REPOSITORY:-}" | tr '[:upper:]' '[:lower:]')}"
           echo "ghcr_image=$GHCR_IMAGE" >> "$GITHUB_OUTPUT"
           if [ -n "${DOCKERHUB_USERNAME:-}" ] && [ -n "${DOCKERHUB_TOKEN:-}" ]; then
             DOCKERHUB_ENABLED="true"
@@ -200,10 +200,11 @@ jobs:
           SKIP="false"
           if [ "$VERSION" != "main" ] && [ "$VERSION" != "next" ] && [ "$EVENT_NAME" != "workflow_dispatch" ]; then
             SKIP="true"
-            CHECK_REFS=("${GHCR_IMAGE}:${VERSION}" "${GHCR_IMAGE}:${VERSION}-web")
+            CHECK_REFS=()
             if [ "$DOCKERHUB_ENABLED" = "true" ]; then
               CHECK_REFS+=("${IMAGE_NAME}:${VERSION}" "${IMAGE_NAME}:${VERSION}-web")
             fi
+            CHECK_REFS+=("${GHCR_IMAGE}:${VERSION}" "${GHCR_IMAGE}:${VERSION}-web")
             for ref in "${CHECK_REFS[@]}"; do
               rc=0
               node scripts/ci/docker-image-complete.mjs "$ref" || rc=$?
@@ -631,10 +632,11 @@ jobs:
           # Validate every flavor in every published registry BEFORE moving any public
           # tag (GHCR always; Docker Hub only when its credentials are configured).
           # Counting alone cannot distinguish two AMD64 images from AMD64 + ARM64.
-          REGISTRY_IMAGES=("$GHCR_IMAGE_NAME")
-          if [ "$DOCKERHUB_ENABLED" = "true" ]; then
+          REGISTRY_IMAGES=()
+          if [ "${DOCKERHUB_ENABLED:-}" = "true" ]; then
             REGISTRY_IMAGES+=("$IMAGE_NAME")
           fi
+          REGISTRY_IMAGES+=("$GHCR_IMAGE_NAME")
           pair_is_valid() {
             local dir="$1" image digest_file
             local refs

@@ -1,5 +1,9 @@
 import { afterEach, after, before, beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 import { getDbInstance, resetDbInstance } from "../../src/lib/db/core.ts";
 import { startCleanupScheduler, stopCleanupScheduler } from "../../src/lib/db/cleanup.ts";
@@ -134,4 +138,43 @@ test("hot reload still arms its poll with the flag off", () => {
   }
   assert.equal(timers.intervals.filter((t) => t.delay === 54_321).length, 1);
   assert.match(logs.find((line) => line.includes("hot-reload started")) ?? "", /poll=54321ms/);
+});
+
+/**
+ * initCredentialHealthCheck() short-circuits on isAutomatedTestProcess(), so the flag branch can
+ * only be reached from a process that does not look like a test run. No argument of the child may
+ * contain a "test" token, and NODE_ENV and the runner's own variables must be gone from its env.
+ */
+function runCredentialHealthInit(flag: string | undefined): string {
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-bg-services-"));
+  const env: NodeJS.ProcessEnv = { ...process.env, DATA_DIR: dataDir };
+  delete env.NODE_ENV;
+  delete env.VITEST;
+  delete env.NODE_TEST_CONTEXT;
+  delete env.NODE_OPTIONS;
+  delete env[FLAG];
+  if (flag !== undefined) env[FLAG] = flag;
+  const code = [
+    'const m = await import("./src/lib/credentialHealth/scheduler.ts");',
+    "const started = m.initCredentialHealthCheck();",
+    "m.stopCredentialHealthCheck();",
+    "process.stdout.write(`RESULT:${started}`);",
+    "process.exit(0);",
+  ].join("\n");
+  try {
+    const child = spawnSync(
+      process.execPath,
+      ["--import", "tsx/esm", "--input-type=module", "-e", code],
+      { cwd: process.cwd(), env, encoding: "utf8", timeout: 180_000 }
+    );
+    assert.equal(child.status, 0, child.stderr);
+    return /RESULT:(true|false)/.exec(child.stdout)?.[1] ?? `no result: ${child.stdout}`;
+  } finally {
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  }
+}
+
+test("credential health check honours the flag outside the test-process short-circuit", () => {
+  assert.equal(runCredentialHealthInit("true"), "false");
+  assert.equal(runCredentialHealthInit(undefined), "true");
 });

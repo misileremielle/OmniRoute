@@ -118,6 +118,11 @@ function runScript(dir, name, { scenario = {}, env = {} } = {}) {
         PATH: `${dir}:${process.env.PATH}`,
         IMAGE_NAME: IMAGE,
         GHCR_IMAGE_NAME: GHCR,
+        // This fork publishes to Docker Hub only when its credentials are configured; the
+        // policy below is exercised with both registries enabled unless a test overrides it.
+        DOCKERHUB_ENABLED: "true",
+        DOCKERHUB_USERNAME: "example",
+        DOCKERHUB_TOKEN: "example-token",
         VERSION: "1.0.0",
         GITHUB_OUTPUT: outputFile,
         FAKE_DOCKER_LOG: logFile,
@@ -520,5 +525,28 @@ test("Web targets import the matching runtime's freshly built base cache", () =>
   assert.match(
     step("Build and push BUN web platform image by digest"),
     /cache-from: \|\n\s+type=gha,scope=docker-bun-web-.*\n\s+type=gha,scope=docker-bun-base-/
+  );
+});
+
+test("prepare: without Docker Hub credentials only the GHCR images are inspected", () => {
+  const result = runPrepare({ ...TAG_PUSH, DOCKERHUB_USERNAME: "", DOCKERHUB_TOKEN: "" });
+  assert.equal(result.status, 0, result.combined);
+  assert.equal(result.outputs.skip, "true");
+  assert.equal(result.outputs.dockerhub_enabled, "false");
+  assert.deepEqual(result.inspected, [`${GHCR}:1.0.0`, `${GHCR}:1.0.0-web`]);
+});
+
+test("guard: without Docker Hub only the GHCR digests are validated", () => {
+  const result = withSandbox((dir) => {
+    const pairs = Object.fromEntries(ALL_FLAVORS.map((flavor) => [flavor, [AMD64, ARM64]]));
+    writeDigests(dir, pairs);
+    return runScript(dir, "Guard against stale digests", { env: { DOCKERHUB_ENABLED: "false" } });
+  });
+  assert.equal(result.status, 0, result.combined);
+  assert.deepEqual(result.outputs, { publish_bun_base: "true", publish_bun_web: "true" });
+  assert.ok(result.inspected.length > 0);
+  assert.ok(
+    result.inspected.every((ref) => ref.startsWith(`${GHCR}@`)),
+    result.inspected.join()
   );
 });

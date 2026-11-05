@@ -705,3 +705,66 @@ test("flag off: a one-model round-robin early empty_content 502 keeps the releas
     assert.deepEqual(dispatches, [first.token, sibling.token]);
   });
 });
+
+// A Claude Messages client served by a non-Claude upstream used to see a mid-stream
+// "Claude returned an empty response (no content block)" error: the content probe only ran
+// for the claude/codex providers, so the empty turn was committed before it could be retried.
+function openAiStream(text = ""): Response {
+  const chunk = (delta: Record<string, unknown>, finish: string | null) =>
+    `data: ${JSON.stringify({
+      id: "chatcmpl-test",
+      object: "chat.completion.chunk",
+      model: "gpt-test",
+      choices: [{ index: 0, delta, finish_reason: finish }],
+    })}\n\n`;
+  const frames = [chunk({ role: "assistant", content: "" }, null)];
+  if (text) frames.push(chunk({ content: text }, null), chunk({}, "stop"));
+  frames.push("data: [DONE]\n\n");
+  return new Response(frames.join(""), { headers: { "Content-Type": "text/event-stream" } });
+}
+
+async function seedOpenAiConnection(name: string): Promise<{ id: string; token: string }> {
+  const token = `sk-test-${name}`;
+  const row = await providersDb.createProviderConnection({
+    provider: "openai",
+    authType: "apikey",
+    name,
+    apiKey: token,
+    isActive: true,
+    testStatus: "active",
+  });
+  return { id: row.id, token };
+}
+
+test("Claude Messages client on an OpenAI upstream recovers an empty turn on a sibling", async () => {
+  const first = await seedOpenAiConnection("openai-empty");
+  const sibling = await seedOpenAiConnection("openai-healthy");
+  const dispatches: string[] = [];
+  globalThis.fetch = async (input, init) => {
+    const url = input instanceof Request ? input.url : String(input);
+    if (!url.includes("/chat/completions")) {
+      return new Response("{}", { headers: { "Content-Type": "application/json" } });
+    }
+    const token = new Headers(init?.headers).get("authorization")?.replace(/^Bearer /, "") ?? "";
+    dispatches.push(token);
+    return token === first.token ? openAiStream() : openAiStream("RECOVERED");
+  };
+
+  const response = await handleChat(
+    new Request("http://localhost/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "openai/gpt-4o-mini",
+        max_tokens: 256,
+        stream: true,
+        messages: [{ role: "user", content: `Reply OK. ${crypto.randomUUID()}` }],
+      }),
+    })
+  );
+  const body = await response.text();
+
+  assert.match(body, /RECOVERED/, body);
+  assert.doesNotMatch(body, /no content block/);
+  assert.deepEqual(dispatches, [first.token, sibling.token]);
+});

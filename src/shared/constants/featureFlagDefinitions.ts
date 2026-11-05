@@ -319,10 +319,10 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     key: "EMPTY_STREAM_SIBLING_RECOVERY_ENABLED",
     label: "Empty Stream Sibling Recovery",
     description:
-      "Claude/Codex streaming: after the first lifecycle event, briefly probe (up to 1s / 64 KiB) for usable output; a stream that ends with no content becomes an empty_content failure that spends the existing bounded retry on another eligible connection (no cooldown, no model lockout), and round-robin combos stop retrying once the client disconnects. Also treats refusal, pause_turn and model_context_window_exceeded as legitimate empty terminals inside the probe. Off by default: readiness, empty-content handling and combo retries stay exactly as before.",
+      "Claude/Codex streaming: after the first lifecycle event, briefly probe (up to 1s / 64 KiB) for usable output; a stream that ends with no content becomes an empty_content failure that spends the existing bounded retry on another eligible connection (no cooldown, no model lockout), and round-robin combos stop retrying once the client disconnects. Also treats refusal, pause_turn and model_context_window_exceeded as legitimate empty terminals inside the probe. Applies to every upstream when the client reads the Claude Messages format. On by default; turn off to restore the previous readiness, empty-content handling and combo retries.",
     descriptionI18nKey: "featureFlagEmptyStreamSiblingRecoveryEnabledDescription",
     category: "network",
-    defaultValue: "false",
+    defaultValue: "true",
     type: "boolean",
     requiresRestart: false,
     warningLevel: "caution",
