@@ -95,9 +95,8 @@ test("resolveBootRevalidationReason only fires on first-start or upgrade", () =>
   assert.equal(resolveBootRevalidationReason("v2", "v2"), null);
 });
 
-test("executeCodexCatalogRevalidation records completion only after a full live sync", async () => {
-  const events: string[] = [];
-  const failed = await executeCodexCatalogRevalidation({
+function runWithSync(result: { attempted: number; succeeded: number }, events: string[]) {
+  return executeCodexCatalogRevalidation({
     appVersion: "build:audit",
     scrub: async () => {
       events.push("scrub");
@@ -107,7 +106,7 @@ test("executeCodexCatalogRevalidation records completion only after a full live 
     },
     liveResync: async () => {
       events.push("sync");
-      return { attempted: 2, succeeded: 1 };
+      return result;
     },
     writeMarker: async () => {
       events.push("marker");
@@ -117,32 +116,28 @@ test("executeCodexCatalogRevalidation records completion only after a full live 
       events.push("log");
     },
   });
+}
 
+test("executeCodexCatalogRevalidation stays incomplete when every live sync fails", async () => {
+  const events: string[] = [];
+  const failed = await runWithSync({ attempted: 2, succeeded: 0 }, events);
   assert.equal(failed.complete, false);
   assert.deepEqual(events, ["scrub", "ready", "sync"]);
+});
 
-  events.length = 0;
-  const complete = await executeCodexCatalogRevalidation({
-    appVersion: "build:audit",
-    scrub: async () => {
-      events.push("scrub");
-    },
-    waitForReady: async () => {
-      events.push("ready");
-    },
-    liveResync: async () => {
-      events.push("sync");
-      return { attempted: 2, succeeded: 2 };
-    },
-    writeMarker: async () => {
-      events.push("marker");
-      return true;
-    },
-    logSuccess: () => {
-      events.push("log");
-    },
-  });
+test("executeCodexCatalogRevalidation completes when some accounts resync (no per-boot re-run)", async () => {
+  // One expired or failing Codex account used to keep the marker unwritten, so every
+  // boot live-resynced every Codex account again. That account is left to the
+  // regular model-sync cycle instead.
+  const events: string[] = [];
+  const partial = await runWithSync({ attempted: 2, succeeded: 1 }, events);
+  assert.equal(partial.complete, true);
+  assert.deepEqual(events, ["scrub", "ready", "sync", "marker", "log"]);
+});
 
+test("executeCodexCatalogRevalidation completes after a full live sync", async () => {
+  const events: string[] = [];
+  const complete = await runWithSync({ attempted: 2, succeeded: 2 }, events);
   assert.equal(complete.complete, true);
   assert.deepEqual(events, ["scrub", "ready", "sync", "marker", "log"]);
 });

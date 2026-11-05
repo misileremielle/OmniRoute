@@ -274,7 +274,11 @@ export async function executeCodexCatalogRevalidation(options: {
   }
 
   const syncResult = await options.liveResync();
-  if (syncResult.succeeded !== syncResult.attempted) {
+  // Only a run where every attempted resync failed (typically no network at boot) stays
+  // incomplete and retries on the next boot. Requiring every account to succeed meant one
+  // expired or failing account re-ran a live resync of every Codex account on every restart;
+  // such an account is left to the regular model-sync cycle.
+  if (syncResult.attempted > 0 && syncResult.succeeded === 0) {
     return { complete: false, ...syncResult };
   }
 

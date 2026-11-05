@@ -312,6 +312,23 @@ async function testConnection(
 /**
  * Single sweep: test all provider connections in parallel (with concurrency limit).
  */
+/**
+ * Pacing for a connection the scheduler has not tested since boot, from its persisted
+ * `lastTested`: a healthy connection is next due one interval later, any other status one
+ * first backoff step later (the same delay a failure inside this process would get).
+ * Returns null when there is no usable timestamp, so the connection is tested right away.
+ */
+export function seedTimingFromLastTest(
+  conn: { lastTested?: string | null; testStatus?: string | null },
+  intervalMs: number,
+  now: number
+): { lastAttemptAt: number; nextAttemptAt: number } | null {
+  const lastAttemptAt = conn.lastTested ? Date.parse(conn.lastTested) : Number.NaN;
+  if (!Number.isFinite(lastAttemptAt) || lastAttemptAt > now) return null;
+  const delayMs = conn.testStatus === "active" ? intervalMs : BACKOFF_SCHEDULE[0];
+  return { lastAttemptAt, nextAttemptAt: lastAttemptAt + delayMs };
+}
+
 export async function sweep(): Promise<void> {
   const state = getSchedulerState();
   if (state.sweepInProgress) return;
@@ -352,6 +369,8 @@ export async function sweep(): Promise<void> {
       provider: string;
       authType?: string;
       healthCheckInterval?: number | null;
+      lastTested?: string | null;
+      testStatus?: string | null;
       providerSpecificData?: { refreshCircuit?: { until?: string } } | null;
     }>;
 
@@ -370,6 +389,8 @@ export async function sweep(): Promise<void> {
         provider: string;
         authType?: string;
         healthCheckInterval?: number | null;
+        lastTested?: string | null;
+        testStatus?: string | null;
         providerSpecificData?: { refreshCircuit?: { until?: string } } | null;
       }>;
     } catch (err) {
@@ -401,9 +422,14 @@ export async function sweep(): Promise<void> {
         });
         return false;
       }
-      const timing = state_.perConnTiming.get(conn.id);
-      // No timing entry = never tested since boot → due now
-      if (!timing) return true;
+      let timing = state_.perConnTiming.get(conn.id);
+      // No timing entry since boot: seed it from the persisted last test so a restart
+      // does not re-probe every connection; never tested (or unparsable) → due now.
+      if (!timing) {
+        timing = seedTimingFromLastTest(conn, intervalMs, now) ?? undefined;
+        if (!timing) return true;
+        state_.perConnTiming.set(conn.id, timing);
+      }
       // Time-based: due when the current time has passed the next attempt time
       return now >= timing.nextAttemptAt;
     });

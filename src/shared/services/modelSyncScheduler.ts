@@ -338,6 +338,17 @@ async function runSyncCycle(apiBaseUrl: string): Promise<void> {
   }
 }
 
+/** Whether the boot-time cycle should run, given the last finished cycle's timestamp. */
+export function isStartupModelSyncDue(
+  lastRunIso: string | null | undefined,
+  intervalMs: number,
+  now: number
+): boolean {
+  const lastRun = typeof lastRunIso === "string" ? Date.parse(lastRunIso) : Number.NaN;
+  if (!Number.isFinite(lastRun) || lastRun > now) return true;
+  return now - lastRun >= intervalMs;
+}
+
 /**
  * Start the model sync scheduler.
  * @param apiBaseUrl — internal base URL to call OmniRoute's own API
@@ -363,11 +374,17 @@ export function startModelSyncScheduler(
       `(phase offset +${MODEL_SYNC_STAGGER_OFFSET_MS / 60_000}m)`
   );
 
-  // Serve traffic first; cleanup's first pass is +30s, so stay past that window.
-  const startupDelay = setTimeout(
-    () => runSyncCycle(trustedApiBaseUrl),
-    MODEL_SYNC_STARTUP_DELAY_MS
-  );
+  // Serve traffic first; cleanup's first pass is +30s, so stay past that window. A restart
+  // within the interval of the last finished cycle skips this run: every cycle sends one
+  // upstream /models request per account, and the regular interval below still covers it.
+  const startupDelay = setTimeout(() => {
+    void getLastModelSyncTime().then((lastRun) => {
+      if (isStartupModelSyncDue(lastRun, effectiveIntervalMs, Date.now())) {
+        return runSyncCycle(trustedApiBaseUrl);
+      }
+      console.log(`[ModelSync] Startup cycle skipped — last cycle at ${lastRun} is recent`);
+    });
+  }, MODEL_SYNC_STARTUP_DELAY_MS);
   startupDelay.unref?.();
 
   // Codex-only: revalidate catalog only on first-start or app upgrade (not every boot).
