@@ -314,21 +314,30 @@ export class CircuitBreaker {
     }
   }
 
+  /** Serialized form of the last state written by _persistToDb (null: nothing written yet). */
+  private lastPersistedSnapshot: string | null = null;
+
   _persistToDb() {
+    const record = {
+      state: this.state,
+      failureCount: this.failureCount,
+      lastFailureTime: this.lastFailureTime,
+      options: {
+        failureThreshold: this.failureThreshold,
+        resetTimeout: this.resetTimeout,
+        halfOpenRequests: this.halfOpenRequests,
+        lastFailureKind: this.lastFailureKind,
+        openCycleCount: this.openCycleCount,
+        kindFailureCounts: this.kindFailureCounts,
+      },
+    };
+    // Every successful request reaches here; a healthy breaker's state does not change, and
+    // rewriting the same row cost a SQLite commit (WAL pages) per breaker per request.
+    const snapshot = JSON.stringify(record);
+    if (snapshot === this.lastPersistedSnapshot) return;
     try {
-      saveCircuitBreakerState(this.name, {
-        state: this.state,
-        failureCount: this.failureCount,
-        lastFailureTime: this.lastFailureTime,
-        options: {
-          failureThreshold: this.failureThreshold,
-          resetTimeout: this.resetTimeout,
-          halfOpenRequests: this.halfOpenRequests,
-          lastFailureKind: this.lastFailureKind,
-          openCycleCount: this.openCycleCount,
-          kindFailureCounts: this.kindFailureCounts,
-        },
-      });
+      saveCircuitBreakerState(this.name, record);
+      this.lastPersistedSnapshot = snapshot;
     } catch {
       // Non-critical
     }

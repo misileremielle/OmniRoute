@@ -55,6 +55,7 @@ import { formatAutoRefreshCountdown } from "./formatters";
 import { translateUsageOrFallback, type UsageTranslationValues } from "./i18nFallback";
 import { compareTr } from "@/shared/utils/turkishText";
 import { fetchWithTimeout } from "@/shared/utils/fetchTimeout";
+import { createConcurrencyLimit } from "@/shared/utils/concurrencyLimit";
 import {
   ConnectionsAuthError,
   emptyQuotaCardKeys,
@@ -142,8 +143,18 @@ const QUOTA_TONE_CLASSES = {
 
 const getQuotaToneClasses = (pct: number) => QUOTA_TONE_CLASSES[quotaStatusLevel(pct)];
 
+// Each live quota fetch talks to the provider and can take many seconds. Without a cap, opening
+// the page with many accounts started one per account; the browser's six per-origin connections
+// filled up, and every other dashboard request — including the maintenance banner's health ping —
+// queued behind them, so the page showed "Server is unreachable" while the server was fine.
+const LIVE_QUOTA_CONCURRENCY = 3;
+const LIVE_QUOTA_TIMEOUT_MS = 60_000;
+const limitLiveQuota = createConcurrencyLimit(LIVE_QUOTA_CONCURRENCY);
+
 async function requestQuota(connectionId: string) {
-  const response = await fetch(`/api/usage/${connectionId}`);
+  const response = await limitLiveQuota(() =>
+    fetchWithTimeout(`/api/usage/${connectionId}`, { timeoutMs: LIVE_QUOTA_TIMEOUT_MS })
+  );
   if (response.ok) return { data: await response.json() };
   const errorData = await response.json().catch(() => ({}));
   const errorMsg = errorData.error || response.statusText;

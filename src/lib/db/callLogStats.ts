@@ -145,6 +145,37 @@ export function getProviderMetrics(): ProviderMetricRow[] {
   return getDbInstance().prepare(PROVIDER_METRICS_SQL).all() as ProviderMetricRow[];
 }
 
+/** How long one aggregate is reused across dashboard polls (all tabs share it). */
+export const PROVIDER_METRICS_CACHE_TTL_MS = 10_000;
+
+/**
+ * Memoize the provider-metrics aggregate for `ttlMs`. The query scans every logical call_logs
+ * row synchronously (≈100 ms per 300k rows, growing with history) and the dashboard home polls
+ * it every few seconds from every open tab, which kept the event loop busy and starved other
+ * requests. Failures are not cached.
+ */
+export function createProviderMetricsCache(
+  read: () => ProviderMetricRow[],
+  { ttlMs = PROVIDER_METRICS_CACHE_TTL_MS, now = Date.now } = {}
+): (() => ProviderMetricRow[]) & { reset: () => void } {
+  let cached: { rows: ProviderMetricRow[]; expiresAt: number } | null = null;
+  const get = () => {
+    const at = now();
+    if (cached && at < cached.expiresAt) return cached.rows;
+    const rows = read();
+    cached = { rows, expiresAt: at + ttlMs };
+    return rows;
+  };
+  return Object.assign(get, {
+    reset: () => {
+      cached = null;
+    },
+  });
+}
+
+/** getProviderMetrics() behind the shared dashboard cache; used by GET /api/provider-metrics. */
+export const getCachedProviderMetrics = createProviderMetricsCache(getProviderMetrics);
+
 // ---------------------------------------------------------------------------
 // /api/free-provider-rankings — windowed usage aggregate
 // ---------------------------------------------------------------------------

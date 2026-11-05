@@ -320,8 +320,14 @@ export function clearModelsDevPricing(): void {
  * Ensure the model_capabilities table exists.
  * Call this before any capability operations.
  */
+// Handles that already ran the DDL below. Capability lookups run this on the request path
+// (dozens of times per proxied request); the table cannot disappear from an open handle, so
+// one CREATE TABLE IF NOT EXISTS per handle is enough. A reset or new handle runs it again.
+const capabilitiesTableReady = new WeakSet<object>();
+
 export function ensureCapabilitiesTable(): void {
   const db = getDbInstance();
+  if (capabilitiesTableReady.has(db)) return;
   db.exec(`
     CREATE TABLE IF NOT EXISTS model_capabilities (
       provider TEXT NOT NULL,
@@ -348,6 +354,7 @@ export function ensureCapabilitiesTable(): void {
       PRIMARY KEY (provider, model_id)
     )
   `);
+  capabilitiesTableReady.add(db);
 }
 
 function defineEnumerableDataProperty<T extends object>(

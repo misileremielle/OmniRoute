@@ -10,6 +10,7 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 
 const core = await import("../../src/lib/db/core.ts");
 const providerMetricsRoute = await import("../../src/app/api/provider-metrics/route.ts");
+const callLogStatsForCache = await import("../../src/lib/db/callLogStats.ts");
 
 type ProviderMetricsResponse = {
   metrics: Record<string, unknown>;
@@ -23,6 +24,8 @@ function resetStorage() {
 }
 
 test.beforeEach(() => {
+  // The route serves a 10s shared cache; every case reads fresh data.
+  callLogStatsForCache.getCachedProviderMetrics.reset();
   resetStorage();
 });
 test.after(() => {

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { isTabVisible } from "@/shared/utils/visiblePolling";
 import EmptyState from "@/shared/components/EmptyState";
 import Icon from "@/shared/components/Icon";
 import { CardSkeleton, Button, Modal } from "@/shared/components";
@@ -102,6 +103,10 @@ function mergeUpdateStep(steps: UpdateStep[], nextStep: UpdateStep) {
   next[idx] = nextStep;
   return next;
 }
+
+// /api/provider-metrics serves a 10s shared aggregate (callLogStats.getCachedProviderMetrics);
+// polling faster only re-reads the cache.
+const TOPOLOGY_POLL_INTERVAL_MS = 10_000;
 
 export default function HomePageClient({ machineId }: HomePageClientProps) {
   const router = useRouter();
@@ -212,6 +217,11 @@ export default function HomePageClient({ machineId }: HomePageClientProps) {
     let controller: AbortController | null = null;
 
     const loadTopologyActivity = async () => {
+      // A hidden tab shows nothing; keep the cadence but skip the request.
+      if (!isTabVisible()) {
+        timeoutId = setTimeout(loadTopologyActivity, TOPOLOGY_POLL_INTERVAL_MS);
+        return;
+      }
       const currentController = new AbortController();
       controller = currentController;
       try {
@@ -239,7 +249,7 @@ export default function HomePageClient({ machineId }: HomePageClientProps) {
           controller = null;
         }
         if (!cancelled) {
-          timeoutId = setTimeout(loadTopologyActivity, 3000);
+          timeoutId = setTimeout(loadTopologyActivity, TOPOLOGY_POLL_INTERVAL_MS);
         }
       }
     };

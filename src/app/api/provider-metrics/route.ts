@@ -3,7 +3,7 @@ import pino from "pino";
 
 import { buildErrorBody } from "@omniroute/open-sse/utils/error.ts";
 
-import { getProviderMetrics, type ProviderMetricRow } from "@/lib/db/callLogStats";
+import { getCachedProviderMetrics, type ProviderMetricRow } from "@/lib/db/callLogStats";
 import { foldMetricRowsByFamily } from "@/lib/providerFamilyAgg";
 import { toNumber, toNumberOrNull } from "@/shared/utils/numeric";
 
@@ -42,7 +42,7 @@ function toProviderMetric(row: ProviderMetricRow): ProviderMetric {
  */
 export async function GET() {
   try {
-    const rows = getProviderMetrics();
+    const rows = getCachedProviderMetrics();
 
     const metrics: Record<string, ProviderMetric> = {};
     let lastProvider = "";
