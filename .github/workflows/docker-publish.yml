@@ -349,7 +349,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Heap for the webpack build inside BuildKit: 12288 MB on every build-args block below.
+      # Heap budgets for webpack inside BuildKit:
+      # - Node images: 12288 MB (validated as stable on hosted runners)
+      # - Bun compatibility images: 10240 MB (hosted amd64 OOM/runner-loss mitigation)
       # Validated on the hosted runners (16 GB) by the publishes of 2026-10-16/17 — runs
       # 38904652365, 38907575198 and 39010473398, amd64 and arm64 green (27-55 min). It stays
       # at or above build.yml's native webpack floor (10240 MB), never below it
@@ -461,7 +463,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           build-args: |
             OMNIROUTE_USE_TURBOPACK=0
-            OMNIROUTE_BUILD_MEMORY_MB=12288
+            OMNIROUTE_BUILD_MEMORY_MB=10240
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           tags: ${{ needs.prepare.outputs.image_tags }}
           cache-from: type=gha,scope=docker-bun-base-${{ matrix.arch }}
@@ -483,7 +485,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           build-args: |
             OMNIROUTE_USE_TURBOPACK=0
-            OMNIROUTE_BUILD_MEMORY_MB=12288
+            OMNIROUTE_BUILD_MEMORY_MB=10240
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           tags: ${{ needs.prepare.outputs.image_tags }}
           cache-from: |
