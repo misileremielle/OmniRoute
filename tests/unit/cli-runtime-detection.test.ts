@@ -10,6 +10,13 @@ import fsPromises from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
+// Detection merges in the login shell's PATH, computed once per process ($SHELL -ilc).
+// Under `pnpm run` on Linux that PATH still holds node_modules/.bin, which carries the `cn`
+// binary of the unrelated `cn` package (a fumadocs-ui dependency), so the "cn is absent"
+// test saw Continue as installed in CI. These tests set PATH themselves; keep the runner's
+// login shell out by pointing SHELL at a shell that does not exist, before the first lookup.
+process.env.SHELL = path.join(os.tmpdir(), "omniroute-test-no-login-shell");
+
 const { getCliRuntimeStatus, getKnownToolPaths, normalizeCliToolId, CLI_TOOL_IDS } =
   await import("../../src/shared/services/cliRuntime.ts");
 
@@ -252,8 +259,7 @@ describe("Continue CLI detection", () => {
       ])
     );
     // A ~/.continue/config.yaml in the real home makes detection report "settings found,
-    // binary unresolved" (installed: true). Another test writing one under the shared HOME
-    // made this fail in CI, so the test runs against an empty home of its own.
+    // binary unresolved" (installed: true), so the test runs against an empty home of its own.
     const emptyHome = createTempDir();
     process.env.PATH = "";
     process.env.HOME = emptyHome;
