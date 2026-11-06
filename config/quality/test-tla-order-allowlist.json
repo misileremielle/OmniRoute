@@ -3,7 +3,6 @@
   "files": [
     "tests/unit/account-fallback-retry-after-json.test.ts",
     "tests/unit/agy-provider.test.ts",
-    "tests/unit/audio-transcriptions-combo-resolution.test.ts",
     "tests/unit/bailian-coding-plan-provider.test.ts",
     "tests/unit/batches-f9-helpers.test.ts",
     "tests/unit/calllogs-format-split.test.ts",
@@ -20,7 +19,6 @@
     "tests/unit/db-settings-split.test.ts",
     "tests/unit/db-usageanalytics-split.test.ts",
     "tests/unit/deepseek-web-images.test.ts",
-    "tests/unit/image-generation-handler.test.ts",
     "tests/unit/log-rotation-reopen-16373.test.ts",
     "tests/unit/model-concurrency-input.test.ts",
     "tests/unit/openai-compatible-tools.test.ts",
@@ -36,7 +34,6 @@
     "tests/unit/responses-tool-call-lifecycle-16106.test.ts",
     "tests/unit/responses-translation-fixes.test.ts",
     "tests/unit/responsesanitizer-reasoning-split.test.ts",
-    "tests/unit/retrieval-scoring-split.test.ts",
     "tests/unit/security-fase01.test.ts",
     "tests/unit/security-s1-s2-s4.test.ts",
     "tests/unit/sse-heartbeat.test.ts",

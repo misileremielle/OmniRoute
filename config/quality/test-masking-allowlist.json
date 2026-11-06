@@ -2177,6 +2177,10 @@
     "tests/unit/migration-225-token-ledger-indexes.test.ts": {
       "sourceRemoved": ["src/lib/db/gamification.ts"],
       "reason": "Feature removed in this fork; nothing left to test."
+    },
+    "tests/unit/onnx-install-env-16225.test.ts": {
+      "replacement": "tests/unit/onnx-install-skip-16225.test.ts",
+      "reason": "chore/pnpm-migration (PR #2): the old test drove npm's lifecycle to prove ONNXRUNTIME_NODE_INSTALL reaches onnxruntime-node's postinstall. Under pnpm that script never runs (allowBuilds denies it; `pnpm ignored-builds` confirms), so the replacement pins the deny entry, the action's skip flag and that no workflow installs outside the audited action."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -2265,5 +2269,11 @@
   "tests/unit/build/backend-only-smoke-workflows.test.ts": "The removed asserts checked dast-smoke.yml, nightly-schemathesis.yml, nightly-resilience.yml, nightly-llm-security.yml and npm-publish.yml, which this fork deleted; the backend-only profile checks remain.",
   "tests/unit/build/push-storm-diet.test.ts": "The removed asserts covered quality.yml and nightly-release-green.yml, which this fork deleted; the ci.yml push-trigger check remains.",
   "tests/unit/check-docs-counts-rankings-catalog.test.ts": "Dropped a source-text assert that src/app/api/free-tier/summary/route.ts calls slice(0, 10); the merged upstream route passes FREE_CATALOG_CURATED_AT through unchanged.",
-  "tests/unit/management-auth-hardening.test.ts": "Dropped the memory-route case: src/app/api/memory/** was removed with the memory system."
+  "tests/unit/management-auth-hardening.test.ts": "Dropped the memory-route case: src/app/api/memory/** was removed with the memory system.",
+  "tests/unit/build/check-lockfile.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. lockfile-lint (npm/yarn lockfiles only) is removed, so its argv-builder tests (getLockfileLintConfig/buildLockfileLintArgs, ~20 asserts on flags) have no subject. The gate's policy is now in findLockfileViolations, covered by 6 negative tests (missing/non-sha512 integrity, http tarball, foreign host, invalid URL) plus a run against the committed lockfile and a real pnpm workspace-mismatch test.",
+  "tests/unit/build/optional-transformers-dependency.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. the three per-package `optional` asserts on npm's flat lock map became one loop over every pnpm snapshot of the same three packages (stricter: checks all resolved copies).",
+  "tests/unit/build/ref-parser-js-yaml-17017.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. pnpm records no nested node_modules path, so the 'no nested js-yaml 4 under ref-parser' assert is replaced by checking every ref-parser snapshot resolves js-yaml 5; the @yarnpkg/parsers case is gone with lockfile-lint, which was its only dependent.",
+  "tests/unit/dry-run-lts-cut.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. bumpLockfile and its test are removed: pnpm-lock.yaml records no workspace versions, so a release bump has no lockfile entry to change.",
+  "tests/unit/playwright-runner-args.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. the npm 'no nested @playwright/test/node_modules/playwright' assert has no pnpm equivalent; lockedVersions(...) == [runtime] for both packages already proves a single Playwright copy.",
+  "tests/unit/wreq-native-manifest.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. pnpm-lock.yaml does not record a package license, so the per-addon `lock.license === MIT` assert is dropped; the manifest's own license assert remains, as do version/integrity/os/cpu/libc against the lockfile."
 }

@@ -7037,13 +7037,13 @@
     "doctorChecking": "Nṣayẹwo ipo…",
     "doctorCheck": "Ṣayẹwo ipo dokita",
     "fallbackRetryBackendTitle": "Oníṣẹ́ àsọtẹ́lẹ́ ìṣọ̀ṣe",
-    "addSystemOneCompatible": "__MISSING__:Add System One Compatible",
-    "systemOneCompatibleName": "__MISSING__:System One Compatible",
+    "addSystemOneCompatible": "Ṣàfikún Èyí Tó Bá System One Mu",
+    "systemOneCompatibleName": "Tó Bá System One Mu",
     "systemOneNamePlaceholder": "__MISSING__:OpenRouter System One",
     "systemOnePrefixPlaceholder": "__MISSING__:sys1",
     "systemOneBaseUrlPlaceholder": "__MISSING__:https://openrouter.ai/api",
-    "systemOneBaseUrlHint": "__MISSING__:Root URL of a System One (Jev) API; OmniRoute appends /v1/systemone. Starts with OpenRouter — use https://api.typesafe.ai for TypeSafe direct, or any Jev-compatible server.",
-    "systemOnePrefixHint": "__MISSING__:Required. Clients call POST /v1/systemone with the model written as prefix/model (e.g. sys1/jev-latest).",
+    "systemOneBaseUrlHint": "URL gbòǹgbò fún API System One (Jev); OmniRoute máa ń fi /v1/systemone kún un. Ó bẹ̀rẹ̀ pẹ̀lú OpenRouter — lo https://api.typesafe.ai fún TypeSafe tààrà, tàbí server èyíkéyìí tó bá Jev mu.",
+    "systemOnePrefixHint": "Ó pọndandan. Àwọn client máa ń pe POST /v1/systemone pẹ̀lú model tí a kọ gẹ́gẹ́ bí prefix/model (fún àpẹẹrẹ sys1/jev-latest).",
     "systemOneTestModelPlaceholder": "__MISSING__:jev-latest"
   },
   "settings": {

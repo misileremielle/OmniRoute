@@ -97,3 +97,14 @@ test("evaluateDeadCode: strict integer comparison — any increase regresses", (
   assert.equal(evaluate(10, 10).regressed, false);
   assert.equal(evaluate(9, 10).regressed, false);
 });
+
+test("extractKnipJson drops log lines a config plugin prints before the report", async () => {
+  const { extractKnipJson, parseKnipMetrics } =
+    await import("../../scripts/check/check-dead-code.mjs");
+  const report = '{"issues":[{"file":"src/a.ts","files":[],"exports":[{"name":"x"}]}]}';
+  const raw = `[MDX] generated files in 15.2ms\n${report}\n`;
+  assert.equal(extractKnipJson(raw), report);
+  assert.equal(extractKnipJson(report), report, "a clean report is left as is");
+  assert.equal(extractKnipJson("not json at all"), "not json at all", "garbage stays garbage");
+  assert.ok(parseKnipMetrics(JSON.parse(extractKnipJson(raw))));
+});

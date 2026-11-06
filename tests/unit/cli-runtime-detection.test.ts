@@ -3,9 +3,10 @@
  * npm prefix deduplication, and env var overrides.
  */
 
-import { describe, it, before, after } from "node:test";
+import { describe, it, before, after, mock } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import fsPromises from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -248,6 +249,16 @@ describe("Continue CLI detection", () => {
     const previousOverride = process.env.CLI_CONTINUE_BIN;
     process.env.PATH = "";
     delete process.env.CLI_CONTINUE_BIN;
+    // Known paths include machine-wide dirs (Node's bin dir, the npm prefix, /usr/local/bin,
+    // ~/.local/bin). A host that really has a `cn` there (GitHub's ubuntu runner does) would
+    // make "absent" false, so the test makes `cn` absent from every one of them itself.
+    const realRealpath = fsPromises.realpath;
+    const realpathMock = mock.method(fsPromises, "realpath", (target: fs.PathLike, ...rest: []) => {
+      if (/^cn(\.cmd)?$/.test(path.basename(String(target)))) {
+        return Promise.reject(Object.assign(new Error("ENOENT (test)"), { code: "ENOENT" }));
+      }
+      return realRealpath(target, ...rest);
+    });
 
     try {
       const result = await getCliRuntimeStatus("continue");
@@ -256,6 +267,7 @@ describe("Continue CLI detection", () => {
       assert.equal(result.reason, "not_found");
       assert.equal(result.requiresBinary, true);
     } finally {
+      realpathMock.mock.restore();
       if (previousPath === undefined) delete process.env.PATH;
       else process.env.PATH = previousPath;
       if (previousOverride === undefined) delete process.env.CLI_CONTINUE_BIN;

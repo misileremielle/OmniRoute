@@ -7114,13 +7114,13 @@
     "doctorChecking": "အခြေအနေစစ်ဆေးနေသည်…",
     "doctorCheck": "doctor အခြေအနေ စစ်ဆေးရန်",
     "fallbackRetryBackendTitle": "အစမ်းပြန်လည်စက်",
-    "addSystemOneCompatible": "__MISSING__:Add System One Compatible",
-    "systemOneCompatibleName": "__MISSING__:System One Compatible",
+    "addSystemOneCompatible": "System One နှင့် ကိုက်ညီသော ဝန်ဆောင်မှု ထည့်ရန်",
+    "systemOneCompatibleName": "System One နှင့် တွဲဖက်အသုံးပြုနိုင်သော",
     "systemOneNamePlaceholder": "__MISSING__:OpenRouter System One",
     "systemOnePrefixPlaceholder": "__MISSING__:sys1",
     "systemOneBaseUrlPlaceholder": "__MISSING__:https://openrouter.ai/api",
-    "systemOneBaseUrlHint": "__MISSING__:Root URL of a System One (Jev) API; OmniRoute appends /v1/systemone. Starts with OpenRouter — use https://api.typesafe.ai for TypeSafe direct, or any Jev-compatible server.",
-    "systemOnePrefixHint": "__MISSING__:Required. Clients call POST /v1/systemone with the model written as prefix/model (e.g. sys1/jev-latest).",
+    "systemOneBaseUrlHint": "System One (Jev) API ၏ အရင်း URL။ OmniRoute က /v1/systemone ကို နောက်တွင် ပေါင်းထည့်ပါသည်။ OpenRouter ဖြင့် စတင်ထားသည် — TypeSafe ကို တိုက်ရိုက်သုံးရန် https://api.typesafe.ai ကို သို့မဟုတ် Jev နှင့် ကိုက်ညီသော မည်သည့် server ကိုမဆို အသုံးပြုပါ။",
+    "systemOnePrefixHint": "မဖြစ်မနေ လိုအပ်သည်။ Client များက model ကို prefix/model ပုံစံဖြင့် ရေး၍ POST /v1/systemone ကို ခေါ်ဆိုပါသည် (ဥပမာ sys1/jev-latest)။",
     "systemOneTestModelPlaceholder": "__MISSING__:jev-latest"
   },
   "settings": {

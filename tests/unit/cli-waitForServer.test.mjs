@@ -24,6 +24,13 @@ async function freePort() {
   });
 }
 
+// Hosts without an IPv6 loopback (some containers and sandboxes) cannot bind ::1 at all.
+const ipv6LoopbackAvailable = await new Promise((resolve) => {
+  const probe = net.createServer();
+  probe.once("error", () => resolve(false));
+  probe.listen(0, "::1", () => probe.close(() => resolve(true)));
+});
+
 test("waitForServer returns false on a closed port within the given timeout (#2460)", async () => {
   const port = await freePort();
   const start = Date.now();
@@ -77,13 +84,6 @@ test("waitForServer returns false when the port accepts TCP but never answers a 
   } finally {
     await new Promise((resolve) => server.close(() => resolve()));
   }
-});
-
-// Hosts without an IPv6 loopback (some containers and sandboxes) cannot bind ::1 at all.
-const ipv6LoopbackAvailable = await new Promise((resolve) => {
-  const probe = net.createServer();
-  probe.once("error", () => resolve(false));
-  probe.listen(0, "::1", () => probe.close(() => resolve(true)));
 });
 
 test(

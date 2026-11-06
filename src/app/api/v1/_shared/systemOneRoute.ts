@@ -15,7 +15,7 @@ import {
 import { createInjectionGuard, withInjectionGuard } from "@/middleware/promptInjectionGuard";
 import { getCachedProviderNodes } from "@/lib/db/readCache";
 import { CORS_HEADERS } from "@omniroute/open-sse/utils/cors.ts";
-import { decodeSystemOneRequest } from "./systemOneRequest";
+import { decodeSystemOneRequest, isSystemOneDecodeFailure } from "./systemOneRequest";
 import { errorResponse } from "@omniroute/open-sse/utils/error.ts";
 import { HTTP_STATUS } from "@omniroute/open-sse/config/constants.ts";
 import { enforceApiKeyPolicy } from "@/shared/utils/apiKeyPolicy";
@@ -105,7 +105,7 @@ async function postHandler(
 ): Promise<Response> {
   // TypeSafe SDK bodies may be zstd-compressed and/or multipart (image assets).
   const decoded = await decodeSystemOneRequest(request);
-  if (!decoded.ok) return errorResponse(decoded.status, decoded.message);
+  if (isSystemOneDecodeFailure(decoded)) return errorResponse(decoded.status, decoded.message);
   const rawBody = decoded.payload;
 
   // withInjectionGuard only scans bodies it can read as plain JSON; run the same

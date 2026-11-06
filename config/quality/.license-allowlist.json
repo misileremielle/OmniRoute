@@ -1,7 +1,6 @@
 {
   "_comment": "SPDX license allowlist for OmniRoute (MIT project). Task 7.20 / PLANO-QUALITY-GATES-FASE7.md.",
   "_policy": "Production deps with a license outside 'allowed' and not in 'exceptions' fail the gate. devDeps get an advisory warning only.",
-
   "allowed": [
     "MIT",
     "Apache-2.0",
@@ -21,7 +20,6 @@
     "PSF-2.0",
     "CC-BY-3.0"
   ],
-
   "allowedExpressions": [
     "MIT*",
     "MIT AND ISC",
@@ -32,7 +30,6 @@
     "(BSD-2-Clause OR MIT OR Apache-2.0)",
     "(MPL-2.0 OR Apache-2.0)"
   ],
-
   "exceptions": {
     "@img/sharp-libvips-linux-x64": {
       "license": "LGPL-3.0-or-later",
@@ -115,6 +112,12 @@
     "@fontsource/vazirmatn": {
       "license": "OFL-1.1",
       "justification": "SIL Open Font License 1.1 covers only the font files shipped by @fontsource/vazirmatn (Copyright 2015 The Vazirmatn Project Authors; self-hosted Arabic-script typography for the RTL locales fa/ar/ur, named only under html[dir=rtl]). OFL-1.1 permits bundling, embedding and redistribution of the fonts with software of any license as long as the fonts themselves are not sold on their own and keep their notices; it places no copyleft or attribution requirement on OmniRoute's code. The fonts are served as static assets, never modified.",
+      "risk": "low",
+      "reviewAt": "v4.0.0"
+    },
+    "@img/sharp-libvips-darwin-arm64": {
+      "license": "LGPL-3.0-or-later",
+      "justification": "Same rationale as @img/sharp-libvips-linux-x64 — the macOS arm64 build of the same prebuilt libvips shared library, installed on Apple-silicon dev machines (sharp picks the platform package). Unmodified, dynamically loaded by sharp.",
       "risk": "low",
       "reviewAt": "v4.0.0"
     }
