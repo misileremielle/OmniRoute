@@ -272,10 +272,12 @@ describe("Continue CLI detection", () => {
 
     try {
       const result = await getCliRuntimeStatus("continue");
-      assert.equal(result.installed, false);
-      assert.equal(result.runnable, false);
-      assert.equal(result.reason, "not_found");
-      assert.equal(result.requiresBinary, true);
+      // On failure, say what was detected and where, so a host-specific hit is diagnosable.
+      const seen = JSON.stringify({ result, home: os.homedir(), path: process.env.PATH });
+      assert.equal(result.installed, false, seen);
+      assert.equal(result.runnable, false, seen);
+      assert.equal(result.reason, "not_found", seen);
+      assert.equal(result.requiresBinary, true, seen);
     } finally {
       realpathMock.mock.restore();
       for (const [key, value] of Object.entries(saved)) {
