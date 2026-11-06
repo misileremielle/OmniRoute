@@ -88,3 +88,14 @@ test("every docker-publish.yml heap override is at or above build.yml's native w
   const below = dockerHeaps.filter((mb) => mb < floor);
   assert.deepEqual(below, [], `docker heap below the native floor of ${floor} MB`);
 });
+
+test("Bun publish steps use the hosted webpack floor heap budget", () => {
+  assert.match(
+    workflow,
+    /- name: Build and push BUN base platform image by digest[\s\S]*?OMNIROUTE_BUILD_MEMORY_MB=10240/
+  );
+  assert.match(
+    workflow,
+    /- name: Build and push BUN web platform image by digest[\s\S]*?OMNIROUTE_BUILD_MEMORY_MB=10240/
+  );
+});
