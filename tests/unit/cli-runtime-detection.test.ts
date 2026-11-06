@@ -245,13 +245,23 @@ describe("Unknown tool", () => {
 
 describe("Continue CLI detection", () => {
   it("should not report Continue as installed when the cn binary is absent", async () => {
-    const previousPath = process.env.PATH;
-    const previousOverride = process.env.CLI_CONTINUE_BIN;
+    const saved = Object.fromEntries(
+      ["PATH", "CLI_CONTINUE_BIN", "HOME", "USERPROFILE", "CLI_CONFIG_HOME"].map((k) => [
+        k,
+        process.env[k],
+      ])
+    );
+    // A ~/.continue/config.yaml in the real home makes detection report "settings found,
+    // binary unresolved" (installed: true). Another test writing one under the shared HOME
+    // made this fail in CI, so the test runs against an empty home of its own.
+    const emptyHome = createTempDir();
     process.env.PATH = "";
+    process.env.HOME = emptyHome;
+    process.env.USERPROFILE = emptyHome;
     delete process.env.CLI_CONTINUE_BIN;
-    // Known paths include machine-wide dirs (Node's bin dir, the npm prefix, /usr/local/bin,
-    // ~/.local/bin). A host that really has a `cn` there (GitHub's ubuntu runner does) would
-    // make "absent" false, so the test makes `cn` absent from every one of them itself.
+    delete process.env.CLI_CONFIG_HOME;
+    // Known paths also include machine-wide dirs (Node's bin dir, the npm prefix,
+    // /usr/local/bin) that the test cannot redirect, so `cn` is made absent from them too.
     const realRealpath = fsPromises.realpath;
     const realpathMock = mock.method(fsPromises, "realpath", (target: fs.PathLike, ...rest: []) => {
       if (/^cn(\.cmd)?$/.test(path.basename(String(target)))) {
@@ -268,10 +278,11 @@ describe("Continue CLI detection", () => {
       assert.equal(result.requiresBinary, true);
     } finally {
       realpathMock.mock.restore();
-      if (previousPath === undefined) delete process.env.PATH;
-      else process.env.PATH = previousPath;
-      if (previousOverride === undefined) delete process.env.CLI_CONTINUE_BIN;
-      else process.env.CLI_CONTINUE_BIN = previousOverride;
+      for (const [key, value] of Object.entries(saved)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+      fs.rmSync(emptyHome, { recursive: true, force: true });
     }
   });
 
