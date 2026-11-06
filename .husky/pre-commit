@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 set -eu
 
-if ! command -v npx >/dev/null 2>&1; then
-  echo "npx not found in PATH — install the project's Node/npm toolchain before committing." >&2
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found in PATH — install the version in config/ci/toolchain.json before committing." >&2
   exit 1
 fi
 
