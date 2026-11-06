@@ -10,7 +10,7 @@
  *   node scripts/i18n/sync-llm-mirrors.mjs
  *
  * Idempotent. Safe to run repeatedly. Used after any edit to `llm.txt` to
- * keep `npm run check:docs-sync` green.
+ * keep `pnpm run check:docs-sync` green.
  */
 
 import { promises as fs } from "node:fs";

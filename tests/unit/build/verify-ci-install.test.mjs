@@ -16,7 +16,9 @@ import test from "node:test";
 import { parse } from "yaml";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
-const action = parse(readFileSync(join(root, ".github/actions/npm-ci-retry/action.yml"), "utf8"));
+const action = parse(
+  readFileSync(join(root, ".github/actions/pnpm-install-retry/action.yml"), "utf8")
+);
 
 function probe(
   sqlite,
@@ -31,10 +33,11 @@ function probe(
       devDependencies: { vitest: "^5.0.0" },
     };
     writeFileSync(join(fixture, "package.json"), JSON.stringify(manifest));
-    const packages = { "": manifest };
+    const importer = { dependencies: {}, devDependencies: {} };
     for (const name of ["better-sqlite3", "esbuild", "vitest"]) {
       const version = name === "vitest" ? "5.0.3" : "1.0.0";
-      packages[`node_modules/${name}`] = { version };
+      const group = name === "vitest" ? "devDependencies" : "dependencies";
+      importer[group][name] = { specifier: manifest[group][name], version };
       if (name === "better-sqlite3" && sqlite === null) continue;
       mkdirSync(join(fixture, "node_modules", name), { recursive: true });
       writeFileSync(
@@ -43,8 +46,8 @@ function probe(
       );
     }
     writeFileSync(
-      join(fixture, "package-lock.json"),
-      JSON.stringify({ lockfileVersion: 3, packages })
+      join(fixture, "pnpm-lock.yaml"),
+      JSON.stringify({ lockfileVersion: "9.0", importers: { ".": importer } })
     );
     for (const [name, source] of [
       ["better-sqlite3", sqlite],
@@ -60,9 +63,13 @@ function probe(
       const destination = join(fixture, "scripts/ci/verify-ci-install.mjs");
       mkdirSync(dirname(destination), { recursive: true });
       cpSync(script, destination);
+      cpSync(join(root, "scripts/ci/pnpmLock.mjs"), join(fixture, "scripts/ci/pnpmLock.mjs"));
+      cpSync(join(root, "node_modules/js-yaml"), join(fixture, "node_modules/js-yaml"), {
+        recursive: true,
+      });
     }
     prepare(fixture);
-    // A composite executes each run block in its own shell. After npm returns
+    // A composite executes each run block in its own shell. After pnpm returns
     // zero, run its real admission probe; without one the install is admitted.
     const verification = action.runs.steps.find((step) => step.id === "verify-install");
     assert.equal(verification?.if, undefined, "native verification also covers cache hits");
@@ -129,19 +136,19 @@ test("install admission rejects an old test runner even when native probes pass"
 });
 
 for (const [name, change, message] of [
-  ["missing lockfile", (dir) => rmSync(join(dir, "package-lock.json")), /package-lock/],
+  ["missing lockfile", (dir) => rmSync(join(dir, "pnpm-lock.yaml")), /pnpm-lock/],
   [
     "missing runner metadata",
     (dir) => rmSync(join(dir, "node_modules/vitest/package.json")),
     /vitest/,
   ],
-  ["corrupt lockfile", (dir) => writeFileSync(join(dir, "package-lock.json"), "{"), /JSON/],
+  ["corrupt lockfile", (dir) => writeFileSync(join(dir, "pnpm-lock.yaml"), "{"), /YAML|flow/i],
   [
     "missing runner version",
     (dir) => {
-      const file = join(dir, "package-lock.json");
+      const file = join(dir, "pnpm-lock.yaml");
       const lock = JSON.parse(readFileSync(file, "utf8"));
-      delete lock.packages["node_modules/vitest"].version;
+      delete lock.importers["."].devDependencies.vitest.version;
       writeFileSync(file, JSON.stringify(lock));
     },
     /vitest.*lockfile/,

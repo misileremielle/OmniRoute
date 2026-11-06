@@ -58,7 +58,7 @@ reviews:
     # The two classes match every catalog except en.json (el, es, et start with "e").
     - "!src/i18n/messages/[a-df-z]*.json"
     - "!src/i18n/messages/e[a-mo-z]*.json"
-    - "!**/package-lock.json"
+    - "!**/pnpm-lock.yaml"
     # Generated files.
     - "!docs/reference/PROVIDER_REFERENCE.md"
     - "!**/*.svg"

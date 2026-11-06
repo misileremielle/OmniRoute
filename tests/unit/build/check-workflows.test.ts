@@ -179,7 +179,7 @@ test("integration candidates never restore PR dependency, lint or browser caches
     );
     const steps = source.split(/^      - /m).slice(1);
     const installers = steps.filter((step) =>
-      step.includes("uses: ./.github/actions/npm-ci-retry")
+      step.includes("uses: ./.github/actions/pnpm-install-retry")
     );
     assert.ok(installers.length > 0);
     for (const step of installers) {

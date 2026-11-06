@@ -5,14 +5,14 @@
  *
  * Writes OMNIROUTE_BUILD_SHA (or git rev-parse --short HEAD) into:
  *   - dist/BUILD_SHA
- *   - .build/next/standalone/BUILD_SHA  (present after `npm run build`)
+ *   - .build/next/standalone/BUILD_SHA  (present after `pnpm run build`)
  *
  * Exits 1 if the standalone directory does not exist, which guards against
  * stale-cache shipping where a previous build artifact is accidentally published
  * without a fresh `next build`.
  *
  * Usage: node scripts/build/write-build-sha.mjs
- * Called by: npm run build:release (after npm run build)
+ * Called by: pnpm run build:release (after pnpm run build)
  */
 
 import fs from "node:fs";
@@ -46,11 +46,11 @@ const NEXT_DIST = process.env.NEXT_DIST_DIR || ".build/next";
 const standaloneDir = path.join(ROOT, NEXT_DIST, "standalone");
 const distDir = path.join(ROOT, "dist");
 
-// Guard: standalone must exist (ensures build:release runs after npm run build)
+// Guard: standalone must exist (ensures build:release runs after pnpm run build)
 if (!fs.existsSync(standaloneDir)) {
   console.error(
     `[write-build-sha] FATAL: standalone dir not found: ${standaloneDir}\n` +
-      `  Run \`npm run build\` before \`npm run build:release\`.`
+      `  Run \`pnpm run build\` before \`pnpm run build:release\`.`
   );
   process.exit(1);
 }

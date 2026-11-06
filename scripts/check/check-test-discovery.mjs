@@ -144,7 +144,7 @@ export const COLLECTORS = [
     sources: ["vitest.config.ts"],
     anchors: { "vitest.config.ts": "tests/unit/encryption.test.ts" },
   },
-  // Playwright — test:e2e: o script chama o runner sem glob (assim `npm run test:e2e -- <spec>`
+  // Playwright — test:e2e: o script chama o runner sem glob (assim `pnpm run test:e2e -- <spec>`
   // filtra de verdade) e a coleta vem do playwright.config.ts (testDir ./tests/e2e +
   // testMatch **/*.spec.ts).
   {
@@ -161,7 +161,7 @@ export const COLLECTORS = [
     glob: "tests/e2e/protocol-clients.test.ts",
     sources: ["scripts/dev/run-protocol-clients-tests.mjs"],
   },
-  // Playwright — suíte de homologação real (npm run homolog, L4 UI): run.mjs invoca
+  // Playwright — suíte de homologação real (pnpm run homolog, L4 UI): run.mjs invoca
   // `playwright test -c tests/homolog/ui/playwright.config.ts` (testMatch **/*.spec.ts).
   {
     glob: "tests/homolog/ui/*.spec.ts",

@@ -53,7 +53,7 @@ test("the Turbopack switch follows the self-hosted build slot; hosted stays on w
   // holds ~40 GB and the build peaked at 49 GB uncapped. Hosted runners (16 GB) cannot hold
   // it and build with webpack (14 GB) — which is where every PR Build now runs.
   const step = workflow.jobs.build.steps.find(
-    (item: { run?: string }) => item.run === "npm run build"
+    (item: { run?: string }) => item.run === "pnpm run build"
   );
   const runnerCondition = workflow.jobs.build["runs-on"].split(" && fromJSON(")[0];
   assert.equal(step.env.OMNIROUTE_USE_TURBOPACK, `${runnerCondition} && '1' || '0' }}`);

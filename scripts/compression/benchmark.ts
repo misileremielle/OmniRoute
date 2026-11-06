@@ -6,8 +6,8 @@
  * rather than intuition. Deterministic and API-free (safe in CI / local dev).
  *
  * Usage:
- *   npm run bench:compression            # the default deterministic engine set
- *   npm run bench:compression rtk lite   # a specific subset
+ *   pnpm run bench:compression            # the default deterministic engine set
+ *   pnpm run bench:compression rtk lite   # a specific subset
  *
  * llmlingua is excluded by default — its real compression needs the ONNX model at runtime
  * (pass it explicitly once provisioned; the framework is engine-agnostic).

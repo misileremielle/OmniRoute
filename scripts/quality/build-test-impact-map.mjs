@@ -55,7 +55,7 @@ export function sourceDepsOf(entry, root = ROOT) {
   return sources;
 }
 
-// Mirror EXACTLY the `npm run test:unit` glob — the curated set of node:test files.
+// Mirror EXACTLY the `pnpm run test:unit` glob — the curated set of node:test files.
 // The TIA step runs the selected subset via `node --test`, so it must NOT include
 // vitest files (`.test.tsx`, `open-sse/**/__tests__`, `tests/unit/autoCombo`), nor
 // e2e/integration tests, which can't run under node:test (they 99-false-failed before).

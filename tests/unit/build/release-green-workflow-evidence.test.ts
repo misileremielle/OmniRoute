@@ -63,12 +63,12 @@ test("both workflow check identities require an explicit measured evidence state
 });
 
 // Exercise the real observer and scanner wrapper. Only external commands are
-// fixtures; unrelated expensive npm gates do not need to run to test this boundary.
+// fixtures; unrelated expensive pnpm gates do not need to run to test this boundary.
 function observe({
   scanners = "missing",
   findings = 0,
   baseline = 0,
-  workflow = "on: push\njobs:\n  lint:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm run check:workflows -- --ratchet\n",
+  workflow = "on: push\njobs:\n  lint:\n    runs-on: ubuntu-latest\n    steps:\n      - run: pnpm run check:workflows --ratchet\n",
 } = {}) {
   const artifacts = fileURLToPath(new URL("_artifacts/", root));
   mkdirSync(artifacts, { recursive: true });
@@ -111,7 +111,7 @@ function observe({
     }
     const scanner = fileURLToPath(new URL("scripts/check/check-workflows.mjs", root));
     writeFileSync(
-      join(bin, "npm"),
+      join(bin, "pnpm"),
       `#!${process.execPath}\n` +
         `const { spawnSync } = require("node:child_process");\n` +
         `if (process.argv[3] === "check:workflows") {\n` +
@@ -229,7 +229,7 @@ test(
     const result = observe({
       scanners: "valid",
       workflow:
-        "on:\n  schedule:\n    - cron: '0 0 * * *'\njobs:\n  lint:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm run check:workflows -- --ratchet\n",
+        "on:\n  schedule:\n    - cron: '0 0 * * *'\njobs:\n  lint:\n    runs-on: ubuntu-latest\n    steps:\n      - run: pnpm run check:workflows --ratchet\n",
     });
     assert.equal(result.status, 1);
     assert.equal(result.report.releaseGreen, false);
@@ -251,7 +251,7 @@ test(
     const result = observe({
       scanners: "valid",
       workflow:
-        "on: push\njobs:\n  lint:\n    runs-on: self-hosted\n    steps:\n      - run: npm publish --provenance\n      - run: npm run check:workflows -- --ratchet\n",
+        "on: push\njobs:\n  lint:\n    runs-on: self-hosted\n    steps:\n      - run: npm publish --provenance\n      - run: pnpm run check:workflows --ratchet\n",
     });
     assert.equal(result.status, 1);
     assert.equal(result.report.releaseGreen, false);

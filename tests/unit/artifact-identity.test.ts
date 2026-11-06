@@ -155,7 +155,7 @@ test("parseIdentityArgs requires --base and rejects flags without values", () =>
   assert.deepEqual(parseIdentityArgs(["--head", HEAD, "--base", BASE]), {
     head: HEAD,
     base: BASE,
-    lockfile: "package-lock.json",
+    lockfile: "pnpm-lock.yaml",
     tarball: undefined,
     out: undefined,
   });
@@ -167,7 +167,7 @@ test("parseIdentityArgs requires --base and rejects flags without values", () =>
 test("CLI prints the identity JSON and writes --out, hashing the real tarball", () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "artifact-identity-"));
   try {
-    const lockfile = path.join(dir, "package-lock.json");
+    const lockfile = path.join(dir, "pnpm-lock.yaml");
     const tarball = path.join(dir, "omniroute-0.0.0.tgz");
     const out = path.join(dir, "identity.json");
     writeFileSync(lockfile, LOCK);

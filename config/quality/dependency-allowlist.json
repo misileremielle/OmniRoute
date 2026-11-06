@@ -133,7 +133,6 @@
     "knip",
     "license-checker-rseidelsohn",
     "lint-staged",
-    "lockfile-lint",
     "lowdb",
     "lucide-react",
     "marked",

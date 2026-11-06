@@ -311,7 +311,7 @@ export function resolveNextBuildEnv(
   // Raise the Node heap for the spawned `next build`. The webpack production pass
   // ("Compiling instrumentation" bundles the whole server graph) is the heaviest
   // phase and overflows V8's default ~2 GB ceiling on memory-constrained machines,
-  // stalling/OOMing local `npm run build` (npm-global installs). #4076/#4104 fixed
+  // stalling/OOMing local `pnpm run build` (npm-global installs). #4076/#4104 fixed
   // this only in the Docker builder stage (ENV NODE_OPTIONS); the local/native path
   // was left unprotected. Respect an existing --max-old-space-size (Docker already
   // sets one — don't clobber/duplicate) and let OMNIROUTE_BUILD_MEMORY_MB override.
@@ -325,7 +325,7 @@ export function resolveNextBuildEnv(
     // production pass, which brushed the old 4 GB ceiling on a borderline OOM. 8 GB gives
     // headroom without risk. NOTE: heap size does NOT fix a poisoned scope — if the build
     // OOMs/livelocks far above this, check for worktrees/cruft leaking into the tsconfig
-    // scope (run `npm run check:build-scope`), not for "more heap". See incident 2026-06-25.
+    // scope (run `pnpm run check:build-scope`), not for "more heap". See incident 2026-06-25.
     const heapMb = Number(baseEnv.OMNIROUTE_BUILD_MEMORY_MB) || resolveBuildHeapMb(memoryBytes);
     env.NODE_OPTIONS = `${env.NODE_OPTIONS || ""} --max-old-space-size=${heapMb}`.trim();
   }

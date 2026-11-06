@@ -5,26 +5,20 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { importerDependency, parsePnpmLock } from "./pnpmLock.mjs";
 
 function verifyDirectDependencyVersions(root) {
   const manifest = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
-  const lockText = readFileSync(resolve(root, "package-lock.json"), "utf8");
-  const lock = JSON.parse(lockText);
-  assert.ok([2, 3].includes(lock.lockfileVersion), "unsupported dependency lockfile version");
-  assert.ok(lock.packages?.[""], "missing root dependency lockfile entry");
+  const lockText = readFileSync(resolve(root, "pnpm-lock.yaml"), "utf8");
+  const lock = parsePnpmLock(lockText);
   const declared = { ...manifest.dependencies, ...manifest.devDependencies };
   const entries = Object.entries(declared);
   assert.ok(entries.length > 0, "missing declared dependencies for install verification");
   for (const [name, spec] of entries) {
     assert.match(name, /^(?:@[a-z0-9._-]+\/)?[a-z0-9._-]+$/, "invalid dependency name");
-    const lockedSpec =
-      lock.packages[""].devDependencies?.[name] ?? lock.packages[""].dependencies?.[name];
-    assert.equal(lockedSpec, spec, `${name}: declaration differs from lockfile`);
-    const locked = lock.packages[`node_modules/${name}`];
-    assert.ok(
-      typeof locked?.version === "string" && locked.version.length > 0,
-      `${name}: missing resolved version in lockfile`
-    );
+    const locked = importerDependency(lock, name);
+    assert.equal(locked?.specifier, spec, `${name}: declaration differs from lockfile`);
+    assert.ok(locked.version?.length > 0, `${name}: missing resolved version in lockfile`);
     const installed = JSON.parse(
       readFileSync(resolve(root, "node_modules", name, "package.json"), "utf8")
     );

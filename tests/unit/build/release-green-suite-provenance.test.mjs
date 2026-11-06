@@ -37,7 +37,7 @@ function observe(mutate = () => {}, { extra = false, workflow = workflowSha } = 
     ])
       mkdirSync(join(dir, path), { recursive: true });
     writeFileSync(join(dir, "package.json"), '{"type":"commonjs"}');
-    writeFileSync(join(dir, "package-lock.json"), "{}");
+    writeFileSync(join(dir, "pnpm-lock.yaml"), "{}");
     for (const file of ["validate-release-green.mjs", "gate-process.mjs"])
       copyFileSync(join(root, "scripts/quality", file), join(dir, "scripts/quality", file));
     writeFileSync(
@@ -64,7 +64,7 @@ function observe(mutate = () => {}, { extra = false, workflow = workflowSha } = 
     executable("git", `console.log("${sha}");`);
     executable("npx", 'console.log("[]");');
     executable(
-      "npm",
+      "pnpm",
       `
       if(process.argv[3] === "check:complexity-ratchets") console.log("complexity=0\\ncognitiveComplexity=0\\n[complexity] OK — 0 violações (baseline 0)\\n[cognitive-complexity] OK — 0 violações (baseline 0)");
       if(process.argv[3] === "check:workflows") console.log("workflowAuditState=MEASURED\\nworkflowFindings=0\\nprovenanceRunnerFindings=0\\nscheduledGuardFindings=0");
@@ -205,7 +205,7 @@ function writeReceipt({ code = "0", missingLog = false, context = true } = {}) {
     writeFileSync(join(dir, "bin/git"), `#!${process.execPath}\nconsole.log("${sha}");`, {
       mode: 0o755,
     });
-    writeFileSync(join(dir, "package-lock.json"), "{}");
+    writeFileSync(join(dir, "pnpm-lock.yaml"), "{}");
     if (!missingLog) writeFileSync(join(dir, "suite.log"), log);
     const result = spawnSync(
       process.execPath,

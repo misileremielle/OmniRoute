@@ -44,15 +44,15 @@ function buildSteps(name: string, pattern: RegExp): Array<{ id: string; step: St
 }
 
 test("the ci.yml Build job uses Turbopack only on the self-hosted build slot", () => {
-  const [build] = buildSteps("ci.yml", /^npm run build$/m);
-  assert.ok(build, "ci.yml build job runs `npm run build`");
+  const [build] = buildSteps("ci.yml", /^pnpm run build$/m);
+  assert.ok(build, "ci.yml build job runs `pnpm run build`");
   const sw = String(build.step.env?.OMNIROUTE_USE_TURBOPACK);
   assert.match(sw, /vars\.USE_VPS_BUILD_RUNNER == 'true'/, "Turbopack is tied to the opt-in slot");
   assert.match(sw, /&& '1' \|\| '0' \}\}$/, "hosted runners (16 GB) fall back to webpack");
 });
 
 test("the manual hosted artifact build avoids Turbopack's OOM footprint (#16169)", () => {
-  const builds = buildSteps("build.yml", /npm run build:release/);
+  const builds = buildSteps("build.yml", /pnpm run build:release/);
   assert.equal(builds.length, 1, "manual artifact workflow must have exactly one release build");
 
   const env = builds[0].step.env;

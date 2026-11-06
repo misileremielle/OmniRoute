@@ -5,10 +5,10 @@
  * Orchestrates the existing perf probes and writes ONE JSON document so two runs on the
  * SAME host can be diffed:
  *
- *   heapGrowth     npm run test:heap              SSE pipeline heap growth over 500 streams
- *   heapBody       npm run bench:heap-body --json retained heap per request (#7847 shape)
- *   routingEvents  npm run bench:routing-events   routing scoring + event-sink cost (µs/op)
- *   buildSeconds   npm run build:release          wall time of the release build (--with-build)
+ *   heapGrowth     pnpm run test:heap              SSE pipeline heap growth over 500 streams
+ *   heapBody       pnpm run bench:heap-body --json retained heap per request (#7847 shape)
+ *   routingEvents  pnpm run bench:routing-events   routing scoring + event-sink cost (µs/op)
+ *   buildSeconds   pnpm run build:release          wall time of the release build (--with-build)
  *   serverBoot     spawn → first /api/health/ping 200 (only when a server is booted here)
  *   ttft           time-to-first-byte (response headers) per endpoint: median + p95 of
  *                  --runs requests after 3 discarded warmup requests
@@ -18,7 +18,7 @@
  * exits 0. Only a usage error (bad flag) exits non-zero.
  *
  * The full build is OFF by default (`--skip-build` is the default; `--with-build` opts in):
- * a shared/loaded dev box must not run `npm run build:release`. On an idle VPS / runner box,
+ * a shared/loaded dev box must not run `pnpm run build:release`. On an idle VPS / runner box,
  * run with `--with-build` so the build time is measured AND `dist/server.js` exists for TTFB.
  *
  * TTFB server: `--url <base>` benches an already-running server; otherwise, when
@@ -32,9 +32,9 @@
  * with argument arrays (no shell) in their own process group, and are always killed.
  *
  * Usage:
- *   npm run perf:lts-baseline -- --runs 20 --out baseline.json --md > baseline.md
- *   npm run perf:lts-baseline -- --with-build --runs 50 --out baseline.json
- *   npm run perf:lts-baseline -- --url http://127.0.0.1:20128 --runs 50
+ *   pnpm run perf:lts-baseline --runs 20 --out baseline.json --md > baseline.md
+ *   pnpm run perf:lts-baseline --with-build --runs 50 --out baseline.json
+ *   pnpm run perf:lts-baseline --url http://127.0.0.1:20128 --runs 50
  *
  * Docs: docs/ops/PERF_BASELINE.md. Linux/macOS (spawns `npm` without a shell).
  */
@@ -423,7 +423,7 @@ export async function runBaseline(options, deps) {
   const childEnv = (name) => buildChildEnv(deps.baseEnv ?? {}, path.join(dataDir, name));
   const measurements = {};
 
-  log("buildSeconds: " + (options.withBuild ? "npm run build:release" : "skipped"));
+  log("buildSeconds: " + (options.withBuild ? "pnpm run build:release" : "skipped"));
   measurements.buildSeconds = await measureCommand({
     spec: {
       command: "npm",
@@ -440,7 +440,7 @@ export async function runBaseline(options, deps) {
       : "build skipped (--skip-build default; run --with-build on an idle VPS/.113)",
   });
 
-  log("heapGrowth: npm run test:heap");
+  log("heapGrowth: pnpm run test:heap");
   measurements.heapGrowth = await measureCommand({
     spec: {
       command: "npm",
@@ -454,7 +454,7 @@ export async function runBaseline(options, deps) {
     summarize: (p) => `heap growth ${p.growthMB} MB after 500 SSE streams (ceiling 20 MB)`,
   });
 
-  log("heapBody: npm run bench:heap-body -- --json");
+  log("heapBody: pnpm run bench:heap-body --json");
   measurements.heapBody = await measureCommand({
     spec: {
       command: "npm",
@@ -470,7 +470,7 @@ export async function runBaseline(options, deps) {
       `(${p.amplification}x wire)`,
   });
 
-  log("routingEvents: npm run bench:routing-events");
+  log("routingEvents: pnpm run bench:routing-events");
   measurements.routingEvents = await measureCommand({
     spec: {
       command: "npm",

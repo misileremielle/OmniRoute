@@ -9,7 +9,7 @@
 //   node scripts/quality/run-all-gates.mjs           # run all gates
 //   node scripts/quality/run-all-gates.mjs --fast    # skip slow gates (duplication)
 //
-// Via npm: npm run quality:scan
+// Via npm: pnpm run quality:scan
 
 import { spawn } from "node:child_process";
 import { pathToFileURL } from "node:url";

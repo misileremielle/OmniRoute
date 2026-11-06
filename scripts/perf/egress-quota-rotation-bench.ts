@@ -6,8 +6,8 @@
  * widened write feeds.
  *
  * Usage:
- *   npm run bench:egress-quota-rotation
- *   npm run bench:egress-quota-rotation -- --iterations 200000
+ *   pnpm run bench:egress-quota-rotation
+ *   pnpm run bench:egress-quota-rotation --iterations 200000
  *   node --expose-gc --import tsx/esm scripts/perf/egress-quota-rotation-bench.ts --json
  *
  * METHODOLOGY & LIMITATIONS:

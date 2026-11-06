@@ -338,7 +338,7 @@ jobs:
       - name: Unit tests
         env:
           TEST_SHARD: ${shardEnv}
-        run: npm run test:unit:ci:shard
+        run: pnpm run test:unit:ci:shard
 `;
   assert.equal(unitShardCountFromCi(job("[1, 2, 3, 4, 5, 6, 7, 8]", "${{ matrix.shard }}/8")), 8);
   assert.equal(unitShardCountFromCi(job("[1, 2, 3]", "${{ matrix.shard }}/3")), 3);
@@ -477,29 +477,29 @@ jobs:
   lint:
     steps:
       - run: npm ci
-      - run: npm run lint
-      - run: npm run check:route-validation:t06
+      - run: pnpm run lint
+      - run: pnpm run check:route-validation:t06
   quality-extended:
     steps:
       - name: Bundle size
-        run: npm run check:bundle-size -- --ratchet
+        run: pnpm run check:bundle-size --ratchet
       - name: Build
-        run: npm run build
+        run: pnpm run build
   docs-sync-strict:
     steps:
       - run: |
-          npm run check:docs-all
-          npm run check:docs-symbols
+          pnpm run check:docs-all
+          pnpm run check:docs-symbols
   pr-test-policy:
     steps:
-      - run: npm run check:test-masking
-      - run: npm run check:pr-evidence
+      - run: pnpm run check:test-masking
+      - run: pnpm run check:pr-evidence
   quality-gate:
     steps:
-      - run: npm run check:codeql-ratchet
+      - run: pnpm run check:codeql-ratchet
   test-unit:
     steps:
-      - run: npm run test:unit
+      - run: pnpm run test:unit
 `;
 
 test("extractCiGates: pulls npm-run gate steps from the ci.yml gate jobs only", () => {
@@ -521,11 +521,12 @@ test("extractCiGates: pulls npm-run gate steps from the ci.yml gate jobs only", 
   );
 });
 
-test("extractCiGates: preserves `-- <args>` so ratchet flags reach the script", () => {
+test("extractCiGates: preserves extra args so ratchet flags reach the script", () => {
   const g = extract(CI_FIXTURE).find((x) => x.id === "check:bundle-size");
-  assert.deepEqual(g?.args, ["run", "check:bundle-size", "--", "--ratchet"]);
+  // pnpm passes args after the script name through as-is, so no `--` separator.
+  assert.deepEqual(g?.args, ["run", "check:bundle-size", "--ratchet"]);
   const plain = extract(CI_FIXTURE).find((x) => x.id === "lint");
-  assert.deepEqual(plain?.args, ["run", "lint"], "no `--` when the step has no extra args");
+  assert.deepEqual(plain?.args, ["run", "lint"], "no extra args when the step has none");
 });
 
 test("extractCiGates: skips the non-local gates (pr-evidence, codeql-ratchet)", () => {
@@ -539,7 +540,7 @@ test("extractCiGates: skips the non-local gates (pr-evidence, codeql-ratchet)", 
 });
 
 test("extractCiGates: attaches GITHUB_BASE_REF=main env to test-masking + de-dups", () => {
-  const gates = extract(CI_FIXTURE + "\n  lint2:\n    steps:\n      - run: npm run lint\n", {
+  const gates = extract(CI_FIXTURE + "\n  lint2:\n    steps:\n      - run: pnpm run lint\n", {
     jobs: [
       "lint",
       "lint2",
@@ -703,15 +704,15 @@ test("extractCiGates: skips steps guarded to pull_request events (no PR range ou
 jobs:
   lint:
     steps:
-      - run: npm run check:public-creds
+      - run: pnpm run check:public-creds
       - name: AI attribution
         if: github.event_name == 'pull_request'
         run: |
           printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
-          npm run check:ai-attribution -- --range "$PR_BASE_SHA..$PR_HEAD_SHA"
+          pnpm run check:ai-attribution --range "$PR_BASE_SHA..$PR_HEAD_SHA"
       - name: still local
         if: github.event_name != 'pull_request'
-        run: npm run check:db-rules
+        run: pnpm run check:db-rules
 `;
   const ids = extract(yaml).map((g) => g.id);
   assert.deepEqual(ids, ["check:public-creds", "check:db-rules"]);

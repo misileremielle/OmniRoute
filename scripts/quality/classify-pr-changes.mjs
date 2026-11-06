@@ -81,7 +81,8 @@ export function classifyPaths(files) {
       f.startsWith("db/") ||
       f.startsWith("config/") ||
       f === "package.json" ||
-      f === "package-lock.json" ||
+      f === "pnpm-lock.yaml" ||
+      f === "pnpm-workspace.yaml" ||
       /^tsconfig.*\.json$/.test(f) ||
       f.startsWith("next.config.") ||
       f.startsWith("vitest") ||
@@ -148,7 +149,8 @@ const ROUTING_SERVICE_PREFIXES = [
 
 const BUILD_ROOT_FILES = new Set([
   "package.json",
-  "package-lock.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
   ".dockerignore",
   ".npmrc",
   ".npmignore",

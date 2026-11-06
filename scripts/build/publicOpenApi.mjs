@@ -36,7 +36,7 @@ export function writePublicOpenApi(projectRoot, outputRoot = projectRoot) {
   return true;
 }
 
-// `npm run gen:public-openapi` refreshes the committed copy. Dev and build never write to it:
+// `pnpm run gen:public-openapi` refreshes the committed copy. Dev and build never write to it:
 // builds generate their own output (assembleStandalone), so the source tree stays clean.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const written = writePublicOpenApi(process.cwd());

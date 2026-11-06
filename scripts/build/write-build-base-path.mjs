@@ -25,7 +25,7 @@ const standaloneDir = path.join(ROOT, NEXT_DIST, "standalone");
 if (!fs.existsSync(standaloneDir)) {
   console.error(
     `[write-build-base-path] FATAL: standalone dir not found: ${standaloneDir}\n` +
-      "  Run `npm run build` first."
+      "  Run `pnpm run build` first."
   );
   process.exit(1);
 }

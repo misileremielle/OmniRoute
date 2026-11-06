@@ -21,11 +21,9 @@ coverage, and reconciliation steps.
 > process. Node's [Windows libuv fix](https://github.com/nodejs/node/pull/61999) addresses
 > this runtime crash; keep the test assertions and runner exit checks enabled.
 
-> **npm v11+ users (Node 24+):** After `npm install`, verify native modules were installed:
-> `node -e "require('better-sqlite3')"`. If it fails with `MODULE_NOT_FOUND`,
-> run `npm approve-scripts better-sqlite3 && npm install`. See
-> [Troubleshooting](docs/guides/TROUBLESHOOTING.md#npm-v11-better-sqlite3-not-installed-cannot-find-module).
-
+- **pnpm** — the version pinned in `config/ci/toolchain.json` (`npm install -g pnpm@<version>`,
+  or `corepack enable`). The checkout is installed with pnpm; end users still install the
+  published package with `npm install -g omniroute`.
 - **Git**
 
 ### Clone & Install
@@ -33,8 +31,12 @@ coverage, and reconciliation steps.
 ```bash
 git clone https://github.com/diegosouzapw/OmniRoute.git
 cd OmniRoute
-npm install
+pnpm install --frozen-lockfile
 ```
+
+Native build scripts run only for the packages listed under `allowBuilds` in
+`pnpm-workspace.yaml`. Check the SQLite driver afterwards with
+`node -e "require('better-sqlite3')"`.
 
 ### Environment Variables
 

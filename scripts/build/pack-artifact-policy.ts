@@ -22,7 +22,7 @@ const STAGING_FORBIDDEN_DIRECTORIES = [
   "_tasks",
 ];
 
-const STAGING_FORBIDDEN_FILES = ["audit-report.json", "package-lock.json"];
+const STAGING_FORBIDDEN_FILES = ["audit-report.json", "package-lock.json", "pnpm-lock.yaml"];
 
 export const APP_STAGING_REMOVAL_PATHS: string[] = [
   ...STAGING_FORBIDDEN_DIRECTORIES,

@@ -9,7 +9,7 @@
  * installed CLI and polls /api/monitoring/health until it proves the artifact
  * starts — regardless of WHICH packaging list drifted.
  *
- * Requires a built dist/ (run after `npm run build:cli`, e.g. in the CI
+ * Requires a built dist/ (run after `pnpm run build:cli`, e.g. in the CI
  * package-artifact job or `check:release-green --with-build`). Exit codes:
  * 0 = boots and reports the right version · 1 = boot failed · 2 = missing build.
  */
@@ -427,7 +427,7 @@ async function main() {
   const ROOT = process.cwd();
   if (!fs.existsSync(path.join(ROOT, "dist", "server.js"))) {
     console.error(
-      "[pack-boot] dist/server.js missing — run `npm run build:cli` first (this is a --with-build gate)"
+      "[pack-boot] dist/server.js missing — run `pnpm run build:cli` first (this is a --with-build gate)"
     );
     process.exit(2);
   }

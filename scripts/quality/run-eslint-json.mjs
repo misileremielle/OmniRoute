@@ -7,7 +7,7 @@
  * cold full-tree walks on different runners.
  *
  * Exit code: ESLint's own (0 = clean, 1 = errors). Warnings do not fail by
- * default (same as `npm run lint`); pass --max-warnings=0 for lint-guard.
+ * default (same as `pnpm run lint`); pass --max-warnings=0 for lint-guard.
  */
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";

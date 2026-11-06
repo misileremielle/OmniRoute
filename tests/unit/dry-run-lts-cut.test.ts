@@ -18,7 +18,6 @@ import {
   DEFAULTS,
   analyzeDormantWorkflow,
   buildCutPlan,
-  bumpLockfile,
   bumpManifest,
   bumpOpenApi,
   evaluateMergifyQueue,
@@ -233,18 +232,6 @@ test("bumpManifest changes only the top-level version of the real package.json f
   assert.throws(() => bumpManifest('{"name":"x"}', "4.0.0"), /version/);
 });
 
-test("bumpLockfile moves the root and the open-sse workspace entries only", () => {
-  const before = fs.readFileSync(path.join(repoRoot, "package-lock.json"), "utf8");
-  const after = bumpLockfile(before, "4.0.0");
-  const lock = JSON.parse(after);
-  assert.equal(lock.version, "4.0.0");
-  assert.equal(lock.packages[""].version, "4.0.0");
-  assert.equal(lock.packages["open-sse"].version, "4.0.0");
-  const beforeLines = before.split("\n");
-  const changed = after.split("\n").filter((line, i) => line !== beforeLines[i]);
-  assert.equal(changed.length, 3);
-});
-
 test("bumpOpenApi changes info.version only", () => {
   const before = fs.readFileSync(path.join(repoRoot, "docs/openapi.yaml"), "utf8");
   const after = bumpOpenApi(before, "4.0.0");
@@ -287,7 +274,6 @@ test("the plan orders the cut and only ever pushes to the selected remote", () =
   assert.deepEqual(plan.bumpFiles, [
     "package.json",
     "open-sse/package.json",
-    "package-lock.json",
     "docs/openapi.yaml",
     "public/openapi.yaml",
   ]);

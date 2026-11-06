@@ -5,7 +5,7 @@
 # Falha se packages/ui-kit/src tiver diff local não documentado em PATCHES.md.
 # Uso: scripts/dev/sync-ui-kit.sh <commit|latest> [caminho-do-clone]
 #   latest = a maior tag v* do upstream (git fetch --tags no clone antes) — o caminho normal para
-#   pegar a release mais nova; `npm run check:ui-kit-upstream` diz quando há uma nova.
+#   pegar a release mais nova; `pnpm run check:ui-kit-upstream` diz quando há uma nova.
 set -euo pipefail
 COMMIT="${1:?uso: sync-ui-kit.sh <commit|latest> [clone]}"
 MAIN=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
@@ -65,20 +65,13 @@ transformação do sync: imports relativos perdem o sufixo \`.js\` (\`./button.j
 Para atualizar: \`scripts/dev/sync-ui-kit.sh <commit>\` (precisa do clone em \`_references/\`).
 Patches locais são proibidos; quando inevitáveis, documentar em PATCHES.md (seção \`## <commit>\`) e enviar upstream.
 MD
-# 4) versão do workspace (package.json + package-lock.json) espelha a versão do upstream
-node - "$DEST/package.json" "$ROOT/package-lock.json" "$VERSION" <<'JS'
+# 4) versão do workspace (package.json) espelha a versão do upstream
+node - "$DEST/package.json" "$VERSION" <<'JS'
 const fs = require("fs");
-const [pkgPath, lockPath, version] = process.argv.slice(2);
+const [pkgPath, version] = process.argv.slice(2);
 const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
 pkg.version = version;
 fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-if (fs.existsSync(lockPath)) {
-  const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
-  if (lock.packages?.["packages/ui-kit"]) {
-    lock.packages["packages/ui-kit"].version = version;
-    fs.writeFileSync(lockPath, JSON.stringify(lock, null, 2) + "\n");
-  }
-}
 JS
 [ -f "$DEST/PATCHES.md" ] || printf '# Patches locais\n\nNenhum. (Formato: `## <commit do snapshot>` + diff + link da PR upstream.)\n' > "$DEST/PATCHES.md"
 echo "ok: packages/ui-kit/src ← $COMMIT ($VERSION, $DATE)"

@@ -8,7 +8,7 @@
 //   1. extract-zip is reachable ONLY through the promptfoo (devDependency) ->
 //      @openai/codex-security chain — never through a production dependency.
 //   2. OmniRoute's own source (src/, open-sse/, bin/, electron/ *code*, not its
-//      package-lock.json) never imports the "extract-zip" npm package directly.
+//      pnpm-lock.yaml) never imports the "extract-zip" npm package directly.
 // If either assertion ever breaks (e.g. a future PR adds extract-zip as a direct or
 // production dependency, or a production module starts importing it), this test goes
 // red and should block merge until re-triaged — that is the intended regression guard.
@@ -17,45 +17,17 @@ import assert from "node:assert/strict";
 import path from "node:path";
 import fs from "node:fs";
 
+// @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
+import { dependentsOf, readPnpmLock } from "../../scripts/ci/pnpmLock.mjs";
+
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
-// Reads the committed package-lock.json directly rather than shelling out to
-// `npm ls` against installed node_modules: in a git-worktree checkout that reuses a
-// SYMLINKED node_modules from a different (main) checkout, npm ls's hoisting/
-// "extraneous" detection reflects the shared install state, not this checkout's
-// lockfile, and produced a false top-level `extract-zip` node in exactly this setup.
-// The lockfile's `packages[path].dependencies` edges are deterministic and checkout-
-// local, independent of what happens to be physically installed in node_modules.
-interface LockPackage {
-  dependencies?: Record<string, string>;
-  devDependencies?: Record<string, string>;
-  optionalDependencies?: Record<string, string>;
-}
-
-interface Lockfile {
-  packages?: Record<string, LockPackage>;
-}
-
-function readLockfile(): Lockfile {
-  return JSON.parse(fs.readFileSync(path.join(ROOT, "package-lock.json"), "utf8")) as Lockfile;
-}
-
-function declaredDependents(lock: Lockfile, depName: string): string[] {
-  const dependents: string[] = [];
-  for (const [key, pkg] of Object.entries(lock.packages ?? {})) {
-    if (key === "") continue; // root project node itself, handled separately
-    const deps: Record<string, string> = {
-      ...(pkg.dependencies ?? {}),
-      ...(pkg.optionalDependencies ?? {}),
-    };
-    if (Object.prototype.hasOwnProperty.call(deps, depName)) dependents.push(key);
-  }
-  return dependents;
-}
-
+// Reads the committed pnpm-lock.yaml directly rather than the installed tree: the
+// lockfile's snapshot edges are deterministic and checkout-local, independent of what
+// happens to be physically installed in node_modules.
 test("extract-zip (GHSA-7pqw-9j4j-h8q3 / GHSA-jmr9-qjv8-65gv) is reachable only via the promptfoo devDependency chain", () => {
-  const lock = readLockfile();
-  const root = lock.packages?.[""] ?? {};
+  const lock = readPnpmLock(ROOT);
+  const root = lock.importers["."];
 
   // 1. The root project must never depend on extract-zip directly (prod or dev).
   assert.ok(
@@ -69,23 +41,23 @@ test("extract-zip (GHSA-7pqw-9j4j-h8q3 / GHSA-jmr9-qjv8-65gv) is reachable only 
 
   // 2. Exactly one package in the whole tree declares a dependency on extract-zip,
   //    and it must be @openai/codex-security.
-  const extractZipDependents = declaredDependents(lock, "extract-zip");
+  const extractZipDependents = dependentsOf(lock, "extract-zip");
   assert.deepEqual(
     extractZipDependents,
-    ["node_modules/@openai/codex-security"],
+    ["@openai/codex-security"],
     `expected only @openai/codex-security to depend on extract-zip, got: ${extractZipDependents.join(", ")}`
   );
 
   // 3. The only thing that depends on @openai/codex-security must be promptfoo.
-  const codexSecurityDependents = declaredDependents(lock, "@openai/codex-security");
+  const codexSecurityDependents = dependentsOf(lock, "@openai/codex-security");
   assert.deepEqual(
     codexSecurityDependents,
-    ["node_modules/promptfoo"],
+    ["promptfoo"],
     `expected only promptfoo to depend on @openai/codex-security, got: ${codexSecurityDependents.join(", ")}`
   );
 
   // 4. promptfoo itself must be a devDependency, never a production dependency —
-  //    this is what makes `npm audit --omit=dev` correctly report 0 for this chain.
+  //    this is what makes `pnpm audit --prod` correctly report 0 for this chain.
   assert.ok(
     Object.prototype.hasOwnProperty.call(root.devDependencies ?? {}, "promptfoo"),
     "promptfoo must be listed under devDependencies"

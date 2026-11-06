@@ -39,16 +39,15 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "24"
-          cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        uses: ./.github/actions/pnpm-install-retry
         env:
           ONNXRUNTIME_NODE_INSTALL: "skip"
 
       - name: Build Next.js app & CLI bundle
         run: |
-          npm run build:release
+          pnpm run build:release
         env:
           # Hosted artifact builds run with less memory than the opt-in 64 GB
           # CI build slot. Keep Webpack here without overriding the latter's

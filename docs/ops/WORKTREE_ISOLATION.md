@@ -40,7 +40,7 @@ own dedicated branch, and you MUST confirm the base branch with the operator bef
    git fetch origin "$BASE_BRANCH"
    git worktree add ".claude/worktrees/${TASK##*/}" -b "$TASK" "origin/$BASE_BRANCH"
    cd ".claude/worktrees/${TASK##*/}"
-   # Reuse the main checkout's node_modules to skip a per-worktree npm install.
+   # Reuse the main checkout's node_modules to skip a per-worktree pnpm install.
    # HARD LINKS (`cp -al`), never a symlink: ~5s for the whole tree and near-zero extra
    # disk (the inodes are shared), and unlike a symlink it does not break the dev server.
    cp -al "$(git -C <main_checkout> rev-parse --show-toplevel)/node_modules" node_modules

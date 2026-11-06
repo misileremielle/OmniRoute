@@ -5,14 +5,17 @@ import test from "node:test";
 import { parse } from "yaml";
 
 const action = parse(
-  readFileSync(new URL("../../../.github/actions/npm-ci-retry/action.yml", import.meta.url), "utf8")
+  readFileSync(
+    new URL("../../../.github/actions/pnpm-install-retry/action.yml", import.meta.url),
+    "utf8"
+  )
 ) as { runs: { steps: Array<{ name?: string; shell?: string; run?: string }> } };
-const install = action.runs.steps.find((step) => step.name?.startsWith("npm ci"));
+const install = action.runs.steps.find((step) => step.name?.startsWith("pnpm install"));
 
 function runInstall(codes: number[]) {
   assert.equal(install?.shell, "bash");
   assert.ok(install?.run);
-  // Execute the actual composite shell. Only npm/network and sleep cross the fixture boundary.
+  // Execute the actual composite shell. Only pnpm/network and sleep cross the fixture boundary.
   const result = spawnSync(
     "bash",
     [
@@ -22,9 +25,9 @@ function runInstall(codes: number[]) {
       "pipefail",
       "-c",
       `
-    IFS=, read -r -a codes <<< "$FIXTURE_NPM_CODES"
+    IFS=, read -r -a codes <<< "$FIXTURE_PNPM_CODES"
     attempt_count=0
-    npm() {
+    pnpm() {
       local code="\${codes[$attempt_count]:-99}"
       attempt_count=$((attempt_count + 1))
       printf 'ATTEMPT:%s\\n' "$*"
@@ -35,7 +38,7 @@ function runInstall(codes: number[]) {
   `,
     ],
     {
-      env: { ...process.env, FIXTURE_NPM_CODES: codes.join(",") },
+      env: { ...process.env, FIXTURE_PNPM_CODES: codes.join(",") },
       encoding: "utf8",
       timeout: 5_000,
     }
@@ -48,12 +51,12 @@ function runInstall(codes: number[]) {
   };
 }
 
-test("exhausted npm ci retries fail the composite with the last install exit", () => {
+test("exhausted pnpm install retries fail the composite with the last install exit", () => {
   const result = runInstall([41, 42, 43]);
   assert.equal(result.status, 43, result.stderr);
   assert.equal(result.attempts.length, 3);
   assert.deepEqual(result.delays, ["DELAY:20", "DELAY:40"]);
-  assert.ok(result.attempts.every((line) => /^ATTEMPT:ci(?: |$)/.test(line)));
+  assert.ok(result.attempts.every((line) => /^ATTEMPT:install --frozen-lockfile$/.test(line)));
 });
 
 test("a deterministic install failure never becomes a successful cache miss", () => {

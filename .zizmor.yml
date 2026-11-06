@@ -84,7 +84,7 @@ rules:
     #     and `release: [released]` + `workflow_dispatch` + `workflow_call`
     #     (npm). They NEVER run on a `pull_request` from a fork, so an untrusted
     #     ref can never populate the npm/node_modules cache they restore. The
-    #     cache key is `hashFiles('package-lock.json')` / `runner.os-node-…`, a
+    #     cache key is `hashFiles('pnpm-lock.yaml')` / `runner.os-node-…`, a
     #     first-party, lockfile-pinned key on trusted events.
     #
     #   • opencode-plugin-ci.yml / opencode-provider-ci.yml — CI-only workflows

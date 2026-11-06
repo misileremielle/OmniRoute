@@ -132,7 +132,7 @@
     "**/logs": true,
     "**/*.tgz": true,
     "**/*.tsbuildinfo": true,
-    "**/package-lock.json": true,
+    "**/pnpm-lock.yaml": true,
     "**/OmniRoute-*": true,
     "**/*-merge-*": true,
     "**/*-worktree-*": true,

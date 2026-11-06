@@ -9,12 +9,12 @@
  * pass below) can spot them. It never overwrites an existing translated value.
  *
  * Usage (driven by npm scripts in package.json):
- *   npm run i18n:sync-ui
- *   npm run i18n:sync-ui -- --locale=pt-BR,zh-CN
- *   npm run i18n:sync-ui -- --dry-run
- *   npm run i18n:sync-ui -- --translate-markers
- *   npm run i18n:sync-ui -- --translate-markers --locale=pt-BR --concurrency=4
- *   npm run i18n:sync-ui -- --translate-markers --batch-size=40
+ *   pnpm run i18n:sync-ui
+ *   pnpm run i18n:sync-ui --locale=pt-BR,zh-CN
+ *   pnpm run i18n:sync-ui --dry-run
+ *   pnpm run i18n:sync-ui --translate-markers
+ *   pnpm run i18n:sync-ui --translate-markers --locale=pt-BR --concurrency=4
+ *   pnpm run i18n:sync-ui --translate-markers --batch-size=40
  *
  * --translate-markers calls the OmniRoute translation backend (same env vars
  * as `run-translation.mjs`; the client lives in `lib/translate-backend.mjs`)

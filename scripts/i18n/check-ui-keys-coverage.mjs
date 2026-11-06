@@ -11,10 +11,10 @@
  *   - coverage:    (present - placeholder) / total_en * 100
  *
  * Usage:
- *   npm run i18n:check-ui-coverage              # threshold 80, fail on drop
- *   npm run i18n:check-ui-coverage -- --threshold=75
- *   npm run i18n:check-ui-coverage -- --report  # informational tabular output
- *   npm run i18n:check-ui-coverage -- --json    # machine-readable report
+ *   pnpm run i18n:check-ui-coverage              # threshold 80, fail on drop
+ *   pnpm run i18n:check-ui-coverage --threshold=75
+ *   pnpm run i18n:check-ui-coverage --report  # informational tabular output
+ *   pnpm run i18n:check-ui-coverage --json    # machine-readable report
  *
  * Exits 1 when any locale falls below `--threshold` (default 80), unless
  * `--report` is set, in which case the table is printed and exit code is 0.

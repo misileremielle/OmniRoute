@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Fast default unit run (`npm run test:unit`): the request path, routing/resilience,
+// Fast default unit run (`pnpm run test:unit`): the request path, routing/resilience,
 // translation, persistence and auth/security suites — the code most changes touch and most
 // regressions break. The full suite (~7k files, one process per file) stays available as
-// `npm run test:unit:full`, and CI keeps running it (`test:unit:ci:shard`).
+// `pnpm run test:unit:full`, and CI keeps running it (`test:unit:ci:shard`).
 //
 // Selection is by path, so a new test in a core area joins automatically:
 //   - every test under tests/unit/{api,auth,authz,security,combo,translator,db,correctness,
@@ -93,7 +93,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const concurrency = Math.max(2, Math.min(8, os.availableParallelism?.() ?? os.cpus().length));
   console.log(
-    `[test:unit] core suite: ${files.length} files, concurrency ${concurrency} (full suite: npm run test:unit:full)`
+    `[test:unit] core suite: ${files.length} files, concurrency ${concurrency} (full suite: pnpm run test:unit:full)`
   );
   const result = spawnSync(
     process.execPath,

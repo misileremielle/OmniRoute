@@ -162,7 +162,7 @@ const POSITIVE_CASES: Array<[string, string[]]> = [
     "build",
     [
       "package.json",
-      "package-lock.json",
+      "pnpm-lock.yaml",
       "next.config.mjs",
       "Dockerfile",
       "Dockerfile.bun",
@@ -193,7 +193,7 @@ const POSITIVE_CASES: Array<[string, string[]]> = [
   ["docs", ["docs/architecture/QUALITY_GATES.md", "README.md", "open-sse/services/AGENTS.md"]],
   [
     "workflow",
-    [".github/workflows/ci.yml", ".zizmor.yml", ".github/actions/npm-ci-retry/action.yml"],
+    [".github/workflows/ci.yml", ".zizmor.yml", ".github/actions/pnpm-install-retry/action.yml"],
   ],
 ];
 

@@ -3,10 +3,12 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 import { buildPlaywrightArgs } from "../../scripts/dev/run-playwright-tests.mjs";
+// @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
+import { lockedVersions, readPnpmLock } from "../../scripts/ci/pnpmLock.mjs";
 
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
-test("npm run test:e2e passes no spec glob of its own, so a caller's spec list wins", () => {
+test("pnpm run test:e2e passes no spec glob of its own, so a caller's spec list wins", () => {
   assert.equal(pkg.scripts["test:e2e"], "node scripts/dev/run-playwright-tests.mjs");
 });
 
@@ -30,8 +32,7 @@ test("@playwright/test is pinned to the runtime playwright version (one Playwrig
   assert.equal(pkg.dependencies["playwright-core"], runtime);
   assert.equal(pkg.devDependencies["@playwright/test"], runtime);
 
-  const lock = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
-  assert.equal(lock.packages["node_modules/@playwright/test"].version, runtime);
-  assert.equal(lock.packages["node_modules/playwright"].version, runtime);
-  assert.equal(lock.packages["node_modules/@playwright/test/node_modules/playwright"], undefined);
+  const lock = readPnpmLock();
+  assert.deepEqual(lockedVersions(lock, "@playwright/test"), [runtime]);
+  assert.deepEqual(lockedVersions(lock, "playwright"), [runtime]);
 });

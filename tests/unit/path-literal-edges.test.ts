@@ -41,7 +41,7 @@ const TRACKED = new Set([
   "eslint.config.mjs",
   "docs/guide.md",
   "package.json",
-  "package-lock.json",
+  "pnpm-lock.yaml",
   "src/lib/value.ts",
   "tests/unit/other.test.ts",
   "dist/bundle.js",
@@ -90,7 +90,7 @@ test("negatives: nonexistent path, import specifier, tests/, generated trees, hu
       'readFileSync("coverage/lcov.info");',
       'readFileSync("docs/i18n/pt/guide.md");',
       'readFileSync("package.json");',
-      'readFileSync(path.join(process.cwd(), "package-lock.json"));',
+      'readFileSync(path.join(process.cwd(), "pnpm-lock.yaml"));',
       'readFileSync("src/lib/value.ts");',
     ].join("\n")
   );

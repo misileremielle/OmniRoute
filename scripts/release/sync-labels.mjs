@@ -10,7 +10,7 @@
 //   node scripts/release/sync-labels.mjs --dry-run      # same, explicit
 //   node scripts/release/sync-labels.mjs --apply        # execute the plan
 //   options: --file <path> (default .github/labels.yml), --repo <owner/name>
-//   npm run labels:sync [-- --apply]
+//   pnpm run labels:sync [-- --apply]
 //
 // Guarantees:
 //   - Never deletes a label and never touches labels absent from labels.yml.

@@ -8,7 +8,7 @@
 // release/v3.8.51 o resultado foi uma inversão de ranking (modelo morto 0.98 vs flagship
 // vivo 0.50) e aliases apontando para ids obsoletos. Este gate compara as três contra o snapshot de
 // ciclo de vida em config/quality/model-lifecycle.json (sem rede; regenerar com
-// `npm run quality:refresh-model-lifecycle`).
+// `pnpm run quality:refresh-model-lifecycle`).
 //
 // Quatro checagens, todas somadas antes do exit — nenhuma aborta as outras:
 //   (a) nenhum padrão do FITNESS_TABLE pontua um id aposentado que o catálogo roteia;

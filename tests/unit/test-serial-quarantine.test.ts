@@ -26,7 +26,7 @@ test("test:unit:serial existe e roda o diretório de quarentena com concurrency=
 test("todos os runners paralelos terminam com o passo serial", () => {
   for (const key of ["test:unit:full", "test:unit:ci", "test:unit:fast", "test:coverage:runner"]) {
     assert.ok(
-      scripts[key].endsWith("&& npm run test:unit:serial"),
+      scripts[key].endsWith("&& pnpm run test:unit:serial"),
       `${key} deve encadear o passo serial no fim`
     );
   }
@@ -48,7 +48,7 @@ test("todos os runners paralelos terminam com o passo serial", () => {
 });
 
 test("os globs paralelos NÃO capturam tests/unit/serial/ (sem dupla execução)", () => {
-  const parallel = scripts["test:unit:full"].split("&& npm run test:unit:serial")[0];
+  const parallel = scripts["test:unit:full"].split("&& pnpm run test:unit:serial")[0];
   assert.ok(!parallel.includes("serial"), "parte paralela não deve referenciar serial/");
   // o glob de subdiretórios é uma brace-list explícita — 'serial' não pode entrar nela
   const braceList = parallel.match(/tests\/unit\/\{([^}]+)\}/)?.[1] ?? "";

@@ -9,7 +9,7 @@
  *
  * and — because the `postbuild` hook runs after a SUCCESSFUL `next build` — the
  * operator sees "✓ Compiled successfully" immediately followed by a failed
- * `npm run build`, with a complete `.build/next/standalone` tree on disk.
+ * `pnpm run build`, with a complete `.build/next/standalone` tree on disk.
  *
  * Switching to `<tool>.cmd` alone is not enough: since the CVE-2024-27980
  * hardening, Node >= 20 refuses to spawn a `.cmd`/`.bat` without a shell

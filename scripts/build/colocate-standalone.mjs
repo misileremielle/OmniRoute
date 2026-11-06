@@ -2,7 +2,7 @@
 /**
  * OmniRoute — Co-locate runtime workers into the raw Next standalone build.
  *
- * WHY: `npm run build` produces `.build/next/standalone/` and THIS machine's PM2
+ * WHY: `pnpm run build` produces `.build/next/standalone/` and THIS machine's PM2
  * deployment runs `server.js` from that directory directly (not the assembled
  * `dist/` bundle). The standalone trace cannot see worker_threads entrypoints
  * resolved at runtime, including the required call-log artifact worker and the
@@ -115,7 +115,7 @@ function main() {
   mkdirSync(dirname(callLogWorkerDest), { recursive: true });
   // Never spawn `node_modules/.bin/esbuild` directly: that extensionless path is
   // a POSIX shell script and does not exist on Windows (ENOENT), which failed
-  // `npm run build` right after a successful `next build`. See buildToolRunner.mjs.
+  // `pnpm run build` right after a successful `next build`. See buildToolRunner.mjs.
   runBuildTool(
     "esbuild",
     "esbuild",

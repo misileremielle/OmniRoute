@@ -6,7 +6,7 @@
  * `better-sqlite3` is a native addon compiled for a specific Node.js ABI
  * (NODE_MODULE_VERSION). This project supports both Node 22 (ABI 127) and
  * Node 24 (ABI 137); switching between them via nvm leaves the previously
- * built `better_sqlite3.node` incompatible, so `npm run dev` crashes during
+ * built `better_sqlite3.node` incompatible, so `pnpm run dev` crashes during
  * bootstrap with:
  *
  *   "The module '…/better_sqlite3.node' was compiled against a different

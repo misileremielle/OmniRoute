@@ -76,22 +76,27 @@ failure. That message is now skipped during the build phase: the module-level wa
 ## Bun and dependency installation
 
 OmniRoute is built and run with **Node.js** (`engines.node` in `package.json`). Install
-dependencies with `npm ci` (or `npm install`):
+dependencies with pnpm:
 
 ```bash
-npm ci
-npm run build:release
+pnpm install --frozen-lockfile
+pnpm run build:release
 ```
+
+`pnpm-workspace.yaml` sets `nodeLinker: hoisted`. The standalone assembler
+(`scripts/build/assembleStandalone.mjs`) needs a flat `node_modules`; with pnpm's default
+isolated layout the bundle builds but loses `better-sqlite3` when copied elsewhere.
 
 **`bun install` is not a supported way to install OmniRoute's dependencies** for this
 branch. Bun `1.4.2` is pinned as a devDependency and is used only to run a small,
 allow-listed set of gate/generator scripts. If you install with Bun you may see:
 
-- `warn: Bun currently only supports one level of nested "overrides"` — Bun's support for
-  `package.json` `overrides` is shallower than npm's; npm applies the full tree.
+- `warn: Bun currently only supports one level of nested "overrides"` — Bun reads the
+  `package.json` copy of the overrides and applies them less deeply; pnpm applies the copy in
+  `pnpm-workspace.yaml` (`tests/unit/build/pnpm-overrides-sync.test.ts` keeps both in step).
 - **Blocked lifecycle scripts** for native packages (ONNX Runtime, Playwright Chromium,
   SWC, protobufjs, Parcel Watcher, unrs-resolver). Bun blocks install scripts by default;
-  the supported `npm ci` path runs them, and `npm run check:native-deps` verifies that
+  the supported pnpm install runs those listed in `allowBuilds`, and `pnpm run check:native-deps` verifies that
   every externalized package resolves afterward.
 
 ### Bun script-runner failures
@@ -99,18 +104,18 @@ allow-listed set of gate/generator scripts. If you install with Bun you may see:
 Bun runs only the allow-listed gate/generator scripts (`check:provider-consistency`,
 `check:compression-budget`, `check:known-symbols`, `gen:provider-reference`,
 `bench:compression`) plus the `test:bun:db` smoke suite — see `AGENTS.md` → Environment.
-After pulling the lockfile change, run `npm install` so `bun` resolves locally (a stale
+After pulling the lockfile change, run `pnpm install` so `bun` resolves locally (a stale
 `node_modules` will fail those scripts with `bun: not found`).
 
 **Two distinct Bun failures, two different fixes — do not confuse them.**
 
-- **(a) `bun: not found`** → the tree is stale; `npm install`.
+- **(a) `bun: not found`** → the tree is stale; `pnpm install`.
 - **(b) Bun exists but refuses to run** → `node_modules/bun/bin/bun.exe` is still the
   ~450-byte **bash placeholder** the package ships, because its `postinstall` was skipped
-  (`npm install --ignore-scripts`, or a package manager that skips lifecycle scripts). The real
+  (`pnpm install --ignore-scripts`, or a package manager that skips lifecycle scripts). The real
   binary is already on disk in the platform package (e.g.
   `node_modules/@oven/bun-windows-x64/bin/bun.exe`, ~86 MB), so nothing is missing and
-  re-running `npm install` on an already-satisfied tree may not fix it. Fix:
+  re-running `pnpm install` on an already-satisfied tree may not fix it. Fix:
   `cd node_modules/bun && node install.js`.
 
 **On Windows the error is actively misleading** — `cmd.exe` asks the loader to run a bash

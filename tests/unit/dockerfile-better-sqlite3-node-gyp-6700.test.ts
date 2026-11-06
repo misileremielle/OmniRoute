@@ -70,7 +70,7 @@ function builderInstallRun(source: string): string {
   const later = all.slice(start + 1);
   const next = later.findIndex((line) => line.toUpperCase().startsWith("FROM "));
   const stage = next < 0 ? later : later.slice(0, next);
-  const runs = stage.filter((line) => line.startsWith("RUN ") && line.includes("npm ci "));
+  const runs = stage.filter((line) => line.startsWith("RUN ") && line.includes("pnpm install "));
   assert.equal(runs.length, 1, "one builder install RUN is required");
   let command = runs[0].slice(4).trimStart();
   while (command.startsWith("--mount=")) {
@@ -81,14 +81,14 @@ function builderInstallRun(source: string): string {
   return command;
 }
 
-/** Only the four expected boundaries can run; there is no real npm/node fallback. */
+/** Only the four expected boundaries can run; there is no real pnpm/node fallback. */
 function writeBoundaryStub(bin: string) {
   const source = `#!${process.execPath}
 const fs = require("node:fs"), path = require("node:path"), assert = require("node:assert/strict");
 const command = path.basename(process.argv[1]), args = process.argv.slice(2), root = process.env.PROBE_ROOT;
 const events = fs.existsSync(process.env.PROBE_LOG) ? fs.readFileSync(process.env.PROBE_LOG, "utf8").trim().split("\\n").filter(Boolean) : [];
-if (command === "npm") {
-  assert.deepEqual(args, ["ci", "--include=optional", "--no-audit", "--no-fund", "--legacy-peer-deps", "--ignore-scripts"]);
+if (command === "pnpm") {
+  assert.deepEqual(args, ["install", "--frozen-lockfile", "--ignore-scripts"]);
   assert.equal(events.length, 0); assert.equal(process.cwd(), root);
 } else if (args[0] === process.env.PROBE_GYP) {
   assert.deepEqual(args, [process.env.PROBE_GYP, "rebuild", "--force_build=1"]);
@@ -101,7 +101,7 @@ if (command === "npm") {
 }
 fs.appendFileSync(process.env.PROBE_LOG, JSON.stringify({ command, args, cwd: process.cwd(), mirror: process.env.NODEJS_ORG_MIRROR || "" }) + "\\n");
 `;
-  for (const command of ["npm", "node"])
+  for (const command of ["pnpm", "node"])
     fs.writeFileSync(path.join(bin, command), source, { mode: 0o700 });
 }
 
@@ -154,20 +154,20 @@ test(
     assert.deepEqual(calls[1].args, [gyp, "rebuild", "--force_build=1"]);
     assert.ok(calls[1].cwd.endsWith("/node_modules/better-sqlite3"));
     assert.equal(
-      calls.some((call) => call.command === "npm" && call.args[0] === "rebuild"),
+      calls.some((call) => call.command === "pnpm" && call.args[0] === "rebuild"),
       false
     );
   }
 );
 
 test(
-  "#6700 the better-sqlite3 rebuild happens after `npm ci --ignore-scripts` and before the smoke-load",
+  "#6700 the better-sqlite3 rebuild happens after `pnpm install --ignore-scripts` and before the smoke-load",
   shellOptions,
   () => {
     const calls = executeInstall(builderInstallRun(dockerfile), "https://headers.invalid/node");
     assert.deepEqual(
       calls.map((call) => call.args[0]),
-      ["ci", gyp, "-e", "-e"]
+      ["install", gyp, "-e", "-e"]
     );
     assert.ok(calls[0].args.includes("--ignore-scripts"));
     assert.equal(calls[2].args[1], sqliteSmoke);
@@ -176,7 +176,11 @@ test(
 
 const invalidRuns: [string, string, string][] = [
   ["wrong working directory", "cd node_modules/better-sqlite3", "cd node_modules"],
-  ["npm rebuild indirection", `node ${gyp} rebuild --force_build=1`, "npm rebuild better-sqlite3"],
+  [
+    "pnpm rebuild indirection",
+    `node ${gyp} rebuild --force_build=1`,
+    "pnpm rebuild better-sqlite3",
+  ],
   ["npx download indirection", `node ${gyp} rebuild --force_build=1`, "npx --yes node-gyp rebuild"],
   ["install scripts enabled", " --ignore-scripts", ""],
   ["smoke before rebuild", `node ${gyp} rebuild --force_build=1`, `node -e "${sqliteSmoke}"`],
@@ -193,9 +197,11 @@ for (const [name, before, after] of invalidRuns) {
 }
 
 test("#6700 comments cannot supply the required install instruction", () => {
-  assert.throws(() => builderInstallRun("RUN echo AS builder\nRUN npm ci --ignore-scripts"));
+  assert.throws(() => builderInstallRun("RUN echo AS builder\nRUN pnpm install --ignore-scripts"));
   assert.throws(() =>
-    builderInstallRun("FROM node AS builder\n# RUN npm ci --ignore-scripts\nFROM node AS runner")
+    builderInstallRun(
+      "FROM node AS builder\n# RUN pnpm install --ignore-scripts\nFROM node AS runner"
+    )
   );
 });
 

@@ -159,7 +159,7 @@ const IGNORE_FROM_CODE = new Set([
   // verify-coverage). Operator-supplied script secrets, not OmniRoute runtime config.
   "BOT_TOKEN",
   "BOT_URL",
-  // Homologation E2E suite (npm run homolog) vars — configured via the dedicated
+  // Homologation E2E suite (pnpm run homolog) vars — configured via the dedicated
   // .env.homolog file (template: .env.homolog.example), never in the runtime .env.
   // Test/ops-only signals against the homologation VPS, same class as COMBO_LIVE_*.
   // See docs/ops/HOMOLOGATION.md.
@@ -217,7 +217,7 @@ const IGNORE_FROM_CODE = new Set([
   // repository .env so isolation tests get a deterministic environment.
   "OMNIROUTE_CLI_SKIP_REPO_ENV",
   // Eval-harness only: operator-supplied provider credentials JSON read by the
-  // opt-in `npm run eval:compression` CLI (scripts/compression-eval/index.ts).
+  // opt-in `pnpm run eval:compression` CLI (scripts/compression-eval/index.ts).
   // A dev/ops measurement tool, never OmniRoute runtime config.
   "OMNIROUTE_EVAL_CREDENTIALS",
   // Build-time only: set by `build:release` (git short SHA) and read by

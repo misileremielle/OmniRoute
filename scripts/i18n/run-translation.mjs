@@ -16,18 +16,18 @@
  * changed or whose target file is missing.
  *
  * Usage (driven by npm scripts in package.json):
- *   npm run i18n:run
- *   npm run i18n:run -- --locale=pt-BR
- *   npm run i18n:run -- --files=CLAUDE.md,docs/ARCHITECTURE.md
- *   npm run i18n:run -- --force
- *   npm run i18n:run:dry
- *   npm run i18n:run -- --adopt   (rebuild .i18n-state.json from disk, no API calls)
- *   npm run i18n:run -- --adopt --targets-only
+ *   pnpm run i18n:run
+ *   pnpm run i18n:run --locale=pt-BR
+ *   pnpm run i18n:run --files=CLAUDE.md,docs/ARCHITECTURE.md
+ *   pnpm run i18n:run --force
+ *   pnpm run i18n:run:dry
+ *   pnpm run i18n:run --adopt   (rebuild .i18n-state.json from disk, no API calls)
+ *   pnpm run i18n:run --adopt --targets-only
  *                                 (re-hash only the mirrors on disk, keeping every
  *                                  source_hash — mechanical mirror rewrites stop
  *                                  showing up as `target changed` while genuine
  *                                  source drift is still reported)
- *   npm run i18n:run -- --failures-json=<path>
+ *   pnpm run i18n:run --failures-json=<path>
  *                                 (also write the run summary and the failed
  *                                  (source, locale) units as JSON)
  *

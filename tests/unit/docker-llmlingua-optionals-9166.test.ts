@@ -255,15 +255,16 @@ test("#9166 Docker explicitly installs and validates LLMLingua optionals", () =>
 
   const builder = dockerfile.slice(builderStart, runnerStart);
 
+  // pnpm installs optional dependencies unless told otherwise.
   assert.match(
     builder,
-    /npm ci\b[^\n]*--include=optional/,
-    "Docker dependency installation must explicitly include optional dependencies"
+    /pnpm install\b/,
+    "Docker dependency installation must run in the builder stage"
   );
 
   assert.doesNotMatch(
     builder,
-    /npm ci\b[^\n]*--omit=optional/,
+    /pnpm install\b[^\n]*(--no-optional|--prod\b)/,
     "Docker must not omit optional dependencies"
   );
 

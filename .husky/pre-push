@@ -7,7 +7,7 @@
 
 if ! command -v npm >/dev/null 2>&1; then
   echo "⚠️  npm not found in PATH — skipping pre-push hooks"
-  echo "   Run 'npm run check:any-budget:t11 && npm run check:tracked-artifacts' manually before pushing."
+  echo "   Run 'pnpm run check:any-budget:t11 && pnpm run check:tracked-artifacts' manually before pushing."
   exit 0
 fi
 

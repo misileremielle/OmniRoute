@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-DEPRECATED 2026-05-13. Use `npm run i18n:run`
+DEPRECATED 2026-05-13. Use `pnpm run i18n:run`
 (scripts/i18n/run-translation.mjs) instead. This Python script will be
 removed in v3.10.
 
 The Node-based translator is hash-incremental (only retranslates files
 whose source SHA-256 changed), runs the OmniRoute Cloud LLM through
-OMNIROUTE_TRANSLATION_* env vars, and is wired into `npm run i18n:run`
-and `npm run i18n:check`.
+OMNIROUTE_TRANSLATION_* env vars, and is wired into `pnpm run i18n:run`
+and `pnpm run i18n:check`.
 
 Historical purpose:
   Scanned `docs/i18n/` markdown files and translated English paragraphs
@@ -16,7 +16,7 @@ Historical purpose:
 
 import sys
 print(
-    "WARN: scripts/i18n/i18n_autotranslate.py is deprecated. Use 'npm run i18n:run' instead.",
+    "WARN: scripts/i18n/i18n_autotranslate.py is deprecated. Use 'pnpm run i18n:run' instead.",
     file=sys.stderr,
 )
 

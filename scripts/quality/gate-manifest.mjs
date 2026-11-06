@@ -111,7 +111,7 @@ export function resolveProfile(manifest, scripts, name) {
   if (!Object.hasOwn(manifest.profiles, name)) throw new Error(`unknown profile: ${name}`);
   return manifest.profiles[name].aliases.map((alias) => ({
     name: alias,
-    cmd: [process.platform === "win32" ? "npm.cmd" : "npm", "run", "--silent", alias],
+    cmd: [process.platform === "win32" ? "pnpm.cmd" : "pnpm", "run", "--silent", alias],
   }));
 }
 
