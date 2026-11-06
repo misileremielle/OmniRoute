@@ -5,7 +5,7 @@
  * Real model calls cost money — a full run is OPT-IN. Use --sample and --cost-cap-usd.
  *
  * Usage:
- *   npm run eval:compression -- --answer-model <id> --judge-model <id> --provider <p> \
+ *   pnpm run eval:compression --answer-model <id> --judge-model <id> --provider <p> \
  *     --sample 10 --cost-cap-usd 2 --mode lite
  *
  * Implementer-config (spec leaves open): the answer/judge model ids, the provider, and the
@@ -29,7 +29,9 @@ async function main(): Promise<void> {
   const judgeModel = flag("judge-model");
   const provider = flag("provider");
   if (!answerModel || !judgeModel || !provider) {
-    console.error("eval:compression requires --answer-model, --judge-model and --provider (no model is called without them).");
+    console.error(
+      "eval:compression requires --answer-model, --judge-model and --provider (no model is called without them)."
+    );
     process.exitCode = 2;
     return;
   }
@@ -43,7 +45,11 @@ async function main(): Promise<void> {
   const credentials = JSON.parse(process.env.OMNIROUTE_EVAL_CREDENTIALS ?? "{}");
   const client = createExecutorModelClient(provider, credentials);
 
-  const config: CompressionConfig = { ...getDefaultCompressionConfig(), enabled: true, defaultMode: mode };
+  const config: CompressionConfig = {
+    ...getDefaultCompressionConfig(),
+    enabled: true,
+    defaultMode: mode,
+  };
 
   const result = await runEval({
     corpus: SEED_CORPUS,

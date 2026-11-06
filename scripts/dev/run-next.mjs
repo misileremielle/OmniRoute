@@ -94,7 +94,7 @@ const systemdNotifier = createSystemdNotifier();
 
 // The mergedEnv copy above pulls NODE_ENV straight from `.env` — and the shipped
 // `.env.example` default is `NODE_ENV=production`. Next's programmatic `next()`
-// entry (unlike the `next` CLI) trusts that value verbatim, so `npm run dev`
+// entry (unlike the `next` CLI) trusts that value verbatim, so `pnpm run dev`
 // would boot the dev bundler with NODE_ENV=production. That desyncs Next's
 // webpack CSS pipeline and `src/app/globals.css` reaches webpack's JS parser
 // instead of PostCSS — failing as `Module parse failed: Unexpected character

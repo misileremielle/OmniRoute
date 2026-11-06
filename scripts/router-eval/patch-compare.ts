@@ -82,7 +82,7 @@ function getArgValue(name: string): string | undefined {
 function usage(): string {
   return [
     "Usage:",
-    "  npm run eval:router:patch-compare -- --baseline <router-config.patch.json> --candidate <router-config.patch.json>",
+    "  pnpm run eval:router:patch-compare --baseline <router-config.patch.json> --candidate <router-config.patch.json>",
     "       [--baseline-name <name>] [--candidate-name <name>] [--artifact-dir <dir>] [--run-id <id>]",
     "       [--output <file>] [--json-output <file>] [--fail-on-regression]",
     "       [--max-aiq-drop <n>] [--max-cost-increase <ratio>] [--max-latency-increase <ratio>]",

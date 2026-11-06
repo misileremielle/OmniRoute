@@ -67,7 +67,7 @@ OmniRoute/
 | **CODE_OF_CONDUCT.md**                      | Contributor Covenant — community behavior expectations                                   |
 | **llm.txt**                                 | Plain-text landing optimized for LLM crawlers (SEO for AI assistants)                    |
 | **package.json**                            | npm manifest, scripts, dependencies, engines, c8 coverage gate                           |
-| **package-lock.json**                       | Locked dependency tree                                                                   |
+| **pnpm-lock.yaml**                          | Locked dependency tree                                                                   |
 | **tsconfig.json**                           | Root TypeScript config                                                                   |
 | **tsconfig.typecheck-core.json**            | Typecheck config for `src/` core                                                         |
 | **tsconfig.typecheck-noimplicit-core.json** | Strict (`noImplicitAny`) typecheck                                                       |

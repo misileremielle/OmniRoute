@@ -62,7 +62,7 @@ for (const dockerfile of ["Dockerfile", "Dockerfile.bun"]) {
       /^ENV\s+OMNIROUTE_WEBPACK_BUILD_CACHE=\$\{?OMNIROUTE_WEBPACK_BUILD_CACHE\}?$/.test(l.trim())
     );
     const buildIdx = stage.findIndex(
-      (l) => !l.trim().startsWith("#") && /\b(npm|bun) run (--quiet )?build\b/.test(l)
+      (l) => !l.trim().startsWith("#") && /\b(p?npm|bun) run (--quiet )?build\b/.test(l)
     );
     assert.ok(argIdx >= 0, `${dockerfile} builder stage must declare the ARG`);
     assert.ok(envIdx > argIdx, `${dockerfile} must promote the ARG to ENV`);

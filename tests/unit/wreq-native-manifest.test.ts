@@ -15,6 +15,9 @@ import {
   resolveWreqJsNativeBinding,
 } from "../../scripts/build/wreqJsNative.mjs";
 
+// @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
+import { readPnpmLock } from "../../scripts/ci/pnpmLock.mjs";
+
 const ROOT = process.cwd();
 const MANIFEST_PATH = join(ROOT, "config/release/wreq-js-native-manifest.json");
 const INVENTORY_PATH = join(ROOT, "config/release/wreq-js-rust-license-inventory.json");
@@ -118,21 +121,9 @@ const EXPECTED_BINARY_HASHES: Record<string, [number, string]> = {
   ],
 };
 
-test("wreq-js 3.2 manifest pins all nine audited native addons to package-lock", () => {
+test("wreq-js 3.2 manifest pins all nine audited native addons to pnpm-lock", () => {
   const manifest = JSON.parse(readFileSync(MANIFEST_PATH, "utf8")) as NativeManifest;
-  const packageLock = JSON.parse(readFileSync(join(ROOT, "package-lock.json"), "utf8")) as {
-    packages: Record<
-      string,
-      {
-        version?: string;
-        integrity?: string;
-        license?: string;
-        os?: string[];
-        cpu?: string[];
-        libc?: string[];
-      }
-    >;
-  };
+  const packageLock = readPnpmLock(ROOT);
 
   assert.equal(manifest.package, "wreq-js");
   assert.equal(manifest.version, "3.2.0");
@@ -156,10 +147,9 @@ test("wreq-js 3.2 manifest pins all nine audited native addons to package-lock",
     assert.equal(addon.arch, helper.arch, `${addon.package}: arch`);
     assert.equal(addon.libc, helper.libc, `${addon.package}: libc`);
 
-    const lock = packageLock.packages[`node_modules/${addon.package}`];
-    assert.equal(lock.version, addon.version, `${addon.package}: lock version`);
-    assert.equal(lock.integrity, addon.integrity, `${addon.package}: lock integrity`);
-    assert.equal(lock.license, "MIT", `${addon.package}: lock license`);
+    const lock = packageLock.packages[`${addon.package}@${addon.version}`];
+    assert.ok(lock, `${addon.package}: lock version`);
+    assert.equal(lock.resolution.integrity, addon.integrity, `${addon.package}: lock integrity`);
     assert.deepEqual(lock.os, [addon.platform], `${addon.package}: lock platform`);
     assert.deepEqual(lock.cpu, [addon.arch], `${addon.package}: lock arch`);
     if (addon.libc) {

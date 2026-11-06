@@ -19,7 +19,7 @@ const EXCLUDED_PREFIXES = [
   "node_modules/",
 ];
 // Hubs already force a full run in TIA.
-const HUB_FILES = new Set(["package.json", "package-lock.json"]);
+const HUB_FILES = new Set(["package.json", "pnpm-lock.yaml"]);
 
 const MAX_LITERAL_LENGTH = 300;
 const WORD_CHAR_RE = /[A-Za-z0-9_$]/;

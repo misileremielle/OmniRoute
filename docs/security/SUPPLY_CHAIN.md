@@ -58,7 +58,7 @@ Per the "no upstream fix" branch of the CVE Variance remedy above, this is an
 **accepted risk**, not a bump:
 
 - **Chain:** `promptfoo` (devDependency) → `@openai/codex-security` → `extract-zip@2.0.1`.
-  Confirmed via `package-lock.json` — exactly one package in the whole dependency
+  Confirmed via `pnpm-lock.yaml` — exactly one package in the whole dependency
   tree (`@openai/codex-security`) declares `extract-zip`, and exactly one package
   (`promptfoo`) declares `@openai/codex-security`.
 - **No fixed release exists anywhere in the chain.** `extract-zip@2.0.1` (published 2020) is the package's final release — it is unmaintained. `@openai/codex-security`'s

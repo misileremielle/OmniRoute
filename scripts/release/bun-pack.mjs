@@ -21,7 +21,7 @@
  * Flags:
  *   --pm bun|npm        Packer + build runner. Default: bun (npm is the fallback).
  *   --skip-build        Reuse an already-staged dist/ (or run
- *                       `npm run build:release` / `bun run build:release` first).
+ *                       `pnpm run build:release` / `bun run build:release` first).
  *                       Default: build first (needs the workspace node_modules).
  *   --destination <dir> Output directory. Default: <repo-root>/_artifacts.
  *
@@ -131,7 +131,7 @@ function main() {
     const bunCheck = run(bunBin, ["--version"]);
     if (bunCheck.status !== 0) {
       fail(
-        "bun not found — run `npm run bun:release` or install bun (curl -fsSL https://bun.sh/install | bash)"
+        "bun not found — run `pnpm run bun:release` or install bun (curl -fsSL https://bun.sh/install | bash)"
       );
     }
     log(`packer: bun ${bunCheck.stdout.trim()}`);

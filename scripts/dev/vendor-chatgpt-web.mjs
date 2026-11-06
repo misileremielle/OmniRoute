@@ -10,8 +10,8 @@
 // against a real ChatGPT Web session, which no script here can perform).
 //
 // Usage:
-//   node scripts/dev/vendor-chatgpt-web.mjs status   # npm run vendor:chatgpt-web:status
-//   node scripts/dev/vendor-chatgpt-web.mjs diff      # npm run vendor:chatgpt-web:diff
+//   node scripts/dev/vendor-chatgpt-web.mjs status   # pnpm run vendor:chatgpt-web:status
+//   node scripts/dev/vendor-chatgpt-web.mjs diff      # pnpm run vendor:chatgpt-web:diff
 //
 // `status` prints the pin vs. latest release and how many commits/files separate them.
 // `diff` prints the same, plus the full changed-file list (path + additions/deletions)

@@ -62,14 +62,14 @@ echo "preflight-build v$VERSION — $(date -u +%Y-%m-%dT%H:%M:%SZ) — quick=$QU
 
 run "version claims (README.md, llm.txt)" 60 \
   node scripts/release/bump-version-claims.mjs --check --to "$VERSION"
-run "root lockfile in sync (npm ci --dry-run)" 300 \
-  npm ci --dry-run --ignore-scripts
+run "root lockfile in sync (pnpm install --frozen-lockfile --lockfile-only)" 300 \
+  pnpm install --frozen-lockfile --lockfile-only --ignore-scripts
 
 if [ "$QUICK" -eq 0 ]; then
-  run "vitest (MCP, autoCombo, cache)" 1200 npm run test:vitest
+  run "vitest (MCP, autoCombo, cache)" 1200 pnpm run test:vitest
   if [ "$BUILD" -eq 1 ]; then
-    run "build:cli (standalone + CLI bundle)" 4000 npm run build:cli
-    run "pack-boot (the tarball users install boots)" 900 npm run check:pack-boot
+    run "build:cli (standalone + CLI bundle)" 4000 pnpm run build:cli
+    run "pack-boot (the tarball users install boots)" 900 pnpm run check:pack-boot
   fi
   if [ "$DOCKER" -eq 1 ]; then
     run "Dockerfile.bun runner-web apt smoke (.113)" 900 \

@@ -102,11 +102,12 @@ RUN --mount=type=cache,id=s/92ca8a61-c1ba-421f-a389-d48ac7258c2d-apt-cache,targe
   && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
 
-COPY package*.json ./
-# Workspace package manifests MUST be present before `npm ci` so npm materializes
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY config/ci/toolchain.json ./config/ci/toolchain.json
+# Workspace package manifests MUST be present before `pnpm install` so pnpm materializes
 # the workspace and installs its *workspace-only* deps (e.g. safe-regex,
 # @toon-format/toon — declared in open-sse/package.json, not hoisted to root).
-# Without this, `npm ci` skips them and the application build fails with "Module not
+# Without this, the install skips them and the application build fails with "Module not
 # found" (root cause of the v3.8.39 Docker build break). workspaces = ["open-sse"].
 COPY open-sse/package.json ./open-sse/package.json
 COPY packages/browser-pool/package.json ./packages/browser-pool/package.json
@@ -114,28 +115,26 @@ COPY packages/ui-kit/package.json ./packages/ui-kit/package.json
 COPY scripts/build/postinstall.mjs ./scripts/build/postinstall.mjs
 COPY scripts/build/postinstallSupport.mjs ./scripts/build/postinstallSupport.mjs
 COPY scripts/build/native-binary-compat.mjs ./scripts/build/native-binary-compat.mjs
-ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
 # --ignore-scripts blocks broad dependency install/postinstall hooks, closing
 # the supply-chain attack surface where a transitive dep can run arbitrary code
 # at install time. better-sqlite3 still needs a native binding for the target
 # platform, so rebuild and smoke-test only that known runtime dependency below.
 #
-# We REQUIRE a committed package-lock.json so resolved dependency versions
+# We REQUIRE a committed pnpm-lock.yaml so resolved dependency versions
 # are reproducible.
-RUN test -f package-lock.json \
-  || (echo "package-lock.json is required for reproducible Docker builds" >&2 && exit 1)
-# `npm rebuild <pkg>` re-runs the package's own install script, so under npm 11 +
-# `--ignore-scripts` on the parent `npm ci` it depends on npm's script-allowlist
-# machinery correctly re-enabling that one package's script. Some self-hosted build
-# environments (e.g. Dokploy) hit a broken/incomplete better-sqlite3 native binding
-# from that indirection. Invoking `node-gyp rebuild` directly inside the package
-# directory bypasses npm's script-running layer entirely and is deterministic
-# regardless of npm version or ignore-scripts allowlist behavior.
+RUN test -f pnpm-lock.yaml \
+  || (echo "pnpm-lock.yaml is required for reproducible Docker builds" >&2 && exit 1)
+# Some self-hosted build environments (e.g. Dokploy) hit a broken/incomplete
+# better-sqlite3 native binding when the package manager re-runs its install script.
+# Invoking `node-gyp rebuild` directly inside the package directory bypasses that
+# script-running layer entirely and is deterministic regardless of ignore-scripts
+# behavior.
 # node-gyp comes from npm's own bundled copy (deterministic, already in the image)
 # instead of `npx --yes`, which would install an arbitrary registry version
 # on-demand and run its lifecycle scripts (Sonar docker:S6505).
-RUN --mount=type=cache,id=s/92ca8a61-c1ba-421f-a389-d48ac7258c2d-npm-cache,target=/root/.npm \
-  npm ci --include=optional --no-audit --no-fund --legacy-peer-deps --ignore-scripts \
+RUN npm install -g --no-audit --no-fund "pnpm@$(node -p "require('./config/ci/toolchain.json').pnpm")"
+RUN --mount=type=cache,id=s/92ca8a61-c1ba-421f-a389-d48ac7258c2d-pnpm-store,target=/root/.local/share/pnpm/store \
+  pnpm install --frozen-lockfile --ignore-scripts \
   && (cd node_modules/better-sqlite3 \
       && if [ -n "${NODE_DIST_URL}" ]; then export NODEJS_ORG_MIRROR="${NODE_DIST_URL}"; fi \
       && node /usr/local/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js rebuild --force_build=1) \
@@ -222,7 +221,7 @@ ENV CIRCLE_NODE_TOTAL=${OMNIROUTE_BUILD_WORKERS}
 
 # Webpack production builds skip the persistent cache unless this is 1 (see
 # next.config.mjs). Declared as ARG+ENV so `--build-arg
-# OMNIROUTE_WEBPACK_BUILD_CACHE=1` reaches `npm run build`.
+# OMNIROUTE_WEBPACK_BUILD_CACHE=1` reaches `pnpm run build`.
 ARG OMNIROUTE_WEBPACK_BUILD_CACHE=""
 ENV OMNIROUTE_WEBPACK_BUILD_CACHE=$OMNIROUTE_WEBPACK_BUILD_CACHE
 
@@ -231,7 +230,7 @@ COPY . ./
 # It holds only the SWC cache unless OMNIROUTE_WEBPACK_BUILD_CACHE=1.
 RUN --mount=type=cache,id=s/92ca8a61-c1ba-421f-a389-d48ac7258c2d-next-cache,target=/app/.build/next/cache \
   mkdir -p /app/data \
-  && npm run build \
+  && pnpm run build \
   && node --input-type=module -e "import { createRequire } from 'node:module'; import { pathToFileURL } from 'node:url'; const standaloneRoot = '/app/.build/next/standalone/node_modules/'; const require = createRequire('/app/.build/next/standalone/package.json'); for (const pkg of ['@atjsh/llmlingua-2', '@huggingface/transformers', 'js-tiktoken']) { const resolved = require.resolve(pkg); if (!resolved.startsWith(standaloneRoot)) throw new Error(pkg + ' resolved outside standalone: ' + resolved); await import(pathToFileURL(resolved).href); } const onnxRuntime = require.resolve('onnxruntime-node'); if (!onnxRuntime.startsWith(standaloneRoot)) throw new Error('onnxruntime-node resolved outside standalone: ' + onnxRuntime); await import(pathToFileURL(onnxRuntime).href);"
 
 # ── Runner base ────────────────────────────────────────────────────────────
@@ -271,7 +270,7 @@ RUN mkdir -p /app/data && chown node:node /app /app/data
 # `-e REQUIRE_API_KEY=false` for an intentionally keyless deployment.
 ENV REQUIRE_API_KEY=true
 
-# `npm run build` (build-next-isolated → assembleStandalone) bundles ALL runtime
+# `pnpm run build` (build-next-isolated → assembleStandalone) bundles ALL runtime
 # files into .build/next/standalone/ — .next, node_modules, migrations, scripts,
 # docs, and the previously hand-COPY'd modules below (@swc/helpers, pino-*, split2,
 # migrations). assembleStandalone copies them straight from the builder's

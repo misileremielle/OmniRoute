@@ -137,12 +137,12 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
-      - run: npm run audit:deps
+      - run: pnpm run check:node-runtime
+      - run: pnpm run audit:deps
       - name: Restore ESLint file cache
         if: github.event_name == 'pull_request'
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
@@ -150,7 +150,7 @@ jobs:
           path: |
             .eslintcache
             .eslintcache-complexity
-          key: eslint-${{ runner.os }}-${{ hashFiles('eslint.config.mjs', 'eslint.complexity-ratchets.config.mjs', 'config/quality/eslint-suppressions.json', 'package-lock.json') }}
+          key: eslint-${{ runner.os }}-${{ hashFiles('eslint.config.mjs', 'eslint.complexity-ratchets.config.mjs', 'config/quality/eslint-suppressions.json', 'pnpm-lock.yaml') }}
           # No restore-keys fallback on purpose (#11600, P-II.1 of the v3.8.50 postmortem): a
           # cache built under a different suppressions file / lint config / lockfile reports
           # stale per-file verdicts, which is exactly how 215 pre-existing errors stayed
@@ -159,7 +159,7 @@ jobs:
       # Single ESLint inventory (JSON) — quality-gate reuses the artifact instead of
       # a second cold full-tree pass for eslintWarnings ratchet counts.
       - name: ESLint (JSON report)
-        run: npm run lint:json
+        run: pnpm run lint:json
       - name: Upload ESLint results
         if: always()
         uses: actions/upload-artifact@v7
@@ -168,7 +168,7 @@ jobs:
           path: .artifacts/eslint-results.json
           if-no-files-found: warn
           retention-days: 7
-      - run: npm run check:cycles:ratchet
+      - run: pnpm run check:cycles:ratchet
       # open-sse → src edge ceiling (metrics.boundaryOpenSseToSrc). On PRs it is base-relative
       # like check:file-size (#8522): max(ceiling, edges on the PR base), so drift other merges
       # added after the seed does not red an innocent PR. push → main stays absolute.
@@ -177,27 +177,27 @@ jobs:
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           if [ -n "${PR_BASE_SHA:-}" ]; then
-            npm run check:boundary:ratchet -- --base-ref "$PR_BASE_SHA"
+            pnpm run check:boundary:ratchet --base-ref "$PR_BASE_SHA"
           else
-            npm run check:boundary:ratchet
+            pnpm run check:boundary:ratchet
           fi
-      - run: npm run check:route-validation:t06
-      - run: npm run check:any-budget:t11
-      - run: npm run check:provider-consistency
-      - run: npm run check:model-lifecycle
-      - run: npm run check:provider-asset-provenance
-      - run: npm run check:fetch-targets
-      - run: npm run check:deps
-      - run: npm run check:file-size
-      - run: npm run check:error-helper
-      - run: npm run check:migration-numbering
-      - run: npm run check:public-creds
-      - run: npm run check:db-rules
-      - run: npm run check:known-symbols
-      - run: npm run check:route-guard-membership
-      - run: npm run check:test-discovery
-      - run: npm run check:test-tla-order
-      - run: npm run check:tracked-artifacts
+      - run: pnpm run check:route-validation:t06
+      - run: pnpm run check:any-budget:t11
+      - run: pnpm run check:provider-consistency
+      - run: pnpm run check:model-lifecycle
+      - run: pnpm run check:provider-asset-provenance
+      - run: pnpm run check:fetch-targets
+      - run: pnpm run check:deps
+      - run: pnpm run check:file-size
+      - run: pnpm run check:error-helper
+      - run: pnpm run check:migration-numbering
+      - run: pnpm run check:public-creds
+      - run: pnpm run check:db-rules
+      - run: pnpm run check:known-symbols
+      - run: pnpm run check:route-guard-membership
+      - run: pnpm run check:test-discovery
+      - run: pnpm run check:test-tla-order
+      - run: pnpm run check:tracked-artifacts
       - name: AI attribution in commit / PR metadata (Hard Rule #16)
         if: github.event_name == 'pull_request'
         env:
@@ -207,41 +207,41 @@ jobs:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
-          npm run check:ai-attribution -- --range "$PR_BASE_SHA..$PR_HEAD_SHA" --pr-title "$PR_TITLE" --pr-body-file "$RUNNER_TEMP/pr-body.md"
+          pnpm run check:ai-attribution --range "$PR_BASE_SHA..$PR_HEAD_SHA" --pr-title "$PR_TITLE" --pr-body-file "$RUNNER_TEMP/pr-body.md"
       # A test parked in vitest.config.ts's exclude list does not run, and looks like
       # coverage to whoever reads the tree. 62 files accumulated behind a comment pointing
       # at #8618 — closed in August while the list grew to 62; 51 of them passed when
       # finally measured (#13204). This gate requires every exclusion to name a tracker and
       # to appear in config/quality/vitest-exclusions.json, so the debt stays reviewable.
-      - run: npm run check:vitest-exclusions
+      - run: pnpm run check:vitest-exclusions
       # WS1.7 (v3.8.49 plan): Dockerfile lint (hadolint, pinned by digest).
       # failure-threshold=error keeps the 5 pre-existing warnings (DL3008/DL3003/
       # DL3016 version pinning / WORKDIR) visible without blocking; any ERROR fails.
       - name: hadolint (Dockerfile)
         run: docker run --rm -i hadolint/hadolint@sha256:27086352fd5e1907ea2b934eb1023f217c5ae087992eb59fde121dce9c9ff21e hadolint --failure-threshold error - < Dockerfile
-      - run: npm run check:lockfile
-      - run: npm run check:licenses
+      - run: pnpm run check:lockfile
+      - run: pnpm run check:licenses
       # check:docs-sync is run by the docs-sync-strict job (via check:docs-all) and the
       # husky pre-commit hook; the standalone copy here was redundant (ROI dedup).
-      - run: npm run typecheck:core
+      - run: pnpm run typecheck:core
       # #7033: typecheck:core's curated file allowlist does not cover
       # src/app/(dashboard) TSX (and next.config.mjs sets ignoreBuildErrors:
       # true, so `next build` never type-checks it either) — orphaned
       # identifiers there (see #6625/#6909) were invisible to CI. This gate
       # runs tsc scoped to the dashboard tree against a frozen baseline of
       # pre-existing errors; only NEW errors fail it.
-      - run: npm run check:dashboard-typecheck
+      - run: pnpm run check:dashboard-typecheck
       # The rest of the app surface — src/lib, src/shared, bin and packages — had no type gate: next build ignores type errors and
       # the root tsconfig cannot finish. API routes are covered separately by
       # api-route-typecheck.yml, so this is not "everything else was unchecked".
       # This runs the production-only program against a frozen per-(file, code)
       # count baseline, so a new error anywhere in that surface fails the job
       # while the pre-existing debt stays visible and cannot grow.
-      - run: npm run check:build-typecheck
+      - run: pnpm run check:build-typecheck
         timeout-minutes: 5
       # typecheck:noimplicit:core dropped from this job (2026-07 optimize):
       # it was advisory (continue-on-error) and largely subsumed by the blocking
-      # check:type-coverage ratchet in quality-gate. Local: npm run typecheck:noimplicit:core.
+      # check:type-coverage ratchet in quality-gate. Local: pnpm run typecheck:noimplicit:core.
 
   quality-gate:
     name: Quality Ratchet
@@ -272,7 +272,7 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
@@ -283,7 +283,7 @@ jobs:
           path: |
             .eslintcache
             .eslintcache-complexity
-          key: eslint-${{ runner.os }}-${{ hashFiles('eslint.config.mjs', 'eslint.complexity-ratchets.config.mjs', 'config/quality/eslint-suppressions.json', 'package-lock.json') }}
+          key: eslint-${{ runner.os }}-${{ hashFiles('eslint.config.mjs', 'eslint.complexity-ratchets.config.mjs', 'config/quality/eslint-suppressions.json', 'pnpm-lock.yaml') }}
           # No restore-keys fallback on purpose (#11600, P-II.1 of the v3.8.50 postmortem): a
           # cache built under a different suppressions file / lint config / lockfile reports
           # stale per-file verdicts, which is exactly how 215 pre-existing errors stayed
@@ -306,7 +306,7 @@ jobs:
         with:
           name: eslint-results
           path: .artifacts/
-      - run: npm run quality:collect
+      - run: pnpm run quality:collect
       # Catraca: falha se qualquer métrica regredir vs quality-baseline.json (commitado).
       # Hoje: contagem de warnings do ESLint. Fase 4 estende com cobertura (lida do
       # coverage mergeado). Tamanho de arquivo e duplicação têm gates dedicados.
@@ -326,24 +326,24 @@ jobs:
       # Catraca de duplicação (jscpd@4 sobre src+open-sse). Roda neste job (paralelo)
       # para não pesar no caminho crítico do lint.
       - name: Duplication ratchet
-        run: npm run check:duplication
+        run: pnpm run check:duplication
       # Complexity + cognitive: one ESLint walk, two independent baselines (by ruleId).
       - name: Complexity + cognitive ratchets
-        run: npm run check:complexity-ratchets
+        run: pnpm run check:complexity-ratchets
       # Fase 7 INT: dead-code, type-coverage promovidos de advisory (quality-extended)
       # para BLOQUEANTES aqui. cognitive-complexity is folded into the step above.
       - name: Dead-code ratchet (knip)
-        run: npm run check:dead-code
+        run: pnpm run check:dead-code
       - name: Type coverage ratchet
-        run: npm run check:type-coverage
+        run: pnpm run check:type-coverage
       - name: Compression budget ratchet (F2.4 / N4)
-        run: npm run check:compression-budget
+        run: pnpm run check:compression-budget
       # CodeQL alerts ratchet — BLOQUEANTE (promovido de advisory na v3.8.26).
       # Lê metrics.codeqlAlerts.value de quality-baseline.json e sai 1 SOMENTE numa
       # regressão real (alertas abertos > baseline). Falha de medição (gh/auth/api)
       # é skip gracioso com exit 0 — security-events:read no job-level permissions.
       - name: CodeQL alerts ratchet (blocking)
-        run: npm run check:codeql-ratchet
+        run: pnpm run check:codeql-ratchet
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Append summary
@@ -388,7 +388,7 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
@@ -396,14 +396,14 @@ jobs:
       # quality-gate (bloqueante) na Fase 7 INT — não rodam aqui para evitar duplo custo.
       - name: Circular deps (dpdm; advisory)
         continue-on-error: true
-        run: npm run check:circular-deps
+        run: pnpm run check:circular-deps
       # BLOCKING ratchet (Etapa 2): bundleSize must not regress vs the baseline
-      # (gzip via @size-limit/file, installed by `npm ci`). --ratchet exits 1 on a
+      # (gzip via @size-limit/file, installed by `pnpm install`). --ratchet exits 1 on a
       # measured regression AND on an unmeasurable one (#15159 G-04): "could not
       # measure" is not "no regression". A missing @size-limit/file or a missing
       # CLI entrypoint now fails loudly here instead of reporting a silent pass.
       - name: Bundle size (ratchet, blocking)
-        run: npm run check:bundle-size -- --ratchet
+        run: pnpm run check:bundle-size --ratchet
       # CodeQL ratchet foi PROMOVIDO a BLOQUEANTE no job quality-gate (v3.8.26) —
       # não roda aqui para evitar duplo run/duplo report.
       # Install the advisory security scanners so the gates below actually run
@@ -465,7 +465,7 @@ jobs:
       # --ratchet exits 1 on a measured regression; it SKIPs (exit 0) when gitleaks
       # is absent (a missing binary never blocks).
       - name: Secret scan (gitleaks, ratchet, blocking)
-        run: npm run check:secrets -- --ratchet
+        run: pnpm run check:secrets --ratchet
       # BLOCKING ratchet (v3.8.27 cycle-end): vulnCount must not regress vs the
       # baseline. --ratchet exits 1 on a measured regression (measured > baseline);
       # it SKIPs (exit 0) when osv-scanner is absent or osv.dev is unreachable (a
@@ -473,13 +473,13 @@ jobs:
       # docs/security/SUPPLY_CHAIN.md — a newly-disclosed CVE on an unchanged dep can
       # red this gate; the fix is to bump the dep or re-baseline metrics.vulnCount.
       - name: Vulnerability ratchet (osv-scanner, ratchet, blocking)
-        run: npm run check:vuln-ratchet -- --ratchet
+        run: pnpm run check:vuln-ratchet --ratchet
       # BLOCKING ratchet (Etapa 2): zizmorFindings must not regress vs the baseline.
       # ONLY zizmor is ratcheted — actionlint findings are reported, not blocking.
       # Both tools must complete with valid reports. Missing/broken scanners or
       # an absent baseline are INCOMPLETE, never zero findings or acceptance.
       - name: Workflow lint (actionlint+zizmor, ratchet, blocking)
-        run: npm run check:workflows -- --ratchet
+        run: pnpm run check:workflows --ratchet
       # OpenAPI breaking-change detection (oasdiff). Diffs the PR's public API
       # contract (docs/openapi.yaml) against the base branch's spec.
       # BLOCKING ratchet (Fase 9 Onda 0): reads metrics.openapiBreaking.value and
@@ -490,7 +490,7 @@ jobs:
       - name: OpenAPI breaking-change (oasdiff, ratchet, blocking)
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: npm run check:openapi-breaking -- --ratchet
+        run: pnpm run check:openapi-breaking --ratchet
 
   docs-sync-strict:
     name: Docs Sync (Strict)
@@ -508,24 +508,24 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:docs-all
+      - run: pnpm run check:docs-all
       # Previously-orphaned contract gates (existed as files, never wired anywhere).
       # All exit 0 today: cli-i18n is a hard gate, openapi-coverage is a ratchet
       # (floor ~36), openapi-security-tiers is advisory (Hard Rules #15/#17).
       - name: CLI i18n consistency
-        run: npm run check:cli-i18n
+        run: pnpm run check:cli-i18n
       - name: OpenAPI route coverage (ratchet)
-        run: npm run check:openapi-coverage
+        run: pnpm run check:openapi-coverage
       - name: OpenAPI security-tier consistency (advisory)
-        run: npm run check:openapi-security-tiers
+        run: pnpm run check:openapi-security-tiers
       # One FS inventory of src/app/api for both anti-hallucination directions.
       - name: API docs refs (openapi + prose → routes)
-        run: npm run check:api-docs-refs
-      # Blocking since the 2026-09 docs re-sync: a core doc edited without `npm run i18n:run
+        run: pnpm run check:api-docs-refs
+      # Blocking since the 2026-09 docs re-sync: a core doc edited without `pnpm run i18n:run
       # --files=<doc>` (or `--adopt` for a mechanical edit) leaves 65 stale mirrors behind;
       # the run only retranslates the `## ` sections whose text changed, so it is cheap.
       #
@@ -539,7 +539,7 @@ jobs:
       # its 66 mirrors in the same PR. Per-PR translation serialised every doc PR behind one
       # translation backend (a 6-day quota outage froze 8 PRs; one doc took 6.6 h of retries)
       # and every mirror PR collided on `.i18n-state.json`. Mirrors are refreshed in a batch
-      # `npm run i18n:run` after merge; the push run below, the nightly Release-Green and the
+      # `pnpm run i18n:run` after merge; the push run below, the nightly Release-Green and the
       # release cut keep the strict verdict, so stale mirrors still cannot ship in a release.
       - name: Base checkout for the i18n drift baseline (PR only)
         if: ${{ github.event_name == 'pull_request' }}
@@ -612,18 +612,18 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
       - run: node scripts/i18n/check-ui-keys-coverage.mjs --threshold=65
       - name: i18n ICU compilation (all UI catalogs)
-        run: npm run check:ui-icu
+        run: pnpm run check:ui-icu
       # Real-translation ratchet: a leaf copied verbatim from en.json passes key
       # parity above but is still English to the user (es shipped 55% English).
       # Blocking since PR-4 retranslated the verbatim-English backlog: the share of
       # untranslated leaves per locale may only fall (ratchet baseline in
-      # config/quality/i18n-translation-baseline.json; `npm run i18n:check-ratio:update`).
+      # config/quality/i18n-translation-baseline.json; `pnpm run i18n:check-ratio:update`).
       - name: i18n real-translation ratio
         run: node scripts/i18n/check-translation-ratio.mjs
       # #8463: a rewritten English value used to leave its 39 translations behind
@@ -676,7 +676,7 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
@@ -800,11 +800,11 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
+      - run: pnpm run check:node-runtime
       # Use the existing webpack fallback on hosted runners, matching limited Docker builders.
       # Keep the benchmarked Turbopack build on the dedicated omni-build runner.
       # Both produce the standalone artifact consumed by downstream smoke checks.
@@ -817,7 +817,7 @@ jobs:
       # runners cannot hold it and build with webpack (14 GB). Next 16.4.x regresses
       # (33 GB in the compile phase alone) - re-measure before bumping. Guarded by
       # tests/unit/ci-build-bundler-webpack.test.ts and heavy-build-queue.test.ts.
-      - run: npm run build
+      - run: pnpm run build
         env:
           OMNIROUTE_USE_TURBOPACK: ${{ (vars.USE_VPS_RUNNER == 'true' && vars.USE_VPS_BUILD_RUNNER == 'true' && github.event_name != 'merge_group' && github.event_name != 'pull_request') && '1' || '0' }}
       - name: Verify colocated compression worker
@@ -865,11 +865,11 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
+      - run: pnpm run check:node-runtime
       - name: Download Next.js build artifact
         uses: actions/download-artifact@v8
         with:
@@ -884,7 +884,7 @@ jobs:
           tar -xzf next-build-artifact/e2e-build.tar.gz
       # build:cli consumes the downloaded .build/next standalone artifact and assembles dist/;
       # it only rebuilds if the downloaded standalone artifact is missing.
-      - run: npm run build:cli
+      - run: pnpm run build:cli
       - name: Assert dist/server.js exists
         run: test -f dist/server.js || (echo "dist/server.js missing — build:cli did not assemble correctly" && exit 1)
       # `build:cli` monta dist/ mas NAO grava dist/BUILD_SHA — so `build:release` faz
@@ -928,14 +928,14 @@ jobs:
               "+refs/heads/$GITHUB_REF_NAME:refs/remotes/origin/$GITHUB_REF_NAME"
             echo "ref=origin/$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
           fi
-      - run: npm run check:pack-artifact
+      - run: pnpm run check:pack-artifact
         env:
           OMNIROUTE_RELEASE_REF: ${{ steps.provenance-ref.outputs.ref }}
       # WS1.2 (#7065 class): pack the real tarball, install it into a clean prefix and
       # BOOT it to a healthy /api/monitoring/health — the gate that structure checks
       # cannot provide (3 releases shipped boot-crashing tarballs with green lists).
       - name: Boot-smoke the packed tarball
-        run: npm run check:pack-boot
+        run: pnpm run check:pack-boot
 
   test-unit:
     name: Unit Tests (${{ matrix.shard }}/8)
@@ -984,11 +984,11 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
+      - run: pnpm run check:node-runtime
       # QW-d (plano mestre): fonte única — o MESMO npm script dos runs locais (adiciona o
       # setupPolyfill que o comando inline omitia; o glob canônico vive só no package.json).
       # D3 (plano mestre): a coverage é coletada NESTE mesmo run (c8/NODE_V8_COVERAGE propaga
@@ -1013,13 +1013,13 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
           rm -rf coverage-shard coverage-shard-report
-          npx c8 --merge-async \
+          pnpm exec c8 --merge-async \
             --temp-directory=coverage-shard \
             --reports-dir=coverage-shard-report \
             --reporter=json \
             --exclude=tests/** \
             --exclude=**/*.test.* \
-            npm run test:unit:ci:shard
+            pnpm run test:unit:ci:shard
       - name: Upload raw shard coverage
         if: always()
         uses: actions/upload-artifact@v7
@@ -1050,7 +1050,7 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
@@ -1063,7 +1063,7 @@ jobs:
       - name: Install Bun (non-Windows)
         if: runner.os != 'Windows'
         run: npm install -g bun
-      - run: npm run test:bun:db
+      - run: pnpm run test:bun:db
 
   test-vitest:
     name: Vitest (MCP / autoCombo / UI components)
@@ -1095,7 +1095,7 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
@@ -1103,11 +1103,11 @@ jobs:
       # wired into CI until the 2026-06-09 quality audit (Fase 6A.2).
       # WS5.2/5.3 (v3.8.49 plan): JUnit output feeds Trunk Flaky Tests (advisory upload
       # below). node:test stays OUT of the first wave (fd1-sensitive reporter stream).
-      - run: npm run test:vitest -- --reporter=default --reporter=junit --outputFile.junit=trunk-junit/vitest-mcp.xml
+      - run: pnpm run test:vitest --reporter=default --reporter=junit --outputFile.junit=trunk-junit/vitest-mcp.xml
       # vitest:ui went back to 870/870 green in the v3.8.49 quality plan (WS6.1,
       # PR #7127 — 69 fails triaged: matchMedia polyfill, node:test→vitest migration,
       # CompareTab D22 cap). Promoted to BLOCKING per the plan's post-merge step.
-      - run: npm run test:vitest:ui -- --reporter=default --reporter=junit --outputFile.junit=trunk-junit/vitest-ui.xml
+      - run: pnpm run test:vitest:ui --reporter=default --reporter=junit --outputFile.junit=trunk-junit/vitest-ui.xml
       # Trunk Flaky Tests upload — advisory (never blocks), own-origin only (fork PRs
       # have no TRUNK_TOKEN). Pinned by SHA (tag v2.1.2).
       - name: Upload test results to Trunk (advisory)
@@ -1159,7 +1159,7 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
@@ -1193,13 +1193,13 @@ jobs:
             find . -maxdepth 3 -type f | sort
             exit 1
           fi
-          # Gate aligned to the project's local coverage bar: `npm run test:coverage`
+          # Gate aligned to the project's local coverage bar: `pnpm run test:coverage`
           # gates at 60/60/60/60, so CI must match it (the previous CI floor of 40
           # silently undershot the local bar — a real drift). Real merged coverage is
           # ~79/79/82/75, so 60 is a conservative floor with headroom; the Fase-4
           # coverage ratchet (quality-baseline.json) layers "must not drop vs baseline"
           # on top of this floor.
-          npx c8 report \
+          pnpm exec c8 report \
             --temp-directory coverage-shards \
             --reports-dir coverage \
             --merge-async \
@@ -1422,19 +1422,19 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
+      - run: pnpm run check:node-runtime
       - name: Cache Playwright browsers
         if: github.event_name == 'pull_request'
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: playwright-chromium-${{ runner.os }}-
-      - run: npx playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps chromium
       - name: Download Next.js build artifact
         uses: actions/download-artifact@v8
         with:
@@ -1461,10 +1461,10 @@ jobs:
             echo "[e2e-balance] shard $SHARD runs:"; echo "$FILES"
             # FILES is our own newline-separated path list, so word-splitting is intended
             # shellcheck disable=SC2086,SC2046
-            npx playwright test $(echo "$FILES" | tr '\n' ' ') --reporter=line,junit
+            pnpm exec playwright test $(echo "$FILES" | tr '\n' ' ') --reporter=line,junit
           else
             echo "[e2e-balance] balancer unavailable — plain --shard fallback"
-            npx playwright test tests/e2e/*.spec.ts --shard="$SHARD"/9 --reporter=line,junit
+            pnpm exec playwright test tests/e2e/*.spec.ts --shard="$SHARD"/9 --reporter=line,junit
           fi
       # WS5.2/5.3: Trunk Flaky Tests upload — advisory, own-origin only, SHA-pinned.
       - name: Upload test results to Trunk (advisory)
@@ -1504,15 +1504,15 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
+      - run: pnpm run check:node-runtime
       - name: Integration tests (shard ${{ matrix.shard }}/2)
         env:
           TEST_SHARD: ${{ matrix.shard }}/2
-        run: npm run test:integration:ci
+        run: pnpm run test:integration:ci
 
   test-security:
     name: Security Tests
@@ -1532,12 +1532,12 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
-      - run: npm run test:security
+      - run: pnpm run check:node-runtime
+      - run: pnpm run test:security
 
   # Live-server E2E. Both suites boot a real OmniRoute via their own runner and
   # drive it over HTTP; neither needs provider credentials. They were documented in
@@ -1566,12 +1566,12 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
-      - run: npm run test:ecosystem
+      - run: pnpm run check:node-runtime
+      - run: pnpm run test:ecosystem
 
   test-protocols-e2e:
     name: Protocol Clients E2E (live server, advisory)
@@ -1601,12 +1601,12 @@ jobs:
         with:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/npm-ci-retry
+      - uses: ./.github/actions/pnpm-install-retry
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - run: npm run check:node-runtime
-      - run: npm run test:protocols:e2e
+      - run: pnpm run check:node-runtime
+      - run: pnpm run test:protocols:e2e
 
   admission-verdict:
     # A queue-draft edit run must not leave a check named "Gate / CI" on the draft: Mergify

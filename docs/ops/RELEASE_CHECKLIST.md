@@ -274,7 +274,7 @@ Deploy skills use the light rsync flow — no `npm pack`, no `npm i -g`:
   - `/deploy-vps-akamai-cc` — Akamai VPS (69.164.221.35)
   - `/deploy-vps-both-cc` — both
 - [ ] Before deploying, confirm `dist/BUILD_SHA` == `git rev-parse --short HEAD`
-- [ ] Build must run where `node_modules` is real (main checkout or `npm ci`'d worktree — NOT a symlinked worktree)
+- [ ] Build must run where `node_modules` is real (main checkout or `pnpm install`ed worktree — NOT a symlinked worktree)
 - [ ] Smoke test deployed instance:
   - Open `/dashboard/health` → check version string matches release
   - Run a `/v1/chat/completions` request against a known provider
@@ -414,8 +414,8 @@ node scripts/release/dry-run-lts-cut.mjs --execute --rollback --remote rehearsal
 ```
 
 The develop bump commit is built with git plumbing (no working tree is touched) and bumps
-the same four files as a cycle-open commit: `package.json`, `open-sse/package.json`,
-`package-lock.json` and `docs/openapi.yaml`. The `[4.0.0]`
+the same files as a cycle-open commit: `package.json`, `open-sse/package.json` and the
+two `openapi.yaml` copies (`pnpm-lock.yaml` records no workspace versions). The `[4.0.0]`
 CHANGELOG section and its i18n mirrors are opened on `develop` afterwards, before its first
 PR. The script never changes npm dist-tags — rehearse those on a scratch package.
 
@@ -432,8 +432,8 @@ gh attestation verify omniroute-*.tgz --repo diegosouzapw/OmniRoute
 npm install -g ./omniroute-*.tgz                          # preview install
 ```
 
-The run does `npm ci`, `npm run build:release`, `npm run check:pack-artifact`, packs the
-tarball, runs `npm run check:pack-boot` (fake secrets, ephemeral data dir), re-packs and
+The run does `pnpm install --frozen-lockfile`, `pnpm run build:release`, `pnpm run check:pack-artifact`, packs the
+tarball, runs `pnpm run check:pack-boot` (fake secrets, ephemeral data dir), re-packs and
 fails unless the digest is identical, then records `artifact-identity.json` (head SHA, base
 SHA, lockfile hash, platform, arch, node ABI, bundler, build policy —
 `scripts/release/artifact-identity.mjs`) and attests the tarball in a separate job. Promoting

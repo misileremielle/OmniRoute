@@ -74,7 +74,7 @@ function coverage() {
 }
 
 // 3) Coverage per critical module (Task 7.9)
-// Reads coverage/coverage-summary.json (produced by `npm run test:coverage` via c8).
+// Reads coverage/coverage-summary.json (produced by `pnpm run test:coverage` via c8).
 // If the file is absent → silently skips (no error). This allows the gate to
 // function normally in environments where coverage was not run (e.g. lint-only CI).
 //

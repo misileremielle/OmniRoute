@@ -27,7 +27,7 @@
  *   node scripts/check/check-install-upgrade.mjs [--from <version>] [--skip-upgrade]
  *
  * `--from` pins the previous version (default: the current `latest` dist-tag on npm).
- * Requires `npm run build:cli` first — this is a --with-build gate, like check:pack-boot.
+ * Requires `pnpm run build:cli` first — this is a --with-build gate, like check:pack-boot.
  */
 
 import { execFileSync, spawn, spawnSync } from "node:child_process";
@@ -350,7 +350,7 @@ async function main() {
   const skipUpgrade = args.includes("--skip-upgrade");
 
   if (!fs.existsSync(path.join(ROOT, "dist", "server.js"))) {
-    console.error("[install-upgrade] dist/server.js missing — run `npm run build:cli` first");
+    console.error("[install-upgrade] dist/server.js missing — run `pnpm run build:cli` first");
     process.exit(2);
   }
   const version = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;

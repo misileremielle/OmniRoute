@@ -19,10 +19,10 @@
 #              node:test files CHANGED by the boarded PRs + vitest, instead of the
 #              full unit suite. For intra-day mega-train drains. The FULL suite must
 #              still run at least once per day on the accumulated tip (one train
-#              without --fast, or `npm run test:unit:full` on the tip) — fast evidence
+#              without --fast, or `pnpm run test:unit:full` on the tip) — fast evidence
 #              lines say so explicitly.
 #
-# Speed note (2026-07-18): full mode runs `npm run test:unit:full` (box-tuned,
+# Speed note (2026-07-18): full mode runs `pnpm run test:unit:full` (box-tuned,
 # --test-concurrency=20). The previous two SEQUENTIAL `test:unit:ci:shard` runs
 # (--test-concurrency=4 each, sized for 4-core GH runners) drove the dominant phase
 # at ~25% of a 16-core devbox (~2.5h suite → ~30-40min).
@@ -65,7 +65,7 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 # gate list, then bind that exact ref only for the changelog check.
 printf -v CHANGELOG_BASE_REF_Q '%q' "origin/${BASE}"
 STATIC_GATES=(
-  "npm run typecheck:core"
+  "pnpm run typecheck:core"
   "node scripts/check/check-file-size.mjs"
   "node scripts/check/check-complexity.mjs"
   "node scripts/check/check-cognitive-complexity.mjs"
@@ -74,12 +74,12 @@ STATIC_GATES=(
   # without mirrors slipped into the release tip three times in 48 h despite the PR CI —
   # each combined tree must carry every en key in all 65 catalogs (UI + CLI), keep the
   # real-translation ratio, and bring the mirrors of every doc it edits (section-level:
-  # `npm run i18n:run -- --files=<doc>`; UI keys: `npm run i18n:translate-new-keys`).
-  "npm run i18n:check-keys"
-  "npm run i18n:check-keys:cli"
-  "npm run i18n:check-ratio"
+  # `pnpm run i18n:run -- --files=<doc>`; UI keys: `pnpm run i18n:translate-new-keys`).
+  "pnpm run i18n:check-keys"
+  "pnpm run i18n:check-keys:cli"
+  "pnpm run i18n:check-ratio"
   # Docs mirrors are advisory on the train since 2026-10-28 (same policy as the PR CI step in
-  # ci.yml): a doc PR boards without its 66 mirrors and the post-merge `npm run i18n:run`
+  # ci.yml): a doc PR boards without its 66 mirrors and the post-merge `pnpm run i18n:run`
   # batch refreshes them. `--warn` still prints every drifted source in the train log; the
   # release push run, the nightly Release-Green and the release cut keep the strict verdict.
   "node scripts/i18n/check-translation-drift.mjs --warn"
@@ -89,30 +89,30 @@ STATIC_GATES=(
   # only the combined tree failed. The migration one alone cost a 226-test red (two
   # boarded PRs both claiming version 181). Kept under ~1 min total on the devbox;
   # anything slower lives in FULL_ONLY_GATES.
-  "npm run check:migration-numbering"   # ~3s  — two boarded PRs claiming one version
-  "npm run check:env-doc-sync"          # ~4s  — process.env added without .env.example
-  "npm run check:route-validation:t06"  # ~4s  — new route without Zod validation
-  "npm run check:db-rules"              # ~5s  — raw SQL outside src/lib/db
-  "npm run check:vitest-exclusions"     # ~2s  — stale vitest exclusion entries
-  "npm run check:tracked-artifacts"     # ~3s  — a boarded PR tracking a root _* path
+  "pnpm run check:migration-numbering"   # ~3s  — two boarded PRs claiming one version
+  "pnpm run check:env-doc-sync"          # ~4s  — process.env added without .env.example
+  "pnpm run check:route-validation:t06"  # ~4s  — new route without Zod validation
+  "pnpm run check:db-rules"              # ~5s  — raw SQL outside src/lib/db
+  "pnpm run check:vitest-exclusions"     # ~2s  — stale vitest exclusion entries
+  "pnpm run check:tracked-artifacts"     # ~3s  — a boarded PR tracking a root _* path
   # The BLOCKING cycles gate is the ratchet (AGENTS.md); bare `check:cycles` is advisory
   # (lists the SCCs, exits non-zero on a healthy base) and must never gate the train.
-  "npm run check:cycles:ratchet"        # ~2s  — an import cycle only the merged tree closes
-  "npm run check:provider-consistency"  # ~2s  — registry/catalog drift across PRs
-  "npm run check:error-helper"          # ~17s — raw err.message reaching a response body
-  "npm run check:known-symbols"         # ~27s — a symbol one PR removes and another still uses
+  "pnpm run check:cycles:ratchet"        # ~2s  — an import cycle only the merged tree closes
+  "pnpm run check:provider-consistency"  # ~2s  — registry/catalog drift across PRs
+  "pnpm run check:error-helper"          # ~17s — raw err.message reaching a response body
+  "pnpm run check:known-symbols"         # ~27s — a symbol one PR removes and another still uses
 )
 # Same class, but minutes each — FULL mode only, so an intra-day `--fast` train stays
 # fast. The daily FULL run (see the header) is where these earn their keep.
 FULL_ONLY_GATES=(
-  "npm run check:route-guard-membership"  # ~46s  — new local-only route left unclassified
-  "npm run check:docs-counts"             # ~164s — README/AGENTS/llm.txt counts vs code
-  "npm run check:dashboard-typecheck"     # minutes — TS errors under the dashboard tsconfig
+  "pnpm run check:route-guard-membership"  # ~46s  — new local-only route left unclassified
+  "pnpm run check:docs-counts"             # ~164s — README/AGENTS/llm.txt counts vs code
+  "pnpm run check:dashboard-typecheck"     # minutes — TS errors under the dashboard tsconfig
 )
 # Full mode: the box-speed runner (same coverage as the two CI shards combined —
 # main + dashboard + serial groups — at local concurrency instead of runner-sized).
-UNIT_FULL="npm run test:unit:full"
-VITEST="npm run test:vitest"
+UNIT_FULL="pnpm run test:unit:full"
+VITEST="pnpm run test:vitest"
 
 if [ "$PLAN" = "1" ]; then
   MODE="full"
@@ -163,7 +163,7 @@ fi
 preflight_env() {
   local nm="$ROOT/node_modules" bad=0
   if [ ! -x "$nm/.bin/tsc" ]; then
-    echo "[merge-train] ✗ PREFLIGHT: ${nm}/.bin/tsc is missing or not executable — partial/corrupted install. Fix: (cd ${ROOT} && npm ci)" >&2
+    echo "[merge-train] ✗ PREFLIGHT: ${nm}/.bin/tsc is missing or not executable — partial/corrupted install. Fix: (cd ${ROOT} && pnpm install --frozen-lockfile)" >&2
     bad=1
   fi
   if [ -e "$nm/node_modules" ]; then
@@ -171,7 +171,7 @@ preflight_env() {
     bad=1
   fi
   if ! "$nm/.bin/bun" --version >/dev/null 2>&1; then
-    echo "[merge-train] ✗ PREFLIGHT: ${nm}/.bin/bun does not run — npm ci blocks the bun postinstall. Fix: (cd ${nm}/bun && node install.js)" >&2
+    echo "[merge-train] ✗ PREFLIGHT: ${nm}/.bin/bun does not run — its postinstall did not complete. Fix: (cd ${nm}/bun && node install.js)" >&2
     bad=1
   fi
   [ "$bad" = "0" ] || exit 1
@@ -233,7 +233,7 @@ echo "[merge-train] running parity suite (log: ${LOG})…"
 # typecheck errors). merge-gates.md §3 says to reproduce a failure on
 # `origin/<base>` before calling it inherited; this does exactly that, automatically.
 #
-# Only the `npm run check:*` static gates are discriminated. The unit/vitest gates
+# Only the `pnpm run check:*` static gates are discriminated. The unit/vitest gates
 # run files the boarded PRs added, which do not exist on the base at all, so a red
 # there means "file not found", not "inherited" — those still abort and the
 # operator bisects as before.

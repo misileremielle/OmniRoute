@@ -21,8 +21,8 @@
  *   node scripts/i18n/check-key-completeness.mjs               # blocking (dashboard catalogs)
  *   node scripts/i18n/check-key-completeness.mjs --warn        # report only, exit 0
  *   node scripts/i18n/check-key-completeness.mjs --catalog=cli # same gate over bin/cli/locales
- *   npm run i18n:check-keys
- *   npm run i18n:check-keys:cli
+ *   pnpm run i18n:check-keys
+ *   pnpm run i18n:check-keys:cli
  */
 
 import { promises as fs } from "node:fs";

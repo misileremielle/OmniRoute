@@ -2,7 +2,7 @@
 /**
  * OmniRoute — add one locale to every surface with a single command.
  *
- *   npm run i18n:add-locale -- --code=el --english=Greek --native=Ελληνικά --flag=🇬🇷 \
+ *   pnpm run i18n:add-locale --code=el --english=Greek --native=Ελληνικά --flag=🇬🇷 \
  *     [--aliases=el-gr] [--flag-file=gr.svg] [--rtl] [--docs=core|all | --files=<csv>] [--cli-full] \
  *     [--force-cli] [--site-dir=../omnirouteSite] [--batch-size=40] [--only=<phase,…>] \
  *     [--skip=<phase,…>] [--dry-run]
@@ -870,7 +870,7 @@ async function main() {
     `${dryTag(ctx)}done: ${o.code} (${entry.english ?? entry.name}) — total locales now ${total}`
   );
   log(
-    "next: node --import tsx/esm --test tests/unit/i18n-locale-surfaces-parity.test.ts && npm run i18n:check-ui-coverage && npm run check:docs-all"
+    "next: node --import tsx/esm --test tests/unit/i18n-locale-surfaces-parity.test.ts && pnpm run i18n:check-ui-coverage && pnpm run check:docs-all"
   );
 }
 

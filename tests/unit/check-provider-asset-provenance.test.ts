@@ -565,6 +565,6 @@ test("repository provider asset manifest covers the audited 144-file snapshot", 
 test("provider asset provenance gate stays on blocking CI rail", () => {
   const ci = readFileSync(join(REPO_ROOT, ".github/workflows/ci.yml"), "utf8");
   const ciLintJob = workflowJob(ci, "lint");
-  assert.match(ciLintJob, /^\s*- run: npm run check:provider-asset-provenance\s*$/m);
+  assert.match(ciLintJob, /^\s*- run: pnpm run check:provider-asset-provenance\s*$/m);
   assert.match(ciLintJob, /fetch-depth: 0/);
 });

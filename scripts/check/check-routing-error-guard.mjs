@@ -3,7 +3,7 @@
 // Gate: swallowed `catch` blocks and fire-and-forget `void (async ...)` on routing
 // paths (open-sse/services/combo.ts + open-sse/services/combo/).
 //
-// Run with `npm run check:routing-error-guard`. It is NOT wired into CI; run it when
+// Run with `pnpm run check:routing-error-guard`. It is NOT wired into CI; run it when
 // touching routing error handling.
 //
 // Rule A (swallowed-catch): a `catch` block with no `throw` and no inline

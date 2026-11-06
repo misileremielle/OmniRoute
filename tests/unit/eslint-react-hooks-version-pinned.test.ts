@@ -10,6 +10,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+// @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
+import { importerDependency, readPnpmLock } from "../../scripts/ci/pnpmLock.mjs";
 
 const ROOT = new URL("../../", import.meta.url);
 const PLUGIN = "eslint-plugin-react-hooks";
@@ -21,10 +23,8 @@ async function readJson(relative: string): Promise<Record<string, unknown>> {
 
 test("eslint-plugin-react-hooks is directly pinned to the locked version", async () => {
   const pkg = await readJson("package.json");
-  const lock = await readJson("package-lock.json");
   const declared = ((pkg.devDependencies ?? {}) as Record<string, string>)[PLUGIN];
-  const packages = (lock.packages ?? {}) as Record<string, { version?: string }>;
-  const locked = packages[`node_modules/${PLUGIN}`]?.version;
+  const locked = importerDependency(readPnpmLock(), PLUGIN)?.version;
 
   assert.ok(declared, `${PLUGIN} must be a direct devDependency`);
   assert.equal(
@@ -32,10 +32,10 @@ test("eslint-plugin-react-hooks is directly pinned to the locked version", async
     EXPECTED_VERSION,
     `${PLUGIN} must remain pinned to ${EXPECTED_VERSION} so a group bump can never ride past the compiler-rules migration review`
   );
-  assert.ok(locked, `${PLUGIN} missing from package-lock.json`);
+  assert.ok(locked, `${PLUGIN} missing from pnpm-lock.yaml`);
   assert.equal(
     declared,
     locked,
-    `package.json declares ${PLUGIN}@${declared} but package-lock.json resolves ${locked}`
+    `package.json declares ${PLUGIN}@${declared} but pnpm-lock.yaml resolves ${locked}`
   );
 });

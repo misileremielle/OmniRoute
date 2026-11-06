@@ -1,5 +1,5 @@
 /**
- * .github/actions/npm-ci-retry — node_modules cache contract (#8084 D3, plan 3.8.51 task 5).
+ * .github/actions/pnpm-install-retry — node_modules cache contract (#8084 D3, plan 3.8.51 task 5).
  *
  * Every CI job installs through this composite (36× per ci.yml run, ~80-90 s each with only
  * the npm tarball cache). The node_modules cache must (a) key on everything that shapes the
@@ -14,7 +14,7 @@ import { parse } from "yaml";
 
 const ACTION = path.resolve(
   import.meta.dirname,
-  "../../../.github/actions/npm-ci-retry/action.yml"
+  "../../../.github/actions/pnpm-install-retry/action.yml"
 );
 const raw = fs.readFileSync(ACTION, "utf8");
 const action = parse(raw) as {
@@ -35,8 +35,8 @@ test("composite restores node_modules via actions/cache with an exact, fully-qua
     "runner.os",
     "runner.arch",
     "steps.node.outputs.version",
-    "package-lock.json",
-    ".npmrc",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
   ]) {
     assert.ok(w.key.includes(input), `cache key must include ${input}`);
   }
@@ -58,16 +58,16 @@ test("composite restores node_modules via actions/cache with an exact, fully-qua
   assert.equal(
     w["restore-keys"],
     undefined,
-    "no restore-keys: exact key or a full npm ci (#11600)"
+    "no restore-keys: exact key or a full pnpm install (#11600)"
   );
 });
 
-test("npm ci is the cache-miss path and still retries", () => {
-  const install = action.runs.steps.find((s) => String(s.name).startsWith("npm ci"));
+test("pnpm install is the cache-miss path and still retries", () => {
+  const install = action.runs.steps.find((s) => String(s.name).startsWith("pnpm install"));
   assert.ok(install);
   assert.equal(install!.if, "steps.node-modules.outputs.cache-hit != 'true'");
   assert.match(String(install!.run), /max_attempts=3/);
-  assert.match(String(install!.run), /npm ci --no-audit --no-fund/);
+  assert.match(String(install!.run), /pnpm install --frozen-lockfile/);
 });
 
 test("cache can be disabled per caller and defaults on", () => {

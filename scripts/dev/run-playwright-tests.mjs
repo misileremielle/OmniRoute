@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 import { sanitizeColorEnv } from "../build/runtime-env.mjs";
 
 // Playwright CLI subcommands that are forwarded untouched. Anything else (a spec path, a
-// `--grep`, `--project=…`) is a `test` argument, so `npm run test:e2e -- tests/e2e/x.spec.ts`
+// `--grep`, `--project=…`) is a `test` argument, so `pnpm run test:e2e -- tests/e2e/x.spec.ts`
 // runs only that spec. The npm script used to pass `test tests/e2e/*.spec.ts` itself, which put
 // every spec ahead of the caller's filter and made the filter a no-op.
 const PASSTHROUGH_COMMANDS = new Set([

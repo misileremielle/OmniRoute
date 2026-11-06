@@ -9,18 +9,18 @@
 ## Quick Start
 
 ```bash
-npm install                    # Install deps (auto-generates .env from .env.example)
-npm run dev                    # Dev server at http://localhost:20128
-npm run build                  # Production build (Next.js 16 standalone)
-npm run build:release          # Release build
-npm run lint                   # ESLint (0 errors expected; warnings are pre-existing)
-npm run typecheck:core         # TypeScript check (should be clean)
-npm run typecheck:noimplicit:core  # Strict check (no implicit any)
-npm run test:coverage          # Unit tests + coverage gate (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60)
-npm run check                  # lint + test combined
-npm run check:cycles           # Detect circular dependencies (advisory — lists the SCCs)
-npm run check:cycles:ratchet   # Same scan, blocking above the quality-baseline ceiling
-npm run check:docs-all         # Run after changing documentation (includes fabricated-docs validation)
+pnpm install --frozen-lockfile # Install deps (auto-generates .env from .env.example)
+pnpm run dev                   # Dev server at http://localhost:20128
+pnpm run build                 # Production build (Next.js 16 standalone)
+pnpm run build:release         # Release build
+pnpm run lint                  # ESLint (0 errors expected; warnings are pre-existing)
+pnpm run typecheck:core        # TypeScript check (should be clean)
+pnpm run typecheck:noimplicit:core # Strict check (no implicit any)
+pnpm run test:coverage         # Unit tests + coverage gate (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60)
+pnpm run check                 # lint + test combined
+pnpm run check:cycles          # Detect circular dependencies (advisory — lists the SCCs)
+pnpm run check:cycles:ratchet  # Same scan, blocking above the quality-baseline ceiling
+pnpm run check:docs-all        # Run after changing documentation (includes fabricated-docs validation)
 ```
 
 Running tests: see [Testing](#testing) below (run the most focused test for changed code first).
@@ -105,7 +105,7 @@ Read the nearest `AGENTS.md` and the linked deep-dive before making a non-trivia
 **The project root MUST ONLY contain:**
 
 - Configuration files (`vitest.config.ts`, `next.config.mjs`, `eslint.config.mjs`, `tsconfig*.json`, `playwright.config.ts`, `prettier.config.mjs`, `postcss.config.mjs`, `sonar-project.properties`, `fly.toml`, `docker-compose*.yml`, `Dockerfile`)
-- Dependency files (`package.json`, `package-lock.json`)
+- Dependency files (`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`)
 - Documentation files (`README.md`, `CHANGELOG.md`, `ROADMAP.md`, `LICENSE`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `llm.txt`)
 - CI/CD files and ignore definitions (`.gitignore`, `.dockerignore`, `.npmignore`, `.npmrc`, `.node-version`, `.nvmrc`, `.env.example`)
 
@@ -129,7 +129,7 @@ When creating _any_ validation tests or one-off logic scripts, default to `scrip
 - **2 spaces**, semicolons, double quotes, 100 char width, es5 trailing commas (enforced by lint-staged via Prettier) — run Prettier on changed files
 - **Imports**: external → internal (`@/`, `@omniroute/open-sse`) → relative
 - **Naming**: files=camelCase/kebab, components=PascalCase, constants=UPPER_SNAKE
-- **ESLint**: `no-eval`, `no-implied-eval`, `no-new-func` = error everywhere; `no-explicit-any` = **error** in `open-sse/` and `tests/` (since #6218 — pre-existing violations are frozen in `config/quality/eslint-suppressions.json`, new ones must be fixed; `npm run lint` applies the suppressions and is what CI runs)
+- **ESLint**: `no-eval`, `no-implied-eval`, `no-new-func` = error everywhere; `no-explicit-any` = **error** in `open-sse/` and `tests/` (since #6218 — pre-existing violations are frozen in `config/quality/eslint-suppressions.json`, new ones must be fixed; `pnpm run lint` applies the suppressions and is what CI runs)
 - **TypeScript**: `strict: false`, target ES2022, module esnext, resolution bundler. Prefer explicit types.
 
 ### Database
@@ -170,7 +170,7 @@ Documentation must describe verified behavior, not plausible behavior.
    directory-specific count command.
 3. Copy code examples from working usage or run them. Prefer a source link such as
    `path/to/file.ts:line` to an invented signature.
-4. Run `npm run check:docs-all` for edits under `docs/`; it includes the fabricated-docs
+4. Run `pnpm run check:docs-all` for edits under `docs/`; it includes the fabricated-docs
    validation.
 
 ---
@@ -209,17 +209,17 @@ For any non-trivial change, read the matching deep-dive first:
 
 ## Testing
 
-- Unit tests — `npm run test:unit`; single file (Node native test runner — most tests) — `node --import tsx/esm --test tests/unit/your-file.test.ts`
-- Vitest (MCP server, autoCombo, cache) — `npm run test:vitest`; all suites — `npm run test:all`
-- E2E (Playwright) — `npm run test:e2e`; Protocol E2E (MCP) — `npm run test:protocols:e2e` (CI job `test-protocols-e2e`, advisory — #10049); Ecosystem — `npm run test:ecosystem` (CI job `test-ecosystem`, blocking)
-- Coverage gate — `npm run test:coverage` (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60); report — `npm run coverage:report`
+- Unit tests — `pnpm run test:unit`; single file (Node native test runner — most tests) — `node --import tsx/esm --test tests/unit/your-file.test.ts`
+- Vitest (MCP server, autoCombo, cache) — `pnpm run test:vitest`; all suites — `pnpm run test:all`
+- E2E (Playwright) — `pnpm run test:e2e`; Protocol E2E (MCP) — `pnpm run test:protocols:e2e` (CI job `test-protocols-e2e`, advisory — #10049); Ecosystem — `pnpm run test:ecosystem` (CI job `test-ecosystem`, blocking)
+- Coverage gate — `pnpm run test:coverage` (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60); report — `pnpm run coverage:report`
 - Full test matrix: `CONTRIBUTING.md` → "Running Tests"
 
 **PR rule**: If you change production code in `src/`, `open-sse/`, `electron/`, or `bin/`, you must include or update tests in the same PR.
 
 **Test layer preference**: unit first → integration (multi-module or DB state) → e2e (UI/workflow only). Encode bug reproductions as automated tests before or alongside the fix.
 
-**Both test runners must pass**: `npm run test:unit` and `npm run test:vitest` cover **non-overlapping files**; both are CI jobs (`test-unit`, `test-vitest`) and must be green before merging — one green suite may silently ship broken MCP tools or routing regressions.
+**Both test runners must pass**: `pnpm run test:unit` and `pnpm run test:vitest` cover **non-overlapping files**; both are CI jobs (`test-unit`, `test-vitest`) and must be green before merging — one green suite may silently ship broken MCP tools or routing regressions.
 
 **Bug fix / issue triage protocol (Hard Rule #18)**: failing-then-passing test (TDD, preferred) OR a documented live test on the production VPS (`root@192.168.0.15`) recorded in the PR; touch only what the failing test proves broken. Decision tree: `docs/ops/HARD_RULES_DETAIL.md` → Rule 18.
 
@@ -277,7 +277,7 @@ git push -u origin feat/your-feature
 
 - **pre-commit**: lint-staged + `check-docs-sync` + `check:any-budget:t11` + `check:tracked-artifacts`
 - **commit-msg**: `check:ai-attribution` — rejects AI/bot `Co-Authored-By` trailers and AI-generation footers in the message (Hard Rule #16; human co-authors allowed; also in the `quality.yml` fast-gates loop (PR→`release/**`) and a PR-only `ci.yml` lint step (PR→`main`) — #14436)
-- **pre-push**: intentionally light (PATH/npm sanity only) — `any-budget` + `tracked-artifacts` already run on pre-commit and CI still enforces both; re-running them per push was pure double-pay (was Fase 6A.12 full pre-push gate; folded into pre-commit in #6716).
+- **pre-push**: intentionally light (PATH/pnpm sanity only) — `any-budget` + `tracked-artifacts` already run on pre-commit and CI still enforces both; re-running them per push was pure double-pay (was Fase 6A.12 full pre-push gate; folded into pre-commit in #6716).
 
 ### Worktree isolation (MANDATORY for every development task)
 
@@ -330,7 +330,8 @@ This checkout is the canonical `cheaper-inference/OmniRoute` repository (formerl
 ## Environment
 
 - **Runtime**: Node.js ≥22.22.2 <23 || ≥24.0.0 <27, ES Modules — the **only supported** runtime for the published `omniroute` CLI, the server, and the test suites (`node:test` + vitest); `engines.node` is authoritative and end users never need Bun. A **best-effort `bun:sqlite` compatibility path** exists so a global Bun install (`bun install -g omniroute`) can start without `better-sqlite3` (driver adapter + Bun-aware process spawning); it is **not** a supported runtime — no support guarantees — and every Bun-specific runtime change MUST preserve the Node driver/fallback chain and ship a Bun test (`test:bun:db`) or an explicit reason why the path is Node-only.
-- **Bun (build/dev script runner + compatibility smoke only)**: Bun `1.4.2` is pinned as an **exact devDependency** (provisioned through the existing `npm ci` via the lockfile's `@oven/bun-*` platform binaries — no `setup-bun`/ad-hoc install). It executes **only** an allow-listed set of TypeScript gate/generator scripts (replacing `node --import tsx` for startup speed): the CI checks `check:provider-consistency`, `check:compression-budget`, `check:known-symbols`; the non-CI `gen:provider-reference`, `bench:compression`; plus the `test:bun:db` compatibility smoke suite. **Do NOT widen Bun to `npm install`, the build (`build:cli*`), `check:pack-artifact`, the supported published runtime, or the main test runners** — those stay on Node. Any new Bun-invoking script must be validated byte-identical against its `node --import tsx` output first. Bun failing (`bun: not found`, or the skipped-`postinstall` placeholder binary): `docs/ops/BUILD_WARNINGS.md` → "Bun script-runner failures".
+- **Package manager (checkout)**: pnpm, pinned in `config/ci/toolchain.json` and `packageManager`; `pnpm-lock.yaml` is the lockfile (there is no `package-lock.json`). `pnpm-workspace.yaml` holds the workspaces, `allowBuilds` (only listed packages run install scripts; `onnxruntime-node` is denied), the dependency `overrides` (mirrored in `package.json` for `Dockerfile.bun` — `tests/unit/build/pnpm-overrides-sync.test.ts` keeps them equal) and `nodeLinker: hoisted`. Keep `hoisted`: with pnpm's isolated layout `scripts/build/assembleStandalone.mjs` produces a standalone bundle that loses `better-sqlite3` (silent `node:sqlite` fallback) and keeps absolute symlinks once moved. A test that imports an undeclared package can still pass under `hoisted` — declare every package a test or script imports. End users still install the published package with `npm install -g omniroute`.
+- **Bun (build/dev script runner + compatibility smoke only)**: Bun `1.4.2` is pinned as an **exact devDependency** (provisioned through the existing `pnpm install` via the lockfile's `@oven/bun-*` platform binaries — no `setup-bun`/ad-hoc install). It executes **only** an allow-listed set of TypeScript gate/generator scripts (replacing `node --import tsx` for startup speed): the CI checks `check:provider-consistency`, `check:compression-budget`, `check:known-symbols`; the non-CI `gen:provider-reference`, `bench:compression`; plus the `test:bun:db` compatibility smoke suite. **Do NOT widen Bun to dependency installation (`pnpm install`), the build (`build:cli*`), `check:pack-artifact`, the supported published runtime, or the main test runners** — those stay on Node. Any new Bun-invoking script must be validated byte-identical against its `node --import tsx` output first. Bun failing (`bun: not found`, or the skipped-`postinstall` placeholder binary): `docs/ops/BUILD_WARNINGS.md` → "Bun script-runner failures".
 - **TypeScript**: 6.0+, target ES2022, module esnext, resolution bundler
 - **Path aliases**: `@/*` → `src/`, `@omniroute/open-sse` → `open-sse/`, `@omniroute/open-sse/*` → `open-sse/*`
 - **Default port**: 20128 (API + dashboard on same port)
@@ -350,8 +351,8 @@ OmniRoute has **~90 quality-gate scripts** (`scripts/check/` + `scripts/quality/
   fix the violation or add an allowlist entry with a justification comment + tracking issue.
 - Gates in job `quality-gate`: ratchet — metrics (ESLint warnings, code coverage, duplication,
   complexity) must not regress vs `quality-baseline.json`. Update via
-  `npm run quality:ratchet -- --update` when a metric genuinely improves.
-- Job `test-vitest` runs `npm run test:vitest` (MCP tools, autoCombo, cache) — blocking.
+  `pnpm run quality:ratchet --update` when a metric genuinely improves.
+- Job `test-vitest` runs `pnpm run test:vitest` (MCP tools, autoCombo, cache) — blocking.
   `test:vitest:ui` has been blocking since PR #7127.
 - **Velocity phase (2026-08-30 → v4.0)**: every numeric baseline is loosened by 20% and `--require-tighten` is advisory (`quality-baseline.json` → `_policy`); the nightly `baseline-headroom` job tracks how much of the budget is left in the issue "📈 Baseline headroom". See `docs/architecture/QUALITY_GATES.md` → "Velocity phase".
 
@@ -373,7 +374,7 @@ is a short form, its complete binding text, rationale and incident history are i
 6. Never silently swallow errors in SSE streams
 7. Always validate inputs with Zod schemas
 8. Always include tests when changing production code
-9. Coverage must not regress below the baseline frozen in `quality-baseline.json` (ratchet); absolute floor is 60% (statements/lines/functions/branches). Update the baseline via `npm run quality:ratchet -- --update` only when coverage genuinely improves. See `docs/architecture/QUALITY_GATES.md`.
+9. Coverage must not regress below the baseline frozen in `quality-baseline.json` (ratchet); absolute floor is 60% (statements/lines/functions/branches). Update the baseline via `pnpm run quality:ratchet --update` only when coverage genuinely improves. See `docs/architecture/QUALITY_GATES.md`.
 10. Never bypass Husky hooks (`--no-verify`, `--no-gpg-sign`) without explicit operator approval.
 11. Never embed public upstream OAuth client_id/secret or Firebase Web keys as string literals — always go through `resolvePublicCred()` (`open-sse/utils/publicCreds.ts`). See `docs/security/PUBLIC_CREDS.md`.
 12. Never return raw `err.stack` / `err.message` in HTTP / SSE / executor responses — always route through `buildErrorBody()` or `sanitizeErrorMessage()` (`open-sse/utils/error.ts`). See `docs/security/ERROR_SANITIZATION.md`.

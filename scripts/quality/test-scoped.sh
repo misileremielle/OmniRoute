@@ -2,9 +2,9 @@
 # test-scoped — run only unit tests impacted by your changes.
 #
 # Usage:
-#   npm run test:scoped              # tests for changes vs HEAD~1 (working tree if no commit)
-#   npm run test:scoped:staged       # tests for staged changes only
-#   npm run test:scoped:full         # rebuild the import-graph impact map first, then select
+#   pnpm run test:scoped              # tests for changes vs HEAD~1 (working tree if no commit)
+#   pnpm run test:scoped:staged       # tests for staged changes only
+#   pnpm run test:scoped:full         # rebuild the import-graph impact map first, then select
 #
 # This is the local DX companion to the CI TIA gate (#8084 D1). It uses the SAME
 # selector as CI (scripts/quality/select-impacted-tests.mjs) against the import-graph
@@ -17,7 +17,7 @@
 # moving files, or pulling a big base update — a stale map falls back to __RUN_ALL__
 # for unknown sources, never to a silent skip.
 #
-# Loader parity with `npm run test:unit` / CI (#6787): tests/unit/dashboard/** runs
+# Loader parity with `pnpm run test:unit` / CI (#6787): tests/unit/dashboard/** runs
 # under `--import tsx` (CJS transform — required for ESM-only deep imports such as
 # @lobehub/icons/es/*), tests/unit/serial/** at --test-concurrency=1, everything else
 # under `--import tsx/esm`. A single tsx/esm invocation false-reds every dashboard
@@ -63,8 +63,8 @@ fi
 SEL=$(printf '%s\n' "$CHANGED" | node "$REPO_ROOT/scripts/quality/select-impacted-tests.mjs" --stdin)
 
 if echo "$SEL" | grep -q "__RUN_ALL__"; then
-  echo "[test:scoped] Hub file or unmapped source changed — run the full suite: npm run test:unit:full"
-  echo "[test:scoped] (if you just added a source file, rebuild the map: npm run test:scoped:full)"
+  echo "[test:scoped] Hub file or unmapped source changed — run the full suite: pnpm run test:unit:full"
+  echo "[test:scoped] (if you just added a source file, rebuild the map: pnpm run test:scoped:full)"
   exit 1
 fi
 

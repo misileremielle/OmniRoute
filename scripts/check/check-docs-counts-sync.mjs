@@ -19,7 +19,7 @@
 // NOTE: PROVIDER_REFERENCE.md is no longer blindly trusted — a STRICT check compares
 // the doc's `Total providers` against the live provider modules (the same collections
 // the generator reads), so a hand-stale doc is a red, not a silently propagated total.
-// Fix by running `npm run gen:provider-reference`. Additional STRICT coverage added in
+// Fix by running `pnpm run gen:provider-reference`. Additional STRICT coverage added in
 // the 2026-08-12 hardening: llm.txt + package.json description (providers), migration
 // count (README/AGENTS/llm.txt), and canonical numbers inside the README SVG diagrams
 // (providers / MCP tools / routing strategies / free-tier pools).
@@ -516,7 +516,7 @@ export function makeVersionClaimValidator(expected) {
 
 /**
  * G-08 (#15159): validate a documented coverage floor against the BLOCKING
- * ratchet, not against `npm run test:coverage`.
+ * ratchet, not against `pnpm run test:coverage`.
  *
  * AGENTS.md advertised `60/60/60/60` (statements/lines/functions/branches).
  * That number is accurate in isolation — it is what test:coverage hardcodes —
@@ -648,7 +648,7 @@ export function makeProviderReferenceValidator(expected) {
       ok: false,
       detail:
         `doc total ${total} is stale — the live provider modules define ${expected} ` +
-        `(run npm run gen:provider-reference)`,
+        `(run pnpm run gen:provider-reference)`,
     };
   };
 }
@@ -1172,7 +1172,7 @@ function main() {
     console.error(
       `✗ ${strict} STRICT drift(s) detected. ` +
         `Update the docs above to the real counts, or regenerate auto-generated sources ` +
-        `(npm run gen:provider-reference).`
+        `(pnpm run gen:provider-reference).`
     );
     process.exit(1);
   }

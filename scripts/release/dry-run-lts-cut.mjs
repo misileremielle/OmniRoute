@@ -28,8 +28,8 @@
  * Every external command goes through execFile with an argv array — no shell.
  *
  * Usage:
- *   npm run release:dry-run-lts-cut
- *   npm run release:dry-run-lts-cut -- --target-version 3.8.58 --previous-tag v3.8.57 \
+ *   pnpm run release:dry-run-lts-cut
+ *   pnpm run release:dry-run-lts-cut --target-version 3.8.58 --previous-tag v3.8.57 \
  *     --advisory freeze,base-green          # 3.8.58 rehearsal on the current tip
  *   node scripts/release/dry-run-lts-cut.mjs --execute --remote rehearsal
  *   node scripts/release/dry-run-lts-cut.mjs --execute --rollback --remote rehearsal
@@ -72,7 +72,6 @@ const PRECONDITION_IDS = [
 const BUMP_FILES = Object.freeze([
   "package.json",
   "open-sse/package.json",
-  "package-lock.json",
   "docs/openapi.yaml",
   "public/openapi.yaml",
 ]);
@@ -366,25 +365,6 @@ export function bumpManifest(text, version) {
   return out;
 }
 
-/** Bump the lockfile root, packages[""] and the open-sse workspace entry. */
-export function bumpLockfile(text, version) {
-  let out = text.replace(/^( {2}"version":\s*")[^"]*(")/m, `$1${version}$2`);
-  out = out.replace(/^( {4}"": \{\n(?: {6}.*\n)*? {6}"version":\s*")[^"]*(")/m, `$1${version}$2`);
-  out = out.replace(
-    /^( {4}"open-sse": \{\n {6}"name": "@omniroute\/open-sse",\n {6}"version":\s*")[^"]*(")/m,
-    `$1${version}$2`
-  );
-  const lock = JSON.parse(out);
-  if (
-    lock.version !== version ||
-    lock.packages?.[""]?.version !== version ||
-    lock.packages?.["open-sse"]?.version !== version
-  ) {
-    throw new Error('lockfile bump did not land on root, packages[""] and open-sse');
-  }
-  return out;
-}
-
 /** Bump `info.version` of the OpenAPI document. */
 export function bumpOpenApi(text, version) {
   const re = /^(info:\n(?:[ ].*\n)*? {2}version: )([^\n]+)/m;
@@ -395,7 +375,6 @@ export function bumpOpenApi(text, version) {
 const BUMPERS = Object.freeze({
   "package.json": bumpManifest,
   "open-sse/package.json": bumpManifest,
-  "package-lock.json": bumpLockfile,
   "docs/openapi.yaml": bumpOpenApi,
   "public/openapi.yaml": bumpOpenApi,
 });

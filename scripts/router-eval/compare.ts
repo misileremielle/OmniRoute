@@ -37,7 +37,7 @@ function getArgValue(name: string): string | undefined {
 function usage(): string {
   return [
     "Usage:",
-    "  npm run eval:router:compare -- --baseline <baseline.ndjson> --candidate <candidate.ndjson>",
+    "  pnpm run eval:router:compare --baseline <baseline.ndjson> --candidate <candidate.ndjson>",
     "       [--baseline-name <name>] [--candidate-name <name>] [--artifact-dir <dir>]",
     "       [--run-id <id>] [--max-aiq-drop <n>] [--max-cost-increase <n>] [--fail-on-regression]",
     "",

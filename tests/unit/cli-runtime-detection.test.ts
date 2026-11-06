@@ -3,11 +3,19 @@
  * npm prefix deduplication, and env var overrides.
  */
 
-import { describe, it, before, after } from "node:test";
+import { describe, it, before, after, mock } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import fsPromises from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+
+// Detection merges in the login shell's PATH, computed once per process ($SHELL -ilc).
+// Under `pnpm run` on Linux that PATH still holds node_modules/.bin, which carries the `cn`
+// binary of the unrelated `cn` package (a fumadocs-ui dependency), so the "cn is absent"
+// test saw Continue as installed in CI. These tests set PATH themselves; keep the runner's
+// login shell out by pointing SHELL at a shell that does not exist, before the first lookup.
+process.env.SHELL = path.join(os.tmpdir(), "omniroute-test-no-login-shell");
 
 const { getCliRuntimeStatus, getKnownToolPaths, normalizeCliToolId, CLI_TOOL_IDS } =
   await import("../../src/shared/services/cliRuntime.ts");
@@ -244,22 +252,45 @@ describe("Unknown tool", () => {
 
 describe("Continue CLI detection", () => {
   it("should not report Continue as installed when the cn binary is absent", async () => {
-    const previousPath = process.env.PATH;
-    const previousOverride = process.env.CLI_CONTINUE_BIN;
+    const saved = Object.fromEntries(
+      ["PATH", "CLI_CONTINUE_BIN", "HOME", "USERPROFILE", "CLI_CONFIG_HOME"].map((k) => [
+        k,
+        process.env[k],
+      ])
+    );
+    // A ~/.continue/config.yaml in the real home makes detection report "settings found,
+    // binary unresolved" (installed: true), so the test runs against an empty home of its own.
+    const emptyHome = createTempDir();
     process.env.PATH = "";
+    process.env.HOME = emptyHome;
+    process.env.USERPROFILE = emptyHome;
     delete process.env.CLI_CONTINUE_BIN;
+    delete process.env.CLI_CONFIG_HOME;
+    // Known paths also include machine-wide dirs (Node's bin dir, the npm prefix,
+    // /usr/local/bin) that the test cannot redirect, so `cn` is made absent from them too.
+    const realRealpath = fsPromises.realpath;
+    const realpathMock = mock.method(fsPromises, "realpath", (target: fs.PathLike, ...rest: []) => {
+      if (/^cn(\.cmd)?$/.test(path.basename(String(target)))) {
+        return Promise.reject(Object.assign(new Error("ENOENT (test)"), { code: "ENOENT" }));
+      }
+      return realRealpath(target, ...rest);
+    });
 
     try {
       const result = await getCliRuntimeStatus("continue");
-      assert.equal(result.installed, false);
-      assert.equal(result.runnable, false);
-      assert.equal(result.reason, "not_found");
-      assert.equal(result.requiresBinary, true);
+      // On failure, say what was detected and where, so a host-specific hit is diagnosable.
+      const seen = JSON.stringify({ result, home: os.homedir(), path: process.env.PATH });
+      assert.equal(result.installed, false, seen);
+      assert.equal(result.runnable, false, seen);
+      assert.equal(result.reason, "not_found", seen);
+      assert.equal(result.requiresBinary, true, seen);
     } finally {
-      if (previousPath === undefined) delete process.env.PATH;
-      else process.env.PATH = previousPath;
-      if (previousOverride === undefined) delete process.env.CLI_CONTINUE_BIN;
-      else process.env.CLI_CONTINUE_BIN = previousOverride;
+      realpathMock.mock.restore();
+      for (const [key, value] of Object.entries(saved)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+      fs.rmSync(emptyHome, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     }
   });
 

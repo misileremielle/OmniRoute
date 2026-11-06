@@ -89,7 +89,7 @@ for (const [key, spec] of Object.entries(baseline.metrics)) {
       status = "↑ melhorou";
       if (REQUIRE_TIGHTEN && base - current > tightenSlack) {
         tightenFailures.push(
-          `${key}: melhorou de ${base} para ${current} (delta ${(base - current).toFixed(4)} > slack ${tightenSlack}) — rode 'npm run quality:ratchet -- --update' e commite o baseline apertado neste PR`
+          `${key}: melhorou de ${base} para ${current} (delta ${(base - current).toFixed(4)} > slack ${tightenSlack}) — rode 'pnpm run quality:ratchet --update' e commite o baseline apertado neste PR`
         );
       }
     }
@@ -102,7 +102,7 @@ for (const [key, spec] of Object.entries(baseline.metrics)) {
       status = "↑ melhorou";
       if (REQUIRE_TIGHTEN && current - base > tightenSlack) {
         tightenFailures.push(
-          `${key}: melhorou de ${base} para ${current} (delta ${(current - base).toFixed(4)} > slack ${tightenSlack}) — rode 'npm run quality:ratchet -- --update' e commite o baseline apertado neste PR`
+          `${key}: melhorou de ${base} para ${current} (delta ${(current - base).toFixed(4)} > slack ${tightenSlack}) — rode 'pnpm run quality:ratchet --update' e commite o baseline apertado neste PR`
         );
       }
     }

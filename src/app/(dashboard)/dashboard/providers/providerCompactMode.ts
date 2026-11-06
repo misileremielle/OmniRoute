@@ -20,6 +20,7 @@ export interface CompactProviderEntryOptions<TProvider> {
   aggregatorProviderEntries: ProviderCategoryEntries<TProvider>;
   enterpriseProviderEntries: ProviderCategoryEntries<TProvider>;
   embeddingRerankProviderEntries: ProviderCategoryEntries<TProvider>;
+  imageProviderEntries: ProviderCategoryEntries<TProvider>;
   webCookieProviderEntries: ProviderCategoryEntries<TProvider>;
   searchProviderEntries: ProviderCategoryEntries<TProvider>;
   webFetchEntries: ProviderCategoryEntries<TProvider>;
@@ -40,6 +41,7 @@ function getCompactProviderEntryGroups<TProvider>({
   aggregatorProviderEntries,
   enterpriseProviderEntries,
   embeddingRerankProviderEntries,
+  imageProviderEntries,
   webCookieProviderEntries,
   searchProviderEntries,
   webFetchEntries,
@@ -54,6 +56,7 @@ function getCompactProviderEntryGroups<TProvider>({
     aggregatorProviderEntries,
     enterpriseProviderEntries,
     embeddingRerankProviderEntries,
+    imageProviderEntries,
   ];
 
   if (showFreeOnly) return [freeSectionEntries];
@@ -83,6 +86,7 @@ function getCompactProviderEntryGroups<TProvider>({
     localProviderEntries,
     searchProviderEntries,
     embeddingRerankProviderEntries,
+    imageProviderEntries,
     noAuthEntries,
   ];
 }

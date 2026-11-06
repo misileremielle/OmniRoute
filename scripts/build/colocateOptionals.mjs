@@ -113,9 +113,7 @@ export function computeDependencyClosure(nodeModulesDir, seeds = SEED_PACKAGES) 
 function isPackageIntact(targetNodeModulesDir, name) {
   if (!existsSync(join(targetNodeModulesDir, name))) return false;
   try {
-    const probe = createRequire(
-      join(targetNodeModulesDir, "__colocate_probe__.js")
-    );
+    const probe = createRequire(join(targetNodeModulesDir, "__colocate_probe__.js"));
     const resolved = probe.resolve(name);
     // A resolution that walked past the target into an ancestor tree does not
     // prove the target copy is usable.
@@ -174,10 +172,7 @@ export function colocateLlmlinguaOptionals({
   // Check the complete closure rather than only the entry package, and judge
   // presence by entrypoint integrity — a partially traced directory (see
   // isPackageIntact) must still receive its missing files.
-  if (
-    closure.length > 0 &&
-    closure.every((name) => isPackageIntact(targetNm, name))
-  ) {
+  if (closure.length > 0 && closure.every((name) => isPackageIntact(targetNm, name))) {
     return { skipped: true, reason: "already co-located" };
   }
 
@@ -194,6 +189,7 @@ export function colocateLlmlinguaOptionals({
       // filled in from the root tree.
       cpSync(join(rootNm, name), dest, {
         recursive: true,
+        dereference: true,
         force: false,
         errorOnExist: false,
       });

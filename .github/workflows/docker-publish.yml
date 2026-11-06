@@ -31,7 +31,7 @@ on:
         default: false
 
 # One publish per ref. A merge storm used to fan out 8 concurrent hosted builds,
-# every one OOM-killing `npm run build` inside BuildKit (#11976). The :next
+# every one OOM-killing `pnpm run build` inside BuildKit (#11976). The :next
 # channel only needs the newest SHA; cancel-in-progress is the same pattern as
 # quality.yml / nightly-release-green.
 # The nightly `schedule` run (runner-alert only) gets its own group: it runs on the

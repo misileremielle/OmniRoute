@@ -19,11 +19,11 @@
  * different engine would report a number that has nothing to do with the production runtime.
  *
  * Usage:
- *   npm run bench:heap-body                          # the #7847 incident shape
- *   npm run bench:heap-body -- --messages 800 --tools 120
- *   npm run bench:heap-body -- --concurrency 16      # simulate overlapping requests
- *   npm run bench:heap-body -- --json                # machine-readable
- *   npm run bench:heap-body -- --max-retained-mib 64 # non-zero exit if exceeded (regression gate)
+ *   pnpm run bench:heap-body                          # the #7847 incident shape
+ *   pnpm run bench:heap-body --messages 800 --tools 120
+ *   pnpm run bench:heap-body --concurrency 16      # simulate overlapping requests
+ *   pnpm run bench:heap-body --json                # machine-readable
+ *   pnpm run bench:heap-body --max-retained-mib 64 # non-zero exit if exceeded (regression gate)
  */
 import os from "node:os";
 import path from "node:path";
@@ -96,7 +96,7 @@ async function main(): Promise<void> {
     console.error(
       "[heap-bench] refusing to run without --expose-gc: retained-heap numbers would be\n" +
         "            dominated by uncollected garbage and are not comparable across runs.\n" +
-        "            Use `npm run bench:heap-body`, which passes it."
+        "            Use `pnpm run bench:heap-body`, which passes it."
     );
     process.exitCode = 2;
     return;
@@ -112,28 +112,44 @@ async function main(): Promise<void> {
   {
     const r = measureRetained(() => cloneLogPayload(body));
     hold.push(r.value);
-    rows.push({ mechanism: "cloneLogPayload (unbounded)", site: "chat.ts buildClientRawRequest", bytes: r.bytes });
+    rows.push({
+      mechanism: "cloneLogPayload (unbounded)",
+      site: "chat.ts buildClientRawRequest",
+      bytes: r.bytes,
+    });
   }
 
   // 2. What the request logger actually keeps (open-sse/utils/requestLogger.ts).
   {
     const r = measureRetained(() => cloneBoundedForLog(body));
     hold.push(r.value);
-    rows.push({ mechanism: "cloneBoundedForLog (bounded)", site: "requestLogger.logClientRawRequest", bytes: r.bytes });
+    rows.push({
+      mechanism: "cloneBoundedForLog (bounded)",
+      site: "requestLogger.logClientRawRequest",
+      bytes: r.bytes,
+    });
   }
 
   // 3. Combo per-target attempt clones (open-sse/services/combo.ts attemptBody).
   {
     const r = measureRetained(() => Array.from({ length: TARGETS }, () => structuredClone(body)));
     hold.push(r.value);
-    rows.push({ mechanism: `structuredClone x${TARGETS} (combo targets)`, site: "combo.ts attemptBody", bytes: r.bytes });
+    rows.push({
+      mechanism: `structuredClone x${TARGETS} (combo targets)`,
+      site: "combo.ts attemptBody",
+      bytes: r.bytes,
+    });
   }
 
   // 4. Whole-body serialization for token estimation (combo.ts estimateTokens(JSON.stringify(...))).
   {
     const r = measureRetained(() => JSON.stringify(body));
     hold.push(r.value);
-    rows.push({ mechanism: "JSON.stringify (token estimate)", site: "combo.ts estimateTokens", bytes: r.bytes });
+    rows.push({
+      mechanism: "JSON.stringify (token estimate)",
+      site: "combo.ts estimateTokens",
+      bytes: r.bytes,
+    });
   }
 
   // 5. Overlap: what C concurrent in-flight requests retain via the entry clone alone.

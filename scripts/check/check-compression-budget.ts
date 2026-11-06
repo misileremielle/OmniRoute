@@ -71,7 +71,7 @@ async function main(): Promise<void> {
     }
   }
   console.error(
-    "\nIf this is an intentional improvement/change, refresh: npm run check:compression-budget -- --update"
+    "\nIf this is an intentional improvement/change, refresh: pnpm run check:compression-budget --update"
   );
   process.exit(1);
 }

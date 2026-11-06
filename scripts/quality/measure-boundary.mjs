@@ -537,7 +537,7 @@ export function evaluateBoundaryRatchet(measured, ceiling) {
     return {
       status: "fail",
       exitCode: 1,
-      message: `[boundary] RATCHET FAIL - open-sse → src edges exceed the quality-baseline.json ceiling (${measured} edges, ceiling ${ceiling}). The engine must not gain new imports from src/: move the code into open-sse/ or inject it. Run \`npm run quality:boundary\` for the full edge list. Do not raise the ceiling to make this gate green.`,
+      message: `[boundary] RATCHET FAIL - open-sse → src edges exceed the quality-baseline.json ceiling (${measured} edges, ceiling ${ceiling}). The engine must not gain new imports from src/: move the code into open-sse/ or inject it. Run \`pnpm run quality:boundary\` for the full edge list. Do not raise the ceiling to make this gate green.`,
     };
   }
   return {
@@ -577,7 +577,7 @@ export function evaluateBoundaryRatchetRelative(measured, baseMeasured, ceiling)
     return {
       status: "fail",
       exitCode: 1,
-      message: `[boundary] RATCHET FAIL - this PR adds open-sse → src edges (${numbers}; effective ceiling max(ceiling, base) = ${effective}). The engine must not gain new imports from src/: move the code into open-sse/ or inject it. Run \`npm run quality:boundary\` for the full edge list. Do not raise the ceiling to make this gate green.`,
+      message: `[boundary] RATCHET FAIL - this PR adds open-sse → src edges (${numbers}; effective ceiling max(ceiling, base) = ${effective}). The engine must not gain new imports from src/: move the code into open-sse/ or inject it. Run \`pnpm run quality:boundary\` for the full edge list. Do not raise the ceiling to make this gate green.`,
       ...(warning ? { warning } : {}),
     };
   }

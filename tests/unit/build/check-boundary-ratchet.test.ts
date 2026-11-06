@@ -243,10 +243,10 @@ function loadWorkflow(name: string): Workflow {
 test("ci.yml lint job runs the blocking boundary ratchet (base-relative on PRs, absolute on push)", () => {
   const steps = loadWorkflow("ci.yml").jobs.lint.steps;
   const runs = steps.map((s) => (s.run ?? "").trim());
-  const idx = runs.findIndex((r) => r.includes("npm run check:boundary:ratchet"));
+  const idx = runs.findIndex((r) => r.includes("pnpm run check:boundary:ratchet"));
   assert.ok(idx >= 0, "lint must run check:boundary:ratchet");
   assert.ok(
-    idx > runs.indexOf("npm run check:cycles:ratchet"),
+    idx > runs.indexOf("pnpm run check:cycles:ratchet"),
     "boundary ratchet sits next to the cycles ratchet"
   );
   const step = steps[idx] as Step & { env?: Record<string, string>; if?: string };
@@ -255,9 +255,9 @@ test("ci.yml lint job runs the blocking boundary ratchet (base-relative on PRs, 
   assert.equal(step.env?.PR_BASE_SHA, "${{ github.event.pull_request.base.sha }}");
   const script = runs[idx];
   assert.match(script, /if \[ -n "\$\{PR_BASE_SHA:-\}" \]/);
-  assert.match(script, /npm run check:boundary:ratchet -- --base-ref "\$PR_BASE_SHA"/);
+  assert.match(script, /pnpm run check:boundary:ratchet --base-ref "\$PR_BASE_SHA"/);
   // The else branch keeps the bare absolute invocation (push / workflow_dispatch).
-  assert.match(script, /else\s+npm run check:boundary:ratchet\s+fi/);
+  assert.match(script, /else\s+pnpm run check:boundary:ratchet\s+fi/);
 });
 
 // ---------------------------------------------------------------------------

@@ -249,6 +249,10 @@
     "usage.tierUltra",
     "usage.totalRequests",
     "usage.totalTokens",
-    "usage.warningThresholdPlaceholder"
+    "usage.warningThresholdPlaceholder",
+    "providers.systemOneNamePlaceholder",
+    "providers.systemOnePrefixPlaceholder",
+    "providers.systemOneBaseUrlPlaceholder",
+    "providers.systemOneTestModelPlaceholder"
   ]
 }

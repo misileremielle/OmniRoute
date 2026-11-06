@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generates bin/cli/api-commands/<tag>.mjs from the OpenAPI spec.
- * Run: npm run build:cli-api
+ * Run: pnpm run build:cli-api
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";

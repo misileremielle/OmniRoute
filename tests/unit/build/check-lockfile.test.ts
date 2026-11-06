@@ -1,14 +1,8 @@
 // tests/unit/build/check-lockfile.test.ts
-// TDD tests for check-lockfile.mjs — lockfile policy gate (Task 7.7).
+// Tests for check-lockfile.mjs — lockfile policy gate (Task 7.7).
 //
-// Strategy: the lockfile-lint binary is an external CLI tool; we do not spawn it
-// in unit tests. Instead, we test the exported policy helpers and inject the
-// process boundary used by the workspace consistency runner:
-//   - getLockfileLintConfig() — returns the policy configuration object
-//   - buildLockfileLintArgs()  — maps a config object to the argv array
-//
-// This validates the policy settings and the arg-assembly logic without requiring
-// a real package-lock.json or a network call.
+// The policy checks run against in-memory lock objects; the workspace consistency check
+// runs the real pnpm command against a throwaway workspace.
 import test from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
@@ -17,299 +11,129 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 // @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
 import {
-  getLockfileLintConfig,
-  buildLockfileLintArgs,
+  getLockfilePolicy,
+  findLockfileViolations,
   getWorkspaceDependencyCheckCommand,
   runWorkspaceDependencyCheck,
 } from "../../../scripts/check/check-lockfile.mjs";
+// @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
+import { parsePnpmLock, readPnpmLock } from "../../../scripts/ci/pnpmLock.mjs";
 
-// ---------------------------------------------------------------------------
-// getLockfileLintConfig
-// ---------------------------------------------------------------------------
-
-test("getLockfileLintConfig: returns an object with required keys", () => {
-  const cfg = getLockfileLintConfig();
-  assert.ok(typeof cfg === "object" && cfg !== null, "config should be an object");
-  assert.ok("lockfilePath" in cfg, "should have lockfilePath");
-  assert.ok("type" in cfg, "should have type");
-  assert.ok("validateHttps" in cfg, "should have validateHttps");
-  assert.ok("validateIntegrity" in cfg, "should have validateIntegrity");
-  assert.ok("allowedHosts" in cfg, "should have allowedHosts");
+const SHA = "sha512-" + "a".repeat(86) + "==";
+const policy = { allowedHosts: ["registry.npmjs.org"] };
+const lockWith = (resolution: Record<string, string>) => ({
+  packages: { "left-pad@1.0.0": { resolution } },
 });
 
-test("getLockfileLintConfig: lockfilePath points to package-lock.json", () => {
-  const cfg = getLockfileLintConfig();
-  assert.ok(
-    cfg.lockfilePath.endsWith("package-lock.json"),
-    `lockfilePath should end with package-lock.json, got: ${cfg.lockfilePath}`
+test("getLockfilePolicy: points at pnpm-lock.yaml and only the npm registry", () => {
+  const cfg = getLockfilePolicy();
+  assert.ok(cfg.lockfilePath.endsWith("pnpm-lock.yaml"));
+  assert.deepEqual(cfg.allowedHosts, ["registry.npmjs.org"]);
+});
+
+test("findLockfileViolations: a registry package with sha512 integrity passes", () => {
+  assert.deepEqual(findLockfileViolations(lockWith({ integrity: SHA }), policy), []);
+});
+
+test("findLockfileViolations: missing or non-sha512 integrity is rejected", () => {
+  assert.match(findLockfileViolations(lockWith({}), policy)[0], /sha512/);
+  assert.match(findLockfileViolations(lockWith({ integrity: "sha1-abc" }), policy)[0], /sha512/);
+});
+
+test("findLockfileViolations: a plain-http tarball is rejected", () => {
+  const found = findLockfileViolations(
+    lockWith({
+      integrity: SHA,
+      tarball: "http://registry.npmjs.org/left-pad/-/left-pad-1.0.0.tgz",
+    }),
+    policy
   );
+  assert.ok(found.some((v: string) => /not HTTPS/.test(v)));
 });
 
-test("getLockfileLintConfig: type is npm", () => {
-  const cfg = getLockfileLintConfig();
-  assert.equal(cfg.type, "npm");
-});
-
-test("getLockfileLintConfig: validateHttps is true (HTTPS enforcement)", () => {
-  const cfg = getLockfileLintConfig();
-  assert.equal(cfg.validateHttps, true, "HTTPS enforcement must be enabled");
-});
-
-test("getLockfileLintConfig: validateIntegrity is true (integrity enforcement)", () => {
-  const cfg = getLockfileLintConfig();
-  assert.equal(cfg.validateIntegrity, true, "integrity validation must be enabled");
-});
-
-test("getLockfileLintConfig: allowedHosts includes npm (official registry)", () => {
-  const cfg = getLockfileLintConfig();
-  assert.ok(Array.isArray(cfg.allowedHosts), "allowedHosts should be an array");
-  assert.ok(
-    cfg.allowedHosts.includes("npm"),
-    "npm must be in allowedHosts (covers registry.npmjs.org)"
+test("findLockfileViolations: a tarball from another host is rejected", () => {
+  const found = findLockfileViolations(
+    lockWith({ integrity: SHA, tarball: "https://evil.example/left-pad-1.0.0.tgz" }),
+    policy
   );
+  assert.ok(found.some((v: string) => /evil\.example is not allowed/.test(v)));
 });
 
-test("getLockfileLintConfig: no http:// hosts in allowedHosts", () => {
-  const cfg = getLockfileLintConfig();
-  for (const host of cfg.allowedHosts) {
-    assert.ok(
-      !host.startsWith("http://"),
-      `allowedHosts must not contain http:// URLs, found: ${host}`
-    );
-  }
+test("findLockfileViolations: an unparseable tarball URL is rejected", () => {
+  const found = findLockfileViolations(lockWith({ integrity: SHA, tarball: "not a url" }), policy);
+  assert.ok(found.some((v: string) => /invalid tarball URL/.test(v)));
 });
 
-// ---------------------------------------------------------------------------
-// buildLockfileLintArgs
-// ---------------------------------------------------------------------------
-
-test("buildLockfileLintArgs: includes --path and --type", () => {
-  const cfg = getLockfileLintConfig();
-  const args = buildLockfileLintArgs(cfg);
-  assert.ok(args.includes("--path"), "args should include --path");
-  assert.ok(args.includes("--type"), "args should include --type");
-  const pathIdx = args.indexOf("--path");
-  assert.equal(args[pathIdx + 1], cfg.lockfilePath);
-  const typeIdx = args.indexOf("--type");
-  assert.equal(args[typeIdx + 1], cfg.type);
+test("the committed pnpm-lock.yaml satisfies the policy", () => {
+  const lock = readPnpmLock();
+  assert.ok(Object.keys(lock.packages).length > 1000, "the dependency document was parsed");
+  assert.deepEqual(findLockfileViolations(lock, getLockfilePolicy()), []);
 });
 
-test("buildLockfileLintArgs: includes --validate-https when validateHttps=true", () => {
-  const args = buildLockfileLintArgs({
-    lockfilePath: "/tmp/package-lock.json",
-    type: "npm",
-    validateHttps: true,
-    validateIntegrity: false,
-    allowedHosts: [],
-  });
-  assert.ok(args.includes("--validate-https"), "should include --validate-https");
+test("parsePnpmLock: skips the leading pnpm self-pin document", () => {
+  const lock = parsePnpmLock(
+    "---\nlockfileVersion: '9.0'\nimporters:\n  .:\n    configDependencies: {}\n---\n" +
+      "lockfileVersion: '9.0'\nimporters:\n  .: {}\npackages:\n  a@1.0.0: {}\n"
+  );
+  assert.deepEqual(Object.keys(lock.packages), ["a@1.0.0"]);
 });
 
-test("buildLockfileLintArgs: omits --validate-https when validateHttps=false", () => {
-  const args = buildLockfileLintArgs({
-    lockfilePath: "/tmp/package-lock.json",
-    type: "npm",
-    validateHttps: false,
-    validateIntegrity: false,
-    allowedHosts: [],
-  });
-  assert.ok(!args.includes("--validate-https"), "should not include --validate-https");
-});
-
-test("buildLockfileLintArgs: includes --validate-integrity when validateIntegrity=true", () => {
-  const args = buildLockfileLintArgs({
-    lockfilePath: "/tmp/package-lock.json",
-    type: "npm",
-    validateHttps: false,
-    validateIntegrity: true,
-    allowedHosts: [],
-  });
-  assert.ok(args.includes("--validate-integrity"), "should include --validate-integrity");
-});
-
-test("buildLockfileLintArgs: omits --validate-integrity when validateIntegrity=false", () => {
-  const args = buildLockfileLintArgs({
-    lockfilePath: "/tmp/package-lock.json",
-    type: "npm",
-    validateHttps: false,
-    validateIntegrity: false,
-    allowedHosts: [],
-  });
-  assert.ok(!args.includes("--validate-integrity"), "should not include --validate-integrity");
-});
-
-test("buildLockfileLintArgs: includes --allowed-hosts and its values", () => {
-  const args = buildLockfileLintArgs({
-    lockfilePath: "/tmp/package-lock.json",
-    type: "npm",
-    validateHttps: false,
-    validateIntegrity: false,
-    allowedHosts: ["npm", "myprivatescope"],
-  });
-  assert.ok(args.includes("--allowed-hosts"), "should include --allowed-hosts");
-  assert.ok(args.includes("npm"), "should include npm host");
-  assert.ok(args.includes("myprivatescope"), "should include additional host");
-});
-
-test("buildLockfileLintArgs: omits --allowed-hosts when array is empty", () => {
-  const args = buildLockfileLintArgs({
-    lockfilePath: "/tmp/package-lock.json",
-    type: "npm",
-    validateHttps: false,
-    validateIntegrity: false,
-    allowedHosts: [],
-  });
-  assert.ok(!args.includes("--allowed-hosts"), "should not include --allowed-hosts when empty");
-});
-
-test("buildLockfileLintArgs: full config produces expected canonical args", () => {
-  const cfg = getLockfileLintConfig();
-  const args = buildLockfileLintArgs(cfg);
-  // Must include all four enforcement flags
-  assert.ok(args.includes("--validate-https"), "must enforce HTTPS");
-  assert.ok(args.includes("--validate-integrity"), "must enforce integrity");
-  assert.ok(args.includes("--allowed-hosts"), "must restrict hosts");
-  assert.ok(args.includes("npm"), "npm must be an allowed host");
-});
-
-test("buildLockfileLintArgs: --allowed-hosts values follow immediately after the flag", () => {
-  const args = buildLockfileLintArgs({
-    lockfilePath: "/tmp/package-lock.json",
-    type: "npm",
-    validateHttps: false,
-    validateIntegrity: false,
-    allowedHosts: ["npm", "verdaccio"],
-  });
-  const hostIdx = args.indexOf("--allowed-hosts");
-  assert.ok(hostIdx !== -1, "--allowed-hosts should be present");
-  assert.equal(args[hostIdx + 1], "npm");
-  assert.equal(args[hostIdx + 2], "verdaccio");
-});
-
-// ---------------------------------------------------------------------------
-// workspace dependency consistency
-// ---------------------------------------------------------------------------
-
-test("getWorkspaceDependencyCheckCommand: checks every workspace at direct depth", () => {
+test("getWorkspaceDependencyCheckCommand: frozen, lockfile-only, no scripts", () => {
   const command = getWorkspaceDependencyCheckCommand("linux");
-  assert.deepEqual(command.args, ["ls", "--workspaces", "--depth=0", "--package-lock-only"]);
-});
-
-test("getWorkspaceDependencyCheckCommand: invokes npm directly outside Windows", () => {
-  const command = getWorkspaceDependencyCheckCommand("linux");
-  assert.equal(command.command, "npm");
-});
-
-test("getWorkspaceDependencyCheckCommand: invokes npm.cmd through cmd.exe on Windows", () => {
-  const command = getWorkspaceDependencyCheckCommand("win32", "C:\\Windows\\System32\\cmd.exe");
-  assert.equal(command.command, "C:\\Windows\\System32\\cmd.exe");
+  assert.equal(command.command, "pnpm");
   assert.deepEqual(command.args, [
-    "/d",
-    "/s",
-    "/c",
-    "npm.cmd",
-    "ls",
-    "--workspaces",
-    "--depth=0",
-    "--package-lock-only",
+    "install",
+    "--frozen-lockfile",
+    "--lockfile-only",
+    "--ignore-scripts",
   ]);
 });
 
-test("runWorkspaceDependencyCheck: executes the selected command and returns success", () => {
-  const calls: unknown[][] = [];
-  const result = runWorkspaceDependencyCheck({
-    platform: "linux",
-    execFile: (...args: unknown[]) => {
-      calls.push(args);
-      return "tree is valid";
-    },
-  });
-
-  assert.deepEqual(result, { ok: true });
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0]?.[0], "npm");
-  assert.deepEqual(calls[0]?.[1], ["ls", "--workspaces", "--depth=0", "--package-lock-only"]);
+test("getWorkspaceDependencyCheckCommand: invokes pnpm.cmd through cmd.exe on Windows", () => {
+  const command = getWorkspaceDependencyCheckCommand("win32", "C:\\Windows\\System32\\cmd.exe");
+  assert.equal(command.command, "C:\\Windows\\System32\\cmd.exe");
+  assert.deepEqual(command.args.slice(0, 4), ["/d", "/s", "/c", "pnpm.cmd"]);
 });
 
-test("runWorkspaceDependencyCheck: reports npm ls failures without masking diagnostics", () => {
-  const failure = Object.assign(new Error("ELSPROBLEMS"), {
-    stdout: "invalid playwright",
-    stderr: "npm error code ELSPROBLEMS",
+test("runWorkspaceDependencyCheck: reports failures without masking diagnostics", () => {
+  const failure = Object.assign(new Error("ERR_PNPM_OUTDATED_LOCKFILE"), {
+    stdout: "",
+    stderr: "ERR_PNPM_OUTDATED_LOCKFILE",
   });
-
   const result = runWorkspaceDependencyCheck({
     platform: "linux",
     execFile: () => {
       throw failure;
     },
   });
-
-  assert.deepEqual(result, {
-    ok: false,
-    stdout: "invalid playwright",
-    stderr: "npm error code ELSPROBLEMS",
-  });
+  assert.deepEqual(result, { ok: false, stdout: "", stderr: "ERR_PNPM_OUTDATED_LOCKFILE" });
 });
 
-test("workspace check validates lock entries independently of node_modules", (t) => {
+test("workspace check fails on a manifest the lockfile does not satisfy", (t) => {
   const root = mkdtempSync(path.join(os.tmpdir(), "omniroute-lockfile-check-"));
   t.after(() => rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
   mkdirSync(path.join(root, "packages", "example"), { recursive: true });
+  writeFileSync(path.join(root, "package.json"), JSON.stringify({ name: "root", private: true }));
+  writeFileSync(path.join(root, "pnpm-workspace.yaml"), 'packages:\n  - "packages/*"\n');
+  const example = path.join(root, "packages", "example", "package.json");
+  writeFileSync(example, JSON.stringify({ name: "example", version: "1.0.0" }));
   writeFileSync(
-    path.join(root, "package.json"),
-    JSON.stringify({ name: "root", version: "1.0.0", private: true, workspaces: ["packages/*"] })
+    path.join(root, "pnpm-lock.yaml"),
+    "lockfileVersion: '9.0'\n\nsettings:\n  autoInstallPeers: true\n  excludeLinksFromLockfile: false\n\n" +
+      "importers:\n\n  .: {}\n\n  packages/example: {}\n"
   );
-  writeFileSync(
-    path.join(root, "packages", "example", "package.json"),
-    JSON.stringify({ name: "example", version: "1.0.0", dependencies: { semver: "7.7.4" } })
-  );
-  const lock = {
-    name: "root",
-    version: "1.0.0",
-    lockfileVersion: 3,
-    requires: true,
-    packages: {
-      "": { name: "root", version: "1.0.0", workspaces: ["packages/*"] },
-      "node_modules/example": { resolved: "packages/example", link: true },
-      "node_modules/semver": { version: "7.6.0" },
-      "packages/example": {
-        name: "example",
-        version: "1.0.0",
-        dependencies: { semver: "7.7.4" },
-      },
-    },
-  };
-  const lockPath = path.join(root, "package-lock.json");
-  writeFileSync(lockPath, JSON.stringify(lock));
-
   const command = getWorkspaceDependencyCheckCommand(process.platform, process.env.ComSpec);
-  assert.throws(
-    () =>
-      execFileSync(command.command, command.args, {
-        cwd: root,
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      }),
-    (error: unknown) => {
-      const diagnostics = `${String((error as { stdout?: string }).stdout ?? "")}\n${String(
-        (error as { stderr?: string }).stderr ?? ""
-      )}`;
-      return /ELSPROBLEMS|invalid/i.test(diagnostics);
-    }
-  );
-
-  lock.packages["node_modules/semver"].version = "7.7.4";
-  writeFileSync(lockPath, JSON.stringify(lock));
-  mkdirSync(path.join(root, "node_modules", "semver"), { recursive: true });
-  writeFileSync(
-    path.join(root, "node_modules", "semver", "package.json"),
-    JSON.stringify({ name: "semver", version: "7.6.0" })
-  );
-  assert.doesNotThrow(() =>
+  const run = () =>
     execFileSync(command.command, command.args, {
       cwd: root,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
-    })
+    });
+  assert.doesNotThrow(run, "an empty, matching workspace is in sync");
+
+  writeFileSync(
+    example,
+    JSON.stringify({ name: "example", version: "1.0.0", dependencies: { semver: "7.7.4" } })
   );
+  assert.throws(run, "a dependency missing from the lockfile must fail the gate");
 });

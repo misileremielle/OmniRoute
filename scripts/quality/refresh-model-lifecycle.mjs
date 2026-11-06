@@ -11,8 +11,8 @@
 // perda de dados que abriria o gate.
 //
 // Uso:
-//   npm run quality:refresh-model-lifecycle            # escreve o snapshot
-//   npm run quality:refresh-model-lifecycle -- --dry-run
+//   pnpm run quality:refresh-model-lifecycle            # escreve o snapshot
+//   pnpm run quality:refresh-model-lifecycle --dry-run
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -188,7 +188,7 @@ async function main() {
   }
   fs.writeFileSync(SNAPSHOT_PATH, JSON.stringify(next, null, 2) + "\n");
   console.log(
-    `[refresh-model-lifecycle] wrote ${path.relative(ROOT, SNAPSHOT_PATH)} — ${after} entries. Review the diff, then run \`npm run check:model-lifecycle\`.`
+    `[refresh-model-lifecycle] wrote ${path.relative(ROOT, SNAPSHOT_PATH)} — ${after} entries. Review the diff, then run \`pnpm run check:model-lifecycle\`.`
   );
 }
 

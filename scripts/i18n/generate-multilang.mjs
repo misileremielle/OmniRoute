@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * DEPRECATED 2026-05-13. Use `npm run i18n:run`
+ * DEPRECATED 2026-05-13. Use `pnpm run i18n:run`
  * (scripts/i18n/run-translation.mjs) for docs translation.
  *
  * This Google-Translate-backed generator is kept for the `messages` and
@@ -15,7 +15,7 @@ import path from "node:path";
 import { normalizeLocaleText } from "./glossary-normalize.mjs";
 
 console.warn(
-  "[generate-multilang] DEPRECATED: prefer `npm run i18n:run` for docs (this script will be removed in v3.10)."
+  "[generate-multilang] DEPRECATED: prefer `pnpm run i18n:run` for docs (this script will be removed in v3.10)."
 );
 
 const ROOT = process.cwd();

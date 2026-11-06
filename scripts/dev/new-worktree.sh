@@ -137,7 +137,7 @@ fi
 if [ -d "$MAIN/.husky/_" ]; then
   cp -a "$MAIN/.husky/_" "$DIR/.husky/_"
 else
-  echo "AVISO: .husky/_ não existe no checkout principal — rode 'npm install' lá primeiro" >&2
+  echo "AVISO: .husky/_ não existe no checkout principal — rode 'pnpm install' lá primeiro" >&2
 fi
 
 # node_modules: hard links, ~5s e disco quase zero (inodes compartilhados).
@@ -149,7 +149,7 @@ if [ -d "$MAIN/node_modules/node_modules" ]; then
 fi
 if [ -d "$MAIN/node_modules" ]; then
   # Falha parcial (limite de hard links, disco) não pode derrubar a worktree inteira:
-  # os hooks já estão no lugar e o npm install continua sendo uma saída válida.
+  # os hooks já estão no lugar e o pnpm install continua sendo uma saída válida.
   if cp -al "$MAIN/node_modules" "$DIR/node_modules" 2>"$DIR/.cp-node-modules.log"; then
     echo "node_modules: $(ls "$DIR/node_modules" | wc -l) entradas (hard links)"
     rm -f "$DIR/.cp-node-modules.log"
@@ -159,7 +159,7 @@ if [ -d "$MAIN/node_modules" ]; then
     head -3 "$DIR/.cp-node-modules.log" >&2
   fi
 else
-  echo "AVISO: node_modules não existe no checkout principal — rode 'npm install' lá primeiro" >&2
+  echo "AVISO: node_modules não existe no checkout principal — rode 'pnpm install' lá primeiro" >&2
 fi
 
 # Verificação: o hook precisa estar REALMENTE ativo, não apenas presente.

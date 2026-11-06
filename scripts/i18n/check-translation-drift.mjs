@@ -13,7 +13,7 @@
  *   --json              emit a JSON report to stdout (no human log lines)
  *
  * Recommended usage in CI:
- *   npm run i18n:check
+ *   pnpm run i18n:check
  */
 
 import { promises as fs, existsSync } from "node:fs";
@@ -113,7 +113,7 @@ async function main() {
   const STATE_FILE = opts.root ? path.join(ROOT_DIR, ".i18n-state.json") : STATE_PATH;
 
   if (!existsSync(STATE_FILE)) {
-    const msg = ".i18n-state.json not found — run `npm run i18n:run` to bootstrap.";
+    const msg = ".i18n-state.json not found — run `pnpm run i18n:run` to bootstrap.";
     if (opts.json) {
       process.stdout.write(JSON.stringify({ ok: false, reason: "missing-state" }) + "\n");
     } else {
@@ -182,7 +182,7 @@ async function main() {
   // after a refresh run was interrupted (upstream quota 429 on 2026-09-18
   // left 45 locales behind for ~6 days), and failing every PR's CI for a
   // backend outage nobody can fix in-branch helps no one. The list is the
-  // work order for `npm run i18n:run -- --locale=<code> --files=<sources>`.
+  // work order for `pnpm run i18n:run -- --locale=<code> --files=<sources>`.
   const staleTargets = findStaleTargets(sources);
   let ok =
     driftedSources.length === 0 && missingTargets.length === 0 && driftedTargets.length === 0;
@@ -237,7 +237,7 @@ async function main() {
     }
     if (staleTargets.length) {
       console.log(
-        `[i18n-check] WARN stale targets (${staleTargets.length}) — translated from an older source (not blocking; refresh with npm run i18n:run):`
+        `[i18n-check] WARN stale targets (${staleTargets.length}) — translated from an older source (not blocking; refresh with pnpm run i18n:run):`
       );
       for (const t of staleTargets) console.log(`  - ${t.rel} [${t.locale}] (stale)`);
     }
@@ -246,7 +246,7 @@ async function main() {
     } else if (opts.mode === "warn") {
       console.log("[i18n-check] WARN — drift detected (warn mode, exiting 0).");
     } else {
-      console.log("[i18n-check] FAIL — drift detected. Run `npm run i18n:run` to refresh.");
+      console.log("[i18n-check] FAIL — drift detected. Run `pnpm run i18n:run` to refresh.");
     }
   }
 

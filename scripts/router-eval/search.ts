@@ -98,7 +98,7 @@ function getArgValues(name: string): string[] {
 function usage(): string {
   return [
     "Usage:",
-    "  npm run eval:router:search -- --baseline <baseline.ndjson>",
+    "  pnpm run eval:router:search --baseline <baseline.ndjson>",
     "       --candidate <name=path.ndjson> [--candidate <name=path.ndjson> ...]",
     "       [--objective balanced|quality|cost|latency]",
     "       [--artifact-dir <dir>] [--run-id <id>] [--max-aiq-drop <n>] [--max-cost-increase <n>]",

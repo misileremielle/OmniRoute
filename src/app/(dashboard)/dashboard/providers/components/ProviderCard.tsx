@@ -500,6 +500,7 @@ const ProviderCard = forwardRef<ProviderCardHandle, ProviderCardProps>(function 
                   hasFree={provider.hasFree === true}
                   label={dotLabels[authType] || t("apiKeyLabel")}
                   freeLabel={t("hasFreeTooltip")}
+                  announce
                 />
               </div>
             </div>

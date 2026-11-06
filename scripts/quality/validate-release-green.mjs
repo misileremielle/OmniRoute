@@ -61,7 +61,7 @@ import { runGateProcess } from "./gate-process.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..", "..");
-const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 export const ESLINT_TIMEOUT_MS = 60 * 60 * 1000;
 
 // Convenient per-gate summaries. The supervisor additionally persists immutable,
@@ -355,7 +355,7 @@ function evaluateWorkflowRun({ code, out }) {
 // release leaked 11 static/gate base-reds (route-validation:t06, docs-counts --strict,
 // docs-symbols, bundle-size --ratchet, test-masking, …) that the pre-flight never ran
 // because they live only in the ci.yml gate JOBS, not in this script. --full-ci reads
-// ci.yml itself and runs every `npm run check:*` / `npm run lint` from those jobs, so the
+// ci.yml itself and runs every `pnpm run check:*` / `pnpm run lint` from those jobs, so the
 // set stays current as gates are added (no drift between this script and CI). One command
 // → zero CI layers for the whole static category.
 
@@ -421,8 +421,8 @@ export function fullCiKindFor(scriptId, results) {
 
 /**
  * Parse a ci.yml text and return the ordered, de-duplicated list of gate commands to run.
- * Each entry: { id, job, args:["run", <script>, ...("--" + args)], env }.
- * Only `npm run lint` and `npm run check:*` steps are taken (build/install/test-run npm
+ * Each entry: { id, job, args:["run", <script>, ...args], env }.
+ * Only `pnpm run lint` and `pnpm run check:*` steps are taken (build/install/test-run npm
  * scripts are ignored); a `run: |` block is scanned line-by-line so multi-command steps work.
  * Exported pure (no side effects) so the extraction has a fixture-driven unit test.
  */
@@ -445,7 +445,7 @@ export function extractCiGates(
       const runStr = typeof step?.run === "string" ? step.run : "";
       if (!runStr) continue;
       for (const rawLine of runStr.split("\n")) {
-        const m = rawLine.trim().match(/^npm run (\S+)(?:\s+--\s+(.+?))?\s*$/);
+        const m = rawLine.trim().match(/^p?npm run (\S+)(?:\s+(?:--\s+)?(.+?))?\s*$/);
         if (!m) continue;
         const script = m[1];
         if (script !== "lint" && !script.startsWith("check:")) continue; // gates only
@@ -455,8 +455,8 @@ export function extractCiGates(
         gates.push({
           id: script,
           job,
-          // preserve the `--` so args reach the script (npm run x -- --ratchet)
-          args: extra.length ? ["run", script, "--", ...extra] : ["run", script],
+          // preserve the `--` so args reach the script (pnpm run x --ratchet)
+          args: extra.length ? ["run", script, ...extra] : ["run", script],
           env: envMap[script],
         });
       }
@@ -566,7 +566,7 @@ export function hostedSuiteIdentity(cwd, workflowSha) {
       runAttempt: process.env.GITHUB_RUN_ATTEMPT,
       nodeVersion: process.version,
       lockfileSha256: createHash("sha256")
-        .update(readFileSync(join(cwd, "package-lock.json")))
+        .update(readFileSync(join(cwd, "pnpm-lock.yaml")))
         .digest("hex"),
     };
     if (
@@ -749,10 +749,10 @@ const runAsync = run;
 async function runPackArtifactGate(timeoutMs) {
   const deadline = Date.now() + timeoutMs;
   const steps = [
-    { cmd: npmCmd, args: ["run", "build:cli"], env: BUILD_GATE_ENV },
+    { cmd: pnpmCmd, args: ["run", "build:cli"], env: BUILD_GATE_ENV },
     { cmd: process.execPath, args: ["scripts/build/write-build-sha.mjs"] },
     {
-      cmd: npmCmd,
+      cmd: pnpmCmd,
       args: ["run", "check:pack-artifact"],
       env: PACK_GATE_ENV,
     },
@@ -769,16 +769,16 @@ async function runPackArtifactGate(timeoutMs) {
 }
 
 /**
- * The unit lane: ci.yml's own shards (`npm run test:unit:ci:shard` with TEST_SHARD=i/N, the
+ * The unit lane: ci.yml's own shards (`pnpm run test:unit:ci:shard` with TEST_SHARD=i/N, the
  * command each "Unit Tests (i/N)" job runs), `pool` at a time, each under its own ceiling.
  */
 async function runUnitShards(total, pool, timeout) {
   const shards = Array.from({ length: total }, (_, index) => index + 1);
   const results = await runPool(shards, pool, async (shard) => {
-    const { code, out } = await runAsync(npmCmd, ["run", "test:unit:ci:shard"], {
+    const { code, out } = await runAsync(pnpmCmd, ["run", "test:unit:ci:shard"], {
       timeout,
       env: { TEST_SHARD: `${shard}/${total}` },
-      label: `${npmCmd} run test:unit:ci:shard (TEST_SHARD=${shard}/${total})`,
+      label: `${pnpmCmd} run test:unit:ci:shard (TEST_SHARD=${shard}/${total})`,
     });
     return { shard, total, code, out };
   });
@@ -851,12 +851,12 @@ async function main() {
 
   process.stderr.write("🔎 Release-green validation (current working tree)\n\n");
 
-  await hardCmd("typecheck", "Typecheck (core)", npmCmd, ["run", "typecheck:core"]);
+  await hardCmd("typecheck", "Typecheck (core)", pnpmCmd, ["run", "typecheck:core"]);
 
   // ESLint: ONE pass → errors (hard) + warnings (drift)
   {
     announce("ESLint (errors + warnings — ~15-45min)");
-    // Suppressions-aware, matching `npm run lint` (Pacote 4 no-new-warnings): the frozen
+    // Suppressions-aware, matching `pnpm run lint` (Pacote 4 no-new-warnings): the frozen
     // pre-existing debt in config/quality/eslint-suppressions.json must not count as
     // errors here — only NET-NEW violations are release reds. The cold release runner can
     // exceed 30 minutes as the repository grows, and this pre-flight often runs under load.
@@ -891,13 +891,13 @@ async function main() {
     }
   }
 
-  await hardCmd("db-rules", "DB rules", npmCmd, ["run", "check:db-rules"]);
-  await hardCmd("public-creds", "Public creds", npmCmd, ["run", "check:public-creds"]);
+  await hardCmd("db-rules", "DB rules", pnpmCmd, ["run", "check:db-rules"]);
+  await hardCmd("public-creds", "Public creds", pnpmCmd, ["run", "check:public-creds"]);
 
   // Complexity + cognitive (one ESLint walk; both still recorded as drift)
   {
     announce("Complexity + cognitive ratchets (shared ESLint walk)");
-    const result = await run(npmCmd, ["run", "check:complexity-ratchets"]);
+    const result = await run(pnpmCmd, ["run", "check:complexity-ratchets"]);
     saveGateLog("complexity-ratchets", result.out);
     for (const metric of evaluateComplexityRun(result, baselineValue("cognitiveComplexity"))) {
       record(metric);
@@ -906,7 +906,7 @@ async function main() {
 
   // file-size (drift)
   {
-    const { code, out } = await run(npmCmd, ["run", "check:file-size"]);
+    const { code, out } = await run(pnpmCmd, ["run", "check:file-size"]);
     record({
       id: "file-size",
       label: "File-size ratchet",
@@ -927,7 +927,7 @@ async function main() {
     await run("git", ["fetch", "--no-tags", "origin", "main", "--depth=200"], {
       timeout: 60 * 1000,
     });
-    const { code, out } = await run(npmCmd, ["run", "check:test-masking"], {
+    const { code, out } = await run(pnpmCmd, ["run", "check:test-masking"], {
       env: { GITHUB_BASE_REF: "main" },
     });
     saveGateLog("test-masking", out);
@@ -945,26 +945,25 @@ async function main() {
   // CI Quality Ratchet job is fail-fast — only on the release PR. Running them all
   // here (drift, never blocking) means a single rebaseline pass at release.
   // complexity recorded above with cognitive (check:complexity-ratchets)
-  await driftCmd("dead-code", "Dead-code (ratchet)", npmCmd, ["run", "check:dead-code"]);
-  await driftCmd("type-coverage", "Type coverage (ratchet)", npmCmd, [
+  await driftCmd("dead-code", "Dead-code (ratchet)", pnpmCmd, ["run", "check:dead-code"]);
+  await driftCmd("type-coverage", "Type coverage (ratchet)", pnpmCmd, [
     "run",
     "check:type-coverage",
   ]);
-  await driftCmd("compression-budget", "Compression budget (ratchet)", npmCmd, [
+  await driftCmd("compression-budget", "Compression budget (ratchet)", pnpmCmd, [
     "run",
     "check:compression-budget",
   ]);
-  await driftCmd("openapi-coverage", "OpenAPI route coverage (ratchet)", npmCmd, [
+  await driftCmd("openapi-coverage", "OpenAPI route coverage (ratchet)", pnpmCmd, [
     "run",
     "check:openapi-coverage",
   ]);
-  await driftCmd("workflow-lint", "Workflow lint (zizmor ratchet)", npmCmd, [
+  await driftCmd("workflow-lint", "Workflow lint (zizmor ratchet)", pnpmCmd, [
     "run",
     "check:workflows",
-    "--",
     "--ratchet",
   ]);
-  await driftCmd("codeql-ratchet", "CodeQL alerts (ratchet)", npmCmd, [
+  await driftCmd("codeql-ratchet", "CodeQL alerts (ratchet)", pnpmCmd, [
     "run",
     "check:codeql-ratchet",
   ]);
@@ -973,14 +972,14 @@ async function main() {
   await driftCmd(
     "pricing-freshness",
     "Pricing freshness (90 days)",
-    npmCmd,
+    pnpmCmd,
     ["run", "check:pricing-freshness"],
     "touched within 90 days"
   );
 
   // Docs sync + fabricated-docs (strict) is a real-defect gate (invented env vars /
   // routes, i18n mirror drift) — HARD.
-  await hardCmd("docs-all", "Docs sync + fabricated-docs (strict)", npmCmd, [
+  await hardCmd("docs-all", "Docs sync + fabricated-docs (strict)", pnpmCmd, [
     "run",
     "check:docs-all",
   ]);
@@ -1140,7 +1139,7 @@ async function main() {
       announce(g.label);
       const result = await (g.run
         ? g.run(g.timeout)
-        : runAsync(npmCmd, g.args, { timeout: g.timeout, env: g.env }));
+        : runAsync(pnpmCmd, g.args, { timeout: g.timeout, env: g.env }));
       slowResults.push(result);
       saveGateLog(g.id, result.out);
       record({
@@ -1173,8 +1172,10 @@ async function main() {
         });
       } else {
         announce(bootLabel);
-        const { code, out } = await runAsync(npmCmd, ["run", "check:pack-boot"], {
-          timeout: 15 * 60 * 1000,
+        // Packs and installs the real tarball, so it scales with the package: the translated
+        // docs mirrors (#18869) added 8,885 files, and 15 minutes stopped being enough.
+        const { code, out } = await runAsync(pnpmCmd, ["run", "check:pack-boot"], {
+          timeout: 40 * 60 * 1000,
         });
         saveGateLog("pack-boot", out);
         record({
@@ -1220,7 +1221,7 @@ async function main() {
     for (const g of gates) {
       // Skip a gate the curated pass already ran with the same id (avoid double-running lint).
       if (already.has(g.id)) continue;
-      const { code, out } = await run(npmCmd, g.args, {
+      const { code, out } = await run(pnpmCmd, g.args, {
         env: g.env,
         timeout: fullCiTimeoutFor(g.id),
       });

@@ -89,7 +89,7 @@ else
   printf -- '- **chore(dashboard):** the vendored Keak CI UI Kit moves to %s (`packages/ui-kit`, upstream `%s`).\n' \
     "$LATEST_VERSION" "${LATEST_COMMIT:0:7}" > "$FRAGMENT"
   git switch -q -c "$BRANCH"
-  git add packages/ui-kit package-lock.json "$FRAGMENT"
+  git add packages/ui-kit pnpm-lock.yaml "$FRAGMENT"
   git -c user.name="github-actions[bot]" \
     -c user.email="$BOT_EMAIL" \
     commit -q -m "$TITLE" \

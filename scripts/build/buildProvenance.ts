@@ -19,10 +19,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 
 export type BuildProvenanceReason =
-  | "on-release-line"
-  | "off-release-line"
-  | "canary-override"
-  | "missing-sha";
+  "on-release-line" | "off-release-line" | "canary-override" | "missing-sha";
 
 export type BuildProvenanceResult = {
   ok: boolean;
@@ -66,7 +63,7 @@ export function resolveBuildProvenance(input: BuildProvenanceInput): BuildProven
       reason: "missing-sha",
       message:
         "dist/BUILD_SHA is missing — the artifact cannot be traced to a commit. " +
-        "Build with `npm run build:release` (or run scripts/build/write-build-sha.mjs).",
+        "Build with `pnpm run build:release` (or run scripts/build/write-build-sha.mjs).",
     };
   }
 

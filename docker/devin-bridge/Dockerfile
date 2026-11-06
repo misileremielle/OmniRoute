@@ -27,11 +27,16 @@ RUN groupadd --gid 10001 bridge \
   && chown -R bridge:bridge /opt/omniroute /workspace
 
 WORKDIR /opt/omniroute
+COPY config/ci/toolchain.json /tmp/toolchain.json
+RUN npm install --global "pnpm@$(node -p "require('/tmp/toolchain.json').pnpm")"
 USER bridge
-COPY --chown=bridge:bridge package.json package-lock.json .npmrc ./
-RUN npm ci --ignore-scripts --no-audit --fund=false
+COPY --chown=bridge:bridge package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=bridge:bridge open-sse/package.json ./open-sse/package.json
+COPY --chown=bridge:bridge packages/browser-pool/package.json ./packages/browser-pool/package.json
+COPY --chown=bridge:bridge packages/ui-kit/package.json ./packages/ui-kit/package.json
+RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY --chown=bridge:bridge . .
-RUN npm rebuild better-sqlite3 || true
+RUN pnpm rebuild better-sqlite3 || true
 
 ENV HOME=/home/bridge \
   CLAUDE_CONFIG_DIR=/home/bridge/.claude-devin-isolated \
@@ -50,7 +55,7 @@ RUN mkdir -p /home/bridge/.claude-devin-isolated /home/bridge/.local/share/devin
 
 RUN DATA_DIR=/tmp/omniroute-build-data \
   SQLITE_FILE=/tmp/omniroute-build-data/storage.sqlite \
-  npm run build \
+  pnpm run build \
   && rm -rf /tmp/omniroute-build-data
 
 ENTRYPOINT ["/usr/bin/tini", "--"]

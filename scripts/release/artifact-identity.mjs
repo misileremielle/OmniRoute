@@ -23,7 +23,7 @@
  * CLI (values arrive as argv — never interpolated into a shell script):
  *
  *   node scripts/release/artifact-identity.mjs --head <sha> --base <sha> \
- *     [--lockfile package-lock.json] [--tarball <file.tgz>] [--out identity.json]
+ *     [--lockfile pnpm-lock.yaml] [--tarball <file.tgz>] [--out identity.json]
  */
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -50,7 +50,7 @@ export function hashLockfile(content) {
 }
 
 /**
- * Bundler `npm run build` uses. Delegates to the build script's own resolver so the
+ * Bundler `pnpm run build` uses. Delegates to the build script's own resolver so the
  * stamped `bundler` can never disagree with the build: since #18184 an unset
  * OMNIROUTE_USE_TURBOPACK picks webpack on hosts with <= 16 GiB of effective RAM.
  */
@@ -106,7 +106,7 @@ export function buildArtifactIdentity({
   tarball,
 }) {
   if (!lockfileContent || lockfileContent.length === 0)
-    throw new Error("lockfile content is required (package-lock.json)");
+    throw new Error("lockfile content is required (pnpm-lock.yaml)");
   const abi = requireText("nodeAbi", nodeAbi);
   if (!/^\d+$/.test(abi)) throw new Error(`nodeAbi must be numeric, got ${JSON.stringify(abi)}`);
 
@@ -149,7 +149,7 @@ export function parseIdentityArgs(argv) {
   return {
     head: values.head,
     base: values.base,
-    lockfile: values.lockfile ?? "package-lock.json",
+    lockfile: values.lockfile ?? "pnpm-lock.yaml",
     tarball: values.tarball,
     out: values.out,
   };

@@ -33,7 +33,7 @@ function getArgValue(name: string): string | undefined {
 function usage(): string {
   return [
     "Usage:",
-    "  npm run eval:router:trends -- --artifact-dir <dir> [--limit <n>] [--dashboard]",
+    "  pnpm run eval:router:trends --artifact-dir <dir> [--limit <n>] [--dashboard]",
     "",
     "Reads retained router-eval JSON artifacts and prints a markdown trend table or dashboard.",
   ].join("\n");

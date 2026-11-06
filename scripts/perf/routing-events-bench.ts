@@ -19,8 +19,8 @@
  *  - Numbers are machine-specific; treat them as relative, not absolute.
  *
  * Usage:
- *   npm run bench:routing-events
- *   npm run bench:routing-events -- --events 200000
+ *   pnpm run bench:routing-events
+ *   pnpm run bench:routing-events --events 200000
  */
 import { performance } from "node:perf_hooks";
 

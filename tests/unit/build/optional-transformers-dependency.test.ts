@@ -2,6 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+// @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
+import {
+  importerDependency,
+  packageSnapshots,
+  readPnpmLock,
+} from "../../../scripts/ci/pnpmLock.mjs";
 
 const repoRoot = process.cwd();
 
@@ -55,39 +61,25 @@ test("ONNX chain (@huggingface/transformers + onnxruntime-node) stays optional s
 });
 
 test("lockfile marks the whole ONNX chain optional", () => {
-  const lock = readJson<{
-    packages: Record<
-      string,
-      {
-        optional?: boolean;
-        dependencies?: Record<string, string>;
-        optionalDependencies?: Record<string, string>;
-      }
-    >;
-  }>("package-lock.json");
+  const lock = readPnpmLock(repoRoot);
 
   assert.match(
-    lock.packages[""]?.optionalDependencies?.["@huggingface/transformers"] ?? "",
+    importerDependency(lock, "@huggingface/transformers")?.specifier ?? "",
     /^\^4\./,
     "root lock optionalDependencies must hold transformers"
   );
   assert.equal(
-    lock.packages[""]?.optionalDependencies?.["onnxruntime-node"],
+    importerDependency(lock, "onnxruntime-node")?.specifier,
     "1.30.0",
     "root lock optionalDependencies must hold onnxruntime-node"
   );
-  assert.ok(
-    lock.packages["node_modules/@huggingface/transformers"]?.optional,
-    "transformers must be marked optional in the lockfile"
-  );
-  assert.ok(
-    lock.packages["node_modules/onnxruntime-node"]?.optional,
-    "onnxruntime-node must be marked optional in the lockfile"
-  );
-  assert.ok(
-    lock.packages["node_modules/onnxruntime-common"]?.optional,
-    "onnxruntime-common must be marked optional in the lockfile"
-  );
+  for (const name of ["@huggingface/transformers", "onnxruntime-node", "onnxruntime-common"]) {
+    const snapshots = packageSnapshots(lock, name);
+    assert.ok(snapshots.length > 0, `${name} must be in the lockfile`);
+    for (const [, snapshot] of snapshots) {
+      assert.equal(snapshot.optional, true, `${name} must be marked optional in the lockfile`);
+    }
+  }
 });
 
 test("every @huggingface/transformers consumer loads it lazily so absent installs degrade gracefully", () => {

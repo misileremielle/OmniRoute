@@ -21,7 +21,7 @@
 #
 # Usage:
 #   bash scripts/i18n/translate-new-keys.sh [--catalog=ui|cli] [--workers=N] [--locales=<csv>]
-#   npm run i18n:translate-new-keys -- --locales=pt-BR,es
+#   pnpm run i18n:translate-new-keys --locales=pt-BR,es
 #   # detached (the session keeps working; poll _artifacts/i18n-new-keys/batch.rc):
 #   mkdir -p _artifacts/i18n-new-keys
 #   nohup setsid bash scripts/i18n/translate-new-keys.sh > _artifacts/i18n-new-keys/runner.out 2>&1 &
@@ -130,7 +130,7 @@ if [ -n "$missing" ]; then
       if [ -n "${!v:-}" ]; then echo "    $v  (set)"; else echo "    $v  (MISSING)"; fi
     done
     echo "  Nothing was translated; the __MISSING__ markers are still in place and the"
-    echo "  new-key gate (npm run i18n:check-new-keys) will reject them."
+    echo "  new-key gate (pnpm run i18n:check-new-keys) will reject them."
   } >&2
   exit 2
 fi
@@ -259,5 +259,5 @@ log "BATCH END ok $(date -Is)"
 echo done >"$ART/batch.status"
 echo 0 >"$ART/batch.rc"
 echo "[i18n-new-keys] DONE — ${#selected[@]} locale(s) translated, no __MISSING__ marker left."
-echo "  Now: npm run i18n:check-keys && npm run i18n:check-ratio && npm run i18n:check-new-keys"
+echo "  Now: pnpm run i18n:check-keys && pnpm run i18n:check-ratio && pnpm run i18n:check-new-keys"
 exit 0

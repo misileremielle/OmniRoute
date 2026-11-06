@@ -3,7 +3,7 @@
  * OmniRoute — Environment Sync
  *
  * Ensures .env exists and contains the selected keys from .env.example.
- * Runs on installs and can be executed manually via `npm run env:sync`.
+ * Runs on installs and can be executed manually via `pnpm run env:sync`.
  *
  * Rules:
  *   - Never overwrites existing values in .env

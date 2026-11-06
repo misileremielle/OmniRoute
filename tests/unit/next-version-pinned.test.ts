@@ -22,6 +22,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+// @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
+import { importerDependency, readPnpmLock } from "../../scripts/ci/pnpmLock.mjs";
 
 const ROOT = new URL("../../", import.meta.url);
 const EXACT_VERSION = /^\d+\.\d+\.\d+(?:-[\w.]+)?$/;
@@ -49,13 +51,11 @@ test("build-coupled dependencies are pinned to exact versions", async () => {
 
 test("pinned next version matches the lockfile version the build uses", async () => {
   const pkg = await readJson("package.json");
-  const lock = await readJson("package-lock.json");
 
   const declared = ((pkg.dependencies ?? {}) as Record<string, string>).next;
-  const packages = (lock.packages ?? {}) as Record<string, { version?: string }>;
-  const locked = packages["node_modules/next"]?.version;
+  const locked = importerDependency(readPnpmLock(), "next")?.version;
 
-  assert.ok(locked, "next missing from package-lock.json");
+  assert.ok(locked, "next missing from pnpm-lock.yaml");
   assert.equal(
     declared,
     locked,

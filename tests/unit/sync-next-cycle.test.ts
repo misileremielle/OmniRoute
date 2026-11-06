@@ -111,7 +111,7 @@ test("git() passes a widened maxBuffer (ENOBUFS on `git show origin/main:CHANGEL
 test("i18n resync also propagates the FINALIZED [prevVersion] section into the mirrors, not just [NEXT]", () => {
   const src = readFileSync(SCRIPT_PATH, "utf8");
   assert.ok(
-    src.includes('"release:sync-changelog-i18n", "--", NEXT, prevVersion'),
+    src.includes('"release:sync-changelog-i18n", NEXT, prevVersion'),
     "syncs the new cycle section"
   );
   assert.ok(
@@ -119,7 +119,7 @@ test("i18n resync also propagates the FINALIZED [prevVersion] section into the m
     "computes the boundary below the shipped section"
   );
   assert.ok(
-    src.includes('"release:sync-changelog-i18n", "--", prevVersion, belowPrev'),
+    src.includes('"release:sync-changelog-i18n", prevVersion, belowPrev'),
     "syncs the shipped (finalized) section — without this all 42 mirrors keep it as TBD"
   );
 });

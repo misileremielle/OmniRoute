@@ -140,7 +140,7 @@ async function main() {
   if (opts.update) {
     const next = {
       _comment:
-        "Catraca de tradução real (valor idêntico ao en.json, placeholder ou ausente, fora do allowlist untranslatable-keys.json) em % por locale. Só pode cair. Atualize via `npm run i18n:check-ratio:update` quando um locale melhora. Valores medidos, nunca chutados.",
+        "Catraca de tradução real (valor idêntico ao en.json, placeholder ou ausente, fora do allowlist untranslatable-keys.json) em % por locale. Só pode cair. Atualize via `pnpm run i18n:check-ratio:update` quando um locale melhora. Valores medidos, nunca chutados.",
       slack,
       locales: Object.fromEntries(Object.entries({ ...baselineDoc.locales, ...measured }).sort()),
     };

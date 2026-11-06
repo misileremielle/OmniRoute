@@ -440,7 +440,7 @@ export function evaluateMasking(perFile, assertReductionAllowlist = new Set()) {
  * The subcheck-3 diff logic above (`evaluateMasking`'s `headExtTaut > baseExtTaut`)
  * only fires for a tautology INTRODUCED within the current PR's own diff, and
  * `resolveBase()` returns `null` outside CI (no `GITHUB_BASE_SHA`/`GITHUB_BASE_REF`),
- * so a local `npm run check:test-masking` run silently no-ops — "sem base ref —
+ * so a local `pnpm run check:test-masking` run silently no-ops — "sem base ref —
  * pulando" — regardless of what the tests actually contain. That is exactly how
  * #6404's `expect(true).toBe(true)` in `playground-api-tab.test.tsx` slipped through
  * for a full release cycle after merging once (the diff-only gate has nothing to

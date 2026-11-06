@@ -8,7 +8,7 @@
  *
  * Usage:
  *   node scripts/test/opencode-chatgpt-web-smoke.mjs
- *   npm run test:opencode:smoke
+ *   pnpm run test:opencode:smoke
  *   node scripts/test/opencode-chatgpt-web-smoke.mjs --dry-run          # preflight only
  *   node scripts/test/opencode-chatgpt-web-smoke.mjs --task "..." --timeout 420
  *   node scripts/test/opencode-chatgpt-web-smoke.mjs --expect-file out/index.html
@@ -105,7 +105,7 @@ async function preflight() {
     else log(`✓ OmniRoute healthy at ${baseUrl}`);
   } catch (error) {
     problems.push(
-      `OmniRoute not reachable at ${baseUrl} (${error.message}) — start it with npm run dev`
+      `OmniRoute not reachable at ${baseUrl} (${error.message}) — start it with pnpm run dev`
     );
   }
 

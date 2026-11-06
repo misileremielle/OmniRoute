@@ -443,7 +443,7 @@ export function buildCandidate(paths, options = {}) {
   }
   if (!fromTarball && !fs.existsSync(path.join(paths.repoRoot, "dist", "server.js"))) {
     throw new UsageError(
-      "dist/server.js missing — run `npm run build:release` first, or pass --from-tarball <file>"
+      "dist/server.js missing — run `pnpm run build:release` first, or pass --from-tarball <file>"
     );
   }
   if (fromTarball && !fs.existsSync(fromTarball)) {
@@ -725,7 +725,7 @@ export async function runCandidateLoop(paths, { build, validate, dryRun = false,
 
 // ── CLI ─────────────────────────────────────────────────────────────────────────────
 
-const HELP = `usage: npm run dev:candidate -- <command> [flags]
+const HELP = `usage: pnpm run dev:candidate <command> [flags]
 
 commands:
   build      npm pack the current tree and install it under _artifacts/candidate/<id>/

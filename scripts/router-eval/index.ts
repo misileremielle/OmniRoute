@@ -120,10 +120,10 @@ function parseArgs(): ArgSpec {
 function usage() {
   return [
     "Usage:",
-    "  npm run eval:router -- --input <file.ndjson> [--since <iso>] [--limit <n>]",
-    "  npm run eval:router -- --db [path] [--db-source usage-history|call-logs|auto] [--since <iso>] [--limit <n>]",
-    "  npm run eval:router -- --input <candidate> --baseline-input <baseline>",
-    "  npm run eval:router -- --db <path> --db-source usage-history",
+    "  pnpm run eval:router --input <file.ndjson> [--since <iso>] [--limit <n>]",
+    "  pnpm run eval:router --db [path] [--db-source usage-history|call-logs|auto] [--since <iso>] [--limit <n>]",
+    "  pnpm run eval:router --input <candidate> --baseline-input <baseline>",
+    "  pnpm run eval:router --db <path> --db-source usage-history",
     "       [--max-aiq-drop <n>] [--max-cost-increase <n>] [--fail-on-regression]",
     "",
     "Options:",

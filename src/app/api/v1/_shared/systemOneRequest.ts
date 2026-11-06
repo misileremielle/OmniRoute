@@ -24,9 +24,23 @@ export interface SystemOneAssetPart {
   data: Uint8Array;
 }
 
-export type DecodedSystemOneRequest =
-  | { ok: true; payload: unknown; assetParts: SystemOneAssetPart[] }
-  | { ok: false; status: number; message: string };
+export type DecodedSystemOneRequest = DecodedSystemOneSuccess | DecodedSystemOneFailure;
+export type DecodedSystemOneSuccess = {
+  ok: true;
+  payload: unknown;
+  assetParts: SystemOneAssetPart[];
+};
+export type DecodedSystemOneFailure = { ok: false; status: number; message: string };
+
+/**
+ * Narrows to the failure branch. The repo compiles with `strict: false`, where a check on the
+ * boolean `ok` alone does not narrow this union, so callers use this guard instead.
+ */
+export function isSystemOneDecodeFailure(
+  decoded: DecodedSystemOneRequest
+): decoded is DecodedSystemOneFailure {
+  return decoded.ok === false;
+}
 
 function decompress(raw: Uint8Array, encoding: string): Uint8Array {
   const options = { maxOutputLength: MAX_DECODED_BYTES };
@@ -61,7 +75,10 @@ async function readMultipart(
 ): Promise<DecodedSystemOneRequest> {
   let form: FormData;
   try {
-    form = await new Response(body, { headers: { "content-type": contentType } }).formData();
+    // TS 6 only accepts an ArrayBuffer-backed view as BodyInit; the decoded body always is
+    // one (zlib/zstd output or the request's own buffer), never a SharedArrayBuffer view.
+    const formBody = body as Uint8Array<ArrayBuffer>;
+    form = await new Response(formBody, { headers: { "content-type": contentType } }).formData();
   } catch {
     return { ok: false, status: 400, message: "Invalid multipart/form-data body" };
   }

@@ -141,8 +141,8 @@ function resolveCommit(ref) {
 }
 
 function sameLockfile(baseRoot) {
-  const head = path.join(ROOT, "package-lock.json");
-  const base = path.join(baseRoot, "package-lock.json");
+  const head = path.join(ROOT, "pnpm-lock.yaml");
+  const base = path.join(baseRoot, "pnpm-lock.yaml");
   return (
     fs.existsSync(head) &&
     fs.existsSync(base) &&
@@ -153,7 +153,7 @@ function sameLockfile(baseRoot) {
 function linkDependencies(baseRoot) {
   const source = path.join(ROOT, "node_modules");
   const target = path.join(baseRoot, "node_modules");
-  if (!fs.existsSync(source)) throw new Error("node_modules is missing; run npm ci first");
+  if (!fs.existsSync(source)) throw new Error("node_modules is missing; run pnpm install first");
 
   fs.mkdirSync(target);
   for (const entry of fs.readdirSync(source)) {

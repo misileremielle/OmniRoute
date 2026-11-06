@@ -16,7 +16,7 @@
  *
  * Flags:
  *   --host       ssh target (required)
- *   --tarball    local tarball produced by `npm run build:release && npm pack` (required)
+ *   --tarball    local tarball produced by `pnpm run build:release && npm pack` (required)
  *   --base-url   http base of the deployed gateway (required)
  *   --model      completion probe target; repeatable, at least one required
  *   --pm2-app    process-manager app name (default: omniroute)

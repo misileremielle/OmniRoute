@@ -1,32 +1,84 @@
 packages:
-  - "packages/*"
   - "open-sse"
-# Match `.npmrc`'s legacy-peer-deps posture. OmniRoute imports only the deep
-# icon modules from @lobehub/icons; auto-installing its unused @lobehub/ui peer
-# pulls a large UI subtree (including packages without distributable licenses).
+  - "packages/browser-pool"
+  - "packages/ui-kit"
+
+# scripts/build/assembleStandalone.mjs needs a flat node_modules: with pnpm's isolated
+# layout the standalone bundle loses better-sqlite3 (silent node:sqlite fallback) and
+# keeps absolute symlinks into the build machine. Dereferencing those copies is not
+# enough, because a package lifted out of .pnpm loses its sibling dependencies.
+nodeLinker: hoisted
+
+# OmniRoute imports only the deep icon modules from @lobehub/icons; auto-installing
+# its unused @lobehub/ui peer pulls a large UI subtree (including packages without
+# distributable licenses).
 autoInstallPeers: false
+
+# Never reinstall implicitly before `pnpm run` / `pnpm exec`.
+verifyDepsBeforeRun: false
+
+# Network resilience: retry a transient registry socket reset instead of failing.
+fetchRetries: 5
+fetchRetryFactor: 4
+fetchRetryMintimeout: 20000
+fetchRetryMaxtimeout: 120000
+
 allowBuilds:
+  "@huggingface/transformers": true
   "@parcel/watcher": true
+  "@playwright/browser-chromium": true
   "@swc/core": true
   better-sqlite3: true
+  bun: true
   core-js: true
   esbuild: true
   keytar: true
   libxmljs2: true
-  onnxruntime-node: true
+  # Its postinstall downloads CUDA binaries; the package already bundles the CPU ones.
+  onnxruntime-node: false
+  opencode-ai: true
   protobufjs: true
   sharp: true
   unrs-resolver: true
-onlyBuiltDependencies:
-  - "@parcel/watcher"
-  - "@swc/core"
-  - "better-sqlite3"
-  - "core-js"
-  - "esbuild"
-  - "keytar"
-  - "libxmljs2"
-  - "onnxruntime-node"
-  - "omniroute"
-  - "protobufjs"
-  - "sharp"
-  - "unrs-resolver"
+
+# Security and compatibility pins, ported from npm's package.json `overrides`.
+# pnpm 12 reads overrides from this file only.
+overrides:
+  "browserslist": "^4.28.8"
+  "joi": "^18.2.9"
+  "onnxruntime-node": "1.30.0"
+  "eslint-plugin-react-hooks": "7.1.1"
+  "fast-xml-parser": "^5.10.1"
+  "sharp": "^0.35.5"
+  "postcss": "^8.5.18"
+  "ip-address": "^10.7.4"
+  "axios": "^1.21.0"
+  "qs": "^6.16.1"
+  "uuid": "^14.0.3"
+  "form-data": "^4.0.6"
+  "vite": "^8.3.3"
+  "protobufjs": "^7.6.5"
+  "@babel/core": "^7.29.6"
+  "hono": "^4.13.13"
+  "@hono/node-server": "^2.1.3"
+  "fast-uri": "^3.1.9"
+  "body-parser": "^2.4.0"
+  "@openai/codex-security>smol-toml": "^1.9.0"
+  "jsdom>undici": "^7.29.0"
+  "node-gyp>undici": "^6.28.0"
+  "concurrently>shell-quote": "^1.9.0"
+  "adm-zip": "^0.6.1"
+  "promptfoo>js-yaml": "^5.2.2"
+  "promptfoo>undici@7": "^7.29.0"
+  "promptfoo>simple-git": "^4.0.1"
+  "promptfoo>@simple-git/argv-parser": "^2.0.1"
+  "mermaid>katex": "^0.18.2"
+  "socket.io-parser": "^4.2.7"
+  "tar": "^7.5.21"
+  "@apidevtools/json-schema-ref-parser>js-yaml": "^5.5.0"
+  "@eslint/eslintrc>js-yaml": "^4.3.1"
+  "xmlbuilder2>js-yaml": "^4.3.1"
+  "nanoid": "^3.3.17"
+  "monaco-editor>dompurify": "^3.4.17"
+  "csv-parse": "^7.0.2"
+  "minimatch@9>brace-expansion": "^2.1.4"

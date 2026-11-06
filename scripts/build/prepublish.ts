@@ -3,9 +3,9 @@
 /**
  * OmniRoute — Prepublish Build Script
  *
- * Consumes the .build/next/standalone artifact produced by `npm run build`
+ * Consumes the .build/next/standalone artifact produced by `pnpm run build`
  * (build-next-isolated.mjs) and assembles the npm staging `dist/` directory.
- * Does NOT run a second `next build` — the caller must run `npm run build` first,
+ * Does NOT run a second `next build` — the caller must run `pnpm run build` first,
  * or this script will invoke it exactly once if the artifact is absent.
  *
  * Run with: node scripts/build/prepublish.ts
@@ -180,19 +180,19 @@ if (existsSync(DIST_DIR)) {
 
 // ── Step 2: Assert / trigger the Next.js standalone build ──
 // prepublish no longer runs its own `next build`.  It consumes the
-// .build/next/standalone artifact produced by `npm run build` (build-next-isolated.mjs).
+// .build/next/standalone artifact produced by `pnpm run build` (build-next-isolated.mjs).
 // If the artifact is absent we invoke it exactly once.
 const NEXT_DIST = process.env.NEXT_DIST_DIR || ".build/next";
 const standaloneServerJs = join(ROOT, NEXT_DIST, "standalone", "server.js");
 if (!existsSync(standaloneServerJs)) {
-  console.log("  🏗️  .build/next/standalone not found — running `npm run build` once...");
+  console.log("  🏗️  .build/next/standalone not found — running `pnpm run build` once...");
   execFileSync(process.execPath, ["scripts/build/build-next-isolated.mjs"], {
     cwd: ROOT,
     stdio: "inherit",
   });
   if (!existsSync(standaloneServerJs)) {
     console.error(
-      "\n  ❌ Standalone build not found after `npm run build` at:",
+      "\n  ❌ Standalone build not found after `pnpm run build` at:",
       standaloneServerJs
     );
     console.error("     Make sure next.config.mjs has: output: 'standalone'");
@@ -532,7 +532,7 @@ if (existsSync(opencodePluginSrc) && existsSync(join(opencodePluginSrc, "package
       console.error("  ❌ Failed to build @omniroute/opencode-plugin:", err.message);
       console.error("     The published package would be missing the plugin dist.");
       console.error(
-        "     Run `cd @omniroute/opencode-plugin && npm install && npm run build` to debug."
+        "     Run `cd @omniroute/opencode-plugin && npm install && pnpm run build` to debug."
       );
       process.exit(1);
     }
