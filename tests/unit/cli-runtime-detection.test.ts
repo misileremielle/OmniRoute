@@ -290,7 +290,7 @@ describe("Continue CLI detection", () => {
         if (value === undefined) delete process.env[key];
         else process.env[key] = value;
       }
-      fs.rmSync(emptyHome, { recursive: true, force: true });
+      fs.rmSync(emptyHome, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     }
   });
 
