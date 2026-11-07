@@ -18,17 +18,9 @@ on:
   # (open/close the tracking issue). Publish jobs skip themselves on this event.
   schedule:
     - cron: "41 4 * * *"
+  # Manual run, no inputs: publishes the chosen branch/tag exactly as a push of it would
+  # (main → :latest, default release/v* → :next, v* tag → :<version>).
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version tag to build (e.g. 3.8.4)"
-        required: true
-        type: string
-      promote_latest:
-        description: "Also tag :latest (only if this is the highest semver)"
-        required: false
-        type: boolean
-        default: false
 
 # One publish per ref. A merge storm used to fan out 8 concurrent hosted builds,
 # every one OOM-killing `pnpm run build` inside BuildKit (#11976). The :next
@@ -42,7 +34,7 @@ on:
 # that, so with cancel-in-progress the next/next-web channel went 13 days without an image
 # (24 cancelled publishes on 2026-10-19 alone). Without it GitHub still keeps at most one
 # running and one pending run per group — an older pending run is replaced by the newest push,
-# the in-flight build completes, the latest tip follows. Tags, releases, dispatches and the
+# the in-flight build completes, the latest tip follows. Tags, releases and the
 # scheduled alert keep cancelling.
 concurrency:
   group: docker-publish-${{ github.event_name == 'schedule' && 'runner-alert' || github.ref }}
@@ -123,8 +115,6 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           REF_NAME: ${{ github.ref_name }}
           REF_TYPE: ${{ github.ref_type }}
-          INPUT_VERSION: ${{ inputs.version }}
-          PROMOTE_INPUT: ${{ inputs.promote_latest }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -148,9 +138,9 @@ jobs:
           echo "dockerhub_enabled=$DOCKERHUB_ENABLED" >> "$GITHUB_OUTPUT"
 
           # 1) Resolve version/channel from the trigger. Only the current default
-          # release branch publishes the mutable `next` channel; main keeps `main`.
+          # release branch publishes the mutable `next` channel; main publishes `latest`.
           VERSION=$(bash scripts/ci/resolve-docker-publish-version.sh \
-            "$EVENT_NAME" "$REF_TYPE" "$REF_NAME" "$INPUT_VERSION" "$DEFAULT_BRANCH")
+            "$EVENT_NAME" "$REF_TYPE" "$REF_NAME" "" "$DEFAULT_BRANCH")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
           # Frozen release branches keep receiving coordination commits after the
@@ -166,13 +156,11 @@ jobs:
           # 2) Decide whether to promote :latest. Floating channels are never
           # eligible, and the helper independently fails closed for non-semver.
           PROMOTE="false"
-          if [ "$VERSION" = "main" ] || [ "$VERSION" = "next" ]; then
+          if [ "$VERSION" = "latest" ] || [ "$VERSION" = "next" ]; then
             PROMOTE="false"
           elif printf '%s' "$VERSION" | grep -qE -- '-(rc|alpha|beta|pre|next)'; then
             echo "Pre-release identifier detected — skipping :latest."
             PROMOTE="false"
-          elif [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            PROMOTE="${PROMOTE_INPUT:-false}"
           else
             # Decide via the extracted helper, which folds VERSION into the
             # candidate set so the result is independent of git-tag sync timing
@@ -194,11 +182,11 @@ jobs:
           # published registry (GHCR, plus Docker Hub when enabled): an existing Node base must not block repairing a missing Web
           # image or architecture. Bun is deliberately not part of this check. It is
           # best-effort, so a release with a failing Bun leg, or a historical version
-          # without Bun tags, must not rebuild (~2 h) on every trigger. workflow_dispatch
-          # never skips: it is the explicit repair path, Bun tags and stale aliases included.
+          # without Bun tags, must not rebuild (~2 h) on every trigger. The floating
+          # `latest` (main) and `next` channels never skip.
           # Helper exit codes: 1 = missing or incomplete (publish), 2 = could not tell.
           SKIP="false"
-          if [ "$VERSION" != "main" ] && [ "$VERSION" != "next" ] && [ "$EVENT_NAME" != "workflow_dispatch" ]; then
+          if [ "$VERSION" != "latest" ] && [ "$VERSION" != "next" ]; then
             SKIP="true"
             CHECK_REFS=()
             if [ "$DOCKERHUB_ENABLED" = "true" ]; then
@@ -214,7 +202,7 @@ jobs:
                 break
               fi
               if [ "$rc" -ne 0 ]; then
-                echo "::error::Could not inspect $ref (registry error, not a missing tag). Not starting a rebuild on an unknown state: re-run this job once the registry recovers, or use workflow_dispatch to force a publish."
+                echo "::error::Could not inspect $ref (registry error, not a missing tag). Not starting a rebuild on an unknown state: re-run this job once the registry recovers."
                 exit 1
               fi
             done
@@ -325,7 +313,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           persist-credentials: false
-          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/v{0}', inputs.version) || '' }}
           # .dockerignore drops .git, so the image build never reads history.
           fetch-depth: 1
 
@@ -758,7 +745,7 @@ jobs:
           create_bun_manifest "${PUBLISH_BUN_WEB:-false}" "${GHCR_IMAGE_NAME}" "-web-bun" /tmp/digests/bun-web
 
       - name: Smoke-test published Docker image
-        if: needs.prepare.outputs.version != 'main'
+        if: needs.prepare.outputs.version != 'latest'
         run: |
           set -euo pipefail
           container="omniroute-smoke-${VERSION//[^a-zA-Z0-9_.-]/-}"
@@ -845,12 +832,12 @@ jobs:
           done
 
       - name: Inspect image
-        if: needs.prepare.outputs.version != 'main'
+        if: needs.prepare.outputs.version != 'latest'
         run: |
           docker buildx imagetools inspect "${GHCR_IMAGE_NAME}:${VERSION}"
 
       - name: Generate CycloneDX SBOM (image, advisory)
-        if: needs.prepare.outputs.version != 'main'
+        if: needs.prepare.outputs.version != 'latest'
         continue-on-error: true
         uses: anchore/sbom-action@v0
         with:
@@ -871,7 +858,7 @@ jobs:
       # repo-root .trivyignore so accepted-risk fixable CVEs have one auditable home.
       # See docs/security/SUPPLY_CHAIN.md.
       - name: Trivy image scan (SARIF, advisory)
-        if: needs.prepare.outputs.version != 'main'
+        if: needs.prepare.outputs.version != 'latest'
         continue-on-error: true
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -893,7 +880,7 @@ jobs:
       # base, bump the dep, or add a justified .trivyignore entry (see the CVE-variance
       # note in docs/security/SUPPLY_CHAIN.md).
       - name: Trivy CRITICAL gate (blocking)
-        if: needs.prepare.outputs.version != 'main'
+        if: needs.prepare.outputs.version != 'latest'
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ env.GHCR_IMAGE_NAME }}:${{ env.VERSION }}
@@ -906,7 +893,7 @@ jobs:
           trivyignores: .trivyignore
 
       - name: Upload Trivy SARIF to Security tab
-        if: needs.prepare.outputs.version != 'main'
+        if: needs.prepare.outputs.version != 'latest'
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@v4.39.1
         with:
@@ -933,7 +920,7 @@ jobs:
   runner-alert:
     name: omni-build runner offline alert
     if: >-
-      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+      github.event_name == 'schedule' &&
       vars.USE_VPS_RUNNER == 'true' && vars.USE_VPS_BUILD_RUNNER == 'true' &&
       (github.event_name != 'schedule' || github.repository == 'cheaper-inference/OmniRoute')
     runs-on: ubuntu-latest

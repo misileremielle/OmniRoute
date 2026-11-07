@@ -5,9 +5,9 @@
 #   resolve-docker-publish-version.sh EVENT_NAME REF_TYPE REF_NAME [INPUT_VERSION] [DEFAULT_BRANCH]
 #
 # Outputs exactly one safe tag string:
-# - workflow_dispatch: requested version without a leading v
 # - push tag: tag without a leading v
-# - push main: main
+# - workflow_dispatch: same as a push of the selected ref
+# - push main: latest
 # - push to the current default release/v* branch: next
 # - release: release tag without a leading v
 set -euo pipefail
@@ -19,16 +19,13 @@ INPUT_VERSION="${4:-}"
 DEFAULT_BRANCH="${5:-}"
 
 case "$EVENT_NAME" in
-  workflow_dispatch)
-    VERSION="${INPUT_VERSION#v}"
-    ;;
-  push)
+  push | workflow_dispatch)
     if [ "$REF_TYPE" = "tag" ]; then
       VERSION="${REF_NAME#v}"
     else
       case "$REF_NAME" in
         main)
-          VERSION="main"
+          VERSION="latest"
           ;;
         release/v*)
           if [ -z "$DEFAULT_BRANCH" ] || [ "$REF_NAME" != "$DEFAULT_BRANCH" ]; then
