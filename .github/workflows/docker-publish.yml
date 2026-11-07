@@ -18,6 +18,9 @@ on:
   # (open/close the tracking issue). Publish jobs skip themselves on this event.
   schedule:
     - cron: "41 4 * * *"
+  # Manual run, no inputs: publishes the chosen branch/tag exactly as a push of it would
+  # (main → :latest, default release/v* → :next, v* tag → :<version>).
+  workflow_dispatch:
 
 # One publish per ref. A merge storm used to fan out 8 concurrent hosted builds,
 # every one OOM-killing `pnpm run build` inside BuildKit (#11976). The :next

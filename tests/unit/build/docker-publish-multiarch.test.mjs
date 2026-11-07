@@ -507,9 +507,22 @@ test("prepare: floating channels never skip or inspect", () => {
   assert.deepEqual(result.inspected, []);
 });
 
-test("no manual version dispatch: every job builds the triggering ref", () => {
-  assert.doesNotMatch(workflow, /workflow_dispatch/);
+test("manual dispatch takes no inputs: every job builds the selected ref", () => {
+  assert.match(workflow, /^  workflow_dispatch:\n/m);
   assert.doesNotMatch(workflow, /inputs\./);
+  assert.doesNotMatch(buildJob, /\n\s+ref:/);
+});
+
+test("prepare: a manual run on main publishes :latest like a push", () => {
+  const result = runPrepare({
+    EVENT_NAME: "workflow_dispatch",
+    REF_TYPE: "branch",
+    REF_NAME: "main",
+    DEFAULT_BRANCH: "main",
+  });
+  assert.equal(result.status, 0, result.combined);
+  assert.equal(result.outputs.version, "latest");
+  assert.equal(result.outputs.skip, "false");
 });
 
 test("Web targets import the matching runtime's freshly built base cache", () => {

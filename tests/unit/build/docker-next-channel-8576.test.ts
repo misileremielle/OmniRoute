@@ -90,6 +90,9 @@ test("a stale release branch skips without overwriting next", () => {
 test("main publishes latest; tag and release behavior is preserved", () => {
   assert.equal(resolveVersion("push", "branch", "main"), "latest");
   assert.equal(resolveVersion("push", "tag", "v3.8.50"), "3.8.50");
+  // A manual run publishes the selected ref exactly like a push of it.
+  assert.equal(resolveVersion("workflow_dispatch", "branch", "main"), "latest");
+  assert.equal(resolveVersion("workflow_dispatch", "tag", "v3.8.50"), "3.8.50");
   assert.equal(resolveVersion("release", "tag", "v3.8.50"), "3.8.50");
 });
 

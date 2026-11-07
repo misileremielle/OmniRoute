@@ -6,6 +6,7 @@
 #
 # Outputs exactly one safe tag string:
 # - push tag: tag without a leading v
+# - workflow_dispatch: same as a push of the selected ref
 # - push main: latest
 # - push to the current default release/v* branch: next
 # - release: release tag without a leading v
@@ -18,7 +19,7 @@ INPUT_VERSION="${4:-}"
 DEFAULT_BRANCH="${5:-}"
 
 case "$EVENT_NAME" in
-  push)
+  push | workflow_dispatch)
     if [ "$REF_TYPE" = "tag" ]; then
       VERSION="${REF_NAME#v}"
     else
