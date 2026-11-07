@@ -514,7 +514,9 @@ test("backfills use current validation scripts but build the requested release s
   );
   assert.doesNotMatch(prepare, /ref:.*inputs.version/);
   assert.doesNotMatch(mergeJob, /ref:.*inputs.version/);
-  assert.match(buildJob, /ref:.*inputs.version/);
+  assert.match(prepare, /resolve-docker-source-ref\.sh/);
+  assert.match(prepare, /source_ref: \$\{\{ steps\.source\.outputs\.source_ref \}\}/);
+  assert.match(buildJob, /ref: \$\{\{ needs\.prepare\.outputs\.source_ref \}\}/);
 });
 
 test("Web targets import the matching runtime's freshly built base cache", () => {
