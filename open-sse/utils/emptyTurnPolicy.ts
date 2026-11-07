@@ -251,6 +251,21 @@ function observePart(state: EmptyTurnExecution, part: string, isSse: boolean) {
   }
 }
 
+const SSE_FIELD_PREFIX = /^(?:data|event|id|retry):/;
+
+/**
+ * SSE vs JSON from the start of a body: true for an SSE field or comment line,
+ * false for anything else, null while only whitespace (or a partial first field)
+ * has arrived and more bytes are coming.
+ */
+function sniffSseBody(text: string, done: boolean): boolean | null {
+  const start = text.trimStart();
+  if (!start) return done ? false : null;
+  if (start.startsWith(":") || SSE_FIELD_PREFIX.test(start)) return true;
+  if (!done && /^[a-z]{1,5}$/.test(start)) return null;
+  return false;
+}
+
 export function markEmptyTurnExecution(
   response: Response,
   requestUrl: string,
@@ -289,7 +304,15 @@ export function markEmptyTurnExecution(
     reasoningTokens: null,
   };
   const decoder = new TextDecoder();
-  const isSse = (response.headers.get("content-type") || "").includes("text/event-stream");
+  // The header is not authoritative: a native stream can reach this point without
+  // a `text/event-stream` content-type, and parsing its SSE body as one JSON
+  // document would leave every clean empty turn untrusted. Without the header,
+  // the body's first non-whitespace bytes decide.
+  let isSse: boolean | null = (response.headers.get("content-type") || "").includes(
+    "text/event-stream"
+  )
+    ? true
+    : null;
   let pending = "";
   function consume(text: string, done = false) {
     // A failed turn stays untrusted, but its later terminal still explains why.
@@ -302,6 +325,8 @@ export function markEmptyTurnExecution(
       pending = "";
       return;
     }
+    if (isSse === null) isSse = sniffSseBody(pending, done);
+    if (isSse === null) return;
     if (!isSse && !done) return;
     const parts = isSse ? pending.split(/\r?\n/) : [pending];
     pending = isSse && !done ? parts.pop() || "" : "";
