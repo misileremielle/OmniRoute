@@ -202,12 +202,8 @@ const ARBITRARY_HEX_ALLOWED: Allow = {
 
 const RGB_HSL_ALLOWED: Allow = {
   "src/app/(dashboard)/dashboard/providers/components/ProviderCard.tsx": {
-    max: 6,
-    reason: BRAND_GAP,
-  },
-  "src/app/(dashboard)/dashboard/compression/studio/SaliencyHeatmap.tsx": {
     max: 2,
-    reason: `red/green saliency ramp until the kit ships sequential/diverging ramps (keak-ai/cheaper-inference-ui-kit#166) — ${TRACKED}`,
+    reason: `blue flash of the locate-card highlight animation — ${TRACKED}`,
   },
   "src/app/(dashboard)/dashboard/providers/[id]/components/ConnectionQuotaPanel.tsx": {
     max: 3,
@@ -235,7 +231,7 @@ const STYLE_LITERAL_ALLOWED: Allow = {
   },
   "src/app/(dashboard)/dashboard/providers/components/ProviderCard.tsx": {
     max: 1,
-    reason: BRAND_GAP,
+    reason: `neutral fallback of the provider icon tile when the catalog has no colour — ${TRACKED}`,
   },
   "src/shared/components/NavigationProgress.tsx": {
     max: 1,
@@ -418,7 +414,7 @@ test("style scan: catches hex, rgb()/hsl() and named colours in style objects on
       [
         '<span style={{ backgroundColor: "var(--ci-chart-3-subtle)", color: pc.text }} />',
         "<span style={{ width: `${progress}%`, opacity: 1 }} />",
-        "<span style={brandTintStyle(provider.color)} />",
+        "<span style={brandTintVars(provider.color)} />",
         'const PROVIDERS = [{ id: "openai", color: "#10A37F" }]; // data, not a style object',
         'type T = { color: "purple" | "blue" };',
       ].join("\n")

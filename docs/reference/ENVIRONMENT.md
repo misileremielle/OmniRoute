@@ -1833,3 +1833,14 @@ Used by `open-sse/services/combo.ts` and `src/lib/quota/quotaScheduler.ts` for p
 | `AWS_REGION` | See source | `open-sse/services/kiroRegion.ts` | Optional override; parsing and defaults are defined in the source. |
 | `GROK_SUBSCRIPTION_IMAGES_ENABLED` | See source | `src/shared/constants/featureFlagDefinitions.ts` | Optional override; parsing and defaults are defined in the source. |
 | `OMNIROUTE_STRICT_SYSTEM_PROVIDERS` | See source | `open-sse/translator/helpers/strictSystemHoist.ts` | Optional override; parsing and defaults are defined in the source. |
+
+## Local OpenCode media-analysis tool
+
+Used by `scripts/cli/omniroute-media-mcp.mjs`. Set these in the local tool process environment.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `OMNIROUTE_MEDIA_CONFIG` | `$XDG_CONFIG_HOME/opencode/opencode.json` (or `~/.config/opencode/opencode.json`) | OpenCode configuration read by the media tool and installer. |
+| `OMNIROUTE_MEDIA_PROVIDER` | `omniroute` | Provider entry read from the OpenCode configuration by the media tool. |
+| `OMNIROUTE_MEDIA_MODEL` | `auto` | Model submitted by the media tool. Its provider must support the requested media types. |
+| `OMNIROUTE_MEDIA_API_KEY` | Configured provider API key or its environment reference | Optional credential override. Keep it in the local process environment; never commit it. |

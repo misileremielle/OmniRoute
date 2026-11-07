@@ -368,10 +368,17 @@ function normalizeAttemptBody(opts: PrepareUpstreamBodyOptions): Body {
     translatedBody.reasoning !== undefined ||
     translatedBody.thinking !== undefined ||
     hasExplicitTemplateReasoning;
-  // Fresh containers per attempt (the normalizers below mutate nested fields in
-  // place), but shared immutable strings: structuredClone() re-copied every base64
-  // image / long history string on every attempt and fallback.
-  let bodyToSend: Body = { ...cloneRequestBody(translatedBody), model: modelToCall };
+  // Codex's Responses transform normalizes input into new item records before
+  // mutation and independently copies its mutable tools/reasoning fields, so its
+  // potentially huge input history stays shared until that boundary. Every other
+  // target gets fresh containers per attempt (the normalizers below mutate nested
+  // fields in place) that still share immutable strings: structuredClone() re-copied
+  // every base64 image / long history string on every attempt and fallback.
+  const attemptSource =
+    provider === "codex" && targetFormat === FORMATS.OPENAI_RESPONSES
+      ? translatedBody
+      : cloneRequestBody(translatedBody);
+  let bodyToSend: Body = { ...attemptSource, model: modelToCall };
   bodyToSend = normalizeThinkingForModel(bodyToSend, modelToCall);
   bodyToSend = normalizeClaudeAdaptiveThinking(bodyToSend, modelToCall);
   bodyToSend = normalizeClaudeDisabledThinkingEffort(bodyToSend, modelToCall, provider);
