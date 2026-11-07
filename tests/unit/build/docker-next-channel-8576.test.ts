@@ -87,13 +87,9 @@ test("a stale release branch skips without overwriting next", () => {
   assert.match(WORKFLOW, /echo "skip=true" >> "\$GITHUB_OUTPUT"/);
 });
 
-test("existing main, tag, dispatch, and release behavior is preserved", () => {
-  assert.equal(resolveVersion("push", "branch", "main"), "main");
+test("main publishes latest; tag and release behavior is preserved", () => {
+  assert.equal(resolveVersion("push", "branch", "main"), "latest");
   assert.equal(resolveVersion("push", "tag", "v3.8.50"), "3.8.50");
-  assert.equal(
-    resolveVersion("workflow_dispatch", "branch", "main", "v3.8.50"),
-    "3.8.50",
-  );
   assert.equal(resolveVersion("release", "tag", "v3.8.50"), "3.8.50");
 });
 
@@ -106,7 +102,7 @@ test("unsupported push branches fail closed", () => {
 
 test("next and other non-semver channels can never promote latest", () => {
   assert.equal(shouldPromote("next", ["v99.0.0"]), "false");
-  assert.equal(shouldPromote("main", []), "false");
+  assert.equal(shouldPromote("latest", []), "false");
   assert.equal(shouldPromote("3.8.51-rc.1", ["v3.8.50"]), "false");
 });
 
@@ -115,7 +111,7 @@ test("workflow triggers release branches and keeps next mutable", () => {
   assert.match(WORKFLOW, /DEFAULT_BRANCH:.*repository\.default_branch/);
   assert.match(
     WORKFLOW,
-    /\[ "\$VERSION" != "main" \] && \[ "\$VERSION" != "next" \]/,
+    /\[ "\$VERSION" != "latest" \] && \[ "\$VERSION" != "next" \]/,
   );
 });
 
@@ -124,6 +120,6 @@ test("next images retain the blocking vulnerability gate", () => {
     /- name: Trivy CRITICAL gate \(blocking\)[\s\S]*?exit-code: "1"/,
   );
   assert.ok(gate, "blocking Trivy gate must remain present");
-  assert.match(gate[0], /version != 'main'/);
+  assert.match(gate[0], /version != 'latest'/);
   assert.doesNotMatch(gate[0], /version != 'next'/);
 });

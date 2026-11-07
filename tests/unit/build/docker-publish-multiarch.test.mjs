@@ -434,7 +434,7 @@ const MANDATORY_REFS = [
 
 function runPrepare(env, scenario) {
   // Actions defines every variable of the step's env block, empty when the event lacks it.
-  const stepEnv = { INPUT_VERSION: "", PROMOTE_INPUT: "", ...env };
+  const stepEnv = { ...env };
   return withSandbox((dir) => runScript(dir, PREPARE, { env: stepEnv, scenario }));
 }
 
@@ -480,16 +480,16 @@ test("prepare: a registry failure fails the job instead of forcing a rebuild", (
   );
 });
 
-test("prepare: workflow_dispatch is the repair path and never skips or inspects", () => {
+test("prepare: a push to main publishes :latest without skipping or inspecting", () => {
   const result = runPrepare({
-    EVENT_NAME: "workflow_dispatch",
+    EVENT_NAME: "push",
     REF_TYPE: "branch",
-    REF_NAME: "release/v1.0.0",
-    INPUT_VERSION: "1.0.0",
-    PROMOTE_INPUT: "false",
-    DEFAULT_BRANCH: "release/v1.0.0",
+    REF_NAME: "main",
+    DEFAULT_BRANCH: "main",
   });
   assert.equal(result.status, 0, result.combined);
+  assert.equal(result.outputs.version, "latest");
+  assert.equal(result.outputs.promote_latest, "false");
   assert.equal(result.outputs.skip, "false");
   assert.deepEqual(result.inspected, []);
 });
@@ -507,16 +507,9 @@ test("prepare: floating channels never skip or inspect", () => {
   assert.deepEqual(result.inspected, []);
 });
 
-test("backfills use current validation scripts but build the requested release source", () => {
-  const prepare = workflow.slice(
-    workflow.indexOf("\n  prepare:"),
-    workflow.indexOf("\n  runner-preflight:")
-  );
-  assert.doesNotMatch(prepare, /ref:.*inputs.version/);
-  assert.doesNotMatch(mergeJob, /ref:.*inputs.version/);
-  assert.match(prepare, /resolve-docker-source-ref\.sh/);
-  assert.match(prepare, /source_ref: \$\{\{ steps\.source\.outputs\.source_ref \}\}/);
-  assert.match(buildJob, /ref: \$\{\{ needs\.prepare\.outputs\.source_ref \}\}/);
+test("no manual version dispatch: every job builds the triggering ref", () => {
+  assert.doesNotMatch(workflow, /workflow_dispatch/);
+  assert.doesNotMatch(workflow, /inputs\./);
 });
 
 test("Web targets import the matching runtime's freshly built base cache", () => {
