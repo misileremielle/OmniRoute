@@ -12,6 +12,7 @@ import { isRequestScopedMisalignmentRefusal } from "@omniroute/open-sse/utils/pr
 import { buildAllExpiredCredentials } from "./authExpiredCredentials.ts";
 import { pickExpiryFirstConnection } from "./expiryFirstAccountSelection.ts";
 import { isModelScopedFailure, isQuotaExhaustedSignal } from "./modelScopedQuotaFailure.ts"; // #13548
+import { isCIPayloadQuotaFailure } from "./ciPayloadQuotaFailure.ts";
 import {
   getCachedRawProviderConnections,
   getCachedProviderNodes,
@@ -29,7 +30,7 @@ import {
 } from "@/lib/db/providers";
 import { getDbInstance } from "@/lib/db/core";
 import { getRecentEgressIpForConnection, EGRESS_IP_LOOKUP_WINDOW_MS } from "@/lib/db/proxyLogs";
-import { validateApiKey } from "@/lib/db/apiKeys";
+import { validateApiKey, type ApiKeyLookupOptions } from "@/lib/db/apiKeys";
 import {
   getActiveExclusiveConnectionLease,
   hashLeaseOwnerId,
@@ -2435,6 +2436,7 @@ function resolveUpstreamResetMs(fallback: {
   return fallback.quotaResetHintMs ?? null;
 }
 
+/** Record provider/account health failures while keeping upload-admission errors request-scoped. */
 export async function markAccountUnavailable(
   connectionId: string,
   status: number,
@@ -2455,6 +2457,11 @@ export async function markAccountUnavailable(
     structuredError?: { code?: string | null; type?: string | null } | null;
   } = {}
 ) {
+  // Preserve the transport's original 429; cooling Opus would hide the cause and
+  // prevent healthy small requests from using the same connection afterward.
+  if (isCIPayloadQuotaFailure(provider, status, options.structuredError?.code))
+    return { shouldFallback: false, cooldownMs: 0 };
+
   const currentMutex = markMutexes.get(connectionId) || Promise.resolve();
   let resolveMutex: (() => void) | undefined;
   markMutexes.set(
@@ -3483,12 +3490,12 @@ export function extractApiKey(request: AuthRequestLike) {
  * persistent passthrough keys that always validate, surviving Docker
  * restarts and backup restores without DB dependency.
  */
-export async function isValidApiKey(apiKey: string) {
+export async function isValidApiKey(apiKey: string, options?: ApiKeyLookupOptions) {
   if (!apiKey) return false;
 
   // Persistent env-var key — always valid regardless of DB state (#1350)
   const envKey = process.env.OMNIROUTE_API_KEY || process.env.ROUTER_API_KEY;
   if (envKey && timingSafeCompare(apiKey, envKey)) return true;
 
-  return await validateApiKey(apiKey);
+  return await validateApiKey(apiKey, options);
 }

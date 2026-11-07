@@ -47,8 +47,6 @@ test("no Material Symbols ligature span is left in the app tree", () => {
 
 test("no raw <select>, <textarea> or <table> outside the adapters (dashboard + shared)", () => {
   const hits = countBy(DASHBOARD, /<(select|textarea|table)\b/g);
-  // The Select adapter renders the native <select class="ci-select-native"> branch.
-  delete hits["src/shared/components/Select.tsx"];
   // Comment-only mentions of "<select>" (no JSX): ModelSelectField, StudioConfigPane.
   for (const f of Object.keys(hits)) {
     const jsx = fs
@@ -204,6 +202,34 @@ test("no hand-rolled role=dialog outside the Modal adapter", () => {
   delete hits["src/shared/components/Modal.tsx"]; // doc comment on the kit DialogContent
   // In-container dialog kept on purpose: pinned tests use window Escape/backdrop (lote 6 #1).
   delete hits["src/shared/components/RequestLoggerDetail.tsx"];
+  assert.deepEqual(hits, {});
+});
+
+// A spun <Icon> kept turning under reduced motion and exposed no status. Spinners go through the
+// Spinner adapter in Loading.tsx: the kit arc, a labelled status unless `decorative`.
+test("animate-spin stays within its budget: new spinners use the Spinner adapter", () => {
+  const hits = countBy(APP, /\banimate-spin\b/g);
+  // Another front owns this file; its one spun icon goes with that work.
+  delete hits["src/shared/components/ConsoleLogViewer.tsx"];
+  const SPIN_ALLOWED: Record<string, number> = {
+    // Spun refresh/progress icons in files that draw charts, which the chart work owns.
+    "src/app/(dashboard)/dashboard/analytics/CompressionAnalyticsTab.tsx": 1,
+    "src/app/(dashboard)/dashboard/health/TelemetryCard.tsx": 1,
+    // Hand-made CSS rings, not icons: bordered spans and divs, some tinted to a status badge.
+    "src/app/(dashboard)/dashboard/analytics/components/DiversityScoreCard.tsx": 1,
+    "src/app/(dashboard)/dashboard/conversations/page.tsx": 1,
+    "src/app/(dashboard)/dashboard/health/page.tsx": 1,
+    "src/app/(dashboard)/dashboard/models/CatalogTestBadge.tsx": 1,
+    "src/shared/components/RequestLoggerDetail.tsx": 1,
+    "src/shared/components/RequestLoggerV2.tsx": 1,
+    "src/shared/components/conversation/MessageContent.tsx": 1,
+  };
+  assert.deepEqual(hits, SPIN_ALLOWED);
+});
+
+test("no raw <kbd> outside the kit Kbd", () => {
+  const hits = countBy(APP, /<kbd\b/g);
+  delete hits["src/shared/components/CommandPalette.tsx"]; // moves with the kit Command palette
   assert.deepEqual(hits, {});
 });
 
