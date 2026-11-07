@@ -219,9 +219,11 @@ export function colocateLlmlinguaOptionals({
       // (global-agent's node_modules/.bin/semver) to absolute paths into this
       // machine's root node_modules, which dangle in any shipped bundle and
       // make the Electron web-build refuse to pack it.
-      cpSync(join(rootNm, name), dest, {
+      // The source is realpath'd so a package directory that is itself a symlink
+      // (pnpm layouts) is copied as a real directory. `dereference` cannot do that
+      // here: Node rejects it together with verbatimSymlinks.
+      cpSync(realpathSync(join(rootNm, name)), dest, {
         recursive: true,
-        dereference: true,
         force: false,
         errorOnExist: false,
         verbatimSymlinks: true,
