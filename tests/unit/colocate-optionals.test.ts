@@ -1,6 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
+import {
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  readFileSync,
+  existsSync,
+  rmSync,
+  renameSync,
+  symlinkSync,
+  lstatSync,
+  readlinkSync,
+} from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -200,6 +211,39 @@ test("colocateLlmlinguaOptionals fills a Next-traced stub (package.json only, no
       existsSync(join(stubDir, "dist", "index.js")),
       "the real dist/index.js must be filled in, not left missing behind the stub"
     );
+  } finally {
+    rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  }
+});
+
+test("colocateLlmlinguaOptionals copies a symlinked package dir as a real dir and keeps inner links relative", () => {
+  // pnpm can leave a top-level package as a symlink into its store, while a package's own
+  // node_modules/.bin links are relative. The upstream merge combined `dereference` (for the
+  // first) with `verbatimSymlinks` (for the second); Node rejects that pair, so every copy threw
+  // and nothing was co-located.
+  const root = mkdtempSync(join(tmpdir(), "omniroute-colocate-symlink-"));
+  try {
+    buildRoot(root);
+    const rootNm = join(root, "node_modules");
+    const store = join(root, "store", "js-tiktoken");
+    mkdirSync(dirname(store), { recursive: true });
+    renameSync(join(rootNm, "js-tiktoken"), store);
+    symlinkSync(store, join(rootNm, "js-tiktoken"), "dir");
+    mkdirSync(join(store, "node_modules", ".bin"), { recursive: true });
+    symlinkSync("../../index.js", join(store, "node_modules", ".bin", "tiktoken"));
+    const distNm = join(root, "dist", "node_modules");
+    mkPkg(distNm, "@huggingface/transformers", { version: "4.2.0" });
+
+    const result = colocateLlmlinguaOptionals({ rootDir: root });
+    assert.equal(result.skipped, false);
+    if (result.skipped === false) {
+      assert.equal(result.copied, result.closure, "every closure package must be copied");
+    }
+
+    const copied = join(distNm, "js-tiktoken");
+    assert.ok(lstatSync(copied).isDirectory(), "a symlinked package lands as a real directory");
+    assert.ok(existsSync(join(copied, "index.js")));
+    assert.equal(readlinkSync(join(copied, "node_modules", ".bin", "tiktoken")), "../../index.js");
   } finally {
     rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
