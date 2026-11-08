@@ -58,8 +58,12 @@ export class RedisVectorStore implements IVectorStore {
     if (this.client) return this.client;
     try {
       const mod = await import("ioredis");
-      const RedisClass = (mod.default ?? mod) as unknown as new (url?: string) => RedisLike;
-      this.client = new RedisClass(this.redisUrl);
+      const RedisClass = (mod.default ?? mod) as unknown as new (
+        url: string | undefined,
+        options: { protocol: 2 }
+      ) => RedisLike;
+      // ioredis 6 speaks RESP3 by default, which changes reply shapes; keep RESP2.
+      this.client = new RedisClass(this.redisUrl, { protocol: 2 });
       return this.client;
     } catch (err) {
       console.warn("[CACHE] Redis driver unavailable:", (err as Error).message);

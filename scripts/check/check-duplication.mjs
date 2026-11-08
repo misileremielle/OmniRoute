@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // scripts/check/check-duplication.mjs
-// Catraca de duplicação de código. Roda jscpd@4 (PINADO — o v5 é um rewrite Rust com
-// CLI/JSON incompatíveis) sobre src+open-sse e compara a % atual contra um baseline
+// Catraca de duplicação de código. Roda jscpd@5 (rewrite Rust; mede numa escala própria,
+// por isso o baseline foi recongelado na troca do v4) sobre src+open-sse e compara a % atual contra um baseline
 // congelado (duplication-baseline.json). Falha se a duplicação SUBIR. Ataca a assinatura
 // nº1 de slop de IA (GitClear 2026: duplicação 4-8x na era IA) — no nosso caso, o
 // copy-paste dos executors (48/50 sobrescrevem execute() inteiro). --update ratcheta.
