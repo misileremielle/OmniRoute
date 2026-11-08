@@ -711,6 +711,9 @@ paths:
         "200":
           description: Chat completion response (or SSE stream)
           headers:
+            X-OmniRoute-Video-Drilldown:
+              description: Up to four comma-separated opaque handles after explicitly consented authenticated video analysis; absent without retained frames. Also available on SSE success responses.
+              schema: { type: string, maxLength: 259 }
             X-OmniRoute-Response-Cost:
               schema:
                 type: string
@@ -1631,6 +1634,7 @@ paths:
     post:
       tags: [Providers]
       summary: Auto-detect and import the local Antigravity CLI (agy) login from disk
+      x-loopback-only: true
       x-always-protected: true
       responses:
         "200":

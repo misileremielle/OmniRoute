@@ -244,6 +244,7 @@ export async function POST(request: Request) {
       testStatus,
       providerSpecificData: incomingPsd,
       allowNoCredential,
+      proxyEnabled,
     } = validation.data;
     const provider = resolveProviderId(requestedProvider);
     if (provider === "cloudflare-ai" && Object.hasOwn(body, "accountId")) {
@@ -406,6 +407,7 @@ export async function POST(request: Request) {
 
     const newConnection = await createProviderConnection({
       provider,
+      ...(proxyEnabled !== undefined ? { proxyEnabled } : {}),
       authType: "apikey",
       name,
       apiKey: persistedApiKey,

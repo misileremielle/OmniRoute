@@ -803,6 +803,17 @@ Web/search provider abstraction (Tavily, Brave, Exa, Serper, etc.).
 
 **Auth:** Bearer API key (`extractApiKey` + `isValidApiKey`). Search policy enforced via `enforceApiKeyPolicy`.
 
+**Auto-select:** without `provider`, the cheapest provider with a configured connection runs
+first and the next cheapest is the failover. Free last-resort providers (`duckduckgo-free`) are
+used only when nothing else is configured. A self-hosted SearXNG counts as configured once its
+connection stores a real `baseUrl` (not the catalog default `http://localhost:8888/search`): it
+then ranks as a $0 provider ahead of keyed ones, with the cheapest keyed provider as failover,
+including when SearXNG answers 400, 401, 403 or 404. A `baseUrl` that is not a valid `http(s)` URL
+or that points at a cloud-metadata address does not count. A SearXNG connection that stores a token
+ranks this way only over `https://` or loopback `http://`. Over remote plain `http://` it is never
+a failover and stays a last resort, used only when no other provider is configured or when
+requested by name, so it does send the token in cleartext in those two cases.
+
 ### Exa and Tavily `provider_options`
 
 Exa and Tavily read provider-specific fields from a namespaced bag:
@@ -1405,6 +1416,34 @@ curl -X PATCH "$OMNIROUTE_URL/api/keys/$KEY_ID" \
 | `/api/cache/stats`           | GET/DELETE | Cache stats / clear                                                                                                                                                                                                                                                                                                                                                                          |
 | `/api/modality-bridge/stats` | GET        | In-memory `attempts`, successes/`bridged`, failures, cache hits, `totalLatencyMs`, `latencySamples`, sample-denominated `averageLatencyMs`, and last-use time (reset on restart; management auth)                                                                                                                                                                                            |
 
+### Video frame drill-down
+
+`GET /api/v1/video-bridge/drilldown` reads a tenant-bound opaque handle returned in
+`x-omniroute-video-drilldown` after an explicitly consented Video Bridge request.
+Both reads and `DELETE` always require a valid API key and the operator's independent
+`modalityBridgeVideoDrilldownRemoteEnabled` permission. Production retention additionally
+requires `modalityBridgeVideoDrilldownEnabled` and strict per-part `drilldown: true`.
+If the key has a nonempty endpoint allowlist, it must include `video` for both
+GET and DELETE, whether the caller uses `/v1` or `/api/v1`.
+
+GET query: required `handle`; optional `variant` (`preview`, `standard`, `detail`),
+`limit` (1–8; legacy `frames` is accepted but cannot be combined with `limit`),
+zero-based `page`, and `start`/`end` seconds. When both focus bounds
+are supplied, `end` must be greater than `start`. Duplicate/unknown query keys are
+rejected. Successful responses contain `derivation`, `durationSeconds`, `frames`,
+`hasMore`, `page`, `variant`, and optional `focusWindow`; no-store JSON is capped at
+32 MiB including Base64. Oversized output returns 413; request fewer frames.
+
+`DELETE /api/v1/video-bridge/drilldown?handle=...` returns `{ "removed": 0|1 }`.
+Unknown, expired and cross-key GETs are indistinguishable 404 responses; cross-key
+DELETE cannot remove the owner's entry. Disabled access returns 403, missing/invalid
+authentication 401, invalid queries 400, cancellation 499 and temporary errors 503.
+Handles are process-local, expire after ten minutes, and do not survive a restart.
+New handles use `v1.` plus a 32-byte random Base64URL token; only token hashes are
+retained. Legacy 64-hex tokens remain syntactically readable for compatibility.
+See [Video Bridge guardrails](../security/GUARDRAILS.md#video-bridge-videobridgets-videobridgepipelinets)
+for consent, quotas and variant derivation details.
+
 ### Backup & Export/Import
 
 | Endpoint                    | Method | Description                                                             |
@@ -1492,7 +1531,7 @@ These endpoints mirror Gemini's API format for clients that expect native Gemini
 
 | Endpoint                 | Method | Description                                            |
 | ------------------------ | ------ | ------------------------------------------------------ |
-| `/api/init`              | GET    | Application initialization check (used on first run)   |
+| `/api/init`              | GET    | Start background sync services (management auth)       |
 | `/api/tags`              | GET    | Ollama-compatible model tags (for Ollama clients)      |
 | `/api/restart`           | POST   | Trigger graceful server restart                        |
 | `/api/shutdown`          | POST   | Trigger graceful server shutdown                       |

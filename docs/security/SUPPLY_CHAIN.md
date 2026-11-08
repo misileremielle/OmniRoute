@@ -49,9 +49,13 @@ Both gates **gracefully SKIP** (exit 0) when the tool is absent or the measureme
 fails (osv-scanner not in PATH, osv.dev/network unreachable, invalid JSON) — a
 **measurement** failure never blocks, only a **measured** regression blocks.
 
-## Known Accepted Risks
+## Retired dependency risk
 
-### extract-zip 2.0.1 — GHSA-7pqw-9j4j-h8q3 / GHSA-jmr9-qjv8-65gv (#14482)
+The root lockfile no longer includes `extract-zip` or a dependency edge to it after
+upgrading the pinned promptfoo development tool. This retires the previously accepted
+`promptfoo` → `@openai/codex-security` → `extract-zip` chain tracked in #14482.
+The regression checks in `tests/unit/extract-zip-14482-exposure.test.ts` reject its
+reintroduction and retain the prohibition on imports from production code.
 
 `extract-zip@2.0.1` carries two unpatched high-severity symlink-traversal advisories.
 Per the "no upstream fix" branch of the CVE Variance remedy above, this is an

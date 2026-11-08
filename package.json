@@ -23,6 +23,7 @@
     ".env.example",
     "config/i18n.json",
     ".npmrc",
+    "scripts/ops/opencode-free-relay.ts",
     "scripts/build/postinstall.mjs",
     "scripts/build/betterSqlitePrebuildTarget.mjs",
     "scripts/build/fixPlaywrightAndroid.mjs",
@@ -488,7 +489,7 @@
     "opencode-ai": "1.19.5",
     "playwright-ctrf-json-reporter": "^0.1.0",
     "prettier": "^3.9.10",
-    "promptfoo": "0.123.0",
+    "promptfoo": "0.125.1",
     "selfsigned": "^5.5.0",
     "size-limit": "^14.3.0",
     "subset-font": "^2.9.0",
@@ -577,6 +578,12 @@
     "monaco-editor": {
       "dompurify": "^3.4.17"
     },
-    "csv-parse": "^7.0.2"
+    "csv-parse": "^7.0.2",
+    "@azure/identity": {
+      "@azure/msal-node": "^7.1.0"
+    },
+    "get-uri": {
+      "basic-ftp": "^6.2.3"
+    }
   }
 }
