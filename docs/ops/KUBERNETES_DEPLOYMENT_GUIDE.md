@@ -354,7 +354,7 @@ Helm:
 
 ```bash
 # Kustomize: pin a real tag rather than relying on :latest
-kubectl -n omniroute set image deploy/omniroute omniroute=diegosouzapw/omniroute:3.8.51
+kubectl -n omniroute set image deploy/omniroute omniroute=ghcr.io/misileremielle/omniroute:3.8.51
 
 # Helm
 helm upgrade omniroute deploy/helm/omniroute -n omniroute --reuse-values \

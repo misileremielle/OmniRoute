@@ -64,14 +64,14 @@ function builderInstallRun(source: string): string {
   const all = instructions(source);
   const start = all.findIndex((line) => {
     const words = line.toUpperCase().split(/\s{1,100}/);
-    return words[0] === "FROM" && words.slice(-2).join(" ") === "AS BUILDER";
+    return words[0] === "FROM" && words.slice(-2).join(" ") === "AS DEPS";
   });
-  assert.ok(start >= 0, "Dockerfile must declare a builder stage");
+  assert.ok(start >= 0, "Dockerfile must declare a deps stage");
   const later = all.slice(start + 1);
   const next = later.findIndex((line) => line.toUpperCase().startsWith("FROM "));
   const stage = next < 0 ? later : later.slice(0, next);
   const runs = stage.filter((line) => line.startsWith("RUN ") && line.includes("pnpm install "));
-  assert.equal(runs.length, 1, "one builder install RUN is required");
+  assert.equal(runs.length, 1, "one deps install RUN is required");
   let command = runs[0].slice(4).trimStart();
   while (command.startsWith("--mount=")) {
     const end = command.indexOf(" ");
@@ -147,7 +147,7 @@ function executeInstall(command: string, mirror = ""): Invocation[] {
 }
 
 test(
-  "#6700 builder stage compiles better-sqlite3 via a direct node-gyp rebuild, not `npm rebuild`",
+  "#6700 deps stage compiles better-sqlite3 via a direct node-gyp rebuild, not `npm rebuild`",
   shellOptions,
   () => {
     const calls = executeInstall(builderInstallRun(dockerfile));
@@ -197,10 +197,10 @@ for (const [name, before, after] of invalidRuns) {
 }
 
 test("#6700 comments cannot supply the required install instruction", () => {
-  assert.throws(() => builderInstallRun("RUN echo AS builder\nRUN pnpm install --ignore-scripts"));
+  assert.throws(() => builderInstallRun("RUN echo AS deps\nRUN pnpm install --ignore-scripts"));
   assert.throws(() =>
     builderInstallRun(
-      "FROM node AS builder\n# RUN pnpm install --ignore-scripts\nFROM node AS runner"
+      "FROM node AS deps\n# RUN pnpm install --ignore-scripts\nFROM node AS runner"
     )
   );
 });
@@ -208,6 +208,6 @@ test("#6700 comments cannot supply the required install instruction", () => {
 test("#6700 cd in a different RUN cannot authorize the rebuild", shellOptions, () => {
   const command = builderInstallRun(dockerfile);
   const changed = command.replace("cd node_modules/better-sqlite3", "true");
-  const source = `FROM node AS builder\nRUN cd node_modules/better-sqlite3\nRUN ${changed}\nFROM node AS runner`;
+  const source = `FROM node AS deps\nRUN cd node_modules/better-sqlite3\nRUN ${changed}\nFROM node AS runner`;
   assert.throws(() => executeInstall(builderInstallRun(source)));
 });

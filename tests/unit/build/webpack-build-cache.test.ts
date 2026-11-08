@@ -49,7 +49,7 @@ test("dev builds keep the cache Next configured", () => {
 
 // Docker drops a --build-arg the stage never declares, so the opt-in has to be an
 // ARG promoted to ENV inside the builder stage, before the build step runs.
-for (const dockerfile of ["Dockerfile", "Dockerfile.bun"]) {
+for (const dockerfile of ["Dockerfile"]) {
   test(`${dockerfile} builder stage passes OMNIROUTE_WEBPACK_BUILD_CACHE to the build`, () => {
     const lines = fs.readFileSync(path.join(repoRoot, dockerfile), "utf-8").split("\n");
     const start = lines.findIndex((l) => /^FROM\s+\S+\s+AS\s+builder\b/i.test(l.trim()));

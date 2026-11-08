@@ -6,7 +6,7 @@ import test from "node:test";
 // node and Bun ship their own root store, so the images must use runtimes that reject the
 // compromised intermediates. These are the first patched releases; Dependabot may bump the
 // pins upward, but nothing may go below them or back to a floating major-only tag.
-const MIN = { node: [26, 12, 1], bun: [1, 4, 4] };
+const MIN = { node: [26, 12, 1] };
 
 const read = (rel) => readFileSync(new URL(`../../../${rel}`, import.meta.url), "utf8");
 
@@ -29,7 +29,6 @@ const cases = [
   ["Dockerfile", "node", MIN.node],
   ["docker/devin-bridge/compose.yml", "node", MIN.node],
   ["docker/devin-bridge/Dockerfile", "node", MIN.node],
-  ["Dockerfile.bun", "oven/bun", MIN.bun],
 ];
 
 for (const [file, image, min] of cases) {

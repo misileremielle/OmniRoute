@@ -86,9 +86,7 @@
 
 [![npm version](https://img.shields.io/npm/v/omniroute?color=cb3837&logo=npm)](https://www.npmjs.com/package/omniroute)
 ![NPM Monthly](https://img.shields.io/npm/dm/omniroute?label=npm/month&color=cb3837&logo=npm)
-[![Docker Hub](https://img.shields.io/docker/v/diegosouzapw/omniroute?label=Docker%20Hub&logo=docker&color=2496ED)](https://hub.docker.com/r/diegosouzapw/omniroute)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-![Docker Pulls](https://img.shields.io/docker/pulls/diegosouzapw/omniroute?label=docker%20pulls&logo=docker&color=2496ED)
 
 <table>
   <tr>
@@ -644,7 +642,7 @@ of your shell history. → [CLI Integrations](docs/guides/CLI-INTEGRATIONS.md)
   <tr><th align="left">Platform</th><th align="left">Install</th><th align="left">Highlights</th></tr>
   <tr><td align="left" nowrap>📦 <b>npm (global)</b></td><td align="left" nowrap><code>npm install -g omniroute</code></td><td align="left">One command, any OS</td></tr>
   <tr><td align="left" nowrap>⚡ <b>Bun (global)</b></td><td align="left" nowrap><code>bun add -g omniroute</code></td><td align="left">Same registry tarball, faster installs</td></tr>
-  <tr><td align="left" nowrap>🐳 <b>Docker</b></td><td align="left" nowrap><code>docker run … diegosouzapw/omniroute</code></td><td align="left">Multi-arch <b>AMD64 + ARM64</b></td></tr>
+  <tr><td align="left" nowrap>🐳 <b>Docker</b></td><td align="left" nowrap><code>docker run … ghcr.io/misileremielle/omniroute</code></td><td align="left">Multi-arch <b>AMD64 + ARM64</b></td></tr>
   <tr><td align="left" nowrap>🎩 <b>Menu-bar (OmniRouteTray)</b></td><td align="left" nowrap><code>brew install --cask zoispag/tap/omniroute-tray</code></td><td align="left">Supervises &amp; auto-updates the server — <b>macOS</b></td></tr>
   <tr><td align="left" nowrap>💪 <b>ARM</b></td><td align="left" nowrap>native <code>arm64</code></td><td align="left">Raspberry Pi, ARM servers, Apple Silicon</td></tr>
   <tr><td align="left" nowrap>📱 <b>Android (Termux)</b></td><td align="left" nowrap><code>pkg install nodejs && npx -y omniroute</code></td><td align="left">Runs <b>on your phone</b>, 24/7, no root</td></tr>
@@ -935,7 +933,7 @@ Use these only for clients that cannot attach `Authorization: Bearer ...`. Heade
 
 ```bash
 docker run -d --name omniroute --restart unless-stopped --stop-timeout 40 \
-  -p 127.0.0.1:20128:20128 -v omniroute-data:/app/data diegosouzapw/omniroute:latest
+  -p 127.0.0.1:20128:20128 -v omniroute-data:/app/data ghcr.io/misileremielle/omniroute:latest
 ```
 
 `:latest` follows the highest **published** stable SemVer. It does not track git `main`. Pin `:X.Y.Z` for GitOps. See [Docker Release Channels](docs/guides/DOCKER_GUIDE.md#release-channels).The image pins **`OMNIROUTE_MEMORY_MB=1024`**. That is enough for the dashboard and a light chat. **Coding agents** (`POST /v1/responses` from Claude Code, Codex, Grok, …) need a much larger V8 heap or the process `FATAL ERROR`s at ~12 GiB under two overlapping long contexts. Size the container above the heap (native buffers sit outside V8):
@@ -949,13 +947,13 @@ docker run -d --name omniroute --restart unless-stopped --stop-timeout 40 \
 ```bash
 docker run -d --name omniroute --restart unless-stopped --stop-timeout 40 \
   -e OMNIROUTE_MEMORY_MB=8192 --memory=10g \
-  -p 127.0.0.1:20128:20128 -v omniroute-data:/app/data diegosouzapw/omniroute:latest
+  -p 127.0.0.1:20128:20128 -v omniroute-data:/app/data ghcr.io/misileremielle/omniroute:latest
 ```
 
 Full table: [Docker Guide — runtime RAM](docs/guides/DOCKER_GUIDE.md#runtime-ram-for-coding-agents).
 
-> **Pre-release Docker channel:** `diegosouzapw/omniroute:next` and
-> `diegosouzapw/omniroute:next-web` follow the current default `release/v*`
+> **Pre-release Docker channel:** `ghcr.io/misileremielle/omniroute:next` and
+> `ghcr.io/misileremielle/omniroute:next-web` follow the current default `release/v*`
 > branch. These mutable tags are intended only for testing unreleased fixes and
 > are **not supported for production**. See
 > [Docker Release Channels](docs/guides/DOCKER_GUIDE.md#release-channels).
@@ -965,8 +963,7 @@ Full table: [Docker Guide — runtime RAM](docs/guides/DOCKER_GUIDE.md#runtime-r
 Standard `bun install` and global installation (`bun install -g omniroute`) are supported via Bun runtime detection:
 
 - **Built-in `bun:sqlite`**: OmniRoute uses Bun's built-in `bun:sqlite` driver when running under Bun, falling back to `better-sqlite3` on Node.js or `sql.js`.
-- **Automatic Webpack bundler selection in dev**: Development (`bun run dev`) automatically detects Bun and disables Turbopack in favor of Webpack to prevent native V8 binding incompatibilities. Production builds (`bun run build`) follow `OMNIROUTE_USE_TURBOPACK` exactly as on Node: Turbopack by default, `OMNIROUTE_USE_TURBOPACK=0` to build with Webpack (`Dockerfile.bun` exposes it as a `--build-arg`).
-- **Dedicated Bun Dockerfile**: Multi-stage `Dockerfile.bun` for native Bun production deployments (`docker build -f Dockerfile.bun -t omniroute:bun .`).
+- **Automatic Webpack bundler selection in dev**: Development (`bun run dev`) automatically detects Bun and disables Turbopack in favor of Webpack to prevent native V8 binding incompatibilities. Production builds (`bun run build`) follow `OMNIROUTE_USE_TURBOPACK` exactly as on Node: Turbopack by default, `OMNIROUTE_USE_TURBOPACK=0` to build with Webpack.
 
 ```bash
 # Install and run with Bun
@@ -1167,8 +1164,8 @@ Métricas canônicas em 2026-10-18: **1.976 vídeos únicos** · **20.220.289 vi
   <tr><td nowrap><b>Logging</b></td><td>pino — structured JSON logs with request context</td></tr>
   <tr><td nowrap><b>Testing</b></td><td>Node.js test runner + Vitest — <b>60,000+ static test declarations</b> across 8,400+ tracked test files (unit, integration, E2E, security, ecosystem)</td></tr>
   <tr><td nowrap><b>Platforms</b></td><td>Android (Termux) · PWA (any browser)</td></tr>
-  <tr><td nowrap><b>CI/CD</b></td><td>GitHub Actions — auto npm publish + Docker Hub on release</td></tr>
-  <tr><td nowrap><b>Links</b></td><td><a href="https://omniroute.online">Website</a> · <a href="https://www.npmjs.com/package/omniroute">npm</a> · <a href="https://hub.docker.com/r/diegosouzapw/omniroute">Docker Hub</a></td></tr>
+  <tr><td nowrap><b>CI/CD</b></td><td>GitHub Actions — auto npm publish + GHCR image on release</td></tr>
+  <tr><td nowrap><b>Links</b></td><td><a href="https://omniroute.online">Website</a> · <a href="https://www.npmjs.com/package/omniroute">npm</a></td></tr>
 </table>
 
 <div align="center">

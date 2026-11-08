@@ -43,7 +43,7 @@ docker run -d \
   --stop-timeout 40 \
   -p 20128:20128 \
   -v omniroute-data:/app/data \
-  diegosouzapw/omniroute:latest
+  ghcr.io/misileremielle/omniroute:latest
 ```
 
 ## With Environment File
@@ -59,7 +59,7 @@ docker run -d \
   --env-file .env \
   -p 20128:20128 \
   -v omniroute-data:/app/data \
-  diegosouzapw/omniroute:latest
+  ghcr.io/misileremielle/omniroute:latest
 ```
 
 ## Docker Compose
@@ -340,7 +340,7 @@ Size **cgroup `--memory` above the heap** — native buffers, SQLite, and compre
 ```bash
 docker run -d --name omniroute --restart unless-stopped --stop-timeout 40 \
   -e OMNIROUTE_MEMORY_MB=8192 --memory=10g \
-  -p 127.0.0.1:20128:20128 -v omniroute-data:/app/data diegosouzapw/omniroute:latest
+  -p 127.0.0.1:20128:20128 -v omniroute-data:/app/data ghcr.io/misileremielle/omniroute:latest
 ```
 
 ## Critical Environment Variables
@@ -396,14 +396,14 @@ runtime environment variable.
 
 ### Pre-built root image + runtime subpath
 
-Published `diegosouzapw/omniroute:*` images are built for the domain root. You can still
+Published `ghcr.io/misileremielle/omniroute:*` images are built for the domain root. You can still
 set `OMNIROUTE_BASE_PATH` at runtime; the container patches the bundle once on startup.
 Pair it with the matching public origin:
 
 ```yaml
 services:
   omniroute:
-    image: diegosouzapw/omniroute:latest
+    image: ghcr.io/misileremielle/omniroute:latest
     environment:
       OMNIROUTE_BASE_PATH: /omniroute
       NEXT_PUBLIC_BASE_URL: https://myhostname.example.com/omniroute
@@ -444,7 +444,7 @@ OmniRoute can be securely exposed using Caddy's automatic SSL provisioning. Ensu
 ```yaml
 services:
   omniroute:
-    image: diegosouzapw/omniroute:latest
+    image: ghcr.io/misileremielle/omniroute:latest
     container_name: omniroute
     restart: unless-stopped
     volumes:
@@ -481,8 +481,8 @@ configuration.
 
 | Image                    | Tag      | Size   | Description                                          |
 | ------------------------ | -------- | ------ | ---------------------------------------------------- |
-| `diegosouzapw/omniroute` | `latest` | ~250MB | Highest **published** stable SemVer (not git `main`) |
-| `diegosouzapw/omniroute` | `3.8.0`  | ~250MB | Pin this class of tag for GitOps                     |
+| `ghcr.io/misileremielle/omniroute` | `latest` | ~250MB | Highest **published** stable SemVer (not git `main`) |
+| `ghcr.io/misileremielle/omniroute` | `3.8.0`  | ~250MB | Pin this class of tag for GitOps                     |
 
 Multi-platform manifest: `linux/amd64` + `linux/arm64` native (Apple Silicon, AWS Graviton, Raspberry Pi). Docker selects the matching architecture automatically; pass `--platform linux/amd64` if you need to force AMD64 emulation on ARM hosts.
 
@@ -515,8 +515,8 @@ If you use those providers, pull the `-web` tag of the channel you are already o
 The `next` channel is rebuilt on every push to the current default `release/v*` branch and is published for both AMD64 and ARM64. Older maintenance branches cannot overwrite it. The channel provides a pullable image for fixes that have merged into the active release branch before the next stable tag is cut.
 
 ```bash
-docker pull diegosouzapw/omniroute:next
-docker pull diegosouzapw/omniroute:next-web
+docker pull ghcr.io/misileremielle/omniroute:next
+docker pull ghcr.io/misileremielle/omniroute:next-web
 ```
 
 For Docker Compose, override the image tag used by the selected profile, then pull and recreate the service:
@@ -524,7 +524,7 @@ For Docker Compose, override the image tag used by the selected profile, then pu
 ```yaml
 services:
   omniroute:
-    image: diegosouzapw/omniroute:next
+    image: ghcr.io/misileremielle/omniroute:next
 ```
 
 ```bash
@@ -537,14 +537,14 @@ docker compose up -d
 `next` is a floating pre-release channel. It may change on any push to the active release branch and is **not supported for production use**. Pin the image digest while evaluating a specific build:
 
 ```bash
-docker pull diegosouzapw/omniroute:next
-docker image inspect diegosouzapw/omniroute:next --format '{{index .RepoDigests 0}}'
+docker pull ghcr.io/misileremielle/omniroute:next
+docker image inspect ghcr.io/misileremielle/omniroute:next --format '{{index .RepoDigests 0}}'
 ```
 
 Before testing, back up the OmniRoute data volume or bind-mounted data directory. To roll back, restore the previously used stable version or digest and recreate the container:
 
 ```bash
-docker pull diegosouzapw/omniroute:<stable-version>
+docker pull ghcr.io/misileremielle/omniroute:<stable-version>
 docker compose up -d
 ```
 
@@ -787,7 +787,7 @@ Compose sketch (two heaps, two volumes — not `deploy.replicas: 2`):
 ```yaml
 services:
   omniroute-a:
-    image: diegosouzapw/omniroute:3.8.49
+    image: ghcr.io/misileremielle/omniroute:3.8.49
     environment:
       DATA_DIR: /app/data
       OMNIROUTE_MEMORY_MB: "12288"
@@ -796,7 +796,7 @@ services:
     volumes: [omniroute-a-data:/app/data]
     ports: ["20128:20128"]
   omniroute-b:
-    image: diegosouzapw/omniroute:3.8.49
+    image: ghcr.io/misileremielle/omniroute:3.8.49
     environment:
       DATA_DIR: /app/data
       OMNIROUTE_MEMORY_MB: "12288"

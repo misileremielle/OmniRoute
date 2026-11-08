@@ -30,7 +30,7 @@ test("#15184: Export digests starts from an empty directory", () => {
 test("#15184: merge job guards against stale digests before imagetools create", () => {
   const merge = workflow.slice(workflow.indexOf("\n  merge:"));
   const guardAt = merge.indexOf("Guard against stale digests");
-  const createAt = merge.indexOf("Create Docker Hub version manifests");
+  const createAt = merge.indexOf("Create GHCR version manifests");
   assert.ok(guardAt !== -1 && guardAt < createAt, "guard step must precede manifest creation");
   assert.match(stepBlock("Guard against stale digests"), /-gt 2/);
 });

@@ -128,7 +128,7 @@ mkdir -p data
 ### 3. Build and start
 
 The application profiles use local image names such as `omniroute:base`; those
-are build outputs, not published Docker Hub tags. On the first run, have Compose
+are build outputs, not published registry tags. On the first run, have Compose
 build the selected profile:
 
 ```bash
@@ -191,7 +191,7 @@ podman run -d --name omniroute \
   -e DATA_DIR=/app/data \
   -p 20128:20128 \
   -v omniroute-data:/app/data \
-  docker.io/diegosouzapw/omniroute:latest
+  ghcr.io/misileremielle/omniroute:latest
 ```
 
 For a bind mount that still fails, inspect or repair the shared path from the

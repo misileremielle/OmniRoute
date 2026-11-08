@@ -344,7 +344,7 @@ export function defaultSpec(target: DeployTargetKind): DeploySpec {
     namespace: "omniroute",
     releaseName: "omniroute",
     image: {
-      repository: "diegosouzapw/omniroute",
+      repository: "ghcr.io/misileremielle/omniroute",
       tag: "latest",
       pullPolicy: "IfNotPresent" as const,
     },
