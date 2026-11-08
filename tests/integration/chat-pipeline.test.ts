@@ -533,7 +533,11 @@ test("#11884 chat pipeline sends a custom node's edited Chat API type upstream",
 });
 
 test("chat pipeline persists Codex responses cache and reasoning tokens to call logs", async () => {
-  await seedConnection("codex", { apiKey: "sk-codex-primary" });
+  // Sol-tier models route only to paid Codex plans (codexPlanModelGate).
+  await seedConnection("codex", {
+    apiKey: "sk-codex-primary",
+    providerSpecificData: { chatgptPlanType: "plus" },
+  });
   const fetchCalls = [];
 
   globalThis.fetch = async (url, init: RequestInit = {}) => {

@@ -85,9 +85,8 @@ describe("CommandPalette ranking (#17915)", () => {
       const expectations: Array<[string, string]> = [
         ["log", "Logs"],
         ["logs", "Logs"],
-        ["log export", "Log export"],
+        ["audit log", "Audit Log"],
         ["proxy logs", "Proxy Logs"],
-        ["radar", "Radar Catalog"],
       ];
       for (const [query, first] of expectations) {
         const options = await optionsFor(input, query);
@@ -95,10 +94,8 @@ describe("CommandPalette ranking (#17915)", () => {
         // Weaker matches stay available, they just come later.
         if (query === "log") {
           const labels = options.map(labelOf);
-          expect(labels).toContain("Log export");
-          expect(labels).toContain("Radar Catalog");
-          expect(labels.indexOf("Logs")).toBeLessThan(labels.indexOf("Log export"));
-          expect(labels.indexOf("Logs")).toBeLessThan(labels.indexOf("Radar Catalog"));
+          expect(labels).toContain("Audit Log");
+          expect(labels.indexOf("Logs")).toBeLessThan(labels.indexOf("Audit Log"));
         }
       }
     }
@@ -121,25 +118,25 @@ describe("CommandPalette ranking (#17915)", () => {
       expect(push).toHaveBeenCalledTimes(1);
       expect(push).toHaveBeenLastCalledWith("/dashboard/logs/proxy");
 
-      // Past the first section: "Log export" sits in Integrations, after the Monitoring rows.
-      const target = labels.indexOf("Log export");
+      // Past the first section: "Audit Log" sits in a later section, after the Monitoring rows.
+      const target = labels.indexOf("Audit Log");
       expect(target).toBeGreaterThan(1);
       for (let step = 1; step < target; step += 1) fireEvent.keyDown(input, { key: "ArrowDown" });
       expect(input.getAttribute("aria-activedescendant")).toBe(options[target].id);
       fireEvent.keyDown(input, { key: "Enter" });
       expect(push).toHaveBeenCalledTimes(2);
-      expect(push).toHaveBeenLastCalledWith("/dashboard/log-export");
+      expect(push).toHaveBeenLastCalledWith("/dashboard/audit");
     }
   );
 
   it("ranks a label typed without its accents above a subtitle match", async () => {
     sidebarOverrides.current = {
-      radar: "Catálogo Radar",
+      auditLog: "Catálogo de Auditoria",
       settingsCacheSubtitle: "Catálogo de modelos e cache de respostas",
     };
     const input = await openPalette();
     const labels = (await optionsFor(input, "catalogo")).map(labelOf);
-    expect(labels).toEqual(["Catálogo Radar", "Cache"]);
+    expect(labels).toEqual(["Catálogo de Auditoria", "Cache"]);
   });
 
   it("keeps rows the kit finds across fields even though no field holds the whole query", async () => {

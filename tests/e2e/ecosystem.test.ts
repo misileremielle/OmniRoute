@@ -1,7 +1,7 @@
 /**
  * E2E Test Suite — OmniRoute Ecosystem
  *
- * 6 scenarios covering MCP, A2A, Auto-Combo, Extension, Stress, and Security.
+ * Scenarios covering MCP, quota, Auto-Combo, OpenClaw, Stress, and Security.
  * Run with: npm run test:ecosystem
  */
 
@@ -126,60 +126,6 @@ describe("E2E: Quota Contract (/api/usage/quota)", () => {
   });
 });
 
-// ─── Scenario 2: A2A Server Complete ─────────────────────────────
-describe("E2E: A2A Server (lifecycle)", () => {
-  beforeAll(async () => {
-    await apiFetch("/api/settings", {
-      method: "PATCH",
-      body: JSON.stringify({ a2aEnabled: true }),
-    });
-  });
-  itCase("should serve Agent Card", async () => {
-    const res = await apiFetch("/.well-known/agent.json");
-    expect(res.ok).toBe(true);
-    const card = (await res.json()) as any;
-    expect(card).toHaveProperty("name");
-    expect(card).toHaveProperty("skills");
-    expect(card).toHaveProperty("version");
-    expect(card.capabilities).toHaveProperty("streaming");
-  });
-
-  itCase("should accept message/send via JSON-RPC", async () => {
-    const res = await apiFetch("/a2a", {
-      method: "POST",
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "e2e-1",
-        method: "message/send",
-        params: {
-          skill: "quota-management",
-          messages: [{ role: "user", content: "show quota ranking" }],
-        },
-      }),
-    });
-    expect(res.ok).toBe(true);
-    const data = (await res.json()) as any;
-    expect(data).toHaveProperty("result");
-    expect(data.result.task).toHaveProperty("id");
-    expect(data.result.task).toHaveProperty("state");
-  });
-
-  itCase("should reject invalid JSON-RPC method", async () => {
-    const res = await apiFetch("/a2a", {
-      method: "POST",
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "e2e-2",
-        method: "invalid/method",
-        params: {},
-      }),
-    });
-    const data = (await res.json()) as any;
-    expect(data).toHaveProperty("error");
-    expect(data.error.code).toBe(-32601);
-  });
-});
-
 // ─── Scenario 3: Auto-Combo ─────────────────────────────────────
 describe("E2E: Auto-Combo (routing + self-healing)", () => {
   itCase("should create auto-combo", async () => {
@@ -255,54 +201,6 @@ describe("E2E: Stress (100 parallel requests)", () => {
 
 // ─── Scenario 6: Security ────────────────────────────────────────
 describe("E2E: Security", () => {
-  itCase("should handle missing A2A auth according to server configuration", async () => {
-    const res = await fetch(`${BASE_URL}/a2a`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      // Intentionally no Authorization header
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "sec-1",
-        method: "message/send",
-        params: { skill: "quota-management", messages: [] },
-      }),
-    });
-    if (API_KEY) {
-      expect(res.status).toBeGreaterThanOrEqual(401);
-      return;
-    }
-
-    if (res.status !== 200) {
-      console.log("SEC-1 FAILED STATUS:", res.status, "BODY:", await res.text());
-    }
-    expect(res.status).toBe(200);
-  });
-
-  itCase("should handle invalid API keys according to server configuration", async () => {
-    const res = await fetch(`${BASE_URL}/a2a`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer invalid-key-12345",
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "sec-2",
-        method: "message/send",
-        params: { skill: "quota-management", messages: [] },
-      }),
-    });
-    if (API_KEY) {
-      expect(res.status).toBeGreaterThanOrEqual(401);
-      return;
-    }
-
-    if (res.status !== 200) {
-      console.log("SEC-2 FAILED STATUS:", res.status, "BODY:", await res.text());
-    }
-    expect(res.status).toBe(200);
-  });
-
   itCase("should not expose internal errors in API responses", async () => {
     const res = await apiFetch("/api/monitoring/health", {
       method: "PATCH",
@@ -311,16 +209,5 @@ describe("E2E: Security", () => {
     expect(res.status).toBe(405);
     const body = await res.text();
     expect(body.includes("Error:")).toBe(false);
-  });
-
-  itCase("should validate JSON-RPC request format", async () => {
-    const res = await apiFetch("/a2a", {
-      method: "POST",
-      body: "not-json",
-    });
-    const data = (await res.json()) as any;
-    if (data.error) {
-      expect(data.error.code).toBe(-32700); // Parse error
-    }
   });
 });
