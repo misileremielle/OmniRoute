@@ -39,20 +39,20 @@ test("extract-zip (GHSA-7pqw-9j4j-h8q3 / GHSA-jmr9-qjv8-65gv) is reachable only 
     "root project must not depend on extract-zip directly (dev)"
   );
 
-  // 2. Exactly one package in the whole tree declares a dependency on extract-zip,
-  //    and it must be @openai/codex-security.
+  // 2. At most one package in the whole tree declares a dependency on extract-zip, and
+  //    it must be @openai/codex-security. (Newer promptfoo releases dropped extract-zip
+  //    from the tree entirely, which closes the exposure as well.)
   const extractZipDependents = dependentsOf(lock, "extract-zip");
-  assert.deepEqual(
-    extractZipDependents,
-    ["@openai/codex-security"],
+  assert.ok(
+    extractZipDependents.every((name) => name === "@openai/codex-security"),
     `expected only @openai/codex-security to depend on extract-zip, got: ${extractZipDependents.join(", ")}`
   );
 
-  // 3. The only thing that depends on @openai/codex-security must be promptfoo.
+  // 3. The only thing that may depend on @openai/codex-security is promptfoo (promptfoo
+  //    0.125 declares it as an optional peer, so the lockfile may hold no edge at all).
   const codexSecurityDependents = dependentsOf(lock, "@openai/codex-security");
-  assert.deepEqual(
-    codexSecurityDependents,
-    ["promptfoo"],
+  assert.ok(
+    codexSecurityDependents.every((name) => name === "promptfoo"),
     `expected only promptfoo to depend on @openai/codex-security, got: ${codexSecurityDependents.join(", ")}`
   );
 

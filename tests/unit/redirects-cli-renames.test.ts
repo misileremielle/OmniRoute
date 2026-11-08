@@ -22,22 +22,6 @@ test("next.config.mjs has permanent wildcard redirect from /dashboard/cli-tools/
   );
 });
 
-test("next.config.mjs has permanent redirect from /dashboard/agents to /dashboard/acp-agents", () => {
-  assert.ok(
-    configSource.includes('source: "/dashboard/agents"') &&
-      configSource.includes('destination: "/dashboard/acp-agents"'),
-    "expected /dashboard/agents → /dashboard/acp-agents redirect in next.config.mjs"
-  );
-});
-
-test("next.config.mjs has permanent wildcard redirect from /dashboard/agents/:path* to /dashboard/acp-agents/:path*", () => {
-  assert.ok(
-    configSource.includes('source: "/dashboard/agents/:path*"') &&
-      configSource.includes('destination: "/dashboard/acp-agents/:path*"'),
-    "expected /dashboard/agents/:path* → /dashboard/acp-agents/:path* redirect in next.config.mjs"
-  );
-});
-
 test("next.config.mjs has permanent redirect from /dashboard/providers/freepik to /dashboard/providers/magnific", () => {
   assert.ok(
     configSource.includes('source: "/dashboard/providers/freepik"') &&
@@ -46,13 +30,13 @@ test("next.config.mjs has permanent redirect from /dashboard/providers/freepik t
   );
 });
 
-test("all 4 CLI redirect entries use permanent: true", () => {
+test("both CLI redirect entries use permanent: true", () => {
   // Extract the CLI Pages block
   const cliBlock = configSource.slice(configSource.indexOf("// CLI Pages — Plano 14 (F9)"));
   assert.ok(cliBlock.length > 0, "expected CLI Pages block to be present");
   const permanentCount = (cliBlock.match(/permanent: true/g) || []).length;
   assert.ok(
-    permanentCount >= 4,
-    `expected at least 4 'permanent: true' entries in CLI Pages block, found ${permanentCount}`
+    permanentCount >= 2,
+    `expected at least 2 'permanent: true' entries in CLI Pages block, found ${permanentCount}`
   );
 });

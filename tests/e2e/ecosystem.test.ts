@@ -5,7 +5,7 @@
  * Run with: npm run test:ecosystem
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect } from "vitest";
 
 const BASE_URL = process.env.OMNIROUTE_BASE_URL || "http://localhost:20128";
 const API_KEY = process.env.OMNIROUTE_API_KEY || "";

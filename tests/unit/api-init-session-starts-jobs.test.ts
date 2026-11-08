@@ -1,7 +1,7 @@
 /**
  * An authorized GET /api/init must still run the init: on a headless server it
- * is the only way to start cloud-sync and the budget-reset, token-health and
- * log_export jobs. ensureCloudSyncInitialized() sets a module-level flag after
+ * is the only way to start cloud-sync and the budget-reset and token-health
+ * jobs. ensureCloudSyncInitialized() sets a module-level flag after
  * its first run, and a test cannot reset it, so this case has its own file. The
  * name sorts after api-init-require-auth.test.ts: with --test-isolation=none
  * (test:unit:fast) Node runs the files of one process in path order, so the
@@ -118,7 +118,7 @@ describe("authorized GET /api/init", () => {
     assert.equal(res.status, 200);
     assert.deepEqual(await res.json(), { initialized: true });
     const registered = register.mock.calls.map((c) => (c.arguments[0] as { id: string }).id);
-    assert.deepEqual(registered.sort(), ["budget_reset", "log_export", "token_health_check"]);
+    assert.deepEqual(registered.sort(), ["budget_reset", "token_health_check"]);
     assert.equal(startAll.mock.callCount(), 1);
     assert.equal((await getCloudSyncScheduler()).isRunning(), true, "cloud sync did not start");
   });

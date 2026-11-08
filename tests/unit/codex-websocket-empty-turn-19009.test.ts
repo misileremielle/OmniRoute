@@ -65,7 +65,12 @@ await test.describe("#19009 chat completions over the Codex WebSocket transport"
     accessToken: "synthetic-codex-token",
     refreshToken: "synthetic-refresh",
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
-    providerSpecificData: { accountId: "synthetic-account", codexTransport: "websocket" },
+    // Sol-tier models route only to paid Codex plans (codexPlanModelGate).
+    providerSpecificData: {
+      accountId: "synthetic-account",
+      codexTransport: "websocket",
+      chatgptPlanType: "plus",
+    },
     isActive: true,
     testStatus: "active",
   });

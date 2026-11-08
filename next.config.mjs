@@ -490,6 +490,12 @@ const nextConfig = {
 
   async redirects() {
     return [
+      // Dashboard routes
+      {
+        source: "/dashboard/providers/freepik",
+        destination: "/dashboard/providers/magnific",
+        permanent: true,
+      },
       // CLI Pages — Plano 14 (F9)
       { source: "/dashboard/cli-tools", destination: "/dashboard/cli-code", permanent: true },
       {

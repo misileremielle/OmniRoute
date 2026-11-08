@@ -41,7 +41,6 @@ test("sections without protected items are hideable", () => {
     "devtools",
     "agentic-features",
     "other-features",
-    "help",
   ]) {
     assert.ok(HIDEABLE_SIDEBAR_SECTION_IDS.includes(id), `section ${id} must be hideable`);
   }

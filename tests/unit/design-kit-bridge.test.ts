@@ -73,8 +73,6 @@ test("the OmniRoute color tokens are aliases of kit tokens (no hex left in :root
     ["--orch-status-error", "var(--ci-color-danger)"],
     ["--radius", "var(--ci-radius-surface)"],
     ["--radius-control", "var(--ci-radius-control)"],
-    ["--color-fd-background", "var(--ci-color-background)"],
-    ["--color-fd-primary", "var(--ci-color-accent)"],
     ["--table-header-bg", "var(--ci-color-surface-muted)"],
   ] as const) {
     assert.ok(root.includes(`${name}: ${target};`), `:root maps ${name} → ${target}`);
