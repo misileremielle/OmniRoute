@@ -2,10 +2,6 @@ import { z } from "zod";
 
 export const NEWS_JSON_URL =
   "https://raw.githubusercontent.com/cheaper-inference/OmniRoute/main/news.json";
-export const CHANGELOG_RAW_URL =
-  "https://raw.githubusercontent.com/cheaper-inference/OmniRoute/main/CHANGELOG.md";
-export const CHANGELOG_GITHUB_URL =
-  "https://github.com/cheaper-inference/OmniRoute/blob/main/CHANGELOG.md";
 export const NEWS_DISMISS_STORAGE_NAME = "omniroute-news-dismissed-v2";
 export const NEWS_DISMISS_EVENT = "omniroute:news-dismissed";
 
@@ -244,20 +240,4 @@ export function parseDismissedNewsIds(raw: string | null): Set<string> {
 export function serializeDismissedNewsIds(ids: Iterable<string>): string {
   const sanitized = [...new Set(ids)].filter((id) => NEWS_ID_PATTERN.test(id));
   return JSON.stringify(sanitized.slice(-MAX_DISMISSED_IDS));
-}
-
-export function getLatestChangelogMarkdown(markdown: string, limit = 10): string {
-  const parts = markdown.split(/^##\s+\[/gm);
-  if (parts.length <= 1) {
-    const truncated = markdown.slice(0, 5000).trimEnd();
-    return markdown.length > 5000 ? `${truncated}\n\n...` : truncated;
-  }
-
-  const header = parts[0].trimEnd();
-  const versions = parts
-    .slice(1, limit + 1)
-    .map((part) => `## [${part.trimEnd()}`)
-    .join("\n\n");
-
-  return [header, versions].filter(Boolean).join("\n\n");
 }

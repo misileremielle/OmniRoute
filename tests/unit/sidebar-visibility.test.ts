@@ -118,27 +118,6 @@ test("sidebar visibility drops stale entries from saved settings", () => {
   ]);
 });
 
-test("help sidebar exposes changelog after docs and issues", () => {
-  const items = sectionItems("help");
-  assert.deepEqual(
-    items.map((item) => ({
-      id: item.id,
-      href: item.href,
-      i18nKey: item.i18nKey,
-    })),
-    [
-      { id: "docs", href: "/docs", i18nKey: "docs" },
-      {
-        id: "issues",
-        href: "https://github.com/cheaper-inference/OmniRoute/issues",
-        i18nKey: "issues",
-      },
-      { id: "changelog", href: "/dashboard/changelog", i18nKey: "changelog" },
-    ]
-  );
-  assert.equal(sidebarVisibility.HIDEABLE_SIDEBAR_ITEM_IDS.includes("changelog"), true);
-});
-
 test("model catalog is available from the OmniProxy sidebar and can be hidden", () => {
   const item = sectionItems("omni-proxy").find((candidate) => candidate.id === "model-catalog");
   assert.ok(item, "expected the model catalog sidebar item to exist");

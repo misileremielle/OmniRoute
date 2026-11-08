@@ -1,6 +1,4 @@
 @import "tailwindcss" source(none);
-@import "fumadocs-ui/css/neutral.css";
-@import "fumadocs-ui/css/preset.css";
 /* Keak type ramp: the vendored kit self-hosts Switzer (packages/ui-kit/src/ci-fonts.css, imported by
    ci-tokens.css) for UI, display and code text. No CDN (Google Fonts is unreachable in some regions,
    #3695). */
@@ -36,21 +34,13 @@
   /* the kit also exposes --font-mono at runtime (ci-tokens.css): keep raw var() users monospace */
   --font-mono: var(--ci-font-code);
 }
-@source "../../node_modules/fumadocs-ui/css/generated/*.css";
 
 /* Keep Tailwind v4 from scanning the entire repository. The UI lives in the
-   App Router and shared component trees; third-party Fumadocs sources remain
-   explicit because node_modules is ignored by automatic detection. */
+   App Router and shared component trees. */
 @source "../app";
 @source "../shared";
-@source "../../node_modules/fumadocs-ui/dist/**/*.js";
 
 @custom-variant dark (&:where(.dark, .dark *));
-
-/* Fumadocs sidebar width override */
-:root {
-  --fd-sidebar-width: 220px;
-}
 
 /* ── Token bridge → CI UI Kit ──────────────────────────────────────────────────────────
    Every OmniRoute token keeps its NAME (hundreds of `var(--color-*)` and Tailwind utilities
@@ -139,24 +129,6 @@
   --color-chart-6-subtle: var(--ci-chart-6-subtle);
   --color-chart-7-subtle: var(--ci-chart-7-subtle);
   --color-chart-8-subtle: var(--ci-chart-8-subtle);
-
-  /* Fumadocs (/docs) */
-  --color-fd-background: var(--ci-color-background);
-  --color-fd-foreground: var(--ci-color-foreground);
-  --color-fd-muted: var(--ci-color-surface-subtle);
-  --color-fd-muted-foreground: var(--ci-color-text-muted);
-  --color-fd-popover: var(--ci-color-surface);
-  --color-fd-popover-foreground: var(--ci-color-foreground);
-  --color-fd-card: var(--ci-color-surface);
-  --color-fd-card-foreground: var(--ci-color-foreground);
-  --color-fd-border: var(--ci-color-border-subtle);
-  --color-fd-primary: var(--ci-color-accent);
-  --color-fd-primary-foreground: var(--ci-color-accent-foreground);
-  --color-fd-secondary: var(--ci-color-surface-subtle);
-  --color-fd-secondary-foreground: var(--ci-color-foreground);
-  --color-fd-accent: var(--ci-color-accent-surface-subtle);
-  --color-fd-accent-foreground: var(--ci-color-foreground);
-  --color-fd-ring: var(--ci-color-focus-ring);
 
   /* Shadows (kit has no shadow scale; keep ours, neutral-only) */
   --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.015);

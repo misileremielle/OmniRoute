@@ -34,7 +34,6 @@ const files = (...dirs: string[]) =>
 
 const PUBLIC_ROUTES = [
   "src/app/landing",
-  "src/app/docs",
   "src/app/login",
   "src/app/status",
   "src/app/connect",

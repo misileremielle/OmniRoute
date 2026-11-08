@@ -102,11 +102,9 @@ Top-level segments under `src/app/`:
 | Path                                                                          | Purpose                                   |
 | ----------------------------------------------------------------------------- | ----------------------------------------- |
 | `api/`                                                                        | All HTTP API routes (see breakdown below) |
-| `.well-known/agent.json/`                                                     | A2A Agent Card discovery document         |
 | `(dashboard)/`                                                                | Dashboard UI (route group, no URL prefix) |
 | `auth/`, `login/`, `forgot-password/`, `callback/`                            | Auth flows                                |
 | `landing/`                                                                    | Marketing/landing page                    |
-| `docs/`                                                                       | Embedded API docs viewer                  |
 | `status/`, `maintenance/`, `offline/`                                         | Operational pages                         |
 | `privacy/`, `terms/`                                                          | Legal pages                               |
 | `400/`, `401/`, `403/`, `408/`, `429/`, `500/`, `502/`, `503/`                | Static error pages                        |

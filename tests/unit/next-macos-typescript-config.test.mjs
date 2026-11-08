@@ -6,8 +6,7 @@ import test from "node:test";
 import { macosDevExperimentalOverrides } from "../../scripts/build/macosDevWorkaround.mjs";
 
 // The darwin/development predicate is tested as a pure helper instead of importing the whole
-// next.config.mjs: with NODE_ENV=development that import starts the fumadocs-mdx dev watcher,
-// which keeps the event loop alive and hangs a plain `node --test` run (#17955).
+// next.config.mjs (#17955).
 
 const require = createRequire(import.meta.url);
 

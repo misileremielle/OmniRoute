@@ -95,7 +95,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   audit: "auditDescription",
   health: "healthDescription",
   proxy: "proxyDescription",
-  changelog: "changelogDescription",
   // Protocols
   mcp: "mcpDescription",
   "api-endpoints": "apiEndpointsDescription",

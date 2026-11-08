@@ -118,26 +118,18 @@ the rest are linked from their domain-specific guides.
 Main pages under `src/app/(dashboard)/dashboard/`:
 
 - `/dashboard` — provider overview
-- `/dashboard/endpoint` — endpoint proxy + MCP + A2A + API endpoint tabs
+- `/dashboard/endpoint` — endpoint proxy + MCP + API endpoint tabs
 - `/dashboard/providers` — provider connections and credentials
 - `/dashboard/combos` — combo strategies, templates, step-based builder, model routing rules, manual persisted ordering
 - `/dashboard/auto-combo` — Auto Combo Engine: scoring weights, mode packs, virtual factory presets, telemetry
 - `/dashboard/costs` — cost aggregation and pricing visibility
 - `/dashboard/analytics` — usage analytics, evaluations, combo target health
 - `/dashboard/limits` — quota/rate controls
-- `/dashboard/cli-tools` — CLI onboarding, runtime detection, config generation
-- `/dashboard/agents` — detected ACP agents + custom agent registration
-- `/dashboard/cloud-agents` — cloud-hosted agent tasks (Codex Cloud, Devin, Jules) and task lifecycle
-- `/dashboard/skills` — A2A skill registry, sandbox execution, built-in skill catalog
-- `/dashboard/memory` — persistent conversational memory inspection and retrieval
-- `/dashboard/webhooks` — outbound webhook subscriptions, secret rotation, retry stats
+- `/dashboard/cli-code` — CLI onboarding, runtime detection, config generation
 - `/dashboard/batch` — batch job submission and progress
 - `/dashboard/cache` — read-through and reasoning cache statistics, eviction controls
 - `/dashboard/playground` — interactive chat playground against any configured combo/model
-- `/dashboard/changelog` — in-app changelog viewer (renders `CHANGELOG.md`)
-- `/dashboard/system` — runtime diagnostics, version info, environment validation surface
 - `/dashboard/onboarding` — first-run setup wizard for new installations
-- `/dashboard/media` — image/video/music playground
 - `/dashboard/search-tools` — search provider testing and history
 - `/dashboard/health` — uptime, circuit breakers, rate limits, quota-monitored sessions
 - `/dashboard/logs` — request/proxy/audit/console logs

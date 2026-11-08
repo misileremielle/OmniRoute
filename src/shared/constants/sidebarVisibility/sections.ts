@@ -517,16 +517,6 @@ const MCP_ITEM: SidebarItemDefinition = {
 
 const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [MCP_ITEM];
 
-const OTHER_FEATURES_ITEMS: readonly SidebarItemDefinition[] = [
-  {
-    id: "media",
-    href: "/dashboard/cache/media",
-    i18nKey: "media",
-    subtitleKey: "mediaSubtitle",
-    icon: "perm_media",
-  },
-];
-
 const BATCH_GROUP: SidebarItemGroup = {
   type: "group",
   id: "batch",
@@ -638,32 +628,6 @@ const CONFIGURATION_ITEMS: readonly SidebarItemDefinition[] = [
   },
 ];
 
-const HELP_ITEMS: readonly SidebarItemDefinition[] = [
-  {
-    id: "docs",
-    href: "/docs",
-    i18nKey: "docs",
-    subtitleKey: "docsSubtitle",
-    icon: "menu_book",
-    external: true,
-  },
-  {
-    id: "issues",
-    href: "https://github.com/cheaper-inference/OmniRoute/issues",
-    i18nKey: "issues",
-    subtitleKey: "issuesSubtitle",
-    icon: "bug_report",
-    external: true,
-  },
-  {
-    id: "changelog",
-    href: "/dashboard/changelog",
-    i18nKey: "changelog",
-    subtitleKey: "changelogSubtitle",
-    icon: "campaign",
-  },
-];
-
 // ─── Sections ────────────────────────────────────────────────────────────────
 
 export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
@@ -720,18 +684,12 @@ export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
     id: "other-features",
     titleKey: "otherFeaturesSection",
     titleFallback: "Other Features",
-    children: [...OTHER_FEATURES_ITEMS, BATCH_GROUP],
+    children: [BATCH_GROUP],
   },
   {
     id: "configuration",
     titleKey: "configurationSection",
     titleFallback: "Configuration",
     children: CONFIGURATION_ITEMS,
-  },
-  {
-    id: "help",
-    titleKey: "helpSection",
-    titleFallback: "Help",
-    children: HELP_ITEMS,
   },
 ] as const;

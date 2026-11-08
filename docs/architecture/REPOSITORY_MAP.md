@@ -29,7 +29,6 @@ OmniRoute/
 ├── skills/               # CLI/agent skill packs (cli-* + omni-* + config-codex-cli)
 ├── examples/             # Sample plugins + omniroute-cmd-hello starter
 ├── contrib/              # Community contributions (podman/)
-├── .source/              # Fumadocs source config (source.config.mjs + server/browser/dynamic)
 ├── .github/              # GitHub Actions workflows + issue templates + PR template
 ├── .husky/               # Git hooks (pre-commit, pre-push)
 ├── .claude/              # Claude Code slash commands (project-scoped)
@@ -94,7 +93,6 @@ OmniRoute/
 | **.nvmrc**                                  | Node version pin for nvm                                                                 |
 | **eslint.complexity.config.mjs**            | ESLint config for the complexity ratchet (`scripts/check/check-complexity.mjs --config`) |
 | **eslint.sonarjs.config.mjs**               | ESLint config for SonarJS rules (cognitive complexity / duplication)                     |
-| **source.config.ts**                        | Fumadocs `defineDocs` source config (feeds `.source/`)                                   |
 | **knip.json**                               | Knip config — unused files/exports/deps (feeds the dead-code gate)                       |
 | **stryker.conf.json**                       | Stryker mutation-testing config                                                          |
 | **.size-limit.json**                        | size-limit bundle budget config                                                          |
@@ -147,7 +145,6 @@ src/
 | `app/(dashboard)/dashboard/activity/`                                        | Activity feed page (Group B): `page.tsx` (server) + `ActivityFeedClient.tsx` + `components/{ActivityFeed,ActivityItem,DayHeader,EventTypeFilter}.tsx` — see `docs/architecture/MONITORING_SECTIONS.md`                                                    |
 | `app/(dashboard)/dashboard/costs/quota-share/`                               | Quota Sharing page (Group B): `QuotaSharePageClient.tsx` + `components/{PoolCard,DimensionBar,AllocationTable,BurnRateChart,QuotaConceptCard,CreatePoolModal,EditAllocationsModal}.tsx` + `hooks/{usePools,usePoolUsage,useLocalStoragePoolMigration}.ts` |
 | `app/(dashboard)/dashboard/costs/quota-share/plans/`                         | Provider plan config page (Group B): `page.tsx` + `ProviderPlanConfigClient.tsx` — quota dimensions per connection override                                                                                                                               |
-| `app/docs/`                                                                  | Embedded documentation viewer (renders `docs/*.md`)                                                                                                                                                                                                       |
 | `app/landing/`                                                               | Marketing landing page                                                                                                                                                                                                                                    |
 | `app/login/`, `forgot-password/`, `forbidden/`                               | Auth-related pages                                                                                                                                                                                                                                        |
 | `app/{400,401,403,408,429,500,502,503}/`                                     | HTTP error pages                                                                                                                                                                                                                                          |

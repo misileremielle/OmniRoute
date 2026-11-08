@@ -237,9 +237,6 @@ const eslintConfig = [
       // .agents/ — skill definitions + their helper scripts (gitignored; the
       // canonical copy lives here and is symlinked into .claude/).
       ".agents/**",
-      // .source/ — fumadocs codegen output (@ts-nocheck + bundler-only import
-      // query params like `?collection=docs`, which are not valid TS on their own).
-      ".source/**",
       // VS Code extension and its large test fixtures
       "vscode-extension/**",
       // packages/ui-kit/ — snapshot vendorizado do CI UI Kit (lintado upstream; patches locais proibidos)

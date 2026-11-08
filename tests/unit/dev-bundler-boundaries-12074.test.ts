@@ -21,11 +21,6 @@ test("Tailwind scans only the UI source roots declared by OmniRoute (#12074 phas
   );
   assert.match(css, /@source\s+"\.\.\/app";/, "App Router components must stay scanned");
   assert.match(css, /@source\s+"\.\.\/shared";/, "shared UI components must stay scanned");
-  assert.match(
-    css,
-    /@source\s+"\.\.\/\.\.\/node_modules\/fumadocs-ui\/dist\/\*\*\/\*\.js";/,
-    "Fumadocs runtime classes must stay scanned"
-  );
 });
 
 test("webpack dev keeps Next defaults instead of production vendor cache groups (#12074 phase 1)", async () => {
@@ -53,7 +48,7 @@ test("webpack dev keeps Next defaults instead of production vendor cache groups 
   assert.equal(config.optimization.splitChunks, originalSplitChunks);
   const cacheGroups = config.optimization.splitChunks.cacheGroups as Record<string, unknown>;
   assert.equal(cacheGroups.recharts, undefined);
-  assert.equal(cacheGroups.fumadocs, undefined);
+  assert.equal(cacheGroups.nextIntl, undefined);
 });
 
 test("webpack production retains OmniRoute vendor cache groups (#12074 phase 1)", async () => {
@@ -73,5 +68,5 @@ test("webpack production retains OmniRoute vendor cache groups (#12074 phase 1)"
   });
 
   assert.ok(config.optimization.splitChunks.cacheGroups.recharts);
-  assert.ok(config.optimization.splitChunks.cacheGroups.fumadocs);
+  assert.ok(config.optimization.splitChunks.cacheGroups.nextIntl);
 });

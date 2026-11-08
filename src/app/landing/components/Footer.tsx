@@ -1,7 +1,6 @@
 "use client";
 
 import Icon from "@/shared/components/Icon";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { OmniRouteLockup } from "@/shared/components/OmniRouteLogo";
 
@@ -62,12 +61,6 @@ export default function Footer() {
           {/* Resources */}
           <div className="flex flex-col gap-4">
             <h4 className="font-bold text-heading">{t("resources")}</h4>
-            <Link
-              className="text-text-muted hover:text-primary text-sm transition-colors"
-              href="/docs"
-            >
-              {t("documentation")}
-            </Link>
             <a
               className="text-text-muted hover:text-primary text-sm transition-colors"
               href="https://github.com/cheaper-inference/OmniRoute"

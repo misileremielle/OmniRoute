@@ -70,8 +70,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "search-tools",
   // Agentic Features
   "mcp",
-  // Other Features — flat
-  "media",
   // Other Features > Batch
   "batch",
   "batch-files",
@@ -88,10 +86,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "settings-feature-flags",
   "settings-cache",
   "settings-sidebar",
-  // Help
-  "docs",
-  "issues",
-  "changelog",
 ] as const;
 
 export type HideableSidebarItemId = (typeof HIDEABLE_SIDEBAR_ITEM_IDS)[number];
@@ -111,8 +105,7 @@ export type SidebarSectionId =
   | "devtools"
   | "agentic-features"
   | "other-features"
-  | "configuration"
-  | "help";
+  | "configuration";
 
 export interface SidebarItemDefinition {
   id: SidebarItemId;

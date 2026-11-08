@@ -2,7 +2,6 @@
 
 import Icon from "@/shared/components/Icon";
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { OmniRouteLockup } from "@/shared/components/OmniRouteLogo";
@@ -40,12 +39,6 @@ export default function Navigation() {
           >
             {t("howItWorks")}
           </a>
-          <Link
-            className="text-text-muted hover:text-text-main text-sm font-medium transition-colors"
-            href="/docs"
-          >
-            {t("docsLink")}
-          </Link>
           <a
             className="text-text-muted hover:text-text-main text-sm font-medium transition-colors flex items-center gap-1"
             href="https://github.com/cheaper-inference/OmniRoute"
@@ -93,13 +86,6 @@ export default function Navigation() {
             >
               {t("howItWorks")}
             </a>
-            <Link
-              className="text-text-muted hover:text-text-main text-sm font-medium transition-colors"
-              href="/docs"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("docsLink")}
-            </Link>
             <a
               className="text-text-muted hover:text-text-main text-sm font-medium transition-colors"
               href="https://github.com/cheaper-inference/OmniRoute"

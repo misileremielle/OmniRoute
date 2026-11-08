@@ -85,14 +85,6 @@ updates:
       # edits package.json, so every bump reds the pin test. Bump by hand: package.json +
       # workflow pin together, after re-running guard-validation against the new release.
       - dependency-name: "promptfoo"
-      # fumadocs-mdx 15.4.7 imports `embedSource` from fumadocs-core/mdx-plugins/stringifier,
-      # which the fumadocs-core on this branch (16.15.x) does not export yet: the Build job
-      # dies loading next.config.mjs (#17197). fumadocs-core/fumadocs-ui ride the
-      # production group and fumadocs-mdx the development group, so dependabot can never
-      # move them together. Remove this ignore in the PR that bumps fumadocs-core,
-      # fumadocs-ui and fumadocs-mdx as one set.
-      - dependency-name: "fumadocs-mdx"
-        versions: [">=15.4.7"]
       # @playwright/test must equal the runtime `playwright` / `playwright-core` exact pin
       # (one Playwright in the tree — tests/unit/playwright-runner-args.test.ts). The
       # runtime pair is a production dependency and @playwright/test a development one,

@@ -1,5 +1,4 @@
 import createNextIntlPlugin from "next-intl/plugin";
-import { createMDX } from "fumadocs-mdx/next";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { betterSqlite3AliasFor } from "./scripts/build/better-sqlite3-stub-flag.mjs";
@@ -339,8 +338,6 @@ const nextConfig = {
   transpilePackages: [
     "@omniroute/open-sse",
     "@lobehub/icons",
-    "fumadocs-ui",
-    "fumadocs-core",
     "@omniroute/ui-kit",
   ],
   allowedDevOrigins: ["localhost", "127.0.0.1", "192.168.0.250"],
@@ -429,12 +426,6 @@ const nextConfig = {
           chunks: "all",
           priority: 25,
         },
-        fumadocs: {
-          test: /[\\/]node_modules[\\/](fumadocs-ui|fumadocs-core|fumadocs-mdx)[\\/]/,
-          name: "vendor-fumadocs",
-          chunks: "all",
-          priority: 20,
-        },
         comboGraph: {
           test: /[\\/]node_modules[\\/]@?dagre[\\/]|[\\/]node_modules[\\/]@?elkjs[\\/]/,
           name: "vendor-combo-graph",
@@ -499,175 +490,11 @@ const nextConfig = {
 
   async redirects() {
     return [
-      // Dashboard routes
-      {
-        source: "/dashboard/skills",
-        destination: "/dashboard/omni-skills",
-        permanent: true,
-      },
-      {
-        source: "/dashboard/providers/freepik",
-        destination: "/dashboard/providers/magnific",
-        permanent: true,
-      },
-      // Architecture
-      {
-        source: "/docs/architecture",
-        destination: "/docs/architecture/architecture",
-        permanent: true,
-      },
-      {
-        source: "/docs/authz-guide",
-        destination: "/docs/architecture/authz-guide",
-        permanent: true,
-      },
-      {
-        source: "/docs/codebase-documentation",
-        destination: "/docs/architecture/codebase-documentation",
-        permanent: true,
-      },
-      {
-        source: "/docs/repository-map",
-        destination: "/docs/architecture/repository-map",
-        permanent: true,
-      },
-      {
-        source: "/docs/resilience-guide",
-        destination: "/docs/architecture/resilience-guide",
-        permanent: true,
-      },
-      // Guides
-      { source: "/docs/docker-guide", destination: "/docs/guides/docker-guide", permanent: true },
-      { source: "/docs/features", destination: "/docs/guides/features", permanent: true },
-      { source: "/docs/i18n", destination: "/docs/guides/i18n", permanent: true },
-      { source: "/docs/kiro-setup", destination: "/docs/guides/kiro-setup", permanent: true },
-      { source: "/docs/pwa-guide", destination: "/docs/guides/pwa-guide", permanent: true },
-      { source: "/docs/setup-guide", destination: "/docs/guides/setup-guide", permanent: true },
-      { source: "/docs/termux-guide", destination: "/docs/guides/termux-guide", permanent: true },
-      {
-        source: "/docs/troubleshooting",
-        destination: "/docs/guides/troubleshooting",
-        permanent: true,
-      },
-      { source: "/docs/uninstall", destination: "/docs/guides/uninstall", permanent: true },
-      { source: "/docs/user-guide", destination: "/docs/guides/user-guide", permanent: true },
-      // Reference
-      {
-        source: "/docs/api-reference",
-        destination: "/docs/reference/api-reference",
-        permanent: true,
-      },
-      { source: "/docs/cli-tools", destination: "/docs/reference/cli-tools", permanent: true },
-      { source: "/docs/environment", destination: "/docs/reference/environment", permanent: true },
-      { source: "/docs/free-tiers", destination: "/docs/reference/free-tiers", permanent: true },
-      {
-        source: "/docs/provider-reference",
-        destination: "/docs/reference/provider-reference",
-        permanent: true,
-      },
-      // Frameworks
-      { source: "/docs/evals", destination: "/docs/frameworks/evals", permanent: true },
-      {
-        source: "/docs/gamification",
-        destination: "/docs/frameworks/gamification",
-        permanent: true,
-      },
-      { source: "/docs/mcp-server", destination: "/docs/frameworks/mcp-server", permanent: true },
-      { source: "/docs/opencode", destination: "/docs/frameworks/opencode", permanent: true },
-      // Routing
-      { source: "/docs/auto-combo", destination: "/docs/routing/auto-combo", permanent: true },
-      {
-        source: "/docs/reasoning-replay",
-        destination: "/docs/routing/reasoning-replay",
-        permanent: true,
-      },
-      // Security
-      { source: "/docs/cli-token", destination: "/docs/security/cli-token", permanent: true },
-      {
-        source: "/docs/cli-token-auth",
-        destination: "/docs/security/cli-token-auth",
-        permanent: true,
-      },
-      { source: "/docs/compliance", destination: "/docs/security/compliance", permanent: true },
-      {
-        source: "/docs/error-sanitization",
-        destination: "/docs/security/error-sanitization",
-        permanent: true,
-      },
-      { source: "/docs/guardrails", destination: "/docs/security/guardrails", permanent: true },
-      { source: "/docs/public-creds", destination: "/docs/security/public-creds", permanent: true },
-      {
-        source: "/docs/route-guard-tiers",
-        destination: "/docs/security/route-guard-tiers",
-        permanent: true,
-      },
-      {
-        source: "/docs/stealth-guide",
-        destination: "/docs/security/stealth-guide",
-        permanent: true,
-      },
-      // Compression
-      {
-        source: "/docs/compression-engines",
-        destination: "/docs/compression/compression-engines",
-        permanent: true,
-      },
-      {
-        source: "/docs/compression-guide",
-        destination: "/docs/compression/compression-guide",
-        permanent: true,
-      },
-      {
-        source: "/docs/compression-language-packs",
-        destination: "/docs/compression/compression-language-packs",
-        permanent: true,
-      },
-      {
-        source: "/docs/compression-rules-format",
-        destination: "/docs/compression/compression-rules-format",
-        permanent: true,
-      },
-      {
-        source: "/docs/rtk-compression",
-        destination: "/docs/compression/rtk-compression",
-        permanent: true,
-      },
-      // Ops
-      { source: "/docs/coverage-plan", destination: "/docs/ops/coverage-plan", permanent: true },
-      {
-        source: "/docs/e2e-dashboard-shakedown-v3.8.0",
-        destination: "/docs/ops/e2e-dashboard-shakedown-v3.8.0",
-        permanent: true,
-      },
-      {
-        source: "/docs/fly-io-deployment-guide",
-        destination: "/docs/ops/fly-io-deployment-guide",
-        permanent: true,
-      },
-      { source: "/docs/proxy-guide", destination: "/docs/ops/proxy-guide", permanent: true },
-      {
-        source: "/docs/release-checklist",
-        destination: "/docs/ops/release-checklist",
-        permanent: true,
-      },
-      { source: "/docs/sqlite-runtime", destination: "/docs/ops/sqlite-runtime", permanent: true },
-      { source: "/docs/tunnels-guide", destination: "/docs/ops/tunnels-guide", permanent: true },
-      {
-        source: "/docs/vm-deployment-guide",
-        destination: "/docs/ops/vm-deployment-guide",
-        permanent: true,
-      },
       // CLI Pages — Plano 14 (F9)
       { source: "/dashboard/cli-tools", destination: "/dashboard/cli-code", permanent: true },
       {
         source: "/dashboard/cli-tools/:path*",
         destination: "/dashboard/cli-code/:path*",
-        permanent: true,
-      },
-      { source: "/dashboard/agents", destination: "/dashboard/acp-agents", permanent: true },
-      {
-        source: "/dashboard/agents/:path*",
-        destination: "/dashboard/acp-agents/:path*",
         permanent: true,
       },
     ];
@@ -756,6 +583,4 @@ const nextConfig = {
   },
 };
 
-const withMDX = createMDX();
-
-export default withMDX(withNextIntl(nextConfig));
+export default withNextIntl(nextConfig);

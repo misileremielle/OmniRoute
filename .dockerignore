@@ -57,40 +57,15 @@ MAX
 quality-ratchet/
 
 # Documentation
-# Issue #2348: The Dashboard Docs viewer reads markdown from `/app/docs` at
-# runtime. The previous `docs/*` block hid every file except openapi.yaml,
-# so the in-product help screen failed with ENOENT for every page.
-# We now keep the English markdown tree plus the docs assets imported by MDX
-# during `next build`, while still dropping the extra raster diagram sources
-# and the translated files the runtime never reads.
-#
-# 2026-11-03 (owner decision): the image serves the translated /docs pages
-# (#18699), which read docs/i18n/<locale>/docs/<section>/<PAGE>.md at runtime.
-# Re-include exactly those mirrors: the sections source.config.ts compiles,
-# minus the operator-internal security pages re-excluded below. The README,
-# CHANGELOG, agent-guide and llm.txt mirrors at each locale root stay out.
-# Keep in sync with scripts/build/docsMirrorRuntime.mjs (enforced by
-# tests/unit/docs-mirror-runtime-shipping.test.ts).
+# The runtime reads only docs/openapi.yaml (/api/openapi/spec) and
+# docs/guides/CODEX-CLI-CONFIGURATION.md (/api/docs/codex-cli). The English
+# markdown tree ships as is; the translated mirrors and raster diagram
+# sources stay out.
 docs/i18n/**
-!docs/i18n/*/docs/getting-started/**/*.md
-!docs/i18n/*/docs/guides/**/*.md
-!docs/i18n/*/docs/architecture/**/*.md
-!docs/i18n/*/docs/reference/**/*.md
-!docs/i18n/*/docs/frameworks/**/*.md
-!docs/i18n/*/docs/routing/**/*.md
-!docs/i18n/*/docs/security/**/*.md
-!docs/i18n/*/docs/compression/**/*.md
-!docs/i18n/*/docs/ops/**/*.md
-!docs/i18n/*/docs/providers/**/*.md
-!docs/i18n/*/docs/comparison/**/*.md
-docs/i18n/*/docs/security/STEALTH_GUIDE.md
-docs/i18n/*/docs/security/SOCKET_DEV_FINDINGS.md
-docs/i18n/*/docs/security/PUBLIC_CREDS.md
 # Internal planning artifacts (gitignored). `*.md` above only matches the root,
-# so without this rule these land in /app/docs and become readable through the
-# dashboard's Docs viewer at runtime.
+# so without this rule these land in /app/docs.
 docs/superpowers/**
-# Operator-internal security writeups: git only, not the image or /docs catalog.
+# Operator-internal security writeups: git only, not the image.
 docs/security/STEALTH_GUIDE.md
 docs/security/SOCKET_DEV_FINDINGS.md
 docs/security/PUBLIC_CREDS.md
@@ -123,7 +98,6 @@ bun.lock
 .agents
 .gemini
 .claude
-.source
 
 # Misc
 llm.txt

@@ -144,22 +144,7 @@ test("CLI cards use packaged brand icons whenever an asset exists", () => {
   assert.match(card, /tool\.imageLight \|\| tool\.imageDark/);
 });
 
-test("changelog and settings breadcrumbs use localized labels", () => {
-  const changelog = [
-    readSource("src/app/(dashboard)/dashboard/changelog/page.tsx"),
-    readSource("src/app/(dashboard)/dashboard/changelog/components/NewsViewer.tsx"),
-    readSource("src/app/(dashboard)/dashboard/changelog/components/ChangelogViewer.tsx"),
-  ].join("\n");
-  for (const rawText of [
-    'label: "News"',
-    'label: "Changelog"',
-    "No new announcements at this time.",
-    "Could not load the changelog.",
-    "View Full History on GitHub",
-  ]) {
-    assert.equal(changelog.includes(rawText), false, `raw changelog copy: ${rawText}`);
-  }
-
+test("settings breadcrumbs use localized labels", () => {
   const breadcrumbs = readSource("src/shared/components/Breadcrumbs.tsx");
   assert.match(breadcrumbs, /general: "general"/);
   assert.match(breadcrumbs, /"feature-flags": "featureFlags"/);

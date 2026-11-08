@@ -46,13 +46,4 @@ test.describe("Dashboard Navigation", () => {
     const body = page.locator("body");
     await expect(body).toBeVisible();
   });
-
-  test("/docs page renders documentation", async ({ page }) => {
-    await page.goto("/docs");
-    const body = page.locator("body");
-    await expect(body).toBeVisible();
-    // Docs should contain some content
-    const text = await body.textContent();
-    expect(text?.length).toBeGreaterThan(100);
-  });
 });

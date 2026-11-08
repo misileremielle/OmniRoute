@@ -51,7 +51,6 @@
     "open-sse",
     "dist",
     "coverage",
-    ".source",
     ".tmp",
     ".claude",
     ".worktrees",

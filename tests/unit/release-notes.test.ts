@@ -197,19 +197,3 @@ test("fetchNewsPayload is GET-only and keeps network failures inert", async () =
     null
   );
 });
-
-test("getLatestChangelogMarkdown keeps the title and the ten latest releases", () => {
-  const versions = Array.from({ length: 12 }, (_, index) => {
-    const version = `1.0.${12 - index}`;
-    return `## [${version}] - 2026-04-${String(28 - index).padStart(2, "0")}\n\n### Bug Fixes\n- Fix ${version}`;
-  });
-  const markdown = ["# Changelog", ...versions].join("\n\n");
-
-  const sliced = releaseNotes.getLatestChangelogMarkdown(markdown, 10);
-
-  assert.match(sliced, /^# Changelog/);
-  assert.equal((sliced.match(/^## \[/gm) || []).length, 10);
-  assert.match(sliced, /## \[1\.0\.12\]/);
-  assert.match(sliced, /## \[1\.0\.3\]/);
-  assert.doesNotMatch(sliced, /## \[1\.0\.2\]/);
-});
