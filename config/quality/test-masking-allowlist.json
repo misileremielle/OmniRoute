@@ -2185,6 +2185,42 @@
     "tests/unit/onnx-install-env-16225.test.ts": {
       "replacement": "tests/unit/onnx-install-skip-16225.test.ts",
       "reason": "chore/pnpm-migration (PR #2): the old test drove npm's lifecycle to prove ONNXRUNTIME_NODE_INSTALL reaches onnxruntime-node's postinstall. Under pnpm that script never runs (allowBuilds denies it; `pnpm ignored-builds` confirms), so the replacement pins the deny entry, the action's skip flag and that no workflow installs outside the audited action."
+    },
+    "tests/unit/assemble-standalone-docs-sanitizer-18699.test.ts": {
+      "sourceRemoved": ["src/lib/docsSanitizer.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/docs-link-resolver.test.ts": {
+      "sourceRemoved": ["src/lib/docsLinkResolver.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/docs-mirror-runtime-shipping.test.ts": {
+      "sourceRemoved": ["src/lib/docsSanitizer.ts", "source.config.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/docs-public-catalog-sensitive-pages.test.ts": {
+      "sourceRemoved": ["source.config.ts", "src/app/docs/page.tsx"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/docs-translated-page-18699.test.tsx": {
+      "sourceRemoved": ["src/app/docs/[...slug]/page.tsx", "src/lib/docsSanitizer.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/npm-runtime-deps-fumadocs-mdx-7661.test.ts": {
+      "sourceRemoved": ["source.config.ts", "src/app/docs/layout.tsx"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/security/docs-path-traversal.test.ts": {
+      "sourceRemoved": ["src/lib/docsI18nPath.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/security/docs-sanitization.test.ts": {
+      "sourceRemoved": ["src/lib/docsSanitizer.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/ui/docs-theme-switch-18078.test.tsx": {
+      "sourceRemoved": ["src/app/docs/DocsThemeSwitch.tsx"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -2279,5 +2315,18 @@
   "tests/unit/build/ref-parser-js-yaml-17017.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. pnpm records no nested node_modules path, so the 'no nested js-yaml 4 under ref-parser' assert is replaced by checking every ref-parser snapshot resolves js-yaml 5; the @yarnpkg/parsers case is gone with lockfile-lint, which was its only dependent.",
   "tests/unit/dry-run-lts-cut.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. bumpLockfile and its test are removed: pnpm-lock.yaml records no workspace versions, so a release bump has no lockfile entry to change.",
   "tests/unit/playwright-runner-args.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. the npm 'no nested @playwright/test/node_modules/playwright' assert has no pnpm equivalent; lockedVersions(...) == [runtime] for both packages already proves a single Playwright copy.",
-  "tests/unit/wreq-native-manifest.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. pnpm-lock.yaml does not record a package license, so the per-addon `lock.license === MIT` assert is dropped; the manifest's own license assert remains, as do version/integrity/os/cpu/libc against the lockfile."
+  "tests/unit/wreq-native-manifest.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. pnpm-lock.yaml does not record a package license, so the per-addon `lock.license === MIT` assert is dropped; the manifest's own license assert remains, as do version/integrity/os/cpu/libc against the lockfile.",
+  "tests/e2e/ecosystem.test.ts": "Fork removed the A2A server: the dropped asserts covered the /a2a JSON-RPC endpoint and Agent Card, which no longer exist. The MCP, quota, auto-combo, OpenClaw, stress and error-leak asserts are unchanged. Feature removed, not weakened.",
+  "tests/e2e/protocol-clients.test.ts": "Fork removed the A2A server: the dropped test drove the /a2a discovery/send/stream/get/cancel flow, which no longer exists. The MCP stdio test is unchanged. Feature removed, not weakened.",
+  "tests/e2e/navigation.spec.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped test rendered /docs, which no longer exists. Feature removed, not weakened.",
+  "tests/e2e/sidebar-navigation.spec.ts": "The fork's home page no longer has the Quick Start heading; the dropped assert waited for it. The sidebar keyboard/search asserts are unchanged.",
+  "tests/unit/build/docker-published-image-smoke-11835.test.ts": "Fork publishes Docker images to GHCR only and dropped the Bun images (commit 3afeb1cf94): the removed asserts pinned the Docker Hub latest promotion and the -bun aliases. Feature removed, not weakened.",
+  "tests/unit/build/known-build-warnings.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): fumadocs-mdx is gone, so the fumadocs eval-*.js warning case was replaced by the next-intl extractor case. Feature removed, not weakened.",
+  "tests/unit/check-pack-boot.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped test required the translated docs mirrors that only the /docs site read at runtime. Feature removed, not weakened.",
+  "tests/unit/dashboard-localization-contract.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8) and the Changelog page: the dropped assert checked the removed changelog copy. Feature removed, not weakened.",
+  "tests/unit/dev-bundler-boundaries-12074.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped asserts pinned the fumadocs split-chunk cache group, which no longer exists. Feature removed, not weakened.",
+  "tests/unit/docker-publish-build-heap-14325.test.ts": "Fork dropped the Bun images (commit 3afeb1cf94): fewer docker build steps carry the heap override, so the minimum-count asserts for the Bun builds went away. Feature removed, not weakened.",
+  "tests/unit/dockerignore-docs-coverage.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped assert required docs markdown in the image for the removed /docs site. Feature removed, not weakened.",
+  "tests/unit/release-notes.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8) and the Changelog page: the dropped asserts covered the changelog slicer the page used. Feature removed, not weakened.",
+  "tests/unit/sidebar-visibility.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped asserts covered the hideable Help items (docs, issues, changelog). Feature removed, not weakened."
 }
