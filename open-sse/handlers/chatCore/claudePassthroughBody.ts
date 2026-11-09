@@ -10,14 +10,17 @@
  */
 
 import { shouldUseMidConversationSystem } from "../../executors/claudeIdentity.ts";
+import { detachClaudeCodeRewriteTargets } from "../../executors/claudeOauthBodyIsolation.ts";
 import { ensureCacheControlOnLastUserMessage } from "../../services/claudeCodeConstraints.ts";
 import { hoistDeferredToolsForTarget } from "../../translator/helpers/claudeDeferredTools.ts";
 import {
   disableManualThinkingWithoutFinalBlock,
+  ensurePassthroughCacheBreakpoints,
   splitMisplacedToolResults,
   type ClaudeRequestBody,
 } from "../../translator/helpers/claudeHelper.ts";
 import { FORMATS } from "../../translator/formats.ts";
+import type { ConnectionCacheOverride } from "../../utils/cacheControlPolicy.ts";
 import { sanitizeAnthropicPassthroughHistory } from "./anthropicPassthroughHistory.ts";
 import { normalizeAdvisorToolModels } from "./claudeAdvisorTool.ts";
 import {
@@ -31,6 +34,37 @@ import { stripClaudeRejectedTopLevelFields } from "./passthroughHelpers.ts";
 
 type LoggerLike = { debug?: (...args: unknown[]) => void } | null | undefined;
 
+type ClaudePassthroughBodyInput = {
+  body: Record<string, unknown>;
+  provider: string;
+  clientHeaders: Headers | Record<string, unknown> | null | undefined;
+  isClaudeCodeSemanticPassthrough: boolean;
+  effectiveModel: string;
+  targetFormat: string;
+  preserveCacheControl: boolean;
+  connectionCacheOverride?: ConnectionCacheOverride | null;
+  normalizeClaudeUpstreamMessages: (
+    payload: Record<string, unknown>,
+    options?: { preserveToolResultBlocks?: boolean }
+  ) => void;
+  log?: LoggerLike;
+};
+
+/**
+ * Anthropic-native upstreams only: third-party Claude-shape providers have their own (or no)
+ * caching semantics. A connection's cache override is the operator's opt-out.
+ */
+function acceptsInjectedCacheBreakpoints(
+  provider: string,
+  connectionCacheOverride: ConnectionCacheOverride | null | undefined
+): boolean {
+  if (provider !== "claude" && !provider.startsWith("anthropic-compatible-")) return false;
+  return (
+    connectionCacheOverride?.supportsPromptCaching !== false &&
+    connectionCacheOverride?.cacheControlPassthrough !== "strip"
+  );
+}
+
 export function buildClaudePassthroughBody({
   body,
   provider,
@@ -39,22 +73,10 @@ export function buildClaudePassthroughBody({
   effectiveModel,
   targetFormat,
   preserveCacheControl,
+  connectionCacheOverride,
   normalizeClaudeUpstreamMessages,
   log,
-}: {
-  body: Record<string, unknown>;
-  provider: string;
-  clientHeaders: Headers | Record<string, unknown> | null | undefined;
-  isClaudeCodeSemanticPassthrough: boolean;
-  effectiveModel: string;
-  targetFormat: string;
-  preserveCacheControl: boolean;
-  normalizeClaudeUpstreamMessages: (
-    payload: Record<string, unknown>,
-    options?: { preserveToolResultBlocks?: boolean }
-  ) => void;
-  log?: LoggerLike;
-}): Record<string, unknown> {
+}: ClaudePassthroughBodyInput): Record<string, unknown> {
   const translatedBody = hoistDeferredToolsForTarget(
     { ...(body as Record<string, unknown>) },
     provider
@@ -117,6 +139,16 @@ export function buildClaudePassthroughBody({
     normalizeClaudeUpstreamMessages(translatedBody, {
       preserveToolResultBlocks: targetFormat === FORMATS.CLAUDE,
     });
+    // Marker-less Anthropic clients (e.g. Cursor) ship zero cache
+    // breakpoints through pure passthrough, re-billing the full prefix
+    // every turn (678M uncached prompt tokens/week observed). Inject the
+    // standard breakpoints ONLY when the body carries none anywhere —
+    // a client that manages its own markers stays byte-untouched. A combo
+    // replays the caller's body on its next step, so write into copies only.
+    if (acceptsInjectedCacheBreakpoints(provider, connectionCacheOverride)) {
+      detachClaudeCodeRewriteTargets(translatedBody);
+      ensurePassthroughCacheBreakpoints(translatedBody as ClaudeRequestBody, provider);
+    }
   }
 
   log?.debug?.("FORMAT", `claude passthrough (preserveCache=${preserveCacheControl})`);

@@ -1616,11 +1616,6 @@
       "count": 7
     }
   },
-  "tests/integration/compression-pipeline.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "tests/integration/fingerprint-expansion.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1

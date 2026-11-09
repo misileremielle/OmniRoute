@@ -337,6 +337,7 @@
       "trafficInspector"
     ],
     "combos": [
+      "accountPreferences",
       "analytics",
       "breadcrumbs",
       "cache",
