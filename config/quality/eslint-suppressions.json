@@ -1470,7 +1470,7 @@
   },
   "tests/e2e/ecosystem.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 17
+      "count": 13
     }
   },
   "tests/e2e/group-b-redirect-logs-activity.spec.ts": {
@@ -1490,7 +1490,7 @@
   },
   "tests/e2e/protocol-clients.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 6
+      "count": 2
     }
   },
   "tests/e2e/responsiveSpecs.ts": {

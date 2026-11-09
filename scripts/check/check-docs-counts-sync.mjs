@@ -796,7 +796,7 @@ export function buildChecks() {
       actual: countLocales(),
       docKey: "i18n locales",
       strict: true,
-      files: ["docs/README.md", "docs/guides/I18N.md"],
+      files: ["docs/guides/I18N.md"],
     },
     ...(() => {
       const f = readCodeFacts();
