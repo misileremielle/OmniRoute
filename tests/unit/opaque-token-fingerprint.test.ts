@@ -89,7 +89,6 @@ const MIGRATED_FILES = [
   "open-sse/services/tokenRefresh/passiveCodex.ts",
   "src/sse/services/museSessionOwnership.ts",
   "src/server/authz/entra/evaluate.ts",
-  "open-sse/executors/m365ImageGeneration.ts",
   "open-sse/services/combo/handoffSessionScope.ts",
 ];
 

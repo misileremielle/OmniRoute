@@ -130,7 +130,7 @@ function buildDeps(claudeBody, sinks, overrides = {}) {
     translateRequest: async (b) => b,
     getModelNormalizeToolCallId: (id) => id,
     getModelPreserveOpenAIDeveloperRole: () => false,
-    getSkillsModelIdForFormat: () => null,
+    getToolCallModelIdForFormat: () => null,
     log: { debug: noop, info: noop, warn: noop, error: noop },
     ...overrides,
   };

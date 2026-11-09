@@ -117,7 +117,7 @@ test("both configured env keys and the process self-loop credential are reserved
 
 test("independent SQLite connections race on encrypted duplicate plaintext: exactly one insert", async () => {
   // Exercise cold fallback DDL as well as warm-row identity contention.
-  db.exec("ALTER TABLE api_keys DROP COLUMN chaos_mode_enabled");
+  db.exec("ALTER TABLE api_keys DROP COLUMN usage_limit_enabled");
   const children = Array.from({ length: 4 }, () =>
     fork("tests/helpers/apiKeyImportWorker.ts", [], {
       execArgv: ["--import", "tsx/esm"],
@@ -149,7 +149,7 @@ test("independent SQLite connections race on encrypted duplicate plaintext: exac
     assert.equal(rows[0].no_log, 1);
     assert.equal(rows[0].usage_limit_enabled, 1);
     assert.equal(rows[0].daily_usage_limit_usd, 5);
-    assert.equal(rows[0].chaos_mode_enabled, 1);
+    assert.equal(rows[0].allow_usage_command, 0);
   } finally {
     for (const child of children) child.kill();
   }

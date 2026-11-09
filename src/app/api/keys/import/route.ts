@@ -46,7 +46,6 @@ const POLICY_FIELDS = [
   "usageLimitEnabled",
   "dailyUsageLimitUsd",
   "weeklyUsageLimitUsd",
-  "chaosModeEnabled",
   "compressionEnabled",
   "allowAutoCombos",
   "allowCcDiscoveryAliases",

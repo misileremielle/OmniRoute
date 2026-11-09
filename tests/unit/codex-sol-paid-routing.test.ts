@@ -214,11 +214,13 @@ test("a cooling Free account cannot produce a false Sol retry-after", async () =
   assert.equal(selected, null);
 });
 
-test("a Codex account without a recorded plan still serves paid-only models (fail open)", async () => {
+// The fork keeps its stricter operator rule (open-sse/services/codexPlanModelGate.ts): routing
+// skips a Codex account with no recorded plan for paid-only models instead of failing open.
+test("a Codex account without a recorded plan is skipped for paid-only models", async () => {
   const legacy = await seedCodex(null, 1);
   for (const model of ["gpt-6-sol-none", "gpt-6.1-astra"]) {
     const selected = await auth.getProviderCredentials("codex", null, [legacy.id], model);
-    assert.equal(selected?.connectionId, legacy.id, model);
+    assert.equal(selected?.connectionId, undefined, model);
   }
 });
 

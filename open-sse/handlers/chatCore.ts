@@ -2317,15 +2317,7 @@ async function handleChatCoreInner({
     // Final continuation policy can invalidate otherwise valid source history.
     // Release this request's owner before invoking fallible error/plugin handling.
     trackPendingRequest(model, provider, pendingConnId, false, undefined, pendingRequestOwner ?? pendingRequestId);
-    return await buildRequestTranslationErrorResult({
-      error,
-      traceId,
-      body,
-      model,
-      provider,
-      apiKeyInfo,
-      log,
-    });
+    return await buildRequestTranslationErrorResult({ error, log });
   }
   translatedBody = finalizedRequest.translatedBody;
   const { requestToolIdentityMap, toolNameMap } = finalizedRequest;

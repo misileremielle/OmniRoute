@@ -17,7 +17,7 @@ const expected = check.actual;
 const evaluate = (content) => tallyDrift([{ ...check, files: ["README.md"] }], () => content);
 
 for (const stale of [
-  "356 providers",
+  "355 providers",
   "**352-provider catalog**",
   "327 AI Providers",
   "329 registered providers",

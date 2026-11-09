@@ -105,7 +105,6 @@ test("admin imports caller secret encrypted with complete policy; real models ha
     usageLimitEnabled: true,
     dailyUsageLimitUsd: "2.5",
     weeklyUsageLimitUsd: 10,
-    chaosModeEnabled: true,
     expiresAt: "2099-01-01T00:00:00.000Z",
   };
   const response = await send(body);
@@ -123,7 +122,7 @@ test("admin imports caller secret encrypted with complete policy; real models ha
   assert.deepEqual(value.allowedModels, ["openai/gpt-4o"]);
   assert.deepEqual(value.allowedCombos, []);
   assert.deepEqual(value.allowedConnections, body.allowedConnections);
-  for (const field of ["noLog", "allowUsageCommand", "usageLimitEnabled", "chaosModeEnabled"]) {
+  for (const field of ["noLog", "allowUsageCommand", "usageLimitEnabled"]) {
     assert.equal(value[field], true, field);
   }
   assert.equal(value.dailyUsageLimitUsd, 2.5);

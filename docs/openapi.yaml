@@ -2019,7 +2019,6 @@ paths:
                 weeklyUsageLimitUsd:
                   type: [number, string, "null"]
                   description: Nonnegative number or numeric string; zero/null clears the cap
-                chaosModeEnabled: { type: boolean, default: false }
                 expiresAt:
                   type: [string, "null"]
                   format: date-time
@@ -12551,7 +12550,6 @@ components:
         usageLimitEnabled: { type: boolean }
         dailyUsageLimitUsd: { type: [number, "null"] }
         weeklyUsageLimitUsd: { type: [number, "null"] }
-        chaosModeEnabled: { type: boolean }
         compressionEnabled: { type: boolean }
         allowAutoCombos: { type: boolean }
         allowCcDiscoveryAliases: { type: boolean }

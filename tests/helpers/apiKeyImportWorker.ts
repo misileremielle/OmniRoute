@@ -11,7 +11,6 @@ process.on("message", (data: { id: string; key: string }) => {
         noLog: true,
         usageLimitEnabled: true,
         dailyUsageLimitUsd: 5,
-        chaosModeEnabled: true,
       },
       "synthetic-machine"
     );
