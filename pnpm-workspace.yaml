@@ -72,7 +72,6 @@ overrides:
   "promptfoo>undici@7": "^7.29.0"
   "promptfoo>simple-git": "^4.0.1"
   "promptfoo>@simple-git/argv-parser": "^2.0.1"
-  "mermaid>katex": "^0.19.1"
   "socket.io-parser": "^4.2.7"
   "tar": "^7.5.21"
   "@apidevtools/json-schema-ref-parser>js-yaml": "^5.5.0"
