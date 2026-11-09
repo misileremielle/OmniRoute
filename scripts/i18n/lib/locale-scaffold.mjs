@@ -5,13 +5,10 @@
  * transforms it here and writes it back.
  *
  * `entry` is a `config/i18n.json` locale object (`code`, `label`, `name`,
- * `native`, `english`, `flag`, optional `aliases`) plus one helper key that is
- * never stored: `flagFile`, the `docs/assets/flags/<file>` to use when the
- * ISO-3166 file cannot be derived from the flag emoji (e.g. `sw` → `tz.svg`).
+ * `native`, `english`, `flag`, optional `aliases`).
  * `total` is the number of UI locales after the insertion, English included.
  *
  *   insertLocaleEntry(configText, entry)                  config/i18n.json
- *   flagFileFor(entry)                                    🇬🇷 → "gr.svg"
  *   insertI18nGuideRow(guideText, entry, total, rtlCodes) docs/guides/I18N.md locale table
  *   bumpCounts(text, total)                               llm.txt counts: "N languages",
  *                                                         "N language JSON files"
@@ -21,8 +18,6 @@
  * existing entry that sorts after it, or after the last one. Duplicates throw.
  */
 
-const REGIONAL_INDICATOR_A = 0x1f1e6;
-const REGIONAL_INDICATOR_Z = REGIONAL_INDICATOR_A + 25;
 const DEFAULT_RTL_CODES = ["ar", "fa", "he", "ur"];
 
 const GUIDE_HEADLINE = /supports \*\*\d+ languages\*\*/;
@@ -60,21 +55,6 @@ function insertAmongRows(lines, rows, row, code, surface) {
   return [...lines.slice(0, at), row, ...lines.slice(at)];
 }
 
-export function flagFileFor(entry) {
-  if (entry.flagFile) return entry.flagFile;
-  const codePoints =
-    typeof entry.flag === "string" ? [...entry.flag].map((char) => char.codePointAt(0)) : [];
-  const isRegionalPair =
-    codePoints.length === 2 &&
-    codePoints.every((cp) => cp >= REGIONAL_INDICATOR_A && cp <= REGIONAL_INDICATOR_Z);
-  if (!isRegionalPair) {
-    throw new Error(`cannot derive a flag file from ${entry.flag}; pass flagFile explicitly`);
-  }
-  return (
-    codePoints.map((cp) => String.fromCharCode(cp - REGIONAL_INDICATOR_A + 97)).join("") + ".svg"
-  );
-}
-
 export function insertLocaleEntry(configText, entry) {
   const code = requireCode(entry);
   const config = JSON.parse(configText);
@@ -83,7 +63,6 @@ export function insertLocaleEntry(configText, entry) {
     throw new Error(`${code} is already configured`);
   }
   const stored = { ...entry };
-  delete stored.flagFile;
   config.locales = insertInCodeOrder(config.locales, stored, (locale) => locale.code);
   return JSON.stringify(config, null, 2) + "\n";
 }

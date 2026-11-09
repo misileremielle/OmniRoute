@@ -1460,7 +1460,6 @@ OmniRoute stands on the shoulders of giants. It started as a fork of **[9router]
   <tr><td nowrap><b><a href="https://github.com/langfuse/langfuse">Langfuse</a></b></td><td align="center">36,907</td><td>Its trace → span → generation observability model shaped our Compression Studio waterfall.</td></tr>
   <tr><td nowrap><b><a href="https://github.com/kiali/kiali">Kiali</a></b></td><td align="center">3,647</td><td>Istio service-mesh observability — inspired our circuit-breaker badges and error-edge visuals in the Routing/Combo Studio.</td></tr>
   <tr><td nowrap><b><a href="https://github.com/lobehub/lobe-icons">lobe-icons</a></b></td><td align="center">2,666</td><td>AI/LLM brand logos that render the provider icons across our dashboard.</td></tr>
-  <tr><td nowrap><b><a href="https://github.com/lipis/flag-icons">flag-icons</a></b></td><td align="center">12,499</td><td>Provides the MIT-licensed SVG flags used by the README language selector.</td></tr>
 </table>
 
 ### 🛡️ Security

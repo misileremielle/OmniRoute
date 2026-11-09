@@ -3,7 +3,7 @@
  * OmniRoute — add one locale to every surface with a single command.
  *
  *   pnpm run i18n:add-locale --code=el --english=Greek --native=Ελληνικά --flag=🇬🇷 \
- *     [--aliases=el-gr] [--flag-file=gr.svg] [--rtl] [--cli-full] \
+ *     [--aliases=el-gr] [--rtl] [--cli-full] \
  *     [--force-cli] [--site-dir=../omnirouteSite] [--batch-size=40] [--only=<phase,…>] \
  *     [--skip=<phase,…>] [--dry-run]
  *
@@ -12,7 +12,6 @@
  * still missing (`__MISSING__` markers, untranslated CLI / site keys):
  *
  *   config   config/i18n.json entry (+ aliases, rtl) — the single source of truth
- *   flag     docs/assets/flags/<cc>.svg from lipis/flag-icons (MIT) when missing
  *   ui       src/i18n/messages/<code>.json — scaffold, then sync-ui-keys --translate-markers;
  *            markers still __MISSING__ afterwards are reported and fail the run (exit 1)
  *   cli      bin/cli/locales/<code>.json — generate-locales --code scaffold, then the
@@ -40,19 +39,14 @@ import process from "node:process";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import {
-  bumpCounts,
-  flagFileFor,
-  insertI18nGuideRow,
-  insertLocaleEntry,
-} from "./lib/locale-scaffold.mjs";
+import { bumpCounts, insertI18nGuideRow, insertLocaleEntry } from "./lib/locale-scaffold.mjs";
 import { addDropdownOption, addSupportedLang } from "./lib/site-scaffold.mjs";
 import { backendConfig, translateBatch, translateString } from "./lib/translate-backend.mjs";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, "..", "..");
 
-const PHASES = ["config", "flag", "ui", "cli", "readme", "site"];
+const PHASES = ["config", "ui", "cli", "readme", "site"];
 // Phases whose outcome must agree with config/i18n.json ON DISK: the child scripts
 // (ui, cli) read the locale list from there, and the readme edits list the locale on
 // every surface the parity test checks against the config. For a brand-new locale they
@@ -62,7 +56,6 @@ const PHASES = ["config", "flag", "ui", "cli", "readme", "site"];
 const PHASES_REQUIRING_CONFIG_ON_DISK = ["ui", "cli", "readme"];
 const PHASES_GUARDED_IN_DRY_RUN = ["readme"];
 const PHASES_TRANSLATING = ["ui", "cli", "site"];
-const FLAG_CDN = "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/";
 const SITE_PAGES = ["index.html", "why/index.html", "viral/index.html"];
 const CLI_DEFAULT_SECTIONS = ["common", "program"];
 const PLACEHOLDER_PREFIX = "__MISSING__:";
@@ -82,7 +75,6 @@ const USAGE = `Usage: node scripts/i18n/add-locale.mjs --code=<code> --english=<
   --native=<name>       native language name, e.g. Ελληνικά (required for a new locale)
   --flag=<emoji>        flag emoji, e.g. 🇬🇷 (required for a new locale)
   --aliases=<csv>       browser/OS tags resolving to this locale, e.g. el-gr
-  --flag-file=<file>    docs/assets/flags/<file> when it cannot be derived from the emoji
   --rtl                 add the code to config/i18n.json "rtl"
   --cli-full            translate every CLI catalog section (default: common + program)
   --force-cli           retranslate CLI keys that already have a value
@@ -148,7 +140,6 @@ function parseArgs(argv) {
     native: null,
     flag: null,
     aliases: [],
-    flagFile: null,
     rtl: false,
     cliFull: false,
     forceCli: false,
@@ -185,9 +176,6 @@ function parseArgs(argv) {
           .split(",")
           .map((s) => s.trim().toLowerCase())
           .filter(Boolean);
-        break;
-      case "--flag-file":
-        o.flagFile = value;
         break;
       case "--rtl":
         o.rtl = true;
@@ -353,26 +341,6 @@ async function phaseConfig(ctx) {
   if (ctx.o.rtl && !ctx.before.rtl.includes(ctx.code)) changes.push("add to rtl");
   log(`config: ${changes.join(", ")} (total locales → ${ctx.total})`);
   await writeFile(ctx, ctx.configPath, ctx.nextConfigText);
-}
-
-async function phaseFlag(ctx) {
-  const file = path.join(ROOT, "docs", "assets", "flags", ctx.flagFile);
-  if (existsSync(file)) {
-    log(`flag: ${display(file)} present`);
-    return;
-  }
-  const url = `${FLAG_CDN}${ctx.flagFile}`;
-  log(`${dryTag(ctx)}fetch ${url} → ${display(file)}`);
-  if (ctx.dry) return;
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(
-      `flag download failed (${res.status}) for ${url} — place docs/assets/flags/${ctx.flagFile} manually (or pass --flag-file) and re-run`
-    );
-  }
-  const svg = await res.text();
-  if (!svg.trimStart().startsWith("<svg")) throw new Error(`flag download is not an SVG: ${url}`);
-  await writeFile(ctx, file, svg);
 }
 
 async function phaseUi(ctx) {
@@ -551,7 +519,6 @@ async function phaseSite(ctx) {
 
 const PHASE_RUNNERS = {
   config: phaseConfig,
-  flag: phaseFlag,
   ui: phaseUi,
   cli: phaseCli,
   readme: phaseReadme,
@@ -622,9 +589,9 @@ async function main() {
   }
 
   // The working entry: the stored one for a known locale, else built from the
-  // arguments. `flagFile` is a helper key that is never written to the config.
+  // arguments.
   const entry = stored
-    ? { ...stored, ...(o.flagFile ? { flagFile: o.flagFile } : {}) }
+    ? { ...stored }
     : {
         code: o.code,
         label: o.code.toUpperCase(),
@@ -633,9 +600,7 @@ async function main() {
         english: o.english,
         flag: o.flag,
         ...(o.aliases.length ? { aliases: o.aliases } : {}),
-        ...(o.flagFile ? { flagFile: o.flagFile } : {}),
       };
-  const flagFile = flagFileFor(entry); // fails fast for a flag the file name cannot be derived from
 
   // config/i18n.json after this run (in memory; the config phase writes it).
   let nextConfigText = stored ? configText : insertLocaleEntry(configText, entry);
@@ -654,7 +619,6 @@ async function main() {
     dry: o.dryRun,
     code: o.code,
     entry,
-    flagFile,
     stored,
     before,
     config,
