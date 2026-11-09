@@ -6,8 +6,6 @@ import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-// A read-only directory does not stop root, so the write-failure path cannot be provoked.
-
 // Issue #8181 companion coverage for the two write-path defects in consoleInterceptor:
 //
 //  * writeEntry appends with no rate limit, so a flood writes unbounded lines to disk. The
@@ -161,13 +159,12 @@ test("the log-unavailable notice is emitted at most once, to the real stderr", (
     `setTimeout(() => process.exit(0), 200);`,
   ]);
 
-    assert.equal(r.status, 0, `child must exit cleanly: ${r.stderr.slice(0, 400)}`);
-    const notices = r.stderr.split("\n").filter((l) => l.includes("[consoleInterceptor]"));
-    assert.equal(
-      notices.length,
-      1,
-      `the notice must fire exactly once across repeated failures, got ${notices.length} — a ` +
-        "per-call notice would itself become a flood"
-    );
-  }
-);
+  assert.equal(r.status, 0, `child must exit cleanly: ${r.stderr.slice(0, 400)}`);
+  const notices = r.stderr.split("\n").filter((l) => l.includes("[consoleInterceptor]"));
+  assert.equal(
+    notices.length,
+    1,
+    `the notice must fire exactly once across repeated failures, got ${notices.length} — a ` +
+      "per-call notice would itself become a flood"
+  );
+});

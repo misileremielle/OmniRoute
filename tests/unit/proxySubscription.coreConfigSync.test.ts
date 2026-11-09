@@ -5,8 +5,6 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-// A read-only directory does not stop root, so the write-failure path cannot be provoked.
-
 test("empty path writes nothing and never calls the renderer", async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-core-empty-"));
   const sync = await import("../../src/lib/proxySubscription/coreConfig/sync.ts");
@@ -352,7 +350,7 @@ test("disk failure still reports the write reason", async (t) => {
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
-);
+});
 
 test("repeated generations leave no accumulated state", async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-core-bounded-"));
