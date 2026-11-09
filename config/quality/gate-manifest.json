@@ -140,17 +140,12 @@
     },
     {
       "name": "check:docs-all",
-      "command": "pnpm run check:docs-sync && pnpm run check:docs-frontmatter && pnpm run check:docs-counts && pnpm run check:env-doc-sync && pnpm run check:deprecated-versions && pnpm run check:doc-links && pnpm run check:fabricated-docs",
+      "command": "pnpm run check:docs-sync && pnpm run check:docs-counts && pnpm run check:env-doc-sync && pnpm run check:deprecated-versions && pnpm run check:doc-links && pnpm run check:fabricated-docs",
       "disposition": "separately-invoked"
     },
     {
       "name": "check:docs-counts",
       "command": "node scripts/check/check-docs-counts-sync.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:docs-frontmatter",
-      "command": "node scripts/check/check-docs-frontmatter.mjs",
       "disposition": "separately-invoked"
     },
     {
@@ -445,7 +440,7 @@
     },
     {
       "name": "lint:md",
-      "command": "pnpm dlx markdownlint-cli2 \"docs/**/*.md\" \"*.md\" \"!docs/i18n\" \"!docs/research\"",
+      "command": "pnpm dlx markdownlint-cli2 \"docs/**/*.md\" \"*.md\" \"!docs/research\"",
       "disposition": "separately-invoked"
     },
     {

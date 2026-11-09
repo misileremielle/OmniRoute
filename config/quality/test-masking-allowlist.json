@@ -31,13 +31,17 @@
   "tests/unit/provider-registry-github-copilot-gpt-4o.test.ts": "PR #12759: legacy `gpt-4o` and `gpt-4o-2024-11-20` Copilot entries are retired. Their former positive registration and chat-target assertions are replaced by checks that both ids are absent from the curated catalog and live discovery while a supported model remains; the shared deprecations test covers the retired-id fallback matrix. Net 6→3 reflects the removed model surface, not masking. Prune after #12759 merges to main.",
   "tests/unit/account-fallback-service.test.ts": "v3.8.52 #15159: fix(resilience) delete the dead isProviderFailureCode export (B-04) — isProviderFailureCode and PROVIDER_FAILURE_ERROR_CODES had ZERO importers on release/v3.8.52 (verified against the base ref: the only hits were the definition itself at open-sse/services/accountFallback.ts:1349 and a stale pointer comment in open-sse/services/combo/comboPredicates.ts:222, which B-05 corrected in the same PR), so the 11 asserts that pinned that function were removed along with it (333→322). The removed case asserted `isProviderFailureCode(429) === true`, which is the OPPOSITE of the shipped breaker policy — AGENTS.md scopes 429 to connection cooldown / model lockout and reserves whole-provider trips for 408/500/502/503/504 — so the deleted test pinned wrong behaviour on dead code rather than guarding anything real. The live surface is now covered MORE strictly by tests/unit/breaker-status-set-single-source-15159.test.ts, which asserts the export is gone, that no production module imports it, and that both the combo copy and the live PROVIDER_BREAKER_FAILURE_STATUSES deepEqual [408, 500, 502, 503, 504] with 429 excluded. Dead export removed, coverage relocated to the single source of truth, not weakened. Prune after v3.8.52 merges to main.",
   "tests/unit/combo-dispatch-prelude.test.ts": "PR #16420: four assertions (64 to 60) move to tests/unit/combo-pinned-empty-turn.test.ts so the oversized fixture shrinks. Both prefixed and alias targets now exercise trusted and untrusted execution evidence, preserving success checks and adding rejection when only a selected-connection header is present. Coverage relocated and strengthened, not removed.",
-  "tests/unit/cli-env-quality-docs-mirrors.test.ts": "release/v3.8.53 PR #17250 (2026-10-20): the ENVIRONMENT.md / AUTO-COMBO.md provenance test asserted .i18n-state.json source_hash against the CURRENT English source (11→9, 2 asserts) — a duplicate of the i18n drift gate (check-translation-drift.mjs, PR-scoped since this PR) that turned every inherited translation drift into a red unit shard on unrelated PRs. The variable/path presence checks in every locale stay. Content assertions and target_hash provenance are unchanged. Verified legitimate, not masking. Prune after the next i18n wave lands.",
-  "tests/unit/resilience-pre-dispatch-docs-mirrors.test.ts": "release/v3.8.53 PR #17250 (2026-10-20): the RESILIENCE_GUIDE provenance test asserted .i18n-state.json source_hash against the CURRENT English source (7→5, 2 asserts) — a duplicate of the i18n drift gate (check-translation-drift.mjs, PR-scoped since this PR) that turned every inherited translation drift into a red unit shard on unrelated PRs. The pre-dispatch retry/terminal contract tokens in every locale stay. Content assertions and target_hash provenance are unchanged. Verified legitimate, not masking. Prune after the next i18n wave lands.",
-  "tests/unit/docs/vision-key-scope-locales.test.ts": "release/v3.8.53 PR #17250 (2026-10-20): the GUARDRAILS vision-key-scope section test asserted .i18n-state.json source_hash against the CURRENT English source (7→5, 2 asserts) — a duplicate of the i18n drift gate (check-translation-drift.mjs, PR-scoped since this PR) that turned every inherited translation drift into a red unit shard on unrelated PRs. Section presence, the nine literals and the no-English-fallback check in every locale stay. Content assertions and target_hash provenance are unchanged. Verified legitimate, not masking. Prune after the next i18n wave lands.",
-  "tests/unit/docs/route-guard-import-locales.test.ts": "release/v3.8.53 PR #17250 (2026-10-20): the route-guard import section test asserted .i18n-state.json source_hash against the CURRENT English source (9→7, 2 asserts) — a duplicate of the i18n drift gate (check-translation-drift.mjs, PR-scoped since this PR) that turned every inherited translation drift into a red unit shard on unrelated PRs. Section presence and literals in every locale stay. Content assertions and target_hash provenance are unchanged. Verified legitimate, not masking. Prune after the next i18n wave lands.",
-  "tests/unit/docs/remote-token-privilege-locales.test.ts": "release/v3.8.53 PR #17250 (2026-10-20): the remote-token privilege section test asserted .i18n-state.json source_hash against the CURRENT English source (7→5, 2 asserts) — a duplicate of the i18n drift gate (check-translation-drift.mjs, PR-scoped since this PR) that turned every inherited translation drift into a red unit shard on unrelated PRs. Section presence and literals in every locale stay. Content assertions and target_hash provenance are unchanged. Verified legitimate, not masking. Prune after the next i18n wave lands.",
+  "tests/unit/env-docs-input-sanitizer-8093.test.ts": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): docs/i18n/, .i18n-state.json and the doc-translation tooling are gone, so the case that read every translated ENVIRONMENT.md mirror has nothing left to read. The English ENVIRONMENT.md assertions stay.",
+  "tests/unit/i18n-locale-surfaces-parity.test.ts": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): docs/i18n/, .i18n-state.json and the doc-translation tooling are gone, so the per-locale docs-mirror, README flag-link and docs index assertions are replaced by one assertion that docs/i18n/ stays gone and the README links no translated docs. Both UI catalog checks per locale stay.",
+  "tests/unit/podman-machine-guidance-8497.test.ts": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): docs/i18n/, .i18n-state.json and the doc-translation tooling are gone, so the case that checked the zh-CN, zh-TW and pl README and ENVIRONMENT mirrors has no files left. The English README and ENVIRONMENT assertions stay.",
+  "tests/unit/routing-strategy-docs-sync-15159.test.ts": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): docs/i18n/, .i18n-state.json and the doc-translation tooling are gone, so the case that checked the bs AGENTS.md mirror has no file left. The English AGENTS.md and AUTO-COMBO.md assertions stay.",
+  "tests/unit/sync-next-cycle.test.ts": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): docs/i18n/, .i18n-state.json and the doc-translation tooling are gone, so sync-next-cycle no longer resyncs CHANGELOG mirrors (release:sync-changelog-i18n was deleted), and the case that pinned that resync is removed with it.",
   "_deletedWithReplacement": {
     "_comment": "Deleções de arquivo de teste com SUBSTITUTO verificado (o gate exige que o replacement exista no HEAD e seja arquivo de teste). Uso restrito ao caso 'reescrito em outro path sem rename detectável pelo -M do git'. Cada entrada precisa de reason com PR ref e passa por revisão humana no release PR. Prune após o release mergear para main.",
+    "tests/unit/combo-cleanup-stale-connection.test.ts": {
+      "replacement": "tests/unit/combo-deleted-connection-refs.test.ts",
+      "reason": "PR #19008 (#18954): deleting a provider connection no longer strips the combo step's connectionId, so the old assertion that the pin gets cleared pinned retired behaviour. The file is rewritten as tests/unit/combo-deleted-connection-refs.test.ts, which asserts the shipped contract instead: the pin survives, the scope allowlist is pruned but never emptied, and a scope that loses every id stays restrictive. Same surface, opposite expectation, plus the allowlist cases the old file never covered. Verified legitimate, not masking. Prune after the release carrying #19008 merges to main."
+    },
     "tests/unit/gemini-web-image-account-fallback.test.ts": {
       "replacement": "tests/unit/gemini-web-image-retirement.test.ts",
       "reason": "v3.8.50 #11708: a capacidade Gemini Web Images foi aposentada em HOLD de procedencia/licenca, sem aposentar Gemini Web chat/auth/tools. O teste positivo de fallback da integracao removida foi substituido pelo guard negativo no catalogo/handler e pelo controle que preserva o executor/registry de chat e provedores legitimos de Nano Banana. Superficie extinta, nao mascaramento."
@@ -2181,6 +2185,81 @@
     "tests/unit/onnx-install-env-16225.test.ts": {
       "replacement": "tests/unit/onnx-install-skip-16225.test.ts",
       "reason": "chore/pnpm-migration (PR #2): the old test drove npm's lifecycle to prove ONNXRUNTIME_NODE_INSTALL reaches onnxruntime-node's postinstall. Under pnpm that script never runs (allowBuilds denies it; `pnpm ignored-builds` confirms), so the replacement pins the deny entry, the action's skip flag and that no workflow installs outside the audited action."
+    },
+    "tests/unit/assemble-standalone-docs-sanitizer-18699.test.ts": {
+      "sourceRemoved": ["src/lib/docsSanitizer.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/docs-link-resolver.test.ts": {
+      "sourceRemoved": ["src/lib/docsLinkResolver.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/docs-mirror-runtime-shipping.test.ts": {
+      "sourceRemoved": ["src/lib/docsSanitizer.ts", "source.config.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/docs-public-catalog-sensitive-pages.test.ts": {
+      "sourceRemoved": ["source.config.ts", "src/app/docs/page.tsx"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/docs-translated-page-18699.test.tsx": {
+      "sourceRemoved": ["src/app/docs/[...slug]/page.tsx", "src/lib/docsSanitizer.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/npm-runtime-deps-fumadocs-mdx-7661.test.ts": {
+      "sourceRemoved": ["source.config.ts", "src/app/docs/layout.tsx"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/security/docs-path-traversal.test.ts": {
+      "sourceRemoved": ["src/lib/docsI18nPath.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/security/docs-sanitization.test.ts": {
+      "sourceRemoved": ["src/lib/docsSanitizer.ts"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/ui/docs-theme-switch-18078.test.tsx": {
+      "sourceRemoved": ["src/app/docs/DocsThemeSwitch.tsx"],
+      "reason": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8)."
+    },
+    "tests/unit/check-translation-drift-base-report.test.ts": {
+      "sourceRemoved": ["scripts/i18n/check-translation-drift.mjs"],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
+    },
+    "tests/unit/cli-env-quality-docs-mirrors.test.ts": {
+      "sourceRemoved": [".i18n-state.json", "docs/i18n/de/docs/reference/ENVIRONMENT.md"],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
+    },
+    "tests/unit/cycle-mirror-locale-guard.test.ts": {
+      "sourceRemoved": ["scripts/ad-hoc/relay-cycle-mirrors-15682.mjs"],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
+    },
+    "tests/unit/docs/remote-token-privilege-locales.test.ts": {
+      "sourceRemoved": [".i18n-state.json", "docs/i18n/de/README.md"],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
+    },
+    "tests/unit/docs/route-guard-import-locales.test.ts": {
+      "sourceRemoved": [".i18n-state.json", "docs/i18n/de/README.md"],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
+    },
+    "tests/unit/docs/vision-key-scope-locales.test.ts": {
+      "sourceRemoved": [".i18n-state.json", "docs/i18n/de/README.md"],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
+    },
+    "tests/unit/i18n-language-bar.test.ts": {
+      "sourceRemoved": ["scripts/i18n/lib/language-bar.mjs", "scripts/i18n/sync-language-bars.mjs"],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
+    },
+    "tests/unit/resilience-pre-dispatch-docs-mirrors.test.ts": {
+      "sourceRemoved": [
+        "scripts/ad-hoc/relay-resilience-delta-mirrors-20261013.mjs",
+        ".i18n-state.json"
+      ],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
+    },
+    "tests/unit/source-delta-mirror-locale-guard.test.ts": {
+      "sourceRemoved": ["scripts/ad-hoc/relay-source-delta-mirrors-20261013.mjs"],
+      "reason": "Fork made the documentation English-only (commit ca689f13dc, PR misileremielle/OmniRoute#8): the translated mirrors and the tooling this test covered no longer exist, so there is no source left to test."
     }
   },
   "tests/unit/catalog-updates-v3x.test.ts": "v3.8.45 #6248: fix(providers) remove deprecated MiMo V2 entries — os 5 asserts removidos pinavam specs de modelos mimo-v2-* que deixaram de existir no catálogo (54→49). Asserts seguem a remoção dos modelos, não enfraquecimento. Verificado legítimo. Prune após v3.8.45 mergear para main.",
@@ -2275,5 +2354,19 @@
   "tests/unit/build/ref-parser-js-yaml-17017.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. pnpm records no nested node_modules path, so the 'no nested js-yaml 4 under ref-parser' assert is replaced by checking every ref-parser snapshot resolves js-yaml 5; the @yarnpkg/parsers case is gone with lockfile-lint, which was its only dependent.",
   "tests/unit/dry-run-lts-cut.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. bumpLockfile and its test are removed: pnpm-lock.yaml records no workspace versions, so a release bump has no lockfile entry to change.",
   "tests/unit/playwright-runner-args.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. the npm 'no nested @playwright/test/node_modules/playwright' assert has no pnpm equivalent; lockedVersions(...) == [runtime] for both packages already proves a single Playwright copy.",
-  "tests/unit/wreq-native-manifest.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. pnpm-lock.yaml does not record a package license, so the per-addon `lock.license === MIT` assert is dropped; the manifest's own license assert remains, as do version/integrity/os/cpu/libc against the lockfile."
+  "tests/unit/wreq-native-manifest.test.ts": "chore/pnpm-migration (PR #2): package-lock.json -> pnpm-lock.yaml. pnpm-lock.yaml does not record a package license, so the per-addon `lock.license === MIT` assert is dropped; the manifest's own license assert remains, as do version/integrity/os/cpu/libc against the lockfile.",
+  "tests/e2e/ecosystem.test.ts": "Fork removed the A2A server: the dropped asserts covered the /a2a JSON-RPC endpoint and Agent Card, which no longer exist. The MCP, quota, auto-combo, OpenClaw, stress and error-leak asserts are unchanged. Feature removed, not weakened.",
+  "tests/e2e/protocol-clients.test.ts": "Fork removed the A2A server: the dropped test drove the /a2a discovery/send/stream/get/cancel flow, which no longer exists. The MCP stdio test is unchanged. Feature removed, not weakened.",
+  "tests/e2e/navigation.spec.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped test rendered /docs, which no longer exists. Feature removed, not weakened.",
+  "tests/e2e/sidebar-navigation.spec.ts": "The fork's home page no longer has the Quick Start heading; the dropped assert waited for it. The sidebar keyboard/search asserts are unchanged.",
+  "tests/unit/build/docker-published-image-smoke-11835.test.ts": "Fork publishes Docker images to GHCR only and dropped the Bun images (commit 3afeb1cf94): the removed asserts pinned the Docker Hub latest promotion and the -bun aliases. Feature removed, not weakened.",
+  "tests/unit/build/known-build-warnings.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): fumadocs-mdx is gone, so the fumadocs eval-*.js warning case was replaced by the next-intl extractor case. Feature removed, not weakened.",
+  "tests/unit/check-pack-boot.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped test required the translated docs mirrors that only the /docs site read at runtime. Feature removed, not weakened.",
+  "tests/unit/dashboard-localization-contract.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8) and the Changelog page: the dropped assert checked the removed changelog copy. Feature removed, not weakened.",
+  "tests/unit/dev-bundler-boundaries-12074.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped asserts pinned the fumadocs split-chunk cache group, which no longer exists. Feature removed, not weakened.",
+  "tests/unit/docker-publish-build-heap-14325.test.ts": "Fork dropped the Bun images (commit 3afeb1cf94): fewer docker build steps carry the heap override, so the minimum-count asserts for the Bun builds went away. Feature removed, not weakened.",
+  "tests/unit/dockerignore-docs-coverage.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped assert required docs markdown in the image for the removed /docs site. Feature removed, not weakened.",
+  "tests/unit/release-notes.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8) and the Changelog page: the dropped asserts covered the changelog slicer the page used. Feature removed, not weakened.",
+  "tests/unit/sidebar-visibility.test.ts": "Fork removed the in-app /docs site (Help sidebar group, commit 9a4a7c8c8c, PR misileremielle/OmniRoute#8): the dropped asserts covered the hideable Help items (docs, issues, changelog). Feature removed, not weakened.",
+  "tests/unit/redirects-cli-renames.test.ts": "The ACP agents page was removed on the fork's main (c1b50be9d6); the dropped asserts pinned the /dashboard/agents → /dashboard/acp-agents redirects to that page, which this PR removes. The CLI and freepik → magnific redirect asserts are unchanged. Feature removed, not weakened."
 }

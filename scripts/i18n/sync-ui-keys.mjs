@@ -16,8 +16,8 @@
  *   pnpm run i18n:sync-ui --translate-markers --locale=pt-BR --concurrency=4
  *   pnpm run i18n:sync-ui --translate-markers --batch-size=40
  *
- * --translate-markers calls the OmniRoute translation backend (same env vars
- * as `run-translation.mjs`; the client lives in `lib/translate-backend.mjs`)
+ * --translate-markers calls the OmniRoute translation backend (the client lives
+ * in `lib/translate-backend.mjs`)
  * and replaces every `__MISSING__:<en>` placeholder with a translated string.
  * Missing env vars cause the script to fail fast — the markers stay in place
  * for a later run.

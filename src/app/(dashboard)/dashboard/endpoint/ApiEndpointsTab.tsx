@@ -346,7 +346,7 @@ export default function ApiEndpointsTab() {
             </div>
             <div className="flex items-center gap-2">
               <a
-                href="/docs/openapi.yaml"
+                href="/openapi.yaml"
                 download
                 className={buttonVariants({ variant: "secondary", size: "sm" })}
               >

@@ -7,9 +7,8 @@
  * `esbuild` transitively via `tsx`. #5757 worried a broken esbuild could make a
  * fresh install "build-fragile", and proposed forcing `esbuild@0.27.4`.
  *
- * That override is unsafe: `tsx` declares `esbuild@~0.28.0` and `fumadocs-mdx`
- * (also a runtime dep) declares `esbuild@^0.28.0`; forcing 0.27.x pushes esbuild
- * below both. So instead of pinning a version, these two tests guard the actual
+ * That override is unsafe: `tsx` declares `esbuild@~0.28.0`; forcing 0.27.x
+ * pushes esbuild below it. So instead of pinning a version, these two tests guard the actual
  * invariants:
  *   1. the runtime tsx/esm loader still transforms modern syntax correctly, and
  *   2. the resolved esbuild stays inside tsx's declared range (so nobody
@@ -75,6 +74,6 @@ test("#5757: resolved esbuild stays within tsx's declared range (blocks the out-
     esbuildPkg.version.startsWith(baseMinor + "."),
     `esbuild ${esbuildPkg.version} is outside tsx's declared range "${declared}". ` +
       `A global esbuild override (such as the esbuild@0.27.4 workaround proposed in #5757) ` +
-      `breaks tsx and fumadocs-mdx (both require esbuild@^0.28) — do not add one.`
+      `breaks tsx — do not add one.`
   );
 });

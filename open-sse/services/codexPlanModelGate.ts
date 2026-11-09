@@ -5,18 +5,11 @@
  * unknown plan is skipped for these models, as if the connection excluded them.
  */
 
+import { getCodexPlanType } from "./codexPlanEligibility.ts";
+
 const PLAN_RESTRICTED_CODEX_MODEL = /(^|\/)gpt-[\w.-]+?-(astra|sol)(-|$)/i;
 const CODEX_PROVIDERS = new Set(["codex", "cx"]);
 export const CODEX_PLAN_RESTRICTED_ALLOWED_PLANS = new Set(["plus", "prolite", "pro", "promax"]);
-
-/** Plan string, read the way the Codex executor reads it (OAuth login first, then import). */
-function codexPlanOf(providerSpecificData: unknown): string {
-  if (!providerSpecificData || typeof providerSpecificData !== "object") return "";
-  const data = providerSpecificData as { workspacePlanType?: unknown; chatgptPlanType?: unknown };
-  const plan =
-    typeof data.workspacePlanType === "string" ? data.workspacePlanType : data.chatgptPlanType;
-  return typeof plan === "string" ? plan.trim().toLowerCase() : "";
-}
 
 export function isCodexModelExcludedByPlan(
   provider: unknown,
@@ -25,5 +18,7 @@ export function isCodexModelExcludedByPlan(
 ): boolean {
   if (typeof provider !== "string" || !CODEX_PROVIDERS.has(provider)) return false;
   if (!PLAN_RESTRICTED_CODEX_MODEL.test(String(model || ""))) return false;
-  return !CODEX_PLAN_RESTRICTED_ALLOWED_PLANS.has(codexPlanOf(providerSpecificData));
+  // Same plan keys and normalization as the upstream gate (planType, plan_type, ... too);
+  // a missing or unknown plan stays excluded here.
+  return !CODEX_PLAN_RESTRICTED_ALLOWED_PLANS.has(getCodexPlanType(providerSpecificData) ?? "");
 }

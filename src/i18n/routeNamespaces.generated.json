@@ -1,5 +1,11 @@
 {
-  "root": ["auth", "common", "docs", "endpoint", "header", "landing", "miniapp", "publicSystem"],
+  "root": [
+    "auth",
+    "common",
+    "landing",
+    "miniapp",
+    "publicSystem"
+  ],
   "chrome": [
     "analytics",
     "breadcrumbs",
@@ -272,33 +278,6 @@
       "traeAuthModal",
       "trafficInspector"
     ],
-    "changelog": [
-      "analytics",
-      "breadcrumbs",
-      "cache",
-      "changelogPage",
-      "cloudSyncStatus",
-      "common",
-      "costs",
-      "cursorAuthModal",
-      "header",
-      "kiroAuthModal",
-      "kiroSocialOAuthModal",
-      "noAuthProvider",
-      "oauthModal",
-      "providers",
-      "proxyConfigModal",
-      "proxyLog",
-      "proxyLogger",
-      "requestLogger",
-      "requestTimeline",
-      "sharedComponents",
-      "sidebar",
-      "stats",
-      "teamCosts",
-      "traeAuthModal",
-      "trafficInspector"
-    ],
     "cli-agents": [
       "analytics",
       "breadcrumbs",
@@ -358,6 +337,7 @@
       "trafficInspector"
     ],
     "combos": [
+      "accountPreferences",
       "analytics",
       "breadcrumbs",
       "cache",

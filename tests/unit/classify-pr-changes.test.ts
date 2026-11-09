@@ -165,7 +165,6 @@ const POSITIVE_CASES: Array<[string, string[]]> = [
       "pnpm-lock.yaml",
       "next.config.mjs",
       "Dockerfile",
-      "Dockerfile.bun",
       "tsconfig.json",
       "tsconfig.typecheck-core.json",
       "scripts/build/postinstall.mjs",

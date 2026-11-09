@@ -4,8 +4,8 @@ const errorPages = [
   {
     path: "/400",
     heading: "Bad Request",
-    primaryHref: "/docs",
-    secondaryHref: "/dashboard/translator",
+    primaryHref: "/dashboard/translator",
+    secondaryHref: null,
   },
   {
     path: "/401",
@@ -61,7 +61,9 @@ test.describe("Error and Resilience Pages", () => {
 
       await expect(page.getByRole("heading", { name: pageSpec.heading })).toBeVisible();
       await expect(page.locator(`a[href="${pageSpec.primaryHref}"]`).first()).toBeVisible();
-      await expect(page.locator(`a[href="${pageSpec.secondaryHref}"]`).first()).toBeVisible();
+      if (pageSpec.secondaryHref) {
+        await expect(page.locator(`a[href="${pageSpec.secondaryHref}"]`).first()).toBeVisible();
+      }
     });
   }
 

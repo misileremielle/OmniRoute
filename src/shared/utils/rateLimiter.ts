@@ -74,6 +74,8 @@ export function getRedisClient(): Promise<Redis> {
       const mod = await import("ioredis");
       const RedisCtor = (mod.default ?? mod) as typeof Redis;
       const client = new RedisCtor(REDIS_URL, {
+        // ioredis 6 speaks RESP3 by default, which changes reply shapes; keep RESP2.
+        protocol: 2,
         maxRetriesPerRequest: 3,
         enableReadyCheck: false,
         keyPrefix: REDIS_KEY_PREFIX,

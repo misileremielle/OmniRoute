@@ -179,7 +179,7 @@ export function resolveKnipBin(opts = {}) {
 
 /**
  * knip loads the project's Next config, and plugins in it can log to stdout before the
- * report (fumadocs-mdx prints `[MDX] generated files in …ms`). The JSON reporter writes the
+ * report. The JSON reporter writes the
  * report as the last line, so a leading log line must not make the run look unparseable.
  *
  * @param {string} stdout - raw knip stdout

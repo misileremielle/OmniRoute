@@ -3,8 +3,6 @@
 # only on the tag, run BEFORE the freeze (v3.8.52 lessons, 2026-10-20).
 #
 # Why this exists: the PR CI never exercises the surfaces that broke the v3.8.52 tag —
-#   • the Bun `runner-web` image's apt list (best-effort stage, `continue-on-error` — dead packages
-#     only surfaced through the manifest guard on the release run, #17223 / #17236);
 #   • the README/llm.txt current-version claims the cycle bump used to skip (#17237).
 # plus the packaging path npm-publish runs (build:cli → check:pack-boot) and the vitest suite.
 #
@@ -12,7 +10,6 @@
 #   scripts/release/preflight-build.sh            # everything (build:cli can take 25–55 min locally)
 #   scripts/release/preflight-build.sh --quick    # lockfiles + version claims only (~20 s)
 #   scripts/release/preflight-build.sh --no-build # skip build:cli / pack-boot (CI artifact already proven)
-#   scripts/release/preflight-build.sh --no-docker# skip the Dockerfile.bun apt smoke (needs ssh to the .113)
 # Logs: _artifacts/preflight/<check>.log (gitignored). Exit 1 on the first class of failure, after
 # running every check, so one run lists everything to fix.
 
@@ -21,12 +18,10 @@ ROOT=$(git rev-parse --show-toplevel)
 cd "$ROOT"
 QUICK=0
 BUILD=1
-DOCKER=1
 for a in "$@"; do
   case "$a" in
     --quick) QUICK=1 ;;
     --no-build) BUILD=0 ;;
-    --no-docker) DOCKER=0 ;;
     -h | --help)
       sed -n '2,20p' "$0"
       exit 0
@@ -58,7 +53,7 @@ run() {
   echo "[$st] $name ($(( $(date +%s) - t0 ))s)"
 }
 
-echo "preflight-build v$VERSION — $(date -u +%Y-%m-%dT%H:%M:%SZ) — quick=$QUICK build=$BUILD docker=$DOCKER"
+echo "preflight-build v$VERSION — $(date -u +%Y-%m-%dT%H:%M:%SZ) — quick=$QUICK build=$BUILD"
 
 run "version claims (README.md, llm.txt)" 60 \
   node scripts/release/bump-version-claims.mjs --check --to "$VERSION"
@@ -70,10 +65,6 @@ if [ "$QUICK" -eq 0 ]; then
   if [ "$BUILD" -eq 1 ]; then
     run "build:cli (standalone + CLI bundle)" 4000 pnpm run build:cli
     run "pack-boot (the tarball users install boots)" 900 pnpm run check:pack-boot
-  fi
-  if [ "$DOCKER" -eq 1 ]; then
-    run "Dockerfile.bun runner-web apt smoke (.113)" 900 \
-      scripts/release/preflight-bun-apt-smoke.sh
   fi
 fi
 

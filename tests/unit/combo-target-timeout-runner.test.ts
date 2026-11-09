@@ -253,7 +253,9 @@ test("resolveTargetTimeoutMs without connection: falls back to comboTargetTimeou
   assert.equal(aborted, true);
 });
 
-test("resolveTargetTimeoutMs extended: 50ms outlives the 20ms base (does not abort at 20ms)", async () => {
+// The work (45ms) must finish well inside the extended timeout: with a 50ms timeout the 5ms margin
+// lost the race on a loaded CI runner and aborted the target.
+test("resolveTargetTimeoutMs extended: 200ms outlives the 20ms base (does not abort at 20ms)", async () => {
   let resolvedWith = "";
   const runner = buildTargetTimeoutRunner({
     handleSingleModel: async (_b, _m, target) => {
@@ -266,7 +268,7 @@ test("resolveTargetTimeoutMs extended: 50ms outlives the 20ms base (does not abo
     },
     comboTargetTimeoutMs: 20,
     resolveTargetTimeoutMs: async (target) =>
-      target?.connectionId === "conn-1" ? 50 : undefined,
+      target?.connectionId === "conn-1" ? 200 : undefined,
     log: noopLog,
   });
   const res = await runner({}, "slow-model", {

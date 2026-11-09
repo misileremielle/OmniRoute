@@ -64,7 +64,8 @@ async function seedOAuthCodex() {
     expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
     isActive: true,
     testStatus: "active",
-    providerSpecificData: {},
+    // Sol-tier models route only to paid Codex plans (codexPlanModelGate).
+    providerSpecificData: { chatgptPlanType: "plus" },
   });
 }
 

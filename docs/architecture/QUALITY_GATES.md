@@ -176,7 +176,7 @@ Runs after `test-coverage`. Blocks merge on failure.
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | `quality:collect`            | Emits `quality-metrics.json` (ESLint warning count, coverage from merged shard report)                                                                      | Yes (upstream of ratchet) |
 | `quality:ratchet`            | Each metric in `quality-baseline.json` has not regressed (ESLint warnings ≤ baseline; coverage ≥ baseline)                                                  | Yes                       |
-| `check:duplication`          | Code duplication (jscpd@4) does not exceed baseline in `quality-baseline.json`                                                                              | Yes                       |
+| `check:duplication`          | Code duplication (jscpd@5) does not exceed baseline in `quality-baseline.json`                                                                              | Yes                       |
 | `check:complexity`           | File-level cyclomatic complexity does not exceed the cap (core ESLint `complexity` + `max-lines-per-function`)                                              | Yes                       |
 | `check:cognitive-complexity` | Cognitive complexity ratchet (`eslint-plugin-sonarjs`) — separate ESLint pass; CI runs both merged as the single `check:complexity-ratchets` step           | Yes                       |
 | `check:dead-code`            | Unused exports / files ratchet (knip) does not regress vs baseline                                                                                          | Yes                       |
@@ -256,9 +256,7 @@ unnoticed until #8463 because:
 
 - `sync-ui-keys` only backfills keys that are **absent**, never ones that are **stale**;
 - `check-ui-keys-coverage` counts key _presence_, so a stale translation scores as covered;
-- `check-translation-drift` tracks the `docs/i18n/<locale>/**.md` documentation mirrors —
-  it never reads `src/i18n/messages/*.json`. Blocking in job `docs-sync-strict` since the
-  2026-09 re-sync: edit a core doc → `npm run i18n:run -- --files=<doc>` (section-level, cheap).
+- the documentation is English-only, so no gate compares translated docs either.
 
 **Diff-aware, not baseline-backed.** It compares `en.json` at the merge base against the
 working tree; for every key whose English value changed, any locale still holding an

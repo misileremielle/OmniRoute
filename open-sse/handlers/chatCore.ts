@@ -4,6 +4,7 @@ import type {
 } from "../utils/providerHttpAttempts.ts";
 import { finalizeTranslatedRequest } from "./chatCore/translatedRequestFinalize.ts";
 import { isPassiveCodex } from "../services/tokenRefresh/passiveCodex.ts";
+import { enforceResponsesToolHistory } from "../translator/helpers/responsesToolHistory.ts";
 import { resolveChatCoreRequestSetup, resolveClientEchoModel } from "./chatCore/requestSetup.ts";
 import { shouldSkipNativeCodexReactiveCompaction } from "./chatCore/nativeCodexCompaction.ts";
 import {
@@ -292,7 +293,10 @@ import type {
   CompressionPipelineStep,
   CompressionResult,
 } from "../services/compression/types.ts";
-import type { CachingDetectionContext } from "../services/compression/cachingAware.ts";
+import {
+  mustKeepOpenCodeHistoryVerbatim,
+  type CachingDetectionContext,
+} from "../services/compression/cachingAware.ts";
 import { runLiveZoneCompression } from "./chatCore/liveZoneCompression.ts";
 import { prepareWebSearchFallbackBody } from "../services/webSearchFallback.ts";
 import { prepareWebFetchFallbackBody } from "../services/webFetchInterception.ts";
@@ -335,6 +339,7 @@ export async function handleChatCore(args: Parameters<typeof handleChatCoreInner
   return withResilienceActionsContext([args], (forwarded) => handleChatCoreInner(forwarded));
 }
 
+/** Process a chat request through admission, translation, dispatch, and response handling. */
 async function handleChatCoreInner({
   body,
   modelInfo,
@@ -1136,6 +1141,9 @@ async function handleChatCoreInner({
   // reactive and last-resort compaction passes. Otherwise an operator selecting
   // "off" still has large histories rewritten by trim_tools/purify_history.
   let reactiveContextCompactionEnabled = false;
+  // Keep automatic-prefix-cached OpenCode history intact during the proactive pass.
+  // Last-resort compaction at the concrete context ceiling remains enabled.
+  let protectOpenCodePrefix = false;
   // Native Codex history stays out of reactive/last-resort compaction unless the default-off
   // NATIVE_CODEX_REACTIVE_COMPACTION_ENABLED flag opts in (#16632; fails closed).
   const skipNativeCodexReactiveCompaction = shouldSkipNativeCodexReactiveCompaction(
@@ -1535,6 +1543,9 @@ async function handleChatCoreInner({
           connectionCacheOverride,
         };
         const compressionConfig = resolveCacheAwareConfig(config, compressionInputBody, cacheCtx);
+        // #18787: keep the upstream cacheable prefix untouched until a stable
+        // live-zone baseline exists; subsequent requests can still compress new tool outputs.
+        protectOpenCodePrefix = mustKeepOpenCodeHistoryVerbatim(compressionInputBody, cacheCtx);
         const compressionPrincipalId = apiKeyInfo?.id ? String(apiKeyInfo.id) : undefined;
         const compressionOptions = {
           model: effectiveModel,
@@ -1581,14 +1592,31 @@ async function handleChatCoreInner({
             targetFormat === FORMATS.OPENAI_RESPONSES) &&
           !(sourceFormat === FORMATS.CLAUDE && targetFormat === FORMATS.CLAUDE)
         ) {
-          runPostTranslationCompression = (input) =>
+          const compressTranslated = (input: Record<string, unknown>) =>
             applyCompressionAsync(input, mode, {
               ...compressionOptions,
               compressionStage: "post-translation" as const,
             });
+          // #18787: post-translation engines also need a separate frozen prefix.
+          // Keep their cache key distinct from the pre-translation live-zone entry.
+          runPostTranslationCompression = protectOpenCodePrefix
+            ? (input) =>
+                runLiveZoneCompression({
+                  compressionInputBody: input,
+                  clientHeaders: clientRawRequest?.headers,
+                  provider,
+                  getCurrentConnectionId,
+                  compressionPrincipalId,
+                  mode: `${mode}:post-translation`,
+                  effectiveModel,
+                  compressionConfig,
+                  preserveRawPrefixOnMiss: true,
+                  runCompression: compressTranslated,
+                })
+            : compressTranslated;
         }
         let result: CompressionResult;
-        if (compressionConfig.liveZone?.enabled === true) {
+        if (compressionConfig.liveZone?.enabled === true || protectOpenCodePrefix) {
           // Live-zone lane extracted to chatCore/liveZoneCompression.ts (chatCore slice 2).
           result = await runLiveZoneCompression({
             compressionInputBody,
@@ -1599,6 +1627,7 @@ async function handleChatCoreInner({
             mode,
             effectiveModel,
             compressionConfig,
+            preserveRawPrefixOnMiss: protectOpenCodePrefix,
             runCompression,
           });
         } else {
@@ -1821,6 +1850,7 @@ async function handleChatCoreInner({
     if (
       reactiveContextCompactionEnabled &&
       !skipNativeCodexReactiveCompaction &&
+      !protectOpenCodePrefix &&
       estimatedTokens > threshold
     ) {
       log?.info?.(
@@ -2077,6 +2107,9 @@ async function handleChatCoreInner({
     );
 
   try {
+    if (sourceFormat === FORMATS.OPENAI_RESPONSES) {
+      enforceResponsesToolHistory(body as Record<string, unknown>);
+    }
     if (nativeResponsesPassthrough) {
       translatedBody = stampNativeResponsesPassthroughBody(
         body as Record<string, unknown>,
@@ -2128,6 +2161,7 @@ async function handleChatCoreInner({
         effectiveModel,
         targetFormat,
         preserveCacheControl,
+        connectionCacheOverride,
         normalizeClaudeUpstreamMessages,
         log,
       });
@@ -2264,19 +2298,27 @@ async function handleChatCoreInner({
   // Request tool metadata, Kiro/Claude tool dispatch fixes, the response tool-name map, the
   // upstream model id, the previous_response_id policy and the Codex effort guard: extracted to
   // chatCore/translatedRequestFinalize.ts (chatCore slice 2).
-  const finalizedRequest = finalizeTranslatedRequest({
-    translatedBody,
-    body,
-    provider,
-    alias,
-    effectiveModel,
-    sourceFormat,
-    targetFormat,
-    isClaudePassthrough,
-    credentials,
-    previousResponseIdMode: settings.responsesPreviousResponseIdMode,
-    log,
-  });
+  let finalizedRequest: ReturnType<typeof finalizeTranslatedRequest>;
+  try {
+    finalizedRequest = finalizeTranslatedRequest({
+      translatedBody,
+      body,
+      provider,
+      alias,
+      effectiveModel,
+      sourceFormat,
+      targetFormat,
+      isClaudePassthrough,
+      credentials,
+      previousResponseIdMode: settings.responsesPreviousResponseIdMode,
+      log,
+    });
+  } catch (error) {
+    // Final continuation policy can invalidate otherwise valid source history.
+    // Release this request's owner before invoking fallible error/plugin handling.
+    trackPendingRequest(model, provider, pendingConnId, false, undefined, pendingRequestOwner ?? pendingRequestId);
+    return await buildRequestTranslationErrorResult({ error, log });
+  }
   translatedBody = finalizedRequest.translatedBody;
   const { requestToolIdentityMap, toolNameMap } = finalizedRequest;
 
@@ -2568,6 +2610,7 @@ async function handleChatCoreInner({
 
   let credentialRefreshPersistRan = false;
   const hadStreamOptions =
+    provider !== "codex" &&
     targetFormat === FORMATS.OPENAI_RESPONSES &&
     translatedBody &&
     typeof translatedBody === "object" &&

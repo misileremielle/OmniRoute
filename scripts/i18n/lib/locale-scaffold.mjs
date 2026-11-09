@@ -5,35 +5,21 @@
  * transforms it here and writes it back.
  *
  * `entry` is a `config/i18n.json` locale object (`code`, `label`, `name`,
- * `native`, `english`, `flag`, optional `aliases`) plus one helper key that is
- * never stored: `flagFile`, the `docs/assets/flags/<file>` to use when the
- * ISO-3166 file cannot be derived from the flag emoji (e.g. `sw` → `tz.svg`).
+ * `native`, `english`, `flag`, optional `aliases`).
  * `total` is the number of UI locales after the insertion, English included.
  *
  *   insertLocaleEntry(configText, entry)                  config/i18n.json
- *   flagFileFor(entry)                                    🇬🇷 → "gr.svg"
- *   insertReadmeFlagLink(readmeText, entry, total)        README.md language block
- *   insertDocsIndexRow(indexText, entry, total)           docs/i18n/README.md
  *   insertI18nGuideRow(guideText, entry, total, rtlCodes) docs/guides/I18N.md locale table
  *   bumpCounts(text, total)                               llm.txt counts: "N languages",
- *                                                         "N translated documentation sets",
- *                                                         "N language JSON files",
- *                                                         "N-language translated docs"
- *   buildMirrorStub({ heading, native, bar, body })       docs/i18n/<code>/llm.txt, CHANGELOG.md
+ *                                                         "N language JSON files"
  *
  * Every insertion leaves the existing lines exactly as they are and places the
  * new one in `code` order (`localeCompare`, "en"): right before the first
  * existing entry that sorts after it, or after the last one. Duplicates throw.
  */
 
-const REGIONAL_INDICATOR_A = 0x1f1e6;
-const REGIONAL_INDICATOR_Z = REGIONAL_INDICATOR_A + 25;
 const DEFAULT_RTL_CODES = ["ar", "fa", "he", "ur"];
 
-const README_MARKER = /<b>🌐 In \d+ languages<\/b>/;
-const INDEX_SENTENCE =
-  /into \d+ languages; together with the English source, the UI supports \d+ locales/;
-const INDEX_ROW = /^- .+ \(`([^`]+)`\): \[Docs Root\]/;
 const GUIDE_HEADLINE = /supports \*\*\d+ languages\*\*/;
 const GUIDE_HEADER = /^\| Code +\| Language +\| RTL +\| Google Translate Code +\|$/;
 const GUIDE_ROW = /^\| `([^`]+)` *\|/;
@@ -69,21 +55,6 @@ function insertAmongRows(lines, rows, row, code, surface) {
   return [...lines.slice(0, at), row, ...lines.slice(at)];
 }
 
-export function flagFileFor(entry) {
-  if (entry.flagFile) return entry.flagFile;
-  const codePoints =
-    typeof entry.flag === "string" ? [...entry.flag].map((char) => char.codePointAt(0)) : [];
-  const isRegionalPair =
-    codePoints.length === 2 &&
-    codePoints.every((cp) => cp >= REGIONAL_INDICATOR_A && cp <= REGIONAL_INDICATOR_Z);
-  if (!isRegionalPair) {
-    throw new Error(`cannot derive a flag file from ${entry.flag}; pass flagFile explicitly`);
-  }
-  return (
-    codePoints.map((cp) => String.fromCharCode(cp - REGIONAL_INDICATOR_A + 97)).join("") + ".svg"
-  );
-}
-
 export function insertLocaleEntry(configText, entry) {
   const code = requireCode(entry);
   const config = JSON.parse(configText);
@@ -92,50 +63,8 @@ export function insertLocaleEntry(configText, entry) {
     throw new Error(`${code} is already configured`);
   }
   const stored = { ...entry };
-  delete stored.flagFile;
   config.locales = insertInCodeOrder(config.locales, stored, (locale) => locale.code);
   return JSON.stringify(config, null, 2) + "\n";
-}
-
-export function insertReadmeFlagLink(readmeText, entry, total) {
-  const code = requireCode(entry);
-  const marker = readmeText.match(README_MARKER);
-  if (!marker || marker.index === undefined) throw new Error("README language block not found");
-  const close = readmeText.indexOf("</div>", marker.index);
-  if (close === -1) throw new Error("README language block is not closed");
-  const href = `docs/i18n/${code}/README.md`;
-  if (readmeText.slice(marker.index, close).includes(`href="${href}"`)) {
-    throw new Error(`${code} is already linked in the README language block`);
-  }
-  const label = `${entry.native} (${code})`;
-  const link = `  <a href="${href}"><img src="docs/assets/flags/${flagFileFor(entry)}" width="30" alt="${label}" title="${label}"></a>`;
-  // `</div>` sits on its own line in README.md; the link goes on the line before it.
-  const lineStart = readmeText.lastIndexOf("\n", close) + 1;
-  return (
-    readmeText.slice(0, marker.index) +
-    `<b>🌐 In ${total} languages</b>` +
-    readmeText.slice(marker.index + marker[0].length, lineStart) +
-    `${link}\n` +
-    readmeText.slice(lineStart)
-  );
-}
-
-export function insertDocsIndexRow(indexText, entry, total) {
-  const code = requireCode(entry);
-  if (!INDEX_SENTENCE.test(indexText)) {
-    throw new Error("docs/i18n/README.md counts sentence not found");
-  }
-  const lines = indexText
-    .replace(
-      INDEX_SENTENCE,
-      `into ${total - 1} languages; together with the English source, the UI supports ${total} locales`
-    )
-    .split("\n");
-  const rows = lines
-    .map((line, index) => ({ index, code: line.match(INDEX_ROW)?.[1] ?? null }))
-    .filter((candidate) => candidate.code !== null);
-  const row = `- ${entry.flag} **${entry.native}** (\`${code}\`): [Docs Root](./${code}/README.md)`;
-  return insertAmongRows(lines, rows, row, code, "docs/i18n/README.md").join("\n");
 }
 
 export function insertI18nGuideRow(guideText, entry, total, rtlCodes = DEFAULT_RTL_CODES) {
@@ -167,13 +96,7 @@ export function insertI18nGuideRow(guideText, entry, total, rtlCodes = DEFAULT_R
 export function bumpCounts(text, total) {
   return text
     .replace(/\d+ languages/g, `${total} languages`)
-    .replace(/\d+ translated documentation sets/g, `${total - 1} translated documentation sets`)
-    .replace(/(\d+) language JSON files/g, `${total} language JSON files`)
-    .replace(/(\d+)-language translated docs/g, `${total - 1}-language translated docs`);
-}
-
-export function buildMirrorStub({ heading, native, bar, body }) {
-  return `# ${heading} (${native})\n\n${bar}\n\n---\n\n${body}`;
+    .replace(/(\d+) language JSON files/g, `${total} language JSON files`);
 }
 
 // --- markdown table alignment ------------------------------------------------

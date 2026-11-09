@@ -247,10 +247,12 @@ test("#9166 co-location is not skipped when every closure dir exists but one is 
 test("#9166 Docker explicitly installs and validates LLMLingua optionals", () => {
   const dockerfile = readFileSync(new URL("../../Dockerfile", import.meta.url), "utf8");
 
-  const builderStart = dockerfile.indexOf("FROM base AS builder");
+  // Dependencies install in the `deps` stage (cached on its own); `builder` builds on top of it.
+  const builderStart = dockerfile.indexOf("FROM base AS deps");
   const runnerStart = dockerfile.indexOf("FROM base AS runner-base");
 
-  assert.ok(builderStart >= 0, "Docker builder stage must exist");
+  assert.ok(builderStart >= 0, "Docker deps stage must exist");
+  assert.ok(dockerfile.includes("FROM deps AS builder"), "Docker builder stage must build on deps");
   assert.ok(runnerStart > builderStart, "Docker runner stage must follow builder");
 
   const builder = dockerfile.slice(builderStart, runnerStart);

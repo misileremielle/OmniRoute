@@ -84,8 +84,11 @@ RUN set -eux; \
   npm --version; \
   npm cache clean --force
 
-# ── Builder ────────────────────────────────────────────────────────────────
-FROM base AS builder
+# ── Dependencies ───────────────────────────────────────────────────────────
+# Its own stage so docker-publish.yml can export just these layers to the
+# GitHub Actions cache: they only change with the lockfile, while the build
+# layers below change on every commit and are never worth exporting.
+FROM base AS deps
 ARG NODE_DIST_URL=
 
 # No telemetry, anywhere. Disable Next.js's anonymous build-time telemetry
@@ -141,6 +144,9 @@ RUN --mount=type=cache,id=s/92ca8a61-c1ba-421f-a389-d48ac7258c2d-pnpm-store,targ
   && test -f node_modules/better-sqlite3/build/Release/better_sqlite3.node \
   && node -e "require('better-sqlite3')(':memory:').close()" \
   && node -e "const wreq=require('wreq-js'); if(typeof wreq.createTransport!=='function') process.exit(1)"
+
+# ── Builder ────────────────────────────────────────────────────────────────
+FROM deps AS builder
 
 # Bundler for the image build. The DOCKERFILE default is webpack
 # (OMNIROUTE_USE_TURBOPACK=0), deliberately different from the repo's code
@@ -259,7 +265,7 @@ ENV DATA_DIR=/app/data
 RUN mkdir -p /app/data && chown node:node /app /app/data
 
 # #13679: default the PUBLISHED image to requiring an API key. A bare
-# `docker run -p 20128:20128 … diegosouzapw/omniroute` (README/QUICK-START
+# `docker run -p 20128:20128 … ghcr.io/misileremielle/omniroute` (README/QUICK-START
 # one-liners) does not pass `--env-file .env`, so without this default the
 # anonymous /v1 LLM proxy would be both keyless AND world-reachable on the
 # published container. This does NOT change the npm/CLI local-dev default

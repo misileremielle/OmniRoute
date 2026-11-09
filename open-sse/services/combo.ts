@@ -16,6 +16,11 @@ import { costKey, resolvePoolCosts } from "./combo/candidateCost.ts";
 import { getComboMetrics } from "./comboMetrics.ts";
 import { qualityScoreFor } from "./routing/index.ts";
 import {
+  accountPreferenceRank,
+  accountPreferenceAttemptConfig,
+} from "./combo/accountPreferences.ts";
+import { parseAutoConfig } from "./combo/autoConfig.ts";
+import {
   resolveComboQueueDepth,
   isComboCooldownWaitEligible,
   resolveComboTargetTimeoutMsForCombo,
@@ -827,11 +832,14 @@ async function handleComboChatInner({
     effectiveSessionId,
     pinnedModel,
     clientRequestedStream,
-    config,
+    config: setupConfig,
     comboTargetTimeoutMs,
     reasoningTokenBufferEnabled,
   } = phaseComboSetup(comboCtx);
   body = comboCtx.body;
+  const hasAccountPreferences =
+    strategy === "auto" && Object.keys(parseAutoConfig(combo, []).accountPreferences).length > 0;
+  const config = accountPreferenceAttemptConfig(setupConfig, hasAccountPreferences);
 
   // #10681: opaque per-invocation decision trace (safe routing metadata only).
   const traceInvocationId = invocationId ?? createInvocationId();
@@ -865,7 +873,7 @@ async function handleComboChatInner({
   // falls through to the target iteration loop below. Implementations live in
   // combo/dispatchPrelude.ts; only the chaos + round-robin hand-offs are short
   // enough to stay inline.
-  if (pinnedModel) {
+  if (pinnedModel && !hasAccountPreferences) {
     const pinnedDispatch = await tryPinnedModelDispatch({
       body,
       combo,
@@ -910,18 +918,20 @@ async function handleComboChatInner({
   });
   if (fusionDispatch) return fusionDispatch;
 
-  const pipelineDispatch = await tryPipelineDispatch({
-    body,
-    combo,
-    config,
-    strategy,
-    settings,
-    apiKeyAllowedConnections,
-    allCombos,
-    handleSingleModelWithTimeout,
-    log,
-    hiddenModelsByProvider,
-  });
+  const pipelineDispatch = hasAccountPreferences
+    ? null
+    : await tryPipelineDispatch({
+        body,
+        combo,
+        config,
+        strategy,
+        settings,
+        apiKeyAllowedConnections,
+        allCombos,
+        handleSingleModelWithTimeout,
+        log,
+        hiddenModelsByProvider,
+      });
   if (pipelineDispatch) return pipelineDispatch;
 
   const runtimeUnitDispatch = await tryRuntimeUnitDispatch({
@@ -954,6 +964,20 @@ async function handleComboChatInner({
     ? getNativeCodexTurnPin(body, combo.name)
     : null;
   let isAutoResuming = false;
+  // An explicit exclusion must not silently move a stateful turn to another account.
+  if (
+    strategy === "auto" &&
+    activeNativeTurnPin &&
+    accountPreferenceRank(
+      activeNativeTurnPin.connectionId,
+      parseAutoConfig(combo, []).accountPreferences
+    ) === 3
+  ) {
+    return errorResponse(
+      503,
+      "The account bound to this turn is excluded by this combo. Start a new turn or remove the exclusion."
+    );
+  }
 
   // Route new round-robin turns to the specialized handler. A native Codex
   // continuation with an established provider/account pin must use the common
@@ -1170,16 +1194,17 @@ async function handleComboChatInner({
     );
   }
 
-  scheduleShadowRouting(
-    combo,
-    config,
-    body,
-    resolveShadowTargets(combo, config, allCombos, hiddenModelsByProvider),
-    handleSingleModel,
-    isModelAvailable,
-    strategy,
-    log
-  );
+  if (!hasAccountPreferences)
+    scheduleShadowRouting(
+      combo,
+      config,
+      body,
+      resolveShadowTargets(combo, config, allCombos, hiddenModelsByProvider),
+      handleSingleModel,
+      isModelAvailable,
+      strategy,
+      log
+    );
 
   // G2: Collect execution keys registered by _registerExecutionCandidates above (auto strategy).
   // We snapshot them now so cleanup can happen after the attempt loop finishes.

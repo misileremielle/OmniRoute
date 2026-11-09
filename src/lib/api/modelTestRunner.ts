@@ -24,6 +24,7 @@ import { getTrustedLocalRateLimitError } from "@omniroute/open-sse/services/rate
 import { runAsProbe } from "@/shared/utils/probeOrigin";
 import { isConnectionUnavailableToAuxiliaryActivity } from "@/lib/exclusiveLeaseIsolation";
 import { resolveSelfLoopBearer } from "@/shared/middleware/chatAdmissionIdentity";
+import { ownListenerSelfHopToken, SELF_HOP_HEADER } from "@omniroute/open-sse/utils/selfHop";
 
 const INTERNAL_ORIGIN = "http://omniroute.internal";
 export const DEFAULT_MODEL_TEST_TIMEOUT_MS = 30_000;
@@ -194,8 +195,10 @@ export function buildInternalChatRequest(
       // on their own (#16403). Present the per-process self-loop bearer so the test keeps
       // working under REQUIRE_API_KEY=true for callers without a dashboard cookie.
       Authorization: `Bearer ${resolveSelfLoopBearer()}`,
-      // Reuse the existing strict-mode internal bypass for live health checks.
+      // Reuse the existing strict-mode internal bypass for live health checks. The mark only
+      // counts next to the process token: this call never crosses fetch, so nothing stamps it.
       "X-Internal-Test": "combo-health-check",
+      [SELF_HOP_HEADER]: ownListenerSelfHopToken(),
       "X-OmniRoute-No-Cache": "true",
       // #6240: a connection test must be clean — never let the operator's globally-enabled
       // Output Styles (e.g. "Ultra terse") leak a system prompt into a test-model call.
@@ -220,6 +223,7 @@ export function buildInternalResponsesRequest(
       // Same in-process authentication as buildInternalChatRequest.
       Authorization: `Bearer ${resolveSelfLoopBearer()}`,
       "X-Internal-Test": "combo-health-check",
+      [SELF_HOP_HEADER]: ownListenerSelfHopToken(),
       "X-OmniRoute-No-Cache": "true",
       "X-OmniRoute-Compression": "off",
       "X-Request-Id": `model-test-${randomUUID()}`,

@@ -36,8 +36,6 @@ test("next config exposes standalone build settings and canonical rewrites", asy
   assert.deepEqual(nextConfig.transpilePackages, [
     "@omniroute/open-sse",
     "@lobehub/icons",
-    "fumadocs-ui",
-    "fumadocs-core",
     "@omniroute/ui-kit",
   ]);
   // #6062: `ws` and its native masking helpers must stay external so the
@@ -219,12 +217,6 @@ test("next-intl webpack hook preserves caller config and filters known extractor
   assert.equal(
     config.ignoreWarnings[0]({ message: "Critical dependency: request is expression" }),
     false
-  );
-  config.infrastructureLogging.console.warn(
-    "[webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Parsing of " +
-      "/repo/node_modules/fumadocs-mdx/dist/load-from-file-test.js for build dependencies " +
-      "failed at 'import(url.href)'.\nBuild dependencies behind this expression are ignored " +
-      "and might cause incorrect cache invalidation."
   );
   config.infrastructureLogging.console.warn(
     "[webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Parsing of " +

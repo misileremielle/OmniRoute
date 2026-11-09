@@ -325,12 +325,6 @@
   "src/app/api/webhooks/[id]/test/route.ts": {
     "TS2352": 2
   },
-  "src/app/docs/[...slug]/page.tsx": {
-    "TS2339": 1
-  },
-  "src/app/docs/layout.tsx": {
-    "TS2739": 1
-  },
   "src/app/manifest.ts": {
     "TS2820": 1
   },
@@ -345,9 +339,6 @@
   },
   "src/lib/db/tierConfig.ts": {
     "TS2345": 2
-  },
-  "src/lib/docsSanitizer.ts": {
-    "TS2345": 1
   },
   "src/lib/env/runtimeEnv.ts": {
     "TS2345": 2

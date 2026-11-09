@@ -90,6 +90,8 @@ async function buildStore(): Promise<CircuitBreakerStore> {
       const mod = await import("ioredis");
       const RedisCtor = (mod.default ?? mod) as RedisCtor;
       const redis = new RedisCtor(redisUrl, {
+        // ioredis 6 speaks RESP3 by default, which changes reply shapes; keep RESP2.
+        protocol: 2,
         maxRetriesPerRequest: 3,
         connectTimeout: 3000,
         lazyConnect: true,

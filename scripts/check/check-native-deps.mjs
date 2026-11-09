@@ -40,8 +40,8 @@ const ROOT = process.cwd();
  * Extract the `serverExternalPackages` string literals from next.config.mjs
  * source text.
  *
- * Parsed rather than imported: next.config.mjs pulls in the next-intl and
- * fumadocs-mdx plugins at module scope, so importing it from a preflight script
+ * Parsed rather than imported: next.config.mjs pulls in the next-intl
+ * plugin at module scope, so importing it from a preflight script
  * would need the very dependency tree this gate is meant to validate. A regex
  * over the array literal has no such bootstrap problem.
  *

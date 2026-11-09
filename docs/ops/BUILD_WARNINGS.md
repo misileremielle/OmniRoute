@@ -31,22 +31,6 @@ runtime and is not a missing dependency.
 Because the loader is imported by the Codex quota service, instrumentation, and the
 internal Codex WebSocket route, webpack reports the same warning once per import path.
 
-## Fumadocs MDX "build dependencies" cache warning
-
-```
-[webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Parsing of
-.../fumadocs-mdx/dist/eval-*.js for build dependencies failed at 'import(pathToFileURL(outfile).href)'.
-Build dependencies behind this expression are ignored and might cause incorrect cache invalidation.
-```
-
-**Upstream `fumadocs-mdx`, not actionable.** The package emits a dynamic `import()` of a
-generated module that webpack's `FileSystemInfo` pass cannot statically follow. The only
-consequence is that webpack may invalidate its build cache more often for that dependency;
-the **emitted output is unaffected**. OmniRoute suppresses the known benign form in
-`next.config.mjs` via `scripts/build/knownBuildWarnings.mjs`, which allow-lists the whole
-`node_modules/fumadocs-mdx/dist/` directory (both the `load-from-file-*.js` and
-`eval-*.js` bundles).
-
 ## Runtime configuration messages during static generation
 
 `next build` imports application modules while collecting page data, so a few
@@ -88,7 +72,7 @@ pnpm run build:release
 isolated layout the bundle builds but loses `better-sqlite3` when copied elsewhere.
 
 **`bun install` is not a supported way to install OmniRoute's dependencies** for this
-branch. Bun `1.4.2` is pinned as a devDependency and is used only to run a small,
+branch. Bun `1.4.4` is pinned as a devDependency and is used only to run a small,
 allow-listed set of gate/generator scripts. If you install with Bun you may see:
 
 - `warn: Bun currently only supports one level of nested "overrides"` — Bun reads the

@@ -2,10 +2,7 @@
  * Known, non-actionable Next.js/webpack build warnings.
  *
  * Kept in a standalone module (rather than inlined in `next.config.mjs`) so the
- * matching logic is unit-testable. The #16320 report showed the Fumadocs MDX
- * "build dependencies" warning escaping the allowlist because the entry only
- * matched the `dist/load-from-file-*.js` bundle, never the `dist/eval-*.js` one
- * that webpack actually parsed in production.
+ * matching logic is unit-testable.
  */
 
 /**
@@ -14,9 +11,6 @@
  * broken output — only coarser build-cache invalidation for that dependency.
  */
 export const IGNORED_INFRASTRUCTURE_BUILD_DEPENDENCY_MODULES = [
-  // `fumadocs-mdx` emits both `dist/load-from-file-*.js` and `dist/eval-*.js`;
-  // match the whole `dist/` directory so a renamed bundle cannot re-open #16320.
-  "/node_modules/fumadocs-mdx/dist/",
   "/node_modules/next-intl/dist/esm/production/extractor/format/index.js",
 ];
 

@@ -29,7 +29,6 @@ OmniRoute/
 ├── skills/               # CLI/agent skill packs (cli-* + omni-* + config-codex-cli)
 ├── examples/             # Sample plugins + omniroute-cmd-hello starter
 ├── contrib/              # Community contributions (podman/)
-├── .source/              # Fumadocs source config (source.config.mjs + server/browser/dynamic)
 ├── .github/              # GitHub Actions workflows + issue templates + PR template
 ├── .husky/               # Git hooks (pre-commit, pre-push)
 ├── .claude/              # Claude Code slash commands (project-scoped)
@@ -94,7 +93,6 @@ OmniRoute/
 | **.nvmrc**                                  | Node version pin for nvm                                                                 |
 | **eslint.complexity.config.mjs**            | ESLint config for the complexity ratchet (`scripts/check/check-complexity.mjs --config`) |
 | **eslint.sonarjs.config.mjs**               | ESLint config for SonarJS rules (cognitive complexity / duplication)                     |
-| **source.config.ts**                        | Fumadocs `defineDocs` source config (feeds `.source/`)                                   |
 | **knip.json**                               | Knip config — unused files/exports/deps (feeds the dead-code gate)                       |
 | **stryker.conf.json**                       | Stryker mutation-testing config                                                          |
 | **.size-limit.json**                        | size-limit bundle budget config                                                          |
@@ -147,7 +145,6 @@ src/
 | `app/(dashboard)/dashboard/activity/`                                        | Activity feed page (Group B): `page.tsx` (server) + `ActivityFeedClient.tsx` + `components/{ActivityFeed,ActivityItem,DayHeader,EventTypeFilter}.tsx` — see `docs/architecture/MONITORING_SECTIONS.md`                                                    |
 | `app/(dashboard)/dashboard/costs/quota-share/`                               | Quota Sharing page (Group B): `QuotaSharePageClient.tsx` + `components/{PoolCard,DimensionBar,AllocationTable,BurnRateChart,QuotaConceptCard,CreatePoolModal,EditAllocationsModal}.tsx` + `hooks/{usePools,usePoolUsage,useLocalStoragePoolMigration}.ts` |
 | `app/(dashboard)/dashboard/costs/quota-share/plans/`                         | Provider plan config page (Group B): `page.tsx` + `ProviderPlanConfigClient.tsx` — quota dimensions per connection override                                                                                                                               |
-| `app/docs/`                                                                  | Embedded documentation viewer (renders `docs/*.md`)                                                                                                                                                                                                       |
 | `app/landing/`                                                               | Marketing landing page                                                                                                                                                                                                                                    |
 | `app/login/`, `forgot-password/`, `forbidden/`                               | Auth-related pages                                                                                                                                                                                                                                        |
 | `app/{400,401,403,408,429,500,502,503}/`                                     | HTTP error pages                                                                                                                                                                                                                                          |
@@ -222,7 +219,7 @@ src/
 | -------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `components/`                    | Dashboard component API: adapters over `packages/ui-kit` — see `docs/architecture/DESIGN_SYSTEM.md` |
 | `constants/iconMap.ts`           | `ICON_MAP`: icon names used by the screens → Lucide components (`<Icon>`)                           |
-| `constants/providers.ts`         | **355 providers** with Zod validation (source of truth)                                             |
+| `constants/providers.ts`         | **356 providers** with Zod validation (source of truth)                                             |
 | `constants/cliTools.ts`          | External CLI tool registry                                                                          |
 | `constants/routingStrategies.ts` | **20 routing strategies** with priorities                                                           |
 | `constants/publicApiRoutes.ts`   | Routes that require Bearer (vs management) auth                                                     |
@@ -331,8 +328,7 @@ open-sse/
 | `check-supported-node-runtime.ts`   | Validate current Node version is supported                                 |
 | `check-pr-test-policy.mjs`          | Enforce "tests required" rule on production code changes                   |
 | **`gen-provider-reference.ts`**     | NEW: auto-generate `docs/reference/PROVIDER_REFERENCE.md` from catalog     |
-| `i18n/generate-multilang.mjs`       | Translate UI strings + docs via Google Translate                           |
-| `i18n_autotranslate.py`             | LLM-based doc translation pipeline                                         |
+| `i18n/generate-multilang.mjs`       | Translate UI strings via Google Translate (deprecated)                     |
 | `validate_translation.py`           | Per-locale translation validation                                          |
 | `check_translations.py`             | Code-side i18n key check                                                   |
 | `run-playwright-tests.mjs`          | Playwright E2E runner                                                      |
@@ -375,7 +371,7 @@ open-sse/
 | `CLI-TOOLS.md`              | External CLI integrations + Internal OmniRoute CLI                                    |
 | `I18N.md`                   | i18n architecture, adding a language, 67 locales                                      |
 | `UNINSTALL.md`              | Clean uninstall steps                                                                 |
-| `PROVIDER_REFERENCE.md`     | **Auto-generated** catalog of 355 providers (regen: `npm run gen:provider-reference`) |
+| `PROVIDER_REFERENCE.md`     | **Auto-generated** catalog of 356 providers (regen: `npm run gen:provider-reference`) |
 
 ### Subsystem deep-dives
 
@@ -422,7 +418,6 @@ open-sse/
 
 | Subdir                | Purpose                                                                                                                                                                                        |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docs/i18n/`          | Localized doc translations (41 locales)                                                                                                                                                        |
 | `docs/screenshots/`   | Image assets for guides                                                                                                                                                                        |
 | `_tasks/superpowers/` | Plans/specs from superpowers (`writing-plans`/`brainstorming`) + research — isolated, separately-versioned repo, gitignored by the main tree. See CLAUDE.md → "Planning & Research Artifacts". |
 

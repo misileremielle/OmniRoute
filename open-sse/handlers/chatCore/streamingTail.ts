@@ -36,7 +36,7 @@ import { hasActiveClaudeThinking } from "../../utils/thinkingBudget.ts";
 import { buildCacheUsageLogMeta } from "./cacheUsageMeta.ts";
 import { recordContextEditingTelemetryHook } from "./contextEditingTelemetry.ts";
 import { readCpaAuthIndex } from "./failureUsage.ts";
-import { maybeConvertJsonBodyToSse } from "./jsonBodyToSse.ts";
+import { convertJsonBodyWithinCap } from "./jsonBodyToSse.ts";
 import { mergeResponseToolNameMap } from "./passthroughToolNames.ts";
 import { wrapReadableStreamWithFinalize } from "./streamFinalize.ts";
 import { buildStreamLedgerDetails, recordStreamingCost } from "./streamingCost.ts";
@@ -163,7 +163,8 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
   // though it carried valid content/reasoning_content. Detect a JSON (non-SSE)
   // upstream body and synthesize an equivalent OpenAI SSE stream so the
   // streaming pipeline (and the client) get a valid stream.
-  providerResponse = await maybeConvertJsonBodyToSse(providerResponse, { log, provider, model });
+  const jsonConversion = await convertJsonBodyWithinCap(providerResponse, { log, provider, model });
+  providerResponse = jsonConversion.response;
   const streamReadinessPolicy = resolveStreamReadinessTimeout({
     baseTimeoutMs: STREAM_READINESS_TIMEOUT_MS,
     provider,
@@ -188,23 +189,27 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
   }
 
   let upstreamHttpSelection = deps.upstreamHttpSelection ?? null;
-  let streamReadiness = await ensureStreamReadiness(providerResponse, {
-    timeoutMs: streamReadinessPolicy.timeoutMs,
-    maxTimeoutMs: streamReadinessPolicy.maxTimeoutMs,
-    provider,
-    model,
-    log,
-    // #16438: briefly probe for usable output after the first lifecycle event so an empty
-    // turn is retried on a sibling connection before the response is committed. Claude/Codex
-    // upstreams always qualify; any upstream does when the client reads the Claude Messages
-    // format, because that client otherwise receives a mid-stream "Claude returned an empty
-    // response (no content block)" error that no retry can replace.
-    contentProbeMs:
-      (provider === "claude" || provider === "codex" || clientResponseFormat === FORMATS.CLAUDE) &&
-      isEmptyStreamSiblingRecoveryEnabled()
-        ? 1000
-        : undefined,
-  });
+  let streamReadiness =
+    jsonConversion.overCap ??
+    (await ensureStreamReadiness(providerResponse, {
+      timeoutMs: streamReadinessPolicy.timeoutMs,
+      maxTimeoutMs: streamReadinessPolicy.maxTimeoutMs,
+      provider,
+      model,
+      log,
+      // #16438: briefly probe for usable output after the first lifecycle event so an empty
+      // turn is retried on a sibling connection before the response is committed. Claude/Codex
+      // upstreams always qualify; any upstream does when the client reads the Claude Messages
+      // format, because that client otherwise receives a mid-stream "Claude returned an empty
+      // response (no content block)" error that no retry can replace.
+      contentProbeMs:
+        (provider === "claude" ||
+          provider === "codex" ||
+          clientResponseFormat === FORMATS.CLAUDE) &&
+        isEmptyStreamSiblingRecoveryEnabled()
+          ? 1000
+          : undefined,
+    }));
   // A stall is an upstream issue, not an account fault — the executor loop
   // already ended at headers, so this bounded retry is the only recovery left.
   const fallback = await maybeFallbackAfterReadiness({
@@ -517,6 +522,8 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
       comboStrategy,
       endpoint: endpointPath,
       cpaAuthIndex: readCpaAuthIndex(providerResponse),
+      partialUsage: streamPartialUsage,
+      emittedOutput: streamEmittedOutput(transformStream),
     });
 
     // Routing event (feedback foundation) — fire-and-forget, cheap, never blocks

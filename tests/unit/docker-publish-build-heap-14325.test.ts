@@ -48,8 +48,8 @@ test("every docker-publish.yml build-push-action step raises the V8 heap ceiling
   );
 
   assert.ok(
-    buildArgBlocks.length >= 4,
-    `expected at least 4 build-args blocks (runner-base/runner-web ×2 platforms' worth of steps), found ${buildArgBlocks.length}`
+    buildArgBlocks.length >= 2,
+    `expected at least 2 build-args blocks (runner-base and runner-web), found ${buildArgBlocks.length}`
   );
 
   const missing: number[] = [];
@@ -82,20 +82,9 @@ test("every docker-publish.yml heap override is at or above build.yml's native w
     Number(m[1])
   );
   assert.ok(
-    dockerHeaps.length >= 4,
-    `expected >= 4 docker heap overrides, found ${dockerHeaps.length}`
+    dockerHeaps.length >= 2,
+    `expected >= 2 docker heap overrides, found ${dockerHeaps.length}`
   );
   const below = dockerHeaps.filter((mb) => mb < floor);
   assert.deepEqual(below, [], `docker heap below the native floor of ${floor} MB`);
-});
-
-test("Bun publish steps use the hosted webpack floor heap budget", () => {
-  assert.match(
-    workflow,
-    /- name: Build and push BUN base platform image by digest[\s\S]*?OMNIROUTE_BUILD_MEMORY_MB=10240/
-  );
-  assert.match(
-    workflow,
-    /- name: Build and push BUN web platform image by digest[\s\S]*?OMNIROUTE_BUILD_MEMORY_MB=10240/
-  );
 });

@@ -144,13 +144,6 @@ async function main() {
     40_000,
     20_000
   );
-  await run(
-    "translation evidence",
-    process.execPath,
-    ["scripts/i18n/check-translation-drift.mjs"],
-    30_000,
-    15_000
-  );
 }
 
 try {

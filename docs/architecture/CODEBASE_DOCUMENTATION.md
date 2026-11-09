@@ -102,11 +102,9 @@ Top-level segments under `src/app/`:
 | Path                                                                          | Purpose                                   |
 | ----------------------------------------------------------------------------- | ----------------------------------------- |
 | `api/`                                                                        | All HTTP API routes (see breakdown below) |
-| `.well-known/agent.json/`                                                     | A2A Agent Card discovery document         |
 | `(dashboard)/`                                                                | Dashboard UI (route group, no URL prefix) |
 | `auth/`, `login/`, `forgot-password/`, `callback/`                            | Auth flows                                |
 | `landing/`                                                                    | Marketing/landing page                    |
-| `docs/`                                                                       | Embedded API docs viewer                  |
 | `status/`, `maintenance/`, `offline/`                                         | Operational pages                         |
 | `privacy/`, `terms/`                                                          | Legal pages                               |
 | `400/`, `401/`, `403/`, `408/`, `429/`, `500/`, `502/`, `503/`                | Static error pages                        |
@@ -485,7 +483,7 @@ helpers (tool schemas, fetch/TTS adapters, quirk handlers). Executors include:
 (shared identity helper) and `index.ts` (registry).
 
 > Note: providers not listed here are served by `default.ts` using the generic
-> OpenAI-compatible executor. The full provider catalog (355 providers) lives in
+> OpenAI-compatible executor. The full provider catalog (356 providers) lives in
 > `src/shared/constants/providers.ts`.
 
 ### 4.3 `open-sse/translator/`
@@ -658,7 +656,7 @@ Organized into 6 subfolders by purpose.
 - **`scripts/docs/`** — `generate-docs-index.mjs`, `gen-provider-reference.ts`.
 - **`scripts/i18n/`** — `generate-multilang.mjs`, `run-visual-qa.mjs`,
   `generate-qa-checklist.mjs`, `apply-priority-overrides.mjs`,
-  `validate_translation.py`, `check_translations.py`, `i18n_autotranslate.py`,
+  `validate_translation.py`, `check_translations.py`,
   `untranslatable-keys.json`.
 - **`scripts/ad-hoc/`** — `cursor-tap.cjs`, `sync-cursor-models.mjs`,
   `migrate-env.mjs`, `dbsetup.js`.

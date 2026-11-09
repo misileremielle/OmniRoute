@@ -84,39 +84,9 @@ function loadNoCheckBaseline() {
   return Array.isArray(parsed.files) ? parsed.files : [];
 }
 
-/**
- * Regenerate the docs collection before compiling.
- *
- * `src/lib/source.ts` imports `.source/server`, which fumadocs-mdx generates and
- * git ignores. Without it the import is TS2307, so a checkout that has never run
- * `next build` reports six more errors than one that has — the same code, two
- * different verdicts. Generating it here costs about a second and makes the
- * gate's answer depend on the tree rather than on someone's build history.
- */
-function ensureGeneratedSources() {
-  const bin = path.join(ROOT, "node_modules/.bin/fumadocs-mdx");
-  if (!fs.existsSync(bin)) return;
-  const result = spawnSync(bin, [], { cwd: ROOT, stdio: "ignore" });
-  if (result.error || result.status !== 0) {
-    throw new Error(
-      "fumadocs-mdx could not generate .source, so the program would be missing " +
-        "the docs collection and report errors that belong to the build, not the code"
-    );
-  }
-}
-
 function main() {
   if (!fs.existsSync(TSCONFIG)) {
     process.stderr.write(`[build-typecheck] FAIL — tsconfig not found at ${TSCONFIG}\n`);
-    process.exit(2);
-  }
-
-  try {
-    ensureGeneratedSources();
-  } catch (err) {
-    process.stderr.write(
-      `[build-typecheck] FAIL — ${err instanceof Error ? err.message : String(err)}\n`
-    );
     process.exit(2);
   }
 

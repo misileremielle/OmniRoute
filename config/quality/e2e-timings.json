@@ -39,5 +39,6 @@
   "smoke.spec.ts": 33,
   "translator-friendly.spec.ts": 115,
   "visual-resilience-smoke.spec.ts": 20,
-  "rtl-font-loading.spec.ts": 114
+  "rtl-font-loading.spec.ts": 114,
+  "zai-web-current-browser-controls.spec.ts": 97
 }

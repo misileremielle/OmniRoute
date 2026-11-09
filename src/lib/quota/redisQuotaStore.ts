@@ -48,15 +48,16 @@ export async function getRedisClient(url: string): Promise<RedisLike> {
   }
 
   // Lazy dynamic require — ioredis is an optional dependency
-  let Redis: new (url: string) => RedisLike;
+  let Redis: new (url: string, options: { protocol: 2 }) => RedisLike;
   try {
     const mod = await import("ioredis");
-    Redis = (mod.default ?? mod) as new (url: string) => RedisLike;
+    Redis = (mod.default ?? mod) as new (url: string, options: { protocol: 2 }) => RedisLike;
   } catch {
     throw new Error("Redis driver requires ioredis package. Run npm install ioredis.");
   }
 
-  _redisClient = new Redis(url);
+  // ioredis 6 speaks RESP3 by default, which changes reply shapes; keep the RESP2 replies.
+  _redisClient = new Redis(url, { protocol: 2 });
   return _redisClient as RedisLike;
 }
 

@@ -20,7 +20,7 @@
  *     (`translation.googleapis.com/language/translate/v2`, format=html).
  *
  * Quality is below the LLM's (no glossary awareness beyond the masked terms; the caller
- * still applies normalizeLocaleText), so run-translation.mjs uses it as a FALLBACK for
+ * still applies normalizeLocaleText), so translate-backend.mjs uses it as a FALLBACK for
  * chunks the LLM could not produce, or as the primary engine on explicit opt-in.
  */
 

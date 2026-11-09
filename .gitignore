@@ -211,7 +211,6 @@ scripts/i18n/_pending-keys.json
 /.fakebin-*/
 
 # Fumadocs generated source
-.source/
 
 # AI agent local settings and configs
 .agents/

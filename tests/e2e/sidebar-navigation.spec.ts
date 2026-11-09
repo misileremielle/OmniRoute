@@ -12,7 +12,6 @@ for (const theme of ["light", "dark"] as const) {
     );
     await gotoDashboardRoute(page, "/home");
     await settingsLoaded;
-    await expect(page.getByRole("heading", { name: "Quick Start", exact: true })).toBeVisible();
     // Kit shell: the kit <Sidebar> renders the <aside data-slot="sidebar">.
     const sidebar = page.locator('aside[data-slot="sidebar"]');
     await expect(sidebar.locator('a[aria-current="page"]')).toHaveAttribute("href", "/home");

@@ -12,7 +12,7 @@ import path from "node:path";
 
 // Detection merges in the login shell's PATH, computed once per process ($SHELL -ilc).
 // Under `pnpm run` on Linux that PATH still holds node_modules/.bin, which carries the `cn`
-// binary of the unrelated `cn` package (a fumadocs-ui dependency), so the "cn is absent"
+// binary of the unrelated `cn` package (a transitive dependency), so the "cn is absent"
 // test saw Continue as installed in CI. These tests set PATH themselves; keep the runner's
 // login shell out by pointing SHELL at a shell that does not exist, before the first lookup.
 process.env.SHELL = path.join(os.tmpdir(), "omniroute-test-no-login-shell");

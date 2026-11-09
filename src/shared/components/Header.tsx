@@ -82,7 +82,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   cache: "cacheDescription",
   quota: "limitsDescription",
   runtime: "runtimeDescription",
-  media: "mediaDescription",
   "cli-code": "cliToolsDescription",
   "cli-agents": "agentsDescription",
   "context-caveman": "contextCavemanDescription",
@@ -95,7 +94,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   audit: "auditDescription",
   health: "healthDescription",
   proxy: "proxyDescription",
-  changelog: "changelogDescription",
   // Protocols
   mcp: "mcpDescription",
   "api-endpoints": "apiEndpointsDescription",

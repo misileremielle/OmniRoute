@@ -16,7 +16,7 @@
  *   5. the onboarding i18n description key is gone (en + all locale mirrors).
  *
  * Historical mentions intentionally KEPT (release records, not catalog):
- * CHANGELOG.md, docs/i18n/*\/CHANGELOG.md, and the removal migration
+ * CHANGELOG.md and the removal migration
  * src/lib/db/migrations/162_remove_hackclub_provider.sql (it IS the removal).
  */
 import test from "node:test";

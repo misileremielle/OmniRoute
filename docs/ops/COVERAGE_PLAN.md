@@ -62,9 +62,7 @@ These files have the lowest line coverage today (< 60%) and offer the best retur
 | --- | ------------------------------------------------------------ | ------: |
 | 1   | `open-sse/services/compression/validation.ts`                |   7.87% |
 | 2   | `src/app/api/v1/batches/route.ts`                            |   9.67% |
-| 3   | `src/app/docs/components/FeedbackWidget.tsx`                 |   9.80% |
 | 4   | `open-sse/services/compression/toolResultCompressor.ts`      |  10.00% |
-| 5   | `src/app/docs/components/DocCodeBlocks.tsx`                  |  10.63% |
 | 6   | `open-sse/services/compression/engines/rtk/lineFilter.ts`    |  10.96% |
 | 7   | `open-sse/services/specificityRules.ts`                      |  11.28% |
 | 8   | `src/lib/system/systemCommands.ts`                           |  12.19% |
@@ -79,7 +77,6 @@ These files have the lowest line coverage today (< 60%) and offer the best retur
 | 17  | `open-sse/services/compression/preservation.ts`              |  15.07% |
 | 18  | `src/lib/cloudAgent/agents/codex.ts`                         |  15.54% |
 | 19  | `open-sse/services/tierResolver.ts`                          |  16.66% |
-| 20  | `src/app/docs/components/DocsLazyWrapper.tsx`                |  16.66% |
 
 Themes for Phases 6-7:
 

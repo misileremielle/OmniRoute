@@ -26,7 +26,6 @@ skills/*/references/*.md
 # bullets and turn the merge-integrity job red. The changelog is generated and
 # reconciled by scripts/release/*, which are its formatter of record.
 CHANGELOG.md
-docs/i18n/*/CHANGELOG.md
 
 # Helm templates are Go text/template, not YAML: `{{- if ... }}` at the start of
 # a line is a parse error for Prettier's YAML parser. Helm itself is the

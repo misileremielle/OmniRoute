@@ -153,7 +153,7 @@ hours and PRs were merged without them. Nine workflows fired on every push to th
 | `Release-Green` `--quick`                   |           0 | ran on `omni-build`, cancelled 97 of 100                       | `omni-release` slot, never cancelled, pending run collapses              |
 | `Lock released branch`, `OpenSSF Scorecard` |           2 | one queued run per push                                        | one run per ref                                                          |
 | `Release acceptance` (shadow report)        |           1 | one hosted `npm ci` per push, never cancelled                  | unchanged — candidate for a `paths:` filter                              |
-| `Publish to Docker Hub` → `Deploy to VPS`   |           2 | cancelled per push; amd64 leg competes on `omni-build`         | unchanged — owner's deploy channel                                       |
+| `Publish Docker images` → `Deploy to VPS`   |           2 | cancelled per push; amd64 leg competes on `omni-build`         | unchanged — owner's deploy channel                                       |
 | CodeQL default setup (`dynamic`)            |           4 | `javascript-typescript`, `actions`, `c-cpp`, `python` per push | unchanged — Settings → Code security; `c-cpp`/`python` scan nothing here |
 
 `tests/unit/build/push-storm-diet.test.ts` pins the `main`-only push trigger of `ci.yml` and

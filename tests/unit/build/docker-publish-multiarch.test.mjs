@@ -1,6 +1,6 @@
 // Runs the real shell scripts of .github/workflows/docker-publish.yml against a fake `docker`
-// (and a fake `git` for the prepare step). Policy under test: Node and Web are mandatory, exactly
-// two validated digests; Bun is best-effort and all-or-nothing, and it never affects the other two.
+// (and a fake `git` for the prepare step). Policy under test: the Node and Web images publish to
+// GHCR only, each from exactly two validated digests (one linux/amd64, one linux/arm64).
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -25,8 +25,7 @@ const buildJob = workflow.slice(workflow.indexOf("\n  build:"), workflow.indexOf
 const AMD64 = "a".repeat(64);
 const ARM64 = "b".repeat(64);
 const AMD64_AGAIN = "c".repeat(64);
-const ALL_FLAVORS = ["base", "web", "bun-base", "bun-web"];
-const IMAGE = "example/image";
+const ALL_FLAVORS = ["base", "web"];
 const GHCR = "ghcr.io/example/image";
 
 function step(name) {
@@ -115,13 +114,7 @@ function runScript(dir, name, { scenario = {}, env = {} } = {}) {
       env: {
         ...process.env,
         PATH: `${dir}:${process.env.PATH}`,
-        IMAGE_NAME: IMAGE,
         GHCR_IMAGE_NAME: GHCR,
-        // This fork publishes to Docker Hub only when its credentials are configured; the
-        // policy below is exercised with both registries enabled unless a test overrides it.
-        DOCKERHUB_ENABLED: "true",
-        DOCKERHUB_USERNAME: "example",
-        DOCKERHUB_TOKEN: "example-token",
         VERSION: "1.0.0",
         GITHUB_OUTPUT: outputFile,
         FAKE_DOCKER_LOG: logFile,
@@ -171,88 +164,59 @@ const DIGEST_SETS = [
   ["3", [AMD64, ARM64, AMD64_AGAIN]],
 ];
 
-for (const flavor of ["base", "web"]) {
+for (const flavor of ALL_FLAVORS) {
   for (const [label, names] of DIGEST_SETS) {
     test(`guard: ${label} ${flavor} digests stop the publish`, () => {
       const result = runGuard({ [flavor]: names });
       assert.notEqual(result.status, 0, result.combined);
-      assert.deepEqual(result.outputs, {});
     });
   }
 
   test(`guard: a missing ${flavor} digest directory stops the publish`, () => {
     const result = runGuard({ [flavor]: null });
     assert.notEqual(result.status, 0, result.combined);
-    assert.deepEqual(result.outputs, {});
   });
 
   test(`guard: two AMD64 ${flavor} digests stop the publish`, () => {
     const result = runGuard({ [flavor]: [AMD64, AMD64_AGAIN] });
     assert.notEqual(result.status, 0, result.combined);
-    assert.deepEqual(result.outputs, {});
   });
 }
 
-test("guard: a registry failure on mandatory digests stops the publish", () => {
+test("guard: a registry failure stops the publish", () => {
   const result = runGuard({}, { failInspect: [GHCR] });
   assert.notEqual(result.status, 0, result.combined);
-  assert.deepEqual(result.outputs, {});
 });
 
-for (const [label, names] of [...DIGEST_SETS, ["no directory with", null]]) {
-  test(`guard: ${label} Bun digests warn and publish no Bun tag, never failing the run`, () => {
-    const result = runGuard({ "bun-base": names });
-    assert.equal(result.status, 0, result.combined);
-    assert.match(result.combined, /::warning::Not publishing the bun-base image/);
-    assert.deepEqual(result.outputs, { publish_bun_base: "false", publish_bun_web: "true" });
-  });
-}
-
-test("guard: two AMD64 Bun digests warn and publish no Bun tag", () => {
-  const result = runGuard({ "bun-web": [AMD64, AMD64_AGAIN] });
-  assert.equal(result.status, 0, result.combined);
-  assert.match(result.combined, /::warning::Not publishing the bun-web image/);
-  assert.deepEqual(result.outputs, { publish_bun_base: "true", publish_bun_web: "false" });
-});
-
-test("guard: a Bun pair must validate in both registries", () => {
-  const digests = { "bun-base": ["d".repeat(64), ARM64] };
-  const result = withSandbox((dir) => {
-    writeDigests(dir, {
-      base: [AMD64, ARM64],
-      web: [AMD64, ARM64],
-      "bun-web": [AMD64, ARM64],
-      ...digests,
-    });
-    return runScript(dir, "Guard against stale digests", {
-      scenario: { failInspect: [`${GHCR}@sha256:${"d".repeat(64)}`] },
-    });
-  });
-  assert.equal(result.status, 0, result.combined);
-  assert.equal(result.outputs.publish_bun_base, "false");
-  assert.equal(result.outputs.publish_bun_web, "true");
-});
-
-test("guard: a complete set publishes every flavor without warnings", () => {
+test("guard: a complete set passes and validates only GHCR digests", () => {
   const result = runGuard({});
   assert.equal(result.status, 0, result.combined);
   assert.doesNotMatch(result.combined, /::warning::/);
-  assert.deepEqual(result.outputs, { publish_bun_base: "true", publish_bun_web: "true" });
+  assert.ok(result.inspected.length > 0);
+  assert.ok(
+    result.inspected.every((ref) => ref.startsWith(`${GHCR}@`)),
+    result.inspected.join()
+  );
 });
 
-test("build: the Node and Web digests are exported and uploaded before any Bun step", () => {
-  const firstBunStep = buildJob.indexOf("- name: Build and push BUN");
-  assert.notEqual(firstBunStep, -1);
-  for (const name of ["Export digests", "Upload base digests", "Upload web digests"]) {
-    const at = buildJob.indexOf(`- name: ${name}\n`);
-    assert.notEqual(at, -1, `missing step: ${name}`);
-    assert.ok(at < firstBunStep, `${name} must run before the Bun builds`);
-    assert.doesNotMatch(step(name), /continue-on-error/);
-    assert.doesNotMatch(step(name), /bun/i);
+test("build: the Node and Web digests are exported and uploaded, and nothing can skip them", () => {
+  for (const name of [
+    "Build and push platform image by digest",
+    "Build and push WEB platform image by digest",
+    "Export digests",
+    "Upload base digests",
+    "Upload web digests",
+  ]) {
+    assert.doesNotMatch(step(name), /continue-on-error/, name);
   }
+  for (const name of ["Upload base digests", "Upload web digests"]) {
+    assert.match(step(name), /if-no-files-found: error/, name);
+  }
+  assert.match(workflow, /platform: linux\/amd64/);
+  assert.match(workflow, /platform: linux\/arm64/);
 });
 
-test("build: the Node and Web export works with no Bun input at all", () => {
+test("build: the Node and Web export writes one digest per flavor", () => {
   withSandbox((dir) => {
     const result = runScript(dir, "Export digests", {
       env: { DIGEST_BASE: `sha256:${AMD64}`, DIGEST_WEB: `sha256:${ARM64}` },
@@ -264,158 +228,49 @@ test("build: the Node and Web export works with no Bun input at all", () => {
   });
 });
 
-test("build: a failed Bun build exports nothing for that flavor and keeps the other", () => {
-  withSandbox((dir) => {
-    const result = runScript(dir, "Export Bun digests", {
-      env: { DIGEST_BUN_BASE: "", DIGEST_BUN_WEB: `sha256:${AMD64}` },
-    });
-    assert.equal(result.status, 0, result.combined);
-    assert.match(result.combined, /::warning::Bun base build produced no digest/);
-    assert.deepEqual(readdirSync(path.join(dir, "digests/bun-base")), []);
-    assert.deepEqual(readdirSync(path.join(dir, "digests/bun-web")), [AMD64]);
-  });
+test("the workflow publishes neither Bun images nor Docker Hub tags", () => {
+  assert.doesNotMatch(workflow, /Dockerfile\.bun|-bun\b|bun-base|bun-web/);
+  assert.doesNotMatch(workflow, /DOCKERHUB|docker\.io|dockerhub-description|Login to Docker Hub/);
 });
 
-test("build: every Bun step is non-blocking and only the Node and Web steps can fail the job", () => {
-  for (const name of [
-    "Build and push BUN base platform image by digest",
-    "Build and push BUN web platform image by digest",
-    "Export Bun digests",
-    "Upload bun-base digests",
-    "Upload bun-web digests",
-  ]) {
-    assert.match(step(name), /continue-on-error: true/, name);
-  }
-  for (const name of [
-    "Build and push BUN base platform image by digest",
-    "Build and push BUN web platform image by digest",
-  ]) {
-    assert.match(step(name), /timeout-minutes: \d+/, `${name} must not reach the job limit`);
-  }
-  for (const name of ["Upload bun-base digests", "Upload bun-web digests"]) {
-    assert.match(step(name), /if-no-files-found: ignore/, name);
-  }
-  for (const name of ["Upload base digests", "Upload web digests"]) {
-    assert.match(step(name), /if-no-files-found: error/, name);
-  }
-  for (const name of [
-    "Build and push platform image by digest",
-    "Build and push WEB platform image by digest",
-  ]) {
-    assert.doesNotMatch(step(name), /continue-on-error/, name);
-  }
-  assert.match(workflow, /platform: linux\/amd64/);
-  assert.match(workflow, /platform: linux\/arm64/);
-});
-
-test("merge: Bun digest downloads may find nothing", () => {
-  for (const name of ["Download bun-base digests", "Download bun-web digests"]) {
-    assert.match(step(name), /continue-on-error: true/, name);
-  }
-});
-
-const MANIFEST_STEPS = [
-  ["Create Docker Hub version manifests", IMAGE],
-  ["Create GHCR version manifests", GHCR],
-];
-
-function runManifests(name, env, scenario) {
+function runManifests(env, scenario) {
   return withSandbox((dir) => {
     writeDigests(dir, Object.fromEntries(ALL_FLAVORS.map((flavor) => [flavor, [AMD64, ARM64]])));
-    return runScript(dir, name, { env, scenario });
+    return runScript(dir, "Create GHCR version manifests", { env, scenario });
   });
 }
 
-for (const [name, image] of MANIFEST_STEPS) {
-  const tag = (suffix) => `${image}:1.0.0${suffix}`;
+const tag = (suffix) => `${GHCR}:1.0.0${suffix}`;
 
-  test(`${name}: creates every tag when the guard passed all flavors`, () => {
-    const result = runManifests(name, { PUBLISH_BUN_BASE: "true", PUBLISH_BUN_WEB: "true" });
-    assert.equal(result.status, 0, result.combined);
-    assert.deepEqual(result.created, [tag(""), tag("-web"), tag("-bun"), tag("-web-bun")]);
-  });
+test("Create GHCR version manifests: creates the Node and Web tags", () => {
+  const result = runManifests();
+  assert.equal(result.status, 0, result.combined);
+  assert.deepEqual(result.created, [tag(""), tag("-web")]);
+});
 
-  test(`${name}: publishes no Bun tag the guard refused`, () => {
-    const result = runManifests(name, { PUBLISH_BUN_BASE: "false", PUBLISH_BUN_WEB: "true" });
-    assert.equal(result.status, 0, result.combined);
-    assert.deepEqual(result.created, [tag(""), tag("-web"), tag("-web-bun")]);
-  });
+test("Create GHCR version manifests: a failed manifest fails the step", () => {
+  const result = runManifests({}, { failCreate: ["1.0.0-web"] });
+  assert.notEqual(result.status, 0, result.combined);
+  assert.deepEqual(result.created, [tag(""), tag("-web")]);
+});
 
-  test(`${name}: a failed Bun manifest warns and keeps the step green`, () => {
-    const result = runManifests(
-      name,
-      { PUBLISH_BUN_BASE: "true", PUBLISH_BUN_WEB: "true" },
-      { failCreate: ["-bun"] }
-    );
-    assert.equal(result.status, 0, result.combined);
-    assert.match(result.combined, /::warning::Could not publish/);
-    assert.ok(result.created.includes(tag("")) && result.created.includes(tag("-web")));
-  });
-
-  test(`${name}: a failed mandatory manifest fails the step before any Bun tag`, () => {
-    const result = runManifests(
-      name,
-      { PUBLISH_BUN_BASE: "true", PUBLISH_BUN_WEB: "true" },
-      { failCreate: ["1.0.0-web"] }
-    );
-    assert.notEqual(result.status, 0, result.combined);
-    assert.deepEqual(result.created, [tag(""), tag("-web")]);
-  });
+function runPromotion(scenario) {
+  return withSandbox((dir) => runScript(dir, "Promote GHCR latest tags", { scenario }));
 }
 
-const PROMOTE_STEPS = [
-  ["Promote Docker Hub latest tags", IMAGE],
-  ["Promote GHCR latest tags", GHCR],
-];
+const latest = (suffix) => `${GHCR}:latest${suffix}`;
 
-function runPromotion(name, env, scenario) {
-  return withSandbox((dir) => runScript(dir, name, { env, scenario }));
-}
+test("Promote GHCR latest tags: promotes both flavors", () => {
+  const result = runPromotion();
+  assert.equal(result.status, 0, result.combined);
+  assert.deepEqual(result.created, [latest(""), latest("-web")]);
+});
 
-for (const [name, image] of PROMOTE_STEPS) {
-  const latest = (suffix) => `${image}:latest${suffix}`;
-  const source = (suffix) => `${image}:1.0.0${suffix}`;
-  const both = { PUBLISH_BUN_BASE: "true", PUBLISH_BUN_WEB: "true" };
-
-  test(`${name}: promotes every flavor this run published complete`, () => {
-    const result = runPromotion(name, both);
-    assert.equal(result.status, 0, result.combined);
-    assert.deepEqual(result.created, [
-      latest(""),
-      latest("-web"),
-      latest("-bun"),
-      latest("-web-bun"),
-    ]);
-  });
-
-  test(`${name}: never promotes a Bun alias the guard refused`, () => {
-    const result = runPromotion(name, { PUBLISH_BUN_BASE: "false", PUBLISH_BUN_WEB: "false" });
-    assert.equal(result.status, 0, result.combined);
-    assert.deepEqual(result.created, [latest(""), latest("-web")]);
-    assert.match(result.combined, /::warning::Not promoting/);
-    assert.ok(!result.inspected.some((ref) => ref.includes("bun")));
-  });
-
-  test(`${name}: never promotes a partial Bun source`, () => {
-    const result = runPromotion(name, both, { tags: { [source("-bun")]: "amd64-only" } });
-    assert.equal(result.status, 0, result.combined);
-    assert.deepEqual(result.created, [latest(""), latest("-web"), latest("-web-bun")]);
-    assert.match(result.combined, /::warning::Not promoting/);
-  });
-
-  test(`${name}: a failed Bun alias warns and keeps the step green`, () => {
-    const result = runPromotion(name, both, { failCreate: ["latest-bun"] });
-    assert.equal(result.status, 0, result.combined);
-    assert.match(result.combined, /::warning::Could not promote/);
-    assert.ok(result.created.includes(latest("")) && result.created.includes(latest("-web")));
-  });
-
-  test(`${name}: an incomplete mandatory source moves no alias at all`, () => {
-    const result = runPromotion(name, both, { tags: { [source("-web")]: "amd64-only" } });
-    assert.notEqual(result.status, 0, result.combined);
-    assert.deepEqual(result.created, []);
-  });
-}
+test("Promote GHCR latest tags: an incomplete source moves no alias at all", () => {
+  const result = runPromotion({ tags: { [tag("-web")]: "amd64-only" } });
+  assert.notEqual(result.status, 0, result.combined);
+  assert.deepEqual(result.created, []);
+});
 
 const PREPARE = "Resolve version, latest-promotion, and skip flag";
 const TAG_PUSH = {
@@ -424,12 +279,7 @@ const TAG_PUSH = {
   REF_NAME: "v1.0.0",
   DEFAULT_BRANCH: "main",
 };
-const MANDATORY_REFS = [
-  `${IMAGE}:1.0.0`,
-  `${IMAGE}:1.0.0-web`,
-  `${GHCR}:1.0.0`,
-  `${GHCR}:1.0.0-web`,
-];
+const MANDATORY_REFS = [`${GHCR}:1.0.0`, `${GHCR}:1.0.0-web`];
 
 function runPrepare(env, scenario) {
   // Actions defines every variable of the step's env block, empty when the event lacks it.
@@ -437,15 +287,8 @@ function runPrepare(env, scenario) {
   return withSandbox((dir) => runScript(dir, PREPARE, { env: stepEnv, scenario }));
 }
 
-test("prepare: skips when the mandatory images are complete, without looking at Bun", () => {
-  const result = runPrepare(TAG_PUSH, {
-    tags: {
-      [`${IMAGE}:1.0.0-bun`]: "missing",
-      [`${IMAGE}:1.0.0-web-bun`]: "amd64-only",
-      [`${GHCR}:1.0.0-bun`]: "missing",
-      [`${GHCR}:1.0.0-web-bun`]: "missing",
-    },
-  });
+test("prepare: skips when both GHCR images are complete", () => {
+  const result = runPrepare(TAG_PUSH);
   assert.equal(result.status, 0, result.combined);
   assert.equal(result.outputs.skip, "true");
   assert.deepEqual(result.inspected, MANDATORY_REFS);
@@ -524,36 +367,16 @@ test("prepare: a manual run on main publishes :latest like a push", () => {
   assert.equal(result.outputs.skip, "false");
 });
 
-test("Web targets import the matching runtime's freshly built base cache", () => {
-  assert.match(
-    step("Build and push WEB platform image by digest"),
-    /cache-from: \|\n\s+type=gha,scope=docker-web-.*\n\s+type=gha,scope=docker-\$/
-  );
-  assert.match(
-    step("Build and push BUN web platform image by digest"),
-    /cache-from: \|\n\s+type=gha,scope=docker-bun-web-.*\n\s+type=gha,scope=docker-bun-base-/
-  );
-});
-
-test("prepare: without Docker Hub credentials only the GHCR images are inspected", () => {
-  const result = runPrepare({ ...TAG_PUSH, DOCKERHUB_USERNAME: "", DOCKERHUB_TOKEN: "" });
-  assert.equal(result.status, 0, result.combined);
-  assert.equal(result.outputs.skip, "true");
-  assert.equal(result.outputs.dockerhub_enabled, "false");
-  assert.deepEqual(result.inspected, [`${GHCR}:1.0.0`, `${GHCR}:1.0.0-web`]);
-});
-
-test("guard: without Docker Hub only the GHCR digests are validated", () => {
-  const result = withSandbox((dir) => {
-    const pairs = Object.fromEntries(ALL_FLAVORS.map((flavor) => [flavor, [AMD64, ARM64]]));
-    writeDigests(dir, pairs);
-    return runScript(dir, "Guard against stale digests", { env: { DOCKERHUB_ENABLED: "false" } });
-  });
-  assert.equal(result.status, 0, result.combined);
-  assert.deepEqual(result.outputs, { publish_bun_base: "true", publish_bun_web: "true" });
-  assert.ok(result.inspected.length > 0);
-  assert.ok(
-    result.inspected.every((ref) => ref.startsWith(`${GHCR}@`)),
-    result.inspected.join()
-  );
+test("the image builds read only the dependency cache and export none", () => {
+  for (const name of [
+    "Build and push platform image by digest",
+    "Build and push WEB platform image by digest",
+  ]) {
+    assert.match(step(name), /cache-from: type=gha,scope=docker-deps-\$\{\{ matrix\.arch \}\}/, name);
+    assert.doesNotMatch(step(name), /cache-to:/, name);
+  }
+  const deps = step("Cache the dependency layers");
+  assert.match(deps, /target: deps/);
+  assert.match(deps, /outputs: type=cacheonly/);
+  assert.match(deps, /cache-to: type=gha,scope=docker-deps-\$\{\{ matrix\.arch \}\},mode=max,ignore-error=true/);
 });

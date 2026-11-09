@@ -80,11 +80,11 @@ as the default reflex (minutes, reversible); `npm unpublish` only inside the 72h
 window and never as the first move. Docker: never rewrite a version tag — rollback is
 repointing `latest` to the last good digest.
 
-**Docker Hub `latest` (required on every stable SemVer publish):** the
+**GHCR `latest` (required on every stable SemVer publish):** the
 `docker-publish` workflow must tag **both** `X.Y.Z` and, when
 `should-promote-latest.sh` agrees this is the highest stable SemVer, `:latest`
-with the **same digest**. After the job: Hub `latest` digest equals the new
-SemVer digest and `last_updated` moved. Do not leave `:latest` on an older
+with the **same digest**. After the job: the GHCR `latest` digest equals the new
+SemVer digest. Do not leave `:latest` on an older
 build while release notes talk about fixes that only exist on git. Compose
 quickstarts use `:latest`; GitOps should keep pinning `X.Y.Z`. See
 [Docker release channels](../guides/DOCKER_GUIDE.md#release-channels) and #10317.
@@ -191,10 +191,8 @@ Breaking changes: add `BREAKING CHANGE:` footer or `!` after the scope (e.g. `fe
 
 ### i18n
 
-- [ ] `npm run i18n:check` exits 0 — translation state (`.i18n-state.json`) in sync with source docs (no drifted sources in strict mode; warn-mode advisory is acceptable for last-minute doc touch-ups, but should be 0 before tagging)
 - [ ] `npm run i18n:check-ui-coverage` exits 0 — every UI locale at or above the 80% coverage floor
 - [ ] `npm run i18n:sync-ui:dry` reports 0 missing keys across all 66 target locales (every locale except the `en` source)
-- [ ] If source English docs changed, run `npm run i18n:run` (requires `OMNIROUTE_TRANSLATION_API_KEY` in `.env`) before tagging
 - [ ] Translation contributions can be deferred to next release if minor (track in CHANGELOG)
 
 ### Database Migrations

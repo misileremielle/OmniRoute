@@ -11,9 +11,8 @@ const workspace = load(fs.readFileSync(path.join(root, "pnpm-workspace.yaml"), "
   nodeLinker?: string;
 };
 
-// pnpm reads the overrides in pnpm-workspace.yaml; Dockerfile.bun runs `bun install`, which
-// reads the ones in package.json. A pin missing from either copy silently leaves that install
-// unpatched.
+// pnpm reads the overrides in pnpm-workspace.yaml; npm-style tooling reads the ones in
+// package.json. A pin missing from either copy silently leaves that install unpatched.
 function flatten(overrides: Record<string, unknown>, parent = ""): Map<string, string> {
   const flat = new Map<string, string>();
   for (const [name, value] of Object.entries(overrides)) {

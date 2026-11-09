@@ -230,7 +230,9 @@ it.each(["en", "zh-CN"])(
     );
     const unit = screen.getByRole("button", { name: new RegExp(m.common.paused) });
     expect(unit).toHaveAttribute("data-kind", "paused");
-    expect(unit).toHaveStyle({ background: "var(--color-text-muted)" });
+    // jsdom 31 resolves var() in computed styles (an undefined variable computes to the
+    // initial value), so toHaveStyle cannot see it; check the inline declaration.
+    expect(unit.style.background).toBe("var(--color-text-muted)");
     expect(unit.querySelector("[data-fill]")).toBeNull();
     fireEvent.focus(unit);
     expect(screen.getByRole("tooltip")).toHaveTextContent(m.common.paused);

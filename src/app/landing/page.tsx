@@ -81,12 +81,6 @@ export default function LandingPage() {
                 >
                   {t("startFree")}
                 </button>
-                <button
-                  onClick={() => router.push("/docs")}
-                  className="w-full sm:w-auto h-14 px-10 rounded-lg border border-border hover:bg-surface text-text-main text-lg font-bold transition-all"
-                >
-                  {t("readDocumentation")}
-                </button>
               </div>
             </div>
           </section>
