@@ -1,5 +1,5 @@
-// SOURCE OF TRUTH: `config/i18n.json` (also consumed by the docs translation
-// pipeline in `scripts/i18n/run-translation.mjs`). Keep this file as a thin
+// SOURCE OF TRUTH: `config/i18n.json` (also consumed by the UI translation
+// scripts in `scripts/i18n/`). Keep this file as a thin
 // typed adapter — do NOT add hand-maintained locale lists here.
 
 import i18nConfig from "../../config/i18n.json" with { type: "json" };

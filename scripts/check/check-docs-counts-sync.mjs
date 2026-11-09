@@ -29,7 +29,6 @@ import { spawnSync as _spawnSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildReadmeMigrationChecks } from "./lib/readmeMigrationCount.mjs";
 
 let _spawnSyncImpl = _spawnSync;
 export function __setSpawnSyncForTest(fn) {
@@ -726,7 +725,6 @@ function makeProviderCountValidator(expected, requireClaim = false) {
 
 export function buildChecks() {
   return [
-    ...buildReadmeMigrationChecks(ROOT, countMigrations()),
     {
       label: "Provider count",
       actual: readProviderTotal(),

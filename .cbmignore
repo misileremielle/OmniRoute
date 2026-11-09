@@ -141,10 +141,6 @@ obsidian-plugin/node_modules/
 # 6. Diretorios de documentacao interna / workflow
 # ─────────────────────────────────────────────────────────────────────────────
 docs/superpowers/
-# Docs traduzidas: 1.215 arquivos / 94 MB (inclui 20+ copias do CHANGELOG).
-# Sao traducoes do tree em ingles, ja indexado — no grafo so geram ruido em
-# search_code e consomem o auto_index_limit.
-docs/i18n/
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 7. Arquivos especificos (nao diretorios inteiros)

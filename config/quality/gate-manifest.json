@@ -440,7 +440,7 @@
     },
     {
       "name": "lint:md",
-      "command": "pnpm dlx markdownlint-cli2 \"docs/**/*.md\" \"*.md\" \"!docs/i18n\" \"!docs/research\"",
+      "command": "pnpm dlx markdownlint-cli2 \"docs/**/*.md\" \"*.md\" \"!docs/research\"",
       "disposition": "separately-invoked"
     },
     {

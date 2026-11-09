@@ -243,7 +243,6 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 │   ├── translator/               # Translator-specific tests
 │   └── load/                     # Load tests
 ├── docs/                         # Documentation
-│   ├── i18n/                     # 66-language translated docs
 │   ├── architecture/             # ARCHITECTURE.md, CODEBASE_DOCUMENTATION.md, REPOSITORY_MAP.md, AUTHZ_GUIDE.md, RESILIENCE_GUIDE.md, QUALITY_GATES.md
 │   ├── reference/                # API_REFERENCE.md, PROVIDER_REFERENCE.md, CLI-TOOLS.md
 │   ├── frameworks/               # MCP-SERVER.md (80 tools), A2A-SERVER.md, SKILLS.md, MEMORY.md, CLOUD_AGENT.md, EVALS.md, WEBHOOKS.md
@@ -344,8 +343,7 @@ stdio, SSE, and Streamable HTTP. See `docs/frameworks/MCP-SERVER.md`.
 
 ### Internationalization
 - 67 languages for UI (all dashboard pages)
-- 66 translated documentation sets in docs/i18n/
-- Language switcher in documentation
+- Documentation in English only
 
 ## Key Architectural Decisions
 

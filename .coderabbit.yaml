@@ -51,9 +51,6 @@ reviews:
       # Release-train validation PRs: 400+ files, over the review file limit, never merged.
       - "do not merge"
   path_filters:
-    # 66 translated doc mirrors and the translation state are produced by the i18n waves.
-    - "!docs/i18n/**"
-    - "!.i18n-state.json"
     # Translated UI catalogs; the English source catalog stays in review.
     # Exclusions only: a pattern without "!" turns the filter into an allowlist, and
     # exclusions always win, so an "en.json" include left every file out of review.

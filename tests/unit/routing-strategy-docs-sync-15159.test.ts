@@ -11,7 +11,6 @@
 //                                        and `pipeline`
 //   docs/routing/AUTO-COMBO.md:279      "19 routing strategies"
 //   docs/routing/AUTO-COMBO.md:828      "(19 strategies)"
-//   docs/i18n/bs/AGENTS.md:90, :414     "19 javnih strategija" (hand-maintained fork)
 //   docs/routing/AUTO-COMBO.md table    missing the `quota-weighted` ROW entirely,
 //                                        even though AGENTS.md calls this document
 //                                        "the full strategy table"
@@ -143,23 +142,4 @@ test("DOC-01: AUTO-COMBO.md count and full strategy table match the code", () =>
     PUBLIC.slice().sort(),
     "the AUTO-COMBO.md strategy table must have exactly one row per public strategy"
   );
-});
-
-test("DOC-01: the bs i18n fork agrees with the code too", () => {
-  // docs/i18n/bs/AGENTS.md is a hand-maintained translation fork (DOC-03), so it
-  // drifts silently. It is the only AGENTS.md mirror tracked in the repo.
-  const text = doc("docs/i18n/bs/AGENTS.md");
-  const line = text.split("\n").find((l) => /javnih strategija/.test(l));
-
-  assert.ok(line, "the bs mirror must carry the strategy sentence");
-  const count = line.match(/(\d+)\s+javnih strategija/);
-  assert.ok(count, "the bs mirror must state a strategy count");
-  assert.equal(
-    Number(count[1]),
-    PUBLIC.length,
-    `docs/i18n/bs/AGENTS.md says ${count[1]}, code has ${PUBLIC.length}`
-  );
-
-  const missing = PUBLIC.filter((strategy) => !line.includes(strategy));
-  assert.deepEqual(missing, [], `docs/i18n/bs/AGENTS.md is missing: ${missing.join(", ")}`);
 });

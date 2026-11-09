@@ -14,9 +14,7 @@ import { findStaleTranslations, flattenLeaves } from "../../scripts/i18n/check-u
 // Neither existing gate can see this:
 //   - `sync-ui-keys.mjs` only fills keys that are ABSENT, never ones that are STALE;
 //   - `check-ui-keys-coverage.mjs` counts key presence, so a stale translation scores
-//     as 100% covered;
-//   - `check-translation-drift.mjs` tracks `docs/i18n/<locale>/**.md` (documentation
-//     mirrors), not the UI message catalogs at all.
+//     as 100% covered.
 //
 // So: when a PR edits an English VALUE, every locale still holding a translation derived
 // from the old English is stale and must either be refreshed or flagged

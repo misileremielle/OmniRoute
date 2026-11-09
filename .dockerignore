@@ -59,9 +59,7 @@ quality-ratchet/
 # Documentation
 # The runtime reads only docs/openapi.yaml (/api/openapi/spec) and
 # docs/guides/CODEX-CLI-CONFIGURATION.md (/api/docs/codex-cli). The English
-# markdown tree ships as is; the translated mirrors and raster diagram
-# sources stay out.
-docs/i18n/**
+# markdown tree ships as is; the raster diagram sources stay out.
 # Internal planning artifacts (gitignored). `*.md` above only matches the root,
 # so without this rule these land in /app/docs.
 docs/superpowers/**

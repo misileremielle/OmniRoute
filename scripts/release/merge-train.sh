@@ -73,16 +73,11 @@ STATIC_GATES=(
   # i18n contract (2026-09-22): the train is where en.json keys without catalogs and docs
   # without mirrors slipped into the release tip three times in 48 h despite the PR CI —
   # each combined tree must carry every en key in all 65 catalogs (UI + CLI), keep the
-  # real-translation ratio, and bring the mirrors of every doc it edits (section-level:
-  # `pnpm run i18n:run -- --files=<doc>`; UI keys: `pnpm run i18n:translate-new-keys`).
+  # real-translation ratio (UI keys: `pnpm run i18n:translate-new-keys`). The docs are
+  # English-only, so there are no doc mirrors to bring along.
   "pnpm run i18n:check-keys"
   "pnpm run i18n:check-keys:cli"
   "pnpm run i18n:check-ratio"
-  # Docs mirrors are advisory on the train since 2026-10-28 (same policy as the PR CI step in
-  # ci.yml): a doc PR boards without its 66 mirrors and the post-merge `pnpm run i18n:run`
-  # batch refreshes them. `--warn` still prints every drifted source in the train log; the
-  # release push run, the nightly Release-Green and the release cut keep the strict verdict.
-  "node scripts/i18n/check-translation-drift.mjs --warn"
   # ci.yml:lint family (2026-09-22): the same lesson as the i18n block above, for the
   # rest of the lint job. A 170-PR drain left the tip red on eleven `ci.yml:lint` /
   # `docs-sync-strict` gates the train never ran — every PR was green on its own and

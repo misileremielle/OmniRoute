@@ -178,37 +178,6 @@ function main() {
   fs.writeFileSync(path.join(WT, "CHANGELOG.md"), merged);
   git(["add", "CHANGELOG.md"], { cwd: WT });
 
-  // i18n mirrors: regenerate instead of merging them one by one.
-  const mirrors = git(["diff", "--name-only", "--diff-filter=U"], { cwd: WT })
-    .split("\n")
-    .filter((f) => f.startsWith("docs/i18n/") && f.endsWith("CHANGELOG.md"));
-  for (const m of mirrors) {
-    execFileSync("git", ["checkout", "origin/main", "--", m], { cwd: WT });
-    execFileSync("git", ["add", m], { cwd: WT });
-  }
-  try {
-    execFileSync("pnpm", ["run", "release:sync-changelog-i18n", NEXT, prevVersion], {
-      cwd: WT,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    // Also propagate the just-FINALIZED [prevVersion] section (dated bullets +
-    // Contributors) into the mirrors — syncing only [NEXT] leaves the shipped
-    // section as "— TBD" in all 42 mirrors (found live in the v3.8.45 run).
-    // Boundary = the version heading right below it in main's CHANGELOG.
-    const belowPrev = versionAfter(mainChangelog, prevVersion);
-    if (belowPrev) {
-      execFileSync("pnpm", ["run", "release:sync-changelog-i18n", prevVersion, belowPrev], {
-        cwd: WT,
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-    }
-    execFileSync("git", ["add", "-A", "docs/i18n"], { cwd: WT });
-  } catch (e) {
-    console.warn("[sync-next-cycle] i18n mirror resync failed (resolve manually):", e.message);
-  }
-
   // Anything still conflicted is for the human (migrations, lockfile, code).
   const unresolved = git(["diff", "--name-only", "--diff-filter=U"], { cwd: WT })
     .split("\n")

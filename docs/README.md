@@ -186,10 +186,6 @@ Release, deployment, proxies, tunnels, coverage, database, monitoring.
 
 Mermaid sources and exported SVG/PNG diagrams referenced from the docs above. See [diagrams/README.md](diagrams/README.md).
 
-## i18n/
-
-Translated mirrors of the documentation in 66 locales (plus the English originals — 67 languages in total). See [i18n/README.md](i18n/README.md) for the supported language list.
-
 ## screenshots/
 
 Static screenshots used by the dashboard and the README. Not part of the doc body.

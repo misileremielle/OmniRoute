@@ -103,7 +103,7 @@ provider updates keep flowing; new features wait.
 ## The `v4-feature` rule
 
 From **3.8.55** on, a third-party PR that adds a feature (rather than fixing a bug, updating
-a provider, or changing docs/i18n):
+a provider, or changing docs or UI translations):
 
 1. Gets the `v4-feature` label. It is **not closed** — the contribution is kept.
 2. Stays open, without merging into the v3 release branch.

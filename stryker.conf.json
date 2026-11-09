@@ -823,7 +823,7 @@
     "what gets mutated (that is the `mutate` array above). The test files MUST be",
     "copied so the tap-runner can find covering tests, so DO NOT ignore tests/ here.",
     "We only exclude heavy, mutation-irrelevant trees to keep sandbox creation fast:",
-    "build output, coverage, the huge docs/i18n translation tree, and other worktrees."
+    "build output, coverage, and other worktrees."
   ],
   "ignorePatterns": [
     ".next",
@@ -834,7 +834,6 @@
     "playwright-report",
     "test-results",
     "reports",
-    "docs/i18n",
     ".worktrees",
     ".stryker-tmp"
   ],

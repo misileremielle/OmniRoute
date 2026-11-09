@@ -5,7 +5,7 @@
  * (/api/openapi/spec) and `docs/guides/CODEX-CLI-CONFIGURATION.md`
  * (/api/docs/codex-cli). This test parses `.dockerignore` with Docker's rule
  * semantics (tests/helpers/dockerignore.ts) and asserts both stay in the
- * Docker build context while the translated mirrors stay out.
+ * Docker build context.
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -57,20 +57,4 @@ test(".dockerignore keeps every doc the runtime reads", () => {
     [],
     `Files excluded from Docker context — the runtime reads these:\n  ${ignored.join("\n  ")}`
   );
-});
-
-test(".dockerignore excludes every translated docs mirror", () => {
-  const parsed = parseDockerignore(fs.readFileSync(DOCKERIGNORE, "utf8"));
-  for (const heavy of [
-    "docs/i18n/pt-BR/CHANGELOG.md",
-    "docs/i18n/pt-BR/README.md",
-    "docs/i18n/pt-BR/AGENTS.md",
-    "docs/i18n/pt-BR/llm.txt",
-    "docs/i18n/pt-BR/docs/routing/AUTO-COMBO.md",
-  ]) {
-    assert.ok(
-      isDockerIgnored(heavy, parsed),
-      `${heavy} should be excluded from Docker context but is not — image size will balloon`
-    );
-  }
 });

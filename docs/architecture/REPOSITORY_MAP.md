@@ -328,8 +328,7 @@ open-sse/
 | `check-supported-node-runtime.ts`   | Validate current Node version is supported                                 |
 | `check-pr-test-policy.mjs`          | Enforce "tests required" rule on production code changes                   |
 | **`gen-provider-reference.ts`**     | NEW: auto-generate `docs/reference/PROVIDER_REFERENCE.md` from catalog     |
-| `i18n/generate-multilang.mjs`       | Translate UI strings + docs via Google Translate                           |
-| `i18n_autotranslate.py`             | LLM-based doc translation pipeline                                         |
+| `i18n/generate-multilang.mjs`       | Translate UI strings via Google Translate (deprecated)                     |
 | `validate_translation.py`           | Per-locale translation validation                                          |
 | `check_translations.py`             | Code-side i18n key check                                                   |
 | `run-playwright-tests.mjs`          | Playwright E2E runner                                                      |
@@ -419,7 +418,6 @@ open-sse/
 
 | Subdir                | Purpose                                                                                                                                                                                        |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docs/i18n/`          | Localized doc translations (41 locales)                                                                                                                                                        |
 | `docs/screenshots/`   | Image assets for guides                                                                                                                                                                        |
 | `_tasks/superpowers/` | Plans/specs from superpowers (`writing-plans`/`brainstorming`) + research — isolated, separately-versioned repo, gitignored by the main tree. See CLAUDE.md → "Planning & Research Artifacts". |
 
