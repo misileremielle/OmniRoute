@@ -1,6 +1,6 @@
 # OmniRoute
 
-> OmniRoute is a free, open-source AI Gateway that acts as a universal API proxy for multi-provider LLMs. It provides smart routing, automatic fallback, load balancing, and format translation across 355 AI providers — all through a single OpenAI-compatible endpoint. Includes a built-in MCP Server (80 tools), guardrails, prompt compression, and a provider dashboard.
+> OmniRoute is a free, open-source AI Gateway that acts as a universal API proxy for multi-provider LLMs. It provides smart routing, automatic fallback, load balancing, and format translation across 356 AI providers — all through a single OpenAI-compatible endpoint. Includes a built-in MCP Server (80 tools), guardrails, prompt compression, and a provider dashboard.
 
 ## Overview
 
@@ -260,7 +260,7 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 ## Key Features (v3.8.54)
 
 ### Core Proxy
-- **355 AI providers** with automatic format translation
+- **356 AI providers** with automatic format translation
 - **Provider categories**: Free (90+ free tiers), OAuth, API Key, Self-Hosted, Custom (OpenAI/Anthropic-compatible)
 - **20 routing strategies**: priority, weighted, round-robin, fill-first, p2c, random, least-used, cost-optimized, reset-aware, reset-window, headroom, quota-weighted, strict-random, auto, lkgp, context-optimized, cache-optimized, context-relay, fusion, pipeline
 - **4-tier fallback**: Subscription → API Key → Cheap → Free
@@ -448,7 +448,7 @@ stdio, SSE, and Streamable HTTP. See `docs/frameworks/MCP-SERVER.md`.
 
 ## v3.8.x Highlights
 
-- **355-provider catalog** with 150+ free tiers, one-click account imports, and bulk key add
+- **356-provider catalog** with 150+ free tiers, one-click account imports, and bulk key add
 - **20 routing strategies** — including `fusion` (parallel panel + judge synthesis), `pipeline`, `reset-aware`, `reset-window`, `headroom`, and `context-relay`
 - **16-factor Auto-Combo scoring** with bandit exploration and progressive cooldown
 - **MCP server expanded to 80 tools / 22 scopes** (canonical + memory/skill/agentSkill/githubSkill/pool/notion/obsidian/localCorpus/gamification/plugin modules)
