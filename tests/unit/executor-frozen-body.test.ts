@@ -266,7 +266,7 @@ async function planCases(): Promise<{ cases: Case[]; refused: number }> {
     try {
       executor = await getExecutor(id);
     } catch {
-      refused++; // search and cloud-agent providers refuse chat
+      refused++; // search providers refuse chat
       continue;
     }
     // Aliases of one executor (pol -> pollinations) share a class and a provider id.

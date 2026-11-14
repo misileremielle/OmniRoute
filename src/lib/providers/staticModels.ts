@@ -55,16 +55,6 @@ const STATIC_MODEL_PROVIDERS: Record<string, () => Array<{ id: string; name: str
   // Non-LLM providers with no /v1/models endpoint — expose their selectable
   // capability ids as a static catalog so the model-import step shows a usable
   // list instead of a red "does not support models listing" failure.
-  jules: () => [
-    // Google Labs async coding agent — single async session, no model selection.
-    { id: "jules", name: "Jules (Google Labs coding agent)" },
-  ],
-  devin: () => [
-    // Cognition's Devin cloud-agent sessions don't expose per-request model
-    // selection like devin-cli's ACP models do — single non-selectable placeholder
-    // so the "Available Models" UI shows something instead of a hard failure (#6142).
-    { id: "devin", name: "Devin (Cognition cloud agent)" },
-  ],
   "amazon-q": () => [
     // Amazon Q Developer shares KiroExecutor + OAuth wiring with kiro but has no
     // discovery config or registry catalog of its own — single non-selectable

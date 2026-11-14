@@ -122,9 +122,9 @@ test("provider categories keep the closest hue of the old palette under the kit 
 });
 
 test("provider category aliases used by the summary card resolve to the same slot", () => {
-  assert.equal(normalizeProviderCategory("webcookie"), "web-cookie");
-  assert.equal(normalizeProviderCategory("cloudagent"), "cloud-agent");
-  assert.deepEqual(providerCategorySlot("webcookie"), providerCategorySlot("web-cookie"));
+  assert.equal(normalizeProviderCategory("upstreamproxy"), "upstream-proxy");
+  assert.equal(normalizeProviderCategory("noauth"), "no-auth");
+  assert.deepEqual(providerCategorySlot("upstreamproxy"), providerCategorySlot("upstream-proxy"));
   assert.equal(providerCategorySlot("not-a-category"), null);
   assert.equal(providerCategorySlot(null), null);
 });

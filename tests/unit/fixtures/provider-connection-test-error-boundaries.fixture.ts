@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { generateKeyPairSync } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -42,16 +43,30 @@ delete process.env.VITEST;
 delete process.env.NODE_TEST_CONTEXT;
 delete process.env.JEST_WORKER_ID;
 
+// Vertex's validator puts the token endpoint's raw response body into its error, so a
+// hostile body reaches every boundary unless each one projects it.
 const hostileValidationMessage =
-  "Jules failed access_token=jules-boundary-secret at /srv/private/validator.ts\n" +
+  "Vertex failed access_token=vertex-boundary-secret at /srv/private/validator.ts\n" +
   "    at probe (/srv/private/validator.ts:42:7)";
-const julesValidationUrl = "https://jules.googleapis.com/v1alpha/sources";
+const vertexValidationUrl = "https://oauth2.googleapis.com/token";
+const { privateKey: boundaryPrivateKey } = generateKeyPairSync("rsa", {
+  modulusLength: 2048,
+  privateKeyEncoding: { type: "pkcs8", format: "pem" },
+  publicKeyEncoding: { type: "spki", format: "pem" },
+});
+const boundaryServiceAccount = JSON.stringify({
+  type: "service_account",
+  project_id: "boundary-test",
+  private_key_id: "boundary-key",
+  private_key: boundaryPrivateKey,
+  client_email: "boundary@boundary-test.iam.gserviceaccount.com",
+});
 const originalFetch = globalThis.fetch;
 let validationFetchCalls = 0;
 const boundaryFetch = (async (input: string | URL | Request) => {
   const url =
     typeof input === "string" ? input : input instanceof Request ? input.url : input.toString();
-  assert.equal(url, julesValidationUrl, `unexpected outbound request: ${url}`);
+  assert.equal(url, vertexValidationUrl, `unexpected outbound request: ${url}`);
   validationFetchCalls += 1;
   return new Response(hostileValidationMessage, { status: 500 });
 }) as typeof fetch;
@@ -149,10 +164,10 @@ test("public runtime projection omits host paths and internal error envelopes", 
 
 test("connection validation projects hostile errors before public and persistent boundaries", async () => {
   const connection = await providersDb.createProviderConnection({
-    provider: "jules",
+    provider: "vertex",
     authType: "apikey",
-    name: "Jules Error Boundary",
-    apiKey: "jules-test-key",
+    name: "Vertex Error Boundary",
+    apiKey: boundaryServiceAccount,
     isActive: true,
     testStatus: "active",
   });
@@ -160,8 +175,8 @@ test("connection validation projects hostile errors before public and persistent
 
   const result = await testSingleConnection(connection.id);
   assert.equal(result.valid, false);
-  assert.ok(validationFetchCalls > 0, "the deterministic Jules stub must handle the probe");
-  assert.match(String(result.error), /Jules failed/i);
+  assert.ok(validationFetchCalls > 0, "the deterministic Vertex stub must handle the probe");
+  assert.match(String(result.error), /Vertex failed/i);
   assert.equal(await waitForCallLogSaves(10_000), true, "call-log write must drain");
   flushProxyLogsSync();
 
@@ -181,8 +196,8 @@ test("connection validation projects hostile errors before public and persistent
     .prepare(
       `SELECT error
        FROM proxy_logs
-       WHERE connection_id = ? AND provider = 'jules'
-         AND target_url = 'jules/connection-test'
+       WHERE connection_id = ? AND provider = 'vertex'
+         AND target_url = 'vertex/connection-test'
        ORDER BY rowid DESC LIMIT 1`
     )
     .get(connection.id) as { error: string | null };
@@ -197,7 +212,7 @@ test("connection validation projects hostile errors before public and persistent
     callLogArtifactError: artifact.error,
     proxyLogError: proxyLogRow.error,
   };
-  const leakPattern = /jules-boundary-secret|srv\/private|validator\.ts|\bat probe\b/i;
+  const leakPattern = /vertex-boundary-secret|srv\/private|validator\.ts|\bat probe\b/i;
   const leakingBoundaries = Object.entries(boundaries)
     .filter(([, value]) => leakPattern.test(JSON.stringify(value)))
     .map(([name]) => name);

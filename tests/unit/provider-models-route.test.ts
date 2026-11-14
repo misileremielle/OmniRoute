@@ -63,7 +63,6 @@ test.after(async () => {
 
 test("provider models route returns a static local catalog for non-LLM search/agent providers (#5569/#5571/#5573/#5575)", async () => {
   const cases = [
-    { provider: "jules", expectId: "jules" },
     { provider: "linkup-search", expectId: "standard" },
     { provider: "ollama-search", expectId: "web_search" },
     { provider: "searchapi-search", expectId: "google" },

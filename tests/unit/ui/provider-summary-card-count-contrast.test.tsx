@@ -22,12 +22,10 @@ const stats = Object.fromEntries(
     "oauth",
     "apikey",
     "compatible",
-    "webcookie",
     "search",
     "audio",
     "local",
     "upstreamproxy",
-    "cloudagent",
     "ide",
     "webfetch",
   ].map((k) => [k, stat])

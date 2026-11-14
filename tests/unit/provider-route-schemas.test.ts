@@ -20,10 +20,10 @@ test("createProviderSchema rejects Pollinations without apiKey", () => {
   assert.equal(result.success, false);
 });
 
-test("providersBatchTestSchema accepts cloud-agent batch mode", () => {
+test("providersBatchTestSchema rejects the removed cloud-agent batch mode", () => {
   const result = providersBatchTestSchema.safeParse({
     mode: "cloud-agent",
   });
 
-  assert.equal(result.success, true);
+  assert.equal(result.success, false);
 });

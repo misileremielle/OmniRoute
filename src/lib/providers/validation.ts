@@ -28,7 +28,6 @@ import {
 import { toValidationErrorResult } from "./validation/transport";
 import { validateOpencodeProvider } from "./validation/opencode";
 import { validateCloudflareAiProvider } from "./validation/cloudflareAi";
-import { validateJulesProvider, validateDevinCloudAgentProvider } from "./validation/cloudAgents";
 import {
   validateHerokuProvider,
   validateDatabricksProvider,
@@ -149,9 +148,8 @@ export async function validateProviderApiKey({
   apiKey,
   providerSpecificData = {},
   // S-01 (#15159): forwarded to specialty validators that can reach a local spawn
-  // (currently only the devin cloud-agent CLI fallback). Remote-reachable routes
-  // pass `false` for non-loopback callers; direct/internal callers keep the
-  // permissive default. See validateDevinCloudAgentProvider for the rationale.
+  // (the auggie and qoder CLI probes). Remote-reachable routes pass `false` for
+  // non-loopback callers; direct/internal callers keep the permissive default.
   allowLocalSpawn = true,
   // A stored connection's own token columns (accessToken / refreshToken / expiresAt), so a
   // specialty validator judges the token the executor will actually use, not a stale paste.
@@ -219,14 +217,6 @@ export async function validateProviderApiKey({
     "cloudflare-ai": validateCloudflareAiProvider,
     "v0-vercel": ({ apiKey, providerSpecificData }: any) =>
       validateV0VercelProvider({ apiKey, providerSpecificData, isLocal }),
-    jules: validateJulesProvider,
-    // "devin" is the Cognition cloud-agent provider (distinct from the "devin-cli"
-    // LLM/ACP provider, which is already registered in providerRegistry). Wired here
-    // for parity with the "jules" cloud-agent entry above — see #6142.
-    // S-01 (#15159): wrapped so the local CLI-spawn fallback receives allowLocalSpawn;
-    // a bare reference would silently drop the flag and let a remote caller spawn.
-    devin: ({ apiKey, allowLocalSpawn }: any) =>
-      validateDevinCloudAgentProvider({ apiKey, allowLocalSpawn }),
     auggie: validateAuggieProvider,
     "cursor-api": validateCursorApiProvider,
     aihorde: validateAiHordeProvider,

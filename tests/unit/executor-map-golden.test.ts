@@ -10,8 +10,7 @@ import { cleanupTempDataDir } from "../_setup/tempDataDir.ts";
 // freeze the full provider-id → executor mapping of open-sse/executors/index.ts —
 // every specialized key with its executor class, effective provider identity and
 // which PROVIDERS config entry backs it — plus the getExecutor() dispatch rules
-// (specialized hit, DefaultExecutor fallback + cache, cloud-agent guard #6699,
-// search-provider guard #10274). The registry refactor must keep this snapshot
+// (specialized hit, DefaultExecutor fallback + cache, search-provider guard #10274). The registry refactor must keep this snapshot
 // byte-identical: any drift in keys, classes, provider identity or guard behavior
 // is a golden diff, not a silent routing change.
 
@@ -75,7 +74,7 @@ function describeExecutor(instance: unknown): {
 const specializedKeys = readSpecializedKeys();
 
 test("golden: specialized executor map — key → class + provider identity + config source", async () => {
-  assert.ok(specializedKeys.length >= 100, `suspiciously few keys: ${specializedKeys.length}`);
+  assert.ok(specializedKeys.length >= 60, `suspiciously few keys: ${specializedKeys.length}`);
 
   const entries: Record<
     string,
@@ -114,7 +113,7 @@ test("golden: getExecutor dispatch rules — fallback, cache and 400-guards", as
   assert.ok(fallback instanceof DefaultExecutor, "fallback must be DefaultExecutor");
   assert.equal(await getExecutor(unknown), fallback, "DefaultExecutor fallback must be cached");
 
-  // 2. Cloud-agent guard (#6699) and search guard (#10274) → status-400 throw.
+  // 2. Search guard (#10274) → status-400 throw.
   const guardOutcome = async (provider: string) => {
     try {
       await getExecutor(provider);
@@ -128,7 +127,6 @@ test("golden: getExecutor dispatch rules — fallback, cache and 400-guards", as
   const searchProviders = Object.keys(SEARCH_PROVIDERS).sort();
   goldenSnapshot("executors/dispatch-rules", {
     fallback: describeExecutor(fallback),
-    cloudAgentGuard: { jules: await guardOutcome("jules") },
     searchGuard: Object.fromEntries(
       await Promise.all(searchProviders.map(async (p) => [p, await guardOutcome(p)]))
     ),

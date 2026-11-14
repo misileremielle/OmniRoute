@@ -24,7 +24,6 @@ Complete guide for configuring providers, creating combos, integrating CLI tools
 - [Skills System](#-skills-system)
 - [Memory System](#-memory-system)
 - [Webhooks](#-webhooks)
-- [Cloud Agents](#-cloud-agents)
 - [Programmatic Management](#-programmatic-management)
 - [Internal CLI](#-internal-cli)
 
@@ -1245,16 +1244,6 @@ Subscribe to OmniRoute events for real-time monitoring and automation.
 - Available events: `request.completed`, `request.failed`, `provider.unavailable`, `budget.exceeded`, `combo.switched`, `circuit_breaker.opened`, `circuit_breaker.closed`
 - Every payload includes `X-OmniRoute-Signature` (HMAC-SHA256) for verification
 - Retries: 3 attempts with exponential backoff, then dead-letter queue
-
----
-
-## ☁️ Cloud Agents
-
-OmniRoute integrates with cloud coding agents (**OpenAI Codex Cloud**, **Devin**, **Jules**, **Antigravity**) so you can dispatch long-running tasks from the same dashboard that handles your local routing.
-
-- Create tasks in **Dashboard → Cloud Agents** or via `POST /api/v1/agents/tasks`
-- Track status, logs, and artifacts per task
-- Bring-your-own API key per provider — credentials never leave the OmniRoute instance
 
 ---
 

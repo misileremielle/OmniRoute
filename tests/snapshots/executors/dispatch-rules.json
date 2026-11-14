@@ -1,11 +1,4 @@
 {
-  "cloudAgentGuard": {
-    "jules": {
-      "message": "Provider \"jules\" is a cloud-agent provider and does not support direct chat completions; use the Cloud Agents task API instead.",
-      "status": 400,
-      "throws": true
-    }
-  },
   "fallback": {
     "className": "DefaultExecutor",
     "configSource": "openai",

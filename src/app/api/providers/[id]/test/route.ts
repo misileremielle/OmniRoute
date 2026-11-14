@@ -70,7 +70,7 @@ export type ConnectionTestOptions = {
   allowLocalRuntimeProbe?: boolean;
   /**
    * S-01 (#15159): whether a provider validator reached from this test may spawn a
-   * local child process (currently only the devin cloud-agent CLI fallback). These
+   * local child process (the auggie and qoder CLI probes). These
    * routes stay remote-reachable for legitimate dashboard use, so the spawn is gated
    * here at its call site on the trusted peer-locality header — the same shape as
    * allowLocalRuntimeProbe above. Defaults to permissive for the internal scheduler.

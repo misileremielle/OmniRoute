@@ -96,7 +96,6 @@ const lazyExecutors: Record<string, () => Promise<BaseExecutor>> = {
   zc: () => import("./zcode.ts").then((m) => new m.ZcodeExecutor()), // Alias
   "devin-cli-agentic": () =>
     import("./devin-cli-agentic.ts").then((m) => new m.DevinCliAgenticExecutor()),
-  devin: () => import("./devin-cli.ts").then((m) => new m.DevinCliExecutor()), // Alias
   "duckduckgo-web": () => import("./duckduckgo-web.ts").then((m) => new m.DuckDuckGoWebExecutor()),
   ddgw: () => import("./duckduckgo-web.ts").then((m) => new m.DuckDuckGoWebExecutor()), // Alias
   "kimi-coding-apikey": () =>
@@ -131,17 +130,6 @@ for (const [alias, load] of Object.entries(lazyExecutors)) {
   registerLazyExecutor(alias, load);
 }
 
-// #6699 — providers that exist ONLY as Cloud Agent task-API entries
-// (CLOUD_AGENT_PROVIDERS / staticModels "Available Models" catalog) and have no
-// chat-completions REGISTRY entry anywhere in open-sse/. Without this guard,
-// getExecutor() silently falls through to DefaultExecutor's
-// `PROVIDERS[provider] || PROVIDERS.openai` fallback, sending the user's real
-// provider key to OpenAI's endpoint (mislabeled as coming from the provider the
-// user actually selected). Starting with just "jules" (the reported case);
-// "devin" and "codex-cloud" share the same structural gap and are left for a
-// follow-up once their own chat-routing behavior is confirmed.
-const CHAT_UNSUPPORTED_CLOUD_AGENT_PROVIDERS = new Set(["jules"]);
-
 // #10274 — providers that exist ONLY as /v1/search endpoint entries
 // (SEARCH_PROVIDERS in open-sse/config/searchRegistry.ts) and have no chat-completions
 // REGISTRY entry anywhere in open-sse/. Without this guard, getExecutor() silently falls
@@ -159,13 +147,6 @@ export async function getExecutor(provider: string): Promise<BaseExecutor> {
   assertCommonChatGptWebProviderAvailable(provider);
   const loaded = await loadRegisteredExecutor(provider);
   if (loaded) return loaded;
-  if (CHAT_UNSUPPORTED_CLOUD_AGENT_PROVIDERS.has(provider)) {
-    const err = new Error(
-      `Provider "${provider}" is a cloud-agent provider and does not support direct chat completions; use the Cloud Agents task API instead.`
-    );
-    (err as Error & { status?: number }).status = 400;
-    throw err;
-  }
   if (CHAT_UNSUPPORTED_SEARCH_PROVIDERS.has(provider)) {
     throw new SearchProviderChatError(provider);
   }

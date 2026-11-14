@@ -161,6 +161,26 @@
           "alias": "cpl"
         }
       ]
+    },
+    {
+      "name": "cloud-agent",
+      "removedOn": "2026-11-15",
+      "migration": "241_remove_cloud_agent_providers.sql",
+      "reason": "Cloud coding-agent task providers removed from the fork.",
+      "providers": [
+        {
+          "id": "jules",
+          "alias": "jules"
+        },
+        {
+          "id": "devin",
+          "alias": "devin"
+        },
+        {
+          "id": "codex-cloud",
+          "alias": "codex-cloud"
+        }
+      ]
     }
   ]
 }

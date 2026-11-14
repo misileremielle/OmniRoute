@@ -219,7 +219,7 @@ src/
 | -------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `components/`                    | Dashboard component API: adapters over `packages/ui-kit` — see `docs/architecture/DESIGN_SYSTEM.md` |
 | `constants/iconMap.ts`           | `ICON_MAP`: icon names used by the screens → Lucide components (`<Icon>`)                           |
-| `constants/providers.ts`         | **329 providers** with Zod validation (source of truth)                                             |
+| `constants/providers.ts`         | **326 providers** with Zod validation (source of truth)                                             |
 | `constants/cliTools.ts`          | External CLI tool registry                                                                          |
 | `constants/routingStrategies.ts` | **21 routing strategies** with priorities                                                           |
 | `constants/publicApiRoutes.ts`   | Routes that require Bearer (vs management) auth                                                     |
@@ -371,7 +371,7 @@ open-sse/
 | `CLI-TOOLS.md`              | External CLI integrations + Internal OmniRoute CLI                                    |
 | `I18N.md`                   | i18n architecture, adding a language, 67 locales                                      |
 | `UNINSTALL.md`              | Clean uninstall steps                                                                 |
-| `PROVIDER_REFERENCE.md`     | **Auto-generated** catalog of 329 providers (regen: `npm run gen:provider-reference`) |
+| `PROVIDER_REFERENCE.md`     | **Auto-generated** catalog of 326 providers (regen: `npm run gen:provider-reference`) |
 
 ### Subsystem deep-dives
 
@@ -380,7 +380,6 @@ open-sse/
 | `MCP-SERVER.md`                             | MCP server: 80 tools, 3 transports, 22 scopes, REST endpoints        |
 | `A2A-SERVER.md`                             | A2A v0.3: JSON-RPC, 6 skills, REST helpers, agent card               |
 | `AGENT_PROTOCOLS_GUIDE.md`                  | Unified guide: A2A vs ACP vs Cloud Agents                            |
-| `CLOUD_AGENT.md`                            | Codex Cloud / Devin / Jules orchestration                            |
 | `SKILLS.md`                                 | Skills framework (built-in + marketplace + SkillsSH + sandbox)       |
 | `MEMORY.md`                                 | Memory system (SQLite FTS5 + Qdrant)                                 |
 | `EVALS.md`                                  | Eval framework (suites, runs, rubrics)                               |

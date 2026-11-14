@@ -403,8 +403,8 @@ export async function POST(request: Request) {
     // 201 response. It is a tracked follow-up, so graceful shutdown waits for it
     // to persist testStatus/lastError/etc. before closing the database.
     // GHSA-jmq6-8j86-8xqj: the local CLI probe spawns on the host — only for local callers.
-    // S-01 (#15159): allowLocalSpawn covers the devin cloud-agent validator's CLI
-    // fallback, which also spawns. Same gate, same reason.
+    // S-01 (#15159): allowLocalSpawn covers the validators that start a local binary
+    // (auggie, qoder). Same gate, same reason.
     runConnectionFollowUp(`Auto-test failed for ${newConnection.id}`, () =>
       testSingleConnection(newConnection.id, undefined, {
         allowLocalRuntimeProbe: getRequestPeerLocality(request) !== "remote",

@@ -109,16 +109,11 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
 export const LOCAL_ONLY_API_PATTERNS: ReadonlyArray<RegExp> = [
   /^\/api\/providers\/volcengine-plan\/connect(\/.*)?$/, // manual headful flow + session-based phone/SMS auto-login (both spawn Playwright)
   /^\/api\/providers\/[^/]+\/refresh-cursor\/?$/,
-  // S-01 (#15159): spawn(bin, ["acp", "--agent-type", "summarizer"], …) in
-  // src/lib/providers/validation/cloudAgents.ts — fixed binary list + fixed argv (not
-  // caller-controlled RCE) but Hard Rules #15 + #16 still require loopback enforcement before
-  // any auth check.
-  //
   // S-01 (#15159): spawn-capable branch of /api/providers/{validate,import,bulk} is
   // gated INSIDE each route (allowLocalSpawn from the trusted peer-locality header,
   // #15766 shape), not by a path pattern — a blanket LOCAL_ONLY regex here locked
   // remote/reverse-proxied dashboards (docker + nginx deployments) out of key
-  // validation for EVERY provider while only the devin CLI-key fallback can spawn.
+  // validation for EVERY provider while only a few CLI-probe validators can spawn.
   // The routes must keep threading allowLocalSpawn; see
   // tests/unit/authz/route-guard-providers-spawn-local-only.test.ts.
   // S-01 (#15159) second hop is deliberately NOT a path pattern: /api/providers/{id}/models

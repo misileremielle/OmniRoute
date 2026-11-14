@@ -1,6 +1,5 @@
 import {
   APIKEY_PROVIDERS,
-  CLOUD_AGENT_PROVIDERS,
   LOCAL_PROVIDERS,
   NOAUTH_PROVIDERS,
   OAUTH_PROVIDERS,
@@ -16,7 +15,7 @@ import {
 export type ProviderDisplayAuthType = "oauth" | "apikey" | "compatible" | "no-auth";
 export type ProviderToggleAuthType = "oauth" | "free" | "apikey" | "no-auth";
 export type StaticProviderCatalogCategory =
-  "no-auth" | "oauth" | "local" | "search" | "upstream-proxy" | "apikey" | "cloud-agent";
+  "no-auth" | "oauth" | "local" | "search" | "upstream-proxy" | "apikey";
 
 export interface ProviderNotice {
   /** Direct link to the API key management page for this provider. */
@@ -135,12 +134,6 @@ export const STATIC_PROVIDER_CATALOG_GROUPS: Record<
     displayAuthType: "apikey",
     toggleAuthType: "apikey",
   },
-  "cloud-agent": {
-    category: "cloud-agent",
-    providers: CLOUD_AGENT_PROVIDERS as ProviderRecord,
-    displayAuthType: "apikey",
-    toggleAuthType: "apikey",
-  },
 };
 
 export const STATIC_PROVIDER_CATALOG_RESOLUTION_ORDER: StaticProviderCatalogCategory[] = [
@@ -149,7 +142,6 @@ export const STATIC_PROVIDER_CATALOG_RESOLUTION_ORDER: StaticProviderCatalogCate
   "local",
   "search",
   "upstream-proxy",
-  "cloud-agent",
   "apikey",
 ];
 
@@ -157,7 +149,6 @@ const MANAGED_PROVIDER_CONNECTION_CATEGORIES = new Set<StaticProviderCatalogCate
   "apikey",
   "local",
   "search",
-  "cloud-agent",
 ]);
 
 export function getStaticProviderCatalogGroup(

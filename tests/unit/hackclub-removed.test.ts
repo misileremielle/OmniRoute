@@ -7,8 +7,8 @@
  * strings and the generated provider reference kept advertising a provider the
  * router can no longer serve. This test pins the complete removal:
  *
- *   1. no canonical catalog (API-key / web-cookie / OAuth / no-auth / local /
- *      search / audio / upstream-proxy / cloud-agent / system) has a `hackclub` entry;
+ *   1. no canonical catalog (API-key / OAuth / no-auth / local / search / audio /
+ *      upstream-proxy / system) has a `hackclub` entry;
  *   2. no provider in any catalog claims the `hc` alias (it belonged to hackclub);
  *   3. the provider/catalog source trees carry no `hackclub` mention at all
  *      (structural grep — catches comments referencing it as a living provider);

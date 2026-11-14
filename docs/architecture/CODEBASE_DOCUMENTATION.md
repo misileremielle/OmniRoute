@@ -12,7 +12,7 @@ lastUpdated: 2026-06-28
 >
 > For high-level architecture diagrams and the reasoning behind each subsystem, read
 > [ARCHITECTURE.md](./ARCHITECTURE.md). For deep dives on individual subsystems
-> (Auto Combo, MCP server, A2A server, Skills, Memory, Cloud Agents, Resilience,
+> (Auto Combo, MCP server, A2A server, Skills, Memory, Resilience,
 > Compression, etc.) see their dedicated files in this `docs/` directory.
 
 This file describes **what exists in the repository today** so that a new engineer
@@ -114,7 +114,7 @@ Top-level segments under `src/app/`:
 #### 3.1.1 `src/app/(dashboard)/dashboard/` — UI pages
 
 `agents`, `analytics`, `api-manager`, `audit`, `auto-combo`, `batch`, `cache`,
-`changelog`, `cli-tools`, `cloud-agents`, `combos`, `compression`, `context`,
+`changelog`, `cli-tools`, `combos`, `compression`, `context`,
 `costs`, `endpoint`, `health`, `limits`, `logs`, `memory`, `onboarding`,
 `playground`, `providers`, `search-tools`, `settings`, `skills`, `system`,
 `translator`, `usage`, `webhooks`, plus root `page.tsx`, `HomePageClient.tsx`,
@@ -483,7 +483,7 @@ helpers (tool schemas, fetch/TTS adapters, quirk handlers). Executors include:
 (shared identity helper) and `index.ts` (registry).
 
 > Note: providers not listed here are served by `default.ts` using the generic
-> OpenAI-compatible executor. The full provider catalog (329 providers) lives in
+> OpenAI-compatible executor. The full provider catalog (326 providers) lives in
 > `src/shared/constants/providers.ts`.
 
 ### 4.3 `open-sse/translator/`

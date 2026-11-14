@@ -35,11 +35,9 @@ function options(activeCategory: string) {
     enterpriseProviderEntries: empty,
     embeddingRerankProviderEntries: empty,
     imageProviderEntries: [entry("image-provider")],
-    webCookieProviderEntries: empty,
     searchProviderEntries: empty,
     webFetchEntries: empty,
     localProviderEntries: empty,
-    cloudAgentProviderEntries: empty,
   };
 }
 

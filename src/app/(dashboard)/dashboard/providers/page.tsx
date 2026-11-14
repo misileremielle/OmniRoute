@@ -262,7 +262,6 @@ function ProvidersPageContent() {
   const [activeServiceKind, setActiveServiceKind] = useState<string | null>(null);
   const notify = useNotificationStore();
   const sectionCategoryAliases: Record<string, string> = {
-    cloud: "cloudagent",
     noauth: "no-auth",
     proxy: "upstream-proxy",
   };
@@ -677,18 +676,6 @@ function ProvidersPageContent() {
     connections
   );
 
-  const cloudAgentProviderEntriesAll = buildStaticProviderEntries("cloud-agent", getProviderStats);
-  const cloudAgentProviderEntries = filterConfiguredProviderEntries(
-    cloudAgentProviderEntriesAll,
-    effectiveShowConfiguredOnly,
-    searchQuery,
-    showFreeOnly,
-    modelSearchQuery,
-    activeServiceKind,
-    liveModelsByProviderId,
-    connections
-  );
-
   const upstreamProxyEntriesAll = buildStaticProviderEntries("upstream-proxy", getProviderStats);
   const upstreamProxyEntries = filterConfiguredProviderEntries(
     upstreamProxyEntriesAll,
@@ -748,7 +735,6 @@ function ProvidersPageContent() {
     ...apiKeyProviderEntriesAll,
     ...localProviderEntriesAll,
     ...searchProviderEntriesAll,
-    ...cloudAgentProviderEntriesAll,
     ...upstreamProxyEntriesAll,
   ] as DashboardProviderEntry[]);
   const dashboardProviderEntriesAll = dedupeProviderEntries([
@@ -824,7 +810,6 @@ function ProvidersPageContent() {
     searchProviderEntries,
     webFetchEntries,
     localProviderEntries,
-    cloudAgentProviderEntries,
   });
 
   const summaryStats = {
@@ -837,7 +822,6 @@ function ProvidersPageContent() {
     search: countConfigured(searchProviderEntriesAll),
     local: countConfigured(localProviderEntriesAll),
     upstreamproxy: countConfigured(upstreamProxyEntriesAll),
-    cloudagent: countConfigured(cloudAgentProviderEntriesAll),
     ide: countConfigured(ideProviderEntriesAll),
     webfetch: countConfigured(webFetchEntriesAll),
   };
@@ -1444,57 +1428,6 @@ function ProvidersPageContent() {
                         provider={provider}
                         stats={stats}
                         authType={displayAuthType}
-                        onToggle={(active) =>
-                          handleToggleProvider(providerId, toggleAuthType, active)
-                        }
-                      />
-                    )
-                  )}
-                </ProviderCardGrid>
-              </div>
-            )}
-
-            {/* Cloud Agent Providers */}
-            {showSection("cloud") && cloudAgentProviderEntries.length > 0 && (
-              <div className="flex flex-col gap-4">
-                <SectionHeader
-                  title={
-                    <span className="flex items-center gap-2">
-                      {t("cloudAgentProviders")}{" "}
-                      <CategoryDot
-                        category="cloud-agent"
-                        size="md"
-                        label={t("cloudAgentProviders")}
-                      />
-                      <ProviderCountBadge {...countConfigured(cloudAgentProviderEntriesAll)} />
-                    </span>
-                  }
-                  description={t("cloudAgentProvidersDesc")}
-                  actions={
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        icon="play_arrow"
-                        loading={testingMode === "cloud-agent"}
-                        onClick={() => handleBatchTest("cloud-agent")}
-                        disabled={!!testingMode}
-                        title={t("testAll")}
-                      >
-                        {testingMode === "cloud-agent" ? t("testing") : t("testAll")}
-                      </Button>
-                    </>
-                  }
-                />
-                <ProviderCardGrid>
-                  {cloudAgentProviderEntries.map(
-                    ({ providerId, provider, stats, toggleAuthType }) => (
-                      <HighlightableProviderCard
-                        key={providerId}
-                        providerId={providerId}
-                        provider={provider}
-                        stats={stats}
-                        authType="cloud-agent"
                         onToggle={(active) =>
                           handleToggleProvider(providerId, toggleAuthType, active)
                         }

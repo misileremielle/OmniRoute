@@ -3,8 +3,8 @@
 // The audit verified two spawn sites reached from management routes that
 // requireLogin=false waives:
 //
-//   1. `src/lib/providers/validation/webProvidersB.ts:535` —
-//      spawn(bin, ["acp", "--agent-type", "summarizer"], …)
+//   1. the provider key validators that start a local CLI (originally the Devin
+//      cloud-agent fallback, since removed; today auggie and qoder) —
 //      reached from POST /api/providers/validate, /api/providers/import,
 //      /api/providers/bulk
 //
@@ -29,9 +29,8 @@ import { isLocalOnlyPath } from "../../../src/server/authz/routeGuard.ts";
 // ─── S-01: validate/import/bulk stay remote-reachable; spawn is call-site gated ──
 
 test("isLocalOnlyPath: /api/providers/validate, /import, /bulk are NOT local-only (spawn gated at call site)", () => {
-  // webProvidersB.ts:535 spawns `bin` with argv ["acp", "--agent-type", "summarizer"]
-  // only in the devin CLI-key fallback validator, which receives allowLocalSpawn from
-  // each dispatching route (#15766 shape). A blanket LOCAL_ONLY pattern here locks
+  // The CLI-probe validators (auggie, qoder) receive allowLocalSpawn from each
+  // dispatching route (#15766 shape). A blanket LOCAL_ONLY pattern here locks
   // remote dashboards out of key validation for every provider — the regression
   // fixed after a reverse-proxied deployment's Check button always said "Invalid".
   assert.equal(isLocalOnlyPath("/api/providers/validate"), false);

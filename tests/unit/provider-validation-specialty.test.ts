@@ -10,9 +10,6 @@ const {
 
 const { SafeOutboundFetchError } = await import("../../src/shared/network/safeOutboundFetch.ts");
 
-const { __setTlsFetchOverrideForTesting: __setPplxTlsFetchOverride } =
-  await import("../../open-sse/services/perplexityTlsClient.ts");
-
 const { __setTlsFetchOverrideForTesting: __setGrokTlsFetchOverride } =
   await import("../../open-sse/services/grokTlsClient.ts");
 
@@ -20,7 +17,6 @@ const originalFetch = globalThis.fetch;
 
 test.afterEach(() => {
   globalThis.fetch = originalFetch;
-  __setPplxTlsFetchOverride(null);
   __setGrokTlsFetchOverride(null);
 });
 

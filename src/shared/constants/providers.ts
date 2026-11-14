@@ -11,7 +11,6 @@ import { APIKEY_PROVIDERS } from "./providers/apikey";
 import { LOCAL_PROVIDERS } from "./providers/local";
 import { SEARCH_PROVIDERS } from "./providers/search";
 import { UPSTREAM_PROXY_PROVIDERS } from "./providers/upstream-proxy";
-import { CLOUD_AGENT_PROVIDERS } from "./providers/cloud-agent";
 import { SYSTEM_PROVIDERS } from "./providers/system";
 import { validateProviders } from "../validation/providerSchema";
 
@@ -327,7 +326,6 @@ const _PROVIDER_SECTIONS = [
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
-  CLOUD_AGENT_PROVIDERS,
   SYSTEM_PROVIDERS,
 ] as const;
 
@@ -341,7 +339,6 @@ function ensureProvidersValidated() {
   validateProviders(LOCAL_PROVIDERS, "LOCAL_PROVIDERS");
   validateProviders(SEARCH_PROVIDERS, "SEARCH_PROVIDERS");
   validateProviders(UPSTREAM_PROXY_PROVIDERS, "UPSTREAM_PROXY_PROVIDERS");
-  validateProviders(CLOUD_AGENT_PROVIDERS, "CLOUD_AGENT_PROVIDERS");
   _validated = true;
 }
 
@@ -394,7 +391,6 @@ export function getProviderById(id: string) {
     (LOCAL_PROVIDERS as Record<string, any>)[id] ??
     (SEARCH_PROVIDERS as Record<string, any>)[id] ??
     (UPSTREAM_PROXY_PROVIDERS as Record<string, any>)[id] ??
-    (CLOUD_AGENT_PROVIDERS as Record<string, any>)[id] ??
     (SYSTEM_PROVIDERS as Record<string, any>)[id] ??
     undefined
   );
@@ -427,7 +423,6 @@ export type AiProviderDefinition =
   | (typeof LOCAL_PROVIDERS)[keyof typeof LOCAL_PROVIDERS]
   | (typeof SEARCH_PROVIDERS)[keyof typeof SEARCH_PROVIDERS]
   | (typeof UPSTREAM_PROXY_PROVIDERS)[keyof typeof UPSTREAM_PROXY_PROVIDERS]
-  | (typeof CLOUD_AGENT_PROVIDERS)[keyof typeof CLOUD_AGENT_PROVIDERS]
   | (typeof SYSTEM_PROVIDERS)[keyof typeof SYSTEM_PROVIDERS];
 
 // Auth methods
@@ -509,6 +504,5 @@ export {
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
-  CLOUD_AGENT_PROVIDERS,
   SYSTEM_PROVIDERS,
 };

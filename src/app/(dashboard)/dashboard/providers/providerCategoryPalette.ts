@@ -12,7 +12,8 @@ import { categoricalSlot, type CategoricalSlot } from "@/shared/utils/categorica
  *   apikey(amber→brown 8) oauth(blue→2) ide(lime→1) audio(rose→pink 5)
  *   upstream-proxy(■4) cloud-agent(■3) webfetch(orange■6) search(■7) no-auth(■8)
  *
- * Append new categories at the end.
+ * Append new categories at the end. `web-cookie` and `cloud-agent` no longer have providers;
+ * they keep their slots so the colours of the categories after them do not move.
  */
 export const PROVIDER_CATEGORY_ORDER = [
   "free",
@@ -34,8 +35,6 @@ export type ProviderCategoryKey = (typeof PROVIDER_CATEGORY_ORDER)[number];
 
 /** The summary card and the page use un-hyphenated keys for some categories. */
 const CATEGORY_ALIASES: Record<string, ProviderCategoryKey> = {
-  webcookie: "web-cookie",
-  cloudagent: "cloud-agent",
   upstreamproxy: "upstream-proxy",
   noauth: "no-auth",
 };

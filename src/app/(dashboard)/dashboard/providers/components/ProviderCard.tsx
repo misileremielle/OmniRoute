@@ -104,7 +104,6 @@ const CARD_DOT_CATEGORIES = new Set([
   "audio",
   "local",
   "upstream-proxy",
-  "cloud-agent",
 ]);
 
 type ProviderMessageTranslator = ((key: string, values?: Record<string, unknown>) => string) & {
@@ -300,14 +299,13 @@ const ProviderCard = forwardRef<ProviderCardHandle, ProviderCardProps>(function 
 
   // Show the Test button for LLM providers (when serviceKinds includes "llm"
   // OR when the provider has no explicit serviceKinds but is a regular LLM provider
-  // i.e. not a search/audio/cloud-agent type).
+  // i.e. not a search/audio type).
   const serviceKinds = provider.serviceKinds ?? [];
   const isLlmProvider =
     serviceKinds.includes("llm") ||
     (serviceKinds.length === 0 &&
       authType !== "search" &&
       authType !== "audio" &&
-      authType !== "cloud-agent" &&
       authType !== "upstream-proxy" &&
       authType !== "no-auth");
 
@@ -399,7 +397,6 @@ const ProviderCard = forwardRef<ProviderCardHandle, ProviderCardProps>(function 
     audio: t("audioProvidersHeading"),
     local: t("localProviders"),
     "upstream-proxy": t("upstreamProxyProviders"),
-    "cloud-agent": t("cloudAgentProviders"),
   };
 
   const staticIconPath = (() => {

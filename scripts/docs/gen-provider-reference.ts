@@ -13,7 +13,6 @@ import {
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
-  CLOUD_AGENT_PROVIDERS,
   SYSTEM_PROVIDERS,
   IMAGE_ONLY_PROVIDER_IDS,
   AGGREGATOR_PROVIDER_IDS,
@@ -174,7 +173,6 @@ function main() {
   const local = asRecords(LOCAL_PROVIDERS);
   const search = asRecords(SEARCH_PROVIDERS);
   const upstreamProxy = asRecords(UPSTREAM_PROXY_PROVIDERS);
-  const cloudAgent = asRecords(CLOUD_AGENT_PROVIDERS);
   const system = asRecords(SYSTEM_PROVIDERS);
 
   const allIds = new Set<string>([
@@ -185,7 +183,6 @@ function main() {
     ...local.map((p) => p.id),
     ...search.map((p) => p.id),
     ...upstreamProxy.map((p) => p.id),
-    ...cloudAgent.map((p) => p.id),
     ...system.map((p) => p.id),
   ]);
 
@@ -197,7 +194,6 @@ function main() {
     buildSection("Local Providers", local, "Local"),
     buildSection("Search Providers", search, "Search"),
     buildSection("Upstream Proxy Providers", upstreamProxy, "Upstream proxy"),
-    buildSection("Cloud Agent Providers", cloudAgent, "Cloud agent"),
     buildSection("System Providers", system, "System"),
   ];
 
@@ -225,7 +221,7 @@ function main() {
     `  Sections: free=${free.length}, noauth=${noauth.length}, oauth=${oauth.length}, ` +
       `apikey=${apiKey.length}, local=${local.length}, ` +
       `search=${search.length}, proxy=${upstreamProxy.length}, ` +
-      `cloud=${cloudAgent.length}, system=${system.length}`
+      `system=${system.length}`
   );
 }
 
