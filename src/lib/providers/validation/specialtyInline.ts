@@ -56,7 +56,7 @@ export async function validateV0VercelProvider({ apiKey, providerSpecificData, i
 //
 // The probe starts the `auggie` binary, so it only runs when this caller may make the host
 // start a process: remote-reachable routes pass `allowLocalSpawn: false` for non-loopback
-// callers (Hard Rules #15/#17); internal callers keep the default.
+// callers (Hard Rules #15/#16); internal callers keep the default.
 export async function validateAuggieProvider({
   allowLocalSpawn = true,
 }: { allowLocalSpawn?: boolean } = {}) {
@@ -112,7 +112,7 @@ export async function validateQoderProvider({
   const key = (apiKey || "").trim();
   if (key.startsWith("pt-")) {
     // The PAT probe runs the local `qodercli`; remote-reachable routes pass
-    // `allowLocalSpawn: false` for non-loopback callers (Hard Rules #15/#17).
+    // `allowLocalSpawn: false` for non-loopback callers (Hard Rules #15/#16).
     if (!allowLocalSpawn) {
       return {
         valid: false,

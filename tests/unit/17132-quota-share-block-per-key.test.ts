@@ -19,7 +19,7 @@
  *
  * TDD: assertions here FAIL before the fix (bare Response → no `.success` /
  * `.errorCode` / `.response`, and the block is classified as provider quota
- * exhaustion). See Hard Rule #18.
+ * exhaustion). See Hard Rule #17.
  */
 
 import test from "node:test";

@@ -53,7 +53,7 @@ alignment signal (we didn't copy a checklist; we converged on the right practice
    counterweights: **mutation testing** (measures whether the test catches the bug, not just
    whether it executes the line), **`check-test-masking`** (blocks weakening asserts to pass),
    **per-module coverage floors** (forces testing HIGH-risk code, not just the easy parts) and
-   **`check-pr-evidence`** (Hard Rule #18).
+   **`check-pr-evidence`** (Hard Rule #17).
 4. **Anti-hallucination / consistency gates.** A rare and valuable category: `check-known-symbols`,
    `check-fetch-targets`, `check-openapi-routes`, `check-docs-symbols` ensure that docs, specs and
    string dispatches point to living symbols. Catches "rot" that lint/test don't.

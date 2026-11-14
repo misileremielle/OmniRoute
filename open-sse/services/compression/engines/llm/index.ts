@@ -12,7 +12,7 @@
  * - `enabled` defaults to `false` in the config schema.
  * A real LLM backend is wired via `setLlmCompressorBackend()` (the same injection seam the
  * tests use). The real production model is intentionally left as a VPS-validated follow-up
- * (Hard Rule #18), exactly as the `llmlingua` worker backend is gated.
+ * (Hard Rule #17), exactly as the `llmlingua` worker backend is gated.
  *
  * ## Fail-open everywhere (never throws, never corrupts)
  * 1. Backend rejection/error per prose segment → segment kept as-is.
@@ -193,7 +193,7 @@ async function processMessages(
 
 const LLM_COMPRESSOR_SCHEMA: EngineConfigField[] = [
   // Default OFF: this tier costs an extra model call and mutates the payload, so it is
-  // opt-in (Hard Rule #20 spirit) — never on by default.
+  // opt-in (Hard Rule #19 spirit) — never on by default.
   { key: "enabled", type: "boolean", label: "Enabled", defaultValue: false },
   { key: "model", type: "string", label: "Compression model", defaultValue: "" },
   {
@@ -224,7 +224,8 @@ function validateLlmCompressorConfig(config: Record<string, unknown>): EngineVal
   }
   if (config["minTokens"] !== undefined) {
     const v = config["minTokens"];
-    if (typeof v !== "number" || Number.isNaN(v) || v < 0) errors.push("minTokens must be a number >= 0");
+    if (typeof v !== "number" || Number.isNaN(v) || v < 0)
+      errors.push("minTokens must be a number >= 0");
   }
   if (config["compressionRate"] !== undefined) {
     const v = config["compressionRate"];

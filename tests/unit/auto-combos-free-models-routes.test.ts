@@ -1,7 +1,7 @@
 /**
  * Unit tests for GET /api/combos/auto and GET /api/free-models (PR #3435).
  *
- * Rule #18 regression coverage for two new endpoints added by mm/auto-combos-plugin.
+ * Rule #17 regression coverage for two new endpoints added by mm/auto-combos-plugin.
  * Tests: happy-path response shape, auth gate (401/403 when requireManagementAuth blocks).
  */
 import test from "node:test";

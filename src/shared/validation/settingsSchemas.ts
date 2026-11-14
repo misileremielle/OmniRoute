@@ -249,7 +249,7 @@ export const updateSettingsSchema = z.object({
   // "provider/model" (or bare "model") ids, or a glob pattern via the shared
   // globToRegex matcher (src/shared/utils/modelExposureList.ts). Independent of
   // hidePaidModels — this is operator curation, not a cost signal. Default
-  // empty arrays = no-op (Hard Rule #20 spirit).
+  // empty arrays = no-op (Hard Rule #19 spirit).
   modelVisibilityAllowlist: z.array(z.string().max(200)).max(500).optional(),
   modelVisibilityDenylist: z.array(z.string().max(200)).max(500).optional(),
   // Subscription-first routing tuning (`auto/subscription`, `auto/thrifty`).
@@ -282,7 +282,7 @@ export const updateSettingsSchema = z.object({
   pinProviderQuotaToHome: z.boolean().optional(),
   showProviderTopologyOnHome: z.boolean().optional(),
   localOnlyManageScopeBypassEnabled: z.boolean().optional(),
-  // Layer 1 of the spawn-capable guard (Hard Rules #15/#17): reject any bypass
+  // Layer 1 of the spawn-capable guard (Hard Rules #15/#16): reject any bypass
   // prefix that overlaps a SPAWN_CAPABLE_PREFIXES path or a
   // SPAWN_CAPABLE_PATTERN_ANCESTORS ancestor (e.g. /api/providers/, the
   // shared ancestor of the dynamic-segment routes in SPAWN_CAPABLE_PATTERNS

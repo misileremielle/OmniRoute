@@ -6,7 +6,7 @@
  * path (`m365.cloud.microsoft/chat` → `wss://substrate.office.com/m365Copilot/
  * Chathub/...`). Keeping these pure lets us unit-test the wire format against the
  * real frame captures contributed in #4042 without opening a live socket — the
- * live round-trip is the separate Rule #18 validation gate for the executor.
+ * live round-trip is the separate Rule #17 validation gate for the executor.
  *
  * Protocol (from @skyzea1's #4042 capture):
  *   - JSON messages terminated with the SignalR record separator `\x1e`.

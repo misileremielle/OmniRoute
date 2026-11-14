@@ -4,7 +4,7 @@
  * Letta configures OmniRoute as its "lmstudio" provider (localModelDiscovery:
  * openai-compatible auto-discovers models from /v1/models). The route shells
  * out to `which letta` to detect the CLI install, so it is classified
- * local-only in routeGuard.ts (Hard Rules #15 + #17) AND guarded by
+ * local-only in routeGuard.ts (Hard Rules #15 + #16) AND guarded by
  * requireCliToolsAuth() like every other cli-tools route
  * (tests/unit/cli-tools-auth-hardening.test.ts).
  */

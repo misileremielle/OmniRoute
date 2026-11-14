@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/check/check-pr-evidence.mjs
-// Gate: Hard Rule #18 — "evidence before assertions".
+// Gate: Hard Rule #17 — "evidence before assertions".
 //
 // When a PR body makes claims about test/validation success (e.g. "tests pass",
 // "all green", "fixed", "added endpoint") it MUST include a block of command
@@ -122,11 +122,11 @@ export function evaluatePrBody(body) {
       (firedStrong.length > 0 ? `  Strong triggers matched: ${firedStrong.join(", ")}\n` : "") +
       (firedWeak.length >= 2 ? `  Weak triggers matched (≥2): ${firedWeak.join(", ")}\n` : "") +
       "\n" +
-      "Hard Rule #18 requires proof that the fix works:\n" +
+      "Hard Rule #17 requires proof that the fix works:\n" +
       "  a) Add a fenced code block (```) containing test-runner or command output, OR\n" +
       "  b) Add a section headed '## Evidence', '## Validation', '## Test output', etc., OR\n" +
       "  c) Add an inline code span with a result token (e.g. `42 passing`, `PASSED`).\n" +
-      "See CLAUDE.md → Hard Rule #18.",
+      "See CLAUDE.md → Hard Rule #17.",
   };
 }
 

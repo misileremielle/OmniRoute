@@ -5,7 +5,7 @@ import { friendliaiProvider } from "../../open-sse/config/providers/registry/fri
 import { novitaProvider } from "../../open-sse/config/providers/registry/novita/index.ts";
 
 // These guards lock in two registry endpoint fixes validated live with real provider keys
-// (Hard Rule #18 — real-environment test recorded in the PR):
+// (Hard Rule #17 — real-environment test recorded in the PR):
 //   - FriendliAI: a serverless `flp_*` token gets 403 Forbidden on the /dedicated path; the
 //     /serverless path serves it. (#5430)
 //   - Novita: the legacy /v3 base + the typo'd `ai-ai/…` model id both 404; /openai/v1 + the

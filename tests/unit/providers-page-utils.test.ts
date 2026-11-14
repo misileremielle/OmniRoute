@@ -957,7 +957,7 @@ test("model search filter is case-insensitive and partial-match", () => {
 // #4613: buildCompatibleProviderGroups partitions provider nodes into the
 // openai-compatible / anthropic-compatible / claude-code-compatible buckets the
 // providers page renders. The memoization in page.tsx wraps this pure helper, so
-// guarding the partition logic here is the regression that matters (Rule #18).
+// guarding the partition logic here is the regression that matters (Rule #17).
 test("buildCompatibleProviderGroups partitions nodes by type + claude-code prefix", () => {
   const labels = {
     openaiCompatibleName: "OpenAI-compatible",

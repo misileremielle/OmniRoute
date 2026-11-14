@@ -1,5 +1,5 @@
 /**
- * Hard Rules #15 + #17 — filesystem sweep of the spawn-capable route surface.
+ * Hard Rules #15 + #16 — filesystem sweep of the spawn-capable route surface.
  *
  * Routes that spawn child processes (`npm install`, `node`, MCP stdio bridges,
  * embedded-service UIs) MUST be classified LOCAL_ONLY by `isLocalOnlyPath()` in
@@ -39,7 +39,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../
 
 /** Hard Rule #15 (`/api/mcp/`, `/api/cli-tools/runtime/`) + #17 (`/api/services/`) API roots. */
 const API_ROOTS = ["src/app/api/mcp", "src/app/api/cli-tools/runtime", "src/app/api/services"];
-/** Hard Rule #17 dashboard root; only its `<name>/embed/**` subtree is in scope. */
+/** Hard Rule #16 dashboard root; only its `<name>/embed/**` subtree is in scope. */
 const EMBED_PARENT = "src/app/(dashboard)/dashboard/providers/services";
 
 /**
@@ -156,7 +156,7 @@ test("every mcp / cli-tools runtime / services / embed route is LOCAL_ONLY for e
     misses,
     [],
     "spawn-capable route(s) NOT classified local-only — add a prefix/pattern in " +
-      "src/server/authz/routeGuard.ts (Hard Rules #15/#17)"
+      "src/server/authz/routeGuard.ts (Hard Rules #15/#16)"
   );
 });
 
@@ -214,7 +214,7 @@ test("the manage-scope carve-out can never cover the subprocess-spawning roots",
   }
 });
 
-test("the route-guard-membership gate walks the same Hard Rule #15/#17 API roots", () => {
+test("the route-guard-membership gate walks the same Hard Rule #15/#16 API roots", () => {
   for (const root of API_ROOTS) {
     assert.ok(
       SPAWN_CAPABLE_ROUTE_ROOTS.includes(root),
@@ -258,6 +258,6 @@ test("every src/app/api file that spawns a process directly is owned by a LOCAL_
   assert.deepEqual(
     unclassified,
     [],
-    "direct spawn in a route NOT classified local-only (Hard Rules #15/#17)"
+    "direct spawn in a route NOT classified local-only (Hard Rules #15/#16)"
   );
 });

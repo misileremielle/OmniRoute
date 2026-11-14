@@ -3,7 +3,7 @@
 @AGENTS.md
 
 **All project rules live in [`AGENTS.md`](AGENTS.md)** — the single source of truth for every AI
-assistant (architecture, conventions, testing, quality gates, git workflow, the 23 Hard Rules,
+assistant (architecture, conventions, testing, quality gates, git workflow, the 22 Hard Rules,
 PII learnings). Read it in full; do not re-add project rules here. Everything below applies ONLY
 to Claude Code — operational refinements of rules already defined in `AGENTS.md`.
 
@@ -14,7 +14,7 @@ path, `cp -al` node_modules, teardown rules) is in
 [`docs/ops/WORKTREE_ISOLATION.md`](docs/ops/WORKTREE_ISOLATION.md) (summarized in `AGENTS.md` →
 Git Workflow → "Worktree isolation"). Claude-Code-specific points:
 
-- Confirm the base branch with the operator via `AskUserQuestion` (Hard Rule #19) unless they
+- Confirm the base branch with the operator via `AskUserQuestion` (Hard Rule #18) unless they
   already told you.
 - Prefer the native `EnterWorktree` tool — it already creates worktrees under
   `.claude/worktrees/` (the canonical path). Create the worktree with the documented `git
@@ -22,14 +22,14 @@ worktree add` command, then call `EnterWorktree` with its `path`.
 
 ## Cross-session safety — Claude Code specifics
 
-Hard Rules #19/#21/#22 (in `AGENTS.md`) govern parallel sessions. Operational reminders for this
+Hard Rules #18/#20/#21 (in `AGENTS.md`) govern parallel sessions. Operational reminders for this
 harness:
 
 - **Replicate the `git stash` ban verbatim in the prompt of every subagent that touches git**
   (Agent tool / Workflow scripts) — subagents do not inherit this file, and the recorded
   recurrence of the stash incident came through a subagent.
 - Before merging or pushing to any PR you did not create _this session_, run `git worktree list`
-  and re-check `gh pr view <N> --json state,headRefOid` (Hard Rule #22b).
+  and re-check `gh pr view <N> --json state,headRefOid` (Hard Rule #21b).
 - End every session with the main checkout on the branch it started on.
 
 ## Superpowers / planning artifacts — path overrides
@@ -59,7 +59,7 @@ otherwise put in `/tmp` — to `/home/diegosouzapw/dev/proxys/OmniRoute/_artifac
 - Reason: keeping scratch output inside the project (vs `/tmp`) makes it trivial for the operator
   to find and delete everything temporary in one place, instead of hunting across ephemeral
   session-specific `/tmp` directories that vanish or accumulate untracked.
-- Do **not** confuse this with `_tasks/` (Hard Rule #23, its own private git repo for durable
+- Do **not** confuse this with `_tasks/` (Hard Rule #22, its own private git repo for durable
   plans/specs/research/hand-offs) — `_artifacts/` is for disposable working files only, nothing
   here needs to survive or be versioned.
 

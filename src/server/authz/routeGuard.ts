@@ -34,12 +34,12 @@ const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
   "/api/mcp/",
   "/api/cli-tools/runtime/",
-  "/api/cli-tools/omp-settings", // spawns `which omp` to detect the CLI install (Hard Rules #15 + #17, #6318)
-  "/api/cli-tools/letta-settings", // spawns `which letta` to detect the CLI install (Hard Rules #15 + #17, #6318)
-  "/api/cli-tools/grok-build-settings", // GET calls getCliRuntimeStatus("grok-build"), which spawns a child process to locate + healthcheck the `grok` binary — same transitive-spawn surface that classified /api/skills/collect/ (Hard Rules #15 + #17). Writing ~/.grok/config.toml is inherently a local-machine operation, so loopback-only costs no real capability.
-  "/api/cli-tools/forge-settings", // spawns via getCliRuntimeStatus() to detect the `forge` CLI install (Hard Rules #15 + #17, #7263)
-  "/api/cli-tools/jcode-settings", // spawns via getCliRuntimeStatus() to detect the `jcode` CLI install (Hard Rules #15 + #17, #7263)
-  "/api/cli-tools/qwen-settings", // GET probes the local `qwen` binary; writes target ~/.qwen config files (Hard Rules #15 + #17)
+  "/api/cli-tools/omp-settings", // spawns `which omp` to detect the CLI install (Hard Rules #15 + #16, #6318)
+  "/api/cli-tools/letta-settings", // spawns `which letta` to detect the CLI install (Hard Rules #15 + #16, #6318)
+  "/api/cli-tools/grok-build-settings", // GET calls getCliRuntimeStatus("grok-build"), which spawns a child process to locate + healthcheck the `grok` binary — same transitive-spawn surface that classified /api/skills/collect/ (Hard Rules #15 + #16). Writing ~/.grok/config.toml is inherently a local-machine operation, so loopback-only costs no real capability.
+  "/api/cli-tools/forge-settings", // spawns via getCliRuntimeStatus() to detect the `forge` CLI install (Hard Rules #15 + #16, #7263)
+  "/api/cli-tools/jcode-settings", // spawns via getCliRuntimeStatus() to detect the `jcode` CLI install (Hard Rules #15 + #16, #7263)
+  "/api/cli-tools/qwen-settings", // GET probes the local `qwen` binary; writes target ~/.qwen config files (Hard Rules #15 + #16)
   // GHSA-35fw-cv32-2373: the 14 cli-tools routes below reach the SAME spawn as their six
   // gated siblings above — getCliRuntimeStatus() -> locateCommand() -> runProcess("sh", -c
   // 'command -v -- "$1"') -> spawn() — but sat on Tier 3 MANAGEMENT only, which
@@ -47,46 +47,46 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
   // Exact entries on purpose: a blanket "/api/cli-tools/" prefix would also lock the
   // non-spawning apply/backups/config/guide-settings/hermes-agent-settings/keys/logs/
   // openclaw/auto-order routes that tunnel-served dashboards legitimately use.
-  "/api/cli-tools/all-statuses", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/claude-settings", // spawns via getCliRuntimeStatus() to detect the `claude` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/cline-settings", // spawns via getCliRuntimeStatus() to detect the `cline` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/codewhale-settings", // spawns via getCliRuntimeStatus() to detect the `codewhale` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/codex-settings", // spawns via getCliRuntimeStatus() to detect the `codex` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/crush-settings", // spawns via getCliRuntimeStatus() to detect the `crush` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/deepseek-tui-settings", // spawns via getCliRuntimeStatus() to detect the `deepseek-tui` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/detect", // GET calls detectAllTools() -> execFile(binary, --version) + execFile("which") per tool (src/lib/cli-helper/tool-detector.ts) (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/droid-settings", // spawns via getCliRuntimeStatus() to detect the `droid` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/kilo-settings", // spawns via getCliRuntimeStatus() to detect the `kilo` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/openclaw-settings", // spawns via getCliRuntimeStatus() to detect the `openclaw` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373). Does NOT cover the non-spawning sibling /api/cli-tools/openclaw/auto-order (different segment).
-  "/api/providers/devin-cli-agentic/auth-status", // GET spawns `devin auth status` via getDevinAgenticAuthStatus() (src/lib/providers/devinAgenticAuthStatus.ts) — RCE-via-tunnel surface (Hard Rules #15 + #17, #15446). Narrow-scoped like /api/providers/cursor/agent-availability.
-  "/api/cli-tools/pi-settings", // spawns via getCliRuntimeStatus() to detect the `pi` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/smelt-settings", // spawns via getCliRuntimeStatus() to detect the `smelt` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/whycodes-settings", // spawns via getCliRuntimeStatus() to detect the `whycodes` CLI install (Hard Rules #15 + #17, #14107)
+  "/api/cli-tools/all-statuses", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/claude-settings", // spawns via getCliRuntimeStatus() to detect the `claude` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/cline-settings", // spawns via getCliRuntimeStatus() to detect the `cline` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/codewhale-settings", // spawns via getCliRuntimeStatus() to detect the `codewhale` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/codex-settings", // spawns via getCliRuntimeStatus() to detect the `codex` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/crush-settings", // spawns via getCliRuntimeStatus() to detect the `crush` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/deepseek-tui-settings", // spawns via getCliRuntimeStatus() to detect the `deepseek-tui` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/detect", // GET calls detectAllTools() -> execFile(binary, --version) + execFile("which") per tool (src/lib/cli-helper/tool-detector.ts) (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/droid-settings", // spawns via getCliRuntimeStatus() to detect the `droid` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/kilo-settings", // spawns via getCliRuntimeStatus() to detect the `kilo` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/openclaw-settings", // spawns via getCliRuntimeStatus() to detect the `openclaw` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373). Does NOT cover the non-spawning sibling /api/cli-tools/openclaw/auto-order (different segment).
+  "/api/providers/devin-cli-agentic/auth-status", // GET spawns `devin auth status` via getDevinAgenticAuthStatus() (src/lib/providers/devinAgenticAuthStatus.ts) — RCE-via-tunnel surface (Hard Rules #15 + #16, #15446). Narrow-scoped like /api/providers/cursor/agent-availability.
+  "/api/cli-tools/pi-settings", // spawns via getCliRuntimeStatus() to detect the `pi` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/smelt-settings", // spawns via getCliRuntimeStatus() to detect the `smelt` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "/api/cli-tools/whycodes-settings", // spawns via getCliRuntimeStatus() to detect the `whycodes` CLI install (Hard Rules #15 + #16, #14107)
   "/api/services/", // T-10: embedded service lifecycle (spawn child processes)
-  "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary, the same work as /api/services/cliproxy/ (Hard Rules #15 + #17); read-only GETs exempted below
+  "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary, the same work as /api/services/cliproxy/ (Hard Rules #15 + #16); read-only GETs exempted below
   "/dashboard/providers/services/", // T-07: reverse proxy to embedded service UIs
   "/api/copilot/", // unauthenticated LLM driver — CLI-only by default; admins can opt-in to remote access via manage-scope bypass
   "/api/issue-agent/", // Issue Agent: recorded/local triage executor surface; keep loopback/LAN until sandbox + audit hardening is complete
-  "/api/middleware/", // SECURITY_AUDIT M8: middleware hooks compile+run arbitrary JS via new vm.Script (src/lib/middleware/registry.ts) on the request hot path — same code-exec class as /api/plugins/, so loopback-gate it for parity (Hard Rules #15 + #17)
-  "/api/system/version", // auto-update: spawns git checkout + npm install — RCE-via-tunnel surface (Hard Rules #15 + #17, found by 6A.8 route-guard gate)
-  "/api/db-backups/exportAll", // spawns tar for export archive (Hard Rules #15 + #17, found by 6A.8 route-guard gate)
-  "/api/db/health", // runManagedDbHealthCheck() forks native diagnostics into a child process via healthCheckRunner.ts (Hard Rules #15 + #17, #13717)
-  "/api/local/", // T-12: 1-click local service launchers (Redis today; spawns podman/docker) — loopback-enforced by isLocalRequestAllowed() in src/lib/security/localEndpoints.ts (Hard Rules #15 + #17)
-  "/api/headroom/start", // Headroom token-saver proxy lifecycle: spawns headroom-ai python CLI (Hard Rules #15 + #17)
-  "/api/headroom/stop", // Headroom token-saver proxy lifecycle: sends SIGTERM/SIGKILL to managed PID (Hard Rules #15 + #17)
-  "/api/jobs", // JobRegistry control (enable/disable/run-now) + run history - runtime job administration, loopback-only (Hard Rules #15 + #17)
+  "/api/middleware/", // SECURITY_AUDIT M8: middleware hooks compile+run arbitrary JS via new vm.Script (src/lib/middleware/registry.ts) on the request hot path — same code-exec class as /api/plugins/, so loopback-gate it for parity (Hard Rules #15 + #16)
+  "/api/system/version", // auto-update: spawns git checkout + npm install — RCE-via-tunnel surface (Hard Rules #15 + #16, found by 6A.8 route-guard gate)
+  "/api/db-backups/exportAll", // spawns tar for export archive (Hard Rules #15 + #16, found by 6A.8 route-guard gate)
+  "/api/db/health", // runManagedDbHealthCheck() forks native diagnostics into a child process via healthCheckRunner.ts (Hard Rules #15 + #16, #13717)
+  "/api/local/", // T-12: 1-click local service launchers (Redis today; spawns podman/docker) — loopback-enforced by isLocalRequestAllowed() in src/lib/security/localEndpoints.ts (Hard Rules #15 + #16)
+  "/api/headroom/start", // Headroom token-saver proxy lifecycle: spawns headroom-ai python CLI (Hard Rules #15 + #16)
+  "/api/headroom/stop", // Headroom token-saver proxy lifecycle: sends SIGTERM/SIGKILL to managed PID (Hard Rules #15 + #16)
+  "/api/jobs", // JobRegistry control (enable/disable/run-now) + run history - runtime job administration, loopback-only (Hard Rules #15 + #16)
   "/api/jobs/", // sub-paths: /api/jobs/:id/{runs,enable,disable,run-now} (the bare `/api/jobs` above matches the list route; this matches children)
-  "/api/oauth/cursor/auto-import", // spawns execFile("which", argv-array-of-one-arg "cursor") to verify a local Cursor install before importing creds — RCE-via-tunnel surface (Hard Rules #15 + #17, found by 6A.8 route-guard gate). Specific path only: the rest of /api/oauth/ (browser redirect/callback flows) must stay remote-reachable. Note: this comment intentionally avoids a literal closing square bracket character — check-openapi-security-tiers.mjs's naive regex parser for this array stops at the first one it finds, silently truncating its view of every entry after this one.
+  "/api/oauth/cursor/auto-import", // spawns execFile("which", argv-array-of-one-arg "cursor") to verify a local Cursor install before importing creds — RCE-via-tunnel surface (Hard Rules #15 + #16, found by 6A.8 route-guard gate). Specific path only: the rest of /api/oauth/ (browser redirect/callback flows) must stay remote-reachable. Note: this comment intentionally avoids a literal closing square bracket character — check-openapi-security-tiers.mjs's naive regex parser for this array stops at the first one it finds, silently truncating its view of every entry after this one.
   "/api/oauth/kiro/auto-import", // reads host-local Kiro credential files (homedir kiro-cli data) — must reach the loopback-only gate, not the PUBLIC /api/oauth/ prefix (GHSA-wgwc-crjm-pmwv, GHSA-gxv4-955v-v6cm). Excluded from PUBLIC in publicApiRoutes.ts.
   "/api/skills/collect/", // Chaos Mode dispatch: fans a task out across providers — the exact public entry in publicApiRoutes.ts covers the Bearer-authenticated POST; everything else under this prefix stays loopback-only
   "/api/discovery/", // Discovery tool (opt-in provider scanner): the scan route makes outbound probes to provider endpoints (SSRF-adjacent) and the whole surface is an admin research tool — strict-loopback only, no manage-scope bypass (NOT in LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES). See _tasks/features-v3.8.42/gaps/DISCOVERY_TOOL_DESIGN.md.
-  VNC_ROUTE_PREFIX, // #7892: /api/vnc-session/* spawns Docker containers via child_process.spawn (src/lib/vncSession/service.ts) — RCE-via-tunnel surface (Hard Rules #15 + #17), same CVE class (GHSA-fhh6-4qxv-rpqj).
+  VNC_ROUTE_PREFIX, // #7892: /api/vnc-session/* spawns Docker containers via child_process.spawn (src/lib/vncSession/service.ts) — RCE-via-tunnel surface (Hard Rules #15 + #16), same CVE class (GHSA-fhh6-4qxv-rpqj).
   "/api/resilience/connections", // Per-account resilience state. NOTE: prefix matching also gates future /api/resilience/connections-* paths.
   // Dashboard HTML stays out of this list: a reverse proxy is not loopback, so
   // gating the page logged the session out. The JSON API above stays local-only.
-  "/api/providers/agy-auth/apply-local", // spawns `secret-tool` through detectLocalAgyTokenRaw() and reads host-local token files (Hard Rules #15 + #17). Exact entry on purpose: the sibling import, import-bulk and zip-extract routes only parse what the request carries, and tunnel-served dashboards use them.
-  "/api/providers/cursor/agent-availability", // credential-free dashboard-nudge check: spawns `cursor-agent status --format json` via checkCursorAgentAvailability()/getCachedCursorAgentAvailability() (src/lib/cursor/renewal.ts) — RCE-via-tunnel surface (Hard Rules #15 + #17). Narrow-scoped like /login and /refresh-cursor, not the whole /api/providers/ tree. Placed under /api/providers/ rather than /api/oauth/ because /api/oauth/ is PUBLIC-classified and never reaches this LOCAL_ONLY gate.
+  "/api/providers/agy-auth/apply-local", // spawns `secret-tool` through detectLocalAgyTokenRaw() and reads host-local token files (Hard Rules #15 + #16). Exact entry on purpose: the sibling import, import-bulk and zip-extract routes only parse what the request carries, and tunnel-served dashboards use them.
+  "/api/providers/cursor/agent-availability", // credential-free dashboard-nudge check: spawns `cursor-agent status --format json` via checkCursorAgentAvailability()/getCachedCursorAgentAvailability() (src/lib/cursor/renewal.ts) — RCE-via-tunnel surface (Hard Rules #15 + #16). Narrow-scoped like /login and /refresh-cursor, not the whole /api/providers/ tree. Placed under /api/providers/ rather than /api/oauth/ because /api/oauth/ is PUBLIC-classified and never reaches this LOCAL_ONLY gate.
 ];
 
 /**
@@ -102,12 +102,12 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
  *
  *   - `POST /api/providers/{id}/login` launches a headful Playwright Chromium
  *     (a child process) to drive a web-cookie login. Loopback enforcement must
- *     happen unconditionally before any auth check (Hard Rules #15 + #17), so a
+ *     happen unconditionally before any auth check (Hard Rules #15 + #16), so a
  *     leaked JWT via tunnel cannot trigger a browser spawn.
  *   - `POST /api/providers/{id}/refresh-cursor` nudges `cursor-agent`
  *     (`--list-models`/`status`, via `src/lib/cursor/renewal.ts`) as part of
  *     a manual Cursor session renewal attempt — the same RCE-via-tunnel
- *     surface (Hard Rules #15 + #17). The rest of `/api/providers/`,
+ *     surface (Hard Rules #15 + #16). The rest of `/api/providers/`,
  *     including the generic `/refresh` route, intentionally stays
  *     remote-reachable — only this Cursor-specific spawn-capable path is
  *     gated, matching the `/login` precedent's narrow-scoping rationale.
@@ -119,7 +119,7 @@ export const LOCAL_ONLY_API_PATTERNS: ReadonlyArray<RegExp> = [
   /^\/api\/providers\/[^/]+\/chatgpt-web-codex-doctor\/?$/,
   // S-01 (#15159): spawn(bin, ["acp", "--agent-type", "summarizer"], …) in
   // src/lib/providers/validation/webProvidersB.ts:535 — fixed binary list + fixed argv (not
-  // caller-controlled RCE) but Hard Rules #15 + #17 still require loopback enforcement before
+  // caller-controlled RCE) but Hard Rules #15 + #16 still require loopback enforcement before
   // any auth check.
   //
   // S-01 (#15159): spawn-capable branch of /api/providers/{validate,import,bulk} is
@@ -350,13 +350,13 @@ export function isPrivateLanHost(hostHeader: string | null): boolean {
  * Current exemptions:
  *   /api/system/version — GET reads package.json + npm registry; only POST
  *   triggers the auto-update flow (spawns git checkout + npm install + pm2).
- *   Hard Rules #15/#17 still apply to POST.
+ *   Hard Rules #15/#16 still apply to POST.
  *   /api/services/cliproxy/status — GET returns lifecycle/version metadata only;
  *   its latest-version lookup is an HTTPS release query, never a child process.
  *   Lifecycle mutations remain LOCAL_ONLY through the parent /api/services/
  *   prefix. The other service status routes are deliberately NOT exempt:
  *   bifrost/dario/mux/openwa call `getLatestVersion()` → `npm view` (execFile) on
- *   a cache miss, which a remote caller must never trigger (Hard Rules #15/#17),
+ *   a cache miss, which a remote caller must never trigger (Hard Rules #15/#16),
  *   and 9router also supports `?reveal=key` (plaintext service credential).
  */
 export const LOCAL_ONLY_API_GET_EXEMPTIONS: ReadonlySet<string> = new Set([

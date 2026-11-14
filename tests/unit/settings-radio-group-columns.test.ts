@@ -60,14 +60,13 @@ test("card radio groups in settings never use the horizontal flex row", () => {
 
 // The groups that used to be 2–5 column grids before the kit migration, keyed by the
 // expression that names them, with the column count of the old grid at its widest.
+// (Upstream also lists two MemorySkillsTab.tsx groups; this fork removed memory/skills.)
 const EXPECTED_COLUMNS: Record<string, number> = {
   'AppearanceTab.tsx t("themeSelectionAria")': 3,
   'AppearanceTab.tsx t("paletteSelectionAria")': 2,
   'AppearanceTab.tsx getSettingsLabel("comboConfigMode"': 2,
   'AutoDisableCard.tsx "auto-disable-banned-scope"': 2,
   'IPFilterSection.tsx t("ipAccessMode")': 4,
-  'MemorySkillsTab.tsx t("strategy")': 3,
-  'MemorySkillsTab.tsx t("memorySkillsActiveSkillsProvider")': 2,
   'RoutingTab.tsx t("routingDefaultAutoVariant")': 3,
   'SidebarTab.tsx getSettingsLabel("sidebarPresets"': 5,
   'ThinkingBudgetTab.tsx t("thinkingBudgetTitle")': 2,

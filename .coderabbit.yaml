@@ -104,12 +104,12 @@ reviews:
         mode: warning
         instructions: >-
           If production code under src/, open-sse/, electron/ or bin/ changes, the PR must add or
-          update tests (AGENTS.md Hard Rules #8 and #18).
+          update tests (AGENTS.md Hard Rules #8 and #17).
       - name: "No AI attribution"
         mode: warning
         instructions: >-
           Commits and the PR body must not carry a Co-Authored-By trailer naming an AI assistant
-          or bot, nor a "Generated with <AI tool>" footer (AGENTS.md Hard Rule #16). Human
+          or bot, nor a "Generated with <AI tool>" footer (enforced by `check:ai-attribution`). Human
           co-authors are fine.
   tools:
     # CI's lint applies the frozen suppressions in config/quality/eslint-suppressions.json;

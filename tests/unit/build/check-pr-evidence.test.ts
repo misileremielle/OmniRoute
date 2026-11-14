@@ -81,7 +81,7 @@ test("evaluatePrBody: 'all tests pass' with no evidence => fail", () => {
   const body = "Fixed the bug. All tests pass and I added a new endpoint.";
   const { result, reason } = evaluatePrBody(body);
   assert.equal(result, "fail");
-  assert.ok(reason.includes("Rule #18"), `reason should mention Rule #18, got: ${reason}`);
+  assert.ok(reason.includes("Rule #17"), `reason should mention Rule #17, got: ${reason}`);
 });
 
 test("evaluatePrBody: 'typecheck is clean' with no evidence => fail", () => {

@@ -11,7 +11,7 @@
 //   - quality-metrics.json — saída do collect-metrics.mjs (gerado, não-versionado)
 //   - symlinks rastreados (mode 120000) — indício de `git add -A` em worktree
 //   - _tasks (exato E prefixo) — repo git SEPARADO; o blob symlink rastreado causou DOIS
-//     wipes do diretório real (2026-08-08 e 2026-08-10; Hard Rule #23)
+//     wipes do diretório real (2026-08-08 e 2026-08-10; Hard Rule #22)
 //   - _references/ _mono_repo/ _ideia/ _cache/ — diretórios privados de raiz (regra /_*/)
 //   - .claude/worktrees/ — worktrees de sessão nunca entram no repo
 //   - docs/superpowers/ — artefatos de planejamento vivem em _tasks/, não em docs/
@@ -29,7 +29,7 @@ const FORBIDDEN_PREFIXES = [
   "coverage/",
   // "_" na raiz é GENÉRICO (regra abaixo em checkTrackedArtifacts): _tasks/, _references/,
   // _mono_repo/, _ideia/, _cache/ e qualquer _<novo>/ futuro — dirs privados, alguns com
-  // repo git próprio (_tasks). Nunca rastrear nada dentro deles (Hard Rule #23).
+  // repo git próprio (_tasks). Nunca rastrear nada dentro deles (Hard Rule #22).
   ".claude/worktrees/",
   "docs/superpowers/",
   ".eslintcache", // matches .eslintcache, .eslintcache-complexity, .eslintcache-probe, …

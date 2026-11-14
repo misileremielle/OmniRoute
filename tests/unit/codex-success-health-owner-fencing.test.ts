@@ -53,7 +53,8 @@ for (const change of ["none", "owner", "failure"] as const) {
       harness.buildRequest({
         url: "http://localhost/v1/responses",
         headers: { "x-omniroute-connection-id": connection.id },
-        body: { model: "codex/gpt-5.6-sol", input: "offline health owner race", stream: false },
+        // Not a -sol/-astra model: this fork's codexPlanModelGate skips plan-less accounts for those.
+        body: { model: "codex/gpt-5.5", input: "offline health owner race", stream: false },
       })
     );
     await Promise.race([
@@ -79,7 +80,7 @@ for (const change of ["none", "owner", "failure"] as const) {
         id: "resp_health",
         object: "response",
         status: "completed",
-        model: "gpt-5.6-sol",
+        model: "gpt-5.5",
         output: [
           {
             id: "msg_health",

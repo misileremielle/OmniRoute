@@ -280,7 +280,7 @@ function normalizeAuthzBypass(settings: Record<string, unknown>): AuthzBypassSna
         new Set(
           rawPrefixes
             .map((entry) => (typeof entry === "string" ? entry.trim() : ""))
-            // Defence-in-depth (Hard Rules #15/#17): the settings PATCH schema already
+            // Defence-in-depth (Hard Rules #15/#16): the settings PATCH schema already
             // refuses spawn-capable prefixes, but other write paths (legacy JSON import,
             // full DB restore, hand-edited rows) bypass that schema. Never let one of
             // them become a live bypass entry.

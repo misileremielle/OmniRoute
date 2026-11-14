@@ -9,6 +9,10 @@ process.env.DATA_DIR = dataDir;
 const core = await import("../../src/lib/db/core.ts");
 const providers = await import("../../src/lib/db/providers.ts");
 const { handleChatCore } = await import("../../open-sse/handlers/chatCore.ts");
+// Registers the fenced Codex refresh writer, as src/instrumentation-node.ts does at boot. This
+// fork's chatCore import chain no longer loads it, and an unregistered writer fails every
+// persist as stale.
+await import("../../src/sse/services/tokenRefresh.ts");
 const { _clearTokenRotationMap } =
   await import("../../open-sse/services/tokenRefresh/rotationMap.ts");
 const originalFetch = globalThis.fetch;

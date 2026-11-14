@@ -1,5 +1,5 @@
 /**
- * #7819 (Level 2) — mandatory regression guard (CLAUDE.md hard rule #18 /
+ * #7819 (Level 2) — mandatory regression guard (CLAUDE.md hard rule #17 /
  * acceptance criterion "Users with no overrides see behavior byte-identical
  * to today"): the `auto/*` candidate pool built by
  * `virtualFactory.createVirtualAutoCombo` must be UNCHANGED when

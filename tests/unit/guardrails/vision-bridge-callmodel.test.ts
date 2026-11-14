@@ -1,5 +1,5 @@
 /**
- * callVisionModel fallback behavior — Integration test (PR #3377, Rule #18)
+ * callVisionModel fallback behavior — Integration test (PR #3377, Rule #17)
  *
  * Verifies that when the primary vision model fails, callVisionModel falls
  * through to the next model in the fallback list, and that when ALL models

@@ -237,10 +237,10 @@ test("isLocalOnlyBypassableByManageScope: /api/services/* is NOT bypassable (spa
   assert.equal(isLocalOnlyBypassableByManageScope("/api/services/"), false);
 });
 
-// Hard Rule #17 — Mux (coder/mux) embedded service (spawns child processes via
+// Hard Rule #16 — Mux (coder/mux) embedded service (spawns child processes via
 // runNpm install + node server spawn): every /api/services/mux/* route MUST be
 // classified local-only, same as every other embedded service under this prefix.
-test("isLocalOnlyPath: /api/services/mux/* is local-only (Hard Rule #17)", () => {
+test("isLocalOnlyPath: /api/services/mux/* is local-only (Hard Rule #16)", () => {
   assert.equal(isLocalOnlyPath("/api/services/mux/install"), true);
   assert.equal(isLocalOnlyPath("/api/services/mux/start"), true);
   assert.equal(isLocalOnlyPath("/api/services/mux/stop"), true);

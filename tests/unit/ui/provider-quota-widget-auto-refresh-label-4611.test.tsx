@@ -3,7 +3,7 @@
 // #4611: the auto-refresh countdown label on ProviderQuotaWidget's refresh
 // button. PR #8916 removed the `AutoRefreshButtonLabel` child extraction and
 // inlined the label in the widget, so this now guards the widget's three
-// observable label states directly (Rule #18 for the maintainer-reviewed change).
+// observable label states directly (Rule #17 for the maintainer-reviewed change).
 import React from "react";
 import { act } from "react";
 import { createRoot } from "react-dom/client";

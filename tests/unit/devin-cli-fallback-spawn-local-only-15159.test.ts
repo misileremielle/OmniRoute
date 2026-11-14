@@ -13,7 +13,7 @@
 // PR #15242 gated POST /api/providers/{id}/login, /refresh-cursor, /validate,
 // /import and /bulk. It did NOT gate /api/providers/{id}/test, which reaches the
 // same spawn through the same validator — so a leaked JWT via tunnel could still
-// trigger process spawning, which Hard Rules #15 and #17 forbid.
+// trigger process spawning, which Hard Rules #15 and #16 forbid.
 //
 // The fix threads an `allowLocalSpawn` flag down from the route (derived from the
 // trusted peer-locality header, exactly like the existing `allowLocalRuntimeProbe`
@@ -125,7 +125,7 @@ test("S-01: validateProviderApiKey does not spawn the Devin CLI when allowLocalS
     assert.equal(
       fs.existsSync(marker),
       false,
-      "the Devin CLI must NOT be spawned for a non-loopback caller (Hard Rules #15/#17)"
+      "the Devin CLI must NOT be spawned for a non-loopback caller (Hard Rules #15/#16)"
     );
     assert.equal(result.valid, false);
   } finally {

@@ -32,7 +32,7 @@ test("isLocalOnlyPath: /api/local* does NOT match the bare /api/localifications 
 test("isLocalOnlyPath: /api/oauth/cursor/auto-import is local-only (spawns child process)", () => {
   // The Cursor auto-import route runs `execFile("which", ["cursor"])` to verify a
   // local Cursor install before importing its credentials — a child-process spawn
-  // that must be loopback-enforced BEFORE any auth check (Hard Rules #15/#17), so a
+  // that must be loopback-enforced BEFORE any auth check (Hard Rules #15/#16), so a
   // leaked JWT via tunnel cannot reach the spawn. Found by check:route-guard-membership.
   assert.equal(isLocalOnlyPath("/api/oauth/cursor/auto-import"), true);
 });

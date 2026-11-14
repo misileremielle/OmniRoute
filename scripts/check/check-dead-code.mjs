@@ -178,6 +178,24 @@ export function resolveKnipBin(opts = {}) {
 }
 
 /**
+ * knip loads the project's Next config, and plugins in it can log to stdout before the
+ * report. The JSON reporter writes the
+ * report as the last line, so a leading log line must not make the run look unparseable.
+ *
+ * @param {string} stdout - raw knip stdout
+ * @returns {string} the JSON document, or the trimmed text when no line looks like one
+ */
+export function extractKnipJson(stdout) {
+  const text = typeof stdout === "string" ? stdout.trim() : "";
+  if (!text || text.startsWith("{")) return text;
+  const lines = text.split("\n");
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].trimStart().startsWith("{")) return lines.slice(i).join("\n").trim();
+  }
+  return text;
+}
+
+/**
  * Parse knip's `--reporter json` stdout.
  *
  * knip >= 6.44 loads `next.config.*`, and ours calls fumadocs-mdx `createMDX()`,

@@ -70,7 +70,7 @@ lastUpdated: 2026-10-18
 2. Register the service in `src/lib/services/bootstrap.ts` (add to `SERVICES[]` array and extend `buildSpawnArgsFactory()`).
 3. Add a DB seed row for the new service in `src/lib/db/migrations/` (`version_manager` table, `status='not_installed'`, `auto_start=0`).
 4. Create 8 API endpoints under `src/app/api/services/{name}/` (`_lib.ts`, `install`, `start`, `stop`, `restart`, `update`, `status`, `auto-start`, `auto-restart-adopted`). All delegate errors through `createErrorResponse()`. The shared `logs` endpoint is already wired via `[name]/logs/route.ts`.
-5. Verify `/api/services/` is in `LOCAL_ONLY_API_PREFIXES` in `src/server/authz/routeGuard.ts`; add a test asserting `isLocalOnlyPath()` returns `true` for the new prefix if you add one (hard rule #17).
+5. Verify `/api/services/` is in `LOCAL_ONLY_API_PREFIXES` in `src/server/authz/routeGuard.ts`; add a test asserting `isLocalOnlyPath()` returns `true` for the new prefix if you add one (hard rule #16).
 6. Add a UI tab in `src/app/(dashboard)/dashboard/providers/services/tabs/` reusing `ServiceStatusCard`, `ServiceLifecycleButtons`, `ServiceLogsPanel`.
 7. Document in `docs/frameworks/EMBEDDED-SERVICES.md` (update §1 service table + §4 API reference) and `docs/openapi.yaml`.
 8. Write tests: unit (`tests/unit/services/`), integration (`tests/integration/services/`, gated by `RUN_SERVICES_INT=1`), and update `docs/ops/RELEASE_CHECKLIST.md` smoke section.

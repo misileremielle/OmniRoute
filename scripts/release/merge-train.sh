@@ -9,7 +9,7 @@
 #
 # Designed for the 32-core runner box (192.168.0.113) or any checkout with
 # node_modules. It only READS from origin — it never pushes, never merges PRs, never
-# touches other worktrees, and never uses `git stash` (Hard Rule #22a).
+# touches other worktrees, and never uses `git stash` (Hard Rule #21a).
 #
 # Usage:
 #   scripts/release/merge-train.sh [--plan] [--fast] <base-branch> <PR#> [<PR#>...]

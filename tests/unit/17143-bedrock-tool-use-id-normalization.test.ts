@@ -22,7 +22,7 @@
  *   - already-valid ids pass through EXACTLY unchanged (no behavior change).
  *
  * TDD: the first test FAILS before the fix (invalid id forwarded verbatim).
- * See Hard Rule #18.
+ * See Hard Rule #17.
  */
 
 import test from "node:test";

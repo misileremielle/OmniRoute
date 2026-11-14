@@ -16,7 +16,7 @@ See the [Release Strategy](../../docs/ops/RELEASE_STRATEGY.md) and the [ROADMAP]
 
 ## Proof Of Fix (required)
 
-Every bug fix must be validated by ONE of the following (`AGENTS.md`, Hard Rule #18).
+Every bug fix must be validated by ONE of the following (`AGENTS.md`, Hard Rule #17).
 A fix without either is not merged.
 
 - [ ] **TDD (preferred)** — a test that fails before the fix and passes after it.

@@ -197,7 +197,7 @@ path always keeps working. Non-image bytes (a fetch that did not return a
 decodable image) are also passed through untouched. This normalization is
 scoped to images the bridge fetches for its own self-call — it is never
 applied to the caller's raw passthrough payload, consistent with the
-opt-in-only mutation principle (Hard Rule #20).
+opt-in-only mutation principle (Hard Rule #19).
 
 #### Settings schema + migration
 
@@ -351,7 +351,7 @@ looked up inside the current chunk only. The ids sit ahead of the generic phone
 patterns, so a validated identifier keeps its own placeholder
 (`[IBAN_REDACTED]`, `[NL_BSN_REDACTED]`, ...). The `gdpr` and `popia` templates
 select the EU and South African ids respectively. Masking itself stays opt-in
-(Hard Rule #20): nothing here changes a feature-flag default.
+(Hard Rule #19): nothing here changes a feature-flag default.
 
 ### Prompt Injection (`promptInjection.ts`)
 
@@ -404,7 +404,7 @@ content, tool-call arguments, tool results) **and** the provider response, so a
 credential pasted into a prompt (or echoed back by a tool result) is not leaked
 to the upstream provider or back to the client.
 
-- **Opt-in only**, same convention as PII redaction (Hard Rule #20-adjacent):
+- **Opt-in only**, same convention as PII redaction (Hard Rule #19-adjacent):
   disabled unless `settings.credentialRedactionEnabled === true` **or**
   `CREDENTIAL_REDACTION_ENABLED=true`. With it off, the guardrail is a no-op —
   it never blocks and never rewrites.

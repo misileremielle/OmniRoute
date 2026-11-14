@@ -1,6 +1,6 @@
 /**
  * REQUIRE_API_KEY must be read the same way by the request gate and by both
- * startup exposure warnings (Hard Rule #18 fail-then-pass).
+ * startup exposure warnings (Hard Rule #17 fail-then-pass).
  *
  * The gate used to accept only the exact strings "true" / "1" / "yes", while
  * the Next startup guard (nonLoopbackApiKeyGuard.ts) and the CLI `serve`

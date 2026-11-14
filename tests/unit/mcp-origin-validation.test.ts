@@ -9,7 +9,7 @@
  * Host never becomes a trusted origin, forwarded headers count only from a trusted
  * proxy, and LOCAL_ONLY locality is decided by the stamped socket peer.
  *
- * Hard Rules #12, #15, #18.
+ * Hard Rules #12, #15, #17.
  */
 import test from "node:test";
 import assert from "node:assert/strict";

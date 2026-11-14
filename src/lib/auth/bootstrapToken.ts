@@ -8,7 +8,7 @@
  * peer address alone. Owner decision (2026-09-21): NEVER treat that gateway
  * peer as loopback — every external client arrives with the same peer, so
  * doing so would open the fresh-install bootstrap window (and the LOCAL_ONLY
- * spawn-capable route tier, Hard Rules #15/#17) to the whole internet.
+ * spawn-capable route tier, Hard Rules #15/#16) to the whole internet.
  *
  * Instead, when a fresh install (no password / OIDC / INITIAL_PASSWORD /
  * session) sees a non-loopback caller try to complete onboarding, the server

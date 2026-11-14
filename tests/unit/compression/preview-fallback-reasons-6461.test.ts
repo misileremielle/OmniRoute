@@ -2,7 +2,7 @@
  * #6461 — the compression preview response must surface WHY a run fell back
  * (deduped `fallbackReasons[]`, mirrored into `skippedReasons`) instead of the
  * previously hard-coded `skippedReasons: []`. Non-fallback runs return [] on
- * both — zero change on the happy path (regression guard, Rule #18).
+ * both — zero change on the happy path (regression guard, Rule #17).
  */
 import test from "node:test";
 import assert from "node:assert/strict";

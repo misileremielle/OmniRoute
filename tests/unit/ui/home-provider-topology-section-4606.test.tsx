@@ -4,7 +4,7 @@
 // and its activity fetch gated behind widget visibility in HomePageClient
 // (`appearanceSettingsLoaded && showProviderTopologyOnHome`). This guards the
 // extracted section: it renders the topology card and feeds live active-requests
-// through selectActiveRequests into ProviderTopology (Rule #18 for the change).
+// through selectActiveRequests into ProviderTopology (Rule #17 for the change).
 import React from "react";
 import { act } from "react";
 import { createRoot } from "react-dom/client";

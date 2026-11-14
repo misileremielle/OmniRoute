@@ -11,10 +11,10 @@ import { SPAWN_CAPABLE_ROUTE_ROOTS } from "../../../scripts/check/check-route-gu
 // GET /api/skills/collect/detect calls getCliRuntimeStatus() (which spawns a
 // child process) once per CLI_TOOL_IDS entry — a spawn-capable, previously
 // unauthenticated route reachable from any tunnel. Must be loopback-enforced
-// BEFORE any auth check (Hard Rules #15 + #17), the same as every other
+// BEFORE any auth check (Hard Rules #15 + #16), the same as every other
 // spawn-capable prefix.
 
-test("isLocalOnlyPath: /api/skills/collect/ prefix is local-only (Hard Rules #15/#17)", () => {
+test("isLocalOnlyPath: /api/skills/collect/ prefix is local-only (Hard Rules #15/#16)", () => {
   assert.equal(isLocalOnlyPath("/api/skills/collect/detect"), true);
   assert.equal(isLocalOnlyPath("/api/skills/collect/install"), true);
   assert.equal(isLocalOnlyPath("/api/skills/collect/"), true);

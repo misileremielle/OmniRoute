@@ -1,5 +1,5 @@
 /**
- * Unit tests for computeSnapshotWeights (Rule #18).
+ * Unit tests for computeSnapshotWeights (Rule #17).
  *
  * Coverage: scoring differentiation by capabilities (reasoning, vision),
  * tier-based bonuses (premium vs free), and neutral baselines for health/quota.

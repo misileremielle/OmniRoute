@@ -279,7 +279,6 @@ test("related configurations (groups, domainBudget, quotaLimits, tokenLimits, au
       usageLimitEnabled: true,
       dailyUsageLimitUsd: 15,
       weeklyUsageLimitUsd: 75,
-      chaosModeEnabled: true,
       compressionEnabled: true,
       allowAutoCombos: true,
       allowCcDiscoveryAliases: true,

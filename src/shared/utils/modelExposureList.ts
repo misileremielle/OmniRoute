@@ -52,7 +52,7 @@ function listMatchesAny(list: string[], candidates: string[]): boolean {
 /**
  * Whether a (provider, model) pair should be exposed given the operator's
  * allow/deny lists. Empty lists (the default) always expose — opt-in, off by
- * default, matching Hard Rule #20's "never mutate the operator's behaviour on
+ * default, matching Hard Rule #19's "never mutate the operator's behaviour on
  * their behalf by default" spirit. Denylist is checked first (deny wins over
  * an overlapping allow entry); when the allowlist is non-empty, only entries
  * it matches survive.

@@ -7,7 +7,7 @@
  * tier (#6210). A raw `providerSpecificData.agent` override is also honored. The individual
  * and EDU tuples must remain unchanged.
  *
- * The live round-trip against a real M365 enterprise tenant is the separate Rule #18
+ * The live round-trip against a real M365 enterprise tenant is the separate Rule #17
  * validation and is NOT possible in this environment — documented as a live-validation
  * follow-up.
  */

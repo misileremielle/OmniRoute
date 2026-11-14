@@ -87,7 +87,7 @@ test("returns {cursorAgentAvailable: false} and ONLY that field when cursor-agen
 });
 
 // Loopback enforcement happens unconditionally before any auth check (Hard
-// Rules #15 + #17): a non-loopback caller with NO credentials at all must
+// Rules #15 + #16): a non-loopback caller with NO credentials at all must
 // still be rejected by the managementPolicy pipeline itself — never by an
 // in-route check (this route intentionally has none; see route.ts's own
 // comment on why).

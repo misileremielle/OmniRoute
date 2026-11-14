@@ -115,7 +115,7 @@ export function supportsNativeWebFetchFallbackBypass({
   // by default — web_fetch interception is BRAND NEW behavior (#7339), so it
   // stays strictly opt-in with no heuristic default: a request with no
   // interceptFetch DB row configured is byte-identical to pre-#7339 behavior
-  // (the tool array is never touched), per Hard Rule #20's "opt-in, never
+  // (the tool array is never touched), per Hard Rule #19's "opt-in, never
   // default-on" precedent and the zero-overhead-when-disabled requirement.
   interceptFetchOverride?: boolean;
 }): boolean {

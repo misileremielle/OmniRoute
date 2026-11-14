@@ -5,7 +5,7 @@
 //
 // WHY: a auditoria 2026-06-09 encontrou ≈135 testes em subdiretórios de tests/unit/
 // que nenhum runner coleta (o glob `tests/unit/*.test.ts` é top-level-only), incluindo
-// tests/unit/authz/routeGuard.test.ts (Hard Rules #15/#17) — cujos asserts JÁ FALHAM,
+// tests/unit/authz/routeGuard.test.ts (Hard Rules #15/#16) — cujos asserts JÁ FALHAM,
 // apodrecidos sem ninguém ver. Teste que não roda é o falso verde definitivo: todo o
 // investimento anti test-masking protege asserts que nem executam.
 //

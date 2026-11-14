@@ -3,7 +3,7 @@
  * Playwright Chromium (a child process) to drive a web-cookie login. It MUST be
  * classified as LOCAL_ONLY so loopback enforcement runs unconditionally before
  * any auth check — a leaked JWT over a Cloudflared/Ngrok tunnel cannot trigger a
- * browser spawn. Hard Rules #15 + #17. See docs/security/ROUTE_GUARD_TIERS.md.
+ * browser spawn. Hard Rules #15 + #16. See docs/security/ROUTE_GUARD_TIERS.md.
  *
  * The login segment sits AFTER the dynamic `[id]` param, so it is matched by a
  * regex in LOCAL_ONLY_API_PATTERNS rather than a flat prefix — classifying the

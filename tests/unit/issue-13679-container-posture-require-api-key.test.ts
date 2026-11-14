@@ -13,7 +13,7 @@
  *
  * The npm/CLI local-dev default in `src/shared/constants/featureFlagDefinitions.ts`
  * (`REQUIRE_API_KEY` defaultValue `"false"`) is explicitly OUT of scope and must
- * stay unchanged — see AGENTS.md Hard Rule #20 precedent and the owner decision
+ * stay unchanged — see AGENTS.md Hard Rule #19 precedent and the owner decision
  * on #13679 PR E.
  */
 import test from "node:test";

@@ -49,7 +49,7 @@ blocking PR-to-release gate.
 Reproduces release-equivalent validation against the current working tree and classifies each red:
 
 - **HARD** (typecheck, lint errors, unit, vitest, db-rules, public-creds, optional
-  `package-artifact`) → **real defect**; `exit 1`. Fixed on the source branch (TDD, Rule #18).
+  `package-artifact`) → **real defect**; `exit 1`. Fixed on the source branch (TDD, Rule #17).
 - **DRIFT** (eslint **warnings**, cognitive-complexity, file-size) → ratchet drift accumulated in
   the cycle, **not the contributor's fault**; it is only reported and **rebaselined by the maintainer at
   release**. Drift **never** changes the exit code — so it never blocks anyone.
@@ -71,7 +71,7 @@ Procedure (summary — see the `green-prs` skill for details):
 1. **Inventory** the queue of open PRs against the active release branch.
 2. **Triage** each PR (viable / reject-worthy / needs-author) — reject/needs-author are
    **reported, not closed** (the author decides).
-3. For each viable PR, in an **isolated worktree** (Rule #19), bring the PR to the release tip and run
+3. For each viable PR, in an **isolated worktree** (Rule #18), bring the PR to the release tip and run
    `npm run check:release-green`:
    - **HARD** → fix **on the contributor's branch** via co-authorship (preserves the author's "Merged" status),
      re-run until all HARDs are cleared.

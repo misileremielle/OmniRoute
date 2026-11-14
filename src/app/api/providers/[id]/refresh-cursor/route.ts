@@ -67,7 +67,7 @@ function evictExpiredManualRefreshAttempts(now: number): void {
  *
  * 🔒 LOCAL_ONLY — classified in `LOCAL_ONLY_API_PATTERNS`
  * (`src/server/authz/routeGuard.ts`) because `renewCursorConnection()` spawns
- * `cursor-agent` as a child process (Hard Rules #15 + #17). Unlike this
+ * `cursor-agent` as a child process (Hard Rules #15 + #16). Unlike this
  * route, the rest of `/api/providers/` (including the generic `/refresh`)
  * intentionally remains remote-reachable.
  */

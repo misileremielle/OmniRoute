@@ -1,7 +1,7 @@
 // Where the opencode CLI headless server (`opencode serve`) lives and whether it
 // answers. Shared by the executor (request path) and the local-only lifecycle
 // routes under /api/services/opencode-server/. Deliberately free of any process
-// API: the executor must never reach spawn() (Hard Rules #15/#17), so starting
+// API: the executor must never reach spawn() (Hard Rules #15/#16), so starting
 // the server lives in opencodeServerLauncher.ts, imported only by those routes.
 import type { OpencodeServerSettings } from "./opencodeServerSettings.ts";
 

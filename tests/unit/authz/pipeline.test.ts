@@ -401,7 +401,7 @@ test("runAuthzPipeline gates the DB health API on loopback, not on the session a
   await forceAuthRequired();
 
   // #13717 moved /api/db/health to Tier 1 LOCAL_ONLY: runManagedDbHealthCheck()
-  // forks native diagnostics into a child process (Hard Rules #15 + #17), and the
+  // forks native diagnostics into a child process (Hard Rules #15 + #16), and the
   // route is NOT in LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES. So a dashboard session
   // is no longer sufficient by itself — an unstamped peer fails closed, whatever the
   // URL says, because requestPeerAddress() never reads the spoofable Host header.

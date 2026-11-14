@@ -3,7 +3,7 @@
  * REMOVE paid models when `hidePaidModels` is on (the public `/v1/models`
  * catalog already did via #6495). `openai` has no curated free roster, so its
  * chat models are paid-tier and must disappear when the toggle is on.
- * Rule #18 regression guard for the added filter in src/app/api/models/route.ts.
+ * Rule #17 regression guard for the added filter in src/app/api/models/route.ts.
  */
 import test from "node:test";
 import assert from "node:assert/strict";

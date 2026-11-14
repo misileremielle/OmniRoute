@@ -198,7 +198,7 @@ jobs:
       - run: pnpm run check:test-discovery
       - run: pnpm run check:test-tla-order
       - run: pnpm run check:tracked-artifacts
-      - name: AI attribution in commit / PR metadata (Hard Rule #16)
+      - name: AI attribution in commit / PR metadata
         if: github.event_name == 'pull_request'
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -507,7 +507,7 @@ jobs:
       - run: pnpm run check:docs-all
       # Previously-orphaned contract gates (existed as files, never wired anywhere).
       # All exit 0 today: cli-i18n is a hard gate, openapi-coverage is a ratchet
-      # (floor ~36), openapi-security-tiers is advisory (Hard Rules #15/#17).
+      # (floor ~36), openapi-security-tiers is advisory (Hard Rules #15/#16).
       - name: CLI i18n consistency
         run: pnpm run check:cli-i18n
       - name: OpenAPI route coverage (ratchet)
@@ -708,7 +708,7 @@ jobs:
       # Anti test-masking: flag net assert removal / new assert.ok(true) in changed tests.
       - name: Detect test-masking (weakened assertions)
         run: npm run check:test-masking
-      # Evidence-in-PR-body (Hard Rule #18 mechanized): claims of "tests pass" must carry output.
+      # Evidence-in-PR-body (Hard Rule #17 mechanized): claims of "tests pass" must carry output.
       - name: Require evidence in PR body
         run: npm run check:pr-evidence
         env:

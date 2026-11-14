@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 // These tests pin the recaptured wire shape and the refresh_token pre-flight
 // (the browser-issued access_token lives ~75 min with no refresh path before
 // this). Live round-trip on a real EDU (A3/Starter) tenant is the separate
-// Rule #18 validation gate.
+// Rule #17 validation gate.
 
 import {
   RECORD_SEPARATOR,

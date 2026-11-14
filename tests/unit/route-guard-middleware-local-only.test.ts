@@ -6,7 +6,7 @@
  * hot path (src/lib/middleware/registry.ts) — the same remote-code-execution class
  * as /api/plugins/* (which is already LOCAL_ONLY). A leaked JWT over a
  * Cloudflared/Ngrok tunnel must not be able to install or trigger a middleware
- * hook. Hard Rules #15 + #17. See docs/security/ROUTE_GUARD_TIERS.md.
+ * hook. Hard Rules #15 + #16. See docs/security/ROUTE_GUARD_TIERS.md.
  */
 import test from "node:test";
 import assert from "node:assert/strict";

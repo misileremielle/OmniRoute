@@ -247,7 +247,7 @@ and the `0600` token cache.
 authority is therefore unproven: consent behavior, the exact claim shapes a given tenant emits,
 Conditional Access interaction, and the group-overage path against real Graph responses.
 
-Hard Rule #18 names OAuth upstream flows as needing real-environment validation, so treat a
+Hard Rule #17 names OAuth upstream flows as needing real-environment validation, so treat a
 live-tenant run as a merge condition if you want one — it is not covered by the suites above.
 
 ```bash

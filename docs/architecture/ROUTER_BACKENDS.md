@@ -105,7 +105,7 @@ the machine-actionable discriminator. Messages are pre-sanitized
 `LOCAL_ONLY_API_PREFIXES` (`src/server/authz/routeGuard.ts`) and
 `src/server/authz/policies/management.ts` rejects any non-loopback / non-private-LAN
 caller **before auth**, because these routes spawn child processes (Hard Rules 15
-and 17). Reaching them through a public tunnel is `403` by design.
+and 16). Reaching them through a public tunnel is `403` by design.
 
 ## Axis B — relay routing backend (dispatch side)
 

@@ -145,7 +145,9 @@ function makeSandbox() {
 
   const run = (...args: string[]) =>
     spawnSync("bash", [SCRIPT_PATH, ...args, "--repo", REPO], {
-      env: { ...process.env, GH_BIN: gh, STUB_DIR: stub, CI_DISC_DIR: out },
+      // The script's `sort -u` follows the locale; pin byte order so the expected line order
+      // holds on a developer machine (en_US.UTF-8 puts "[check]" before "REGRESSÃO").
+      env: { ...process.env, LC_ALL: "C", GH_BIN: gh, STUB_DIR: stub, CI_DISC_DIR: out },
       encoding: "utf8",
     });
   const calls = () => readFileSync(join(stub, "calls.log"), "utf8").trim().split("\n");

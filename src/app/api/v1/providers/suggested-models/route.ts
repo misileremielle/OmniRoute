@@ -19,7 +19,7 @@ import {
  *
  * This route is a read-only proxy to a public search endpoint — it never
  * spawns a child process, so it does NOT require `isLocalOnlyPath()`
- * classification in `src/server/authz/routeGuard.ts` (Hard Rules #15/#17
+ * classification in `src/server/authz/routeGuard.ts` (Hard Rules #15/#16
  * only apply to routes that spawn processes or reverse-proxy embedded
  * service UIs).
  */
@@ -63,10 +63,10 @@ export async function GET(request: Request) {
   const { type, sortBy, limit } = parsed.data;
   const pipelineTag = resolveHfPipelineTag(type);
   if (!pipelineTag) {
-    return NextResponse.json(
-      buildErrorBody(400, `Unsupported suggested-models type: ${type}`),
-      { status: 400, headers: CORS_HEADERS }
-    );
+    return NextResponse.json(buildErrorBody(400, `Unsupported suggested-models type: ${type}`), {
+      status: 400,
+      headers: CORS_HEADERS,
+    });
   }
 
   try {

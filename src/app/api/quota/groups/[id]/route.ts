@@ -13,7 +13,7 @@
  * protected seed 'group-demo' is targeted. Both cases are signalled by
  * deleteGroup throwing — caught here and mapped to 409.
  *
- * NOT LOCAL_ONLY — does not spawn processes (B18, Hard Rules #15/#17 do not apply).
+ * NOT LOCAL_ONLY — does not spawn processes (B18, Hard Rules #15/#16 do not apply).
  *
  * Part of: Group B — REST routes for Quota Sharing (plan 22, frente F8).
  */

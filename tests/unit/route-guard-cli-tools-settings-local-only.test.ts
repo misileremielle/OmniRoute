@@ -17,7 +17,7 @@
  * Classifying them LOCAL_ONLY closes the remote-spawn vector: a non-loopback /
  * non-LAN caller — with or without a leaked JWT over a Cloudflared/Ngrok tunnel —
  * cannot trigger process spawning or enumerate the host's CLI inventory.
- * Hard Rules #15 + #17. See docs/security/ROUTE_GUARD_TIERS.md.
+ * Hard Rules #15 + #16. See docs/security/ROUTE_GUARD_TIERS.md.
  */
 import test from "node:test";
 import assert from "node:assert/strict";

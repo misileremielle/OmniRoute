@@ -36,7 +36,7 @@
  * `@atjsh/llmlingua-2` (not a regular dependency) and is already bundled in `dist/node_modules`,
  * so the closure walk never reaches it and the no-clobber guard would skip it anyway.
  *
- * ## Validation (Hard Rule #18)
+ * ## Validation (Hard Rule #17)
  *
  * Manual co-location of this exact closure on the production VPS produced real 54.8% compression
  * (11520 → 5203 chars) via real ONNX inference — both the default and the `modelPath` (PR #4257)

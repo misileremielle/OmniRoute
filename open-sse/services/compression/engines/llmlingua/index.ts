@@ -44,7 +44,7 @@
  * `./worker.ts` runs `@atjsh/llmlingua-2` (MobileBERT ONNX) in a worker_threads.Worker,
  * gated by a minimum token count and strictly fail-open. The optional deps are not
  * installed by default (CI / most installs), so the engine no-ops there; the real model
- * is exercised on the VPS behind RUN_LLMLINGUA_INT (Hard Rule #18). See `./worker.ts`.
+ * is exercised on the VPS behind RUN_LLMLINGUA_INT (Hard Rule #17). See `./worker.ts`.
  */
 
 import { createCompressionStats, estimateCompressionTokens } from "../../stats.ts";

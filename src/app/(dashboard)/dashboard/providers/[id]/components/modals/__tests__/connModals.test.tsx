@@ -2,7 +2,7 @@
 //
 // Phase 1c regression tests for Issue #3501. AddApiKeyModal and EditConnectionModal
 // were extracted from the god-component. This proves each mounts in isolation with
-// its clean Props interface (Hard Rule #8, Rule #18 TDD gate).
+// its clean Props interface (Hard Rule #8, Rule #17 TDD gate).
 import React, { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

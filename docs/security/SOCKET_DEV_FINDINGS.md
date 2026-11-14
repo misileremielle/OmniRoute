@@ -102,7 +102,7 @@ the local dashboard.
 **Already-in-place protections**:
 
 - All `/api/services/*` routes are LOCAL_ONLY per
-  `src/server/authz/routeGuard.ts` (hard rule #17). Loopback enforcement
+  `src/server/authz/routeGuard.ts` (hard rule #16). Loopback enforcement
   happens before any auth check — a leaked JWT cannot reach them.
 - The 9router DB row is seeded as `status='not_installed', auto_start=0` (see
   `src/lib/db/migrations/071_services.sql:19`). The service does **not** start

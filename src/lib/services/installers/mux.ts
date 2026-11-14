@@ -151,7 +151,7 @@ export async function uninstall(): Promise<void> {
  * Build spawn args for ServiceSupervisor.start().
  *
  * Mux binds to 127.0.0.1 explicitly (never 0.0.0.0) — the dashboard route is
- * already loopback-gated (Hard Rule #17), and this is defense-in-depth since
+ * already loopback-gated (Hard Rule #16), and this is defense-in-depth since
  * Mux orchestrates AI agents that can execute shell commands on the host.
  * The bearer token is passed via `MUX_SERVER_AUTH_TOKEN` (mux's documented env
  * form), never as a CLI arg, so it never appears in `ps`/process listings.

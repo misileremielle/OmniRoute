@@ -73,7 +73,7 @@ tags:
   - name: Embedded Services
     description: >-
       Install, start, stop, and monitor locally-running embedded services (9Router, CLIProxyAPI).
-      All routes are LOCAL_ONLY — accessible from loopback only (hard rule #17).
+      All routes are LOCAL_ONLY — accessible from loopback only (hard rule #16).
   - name: OAuth
     description: OAuth flows for provider authentication
   - name: System
@@ -1600,7 +1600,7 @@ paths:
     post:
       tags: [Providers]
       summary: Validate provider credentials
-      description: "Validates provider credentials over HTTP. The devin CLI-spawn fallback is call-site gated on the trusted peer-locality header (loopback/LAN only, Hard Rules #15/#17, audit #15159 S-01, #15766 shape); the route itself is management-auth remote-reachable."
+      description: "Validates provider credentials over HTTP. The devin CLI-spawn fallback is call-site gated on the trusted peer-locality header (loopback/LAN only, Hard Rules #15/#16, audit #15159 S-01, #15766 shape); the route itself is management-auth remote-reachable."
       responses:
         "200":
           description: Validation result
@@ -4482,7 +4482,7 @@ paths:
           description: OpenClaw CLI settings reset
 
   # ─── Embedded Services ─────────────────────────────────────────
-  # All routes LOCAL_ONLY (loopback only) — hard rule #17.
+  # All routes LOCAL_ONLY (loopback only) — hard rule #16.
   # See docs/frameworks/EMBEDDED-SERVICES.md for full reference.
 
   /api/services/9router/install:
@@ -10100,7 +10100,7 @@ paths:
       tags:
         - Providers
       summary: "POST providers › bulk"
-      description: "The devin CLI-spawn fallback (webProvidersB.ts) is call-site gated on the trusted peer-locality header — loopback/LAN only (Hard Rules #15/#17, audit #15159 S-01, #15766 shape); the route is management-auth remote-reachable."
+      description: "The devin CLI-spawn fallback (webProvidersB.ts) is call-site gated on the trusted peer-locality header — loopback/LAN only (Hard Rules #15/#16, audit #15159 S-01, #15766 shape); the route is management-auth remote-reachable."
       responses:
         "200":
           description: OK
@@ -10252,7 +10252,7 @@ paths:
       tags:
         - Providers
       summary: "POST providers › import"
-      description: "The devin CLI-spawn fallback (webProvidersB.ts) is call-site gated on the trusted peer-locality header — loopback/LAN only (Hard Rules #15/#17, audit #15159 S-01, #15766 shape); the route is management-auth remote-reachable."
+      description: "The devin CLI-spawn fallback (webProvidersB.ts) is call-site gated on the trusted peer-locality header — loopback/LAN only (Hard Rules #15/#16, audit #15159 S-01, #15766 shape); the route is management-auth remote-reachable."
       responses:
         "200":
           description: OK

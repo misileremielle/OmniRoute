@@ -39,7 +39,7 @@ async function main(): Promise<void> {
   const costCapUsd = flag("cost-cap-usd") ? Number(flag("cost-cap-usd")) : 0;
   const mode = (flag("mode") ?? "lite") as CompressionConfig["defaultMode"];
 
-  // Credentials wiring is operator-supplied (env / connection store). Documented in Rule #18:
+  // Credentials wiring is operator-supplied (env / connection store). Documented in Rule #17:
   // the adapter is validated against a real account; this CLI reads the credential the operator
   // exports for the chosen provider. Placeholder lookup left to the operator's environment.
   const credentials = JSON.parse(process.env.OMNIROUTE_EVAL_CREDENTIALS ?? "{}");

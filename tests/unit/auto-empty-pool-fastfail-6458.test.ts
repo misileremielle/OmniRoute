@@ -2,7 +2,7 @@
  * #6458 — an `auto/*` category/tier combo that matches ZERO connected
  * candidates must fail fast with a clear 503, instead of building an empty
  * virtual combo whose downstream routing stalls on a silent ~15s upstream
- * timeout. Regression guard (Rule #18).
+ * timeout. Regression guard (Rule #17).
  */
 import test from "node:test";
 import assert from "node:assert/strict";

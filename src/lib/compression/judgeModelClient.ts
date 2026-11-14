@@ -9,7 +9,7 @@ import { calculateCost } from "@/lib/usage/costCalculator";
 
 /**
  * Cost-aware judge ModelClient for the compression playground's fidelity verify.
- * Hard Rule #18 — NOT unit-tested (touches the real executor); the cost math is calculateCost
+ * Hard Rule #17 — NOT unit-tested (touches the real executor); the cost math is calculateCost
  * (already covered) and the cap logic is judgeFidelityBatch (unit-tested with a stub). Computes
  * usdCost from FULL usage (prompt + completion tokens) via the canonical pricing engine, so the
  * USD cap actually engages and totalUsd is real.

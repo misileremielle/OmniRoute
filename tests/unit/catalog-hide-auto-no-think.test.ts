@@ -1,8 +1,8 @@
 /**
  * #9418 — `hideAutoCombos` and `hideNoThinkVariants` settings toggles filter
  * built-in `auto/*` virtual combos and `no-think/*` gateway variants from the
- * unified `/v1/models` catalog. Default false (opt-in, Rule #20 spirit).
- * Rule #18 regression guard for both toggles.
+ * unified `/v1/models` catalog. Default false (opt-in, Rule #19 spirit).
+ * Rule #17 regression guard for both toggles.
  */
 import test from "node:test";
 import assert from "node:assert/strict";

@@ -1,5 +1,5 @@
 /**
- * Unit tests for POST /api/combos/duplicate (Rule #18).
+ * Unit tests for POST /api/combos/duplicate (Rule #17).
  *
  * Coverage: auth gate, input validation (400), success response shape (201)
  * including weight distribution and naming convention, config fields,

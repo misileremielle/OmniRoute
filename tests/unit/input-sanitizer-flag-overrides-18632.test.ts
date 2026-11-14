@@ -2,7 +2,7 @@
 // PII_REDACTION_ENABLED straight from process.env, so a dashboard Feature Flags
 // override (persisted in the key_value store) never took effect. Config now
 // reads the DB override first and keeps the env var as fallback, matching the
-// INJECTION_GUARD_MODE pattern in promptInjection.ts. Hard Rule 20 note: the
+// INJECTION_GUARD_MODE pattern in promptInjection.ts. Hard Rule 19 note: the
 // PII flags stay opt-in — this only lets an explicit operator override turn
 // them on, the definition default remains "false".
 import assert from "node:assert/strict";

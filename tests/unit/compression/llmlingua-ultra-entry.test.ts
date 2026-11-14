@@ -105,7 +105,7 @@ test("prewarmLlmlinguaUltra is a no-op when unavailable", async () => {
   }
 });
 
-// ─── Task 7 — gated VPS live validation (Hard Rule #18) ──────────────────────
+// ─── Task 7 — gated VPS live validation (Hard Rule #17) ──────────────────────
 // These tests run the REAL ONNX model and are SKIPPED unless RUN_LLMLINGUA_INT=1
 // AND the optional deps are present (only true on the VPS). Under the normal
 // runner they print a skip line and pass as no-ops.

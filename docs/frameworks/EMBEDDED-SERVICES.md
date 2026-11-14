@@ -50,7 +50,7 @@ All eight follow the same supervisory model:
 - OmniRoute installs them under `DATA_DIR/services/{name}/` (isolated from OmniRoute's own `package.json`)
 - OmniRoute spawns and monitors them as child processes
 - OmniRoute injects an ephemeral API key into the child's environment and rotates it without downtime (where applicable)
-- All management routes (`/api/services/*`) are **LOCAL_ONLY** — accessible only from loopback (hard rule #17)
+- All management routes (`/api/services/*`) are **LOCAL_ONLY** — accessible only from loopback (hard rule #16)
 
 ### Key decisions (from design plan)
 
@@ -214,7 +214,7 @@ race conditions when, for example, auto-start and a UI button fire simultaneousl
 
 ## 4. API reference
 
-All routes under `/api/services/` are **LOCAL_ONLY** (loopback only, hard rule #17).
+All routes under `/api/services/` are **LOCAL_ONLY** (loopback only, hard rule #16).
 Non-loopback requests receive `403 LOCAL_ONLY` regardless of auth token.
 
 ### 4.1 9Router endpoints (11 routes)
@@ -627,7 +627,7 @@ Cloudflare/Ngrok tunnel cannot proxy into embedded services.
 
 ## 5. Security
 
-### LOCAL_ONLY enforcement (hard rule #17)
+### LOCAL_ONLY enforcement (hard rule #16)
 
 All routes under `/api/services/` and `/dashboard/providers/services/*/embed/` are
 classified as LOCAL_ONLY in `src/server/authz/routeGuard.ts`. The loopback check
@@ -918,7 +918,7 @@ OmniRoute's default port 20128.
 
 **Q: Can I expose the embedded services endpoints to non-loopback clients?**
 
-No. The LOCAL_ONLY tier is intentional (hard rule #17). Routes that can invoke
+No. The LOCAL_ONLY tier is intentional (hard rule #16). Routes that can invoke
 `npm install` or spawn `node` processes must not be reachable from non-loopback
 traffic, because a leaked JWT via a tunnel (Cloudflare, Ngrok, Tailscale) would
 otherwise allow arbitrary process spawning. There is no opt-out carve-out for

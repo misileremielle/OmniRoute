@@ -31,7 +31,8 @@ function invoke(id: string, stream = false) {
     harness.buildRequest({
       url: "http://localhost/v1/responses",
       headers: { "x-omniroute-connection": id },
-      body: { model: "codex/gpt-5.6-sol", input: "offline owner race", stream },
+      // Not a -sol/-astra model: this fork's codexPlanModelGate skips plan-less accounts for those.
+      body: { model: "codex/gpt-5.5", input: "offline owner race", stream },
     })
   );
 }
@@ -40,7 +41,7 @@ function success() {
     id: "resp_owner",
     object: "response",
     status: "completed",
-    model: "gpt-5.6-sol",
+    model: "gpt-5.5",
     output: [
       {
         id: "msg_owner",
@@ -185,7 +186,7 @@ test("late streaming failure retains its immutable dispatch owner", async () => 
           controller = value;
           controller.enqueue(
             encoder.encode(
-              'event: response.created\ndata: {"type":"response.created","response":{"id":"resp_stream","model":"gpt-5.6-sol"}}\n\nevent: response.output_text.delta\ndata: {"type":"response.output_text.delta","delta":"ok"}\n\n'
+              'event: response.created\ndata: {"type":"response.created","response":{"id":"resp_stream","model":"gpt-5.5"}}\n\nevent: response.output_text.delta\ndata: {"type":"response.output_text.delta","delta":"ok"}\n\n'
             )
           );
         },

@@ -16,6 +16,10 @@ const { resolveExecutionCredentials } =
   await import("../../open-sse/handlers/chatCore/executionCredentials.ts");
 const { CodexExecutor } = await import("../../open-sse/executors/codex.ts");
 const { resetDbInstance } = await import("../../src/lib/db/core.ts");
+// Registers the fenced Codex refresh writer, as src/instrumentation-node.ts does at boot. This
+// fork's chatCore import chain no longer loads it, and an unregistered writer fails every
+// persist as stale.
+await import("../../src/sse/services/tokenRefresh.ts");
 type JsonRecord = Record<string, unknown>;
 const model = "gpt-5.6-sol";
 const executor = new CodexExecutor();

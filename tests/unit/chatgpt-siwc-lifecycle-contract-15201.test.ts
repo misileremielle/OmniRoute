@@ -1,5 +1,5 @@
 /**
- * #15201 — hermetic contract test for the whole Sign-in-with-ChatGPT lifecycle (Hard Rule #18,
+ * #15201 — hermetic contract test for the whole Sign-in-with-ChatGPT lifecycle (Hard Rule #17,
  * TDD path): authorize URL → pasted callback → token exchange → ID-token verification → persisted
  * registration → live model discovery → refresh-token rotation → one inference request.
  *

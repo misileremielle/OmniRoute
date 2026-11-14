@@ -2,7 +2,7 @@
 // (POST /api/providers/validate, bulk and import with validateKeys, connection tests) pass
 // `allowLocalSpawn: false` for non-loopback callers, and the dispatcher forwards it to every
 // specialty validator — but the Auggie validator took no options and always spawned the
-// binary. A remote caller must never make the host start a process (Hard Rules #15/#17).
+// binary. A remote caller must never make the host start a process (Hard Rules #15/#16).
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

@@ -2,7 +2,8 @@
  * #18075 — the MCP service toggle printed a hard-coded "ON"/"OFF" next to its switch.
  * #19620 — the state text is gone from both pages: the switch shows the state, and its translated
  * enable/disable name says what a press does. tests/unit/ui/mcp-a2a-service-toggle-19620.test.tsx
- * checks the rendered result.
+ * checks the rendered result. (Upstream also checks a2a/page.tsx; this fork removed the A2A
+ * server and its page.)
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -14,7 +15,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", ".
 const read = (p: string) =>
   fs.readFileSync(path.join(ROOT, "src/app/(dashboard)/dashboard", p), "utf8");
 
-for (const page of ["mcp/page.tsx", "a2a/page.tsx"]) {
+for (const page of ["mcp/page.tsx"]) {
   test(`${page}: the switch is named by translated labels, with no ON/OFF text beside it`, () => {
     const src = read(page);
     assert.doesNotMatch(src, /["'](ON|OFF)["']/, "no hard-coded ON/OFF literal");

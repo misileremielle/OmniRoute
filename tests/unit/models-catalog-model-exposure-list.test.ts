@@ -1,7 +1,7 @@
 /**
  * #11481 — `modelVisibilityAllowlist`/`modelVisibilityDenylist` filter the
  * unified `/v1/models` catalog. Mirrors models-catalog-hide-paid.test.ts.
- * Rule #18 regression guard for the toggle.
+ * Rule #17 regression guard for the toggle.
  */
 import test from "node:test";
 import assert from "node:assert/strict";

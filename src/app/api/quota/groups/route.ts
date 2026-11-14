@@ -6,7 +6,7 @@
  * Zod:  GroupCreateSchema from @/shared/schemas/quota
  * Sanitization: all error responses via buildErrorBody (Hard Rule #12, B25)
  *
- * NOT LOCAL_ONLY — does not spawn processes (B18, Hard Rules #15/#17 do not apply).
+ * NOT LOCAL_ONLY — does not spawn processes (B18, Hard Rules #15/#16 do not apply).
  *
  * Part of: Group B — REST routes for Quota Sharing (plan 22, frente F8).
  */

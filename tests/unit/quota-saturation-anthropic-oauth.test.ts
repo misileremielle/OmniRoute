@@ -168,7 +168,7 @@ test("oauth/usage fetch throws → fails open (0), no throw", async () => {
   assert.equal(val, 0);
 });
 
-// ─── Cache: don't poll per request (Rule #18) ────────────────────────────────
+// ─── Cache: don't poll per request (Rule #17) ────────────────────────────────
 
 test("second call within 30s TTL is served from cache (fetchUsage NOT re-invoked)", async () => {
   _clearSaturationCache();

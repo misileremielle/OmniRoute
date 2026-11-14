@@ -4,7 +4,7 @@
  * process, via src/lib/cursor/renewal.ts) to attempt a Cursor session
  * renewal. It MUST be classified LOCAL_ONLY so loopback enforcement runs
  * unconditionally before any auth check — a leaked JWT via a Cloudflared/
- * Ngrok tunnel cannot trigger a process spawn. Hard Rules #15 + #17. See
+ * Ngrok tunnel cannot trigger a process spawn. Hard Rules #15 + #16. See
  * docs/security/ROUTE_GUARD_TIERS.md.
  *
  * The refresh-cursor segment sits AFTER the dynamic `[id]` param, so it is

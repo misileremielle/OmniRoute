@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 //
 // These tests pin the prompt builders, the decision parsers, and the frame-level
 // guards (tool-progress suppression, type:3 error surfacing). Live round-trip on
-// a real tenant is the separate Rule #18 validation gate.
+// a real tenant is the separate Rule #17 validation gate.
 
 import {
   buildChatInvocation,

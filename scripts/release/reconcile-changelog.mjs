@@ -4,7 +4,7 @@
 // Reconcile the living `## [<version>]` CHANGELOG section against the FULL development cycle
 // (Phase 0a.1–0a.3a of /generate-release), so that at the moment a release is cut:
 //   • every cycle commit is represented by a bullet whose PRIMARY reference is that commit's PR,
-//   • every bullet carries the merged PR link and `— thanks @author` (Hard Rule #16),
+//   • every bullet carries the merged PR link and `— thanks @author` (human credit),
 //   • fragments are folded in under the RIGHT version section (not the first heading that
 //     matches — `[Unreleased]` still carries a `### ✨ New Features` heading),
 //   • fragments that duplicate bullets already shipped in a previous version are dropped,

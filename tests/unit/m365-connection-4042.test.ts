@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 // #4042 — M365 Copilot (individual) connection helpers: credential resolution,
 // WS URL building, token redaction, and prompt flattening. Pure functions, no
-// live socket — the round-trip is the separate Rule #18 validation gate.
+// live socket — the round-trip is the separate Rule #17 validation gate.
 
 import {
   M365_INDIVIDUAL_DEFAULTS,

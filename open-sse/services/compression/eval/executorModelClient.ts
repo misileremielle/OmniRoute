@@ -3,7 +3,7 @@ import type { ExecuteInput, ProviderCredentials } from "../../../executors/base.
 import type { ChatTurn, ModelCallResult, ModelClient } from "./types.ts";
 
 /**
- * Production ModelClient adapter (Hard Rule #18 — NOT unit-tested; validated on a real
+ * Production ModelClient adapter (Hard Rule #17 — NOT unit-tested; validated on a real
  * VPS/account). Wraps the server executor: builds a minimal non-stream chat body, calls
  * `getExecutor(provider).execute(...)`, reads the response text + (best-effort) usage cost.
  *

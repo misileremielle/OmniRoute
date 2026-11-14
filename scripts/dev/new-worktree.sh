@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Cria uma worktree isolada seguindo o protocolo obrigatório do AGENTS.md
-# (Git Workflow → "Worktree isolation" / Hard Rule #19), incluindo os dois
+# (Git Workflow → "Worktree isolation" / Hard Rule #18), incluindo os dois
 # passos que são fáceis de esquecer e falham em silêncio:
 #
 #   1. node_modules por HARD LINK (`cp -al`), nunca symlink — um symlink que
@@ -86,7 +86,7 @@ acquire_lock() {
 acquire_lock
 
 # Sem base explícita, usa a release ativa (maior release/* por semver) — nunca
-# `main` e nunca "a branch em que eu estou", conforme a Hard Rule #19.
+# `main` e nunca "a branch em que eu estou", conforme a Hard Rule #18.
 if [ -z "$BASE" ]; then
   BASE=$(git ls-remote --heads origin 'refs/heads/release/*' \
     | sed 's#.*refs/heads/##' | sort -V | tail -1)

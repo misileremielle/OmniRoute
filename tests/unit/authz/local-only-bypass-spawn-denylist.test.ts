@@ -1,6 +1,6 @@
 /**
  * The LOCAL_ONLY manage-scope bypass list must never be able to open a route that
- * spawns processes or executes caller-supplied code (Hard Rules #15 + #17).
+ * spawns processes or executes caller-supplied code (Hard Rules #15 + #16).
  *
  * Three layers are covered here:
  *   1. the settings PATCH schema refine (BYPASS_PREFIX_NOT_ALLOWED),

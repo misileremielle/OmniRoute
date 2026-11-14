@@ -13,7 +13,7 @@
  * prompt into `user_instruction` (it now carries only the short latest user message).
  * The most-recent tool result must still be present so the model keeps its observation.
  *
- * The upstream 422→200 clearing is VPS-only (Hard Rule #18); this unit test covers the
+ * The upstream 422→200 clearing is VPS-only (Hard Rule #17); this unit test covers the
  * bounding logic (char/length caps + tool-result presence), which is the root cause.
  */
 import test from "node:test";
@@ -21,8 +21,7 @@ import assert from "node:assert/strict";
 import { GitlabExecutor, buildPrompt } from "../../open-sse/executors/gitlab.ts";
 
 // A tool result large enough to blow the small_file generation contract if unbounded.
-const HUGE_TOOL_RESULT =
-  "TOOLRESULT_START " + "x".repeat(60_000) + " TOOLRESULT_END";
+const HUGE_TOOL_RESULT = "TOOLRESULT_START " + "x".repeat(60_000) + " TOOLRESULT_END";
 
 function buildLongToolConversation() {
   const messages: Array<Record<string, unknown>> = [

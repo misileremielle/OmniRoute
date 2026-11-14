@@ -185,7 +185,7 @@ src/app/api/
 #### 3.1.2a `src/app/api/services/` — Embedded Services management
 
 Routes for installing, starting, stopping, and monitoring 9Router and CLIProxyAPI.
-All paths are classified **LOCAL_ONLY** (loopback only, hard rule #17) because they
+All paths are classified **LOCAL_ONLY** (loopback only, hard rule #16) because they
 can invoke `npm install` and spawn child processes.
 
 ```

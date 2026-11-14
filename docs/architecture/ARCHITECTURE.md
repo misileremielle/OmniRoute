@@ -326,7 +326,7 @@ Architecture layers:
   live log streaming, API key management, and (for 9Router) embedded native UI via
   an internal reverse proxy.
 - **API** (`/api/services/{name}/*`) — 11 endpoints for 9Router, 10 for CLIProxyAPI, 8 each for Bifrost / Mux / Dario,
-  all classified **LOCAL_ONLY** (hard rule #17). A shared `GET /api/services/[name]/logs`
+  all classified **LOCAL_ONLY** (hard rule #16). A shared `GET /api/services/[name]/logs`
   SSE endpoint serves both services.
 - **Supervisor** (`src/lib/services/`) — generic `ServiceSupervisor` class wraps
   `child_process.spawn`, holds a 5 MB ring buffer for SSE log streaming, a health

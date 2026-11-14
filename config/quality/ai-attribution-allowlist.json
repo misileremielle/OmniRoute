@@ -35,31 +35,31 @@
       "pr": 14122,
       "kind": "ai",
       "subject": "fix(providers): keep array subscripts in perplexity-web code output (#14122)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "614ff4b60a11307ca7a6887eacf3cf130e35599a": {
       "pr": 13008,
       "kind": "ai",
       "subject": "fix(sse): thread errorText into shouldMarkAccountExhaustedFrom429 (#13008)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "d600eba35b5d17717e24dfa1b90ffa06f9c920a5": {
       "pr": 12485,
       "kind": "ai",
       "subject": "fix(cli): preflight the port before serving so a second instance cannot de-register the first (#12485)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "55b6ca6573473c8088098226e1f1acdd9b0ffd03": {
       "pr": 13637,
       "kind": "ai",
       "subject": "fix(compression): fall back in-process when the compression worker fa… (#13637)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "706dc75c13906d83e1932e05e40c0c65b98ae41e": {
       "pr": 12406,
       "kind": "ai",
       "subject": "fix(chatCore): stop executeWithUpstreamStartTimeout leaking its abortPromise listener (hedge-cancelled process exit) (#12406)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "44e32a1995cbd7eb914ae7537d905b6a808bad63": {
       "pr": 13664,
@@ -71,31 +71,31 @@
       "pr": 12484,
       "kind": "ai",
       "subject": "fix(cli): escalate the readiness probe timeout so a slow health response is not a phantom boot failure (#12484)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "b84059213f87c914523e98773c83213d13898d96": {
       "pr": 12310,
       "kind": "ai",
       "subject": "fix(gemini): preserve response-schema nullability across union flattening (#12310)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "04eba4dc05f37d8b4721b3f621b474808722fbaf": {
       "pr": 13223,
       "kind": "ai",
       "subject": "fix(mcp): load audit sqlite via runtime helper (#13223)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "04cc8aab673a65b62eac03ca06f256291b32350e": {
       "pr": 12309,
       "kind": "ai",
       "subject": "fix(cache): fold the response output contract into the semantic cache signature (#12309)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "a5d603ebc986c05e1dd92a79779b11469118d631": {
       "pr": 12948,
       "kind": "ai",
       "subject": "fix(soniox): pass client parameters through and surface speaker diarization (#12948)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "602161d7bc1392a7ed2e0be127382b7c551d76c3": {
       "pr": 13661,
@@ -113,7 +113,7 @@
       "pr": 11564,
       "kind": "ai",
       "subject": "feat(compression): make proactive context-compression threshold a live setting (#11564)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "7f6958960c37d0d55b77f87eb79104174c890a9c": {
       "pr": 10626,
@@ -137,13 +137,13 @@
       "pr": 10392,
       "kind": "ai",
       "subject": "fix(translator): Normalize tool call names from lowercase to PascalCase when translating upstream responses to Claude Messages API format (#10392)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "24ef1dc3d477441503fb88a46f831792ecf0a31e": {
       "pr": 10411,
       "kind": "ai",
       "subject": "Sanitize test fixtures, add developer .env guidance, and add gitleaks… (#10411)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "8bd0e7b6bfa197409977bee2fad9145140db5761": {
       "pr": 10403,
@@ -185,13 +185,13 @@
       "pr": 9584,
       "kind": "ai",
       "subject": "feat(providers): integrate wave4 free-tier gateways (#9584)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "ce70df60030670c7803b9b9c5c576cfa268bec68": {
       "pr": 8080,
       "kind": "ai",
       "subject": "feat(a2a): Conductor bridge — mirror OmniConductor hub tasks into the A2A TaskManager (PRD RF1) (#8080)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "3898305df069ba5aa530c7354816ca35bb421f11": {
       "pr": 9164,
@@ -203,25 +203,25 @@
       "pr": 8974,
       "kind": "ai",
       "subject": "feat(providers): add Conol (conol.ai) web session provider (#8974)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "5133aad76daca5d1494bc18bf3adacf7f3727ee2": {
       "pr": 9634,
       "kind": "ai",
       "subject": "fix(test): reconcile base-drifted test expectations on release/v3.8.50 (#9634)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "b13c3cd20219fb298b068ff58537dda55a0aec2b": {
       "pr": 9423,
       "kind": "ai",
       "subject": "fix(translator): normalize streamed optional tool arguments (#9423)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "5f75abe4a2040c42e614de671250500d4673d847": {
       "pr": 9874,
       "kind": "ai",
       "subject": "cherry-pick(pr-9634): fix(test): reconcile base-drifted test expectations on release/v3.8.50 (#9874)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "9acf79f04fa1f09b4a5e41a2715db221fd8b8791": {
       "pr": 9082,
@@ -239,7 +239,7 @@
       "pr": 8306,
       "kind": "ai",
       "subject": "fix(api): enforce image generation API key auth (#8306)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "aecf2fccef67a2ecb2884279c724cefb24ef5396": {
       "pr": 8793,
@@ -263,7 +263,7 @@
       "pr": 8561,
       "kind": "ai",
       "subject": "chore(quality): rebaseline file-size for inherited base growth (#8561)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "94125e09b13ceae62518c0288d7b4cbd8a81f2bb": {
       "pr": 8456,
@@ -299,43 +299,43 @@
       "pr": 8355,
       "kind": "ai",
       "subject": "fix(i18n): restore brand proper nouns and unify terminology in zh-CN and zh-TW (#8355)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "1f7ec2c3213bb8a160f6c29774a9bdb76b4dff8d": {
       "pr": 8308,
       "kind": "ai",
       "subject": "fix(cpa): isolate credential-pool failures (#8308)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "cbe49f6929b20d73a8cec8b7dc66338123d05f91": {
       "pr": 8303,
       "kind": "ai",
       "subject": "fix(mcp): keep POST SSE responses uncompressed (#8303)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "1684adcd63c188f8c91acd2fe3f9e76609d3ae28": {
       "pr": 8302,
       "kind": "ai",
       "subject": "fix(providers): adapt Kimi nonstream requests internally (#8302)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "8a2a3d48b02a865a5d34c4247359caa2569197d9": {
       "pr": 8301,
       "kind": "ai",
       "subject": "perf(api): singleflight version lookups (#8278) (#8301)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "08a21bcf27a504c752b038d6d5c4f6d91e301bb3": {
       "pr": 8296,
       "kind": "ai",
       "subject": "fix(backend): add structure-aware chat admission (#8296)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "069d5a79257590a3d2f6ecd45a2a08c1a3cc9984": {
       "pr": 8292,
       "kind": "ai",
       "subject": "fix(dashboard): stop sidebar RSC prefetch storms (#8292)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "612b6b38efdfef68ad2beb40f15ae1c27d75e77d": {
       "pr": 8235,
@@ -347,7 +347,7 @@
       "pr": 8232,
       "kind": "ai",
       "subject": "fix: restore OAuth auto-refresh for gemini-cli connections (#8232)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "9b58c2ba19bdbddb28c0d99d90d0f2113f121472": {
       "pr": 7989,
@@ -365,7 +365,7 @@
       "pr": 7528,
       "kind": "ai",
       "subject": "fix(providers): migrate muse-spark-web from GraphQL to WebSocket protocol (#7528)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "55549bfe5afa48886284d9d41d7f37c252c09f21": {
       "pr": 7911,
@@ -443,7 +443,7 @@
       "pr": 7390,
       "kind": "ai",
       "subject": "fix(branding): regenerate raster favicons — white mark was shipped without its gradient tile (#7390)",
-      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (Hard Rule #16 violation, recorded in #14436)"
+      "reason": "third-party contributor PR squash-merged with AI co-author/session trailers before the gate existed (AI-attribution violation, recorded in #14436)"
     },
     "cfc1d79edde064444430c20110550cd14ffa1dbb": {
       "pr": 7642,

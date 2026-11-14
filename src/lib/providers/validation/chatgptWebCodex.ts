@@ -30,7 +30,7 @@ export async function validateChatGptWebCodexProvider({
   providerSpecificData?: Record<string, unknown>;
   /**
    * Whether this caller may make the host launch a browser. Remote-reachable routes pass
-   * `false` for non-loopback callers (Hard Rules #15/#17); internal callers keep the default.
+   * `false` for non-loopback callers (Hard Rules #15/#16); internal callers keep the default.
    */
   allowLocalSpawn?: boolean;
 }) {

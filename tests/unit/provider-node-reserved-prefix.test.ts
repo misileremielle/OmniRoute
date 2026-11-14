@@ -224,7 +224,10 @@ test("shared set size includes live REGISTRY and retired Designer + Felo + Qwen 
   // (434 -> 435). Measured on the merged tree: RESERVED_PROVIDER_PREFIXES.size = 435.
   // Gisoo (#18112) adds id and alias "gisoo" (+1 distinct prefix: 435 -> 436).
   // MiniMax Code (#17286) registers id "minimax-code" and alias "mmcode" — two more.
-  assert.equal(RESERVED_PREFIX_COUNT, 431);
+  // Upstream v3.8.54 second sync (+12, measured against the fork parent): cerebrium, chatgpt,
+  // empiriolabs, grokified, hetzner, megabrain/mb, opencode-server/ocs, paraloncloud/paralon,
+  // replicate — 431 -> 443.
+  assert.equal(RESERVED_PREFIX_COUNT, 443);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("ainetcafe"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("tokenharbor"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("runcrate"), true);

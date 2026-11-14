@@ -19,7 +19,7 @@ function success() {
     id: "resp_reselect",
     object: "response",
     status: "completed",
-    model: "gpt-5.6-sol",
+    model: "gpt-5.5",
     output: [
       {
         id: "msg_reselect",
@@ -35,9 +35,9 @@ function success() {
 function streamSuccess() {
   return new Response(
     [
-      'event: response.created\ndata: {"type":"response.created","response":{"id":"resp_reselect","model":"gpt-5.6-sol"}}\n\n',
+      'event: response.created\ndata: {"type":"response.created","response":{"id":"resp_reselect","model":"gpt-5.5"}}\n\n',
       'event: response.output_text.delta\ndata: {"type":"response.output_text.delta","delta":"ok"}\n\n',
-      'event: response.completed\ndata: {"type":"response.completed","response":{"id":"resp_reselect","model":"gpt-5.6-sol","status":"completed","output":[],"usage":{"input_tokens":4,"output_tokens":2,"total_tokens":6}}}\n\n',
+      'event: response.completed\ndata: {"type":"response.completed","response":{"id":"resp_reselect","model":"gpt-5.5","status":"completed","output":[],"usage":{"input_tokens":4,"output_tokens":2,"total_tokens":6}}}\n\n',
     ].join(""),
     { headers: { "Content-Type": "text/event-stream" } }
   );
@@ -60,7 +60,8 @@ function invoke(id: string, stream = false) {
     harness.buildRequest({
       url: "http://localhost/v1/responses",
       headers: { "x-omniroute-connection": id },
-      body: { model: "codex/gpt-5.6-sol", input: "offline stale selection", stream },
+      // Not a -sol/-astra model: this fork's codexPlanModelGate skips plan-less accounts for those.
+      body: { model: "codex/gpt-5.5", input: "offline stale selection", stream },
     })
   );
 }

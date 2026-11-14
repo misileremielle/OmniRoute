@@ -28,7 +28,7 @@ export interface FidelityBatchResult {
  * exceeds `costCapUsd`. Remaining items receive `skippedCapped: true` and
  * `verdict: null` so callers can distinguish "not judged" from "unparseable".
  *
- * Hard Rule #18: NOT unit-tested for real LLM calls; VPS-validated via the
+ * Hard Rule #17: NOT unit-tested for real LLM calls; VPS-validated via the
  * /api/compression/compare/verify route.
  */
 export async function judgeFidelityBatch(
@@ -50,7 +50,12 @@ export async function judgeFidelityBatch(
       const prompt = buildJudgePrompt(item.original, item.compressed);
       const { text, usdCost } = await client.complete(judgeModel, prompt);
       meter.add(usdCost ?? 0);
-      results.push({ id: item.id, verdict: parseJudgeVerdict(text), usdCost: usdCost ?? 0, skippedCapped: false });
+      results.push({
+        id: item.id,
+        verdict: parseJudgeVerdict(text),
+        usdCost: usdCost ?? 0,
+        skippedCapped: false,
+      });
     } catch {
       results.push({ id: item.id, verdict: "unparseable", usdCost: 0, skippedCapped: false });
     }

@@ -9,7 +9,7 @@ const SAFE_REMOTE_STATUS_PATHS = ["/api/services/cliproxy/status"] as const;
  * Status routes whose GET handler calls `getLatestVersion()`, which runs
  * `npm view` (execFile) on a cache miss. A non-local caller must be rejected by
  * the loopback gate BEFORE the handler runs, so no remote request can ever
- * spawn a process (Hard Rules #15/#17).
+ * spawn a process (Hard Rules #15/#16).
  */
 const NPM_VIEW_STATUS_PATHS = [
   "/api/services/bifrost/status",

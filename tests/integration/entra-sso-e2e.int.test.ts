@@ -9,7 +9,7 @@
  * credential and nothing else.
  *
  * A stub authority stands in for a tenant. That does not replace a live-tenant
- * run (Hard Rule #18 still wants one for the OAuth upstream), but it does catch
+ * run (Hard Rule #17 still wants one for the OAuth upstream), but it does catch
  * everything that is our code rather than Microsoft's.
  *
  * OPT-IN. Self-skips unless `RUN_ENTRA_SSO_E2E=1` (same gating convention as the

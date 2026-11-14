@@ -79,8 +79,8 @@ Fixes land on the oldest supported line first and move forward:
 2. It is cherry-picked onto `develop` in a forward-port PR labeled `forward-port`.
 3. The forward-port keeps the original author's credit with a standard
    `Co-authored-by: Name <email>` trailer for every human author of the original change.
-   Crediting human contributors is required; crediting an AI assistant or bot is forbidden
-   (`AGENTS.md`, Hard Rule #16).
+   Crediting human contributors is required; an AI or bot `Co-Authored-By` trailer is
+   rejected by `check:ai-attribution`.
 4. If the code moved during the v4 refactor and the cherry-pick does not apply, the
    forward-port is rewritten by hand — the credit trailer still goes on it.
 
@@ -154,7 +154,7 @@ compare URL:
 
 - Feature: `…/compare/<base>...<branch>?template=feature.md`
 - Bug fix: `…/compare/<base>...<branch>?template=bugfix.md` — requires a failing-then-passing
-  test or a recorded VPS validation (`AGENTS.md`, Hard Rule #18).
+  test or a recorded VPS validation (`AGENTS.md`, Hard Rule #17).
 
 ## Related docs
 

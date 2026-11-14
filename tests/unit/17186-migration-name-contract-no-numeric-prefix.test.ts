@@ -14,7 +14,7 @@
  * started seeding rows would be a behavior change — the read path
  * merges DEFAULT_DATABASE_SETTINGS on read, so absent rows are the normal
  * case). It exercises the REAL migrations directory with the SAME regex the
- * runner uses. See Hard Rule #18 — this is a subtractive chore, so the pin is
+ * runner uses. See Hard Rule #17 — this is a subtractive chore, so the pin is
  * an invariant, not a failing-then-passing repro.
  */
 

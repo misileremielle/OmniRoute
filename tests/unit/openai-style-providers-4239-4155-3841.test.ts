@@ -9,7 +9,7 @@
  * registry, and added to NAMED_OPENAI_STYLE_PROVIDERS so `/models` serves the
  * live upstream catalog (falling back to the seeded list when the fetch fails).
  *
- * NOTE (Rule #18): the base paths were confirmed live (each returns a 401
+ * NOTE (Rule #17): the base paths were confirmed live (each returns a 401
  * OpenAI-style error body, i.e. the endpoint exists and requires a Bearer key).
  * The exact upstream model-id list could not be fetched without a key, so the
  * seed lists below are intentionally minimal — populated only from author/doc

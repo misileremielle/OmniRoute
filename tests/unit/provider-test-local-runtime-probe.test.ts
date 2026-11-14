@@ -1,7 +1,7 @@
 /**
  * GHSA-jmq6-8j86-8xqj — the connection test's local CLI probe spawns on the host
  * (`getCliRuntimeStatus()` → `sh -c 'command -v -- "$1"'`), the LOCAL_ONLY capability of
- * Hard Rules #15/#17. The connection-test routes stay reachable remotely, so the probe
+ * Hard Rules #15/#16. The connection-test routes stay reachable remotely, so the probe
  * itself is gated on the caller's trusted locality (loopback or private LAN).
  */
 import test, { after } from "node:test";

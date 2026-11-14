@@ -3,7 +3,7 @@
  * unified `/v1/models` catalog. Uses `isFreeModel()` from
  * `src/shared/utils/freeModels.ts` (`:free` suffix, zero-price pricing, or
  * FREE_MODEL_BUDGETS membership). Modality registries are exempt (no pricing).
- * Rule #18 regression guard for the toggle.
+ * Rule #17 regression guard for the toggle.
  */
 import test from "node:test";
 import assert from "node:assert/strict";

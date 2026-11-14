@@ -1,6 +1,6 @@
 // #7895 — narrow `mcp:connect` scope + per-key HTTP tool-scope binding for
 // remote MCP. Security-critical (touches the LOCAL_ONLY manage-scope bypass,
-// Hard Rules #15/#17) — dedicated regression tests, mirroring the harness in
+// Hard Rules #15/#16) — dedicated regression tests, mirroring the harness in
 // tests/unit/authz/management-policy.test.ts.
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -227,7 +227,7 @@ test("stdio entrypoint (server.ts) does not import the HTTP-only authInfo resolv
   );
 });
 
-// ─── 6. isLocalOnlyPath()/bypass regression guard (Hard Rule #15/#17) ───────
+// ─── 6. isLocalOnlyPath()/bypass regression guard (Hard Rule #15/#16) ───────
 
 test("isLocalOnlyPath/isLocalOnlyBypassableByManageScope classification is unchanged by #7895", () => {
   assert.equal(isLocalOnlyPath("/api/mcp/sse"), true);

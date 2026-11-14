@@ -1,6 +1,6 @@
 // Starts and stops the local `opencode serve` process on the operator's request.
 //
-// SECURITY (Hard Rules #13/#15/#17): this is the ONLY module of the
+// SECURITY (Hard Rules #13/#15/#16): this is the ONLY module of the
 // opencode-server provider that loads a process API. It is imported solely by the
 // lifecycle routes under /api/services/opencode-server/, which isLocalOnlyPath()
 // classifies loopback-only before any auth check. The executor (request path)

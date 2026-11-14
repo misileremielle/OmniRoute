@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 // Fixtures below are taken from @skyzea1's real, sanitized capture of an
 // `m365.cloud.microsoft/chat` round-trip (test prompt → one-word "pong" reply).
 // These pin the wire format so the executor's encode/decode cannot drift; the
-// live socket round-trip is the separate Rule #18 validation gate.
+// live socket round-trip is the separate Rule #17 validation gate.
 
 import {
   RECORD_SEPARATOR,
@@ -61,7 +61,13 @@ const FINAL_UPDATE = {
   arguments: [
     {
       messages: [
-        { text: "pong", author: "bot", sourceAttributions: [], references: {}, contentOrigin: "DeepLeo" },
+        {
+          text: "pong",
+          author: "bot",
+          sourceAttributions: [],
+          references: {},
+          contentOrigin: "DeepLeo",
+        },
       ],
       isLastUpdate: true,
       requestId: "trace-id",

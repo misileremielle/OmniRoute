@@ -68,7 +68,7 @@ import {
 //     streaming via `message.part.delta` events, terminated by `session.idle`.
 //
 // The executor never starts the server. Spawning a process from the request path
-// would make every inference route a process-spawn surface (Hard Rules #15/#17,
+// would make every inference route a process-spawn surface (Hard Rules #15/#16,
 // check:route-guard-membership), so `opencode serve` is started by the operator:
 // from the dashboard (Providers -> Services -> OpenCode, backed by the local-only
 // /api/services/opencode-server/* routes and services/opencodeServerLauncher.ts)

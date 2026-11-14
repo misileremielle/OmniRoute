@@ -63,7 +63,10 @@ const P = await import("../../src/shared/constants/providers.ts");
 // Token Harbor (#16315) adds one apikey/gateways entry — 253.
 // Runcrate (#18061) adds one apikey/inference-hosts entry — 254.
 // Gisoo (#18112) adds one apikey/gateways entry — 255.
-const APIKEY_PROVIDER_COUNT = 243;
+// Upstream v3.8.54 second sync adds empiriolabs, paraloncloud, replicate, cerebrium, hetzner,
+// grokified and deapi (+7) to this fork's 243; upstream's image/video/audio gateways
+// (fal-ai, stability-ai, runwayml, …) are not carried — 250.
+const APIKEY_PROVIDER_COUNT = 250;
 
 test("barrel still exports every catalog + key helpers", () => {
   for (const name of [

@@ -122,14 +122,6 @@ function pipelineEffort(model: string, provider: string, body: Record<string, un
   return out.reasoning_effort;
 }
 
-const forceRule = (targetEffort: string) => ({
-  id: "rule-1",
-  effortMode: "force",
-  targetEffort,
-  budgetAction: "preserve",
-  budgetTokens: null,
-});
-
 test("pipeline: the system directive effort wins over the top-level effort", () => {
   const effort = pipelineEffort("gpt-5", "openai", {
     output_config: { effort: "low" },
@@ -158,24 +150,8 @@ test("pipeline: Auto thinking mode drops the directive effort too", () => {
   }
 });
 
-test("pipeline: a forced reasoning rule beats the directive effort", () => {
-  for (const forced of ["low", "none"]) {
-    const effort = pipelineEffort("gpt-5", "openai", {
-      _omnirouteReasoningRule: forceRule(forced),
-      output_config: { effort: "high" },
-      messages: turns({ effort: "high" }),
-    });
-    assert.equal(effort, forced, `forced ${forced}`);
-  }
-});
-
-test("pipeline: a default reasoning rule keeps the directive effort", () => {
-  const effort = pipelineEffort("gpt-5", "openai", {
-    _omnirouteReasoningRule: { ...forceRule("low"), effortMode: "default" },
-    messages: turns({ effort: "high" }),
-  });
-  assert.equal(effort, "high");
-});
+// Upstream's "forced/default reasoning rule" cases are not carried: this fork removed
+// reasoning routing rules (_omnirouteReasoningRule is never set).
 
 test("pipeline: the caller body keeps its directive and top-level effort", () => {
   const body = {

@@ -1,7 +1,7 @@
 /**
  * Security regression (#15446): GET /api/providers/devin-cli-agentic/auth-status
  * spawns `devin auth status` (getDevinAgenticAuthStatus()), so it MUST be
- * LOCAL_ONLY like every other spawn-capable route (Hard Rules #15 + #17) — a
+ * LOCAL_ONLY like every other spawn-capable route (Hard Rules #15 + #16) — a
  * leaked dashboard session over a tunnel must not be able to trigger it.
  */
 import test from "node:test";

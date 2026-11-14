@@ -6,7 +6,7 @@
  * Spawns the local `headroom proxy --port <port>` as a detached process,
  * tracks its PID in `<DATA_DIR>/headroom/proxy.pid`, and exposes start/stop/
  * status helpers. Only invoked behind the LOCAL_ONLY route-guard tier
- * (Hard Rules #15 + #17): a tunneled JWT cannot reach the start/stop routes.
+ * (Hard Rules #15 + #16): a tunneled JWT cannot reach the start/stop routes.
  */
 
 import fs from "node:fs";

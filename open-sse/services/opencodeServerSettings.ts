@@ -3,7 +3,7 @@
 // Only the server URL lives here. The CLI binary that gets spawned is deliberately
 // NOT a stored setting: a free-text path in the settings DB that the request path
 // later passes to spawn() would turn any management JWT into a process-execution
-// primitive (Hard Rules 15/17). The binary comes from the operator's environment
+// primitive (Hard Rules 15/16). The binary comes from the operator's environment
 // (OPENCODE_SERVER_BIN / CLI_OPENCODE_BIN) or well-known install locations only.
 //
 // The value is pushed in by the runtime-settings applier (src/lib/config/

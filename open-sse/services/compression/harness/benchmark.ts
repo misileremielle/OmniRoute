@@ -17,7 +17,7 @@
  *   runner is already deterministic. Running `benchmarkEngines` twice on the
  *   same corpus MUST yield identical numbers.
  *
- * - `llmlingua` real-model A/B is a VPS-validated follow-up (Hard Rule #18 /
+ * - `llmlingua` real-model A/B is a VPS-validated follow-up (Hard Rule #17 /
  *   L3). The sandbox benchmark covers the deterministic engines (rtk, caveman,
  *   lite, aggressive, ultra, session-dedup, headroom, ccr). The framework is
  *   engine-agnostic: adding llmlingua later is just another id in the engines
@@ -211,7 +211,10 @@ export function engineToCompressFn(engineId: string): CompressFn {
         // the first string content otherwise.
         for (let i = messages.length - 1; i >= 0; i--) {
           const c = (messages[i] as Record<string, unknown>)["content"];
-          if (typeof c === "string" && (messages[i] as Record<string, unknown>)["role"] !== "system") {
+          if (
+            typeof c === "string" &&
+            (messages[i] as Record<string, unknown>)["role"] !== "system"
+          ) {
             return c;
           }
         }

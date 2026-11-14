@@ -51,7 +51,7 @@ test("backward-compat: untouched backends (cliproxy/mux/bifrost) installer spawn
   assert.deepStrictEqual(bifrostSpawnArgs(8080), bifrostSpawnArgs(8080));
 });
 
-test("Hard Rule #17 regression: /api/services/* stays LOCAL_ONLY after the plugin contract introduction", () => {
+test("Hard Rule #16 regression: /api/services/* stays LOCAL_ONLY after the plugin contract introduction", () => {
   assert.equal(isLocalOnlyPath("/api/services/9router/status"), true);
   assert.equal(isLocalOnlyPath("/api/services/cliproxy/status"), true);
 });

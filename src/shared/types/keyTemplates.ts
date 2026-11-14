@@ -98,7 +98,6 @@ export interface KeyTemplateKeyPolicy {
   dailyUsageLimitUsd: number | null;
   weeklyUsageLimitUsd: number | null;
   fiveHourUsageLimitUsd: number | null;
-  chaosModeEnabled: boolean;
   compressionEnabled: boolean;
   allowAutoCombos: boolean;
   allowCcDiscoveryAliases: boolean;
@@ -338,7 +337,6 @@ export function createDefaultKeyTemplatePolicy(): KeyTemplatePolicy {
       dailyUsageLimitUsd: null,
       weeklyUsageLimitUsd: null,
       fiveHourUsageLimitUsd: null,
-      chaosModeEnabled: false,
       compressionEnabled: true,
       allowAutoCombos: true,
       allowCcDiscoveryAliases: true,

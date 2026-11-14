@@ -1,6 +1,6 @@
 /**
  * POST /api/providers/agy-auth/apply-local spawns `secret-tool` through
- * detectLocalAgyTokenRaw(), so it must be LOCAL_ONLY (Hard Rules #15 + #17). Its siblings
+ * detectLocalAgyTokenRaw(), so it must be LOCAL_ONLY (Hard Rules #15 + #16). Its siblings
  * only parse what the request carries, and a blanket /api/providers/agy-auth/ prefix would
  * take the modal's File/Paste and Bulk tabs away from tunnel-served dashboards.
  */

@@ -28,7 +28,7 @@ const LIFECYCLE_PATHS = [
   "/api/services/opencode-server/stop",
 ];
 
-test("opencode-server lifecycle routes are loopback-only (Hard Rules #15/#17)", () => {
+test("opencode-server lifecycle routes are loopback-only (Hard Rules #15/#16)", () => {
   for (const route of LIFECYCLE_PATHS) {
     for (const method of ["GET", "POST"]) {
       assert.equal(isLocalOnlyPath(route, method), true, `${method} ${route}`);

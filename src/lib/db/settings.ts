@@ -338,7 +338,7 @@ export async function getSettings() {
     // quota window right after it resets, so the first real request doesn't land in
     // a cold window. `connections` maps connection id -> enabled. Default empty map
     // (nobody opted in) — the scheduler is a no-op until an operator flips a
-    // connection on, since pinging burns a small amount of real quota (Hard Rule #20
+    // connection on, since pinging burns a small amount of real quota (Hard Rule #19
     // spirit: never mutate/consume on the operator's behalf by default).
     codexAutoPing: { connections: {} },
     // Opt-in auto-apply of banked resets (Codex credits, Claude grants, Claude weekly
@@ -347,7 +347,7 @@ export async function getSettings() {
     // mergeBankedResetAutoApplySettings (src/lib/usage/bankedResetPolicy.ts).
     bankedResetAutoApply: createBankedResetAutoApplyDefaults(),
     // Opt-in auto-spend of Codex reset credits that are about to expire. Spending a
-    // credit mutates upstream account state, so this is off by default (Hard Rule #20
+    // credit mutates upstream account state, so this is off by default (Hard Rule #19
     // spirit: never consume on the operator's behalf until they opt in).
     // `enabled` is the master switch; `connections` narrows it to specific ids
     // (absent = every eligible Codex connection; `{}` = nobody). `maxPerDay` is a

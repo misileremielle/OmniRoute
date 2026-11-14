@@ -12,7 +12,7 @@
 //      spawn(binary, args, …)
 //      reached from GET /api/providers/[id]/models
 //
-// Hard Rules #15 and #17 require loopback enforcement unconditionally before
+// Hard Rules #15 and #16 require loopback enforcement unconditionally before
 // any auth check. Both hops are now gated at their call sites on the trusted
 // peer-locality header (the /api/providers/[id]/models precedent): the spawn
 // only runs for loopback/LAN peers, so the routes themselves stay

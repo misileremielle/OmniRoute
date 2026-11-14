@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/check/check-route-guard-membership.ts
-// Quality gate: route-guard membership (CLAUDE.md Hard Rules #15 + #17).
+// Quality gate: route-guard membership (CLAUDE.md Hard Rules #15 + #16).
 //
 // WHY: routes that spawn child processes (`npm install`, `node`, MITM/Playwright,
 // worker_threads) MUST be classified loopback-only by `isLocalOnlyPath()` in
@@ -47,37 +47,37 @@ function assertNoStaleEntries(
 
 // Spawn-capable route roots (relative to repo root). Mirrors the spawn-capable
 // prefixes documented in routeGuard.ts (SPAWN_CAPABLE_PREFIXES) and CLAUDE.md
-// Hard Rules #15/#17 for the dirs that physically exist under src/app/api/.
+// Hard Rules #15/#16 for the dirs that physically exist under src/app/api/.
 export const SPAWN_CAPABLE_ROUTE_ROOTS: ReadonlyArray<string> = [
   "src/app/api/services",
   "src/app/api/mcp",
   "src/app/api/cli-tools/runtime",
-  "src/app/api/local", // T-12: 1-click local service launchers (Redis today) — every child here spawns podman/docker (Hard Rules #15 + #17)
+  "src/app/api/local", // T-12: 1-click local service launchers (Redis today) — every child here spawns podman/docker (Hard Rules #15 + #16)
   "src/app/api/skills/collect", // Chaos Mode dispatch route, kept loopback-only apart from its exact public entry
-  "src/app/api/cli-tools/forge-settings", // GET calls getCliRuntimeStatus() to detect the `forge` CLI install (Hard Rules #15 + #17, #7263)
-  "src/app/api/cli-tools/jcode-settings", // GET calls getCliRuntimeStatus() to detect the `jcode` CLI install (Hard Rules #15 + #17, #7263)
-  "src/app/api/cli-tools/qwen-settings", // GET calls getCliRuntimeStatus("qwen") and writes local ~/.qwen config files (Hard Rules #15 + #17)
+  "src/app/api/cli-tools/forge-settings", // GET calls getCliRuntimeStatus() to detect the `forge` CLI install (Hard Rules #15 + #16, #7263)
+  "src/app/api/cli-tools/jcode-settings", // GET calls getCliRuntimeStatus() to detect the `jcode` CLI install (Hard Rules #15 + #16, #7263)
+  "src/app/api/cli-tools/qwen-settings", // GET calls getCliRuntimeStatus("qwen") and writes local ~/.qwen config files (Hard Rules #15 + #16)
   // GHSA-35fw-cv32-2373: the 14 cli-tools routes that reach the same spawn as the siblings
   // above via getCliRuntimeStatus() (13) or detectAllTools() -> execFile (detect).
-  "src/app/api/cli-tools/all-statuses", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/claude-settings", // GET calls getCliRuntimeStatus() to detect the `claude` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/cline-settings", // GET calls getCliRuntimeStatus() to detect the `cline` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/codewhale-settings", // GET calls getCliRuntimeStatus() to detect the `codewhale` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/codex-settings", // GET calls getCliRuntimeStatus() to detect the `codex` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/crush-settings", // GET calls getCliRuntimeStatus() to detect the `crush` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/deepseek-tui-settings", // GET calls getCliRuntimeStatus() to detect the `deepseek-tui` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/detect", // GET calls detectAllTools() -> execFile(binary, --version) + execFile("which") per tool via src/lib/cli-helper/tool-detector.ts (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/droid-settings", // GET calls getCliRuntimeStatus() to detect the `droid` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/kilo-settings", // GET calls getCliRuntimeStatus() to detect the `kilo` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/openclaw-settings", // GET calls getCliRuntimeStatus() to detect the `openclaw` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/pi-settings", // GET calls getCliRuntimeStatus() to detect the `pi` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/smelt-settings", // GET calls getCliRuntimeStatus() to detect the `smelt` CLI install (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #17, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/whycodes-settings", // GET calls getCliRuntimeStatus() to detect the `whycodes` CLI install (Hard Rules #15 + #17, #14107)
+  "src/app/api/cli-tools/all-statuses", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/claude-settings", // GET calls getCliRuntimeStatus() to detect the `claude` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/cline-settings", // GET calls getCliRuntimeStatus() to detect the `cline` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/codewhale-settings", // GET calls getCliRuntimeStatus() to detect the `codewhale` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/codex-settings", // GET calls getCliRuntimeStatus() to detect the `codex` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/crush-settings", // GET calls getCliRuntimeStatus() to detect the `crush` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/deepseek-tui-settings", // GET calls getCliRuntimeStatus() to detect the `deepseek-tui` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/detect", // GET calls detectAllTools() -> execFile(binary, --version) + execFile("which") per tool via src/lib/cli-helper/tool-detector.ts (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/droid-settings", // GET calls getCliRuntimeStatus() to detect the `droid` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/kilo-settings", // GET calls getCliRuntimeStatus() to detect the `kilo` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/openclaw-settings", // GET calls getCliRuntimeStatus() to detect the `openclaw` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/pi-settings", // GET calls getCliRuntimeStatus() to detect the `pi` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/smelt-settings", // GET calls getCliRuntimeStatus() to detect the `smelt` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
+  "src/app/api/cli-tools/whycodes-settings", // GET calls getCliRuntimeStatus() to detect the `whycodes` CLI install (Hard Rules #15 + #16, #14107)
   // (executor.ts -> builtins.ts -> sandbox.ts) — invisible to the source-scan subcheck.
   // install / start / restart / stop reach the CLIProxyAPI download + ServiceSupervisor spawn
   // transitively, which the source-scan subcheck cannot see.
-  "src/app/api/version-manager", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #17)
+  "src/app/api/version-manager", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #16)
 ];
 
 // Frozen pre-existing exceptions: spawn-capable routes NOT yet classified
@@ -160,7 +160,7 @@ export function findSpawnCapableRoutes(repoRoot: string): string[] {
 /**
  * 6A.8: pre-existing spawn-capable route.ts files that live OUTSIDE
  * SPAWN_CAPABLE_ROUTE_ROOTS but are NOT yet classified local-only.
- * Each entry is documented security debt (Hard Rules #15/#17):
+ * Each entry is documented security debt (Hard Rules #15/#16):
  * the route can spawn child processes and is reachable past the loopback gate.
  *
  * TODO(6A.8): classify these in LOCAL_ONLY_API_PREFIXES / LOCAL_ONLY_API_PATTERNS
@@ -428,7 +428,7 @@ async function main(): Promise<void> {
 
   if (unclassified.length) {
     console.error(
-      `[route-guard-membership] CRITICAL — ${unclassified.length} spawn-capable route(s) in SPAWN_CAPABLE_ROUTE_ROOTS NOT classified local-only (RCE-via-tunnel risk, Hard Rules #15/#17):\n` +
+      `[route-guard-membership] CRITICAL — ${unclassified.length} spawn-capable route(s) in SPAWN_CAPABLE_ROUTE_ROOTS NOT classified local-only (RCE-via-tunnel risk, Hard Rules #15/#16):\n` +
         unclassified.map((p) => `  ✗ ${p}`).join("\n") +
         `\n  → add a matching prefix to LOCAL_ONLY_API_PREFIXES or a pattern to LOCAL_ONLY_API_PATTERNS in src/server/authz/routeGuard.ts, or freeze in KNOWN_UNCLASSIFIED with justification.`
     );
@@ -437,7 +437,7 @@ async function main(): Promise<void> {
 
   if (unclassifiedSourceSpawn.length) {
     console.error(
-      `[route-guard-membership] CRITICAL — ${unclassifiedSourceSpawn.length} route.ts file(s) contain child_process/worker_threads but are NOT classified local-only (Hard Rules #15/#17):\n` +
+      `[route-guard-membership] CRITICAL — ${unclassifiedSourceSpawn.length} route.ts file(s) contain child_process/worker_threads but are NOT classified local-only (Hard Rules #15/#16):\n` +
         unclassifiedSourceSpawn.map((p) => `  ✗ ${p} (${routeFileToApiPath(p)})`).join("\n") +
         `\n  → classify in LOCAL_ONLY_API_PREFIXES / LOCAL_ONLY_API_PATTERNS, or freeze in KNOWN_UNCLASSIFIED_SOURCE_SPAWN with justification.`
     );
@@ -446,7 +446,7 @@ async function main(): Promise<void> {
 
   if (transitiveGaps.length) {
     console.error(
-      `[route-guard-membership] CRITICAL — ${transitiveGaps.length} route.ts file(s) reach a NEW spawn-capable module through their import graph but are NOT classified local-only (Hard Rules #15/#17, G-09):\n` +
+      `[route-guard-membership] CRITICAL — ${transitiveGaps.length} route.ts file(s) reach a NEW spawn-capable module through their import graph but are NOT classified local-only (Hard Rules #15/#16, G-09):\n` +
         formatTransitiveGaps(transitiveGaps) +
         `\n  → classify the route in LOCAL_ONLY_API_PREFIXES / LOCAL_ONLY_API_PATTERNS, gate the spawn at its call site, or (fixed-argv process plumbing only) list the module in TRANSITIVE_SPAWN_INFRA_MODULES with justification.`
     );

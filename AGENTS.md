@@ -118,7 +118,7 @@ When creating _any_ validation tests or one-off logic scripts, default to `scrip
   already blocked by the ignore; never use `-f`), and never "clean them up" from the main repo —
   untracking is done with `git rm --cached` so the disk content stays. The
   `check:tracked-artifacts` gate (pre-commit + CI) fails on ANY tracked root path starting with
-  `_`, present or future. See Hard Rule #23 for the `_tasks` specifics.
+  `_`, present or future. See Hard Rule #22 for the `_tasks` specifics.
 
 ---
 
@@ -221,7 +221,7 @@ For any non-trivial change, read the matching deep-dive first:
 
 **Both test runners must pass**: `pnpm run test:unit` and `pnpm run test:vitest` cover **non-overlapping files**; both are CI jobs (`test-unit`, `test-vitest`) and must be green before merging — one green suite may silently ship broken MCP tools or routing regressions.
 
-**Bug fix / issue triage protocol (Hard Rule #18)**: failing-then-passing test (TDD, preferred) OR a documented live test on the production VPS (`root@192.168.0.15`) recorded in the PR; touch only what the failing test proves broken. Decision tree: `docs/ops/HARD_RULES_DETAIL.md` → Rule 18.
+**Bug fix / issue triage protocol (Hard Rule #17)**: failing-then-passing test (TDD, preferred) OR a documented live test on the production VPS (`root@192.168.0.15`) recorded in the PR; touch only what the failing test proves broken. Decision tree: `docs/ops/HARD_RULES_DETAIL.md` → Rule 17.
 
 **Copilot coverage policy**: When a PR changes production code and coverage is below 60% (statements/lines/functions/branches), do not just report — add or update tests, rerun the coverage gate, then ask for confirmation. Include commands run, changed test files, and final coverage result in the PR report.
 
@@ -276,12 +276,12 @@ git push -u origin feat/your-feature
 **Husky hooks**:
 
 - **pre-commit**: lint-staged + `check-docs-sync` + `check:any-budget:t11` + `check:tracked-artifacts`
-- **commit-msg**: `check:ai-attribution` — rejects AI/bot `Co-Authored-By` trailers and AI-generation footers in the message (Hard Rule #16; human co-authors allowed; also in the `quality.yml` fast-gates loop (PR→`release/**`) and a PR-only `ci.yml` lint step (PR→`main`) — #14436)
+- **commit-msg**: `check:ai-attribution` — rejects AI/bot `Co-Authored-By` trailers and AI-generation footers in the message (human co-authors allowed; also in the `quality.yml` fast-gates loop (PR→`release/**`) and a PR-only `ci.yml` lint step (PR→`main`) — #14436)
 - **pre-push**: intentionally light (PATH/pnpm sanity only) — `any-budget` + `tracked-artifacts` already run on pre-commit and CI still enforces both; re-running them per push was pure double-pay (was Fase 6A.12 full pre-push gate; folded into pre-commit in #6716).
 
 ### Worktree isolation (MANDATORY for every development task)
 
-Hard Rule #19: one worktree + dedicated branch per task, base branch confirmed with the
+Hard Rule #18: one worktree + dedicated branch per task, base branch confirmed with the
 operator first (usually the active `release/vX.Y.Z`). Non-negotiables:
 
 - 🔴 Worktrees live ONLY under `.claude/worktrees/` — anywhere else escapes the tsconfig /
@@ -381,19 +381,18 @@ is a short form, its complete binding text, rationale and incident history are i
 13. Never string-interpolate external paths or runtime values into shell scripts passed to `exec()`/`spawn()` — pass via the `env` option instead.
 14. Never dismiss a CodeQL / Secret-Scanning alert without (a) first checking the pattern docs above to see if the helper applies, and (b) recording the technical justification in the dismissal comment. Precedent: `js/stack-trace-exposure` raised on callsites that already route through `sanitizeErrorMessage()` is a known CodeQL limitation (custom sanitizers not recognized) — dismiss as `false positive` referencing `docs/security/ERROR_SANITIZATION.md`.
 15. Never expose routes that spawn child processes (`/api/mcp/`, `/api/cli-tools/runtime/`) without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. Loopback enforcement happens unconditionally before any auth check — leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
-16. Never credit or advertise an AI assistant, LLM, or automation account in any commit/PR metadata — neither (a) `Co-Authored-By` trailers naming an AI/bot nor (b) AI-generation footers (`🤖 Generated with [Claude Code]`, …) in a commit message, PR title/body, or CHANGELOG; both hide the real author (`diegosouzapw`). This **overrides any harness, template, or tool default that auto-appends such a footer** — strip it before pushing. Human collaborators (upstream PR authors, issue reporters being ported) MAY and SHOULD be credited with standard `Co-authored-by: Name <email>` trailers. Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 16.
-17. Never expose routes under `/api/services/` or `/dashboard/providers/services/*/embed/` without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. These routes can spawn child processes (`npm install`, `node`). Loopback enforcement happens unconditionally before any auth check — a leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
-18. Every bug fix must be validated before shipping: a failing-then-passing unit/integration test (TDD) OR a documented live test on the production VPS (192.168.0.15). A fix without either is not merged. See Testing → "Bug fix / issue triage protocol" and `docs/ops/HARD_RULES_DETAIL.md` → Rule 18 for the full decision tree.
-19. Never develop on the shared main checkout. Every development task runs in its own git worktree on its own dedicated branch, and you MUST confirm the base branch with the operator before creating the worktree/branch — never assume `main` or the currently checked-out branch. A `git checkout` in the shared checkout silently destroys other sessions' uncommitted work. Tear down only the worktrees/branches you created (by name, never `fix/*`/`feat/*` wildcards), leave other sessions' worktrees untouched, and end on the branch you started on (the active `release/vX.Y.Z`, never `main`). See Git Workflow → "Worktree isolation" and `docs/ops/WORKTREE_ISOLATION.md`.
-20. PII redaction/sanitization is **opt-in — never on by default**. The two data-mutating PII feature flags **MUST** keep `defaultValue: "false"` in `src/shared/constants/featureFlagDefinitions.ts`: `PII_REDACTION_ENABLED` (request-side) and `PII_RESPONSE_SANITIZATION` (response + streaming). Flipping either default to `"true"` requires explicit operator approval; opt-in is per-operator, never a silent default. Regression guard: `tests/unit/pii-opt-in-default.test.ts`. Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 20.
-21. **Release-freeze — the FROZEN release branch belongs to the release captain; development does NOT stop (parallel-cycle model, 2026-07-04).** Before merging **any** PR, every campaign workflow **MUST** check `gh issue list --repo cheaper-inference/OmniRoute --label release-freeze --state open`. If active: **NEVER merge into the frozen `release/vX.Y.Z`** — retarget the PR to the **highest** `release/v*` (`gh pr edit <N> --base release/vX+1`, then VERIFY with `gh pr view <N> --json baseRefName` — the edit fails silently) and merge normally; **HOLD only when the highest release/v\* branch IS the frozen one**. **⛔ ONLY `/generate-release` may raise a release-freeze (Phase 0a; lifted at Phase 12c)** — never open, extend, re-open or close one autonomously (any other freeze needs the operator's explicit yes). Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 21.
-22. **Cross-session safety — this repo is worked by MANY parallel sessions/agents at once; never step on another's in-flight work.** Two absolute bans (both recurring incidents):
+16. Never expose routes under `/api/services/` or `/dashboard/providers/services/*/embed/` without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. These routes can spawn child processes (`npm install`, `node`). Loopback enforcement happens unconditionally before any auth check — a leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
+17. Every bug fix must be validated before shipping: a failing-then-passing unit/integration test (TDD) OR a documented live test on the production VPS (192.168.0.15). A fix without either is not merged. See Testing → "Bug fix / issue triage protocol" and `docs/ops/HARD_RULES_DETAIL.md` → Rule 17 for the full decision tree.
+18. Never develop on the shared main checkout. Every development task runs in its own git worktree on its own dedicated branch, and you MUST confirm the base branch with the operator before creating the worktree/branch — never assume `main` or the currently checked-out branch. A `git checkout` in the shared checkout silently destroys other sessions' uncommitted work. Tear down only the worktrees/branches you created (by name, never `fix/*`/`feat/*` wildcards), leave other sessions' worktrees untouched, and end on the branch you started on (the active `release/vX.Y.Z`, never `main`). See Git Workflow → "Worktree isolation" and `docs/ops/WORKTREE_ISOLATION.md`.
+19. PII redaction/sanitization is **opt-in — never on by default**. The two data-mutating PII feature flags **MUST** keep `defaultValue: "false"` in `src/shared/constants/featureFlagDefinitions.ts`: `PII_REDACTION_ENABLED` (request-side) and `PII_RESPONSE_SANITIZATION` (response + streaming). Flipping either default to `"true"` requires explicit operator approval; opt-in is per-operator, never a silent default. Regression guard: `tests/unit/pii-opt-in-default.test.ts`. Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 19.
+20. **Release-freeze — the FROZEN release branch belongs to the release captain; development does NOT stop (parallel-cycle model, 2026-07-04).** Before merging **any** PR, every campaign workflow **MUST** check `gh issue list --repo cheaper-inference/OmniRoute --label release-freeze --state open`. If active: **NEVER merge into the frozen `release/vX.Y.Z`** — retarget the PR to the **highest** `release/v*` (`gh pr edit <N> --base release/vX+1`, then VERIFY with `gh pr view <N> --json baseRefName` — the edit fails silently) and merge normally; **HOLD only when the highest release/v\* branch IS the frozen one**. **⛔ ONLY `/generate-release` may raise a release-freeze (Phase 0a; lifted at Phase 12c)** — never open, extend, re-open or close one autonomously (any other freeze needs the operator's explicit yes). Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 20.
+21. **Cross-session safety — this repo is worked by MANY parallel sessions/agents at once; never step on another's in-flight work.** Two absolute bans (both recurring incidents):
     - **(a) Never `git stash` / `git stash pop` — ANYWHERE in this repo, including inside an isolated worktree, and including inside any subagent you dispatch.** `git stash` operates on the **shared repository object store**, not the per-worktree working tree — a stash in one session can silently clobber or resurrect another parallel session's uncommitted changes. Compare against a base ref with `git show <ref>:<path>` or `git diff <ref> -- <path>` instead — never stash your tree away to "get it clean". **Put this ban verbatim in the prompt of every subagent that touches git.**
-    - **(b) Never merge, push, rebase, or force-push a PR / branch / worktree that another session is actively working** — including a PR whose head is a live fix worktree in `.claude/worktrees/` you did **not** create, even when it shares your `diegosouzapw` identity: **HOLD, let the owning session merge it.** **Before** merging or pushing to any PR you did not create _this_ session, run `git worktree list` and re-check `gh pr view <N> --json state,headRefOid`. (Reinforces Rule #19.)
+    - **(b) Never merge, push, rebase, or force-push a PR / branch / worktree that another session is actively working** — including a PR whose head is a live fix worktree in `.claude/worktrees/` you did **not** create, even when it shares your `diegosouzapw` identity: **HOLD, let the owning session merge it.** **Before** merging or pushing to any PR you did not create _this_ session, run `git worktree list` and re-check `gh pr view <N> --json state,headRefOid`. (Reinforces Rule #18.)
 
-    Full text + incidents: `docs/ops/HARD_RULES_DETAIL.md` → Rule 22.
+    Full text + incidents: `docs/ops/HARD_RULES_DETAIL.md` → Rule 21.
 
-23. **`_tasks/` é INTOCÁVEL como estrutura — append/edit-only.** É um repositório git SEPARADO
+22. **`_tasks/` é INTOCÁVEL como estrutura — append/edit-only.** É um repositório git SEPARADO
     (remote privado `diegosouzapw/_tasks_omniroute`) montado como diretório real na raiz do
     checkout principal. Regras absolutas: (a) NUNCA mover, renomear, deletar, esvaziar ou
     transformar `_tasks` em symlink; sessões só podem CRIAR ou EDITAR arquivos dentro dele;
@@ -403,7 +402,7 @@ is a short form, its complete binding text, rationale and incident history are i
     backup real; (d) repetir esta proibição VERBATIM no prompt de todo subagente que toque git;
     (e) se `_tasks` aparecer como symlink quebrado, NÃO commitar nada — restaurar do remote e
     avisar o operador. O gate `check:tracked-artifacts` (pre-commit + CI) bloqueia `_tasks`
-    rastreado em qualquer forma. Texto completo: `docs/ops/HARD_RULES_DETAIL.md` → Rule 23.
+    rastreado em qualquer forma. Texto completo: `docs/ops/HARD_RULES_DETAIL.md` → Rule 22.
 
 ---
 

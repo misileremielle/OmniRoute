@@ -1492,7 +1492,7 @@ export async function GET(
       // The host's cursor-agent login is a different account than an API-key
       // connection, so only IDE/OAuth connections may borrow its catalog.
       if (provider === "cursor") {
-        // Hard Rules #15 + #17 (audit #15159 S-01): fetchCursorAgentModels() -> runCursorAgent()
+        // Hard Rules #15 + #16 (audit #15159 S-01): fetchCursorAgentModels() -> runCursorAgent()
         // -> spawn() at src/lib/providerModels/cursorAgent.ts:17. The `{id}` segment is a
         // CONNECTION id, so this cannot be classified by path pattern in routeGuard.ts without
         // also locking remote model discovery for every non-Cursor provider. Gate the spawn

@@ -13,7 +13,7 @@ const NAME = "opencode-server";
 // Start/Stop only: the opencode CLI is installed and updated by the operator, so
 // the install/update/restart buttons of ServiceLifecycleButtons do not apply.
 // The executor never starts the server itself (the request path must not reach
-// spawn, Hard Rules #15/#17); this tab, backed by the local-only
+// spawn, Hard Rules #15/#16); this tab, backed by the local-only
 // /api/services/opencode-server/* routes, is the in-app way to launch it.
 function OpencodeServerLifecycleButtons() {
   const t = useTranslations("embeddedServices");

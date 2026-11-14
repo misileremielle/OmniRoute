@@ -1,5 +1,5 @@
 /**
- * Hard Rule #17 — every /api/services/singbox/* route can spawn/stop a child process
+ * Hard Rule #16 — every /api/services/singbox/* route can spawn/stop a child process
  * (`sing-box run`) and the TPROXY path edits host iptables, so each one must be
  * classified LOCAL_ONLY in src/server/authz/routeGuard.ts (loopback enforced before auth).
  * The route list is read from disk, so a route added later without being covered fails here.
@@ -38,7 +38,7 @@ test("singbox exposes the full 8-route lifecycle surface", () => {
 
 test("every /api/services/singbox/* route is a LOCAL_ONLY path", () => {
   for (const route of discoveredRoutes()) {
-    assert.equal(isLocalOnlyPath(route), true, `${route} must be local-only (Hard Rule #17)`);
+    assert.equal(isLocalOnlyPath(route), true, `${route} must be local-only (Hard Rule #16)`);
   }
 });
 

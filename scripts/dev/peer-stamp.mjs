@@ -30,7 +30,7 @@ export const PEER_IP_HEADER = "x-omniroute-peer-ip";
  * Required so the middleware can tell that a loopback socket is the
  * reverse-proxy hop (nginx / Caddy / Cloudflare Tunnel) and NOT trust it as
  * local — without this, a leaked JWT over a public tunnel would reach the
- * LOCAL_ONLY routes that spawn child processes (Hard Rules #15 + #17; port of
+ * LOCAL_ONLY routes that spawn child processes (Hard Rules #15 + #16; port of
  * upstream decolua/9router commit da667836). A peer on any other address can
  * write forwarding headers itself, so from it they do not set the marker.
  *

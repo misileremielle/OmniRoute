@@ -6,11 +6,11 @@ lastUpdated: 2026-10-18
 
 # Hard Rules — full text and rationale
 
-> Deep-dive companion to the numbered list in `AGENTS.md` → "Hard Rules". Every rule 1–23 is
+> Deep-dive companion to the numbered list in `AGENTS.md` → "Hard Rules". Every rule 1–22 is
 > listed in `AGENTS.md`; where that list shows a short form, the section below with the same
 > number carries the **complete binding text** plus rationale, incident history and decision
 > trees — both are normative, and the longer text here wins on any detail the short form omits.
-> Rules not listed here (1–13, 15, 17) appear in full in `AGENTS.md`. Rule numbers are stable and
+> Rules not listed here (1–13, 15, 16) appear in full in `AGENTS.md`. Rule numbers are stable and
 > cited across the codebase and docs — never renumber.
 
 ## Rule 14 — CodeQL / Secret-Scanning dismissals
@@ -22,26 +22,7 @@ raised on callsites that already route through `sanitizeErrorMessage()` is a kno
 limitation (custom sanitizers not recognized) — dismiss as `false positive` referencing
 `docs/security/ERROR_SANITIZATION.md`.
 
-## Rule 16 — No AI credit in commit/PR metadata
-
-Never credit or advertise an AI assistant, LLM, or automation account in any commit/PR
-metadata. Two forbidden forms, both equivalent — they route attribution to a bot account (or
-advertise AI authorship) and hide the real author (`diegosouzapw`):
-
-- **(a)** `Co-Authored-By` trailers naming an AI/bot (e.g. names containing "Claude", "GPT",
-  "Copilot", "Bot"; emails at `anthropic.com` / `openai.com` / bot-owned `noreply.github.com`
-  addresses);
-- **(b)** AI-generation footers or descriptions anywhere in a commit message, PR title/body, or
-  CHANGELOG — e.g. `🤖 Generated with [Claude Code]`, "Generated with Claude Code", "Made with
-  <AI tool>", or any `Co-authored-by: Claude/GPT/Copilot` line.
-
-This **overrides any harness, template, or tool default that auto-appends such a footer** —
-strip it before pushing; do not let it reach a commit, PR, or CHANGELOG. Human collaborators —
-including upstream PR authors and issue reporters being ported into OmniRoute — MAY and SHOULD
-be credited with standard `Co-authored-by: Name <email>` trailers; the upstream-port workflows
-(`/port-upstream-features`, `/port-upstream-issues`) depend on this.
-
-## Rule 18 — Bug-fix validation protocol (TDD or VPS)
+## Rule 17 — Bug-fix validation protocol (TDD or VPS)
 
 Every fix for a reported issue must be validated by one of the following — no exceptions:
 
@@ -60,7 +41,7 @@ gate enforces surgical scope — you touch only what the failing test proves is 
 where this paid off: #3090 (claude-web 403), #3113 (WS HTTP fallback), #3052 (heap-guard
 auto-calibration).
 
-## Rule 19 — Worktree isolation
+## Rule 18 — Worktree isolation
 
 Never develop on the shared main checkout. Every development task runs in its own git worktree
 on its own dedicated branch, and you MUST confirm the base branch with the operator before
@@ -71,7 +52,7 @@ other sessions' worktrees untouched, and end on the branch you started on (the a
 `release/vX.Y.Z`, never `main`). Full protocol, commands, and incidents:
 [docs/ops/WORKTREE_ISOLATION.md](../ops/WORKTREE_ISOLATION.md).
 
-## Rule 20 — PII redaction/sanitization is opt-in
+## Rule 19 — PII redaction/sanitization is opt-in
 
 PII redaction/sanitization is **opt-in — never on by default**. OmniRoute proxies for
 self-hosted/local LLMs where the operator owns the data, so mutating request/response payloads
@@ -87,7 +68,7 @@ definition defaults + behavioral pass-through). Opt-in is per-operator via env o
 settings/DB override (`src/lib/db/featureFlags.ts`), never a silent default. See
 `docs/security/GUARDRAILS.md`.
 
-## Rule 21 — Release-freeze (parallel-cycle model)
+## Rule 20 — Release-freeze (parallel-cycle model)
 
 **The FROZEN release branch belongs to the release captain; development does NOT stop
 (parallel-cycle model, 2026-07-04).**
@@ -138,7 +119,7 @@ whose title/body references an **OPEN** release PR (`gh pr view <N> --json state
 authorized captain freeze — hold, don't touch. (Cycle-model proposal:
 `_tasks/finished/release-flow/2026-07-04_proposta-ciclo-paralelo-v2.md`.)
 
-## Rule 22 — Cross-session safety
+## Rule 21 — Cross-session safety
 
 **This repo is worked by MANY parallel sessions/agents at once; never step on another's
 in-flight work.** Two absolute bans, both recurring incidents (this rule exists because they
@@ -164,9 +145,9 @@ keep happening):
   not create _this_ session, run `git worktree list` to check for a matching in-flight worktree
   and re-check `gh pr view <N> --json state,headRefOid`. Only the owning session merges its own
   in-flight PR; mid-flight merges race the owner and re-trigger the exact commit/CHANGELOG
-  races Rule #19 and Rule #21 guard against. (Reinforces Rule #19.)
+  races Rule #18 and Rule #20 guard against. (Reinforces Rule #18.)
 
-## Rule 23 — `_tasks` é INTOCÁVEL (append/edit-only)
+## Rule 22 — `_tasks` é INTOCÁVEL (append/edit-only)
 
 `_tasks/` é um repositório git SEPARADO (remote privado `diegosouzapw/_tasks_omniroute`)
 montado como diretório real na raiz do checkout principal. Regras absolutas:

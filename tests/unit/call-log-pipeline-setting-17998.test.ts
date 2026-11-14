@@ -288,7 +288,10 @@ for (const [label, apiKeyInfo] of [
   result[label] = [...seen];
 }
 await waitForCallLogSaves(60000);
-core.resetDbInstance();
+// The child is not a test process, so the deferred startup health check (on by default in
+// this fork) may still be running: shutdownDbInstance stops it before closing, while
+// resetDbInstance throws "Database health check already in progress".
+await core.shutdownDbInstance();
 fs.rmSync(process.env.DATA_DIR, { recursive: true, force: true });
 process.stdout.write("RESULT17998:" + JSON.stringify(result) + "\\n");
 process.exit(0);
@@ -384,7 +387,7 @@ for (const combo of JSON.parse(process.env.COMBOS_17998)) {
   }
 }
 await waitForCallLogSaves(60000);
-core.resetDbInstance();
+await core.shutdownDbInstance();
 fs.rmSync(process.env.DATA_DIR, { recursive: true, force: true });
 process.stdout.write("MATRIX17998:" + JSON.stringify(out) + "\\n");
 process.exit(0);

@@ -4,7 +4,7 @@
  * dashboard's install-nudge banner, but it still spawns `cursor-agent status
  * --format json` (via checkCursorAgentAvailability()/
  * getCachedCursorAgentAvailability()) — so it MUST be LOCAL_ONLY, same as
- * every other spawn-capable route (Hard Rules #15 + #17).
+ * every other spawn-capable route (Hard Rules #15 + #16).
  *
  * Unlike Task 4's refresh-cursor route, this one is a STATIC path (no dynamic
  * `[id]` segment), so it's classified via the flat LOCAL_ONLY_API_PREFIXES

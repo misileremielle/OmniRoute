@@ -21,14 +21,14 @@
  * `Module not found: Can't resolve 'dns'/'net'`. Keeping the value here lets both the
  * client-safe schema and the server routeGuard import it with no server coupling.
  * Regression guard: `tests/unit/authz/spawn-capable-prefixes-client-safe.test.ts`.
- * Hard Rules #15 + #17.
+ * Hard Rules #15 + #16.
  */
 export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/cli-tools/runtime/",
   "/api/cli-tools/qwen-settings", // GET probes the Qwen Code binary; the route also mutates local ~/.qwen files
   // GHSA-35fw-cv32-2373: 14 cli-tools routes that reach the same getCliRuntimeStatus() /
   // detectAllTools() spawn as their gated siblings — must never be whitelistable via
-  // manage-scope bypass (Hard Rules #15 + #17). Exact entries; NOT a "/api/cli-tools/" blanket.
+  // manage-scope bypass (Hard Rules #15 + #16). Exact entries; NOT a "/api/cli-tools/" blanket.
   "/api/cli-tools/all-statuses", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry
   "/api/cli-tools/claude-settings", // GET probes the `claude` binary via getCliRuntimeStatus()
   "/api/cli-tools/cline-settings", // GET probes the `cline` binary via getCliRuntimeStatus()
@@ -45,16 +45,16 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry
   "/api/cli-tools/whycodes-settings", // GET probes the `whycodes` binary via getCliRuntimeStatus()
   "/api/services/", // T-10: can run npm install + spawn node processes
-  "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #17)
-  "/api/local/", // T-12: 1-click local service launchers (Redis today) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17)
+  "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #16)
+  "/api/local/", // T-12: 1-click local service launchers (Redis today) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #16)
   "/api/skills/collect/", // Chaos Mode dispatch prefix — must never be whitelistable via manage-scope bypass
-  "/api/headroom/start", // spawns headroom-ai python CLI — must never be bypassable (Hard Rules #15 + #17)
-  "/api/headroom/stop", // kills tracked PID — must never be bypassable (Hard Rules #15 + #17)
-  "/api/vnc-session", // #7892: spawns Docker containers via child_process.spawn (src/lib/vncSession/service.ts) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #17)
+  "/api/headroom/start", // spawns headroom-ai python CLI — must never be bypassable (Hard Rules #15 + #16)
+  "/api/headroom/stop", // kills tracked PID — must never be bypassable (Hard Rules #15 + #16)
+  "/api/vnc-session", // #7892: spawns Docker containers via child_process.spawn (src/lib/vncSession/service.ts) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #16)
   // LOCAL_ONLY routes that reach a spawn / code-exec sink but were never mirrored here, so
   // both enforcement layers treated them as whitelistable. Every LOCAL_ONLY prefix must now be
   // either listed here or reviewed as bypass-eligible — drift guard:
-  // tests/unit/authz/local-only-bypass-spawn-denylist.test.ts (Hard Rules #15 + #17).
+  // tests/unit/authz/local-only-bypass-spawn-denylist.test.ts (Hard Rules #15 + #16).
   "/api/middleware/", // middleware hooks compile + run caller-supplied JS via new vm.Script (src/lib/middleware/registry.ts)
   "/api/system/version", // POST auto-update spawns git checkout + npm install
   "/api/db-backups/exportAll", // spawns tar for the export archive
@@ -65,7 +65,7 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/cli-tools/grok-build-settings", // GET probes the `grok` binary via getCliRuntimeStatus()
   "/api/cli-tools/forge-settings", // GET probes the `forge` binary via getCliRuntimeStatus()
   "/api/cli-tools/jcode-settings", // GET probes the `jcode` binary via getCliRuntimeStatus()
-  "/dashboard/providers/services/", // reverse proxy into embedded service UIs — Hard Rule #17 pairs it with /api/services/
+  "/dashboard/providers/services/", // reverse proxy into embedded service UIs — Hard Rule #16 pairs it with /api/services/
   "/api/discovery/", // not a spawn, but declared strict-loopback with no manage-scope bypass (outbound provider probes, SSRF-adjacent)
   "/api/issue-agent/", // local triage executor surface, held loopback/LAN "until sandbox + audit hardening is complete" — not opt-in remote until then
   // Host-credential reads: no spawn, but the handler reads credential files from the host's
@@ -87,9 +87,9 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
 export const SPAWN_CAPABLE_PATTERNS: ReadonlyArray<RegExp> = [
   /^\/api\/providers\/[^/]+\/login\/?$/, // pre-existing gap: in LOCAL_ONLY_API_PATTERNS today but never in a spawn-capable deny-list
   /^\/api\/providers\/volcengine-plan\/connect(\/.*)?$/, // launches Playwright to bind a Volcano Engine console session — covers the manual headful flow AND the session-based phone/SMS auto-login sub-routes (/code, /status, /cancel, /resend)
-  /^\/api\/providers\/[^/]+\/refresh-cursor\/?$/, // spawns cursor-agent via renewal.ts (Hard Rules #15 + #17)
-  /^\/api\/providers\/cursor\/agent-availability\/?$/, // static path (no dynamic segment), but kept in this array alongside its /api/providers/ siblings rather than the flat SPAWN_CAPABLE_PREFIXES array — spawns cursor-agent status via checkCursorAgentAvailability()/getCachedCursorAgentAvailability() (Hard Rules #15 + #17)
-  /^\/api\/providers\/agy-auth\/apply-local\/?$/, // static path kept with its /api/providers/ siblings, like cursor/agent-availability above — spawns `secret-tool` via detectLocalAgyTokenRaw() (Hard Rules #15 + #17)
+  /^\/api\/providers\/[^/]+\/refresh-cursor\/?$/, // spawns cursor-agent via renewal.ts (Hard Rules #15 + #16)
+  /^\/api\/providers\/cursor\/agent-availability\/?$/, // static path (no dynamic segment), but kept in this array alongside its /api/providers/ siblings rather than the flat SPAWN_CAPABLE_PREFIXES array — spawns cursor-agent status via checkCursorAgentAvailability()/getCachedCursorAgentAvailability() (Hard Rules #15 + #16)
+  /^\/api\/providers\/agy-auth\/apply-local\/?$/, // static path kept with its /api/providers/ siblings, like cursor/agent-availability above — spawns `secret-tool` via detectLocalAgyTokenRaw() (Hard Rules #15 + #16)
   /^\/api\/providers\/[^/]+\/chatgpt-web-codex-doctor\/?$/, // spawns via getTunnelRuntimeStatus() → spawnSync("...","runtimes status") (open-sse/executors/chatgpt-web-codex/tunnelClient.ts). Mirrors LOCAL_ONLY_API_PATTERNS in routeGuard.ts; keep the two in sync (GHSA-9q3h-mjm5-f4gj).
   // S-01 (#15159): web-provider validation spawns `<bin> acp --agent-type summarizer`.
   // Mirrors LOCAL_ONLY_API_PATTERNS (every LOCAL_ONLY pattern must have a twin here).

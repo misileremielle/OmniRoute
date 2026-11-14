@@ -69,7 +69,7 @@ test("validation schemas must not VALUE-import from server-side roots (client/CL
 
 test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with the expected entries", () => {
   assert.ok(Array.isArray(SPAWN_CAPABLE_PREFIXES));
-  // The full deny-list survived the extraction out of routeGuard.ts (Hard Rules #15/#17).
+  // The full deny-list survived the extraction out of routeGuard.ts (Hard Rules #15/#16).
   for (const prefix of [
     "/api/cli-tools/runtime/",
     "/api/services/",

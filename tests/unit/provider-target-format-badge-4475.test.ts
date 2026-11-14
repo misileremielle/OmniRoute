@@ -1,5 +1,5 @@
 /**
- * Regression for #4475 (feat: targetFormat selector in custom-models form) — Rule #18.
+ * Regression for #4475 (feat: targetFormat selector in custom-models form) — Rule #17.
  *
  * The form is a .tsx, so the testable surface is the pure label-mapping extracted into
  * providerPageHelpers.ts. `targetFormatBadgeI18nKey` drives the model-row badge and must

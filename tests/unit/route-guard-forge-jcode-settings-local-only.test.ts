@@ -11,7 +11,7 @@
  *
  * Classifying it LOCAL_ONLY closes the remote-RCE vector: a leaked JWT over a
  * Cloudflared/Ngrok tunnel cannot trigger process spawning.
- * Hard Rules #15 + #17. See docs/security/ROUTE_GUARD_TIERS.md. Issue #7263.
+ * Hard Rules #15 + #16. See docs/security/ROUTE_GUARD_TIERS.md. Issue #7263.
  */
 import test from "node:test";
 import assert from "node:assert/strict";

@@ -24,7 +24,7 @@ release freezes, or if the Mergify Open Source plan ever changes.
 4. Post-merge, the continuous release-green workflow validates the new tip on push
    and opens an attribution issue if the combination regressed (never auto-revert).
 
-Guardrails (mirror `CLAUDE.md` Hard Rules #21/#22):
+Guardrails (mirror `CLAUDE.md` Hard Rules #20/#21):
 
 - **Release freeze open** → do NOT label PRs targeting the frozen branch; retarget to
   the active `release/vX+1` first.

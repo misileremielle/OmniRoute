@@ -1,6 +1,6 @@
 // #7013: Grok Build (grok-cli) browser login (PKCE) — unit coverage for
 // everything testable without a real auth.x.ai round-trip (that half is
-// validated live on the VPS per Hard Rule #18, see the PR description).
+// validated live on the VPS per Hard Rule #17, see the PR description).
 //
 // DB handles released in test.after (CLAUDE.md learning: unreleased SQLite
 // handles hang node:test).

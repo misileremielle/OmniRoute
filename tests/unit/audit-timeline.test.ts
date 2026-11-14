@@ -24,15 +24,18 @@ function makeEntry(id: number, timestampIso: string, action = "provider.added"):
   };
 }
 
-// Reference: 2026-05-27T15:00:00.000Z (UTC)
-const REF = new Date("2026-05-27T15:00:00.000Z").getTime();
+// groupByDay buckets by the local calendar day, so every timestamp is built in local time:
+// fixed UTC instants put "today" on another local day east of UTC+8 (15:00Z is midnight in KST).
+const localIso = (day: number, hour: number) => new Date(2026, 4, day, hour).toISOString();
+// Reference: 2026-05-27 15:00 local
+const REF = new Date(2026, 4, 27, 15).getTime();
 // Today: 2026-05-27
-const TODAY_ISO = "2026-05-27T10:00:00.000Z";
-const TODAY_ISO_2 = "2026-05-27T08:00:00.000Z";
+const TODAY_ISO = localIso(27, 10);
+const TODAY_ISO_2 = localIso(27, 8);
 // Yesterday: 2026-05-26
-const YESTERDAY_ISO = "2026-05-26T12:00:00.000Z";
+const YESTERDAY_ISO = localIso(26, 12);
 // 3 days ago: 2026-05-24
-const WEEK_AGO_ISO = "2026-05-24T09:00:00.000Z";
+const WEEK_AGO_ISO = localIso(24, 9);
 
 // ── groupByDay ─────────────────────────────────────────────────────────────
 

@@ -549,7 +549,7 @@ test("handleComboChat universal handoff detects model switch before recording cu
   assert.equal(saved.lastModel, "openai/previous");
 });
 
-// ── Rule #18 gate — PR #3399: server-side context cache pinning ─────────────
+// ── Rule #17 gate — PR #3399: server-side context cache pinning ─────────────
 // Proves that when context_cache_protection=true and session_model_history has
 // a prior model, handleComboChat overrides body.model with the pinned model
 // (no client-side <omniModel> tag injection required).

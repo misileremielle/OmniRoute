@@ -11,7 +11,7 @@
  *   3. The format leaf exports its helpers directly.
  *
  * NOTE: helpers that call sanitizePII are exercised with non-PII text, since PII
- * redaction is opt-in / off by default (Hard Rule #20), so sanitizePII is a
+ * redaction is opt-in / off by default (Hard Rule #19), so sanitizePII is a
  * pass-through here — the test pins the formatting logic, not PII behaviour.
  */
 

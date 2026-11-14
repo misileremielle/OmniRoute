@@ -113,7 +113,7 @@ test("scanRange + main: flags only the commits in the range that carry AI attrib
     } finally {
       console.error = orig;
     }
-    assert.ok(errors.some((e) => e.includes("Hard Rule #16")));
+    assert.ok(errors.some((e) => e.includes("[ai-attribution] FAIL")));
   } finally {
     process.chdir(cwd);
     fs.rmSync(dir, { recursive: true, force: true });

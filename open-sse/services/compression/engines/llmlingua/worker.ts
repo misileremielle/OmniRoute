@@ -27,7 +27,7 @@
  * Code blocks NEVER reach this backend — the engine (index.ts) tombstones preserved
  * constructs first; this backend sees prose-only segments.
  *
- * VPS validation (Hard Rule #18): the real model is exercised behind RUN_LLMLINGUA_INT.
+ * VPS validation (Hard Rule #17): the real model is exercised behind RUN_LLMLINGUA_INT.
  */
 
 import { Worker } from "node:worker_threads";

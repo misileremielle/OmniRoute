@@ -142,7 +142,6 @@ export function createDefaultKeyTemplatePolicy(): KeyTemplatePolicy {
       dailyUsageLimitUsd: null,
       weeklyUsageLimitUsd: null,
       fiveHourUsageLimitUsd: null,
-      chaosModeEnabled: false,
       compressionEnabled: true,
       allowAutoCombos: true,
       allowCcDiscoveryAliases: true,
@@ -252,7 +251,6 @@ export interface PolicyEditorFormState {
   cacheDefaultMode: KeyTemplateCacheDefaultMode;
   codexServiceMode: KeyTemplateCodexServiceMode;
   compressionEnabled: boolean;
-  chaosModeEnabled: boolean;
   allowUsageCommand: boolean;
   groupIds: string[];
   reasoningRules: (KeyTemplateReasoningRule & { clientRowId?: string })[];
@@ -606,7 +604,6 @@ function readBehaviourForm(
   | "cacheDefaultMode"
   | "codexServiceMode"
   | "compressionEnabled"
-  | "chaosModeEnabled"
   | "allowUsageCommand"
   | "groupIds"
   | "reasoningRules"
@@ -621,7 +618,6 @@ function readBehaviourForm(
     cacheDefaultMode: key.cacheDefaultMode === "bypass" ? "bypass" : "legacy",
     codexServiceMode: key.codexServiceMode ?? "inherit",
     compressionEnabled: key.compressionEnabled !== false,
-    chaosModeEnabled: key.chaosModeEnabled === true,
     allowUsageCommand: key.allowUsageCommand === true,
     groupIds: Array.isArray(related?.groupIds) ? [...related.groupIds] : [],
     reasoningRules: Array.isArray(related?.reasoningRules)
@@ -799,7 +795,6 @@ function writeDiscoveryPolicy(
   state: PolicyEditorFormState
 ): Pick<
   KeyTemplatePolicy["key"],
-  | "chaosModeEnabled"
   | "compressionEnabled"
   | "allowAutoCombos"
   | "allowCcDiscoveryAliases"
@@ -807,7 +802,6 @@ function writeDiscoveryPolicy(
   | "forcedModel"
 > {
   return {
-    chaosModeEnabled: state.chaosModeEnabled,
     compressionEnabled: state.compressionEnabled,
     allowAutoCombos: state.allowAutoCombos,
     allowCcDiscoveryAliases: state.allowCcDiscoveryAliases,

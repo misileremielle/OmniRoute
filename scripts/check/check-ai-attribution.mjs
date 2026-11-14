@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/check/check-ai-attribution.mjs
-// Gate: Hard Rule #16 — never credit or advertise an AI assistant, LLM, or automation account in
+// Gate: never credit or advertise an AI assistant, LLM, or automation account in
 // commit / PR metadata. Two forbidden forms:
 //   (a) `Co-Authored-By` trailers naming an AI/bot (names containing Claude / GPT / Copilot / Codex /
 //       Gemini / Bot…, or e-mails at anthropic.com / openai.com / bot-owned noreply.github.com);
@@ -211,8 +211,8 @@ export function main(argv = process.argv.slice(2)) {
   }
   if (failed) {
     console.error(
-      "[ai-attribution] FAIL — Hard Rule #16: strip AI/bot Co-Authored-By trailers and AI-generation footers " +
-        "(human co-authors stay). See AGENTS.md → Hard Rules → #16 and issue #14436."
+      "[ai-attribution] FAIL — strip AI/bot Co-Authored-By trailers and AI-generation footers " +
+        "(human co-authors stay). See issue #14436."
     );
     return 1;
   }

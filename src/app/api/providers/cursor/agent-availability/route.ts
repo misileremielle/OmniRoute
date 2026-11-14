@@ -26,7 +26,7 @@ import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error";
  * enforcement, but not incorrect.
  *
  * 🔒 LOCAL_ONLY — spawns `cursor-agent status --format json` via
- * `checkCursorAgentAvailability()` (Hard Rules #15 + #17).
+ * `checkCursorAgentAvailability()` (Hard Rules #15 + #16).
  */
 export async function GET() {
   try {
