@@ -5,7 +5,6 @@ import Icon from "@/shared/components/Icon";
 // Phase 1t.1 extraction — Issue #3501
 import Link from "next/link";
 import { PageHeader } from "@omniroute/ui-kit/page-header";
-import { Button } from "@/shared/components";
 import ProviderIcon from "@/shared/components/ProviderIcon";
 import { getHeaderIconProviderId } from "../providerPageHelpers";
 import type { ProviderMessageTranslator } from "../providerPageHelpers";
@@ -31,17 +30,14 @@ interface ProviderPageHeaderProps {
   connectionsCount: number;
   isOpenAICompatible: boolean;
   isAnthropicProtocolCompatible: boolean;
-  onOpenTutorial: () => void;
   t: ProviderMessageTranslator;
 }
 
 export default function ProviderPageHeader({
-  providerId,
   providerInfo,
   connectionsCount,
   isOpenAICompatible,
   isAnthropicProtocolCompatible,
-  onOpenTutorial,
   t,
 }: ProviderPageHeaderProps) {
   // Resolve the API-key registration link: prefer apiKeyUrl, fall back to
@@ -112,16 +108,6 @@ export default function ProviderPageHeader({
         <span className="flex flex-wrap items-center gap-2">
           <span>{t("connectionCountLabel", { count: connectionsCount })}</span>
           {apiKeyLink}
-          {providerId === "adapta-web" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onOpenTutorial}
-              className="h-auto min-h-0 px-0 text-sm font-medium text-primary underline underline-offset-2 hover:bg-transparent hover:text-text-main"
-            >
-              Tutorial
-            </Button>
-          )}
         </span>
       }
     />

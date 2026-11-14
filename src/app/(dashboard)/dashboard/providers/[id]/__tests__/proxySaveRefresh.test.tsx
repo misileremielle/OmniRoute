@@ -199,7 +199,6 @@ describe("provider page — proxy save refreshes per-connection proxy badges", (
           importedCount: 0,
         },
         showImportModal: false,
-        showTutorialModal: false,
         t: (key: string) => key,
       };
 

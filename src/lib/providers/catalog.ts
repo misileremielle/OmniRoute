@@ -6,7 +6,6 @@ import {
   OAUTH_PROVIDERS,
   SEARCH_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
-  WEB_COOKIE_PROVIDERS,
   isClaudeCodeCompatibleProvider,
   resolveProviderId,
   supportsApiKeyOnFreeProvider,
@@ -17,14 +16,7 @@ import {
 export type ProviderDisplayAuthType = "oauth" | "apikey" | "compatible" | "no-auth";
 export type ProviderToggleAuthType = "oauth" | "free" | "apikey" | "no-auth";
 export type StaticProviderCatalogCategory =
-  | "no-auth"
-  | "oauth"
-  | "web-cookie"
-  | "local"
-  | "search"
-  | "upstream-proxy"
-  | "apikey"
-  | "cloud-agent";
+  "no-auth" | "oauth" | "local" | "search" | "upstream-proxy" | "apikey" | "cloud-agent";
 
 export interface ProviderNotice {
   /** Direct link to the API key management page for this provider. */
@@ -119,12 +111,6 @@ export const STATIC_PROVIDER_CATALOG_GROUPS: Record<
     displayAuthType: "oauth",
     toggleAuthType: "oauth",
   },
-  "web-cookie": {
-    category: "web-cookie",
-    providers: WEB_COOKIE_PROVIDERS as ProviderRecord,
-    displayAuthType: "apikey",
-    toggleAuthType: "apikey",
-  },
   local: {
     category: "local",
     providers: LOCAL_PROVIDERS as ProviderRecord,
@@ -160,7 +146,6 @@ export const STATIC_PROVIDER_CATALOG_GROUPS: Record<
 export const STATIC_PROVIDER_CATALOG_RESOLUTION_ORDER: StaticProviderCatalogCategory[] = [
   "no-auth",
   "oauth",
-  "web-cookie",
   "local",
   "search",
   "upstream-proxy",
@@ -170,7 +155,6 @@ export const STATIC_PROVIDER_CATALOG_RESOLUTION_ORDER: StaticProviderCatalogCate
 
 const MANAGED_PROVIDER_CONNECTION_CATEGORIES = new Set<StaticProviderCatalogCategory>([
   "apikey",
-  "web-cookie",
   "local",
   "search",
   "cloud-agent",

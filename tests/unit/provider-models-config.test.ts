@@ -126,7 +126,7 @@ test("GitHub Copilot registry reflects the current supported model lineup", () =
 });
 
 test("verified Anthropic launch catalogs keep Fable 5.1 first", () => {
-  for (const provider of ["anthropic", "cc", "cw"]) {
+  for (const provider of ["anthropic", "cc"]) {
     assert.equal(
       getProviderModels(provider)[0]?.id,
       "claude-fable-5-1",

@@ -161,14 +161,7 @@ test("extractProviderErrorMessage includes upstream details when generic error i
   );
 });
 
-test("resolveModelTestTimeoutMs extends Dola Pro model checks", () => {
-  assert.equal(resolveModelTestTimeoutMs("doubao-web", "dola-pro", 10_000), 90_000);
-  assert.equal(resolveModelTestTimeoutMs("doubao-web", "doubao-web/dola-pro", 10_000), 90_000);
-  assert.equal(resolveModelTestTimeoutMs("DOUBAO-WEB", "dola-pro", 120_000), 120_000);
-});
-
 test("resolveModelTestTimeoutMs leaves ordinary models unchanged", () => {
-  assert.equal(resolveModelTestTimeoutMs("doubao-web", "dola-speed", 10_000), 10_000);
   assert.equal(resolveModelTestTimeoutMs("openai", "dola-pro", 10_000), 10_000);
 });
 
@@ -295,11 +288,6 @@ test("resolveModelTestTimeoutMs defaults ordinary model checks to 30 seconds", (
   assert.equal(resolveModelTestTimeoutMs("openai", "gpt-4.1"), 30_000);
 });
 
-test("resolveModelTestTimeoutMs gives zai-web checks up to 60 seconds", () => {
-  assert.equal(resolveModelTestTimeoutMs("zai-web", "glm-5.2", 30_000), 60_000);
-  assert.equal(resolveModelTestTimeoutMs("zai-web", "zai-web/glm-5.3-flash", 90_000), 90_000);
-});
-
 test("resolveModelTestTimeoutMs applies a 60-second minimum to Xiaomi MiMo Token Plan checks", () => {
   assert.equal(
     resolveModelTestTimeoutMs("xiaomi-mimo-token-plan", "mimo-v2.6-flash", 30_000),
@@ -310,31 +298,6 @@ test("resolveModelTestTimeoutMs applies a 60-second minimum to Xiaomi MiMo Token
     resolveModelTestTimeoutMs("xiaomi-mimo-token-plan", "mimo-v2.6-flash", 90_000),
     90_000
   );
-});
-
-test("runSingleModelTest skips web-session providers before sending a chat probe", async () => {
-  const result = await runSingleModelTest({
-    providerId: "deepseek-web",
-    modelId: "deepseek-v4-pro-think",
-  });
-
-  assert.equal(result.status, "error");
-  assert.equal(result.httpStatus, 422);
-  assert.match(result.error ?? "", /Skipped:.*web-session/i);
-});
-
-test("resolveModelTestTimeoutMs gives ChatGPT Web checks up to 90 seconds", () => {
-  assert.equal(resolveModelTestTimeoutMs("chatgpt-web", "gpt-5.6-luna-free", 30_000), 90_000);
-  assert.equal(resolveModelTestTimeoutMs("CHATGPT-WEB", "chatgpt-web/gpt-5-5", 120_000), 120_000);
-});
-
-test("ChatGPT Web Clean Room is eligible for an explicit model test", async () => {
-  const { chatProbeLeavesNoConversation } =
-    await import("../../src/lib/providers/chatProbePolicy.ts");
-
-  assert.equal(await chatProbeLeavesNoConversation("chatgpt-web"), true);
-  assert.equal(await chatProbeLeavesNoConversation(" CHATGPT-WEB "), true);
-  assert.equal(await chatProbeLeavesNoConversation("deepseek-web"), false);
 });
 
 // ---------------------------------------------------------------------------

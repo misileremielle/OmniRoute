@@ -94,8 +94,6 @@ if (
 
 Deliberately **excluded**:
 
-- `claude-web` — a browser relay with a `create_conversation_params` request shape that never sees
-  `context_management`.
 - Generic `anthropic-compatible-*` relays (without the `-cc-` prefix) — third-party endpoints with
   uncertain beta support.
 

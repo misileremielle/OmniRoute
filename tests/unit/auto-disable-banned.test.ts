@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { updateAutoDisableAccountsSchema } from "../../src/shared/validation/schemas/settings.ts";
 import {
-  isSubscriptionStyleConnection,
   normalizeAutoDisableBannedScope,
   shouldAutoDisableBannedConnection,
 } from "../../src/shared/utils/autoDisableBanned.ts";
@@ -101,27 +100,6 @@ test("scope=subscription still deactivates OAuth and cookie accounts", () => {
       enabled: true,
       scope: "subscription",
       authType: "web",
-    }),
-    true
-  );
-});
-
-test("scope=subscription treats web-cookie providers as subscriptions even when authType is apikey", () => {
-  assert.equal(
-    isSubscriptionStyleConnection({
-      authType: "apikey",
-      providerId: "grok-web",
-      webCookieProviderIds: { "grok-web": {} },
-    }),
-    true
-  );
-  assert.equal(
-    shouldAutoDisableBannedConnection({
-      enabled: true,
-      scope: "subscription",
-      authType: "apikey",
-      providerId: "grok-web",
-      webCookieProviderIds: { "grok-web": {} },
     }),
     true
   );

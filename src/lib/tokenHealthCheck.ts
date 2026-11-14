@@ -29,11 +29,6 @@ import {
   refreshGithubCopilotSubTokenIfNeeded,
 } from "@/lib/tokenHealthCheckCopilot";
 import { checkCursorConnectionIfNeeded } from "@/lib/tokenHealthCheckCursor";
-import { checkKimiWebConnectionIfNeeded } from "@/lib/tokenHealthCheckKimi";
-import {
-  checkWebCookieConnectionIfNeeded,
-  isWebCookieHealthProbeCandidate,
-} from "@/lib/tokenHealthCheckWebCookie";
 import {
   isInRefreshBackoff,
   preservesRefreshTokenOnUnrecoverable,
@@ -705,38 +700,6 @@ export async function checkConnection(conn: any) {
       log,
       logWarn,
       logError,
-      getConnectionLogLabel,
-      logPrefix: LOG_PREFIX,
-    });
-    return;
-  }
-
-  // Kimi Web proactive token check and jittered auto-refresh
-  const providerLower = String(conn.provider || "").toLowerCase();
-  if (providerLower === "kimi-web" || providerLower === "kimi_web") {
-    const now = new Date().toISOString();
-    await checkKimiWebConnectionIfNeeded({
-      conn,
-      now,
-      log,
-      logWarn,
-      logError,
-      getConnectionLogLabel,
-      logPrefix: LOG_PREFIX,
-    });
-    return;
-  }
-
-  // Generic web-cookie verify-only probe (#11488): every catalogued cookie
-  // provider without its own bespoke leaf above. Kimi-web already returned.
-  if (isWebCookieHealthProbeCandidate(conn.provider)) {
-    const now = new Date().toISOString();
-    await checkWebCookieConnectionIfNeeded({
-      conn,
-      now,
-      intervalMin,
-      log,
-      logWarn,
       getConnectionLogLabel,
       logPrefix: LOG_PREFIX,
     });

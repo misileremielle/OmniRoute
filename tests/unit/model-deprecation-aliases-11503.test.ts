@@ -81,7 +81,7 @@ describe("#11503 BUILT_IN_ALIASES point at live catalog models", () => {
 
 describe("#11503 resolveModelAlias respects the serving provider", () => {
   it("leaves the id alone when the provider serves it as-is", () => {
-    assert.equal(resolveModelAlias("kimi-k2", "t3-web"), "kimi-k2");
+    assert.equal(resolveModelAlias("kimi-k2", "uc-direct"), "kimi-k2");
   });
 
   it("still rewrites for a provider that only knows the canonical id", () => {

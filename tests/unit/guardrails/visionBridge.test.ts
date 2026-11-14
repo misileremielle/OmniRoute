@@ -243,41 +243,6 @@ test("VB-S02c: Conol multimodal models bypass the vision bridge", async () => {
   assert.strictEqual(visionCallCount, 0);
 });
 
-test("VB-S02d: Conol text-only models remain eligible for the vision bridge", async () => {
-  const guardrail = createGuardrail();
-  const model = "conol-web/deepseek/deepseek-v4-pro";
-  const payload = createPayload({
-    model,
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: "What is this?" },
-          {
-            type: "image_url",
-            image_url: { url: "data:image/png;base64,aW1hZ2U=" },
-          },
-        ],
-      },
-    ],
-  });
-  visionCallCount = 0;
-
-  const result = await guardrail.preCall(payload, createContext({ model }));
-
-  assert.equal(getResolvedModelCapabilities(model).supportsVision, false);
-  assert.strictEqual(result.block, false);
-  assert.notStrictEqual(result.modifiedPayload, undefined);
-  // #9759: with a configured vision model, individual text-only models REROUTE
-  // to it (images kept) instead of describing through an intermediate vision
-  // call — same contract as VB-S07. The point of this case is unchanged: conol
-  // text-only models must not be skipped by the bridge.
-  const modified = result.modifiedPayload as { model?: string };
-  assert.ok(modified.model, "rerouted model should be set");
-  assert.notStrictEqual(modified.model, model, "model should be different from original");
-  assert.strictEqual(visionCallCount, 0, "reroute keeps images; no describe call");
-});
-
 test("VB-S02: model capabilities returns supportsVision for known models", () => {
   const gpt4oCaps = getResolvedModelCapabilities("openai/gpt-4o");
   // supportsVision may be true (if sync data exists) or null (if not synced)

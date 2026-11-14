@@ -53,7 +53,7 @@ test("issue #13461: classifyFakeSuccessBody flags a short credits-exhausted body
 
 test("issue #13461: classifyFakeSuccessBody flags an account-deactivated body for an allowlisted provider", () => {
   const content = "Sorry, your account has been suspended. Please contact support.";
-  assert.equal(classifyFakeSuccessBody(content, "perplexity-web"), "account_deactivated");
+  assert.equal(classifyFakeSuccessBody(content, "pollinations"), "account_deactivated");
 });
 
 test("issue #13461: classifyFakeSuccessBody ignores an unrecognized provider (allowlist guard)", () => {
@@ -81,7 +81,7 @@ test("issue #13461: classifyFakeSuccessBody ignores a long legitimate answer tha
 
 test("issue #13461: classifyFakeSuccessBody ignores short content with no recognized signal phrase", () => {
   const content = "Please go to perplexity.ai and sign up to continue using this feature.";
-  assert.equal(classifyFakeSuccessBody(content, "perplexity-web"), null);
+  assert.equal(classifyFakeSuccessBody(content, "pollinations"), null);
 });
 
 // ── (b) detectMalformedNonStream wiring ──────────────────────────────────────

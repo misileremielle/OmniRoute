@@ -94,7 +94,6 @@ const PROVIDER_CATEGORY_URL_VALUES = new Set([
   "upstream-proxy",
   "apikey",
   "compatible",
-  "webcookie",
   "search",
   "webfetch",
   "local",
@@ -277,13 +276,6 @@ export function connectionMatchesProviderCard(
 ): boolean {
   if (!conn || !connectionBelongsToProviderPage(conn.provider, providerId)) return false;
   if (cardAuthType === "free") return true;
-  // Bulk web-session imports persist authType "cookie", while the ordinary
-  // Add flow stores "apikey". Both belong on the same Web Cookie provider card.
-  // Keep this restricted to that catalog family; unrelated API-key providers
-  // must never count cookie credentials as usable connections.
-  if (cardAuthType === "apikey" && conn.authType === "cookie") {
-    return Object.hasOwn(getStaticProviderCatalogGroup("web-cookie").providers, providerId);
-  }
   if (
     supportsApiKeyOnFreeProvider(providerId) ||
     supportsDualAuthProvider(providerId) ||

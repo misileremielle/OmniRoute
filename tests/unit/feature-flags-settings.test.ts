@@ -70,7 +70,8 @@ const {
 // Upstream v3.8.54 sync: CODEX_SEARCH_AUTO_FALLBACK_ENABLED (#17933, +1) and
 // CODE_ASSIST_INELIGIBLE_ONBOARD_LEGACY_TIER (#18060, +1) take it to 117. FAL_NATIVE_ENABLED
 // (#18849) is not carried: this fork has no image/Fal gateway.
-const EXPECTED_FEATURE_FLAG_COUNT = 117;
+// Removing the web-cookie providers drops LMARENA_SYNTHESIZED_CX_ENABLED (-1): 116.
+const EXPECTED_FEATURE_FLAG_COUNT = 116;
 // tool_call wrapper repair, default on) to 86; OPENCODE_V2_CLIENT_FINGERPRINT_ENABLED
 // (#16571, OpenCode v2 client fingerprint, default off) to 87.
 // tool_call wrapper repair, default on) to 86; CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED

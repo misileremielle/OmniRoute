@@ -59,13 +59,10 @@ spawn-capable prefixes and fails CI if any is not classified local-only.
 | `/api/oauth/cursor/auto-import`                                                                          | `execFile("which", ["cursor"])` before importing creds                                          |
 | `/api/oauth/kiro/auto-import`                                                                            | Reads Kiro CLI credential files from the host                                                   |
 | `/api/discovery/`                                                                                        | Local network/provider discovery probes                                                         |
-| `/api/vnc-session` (`VNC_ROUTE_PREFIX`)                                                                  | Spawns a headful browser + VNC session for interactive logins                                   |
 | `/api/resilience/connections`                                                                            | Per-account resilience JSON (cooldown, breaker, lockout). The dashboard HTML is not local-only. |
 | `/api/providers/cursor/agent-availability`                                                               | Dashboard install-nudge check — spawns `cursor-agent status --format json`                      |
-| `/api/providers/{id}/login` (regex)                                                                      | Launches a headful Playwright Chromium for web-cookie login                                     |
 | `/api/providers/volcengine-plan/connect` (regex)                                                         | Manual headful flow + session-based phone/SMS auto-login (spawns Playwright)                    |
 | `/api/providers/{id}/refresh-cursor` (regex)                                                             | Manual Cursor session renewal — nudges `cursor-agent`                                           |
-| `/api/providers/{id}/chatgpt-web-codex-doctor` (regex)                                                   | Diagnoses the local Codex CLI install (spawns the binary)                                       |
 
 **Response on violation:** `403 LOCAL_ONLY`
 

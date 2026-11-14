@@ -12,11 +12,6 @@ import {
 } from "@/lib/combos/testHealth";
 import { getCustomModels } from "@/lib/db/models";
 import { getProviderNodeById } from "@/lib/db/providers";
-import {
-  CHAT_PROBE_NOT_ISOLATED_MESSAGE,
-  chatProbeLeavesNoConversation,
-  isChatProbeRefusal,
-} from "@/lib/providers/chatProbePolicy";
 import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error";
 import { withRateLimit } from "@omniroute/open-sse/services/rateLimitManager";
 import {
@@ -32,15 +27,8 @@ import { ownListenerSelfHopToken, SELF_HOP_HEADER } from "@omniroute/open-sse/ut
 
 const INTERNAL_ORIGIN = "http://omniroute.internal";
 export const DEFAULT_MODEL_TEST_TIMEOUT_MS = 30_000;
-const DOLA_PRO_TEST_TIMEOUT_MS = 90_000;
-const DOUBAO_WEB_PROVIDER_ID = "doubao-web";
-const ZAI_WEB_PROVIDER_ID = "zai-web";
-const ZAI_WEB_TEST_TIMEOUT_MS = 60_000;
-const CHATGPT_WEB_PROVIDER_ID = "chatgpt-web";
-const CHATGPT_WEB_TEST_TIMEOUT_MS = 90_000;
 const XIAOMI_MIMO_TOKEN_PLAN_PROVIDER_ID = "xiaomi-mimo-token-plan";
 const XIAOMI_MIMO_TOKEN_PLAN_TEST_TIMEOUT_MS = 60_000;
-const SLOW_WEB_TEST_MODELS = new Set(["dola-pro"]);
 const STREAMING_CHAT_TEST_MAX_TOKENS = 64;
 // Responses calls the same budget `max_output_tokens`; `max_tokens` is silently
 // ignored on that endpoint, which would let a reasoning model spend the whole
@@ -113,30 +101,12 @@ function stripFirstSegment(modelId: string): string | null {
   return slashIdx > 0 ? modelId.slice(slashIdx + 1) : null;
 }
 
-function getModelLeafId(modelId: string): string {
-  const segments = modelId.trim().toLowerCase().split("/").filter(Boolean);
-  return segments[segments.length - 1] || "";
-}
-
 export function resolveModelTestTimeoutMs(
   providerId: string,
-  modelId: string,
+  _modelId: string,
   requestedTimeoutMs: number = DEFAULT_MODEL_TEST_TIMEOUT_MS
 ) {
   const normalizedProviderId = providerId.trim().toLowerCase();
-  const modelLeafId = getModelLeafId(modelId);
-
-  if (normalizedProviderId === DOUBAO_WEB_PROVIDER_ID && SLOW_WEB_TEST_MODELS.has(modelLeafId)) {
-    return Math.max(requestedTimeoutMs, DOLA_PRO_TEST_TIMEOUT_MS);
-  }
-
-  if (normalizedProviderId === ZAI_WEB_PROVIDER_ID) {
-    return Math.max(requestedTimeoutMs, ZAI_WEB_TEST_TIMEOUT_MS);
-  }
-
-  if (normalizedProviderId === CHATGPT_WEB_PROVIDER_ID) {
-    return Math.max(requestedTimeoutMs, CHATGPT_WEB_TEST_TIMEOUT_MS);
-  }
 
   if (normalizedProviderId === XIAOMI_MIMO_TOKEN_PLAN_PROVIDER_ID) {
     return Math.max(requestedTimeoutMs, XIAOMI_MIMO_TOKEN_PLAN_TEST_TIMEOUT_MS);
@@ -456,18 +426,6 @@ export function classifyTestErrorQuota(errorText: string): {
  * `SingleModelTestResult` (not an HTTP Response) so the single-test and
  * batch-test endpoints can format it differently.
  */
-/** A probe the conversation-isolation policy kept off a signed-in account: never dispatched. */
-function skippedProbe(modelId: string): SingleModelTestResult {
-  return {
-    modelId,
-    status: "error",
-    latencyMs: 0,
-    httpStatus: 422,
-    skipped: true,
-    error: CHAT_PROBE_NOT_ISOLATED_MESSAGE,
-  };
-}
-
 export async function runSingleModelTest(
   options: RunSingleModelTestOptions
 ): Promise<SingleModelTestResult> {
@@ -494,8 +452,6 @@ export async function runSingleModelTest(
   if (!fullModelStr.includes("/")) {
     fullModelStr = `${providerId}/${modelId}`;
   }
-  // Every probe kind asks the same policy the chat pipeline enforces (#14780).
-  if (!(await chatProbeLeavesNoConversation(providerId))) return skippedProbe(fullModelStr);
   const effectiveTimeoutMs = resolveModelTestTimeoutMs(providerId, fullModelStr, timeoutMs);
 
   const catalogError = await prepareConnectionModelTest(providerId, connectionId, fullModelStr);
@@ -782,8 +738,6 @@ export async function runSingleModelTest(
   let errorMsg = "";
   try {
     const errBody = await res.json();
-    // A probe that reached a non-isolated target indirectly (e.g. through a combo).
-    if (isChatProbeRefusal(errBody)) return skippedProbe(fullModelStr);
     errorMsg = extractProviderErrorMessage(errBody, res.statusText);
   } catch {
     errorMsg = res.statusText;

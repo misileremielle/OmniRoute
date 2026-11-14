@@ -1,6 +1,5 @@
 import {
   NOAUTH_PROVIDERS,
-  WEB_COOKIE_PROVIDERS,
   getProviderById,
   resolveProviderId,
   getProviderAlias,
@@ -18,7 +17,6 @@ const noAuthProviderEntries = Object.values(NOAUTH_PROVIDERS) as NoAuthProviderE
 // dispatch cannot drift apart if an entry moves between the maps.
 const syntheticNoAuthReferralMaps = [
   NOAUTH_PROVIDERS as Record<string, { noAuth?: boolean } | undefined>,
-  WEB_COOKIE_PROVIDERS as Record<string, { noAuth?: boolean } | undefined>,
 ];
 
 /**

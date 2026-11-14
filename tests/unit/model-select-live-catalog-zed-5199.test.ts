@@ -16,7 +16,7 @@ test("shouldFetchLiveModels: zed-hosted (empty static catalog + modelsUrl) is fe
 });
 
 test("shouldFetchLiveModels: the other empty-catalog + modelsUrl providers are included too", () => {
-  for (const id of ["nube", "modelscope", "chatplayground"]) {
+  for (const id of ["nube", "modelscope"]) {
     assert.equal(shouldFetchLiveModels(id), true, id);
   }
 });

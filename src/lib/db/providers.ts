@@ -38,7 +38,6 @@ import {
   webSessionCredentialKey,
   parseProviderSpecificData,
   isMatchingOauthIdentity,
-  isWebCookieProviderId,
 } from "./webSessionDedup";
 import { LOCAL_PROVIDERS } from "@/shared/constants/providers";
 import { pickCodexConnectionForUser } from "@/lib/oauth/utils/codexConnectionSelection";
@@ -46,7 +45,6 @@ import { isMicrosoftDesignerWebRetiredProviderId } from "@/shared/constants/desi
 import { reconcileCodexUsageHistory } from "./providers/usageIdentityReconciliation";
 import { isRuntimeRetiredProviderId } from "@/shared/constants/providerRetirement";
 import { applyCodexChildCooldownClearOnUpdate } from "./providers/codexAccountState";
-import { sameM365Account } from "@/lib/providers/m365Identity";
 
 import {
   withNullableMaxConcurrent,
@@ -506,19 +504,6 @@ export async function createProviderConnection(data: JsonRecord) {
 
   if (data.authType === "oauth" && data.provider === "chatgpt") {
     existing = findChatGptConnectionByRegistration(providerSpecificData);
-  } else if (data.authType === "oauth" && data.provider === "copilot-m365-web") {
-    const candidates = db
-      .prepare("SELECT * FROM provider_connections WHERE provider = ? AND auth_type = 'oauth'")
-      .all(data.provider) as JsonRecord[];
-    existing =
-      candidates.find((row) =>
-        sameM365Account(
-          {
-            providerSpecificData: parseProviderSpecificData(row.provider_specific_data),
-          },
-          data
-        )
-      ) || null;
   } else if (data.authType === "oauth" && data.provider === "codex" && chatgptUserId) {
     const strongSql = workspaceId
       ? "SELECT * FROM provider_connections WHERE provider = ? AND auth_type = 'oauth' AND json_extract(provider_specific_data, '$.workspaceId') = ? AND json_extract(provider_specific_data, '$.chatgptUserId') = ?"
@@ -591,7 +576,7 @@ export async function createProviderConnection(data: JsonRecord) {
         ) || null;
     }
   } else if (data.authType === "apikey") {
-    if (data.name && !isWebCookieProviderId(data.provider)) {
+    if (data.name) {
       existing =
         (db
           .prepare(

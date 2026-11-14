@@ -1057,7 +1057,7 @@ test("grok-cli 402 marks only the empty connection, not the whole provider", () 
   void sibling;
 });
 
-for (const provider of ["grok-web", "xai-oauth"] as const) {
+for (const provider of ["xai-oauth"] as const) {
   test(`${provider} 402 with empty body marks only that connection`, () => {
     const s = sets();
     const empty = target({

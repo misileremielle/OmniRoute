@@ -25,27 +25,13 @@ import { requireManagementAuth } from "@/lib/api/requireManagementAuth";
 import { isApiKeyRevealEnabled, maskStoredApiKey } from "@/lib/apiKeyExposure";
 import { reconcileMaskedExtraApiKeys } from "@/shared/utils/apiKeyMask";
 import { cleanupProviderModelsAfterConnectionDelete } from "@/lib/db/models";
-import { canUpdateProviderApiKey } from "@/shared/providers/webSessionCredentials";
 import {
   refreshConnectionRateLimits,
   enableRateLimitProtection,
   disableRateLimitProtection,
 } from "@/../open-sse/services/rateLimitManager";
-// Dynamically imported below, inside the one `provider === "chatgpt-web-codex"`
-// branch that needs it -- same fix as #12355 (src/app/api/providers/route.ts),
-// which missed this identical pattern in the by-id route. This module's
-// transitive chain pulls in tiktoken's WASM tokenizer, which Turbopack dev
-// mode fails to resolve for this graph even with `tiktoken` listed in
-// serverExternalPackages. A static top-level import evaluates that whole
-// chain on EVERY PUT to this route regardless of provider, turning an
-// unrelated-provider bundling bug into a route-wide 500 (observed live: PUT
-// on a plain openai-compatible connection's rename failed with "Missing
-// tiktoken_bg.wasm" after 17-50s, never touching chatgpt-web-codex at all).
 import { rejectRetiredCommonChatGptWebProvider } from "@/lib/providers/chatgptWebRetirementResponse";
-import { chatGptWebStorageStateFromCookieHeader } from "@omniroute/open-sse/utils/chatgptWebExecutorAdapter.ts";
 import { applyOperatorActivationIntent } from "@/lib/providers/operatorDisable";
-import { parseM365RefreshToken } from "@/lib/providers/m365RefreshToken";
-import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error.ts";
 import { getQuotaCacheState } from "@/domain/quotaCacheState";
 import { retireUnreportedQuotaWindows } from "@/domain/quotaSnapshotPersistence";
 
@@ -196,86 +182,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const retirementResponse = rejectRetiredCommonChatGptWebProvider(existing.provider);
     if (retirementResponse) return retirementResponse;
 
-    const m365Token = parseM365RefreshToken(existing.provider, rawIncomingPsd);
-    if (!m365Token.success) {
-      return NextResponse.json(
-        {
-          error: {
-            message: sanitizeErrorMessage("Invalid request"),
-            details: [
-              {
-                field: "providerSpecificData.refreshToken",
-                message: sanitizeErrorMessage("Refresh token must be a bounded plaintext string"),
-              },
-            ],
-          },
-        },
-        { status: 400 }
-      );
-    }
     const incomingPsd = rawIncomingPsd ? { ...rawIncomingPsd } : rawIncomingPsd;
-    if (existing.provider === "copilot-m365-web" && incomingPsd) {
-      // Blank/missing input must not overwrite a legacy nested fallback during the merge.
-      delete incomingPsd.refreshToken;
-    }
 
     const updateData: Record<string, any> = {};
-    if (m365Token.data.refreshToken) updateData.refreshToken = m365Token.data.refreshToken;
     if (name !== undefined) updateData.name = name;
     if (priority !== undefined) updateData.priority = priority;
     if (globalPriority !== undefined) updateData.globalPriority = globalPriority;
     if (defaultModel !== undefined) updateData.defaultModel = defaultModel;
     if (isActive !== undefined) updateData.isActive = isActive;
-    if (apiKey && canUpdateProviderApiKey(existing.authType, existing.provider)) {
-      if (existing.provider === "chatgpt-web-codex") {
-        const validationId =
-          incomingPsd && typeof incomingPsd.validationId === "string"
-            ? incomingPsd.validationId
-            : "";
-        try {
-          const {
-            finalizeValidatedChatGptWebCodexSecrets,
-            decodeChatGptWebCodexSecrets,
-            encodeChatGptWebCodexSecrets,
-          } = await import("@omniroute/open-sse/services/chatgptWebCodexAdmin.ts");
-          const incomingSecrets = decodeChatGptWebCodexSecrets(apiKey);
-          const existingSecrets = decodeChatGptWebCodexSecrets(existing.apiKey || "");
-          const encoded = encodeChatGptWebCodexSecrets({
-            cookie: incomingSecrets.cookie,
-            runtimeKey: incomingSecrets.runtimeKey || existingSecrets.runtimeKey,
-          });
-          updateData.apiKey = finalizeValidatedChatGptWebCodexSecrets(
-            encoded,
-            validationId
-          ).encodedCredential;
-        } catch (error) {
-          return NextResponse.json(
-            {
-              error:
-                error instanceof Error
-                  ? error.message
-                  : "Die ChatGPT-Browserprüfung konnte nicht abgeschlossen werden.",
-            },
-            { status: 400 }
-          );
-        }
-      } else if (existing.provider === "chatgpt-web") {
-        try {
-          JSON.parse(apiKey);
-          updateData.apiKey = apiKey;
-        } catch {
-          try {
-            updateData.apiKey = JSON.stringify(chatGptWebStorageStateFromCookieHeader(apiKey));
-          } catch {
-            return NextResponse.json(
-              { error: "ChatGPT Web storage state JSON or Cookie header is invalid" },
-              { status: 400 }
-            );
-          }
-        }
-      } else {
-        updateData.apiKey = apiKey;
-      }
+    if (apiKey && existing.authType === "apikey") {
+      updateData.apiKey = apiKey;
     }
     if (testStatus !== undefined) updateData.testStatus = testStatus;
     if (lastError !== undefined) updateData.lastError = lastError;
@@ -343,9 +259,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
       const mergedPsd = { ...existingPsd, ...incomingPsd };
       keepServerOwnedPsd(mergedPsd, existingPsd);
-      if (m365Token.data.refreshToken) delete mergedPsd.refreshToken;
       delete mergedPsd.validationId;
-      delete mergedPsd.runtimeKey;
 
       // Deep-merge and normalize Codex limit policy defaults.
       if (existing.provider === "codex") {

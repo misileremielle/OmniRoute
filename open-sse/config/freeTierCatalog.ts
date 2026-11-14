@@ -27,7 +27,6 @@ export const FREE_TIER_BUDGETS: Record<string, number> = {
   bazaarlink: 3_600_000,
   openrouter: 1_200_000,
   cohere: 800_000,
-  huggingchat: 500_000,
   morph: 400_000,
   huggingface: 200_000,
   kiro: 25_000,
@@ -43,8 +42,6 @@ export const FREE_TIER_TOS: Record<string, TosVerdict> = {
   antigravity: "avoid", // Both registered IDs use the same Antigravity integration.
   kiro: "avoid",
   "amazon-q": "avoid",
-  "muse-spark-web": "avoid",
-  "t3-web": "avoid",
   modal: "avoid",
   nlpcloud: "avoid",
   blackbox: "avoid",

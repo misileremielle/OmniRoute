@@ -28,7 +28,6 @@ import type { ApiKeyMetadata as PolicyApiKeyMetadata } from "@/shared/utils/apiK
 import { persistResponsesWsCallHistory } from "./history";
 import { applyResponsesWsCompression } from "./compression";
 import { getComboByName } from "@/lib/db/combos";
-import { getComboModelString } from "@/lib/combos/steps";
 import { isQuotaModelName } from "@/lib/quota/quotaModelNaming";
 import {
   buildManagedLeaseErrorResponse,
@@ -404,14 +403,6 @@ async function prepare(body: JsonRecord) {
         426,
         "responses_websocket_http_fallback",
         "Quota sharing requires the HTTP/SSE Responses transport for lease and quota coordination"
-      );
-    }
-    const models = Array.isArray(combo.models) ? combo.models : [];
-    if (models.some((model) => getComboModelString(model)?.startsWith("chatgpt-web-codex/"))) {
-      return jsonError(
-        426,
-        "responses_websocket_http_fallback",
-        "This Combo contains ChatGPT Web (Codex) and must use the HTTP/SSE Responses transport"
       );
     }
   }

@@ -23,7 +23,7 @@ import * as log from "@/sse/utils/logger";
 
 const CONSECUTIVE_RATE_LIMIT_STOP_THRESHOLD = 3;
 /** Web-session providers (esp. Arena/CF) ban burst probes — pause between models. */
-const SLOW_PROBE_PROVIDERS = new Set(["lmarena", "lma"]);
+const SLOW_PROBE_PROVIDERS = new Set<string>([]);
 /** Fixed inter-model delay for SLOW_PROBE_PROVIDERS (no env — avoids doc-sync drift). */
 const SLOW_PROBE_DELAY_MS = 3500;
 const CONSECUTIVE_BOT_STOP_THRESHOLD = 2;
@@ -97,8 +97,14 @@ export async function POST(request: Request) {
   }
   const { providerId, modelIds, connectionId, respectRateLimit, autoHideFailed } = validation.data;
   const providerConnections = await getProviderConnections({ provider: providerId });
-  if (providerConnections.length > 0 && providerConnections.every((connection) => connection.isActive === false)) {
-    return NextResponse.json({ error: { message: `Provider ${providerId} has no active connections` } }, { status: 409 });
+  if (
+    providerConnections.length > 0 &&
+    providerConnections.every((connection) => connection.isActive === false)
+  ) {
+    return NextResponse.json(
+      { error: { message: `Provider ${providerId} has no active connections` } },
+      { status: 409 }
+    );
   }
 
   // #6328 (follow-up to #6495): REMOVE — not just hide — paid Test-all dispatches

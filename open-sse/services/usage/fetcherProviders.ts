@@ -74,19 +74,13 @@ export const USAGE_FETCHER_PROVIDERS = [
   // Lyceum credit balance (GET /api/v2/external/billing/credits)
   "lyceum",
   // PromptQL playground credits (data.pro.ql.app getCreditSummary)
-  "promptql",
-  "pql",
   // Adobe Firefly credit balance (GET firefly.adobe.io/v1/credits/balance).
   // Dispatched since #8006; the registration list was missed at the time, so the
   // manifest and the quota fetchers reported no usage support for either id.
   // Declaring them here is what makes `registerGenericQuotaFetchers` wire a
   // generic fetcher for them and `resolveFreeAccessState` stop returning early —
   // i.e. the balance is now actually fetched, which is the point.
-  "adobe-firefly",
-  "firefly",
   // HyperAgent billing usage (creditBlocks USD)
-  "hyperagent",
-  "ha",
   // Firecrawl team credits (GET /v2/team/credit-usage)
   "firecrawl",
   "context7",
@@ -102,10 +96,6 @@ export const USAGE_FETCHER_PROVIDERS = [
   "volcengine-coding-plan",
   // Command Code credits + 5h/weekly windows (GET /alpha/billing/credits)
   "command-code",
-  "conol-web",
-  "cnl",
-  "syntx",
-  "stx",
   // AgentRouter (New-API) console balance (GET /api/user/self)
   "agentrouter",
   // TokenRouter Management API (optional Management Key in consoleApiKey)
@@ -120,8 +110,6 @@ export const USAGE_FETCHER_PROVIDERS = [
   // Devin CLI agentic quota (Codeium seat-management GetUserStatus, protobuf)
   "devin-cli",
   // ChatPlayground subscription and daily credits (GET /api/user)
-  "chatplayground",
-  "cpl",
   // Cloudflare Workers AI daily neurons (GraphQL Analytics aiInferenceAdaptiveGroups)
   "cloudflare-ai",
   // xKiro daily free-token quota only, never the paid wallet (GET /v1/usage)

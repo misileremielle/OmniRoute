@@ -29,7 +29,6 @@ test("CLI guide fallback checks key existence before translating", () => {
 
 test("known provider PNGs resolve locally before the external CDN", () => {
   const source = readSource("src/shared/components/ProviderIcon.tsx");
-  assert.match(source, /"poe-web": "poe"/);
   assert.match(source, /"opencode-go": "opencode"/);
   assert.match(source, /"opencode-zen": "opencode"/);
   assert.ok(source.indexOf("if (hasPng && !pngFailed)") < source.indexOf("if (!theSvgFailed)"));

@@ -145,28 +145,6 @@ omniroute doctor
 
 ---
 
-## Gemini Web and Playwright Chromium
-
-If a Gemini Web request returns `503` with a message that Playwright Chromium
-is not installed, the npm package is present but the browser binary is missing.
-Playwright deliberately keeps browser downloads separate from npm package
-installation, so this response is expected until the browser is installed.
-
-For a global npm installation, install Chromium from the OmniRoute package's
-directory so the browser cache belongs to the same Playwright installation:
-
-```bash
-cd "$(npm root -g)/omniroute"
-npx playwright install chromium
-```
-
-Restart OmniRoute after the install, then retry the Gemini Web request. If you
-run OmniRoute from a Docker image, use the `-web` image (or the `runner-web`
-build target), which bundles Chromium and its dependencies; the base image does
-not.
-
----
-
 ## Quick Fixes
 
 | Problem                                                    | Solution                                                                                                                                                  |

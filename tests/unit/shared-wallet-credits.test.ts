@@ -23,7 +23,7 @@ test("the usage balance signal is matched in an already lowercased body", () => 
 });
 
 test("only a 402 from a shared-wallet provider can qualify", () => {
-  for (const provider of ["grok-cli", "grok-web", "xai-oauth"]) {
+  for (const provider of ["grok-cli", "xai-oauth"]) {
     assert.equal(isSharedWalletCredits402(provider, 402), true, provider);
   }
   assert.equal(isSharedWalletCredits402("openai", 402), false);
@@ -44,8 +44,11 @@ test("an empty or blank body from a shared-wallet provider qualifies", () => {
 });
 
 test("a body qualifies only when it carries the usage balance signal, in any case", () => {
-  assert.equal(isSharedWalletCredits402("grok-web", 402, "Usage Balance Exhausted"), true);
-  assert.equal(isSharedWalletCredits402("grok-web", 402, "payment required for this model"), false);
+  assert.equal(isSharedWalletCredits402("xai-oauth", 402, "Usage Balance Exhausted"), true);
+  assert.equal(
+    isSharedWalletCredits402("xai-oauth", 402, "payment required for this model"),
+    false
+  );
 });
 
 test("the credit check accepts the caller's signals or the shared-wallet signal", () => {

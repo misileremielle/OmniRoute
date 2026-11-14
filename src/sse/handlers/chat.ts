@@ -41,7 +41,6 @@ import { stripContextWindowSuffix } from "@omniroute/open-sse/services/model.ts"
 import { resolveBareModelToConnectionDefault } from "@omniroute/open-sse/services/model.ts";
 import { errorResponse } from "@omniroute/open-sse/utils/error.ts";
 import { trustedInternalTestMark } from "@omniroute/open-sse/utils/selfHop.ts";
-import { ASSESSMENT_PROBE_MARK, refuseUnisolatedChatProbe } from "@/lib/providers/chatProbePolicy";
 import { acceptHeaderForcesStream } from "@omniroute/open-sse/utils/aiSdkCompat.ts";
 import { normalizeVisionImagesInBody } from "@omniroute/open-sse/utils/visionImageNormalization.ts";
 import {
@@ -90,7 +89,6 @@ import { createHookContext, runHooks, initPreRequestRegistry } from "@/lib/middl
 import { rejectPeerRequest } from "@/shared/resilience/peerRouting";
 import { isRuntimeProviderRetirementError } from "@/shared/constants/providerRetirement";
 import { isCommonChatGptWebRetirementError } from "@/shared/constants/chatgptWebRetirement";
-import { isChatGptWebCodexModel } from "@/shared/constants/chatgptWebCodex";
 import { deleteHandoff, getHandoff } from "@/lib/db/contextHandoffs";
 import { scopeHandoffSessionId } from "@omniroute/open-sse/services/combo/handoffSessionScope.ts";
 import { updateCombo } from "@/lib/db/combos";
@@ -220,7 +218,6 @@ import {
 } from "@omniroute/open-sse/services/moonshotQuotaFetcher.ts";
 import { registerOpenrouterQuotaFetcher } from "@omniroute/open-sse/services/openrouterQuotaFetcher.ts";
 import { registerOpencodeQuotaFetcher } from "@omniroute/open-sse/services/opencodeQuotaFetcher.ts";
-import { registerGrokWebQuotaFetcher } from "@omniroute/open-sse/services/grokQuotaFetcher.ts";
 import { registerGenericQuotaFetchers } from "@omniroute/open-sse/services/genericQuotaFetcher.ts";
 import { registerQuotaTrackersBatch } from "@omniroute/open-sse/services/quotaTrackersBatch.ts";
 import {
@@ -294,7 +291,6 @@ registerOpencodeQuotaFetcher();
 // This runs before registerGenericQuotaFetchers so the bespoke fetcher takes
 // precedence over the generic path (which can't resolve grok OIDC auth from
 // cookie-based connections).
-registerGrokWebQuotaFetcher();
 
 // Register the generic quota fetcher for every other provider that has a
 // usage implementation in usage.ts but no bespoke preflight fetcher. This is
@@ -656,12 +652,6 @@ async function handleChatImplementation(
   }
 
   const isComboLiveTest = trustedInternalTestMark(request.headers) === "combo-health-check";
-  // Every automated probe, a live test or an assessment, is gated against leaving a conversation
-  // on a signed-in account; only the live test also bypasses breakers, cooldowns and quota policy.
-  // That bypass needs this process's token; the assessment mark only makes its own request
-  // stricter, so it is read as sent (assessment probes do not always reach the stamped listener).
-  const isAutomatedProbe =
-    isComboLiveTest || request.headers?.get?.("x-internal-test") === ASSESSMENT_PROBE_MARK;
 
   if (!modelStr) {
     log.warn("CHAT", "Missing model");
@@ -761,7 +751,6 @@ async function handleChatImplementation(
   );
   if (
     previousResponseIdMode !== "preserve" &&
-    !isChatGptWebCodexModel(modelStr) &&
     sourceFormat === FORMATS.OPENAI_RESPONSES &&
     typeof (body as { previous_response_id?: unknown }).previous_response_id === "string"
   ) {
@@ -1203,7 +1192,6 @@ async function handleChatImplementation(
             sessionId,
             sessionAffinityKey,
             forceLiveComboTest: isComboLiveTest,
-            automatedProbe: isAutomatedProbe,
             ...resolvedPolicy.comboAuthorizationOptions(apiKeyInfo, resolvedModelStr),
             forcedConnectionId: target?.connectionId ?? null,
             allowedConnectionIds: target?.allowedConnectionIds ?? null,
@@ -1299,7 +1287,6 @@ async function handleChatImplementation(
                 sessionAffinityKey,
                 emergencyFallbackTried: true,
                 forceLiveComboTest: isComboLiveTest,
-                automatedProbe: isAutomatedProbe,
                 conversationId,
                 managedLease,
               },
@@ -1413,7 +1400,6 @@ async function handleChatImplementation(
           sessionId,
           sessionAffinityKey,
           forceLiveComboTest: isComboLiveTest,
-          automatedProbe: isAutomatedProbe,
           forcedConnectionId: requestedConnectionId,
           correlationId: reqId,
           conversationId,
@@ -1467,7 +1453,6 @@ async function handleSingleModelChat(
     providerFailoverPending?: boolean; // another provider of this model is queued (providerFailover.ts)
     forceLiveComboTest?: boolean;
     /** An automated probe (live test or assessment): must not leave an account conversation. */
-    automatedProbe?: boolean;
     sessionId?: string | null;
     sessionAffinityKey?: string | null;
     forcedConnectionId?: string | null;
@@ -1566,8 +1551,6 @@ async function handleSingleModelChat(
           {
             sessionId: "", // safety-net redirect doesn't have session context
             forceLiveComboTest: false,
-            // A probe stays a probe through the redirect, so each target is gated as one.
-            automatedProbe: runtimeOptions.automatedProbe === true,
             authorizationContextModel: runtimeOptions.authorizationContextModel ?? modelStr,
             forcedConnectionId: runtimeOptions?.forcedConnectionId ?? null,
             allowedConnectionIds: null,
@@ -1633,12 +1616,6 @@ async function handleSingleModelChat(
   const modelPolicyRejection = await resolvedModelGate([`${provider}/${model}`]);
   if (modelPolicyRejection) return modelPolicyRejection;
   const forceLiveComboTest = runtimeOptions.forceLiveComboTest === true;
-  // #14780: a probe must not leave a conversation on a signed-in account. Decided here,
-  // once the target's provider is final, so every probe path and combo target is covered.
-  const probeRefusal = runtimeOptions.automatedProbe
-    ? await refuseUnisolatedChatProbe(provider)
-    : null;
-  if (probeRefusal) return probeRefusal;
   const budgetRejection = rejectIfMeteredBudgetExceeded(apiKeyInfo?.id, provider, modelStr);
   if (budgetRejection) return budgetRejection;
   const bypassProviderQuotaPolicy = hasProviderQuotaBypassScope(apiKeyInfo?.scopes);
@@ -1723,8 +1700,7 @@ async function handleSingleModelChat(
     resolveResilienceSettings(cachedRuntimeSettings).preferredAccountFailover;
   const retrySettings = disableCooldownAwareRetry(
     baseRetrySettings,
-    provider === "claude-web" ||
-      isCombo ||
+    isCombo ||
       forceLiveComboTest ||
       runtimeOptions.emergencyFallbackTried === true ||
       runtimeOptions.providerFailoverPending === true

@@ -72,7 +72,6 @@ test("barrel still exports every catalog + key helpers", () => {
   for (const name of [
     "NOAUTH_PROVIDERS",
     "OAUTH_PROVIDERS",
-    "WEB_COOKIE_PROVIDERS",
     "APIKEY_PROVIDERS",
     "LOCAL_PROVIDERS",
     "SEARCH_PROVIDERS",
@@ -139,7 +138,6 @@ test("each extracted data module is importable on its own", async () => {
   const mods = [
     ["noauth", "NOAUTH_PROVIDERS"],
     ["oauth", "OAUTH_PROVIDERS"],
-    ["web-cookie", "WEB_COOKIE_PROVIDERS"],
     ["local", "LOCAL_PROVIDERS"],
     ["search", "SEARCH_PROVIDERS"],
     ["upstream-proxy", "UPSTREAM_PROXY_PROVIDERS"],

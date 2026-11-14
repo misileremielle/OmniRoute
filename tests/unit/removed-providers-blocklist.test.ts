@@ -172,3 +172,44 @@ test("the opencode guard leaves the paid OpenCode providers and the client integ
     }
   }
 });
+
+// ── Providers removed from this fork (config/fork-removed-providers.json) ─────────────
+// Not operator takedowns, so no source-text scan: the guard is that none of these ids or
+// aliases is a provider, a chat-registry entry or a specialized executor.
+interface ForkRemovedBatch {
+  name: string;
+  migration: string;
+  providers: Array<{ id: string; alias: string | null }>;
+}
+const FORK_REMOVED = JSON.parse(
+  fs.readFileSync(path.join(ROOT, "config/fork-removed-providers.json"), "utf8")
+) as { batches: ForkRemovedBatch[] };
+
+for (const batch of FORK_REMOVED.batches) {
+  test(`fork-removed batch "${batch.name}" stays out of the catalogs, registry and executor map`, () => {
+    const leftovers: string[] = [];
+    for (const { id, alias } of batch.providers) {
+      if (getProviderById(id) !== undefined) leftovers.push(`${id}: provider catalog`);
+      if (REGISTRY[id] !== undefined) leftovers.push(`${id}: REGISTRY`);
+      if (hasSpecializedExecutor(id)) leftovers.push(`${id}: executor`);
+      if (alias) {
+        if (getProviderByAlias(alias) !== null) leftovers.push(`${alias}: alias reused`);
+        if (REGISTRY[alias] !== undefined) leftovers.push(`${alias}: REGISTRY alias`);
+        if (hasSpecializedExecutor(alias)) leftovers.push(`${alias}: executor alias`);
+      }
+      if (FREE_MODEL_BUDGETS.some((b) => b.provider === id)) leftovers.push(`${id}: free catalog`);
+    }
+    assert.deepEqual(leftovers, [], `see docs/reference/REMOVED_PROVIDERS.md (${batch.name})`);
+  });
+
+  test(`fork-removed batch "${batch.name}" has its data migration and doc row`, () => {
+    const migration = path.join(ROOT, "src/lib/db/migrations", batch.migration);
+    assert.ok(fs.existsSync(migration), `${batch.migration} must exist`);
+    const sql = fs.readFileSync(migration, "utf8");
+    for (const { id } of batch.providers) {
+      assert.ok(sql.includes(`('${id}')`), `${batch.migration} must list ${id}`);
+    }
+    const doc = fs.readFileSync(path.join(ROOT, "docs/reference/REMOVED_PROVIDERS.md"), "utf8");
+    assert.ok(doc.includes(`\`${batch.migration}\``), `the doc must name ${batch.migration}`);
+  });
+}

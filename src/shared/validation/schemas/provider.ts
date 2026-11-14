@@ -659,7 +659,6 @@ export const providersBatchTestSchema = z
       "apikey",
       "compatible",
       "all",
-      "web-cookie",
       "search",
       "audio",
       "local",

@@ -48,7 +48,6 @@ import { getClaudeUsage, getClaudePlanLabel } from "./usage/claude.ts";
 import { getKiroUsage, buildKiroUsageResult, discoverKiroProfileArn } from "./usage/kiro.ts";
 // Re-exported para os testes kiro-* (importam de services/usage).
 export { buildKiroUsageResult, discoverKiroProfileArn } from "./usage/kiro.ts";
-import { getAdobeFireflyUsage } from "./usage/adobeFirefly.ts";
 import { getOpenrouterUsage } from "./usage/openrouter.ts";
 import { getOpenAiCompatibleUsage } from "./usage/openaiCompatible.ts";
 import { getLlmgatewayUsage } from "./usage/llmgateway.ts";
@@ -56,8 +55,6 @@ import { getLyceumUsage } from "./usage/lyceum.ts";
 import { getOllamaCloudUsage } from "./opencodeOllamaUsage.ts";
 import { getCodeBuddyCnUsage } from "./usage/codebuddy-cn.ts";
 import { getCodeBuddyIntlUsage } from "./usage/codebuddy-intl.ts";
-import { getPromptQlUsage } from "./usage/promptql.ts";
-import { getHyperAgentUsage } from "./usage/hyperagent.ts";
 import { getGitHubUsage, formatGitHubQuotaSnapshot, inferGitHubPlanName } from "./usage/github.ts";
 import { getCrofUsage } from "./usage/crof.ts";
 import { getClinepassUsage } from "./usage/clinepass.ts";
@@ -90,12 +87,9 @@ import { getJinaUsage } from "./usage/jina.ts";
 import { getVolcenginePlanUsage } from "./usage/volcenginePlan.ts";
 import { getCommandCodeUsage } from "./usage/command-code.ts";
 import { getQwenTokenPlanUsage } from "./usage/qwen-token-plan.ts";
-import { getConolUsage } from "./conolUsage.ts";
-import { getSyntxUsage } from "./usage/syntx.ts";
 import { getAgentrouterUsage } from "./usage/agentrouter.ts";
 import { getKilocodeUsage } from "./usage/kilocode.ts";
 import { getMegabrainUsage } from "./usage/megabrain.ts";
-import { getChatPlaygroundUsage } from "./usage/chatplayground.ts";
 import { getTokenRouterUsage } from "./usage/tokenrouter.ts";
 import { getCloudflareAiUsage } from "./usage/cloudflareAi.ts";
 import { getXkiroUsage } from "./usage/xkiro.ts";
@@ -260,17 +254,6 @@ export async function getUsageForProvider(
     case "codebuddy-intl":
     case "cbai":
       return await getCodeBuddyIntlUsage(accessToken, apiKey, providerSpecificData);
-    case "promptql":
-    case "pql":
-      // DDN lux JWTs carry projectId only in JWT aud; connection.projectId may be set by sync.
-      return await getPromptQlUsage(apiKey || accessToken, providerSpecificData, projectId);
-    case "adobe-firefly":
-    case "firefly":
-      // Cookie or IMS JWT in apiKey/accessToken → GET firefly.adobe.io/v1/credits/balance
-      return await getAdobeFireflyUsage(apiKey, accessToken, providerSpecificData);
-    case "hyperagent":
-    case "ha":
-      return await getHyperAgentUsage(apiKey || accessToken, providerSpecificData);
     case "firecrawl":
       return await getFirecrawlUsage(id || "", apiKey, connection);
     case "context7":
@@ -288,12 +271,6 @@ export async function getUsageForProvider(
       return await getVolcenginePlanUsage(apiKey || "", provider, providerSpecificData);
     case "command-code":
       return await getCommandCodeUsage(apiKey || accessToken || "", id || "");
-    case "conol-web":
-    case "cnl":
-      return await getConolUsage(apiKey || accessToken, providerSpecificData, id || "");
-    case "syntx":
-    case "stx":
-      return await getSyntxUsage(apiKey, accessToken, providerSpecificData, id || "");
     case "agentrouter":
       return await getAgentrouterUsage(id, connection);
     case "tokenrouter":
@@ -309,9 +286,6 @@ export async function getUsageForProvider(
       return await getDevinCliUsage(apiKey || accessToken, id || "");
     case "anthropic":
       return await getAnthropicApiKeyUsage(apiKey);
-    case "chatplayground":
-    case "cpl":
-      return await getChatPlaygroundUsage(apiKey || accessToken, providerSpecificData, id || "");
     case "cloudflare-ai":
       // Daily neurons from GraphQL Analytics (needs Account Analytics: Read on the token).
       return await getCloudflareAiUsage(apiKey || "", providerSpecificData);

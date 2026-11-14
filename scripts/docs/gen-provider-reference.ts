@@ -9,7 +9,6 @@ import {
   FREE_PROVIDERS,
   NOAUTH_PROVIDERS,
   OAUTH_PROVIDERS,
-  WEB_COOKIE_PROVIDERS,
   APIKEY_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
@@ -171,7 +170,6 @@ function main() {
   const free = asRecords(FREE_PROVIDERS);
   const noauth = asRecords(NOAUTH_PROVIDERS as Record<string, ProviderRecord>);
   const oauth = asRecords(OAUTH_PROVIDERS);
-  const webCookie = asRecords(WEB_COOKIE_PROVIDERS);
   const apiKey = asRecords(APIKEY_PROVIDERS);
   const local = asRecords(LOCAL_PROVIDERS);
   const search = asRecords(SEARCH_PROVIDERS);
@@ -183,7 +181,6 @@ function main() {
     ...free.map((p) => p.id),
     ...noauth.map((p) => p.id),
     ...oauth.map((p) => p.id),
-    ...webCookie.map((p) => p.id),
     ...apiKey.map((p) => p.id),
     ...local.map((p) => p.id),
     ...search.map((p) => p.id),
@@ -196,7 +193,6 @@ function main() {
     buildSection("Free Tier (OAuth-first or no-key)", free, "Free"),
     buildSection("No-auth Providers (no key required)", noauth, "No-auth"),
     buildSection("OAuth Providers", oauth, "OAuth"),
-    buildSection("Web Cookie Providers", webCookie, "Web cookie"),
     buildSection("API Key Providers (paid / paid-with-free-credits)", apiKey, "API key"),
     buildSection("Local Providers", local, "Local"),
     buildSection("Search Providers", search, "Search"),
@@ -227,7 +223,7 @@ function main() {
   console.log(`  Providers: ${allIds.size} unique IDs`);
   console.log(
     `  Sections: free=${free.length}, noauth=${noauth.length}, oauth=${oauth.length}, ` +
-      `web=${webCookie.length}, apikey=${apiKey.length}, local=${local.length}, ` +
+      `apikey=${apiKey.length}, local=${local.length}, ` +
       `search=${search.length}, proxy=${upstreamProxy.length}, ` +
       `cloud=${cloudAgent.length}, system=${system.length}`
   );

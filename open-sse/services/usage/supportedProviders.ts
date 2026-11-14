@@ -60,13 +60,7 @@ export const USAGE_SUPPORTED_PROVIDERS: readonly string[] = [
   "codebuddy-intl",
   "cbai",
   // PromptQL playground credits (getCreditSummary → USD micros)
-  "promptql",
-  "pql",
   // Adobe Firefly web (cookie/JWT as apikey) — GET firefly.adobe.io/v1/credits/balance
-  "adobe-firefly",
-  "firefly",
-  "hyperagent",
-  "ha",
   // xAI OAuth (Grok) weekly quota (id + public alias, same pattern as ha/agy)
   "xai-oauth",
   "xao",
@@ -87,10 +81,6 @@ export const USAGE_SUPPORTED_PROVIDERS: readonly string[] = [
   "volcengine-coding-plan",
   // Command Code credits + 5h/weekly rolling windows
   "command-code",
-  "conol-web",
-  "cnl",
-  "syntx",
-  "stx",
   // Alibaba Coding Plan triple-window quota (#9603 UI gap — fetcher existed, list entry missing)
   "bailian-coding-plan",
   // Qwen Cloud / Model Studio personal Token Plan (cookie-authenticated console gateway)
@@ -115,8 +105,6 @@ export const USAGE_SUPPORTED_PROVIDERS: readonly string[] = [
   // Devin CLI agentic quota (Codeium seat-management GetUserStatus, protobuf)
   "devin-cli",
   // ChatPlayground subscription and daily credits (GET /api/user)
-  "chatplayground",
-  "cpl",
   // Cloudflare Workers AI daily neurons vs the 10k/day free allocation (needs Analytics: Read)
   "cloudflare-ai",
   // xKiro daily free-token quota (GET /v1/usage → free_tokens; wallet ignored)

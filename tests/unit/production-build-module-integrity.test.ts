@@ -22,11 +22,6 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
-
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 test("modelSelectModalHelpers exports survive isProviderModelHidden (#9011 missing brace)", async () => {
   const helpers = await import("@/shared/components/modelSelectModalHelpers");
@@ -91,18 +86,4 @@ test("the stale-while-revalidate path does not throw a ReferenceError (#9199 mer
   const stale = await call("second");
   assert.equal(await stale.text(), "first", "the stale body must be served, not a crash");
   await catalogCache.__flushCatalogBackgroundRefreshForTest();
-});
-
-test("tinycmsSigner has no build-time-resolvable wasm sidecar URL (#8736/#10087)", () => {
-  const source = readFileSync(path.join(repoRoot, "open-sse/executors/tinycmsSigner.ts"), "utf8");
-
-  // The wasm binary ships inlined as WASM_BASE64; there is no wasm_signer_bg.wasm file.
-  // Turbopack statically resolves `new URL(<literal>, import.meta.url)`, so leaving the
-  // generated default in place fails `next build` with "Module not found".
-  assert.ok(source.includes("const WASM_BASE64 ="), "wasm binary must stay inlined");
-  assert.doesNotMatch(
-    source,
-    /new URL\(\s*['"]wasm_signer_bg\.wasm['"]/,
-    "generated wasm-bindgen sidecar URL must not survive — Turbopack resolves it at build time"
-  );
 });

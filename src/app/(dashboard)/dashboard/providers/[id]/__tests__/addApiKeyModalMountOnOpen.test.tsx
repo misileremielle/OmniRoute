@@ -105,7 +105,6 @@ function basePanelProps(showAddApiKeyModal: boolean) {
       importedCount: 0,
     },
     showImportModal: false,
-    showTutorialModal: false,
     t: (key: string) => key,
   };
 }

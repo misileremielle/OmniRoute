@@ -106,14 +106,8 @@ const PROVIDER_LIMITS_APIKEY_PROVIDERS = new Set([
   // Qoder connections are PAT-based (authType "apikey"); the usage fetcher
   // exchanges the PAT for a job token and reads openapi.qoder.sh/user/status.
   "qoder",
-  "promptql", // PromptQL playground JWT → getCreditSummary USD credits
-  "pql",
   // Adobe Firefly: web-cookie / JWT stored as apikey → credits/balance
-  "adobe-firefly",
-  "firefly",
   // HyperAgent session cookie → billing/usage creditBlocks
-  "hyperagent",
-  "ha",
   "firecrawl",
   // Context7 rate limit quota (ratelimit-* headers of GET https://context7.com/api/v1/search)
   "context7",
@@ -130,10 +124,6 @@ const PROVIDER_LIMITS_APIKEY_PROVIDERS = new Set([
   "volcengine-coding-plan",
   // Command Code API key → /alpha/billing/credits + windowLimits
   "command-code",
-  "conol-web",
-  "cnl",
-  "syntx",
-  "stx",
   // Alibaba Coding Plan (console API key) + Qwen personal Token Plan (console cookie) — #9603
   "bailian-coding-plan",
   "qwen-cloud-token-plan",

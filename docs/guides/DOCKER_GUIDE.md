@@ -91,7 +91,7 @@ OmniRoute ships Compose profiles for the main deployment shapes. Pick the one th
 | `cli`            | `omniroute-cli`  | Agentic workflows that call `omniroute providers/setup/doctor` and bundled CLIs (Codex, Claude Code, Droid, OpenClaw)              | `docker compose --profile cli up -d`         |
 | `host`           | `omniroute-host` | Linux hosts that want `network_mode`-like access to host CLIs by mounting `~/.local/bin`, `~/.codex`, `~/.claude`, etc. read-only  | `docker compose --profile host up -d`        |
 | `cliproxyapi`    | `cliproxyapi`    | Run the [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) sidecar on port `8317` for upstream CLI proxying               | `docker compose --profile cliproxyapi up -d` |
-| `web`            | `omniroute-web`  | Web-session providers that need a browser: `gemini-web`, `claude-web`, `claude-turnstile` (builds `runner-web`, Chromium included) | `docker compose --profile web up -d`         |
+| `web`            | `omniroute-web`  | Browser-backed integrations: `cloudflare-playground` and the Volcano Engine console login (builds `runner-web`, Chromium included) | `docker compose --profile web up -d`         |
 
 > Multiple profiles can be combined: `docker compose --profile cli --profile cliproxyapi up -d`.
 
@@ -241,12 +241,12 @@ The prod stack runs in parallel with the dev compose (different container names,
 
 The repository ships a multi-stage Dockerfile (`Dockerfile`). Four stages are exposed; pick the right `target` for your use case.
 
-| Stage         | Base image            | Purpose                                                                                                                                                                                                                                                                     |
-| ------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `builder`     | `node:26-trixie-slim` | Installs deps (`npm ci --legacy-peer-deps`) and runs `npm run build` (Turbopack by default — see Build-time resources below)                                                                                                                                                |
-| `runner-base` | `node:26-trixie-slim` | Production runtime with the Next.js standalone output. **No provider CLIs bundled.**                                                                                                                                                                                        |
-| `runner-cli`  | `runner-base`         | Adds `git`, `docker.io`, `docker-compose` and global CLIs: `@openai/codex`, `@anthropic-ai/claude-code`, `droid`, `openclaw`. **Pick this for agentic workflows.**                                                                                                          |
-| `runner-web`  | `runner-base`         | Adds Playwright + a Chromium browser (`--with-deps`) for web-session providers: `gemini-web`, `claude-web`, `claude-turnstile`. **Pick this when you use those providers** — the plain image fails at request time without it (see the `-web` note under Release Channels). |
+| Stage         | Base image            | Purpose                                                                                                                                                                                                                                                                                         |
+| ------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `builder`     | `node:26-trixie-slim` | Installs deps (`npm ci --legacy-peer-deps`) and runs `npm run build` (Turbopack by default — see Build-time resources below)                                                                                                                                                                    |
+| `runner-base` | `node:26-trixie-slim` | Production runtime with the Next.js standalone output. **No provider CLIs bundled.**                                                                                                                                                                                                            |
+| `runner-cli`  | `runner-base`         | Adds `git`, `docker.io`, `docker-compose` and global CLIs: `@openai/codex`, `@anthropic-ai/claude-code`, `droid`, `openclaw`. **Pick this for agentic workflows.**                                                                                                                              |
+| `runner-web`  | `runner-base`         | Adds Playwright + a Chromium browser (`--with-deps`) for browser-backed integrations: `cloudflare-playground` and the Volcano Engine console login. **Pick this when you use those providers** — the plain image fails at request time without it (see the `-web` note under Release Channels). |
 
 Build a specific target manually:
 
@@ -479,8 +479,8 @@ configuration.
 
 ## Image Tags
 
-| Image                    | Tag      | Size   | Description                                          |
-| ------------------------ | -------- | ------ | ---------------------------------------------------- |
+| Image                              | Tag      | Size   | Description                                          |
+| ---------------------------------- | -------- | ------ | ---------------------------------------------------- |
 | `ghcr.io/misileremielle/omniroute` | `latest` | ~250MB | Highest **published** stable SemVer (not git `main`) |
 | `ghcr.io/misileremielle/omniroute` | `3.8.0`  | ~250MB | Pin this class of tag for GitOps                     |
 
@@ -497,9 +497,9 @@ OmniRoute publishes separate Docker channels for stable releases, active release
 | `:next` / `:next-web`           | Current default `release/v*` branch | Mutable pre-release pointer | Testing fixes that have landed on the active release branch but are not yet in a stable release                       |
 | `:main` / `:main-web`           | `main` branch                       | Mutable development pointer | Development and integration testing only                                                                              |
 
-#### Web-session providers: the `-web` images
+#### Browser-backed integrations: the `-web` images
 
-Every channel above doubles as a `-web` tag (`:latest-web`, `:<version>-web`, `:next-web`, `:main-web`), built from the `runner-web` stage — the same image plus Playwright and a Chromium browser. The plain image ships **without** Chromium; `gemini-web`, `claude-web` and `claude-turnstile` need it.
+Every channel above doubles as a `-web` tag (`:latest-web`, `:<version>-web`, `:next-web`, `:main-web`), built from the `runner-web` stage — the same image plus Playwright and a Chromium browser. The plain image ships **without** Chromium; `cloudflare-playground` and the Volcano Engine console login need it.
 
 The failure is deferred, not startup-time: those providers list their models and show as connected in the dashboard, and only the first request fails with
 

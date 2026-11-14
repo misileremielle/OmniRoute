@@ -100,7 +100,6 @@ const KNOWN_SVGS = new Set([
   "charm-hyper",
   "chutes",
   "claude",
-  "claude-web",
   "cline",
   "cloudflare",
   "codex",
@@ -135,7 +134,6 @@ const KNOWN_SVGS = new Set([
   "groq",
   "hcnsec",
   "heroku",
-  "huggingchat",
   "huggingface",
   "hyperbolic",
   "ibm",
@@ -160,7 +158,6 @@ const KNOWN_SVGS = new Set([
   "nebius",
   "nlpcloud",
   "nomic",
-  "notrack-web",
   "novita",
   "nube",
   "nvidia",
@@ -194,7 +191,6 @@ const KNOWN_SVGS = new Set([
   "sparkdesk",
   "stepfun",
   "sumopod",
-  "t3-web",
   "tavily",
   "tencent",
   "tokenrouter",
@@ -214,10 +210,8 @@ const KNOWN_SVGS = new Set([
   "xai",
   "xinference",
   "yi",
-  "yuanbao-web",
   "zed-hosted",
   "zenmux",
-  "zenmux-free",
   "zhipu",
 ]);
 
@@ -277,21 +271,17 @@ const GENERIC_PROVIDER_IDS = new Set([
   "unorouter",
   "wandb",
   "youcom-search",
-  "adapta-web",
   "agentrouter",
   "aimlapi",
   "anthropic-m",
-  "blackbox-web",
   "blackbox",
   "cliproxyapi",
   "dahl",
   "empower",
   "gigachat",
-  "inner-ai",
   "ironclaw",
   "kie",
   "lemonade",
-  "kagi-assistant",
   "kagi-search",
   "linkup-search",
   "llamafile",
@@ -307,8 +297,6 @@ const GENERIC_PROVIDER_IDS = new Set([
   "predibase",
   "reka",
   "zeroclaw",
-  "lmarena",
-  "lma",
 ]);
 
 const THEMED_SVGS: Record<string, { light: string; dark: string }> = {
@@ -331,10 +319,6 @@ const THEMED_SVGS: Record<string, { light: string; dark: string }> = {
     light: "/providers/kimi-logomark-light.svg",
     dark: "/providers/kimi-logomark-dark.svg",
   },
-  "kimi-web": {
-    light: "/providers/kimi-logomark-light.svg",
-    dark: "/providers/kimi-logomark-dark.svg",
-  },
   moonshot: {
     light: "/providers/kimi-logomark-light.svg",
     dark: "/providers/kimi-logomark-dark.svg",
@@ -345,7 +329,6 @@ const PROVIDER_ICON_ALIASES: Record<string, string> = {
   "opencode-go": "opencode",
   "opencode-zen": "opencode",
   "opencode-server": "opencode",
-  "poe-web": "poe",
 };
 
 const ProviderIcon = memo(function ProviderIcon({

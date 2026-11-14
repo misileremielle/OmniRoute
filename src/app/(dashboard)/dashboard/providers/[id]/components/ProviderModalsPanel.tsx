@@ -26,7 +26,6 @@ import EditCompatibleNodeModal from "./modals/EditCompatibleNodeModal";
 import ExternalLinkModal from "./ExternalLinkModal";
 import BatchTestResultsModal from "./BatchTestResultsModal";
 import ImportProgressModal from "./ImportProgressModal";
-import { AdaptaTutorialModal } from "./AdaptaTutorialModal";
 import { ImportCodexAuthModal, ApplyCodexAuthModal } from "./modals/ImportCodexAuthModal";
 import { ImportClaudeAuthModal, ApplyClaudeAuthModal } from "./modals/ImportClaudeAuthModal";
 import ImportGrokCliAuthModal from "./modals/ImportGrokCliAuthModal";
@@ -153,8 +152,6 @@ interface ProviderModalsPanelProps {
   showImportModal: boolean;
   setShowImportModal: (open: boolean) => void;
   // Tutorial
-  showTutorialModal: boolean;
-  setShowTutorialModal: (open: boolean) => void;
   t: ProviderMessageTranslator;
 }
 
@@ -237,8 +234,6 @@ export default function ProviderModalsPanel({
   importProgress,
   showImportModal,
   setShowImportModal,
-  showTutorialModal,
-  setShowTutorialModal,
   t,
 }: ProviderModalsPanelProps) {
   const oauthProviderId = resolveProviderOAuthBackendId(providerId, providerInfo);
@@ -493,12 +488,6 @@ export default function ProviderModalsPanel({
         }}
         t={t}
       />
-      {providerId === "adapta-web" && (
-        <AdaptaTutorialModal
-          isOpen={showTutorialModal}
-          onClose={() => setShowTutorialModal(false)}
-        />
-      )}
     </>
   );
 }

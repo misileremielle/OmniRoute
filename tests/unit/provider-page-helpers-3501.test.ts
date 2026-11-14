@@ -20,9 +20,6 @@ import {
   formatRoutingTagsInput,
   formatExcludedModelsInput,
   // Phase 2b additions
-  getWebSessionCredentialLabel,
-  getWebSessionCredentialHint,
-  getWebSessionCredentialCheckLabel,
   getAddCredentialModalTitle,
   upstreamHeadersRecordsEqual,
   UPSTREAM_HEADERS_UI_MAX,
@@ -98,32 +95,8 @@ test("routing-tags / excluded-models parse + format round-trip", () => {
 // Phase 2b — runtime guards for the newly-moved helpers
 // ---------------------------------------------------------------------------
 
-const tokenReq = { kind: "token" as const, credentialName: "myToken" };
-const cookieReq = { kind: "cookie" as const, credentialName: "SESS" };
-const noneReq = { kind: "none" as const, credentialName: "" };
-
-test("getWebSessionCredentialLabel (Phase 2b — transitive import guard)", () => {
-  assert.ok(getWebSessionCredentialLabel(tStub, tokenReq, false).length > 0);
-  assert.ok(getWebSessionCredentialLabel(tStub, cookieReq, true).length > 0);
-  assert.ok(getWebSessionCredentialLabel(tStub, noneReq, false).length > 0);
-});
-
-test("getWebSessionCredentialHint returns undefined for none-kind, string otherwise", () => {
-  assert.equal(getWebSessionCredentialHint(tStub, noneReq, "Acme", false), undefined);
-  assert.equal(typeof getWebSessionCredentialHint(tStub, tokenReq, "Acme", false), "string");
-  assert.equal(typeof getWebSessionCredentialHint(tStub, cookieReq, "Acme", true), "string");
-});
-
-test("getWebSessionCredentialCheckLabel returns a non-empty string", () => {
-  assert.ok(getWebSessionCredentialCheckLabel(tStub, tokenReq).length > 0);
-  assert.ok(getWebSessionCredentialCheckLabel(tStub, cookieReq).length > 0);
-});
-
-test("getAddCredentialModalTitle handles null/none/token/cookie requirements", () => {
-  assert.ok(getAddCredentialModalTitle(tStub, "Acme", null).length > 0);
-  assert.ok(getAddCredentialModalTitle(tStub, "Acme", noneReq).length > 0);
-  assert.ok(getAddCredentialModalTitle(tStub, "Acme", tokenReq).length > 0);
-  assert.ok(getAddCredentialModalTitle(tStub, "Acme", cookieReq).length > 0);
+test("getAddCredentialModalTitle names the provider", () => {
+  assert.ok(getAddCredentialModalTitle(tStub, "Acme").length > 0);
 });
 
 test("upstreamHeadersRecordsEqual is order-insensitive and correct", () => {

@@ -65,8 +65,8 @@ test("Fable 5 catalog exposes claude-fable-5 in cc — but NOT via Kiro (fabrica
   );
 });
 
-test("Opus 5 catalog is limited to verified first-party, web, and Copilot providers", () => {
-  for (const providerId of ["claude", "github", "claude-web", "anthropic"]) {
+test("Opus 5 catalog is limited to verified first-party and Copilot providers", () => {
+  for (const providerId of ["claude", "github", "anthropic"]) {
     const model = getModelsByProviderId(providerId).find((entry) => entry.id === "claude-opus-5");
     assert.ok(model, `${providerId} must expose claude-opus-5`);
   }

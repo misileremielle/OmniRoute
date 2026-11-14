@@ -96,25 +96,3 @@ test("#13575: egress-bucketed-quota providers (opencode-go) stay pinned on the c
     `expected an egress-bucketed-quota connection to stay pinned to one member, got: ${JSON.stringify(hosts)}`
   );
 });
-
-test("#13575: IP-pinned web-session providers (grok-web) stay pinned on the chat path", async () => {
-  const a = await makeProxy();
-  const b = await makeProxy();
-  const connId = await makeConnection("grok-web");
-  await proxiesDb.addProxyToScopePool("account", connId, a.id);
-  await proxiesDb.addProxyToScopePool("account", connId, b.id);
-
-  const hosts: string[] = [];
-  for (let i = 0; i < 6; i++) {
-    const r = (await settingsDb.resolveProxyForConnection(connId)) as {
-      proxy?: { host?: string } | null;
-    };
-    hosts.push(r.proxy?.host ?? "null");
-  }
-
-  assert.deepEqual(
-    new Set(hosts),
-    new Set([hosts[0]]),
-    `expected an IP-pinned web-session connection to stay pinned to one member, got: ${JSON.stringify(hosts)}`
-  );
-});

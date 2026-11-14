@@ -8,7 +8,7 @@ import os from "node:os";
 import path from "node:path";
 
 import { validateProviderApiKey } from "../../src/lib/providers/validation.ts";
-import { validateDevinCloudAgentProvider } from "../../src/lib/providers/validation/webProvidersB.ts";
+import { validateDevinCloudAgentProvider } from "../../src/lib/providers/validation/cloudAgents.ts";
 import { getStaticModelsForProvider } from "../../src/lib/providers/staticModels.ts";
 
 // Writes a tiny executable shell script that inspects WINDSURF_API_KEY (the env

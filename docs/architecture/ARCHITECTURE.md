@@ -15,7 +15,7 @@ It provides a single OpenAI-compatible endpoint (`/v1/*`) and routes traffic acr
 
 Core capabilities:
 
-- OpenAI-compatible API surface for CLI/tools (367 providers, 159 executor modules)
+- OpenAI-compatible API surface for CLI/tools (329 providers, 159 executor modules)
 - Request/response translation across provider formats
 - Model combo fallback (multi-model sequence)
 - Structured combo steps (`provider + model + connection`) with runtime ordering by `compositeTiers`
@@ -895,7 +895,6 @@ Each provider has a specialized executor extending `BaseExecutor` (in `open-sse/
 | `DefaultExecutor`         | OpenAI, Claude, Gemini, Qwen, OpenRouter, GLM, Kimi, MiniMax, DeepSeek, Groq, xAI, Mistral, Perplexity, Together, Fireworks, Cerebras, Cohere, NVIDIA, etc. | Dynamic URL/header config per provider                               |
 | `AntigravityExecutor`     | Google Antigravity                                                                                                                                          | Custom project/session IDs, Retry-After parsing, 429 obfuscation     |
 | `AzureOpenAIExecutor`     | Azure OpenAI                                                                                                                                                | Deployment-based routing, api-version query enforcement              |
-| `BlackboxWebExecutor`     | Blackbox AI (web-mode)                                                                                                                                      | Web-session reverse with TLS fingerprint emulation                   |
 | `ClaudeIdentityExecutor`  | Claude.ai (CCH path)                                                                                                                                        | Constraint + tool-remap pipelines, fingerprint shaping               |
 | `CliProxyApiExecutor`     | CLIProxyAPI-compatible providers                                                                                                                            | Custom auth and protocol handling                                    |
 | `CloudflareAiExecutor`    | Cloudflare Workers AI                                                                                                                                       | Account ID injection, Neurons-based usage tracking                   |
@@ -907,13 +906,10 @@ Each provider has a specialized executor extending `BaseExecutor` (in `open-sse/
 | `GithubExecutor`          | GitHub Copilot                                                                                                                                              | Copilot token refresh, VSCode-mimicking headers                      |
 | `GitlabExecutor`          | GitLab Duo                                                                                                                                                  | GitLab OAuth + project-scoped routing                                |
 | `GlmExecutor`             | Z.AI GLM (incl. `glmt` preset)                                                                                                                              | Thinking-budget aware, GLMT preset constants                         |
-| `GrokWebExecutor`         | xAI Grok web                                                                                                                                                | Web-session reverse, mode selection (think/standard)                 |
 | `KieExecutor`             | KIE                                                                                                                                                         | Custom token issuance with rotating session anchors                  |
 | `KiroExecutor`            | AWS CodeWhisperer/Kiro                                                                                                                                      | AWS EventStream binary format → SSE conversion                       |
-| `MuseSparkWebExecutor`    | Muse Spark (web)                                                                                                                                            | Web-session reverse with image-message bridging                      |
 | `NlpCloudExecutor`        | NLP Cloud                                                                                                                                                   | Provider-specific request body shape                                 |
 | `OpenCodeExecutor`        | OpenCode                                                                                                                                                    | AI SDK compatible provider setup                                     |
-| `PerplexityWebExecutor`   | Perplexity web                                                                                                                                              | Web-session reverse for chat continuation                            |
 | `PetalsExecutor`          | Petals distributed inference                                                                                                                                | Decentralized swarm routing                                          |
 | `PollinationsExecutor`    | Pollinations AI                                                                                                                                             | No API key required, rate-limited requests                           |
 | `QoderExecutor`           | Qoder AI                                                                                                                                                    | PAT and OAuth support, multi-model free tier                         |
@@ -921,22 +917,6 @@ Each provider has a specialized executor extending `BaseExecutor` (in `open-sse/
 | `DevinDesktopExecutor`    | Devin Desktop                                                                                                                                               | Imported API key + Connect-protobuf chat streaming                   |
 
 All other providers (including custom compatible nodes) use the `DefaultExecutor`.
-
-### Automated probes and web-session accounts
-
-Model tests, Test All, combo tests and assessments send real chat requests. A web-session
-provider acts as the signed-in user, so each of those requests would be saved as a
-conversation on that account; automated probes that left such conversations got an account
-suspended (#14780). The chat pipeline therefore refuses every target an automated probe
-reaches whose provider takes a web-session credential, once the target's provider is
-resolved and before a credential is chosen (`src/lib/providers/chatProbePolicy.ts`). The
-refusal is `422` with `error.code` `chat_probe_not_isolated`, and the probe runners report
-it as a skip, not a failure.
-
-An executor that runs every chat in the provider's own no-history mode declares it with
-`ChatProbeIsolatingExecutor` (`open-sse/executors/chatProbeIsolation.ts`); probes to that
-provider are then allowed. ChatGPT Web declares `temporary-chat`. Pin a declaration to its
-mechanism with a test, so the claim cannot outlive the code that makes it true.
 
 ## Provider Compatibility Matrix
 
@@ -992,10 +972,6 @@ mechanism with a test, so the claim cannot outlive the code that makes it true.
 | Codex Cloud         | openai-responses | OAuth                 | ✅               | ❌         | ✅            | ✅ Rate limits     |
 | Jules               | openai           | OAuth                 | ✅               | ✅         | ✅            | ✅ Task API        |
 | AgentRouter         | openai           | API Key               | ✅               | ✅         | ❌            | ❌                 |
-| Grok-Web            | openai           | Session cookie        | ✅               | ✅         | ❌            | ❌                 |
-| Perplexity-Web      | openai           | Session cookie        | ✅               | ✅         | ❌            | ❌                 |
-| BlackBox-Web        | openai           | Session cookie + TLS  | ✅               | ✅         | ❌            | ❌                 |
-| Muse-Spark-Web      | openai           | Session cookie        | ✅               | ✅         | ❌            | ❌                 |
 | ModelScope          | openai           | API Key               | ✅               | ✅         | ❌            | ⚠️ Quota policy    |
 | BazaarLink          | openai           | API Key               | ✅               | ✅         | ❌            | ❌                 |
 | Petals              | openai           | None                  | ✅               | ✅         | ❌            | ❌                 |

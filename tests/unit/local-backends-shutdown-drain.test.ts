@@ -16,7 +16,6 @@
  *
  * Covered here:
  *   - open-sse/executors/codex-app-server.ts  (local Codex app-server child process)
- *   - open-sse/executors/chatgpt-web-codex.ts (runtime stopped BY our own cleanup())
  *   - open-sse/executors/devin-cli-agentic.ts (local Devin CLI child process)
  *
  * The drain flag is driven directly through `globalThis.__omnirouteShutdown` — the
@@ -42,11 +41,7 @@ fs.mkdirSync(devinHome, { recursive: true });
 fs.mkdirSync(process.env.DATA_DIR, { recursive: true });
 
 const { CodexAppServerExecutor } = await import("../../open-sse/executors/codex-app-server.ts");
-const { ChatGptWebCodexExecutor } = await import("../../open-sse/executors/chatgpt-web-codex.ts");
-const { encodeChatGptWebCodexSecrets } =
-  await import("../../open-sse/executors/chatgpt-web-codex/credentials.ts");
 const { DevinCliAgenticExecutor } = await import("../../open-sse/executors/devin-cli-agentic.ts");
-const { FORMATS } = await import("../../open-sse/translator/formats.ts");
 const { normalizeStreamFailurePayload } = await import("../../open-sse/utils/streamErrorFormat.ts");
 
 /** The exact shape gracefulShutdown.ts writes and open-sse/utils/drainStatus.ts reads. */
@@ -154,71 +149,6 @@ test("codex app-server: a drained streaming turn is not reported as a 5xx", asyn
   assert.ok(payload, "the stream must carry a response.failed frame");
   const status = runtimeVisibleStatus(payload);
   assert.ok(status < 500, `the runtime must not read a 5xx from our own teardown (got ${status})`);
-});
-
-// ── ChatGPT Web (Codex) — the runtime our own cleanup() stops ───────────────
-
-/** A "chrome" that exits immediately: the browser can never come up. */
-function writeFailingChrome(dir: string): string {
-  const scriptFile = path.join(dir, "failing-chrome.cjs");
-  writeFileSync(scriptFile, "#!/usr/bin/env node\nprocess.exit(3);\n", { mode: 0o755 });
-  return scriptFile;
-}
-
-async function runChatGptWebTurn(stream: boolean) {
-  const chromeExecutablePath = writeFailingChrome(isolatedRoot);
-  // Only an operator-configured browser is launched (#18358): a stored
-  // chromeExecutablePath is honoured only when it matches CHATGPT_WEB_CODEX_CHROME_PATH.
-  const oldChromePath = process.env.CHATGPT_WEB_CODEX_CHROME_PATH;
-  process.env.CHATGPT_WEB_CODEX_CHROME_PATH = chromeExecutablePath;
-  try {
-    return await runChatGptWebTurnWith(chromeExecutablePath, stream);
-  } finally {
-    if (oldChromePath === undefined) delete process.env.CHATGPT_WEB_CODEX_CHROME_PATH;
-    else process.env.CHATGPT_WEB_CODEX_CHROME_PATH = oldChromePath;
-  }
-}
-
-async function runChatGptWebTurnWith(chromeExecutablePath: string, stream: boolean) {
-  const executor = new ChatGptWebCodexExecutor();
-  return executor.execute({
-    model: "luna",
-    body: {
-      _nativeCodexPassthrough: true,
-      model: "gpt-5.6-luna",
-      input: [{ type: "message", role: "user", content: [{ type: "input_text", text: "hi" }] }],
-      client_metadata: { "x-codex-turn-metadata": { thread_id: "thr_1", turn_id: "turn_1" } },
-    },
-    stream,
-    credentials: {
-      connectionId: "conn_drain_probe",
-      apiKey: encodeChatGptWebCodexSecrets({
-        storageState: { cookies: [], origins: [] },
-        runtimeKey: "k",
-      }),
-      providerSpecificData: { chromeExecutablePath, solAvailable: false },
-    },
-    clientHeaders: { "user-agent": "codex_cli_rs/1.0" },
-    clientResponseFormat: FORMATS.OPENAI_RESPONSES,
-  } as never);
-}
-
-test("chatgpt web codex: a failure outside a drain keeps its own 502", async () => {
-  setDraining(false);
-  const response = responseOf(await runChatGptWebTurn(false));
-  assert.equal(response.status, 200, await response.clone().text());
-  const body = JSON.parse(await response.text());
-  assert.equal(body.status, "failed");
-  assert.equal(runtimeVisibleStatus(body), 502);
-});
-
-test("chatgpt web codex: while draining the failed turn is answered 499", async () => {
-  setDraining(true);
-  const response = responseOf(await runChatGptWebTurn(false));
-  assert.equal(response.status, 499, await response.clone().text());
-  const body = JSON.parse(await response.text());
-  assert.equal(body.error.type, "client_disconnected");
-  assert.equal(body.error.code, "client_disconnected");
 });
 
 // ── Devin CLI agentic (local child process) ─────────────────────────────────

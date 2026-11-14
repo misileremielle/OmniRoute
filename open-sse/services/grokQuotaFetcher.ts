@@ -1,80 +1,29 @@
 /**
- * grokQuotaFetcher.ts — Grok Web Weekly Quota Fetcher
+ * grokQuotaFetcher.ts — xAI shared weekly billing helpers.
  *
- * Implements QuotaFetcher for the grok-web provider (grok.com SSO/cookie
- * connections). Since grok-web uses cookie auth rather than an accessToken
- * stored in the provider connection, this fetcher reads the account-level
- * OIDC tokens from the local Grok CLI (~/.grok/auth.json) and calls the
- * same billing API that powers the grok CLI /usage command and third-party
- * quota widgets (pi-grok-usage, hermes-grok-usage).
+ * `fetchGrokBillingWithToken` / `grokBillingSnapshotToQuotaInfo` call the billing API that
+ * powers the grok CLI /usage command and map it to the preflight QuotaInfo contract. Used by
+ * `xaiOauthQuotaFetcher.ts` (connection OAuth token path).
  *
- * The billing endpoint returns a single weekly credit-usage percentage
- * that covers all Grok products (Chat, Build, Imagine, API) under the
- * SuperGrok / X Premium+ unified weekly pool.
- *
- * Registration: call registerGrokWebQuotaFetcher() once at server startup,
- * before registerGenericQuotaFetchers() — because the generic path doesn't
- * know how to resolve grok OIDC auth from a cookie-based connection.
- *
- * Shared billing helper: `fetchGrokBillingWithToken` / `grokBillingSnapshotToQuotaInfo`
- * are also used by `xaiOauthQuotaFetcher.ts` (connection OAuth token path).
+ * The billing endpoint returns a single weekly credit-usage percentage that covers all Grok
+ * products (Chat, Build, Imagine, API) under the SuperGrok / X Premium+ unified weekly pool.
  */
 
-import {
-  registerQuotaCacheInvalidator,
-  registerQuotaFetcher,
-  registerQuotaWindows,
-  type QuotaInfo,
-} from "./quotaPreflight.ts";
+import { type QuotaInfo } from "./quotaPreflight.ts";
 import { fetchWithConnectionProxy } from "./connectionProxyFetch.ts";
-import { registerMonitorFetcher } from "./quotaMonitor.ts";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const BILLING_URL = "https://cli-chat-proxy.grok.com/v1/billing?format=credits";
-const DEFAULT_ISSUER = "https://auth.x.ai";
-const FETCH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes — matches grok-web rate limit cooldown
 const REQUEST_TIMEOUT_MS = 10_000;
-const EXPIRY_SKEW_MS = 60_000; // refresh a bit before actual expiry
-/**
- * Resolve the Grok auth.json path.
- * Controlled by the GROK_AUTH_PATH env var for testing; defaults to ~/.grok/auth.json.
- */
-function getAuthPath(): string {
-  const override = (process.env.GROK_AUTH_PATH || "").trim();
-  return override || join(homedir(), ".grok", "auth.json");
-}
 
 /**
- * Stable window identifier for the grok-web weekly quota.
+ * Stable window identifier for the weekly quota.
  * Surfaced in the dashboard as "Weekly" under provider limits.
  */
 export const GROK_WINDOW_WEEKLY = "weekly";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-interface GrokAuthEntry {
-  key?: string;
-  refresh_token?: string;
-  expires_at?: string;
-  email?: string;
-  auth_mode?: string;
-  oidc_issuer?: string;
-  oidc_client_id?: string;
-}
-
-interface ResolvedAuth {
-  entryId: string;
-  token: string;
-  refreshToken?: string;
-  email?: string;
-  expiresAtMs?: number;
-  issuer: string;
-  clientId?: string;
-}
 
 interface BillingConfig {
   currentPeriod?: {
@@ -109,209 +58,8 @@ interface UsageSnapshot {
   fetchedAt: number;
 }
 
-/** Public billing snapshot for the shared weekly credit pool (grok-web / xai-oauth). */
+/** Public billing snapshot for the shared weekly credit pool (xai-oauth). */
 export type GrokBillingSnapshot = UsageSnapshot;
-
-// ─── In-memory cache (per-connection, keyed by connectionId) ─────────────────
-
-interface CacheEntry {
-  quota: QuotaInfo | null;
-  error: string | null;
-  fetchedAt: number;
-}
-
-const quotaCache = new Map<string, CacheEntry>();
-const CACHE_TTL_MS = 60_000; // 60 seconds — matches codexQuotaFetcher
-
-const _cacheCleanup = setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of quotaCache) {
-    if (now - entry.fetchedAt > CACHE_TTL_MS * 5) {
-      quotaCache.delete(key);
-    }
-  }
-}, 5 * 60_000);
-
-if (typeof _cacheCleanup === "object" && "unref" in _cacheCleanup) {
-  (_cacheCleanup as { unref?: () => void }).unref?.();
-}
-
-// ─── Auth helpers (mirrors pi-grok-usage / hermes-grok-usage patterns) ────────
-
-function isAllowedXaiUrl(raw: string): boolean {
-  try {
-    const url = new URL(raw);
-    return url.protocol === "https:" && (url.hostname === "x.ai" || url.hostname.endsWith(".x.ai"));
-  } catch {
-    return false;
-  }
-}
-
-function readAuthFile(): Record<string, GrokAuthEntry> | null {
-  if (!existsSync(getAuthPath())) return null;
-  try {
-    const raw = JSON.parse(readFileSync(getAuthPath(), "utf8")) as Record<string, GrokAuthEntry>;
-    if (!raw || typeof raw !== "object") return null;
-    return raw;
-  } catch {
-    return null;
-  }
-}
-
-function pickAuthEntry(file: Record<string, GrokAuthEntry>): ResolvedAuth | null {
-  const now = Date.now();
-  const scored = Object.entries(file)
-    .map(([entryId, e]) => {
-      const token = typeof e?.key === "string" ? e.key.trim() : "";
-      const exp = e?.expires_at ? Date.parse(e.expires_at) : Number.POSITIVE_INFINITY;
-      const expired = Number.isFinite(exp) ? exp <= now + EXPIRY_SKEW_MS : false;
-      const hasRefresh = typeof e?.refresh_token === "string" && e.refresh_token.length > 0;
-      return { entryId, e, token, exp, expired, hasRefresh };
-    })
-    .filter((x) => x.token.length > 0 || x.hasRefresh);
-
-  if (scored.length === 0) return null;
-
-  scored.sort((a, b) => {
-    if (a.expired !== b.expired) return a.expired ? 1 : -1;
-    if (a.hasRefresh !== b.hasRefresh) return a.hasRefresh ? -1 : 1;
-    return b.exp - a.exp;
-  });
-
-  const best = scored[0];
-  const issuer = (best.e.oidc_issuer || DEFAULT_ISSUER).replace(/\/$/, "");
-  return {
-    entryId: best.entryId,
-    token: best.token,
-    refreshToken: best.e.refresh_token?.trim() || undefined,
-    email: best.e.email,
-    expiresAtMs: Number.isFinite(best.exp) ? best.exp : undefined,
-    issuer,
-    clientId: best.e.oidc_client_id?.trim() || undefined,
-  };
-}
-
-function writeRefreshedTokens(
-  entryId: string,
-  update: { access: string; refresh?: string; expiresAtIso: string }
-): void {
-  const file = readAuthFile();
-  if (!file || !file[entryId]) return;
-  file[entryId] = {
-    ...file[entryId],
-    key: update.access,
-    ...(update.refresh ? { refresh_token: update.refresh } : {}),
-    expires_at: update.expiresAtIso,
-  };
-  try {
-    writeFileSync(getAuthPath(), `${JSON.stringify(file, null, 2)}\n`, { encoding: "utf8" });
-  } catch {
-    // Non-fatal: token is still valid in-memory this session
-  }
-}
-
-async function discoverTokenEndpoint(
-  issuer: string,
-  signal: AbortSignal,
-  connectionId: string
-): Promise<string> {
-  const discoveryUrl = `${issuer.replace(/\/$/, "")}/.well-known/openid-configuration`;
-  if (!isAllowedXaiUrl(discoveryUrl)) {
-    throw new Error("invalid oidc issuer");
-  }
-  const res = await fetchWithConnectionProxy(connectionId, discoveryUrl, {
-    headers: { Accept: "application/json" },
-    signal,
-  });
-  if (!res) throw new Error("proxy quota fetch failed");
-  if (!res.ok) throw new Error(`token refresh failed (discovery HTTP ${res.status})`);
-  const json = (await res.json()) as { token_endpoint?: string };
-  const endpoint = String(json.token_endpoint || "");
-  if (!isAllowedXaiUrl(endpoint)) throw new Error("invalid token endpoint");
-  return endpoint;
-}
-
-async function refreshAccessToken(
-  auth: ResolvedAuth,
-  signal: AbortSignal,
-  connectionId: string
-): Promise<ResolvedAuth> {
-  if (!auth.refreshToken) {
-    throw new Error("auth expired — run `grok login`");
-  }
-  if (!auth.clientId) {
-    throw new Error("auth missing client id — run `grok login`");
-  }
-
-  const tokenEndpoint = await discoverTokenEndpoint(auth.issuer, signal, connectionId);
-  const res = await fetchWithConnectionProxy(connectionId, tokenEndpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Accept: "application/json",
-      "User-Agent": "omniroute-grok-usage/1.0",
-    },
-    body: new URLSearchParams({
-      grant_type: "refresh_token",
-      client_id: auth.clientId ?? "",
-      refresh_token: auth.refreshToken ?? "",
-    }).toString(),
-    signal,
-  });
-  if (!res) throw new Error("proxy quota fetch failed");
-
-  if (!res.ok) {
-    throw new Error(`token refresh failed (HTTP ${res.status})`);
-  }
-
-  const payload = (await res.json()) as {
-    access_token?: string;
-    refresh_token?: string;
-    expires_in?: number;
-  };
-
-  const access = String(payload.access_token || "").trim();
-  if (!access) throw new Error("token refresh failed (empty access token)");
-
-  const expiresInSec = Number(payload.expires_in || 3600);
-  const expiresAtMs = Date.now() + Math.max(60, expiresInSec) * 1000;
-  const expiresAtIso = new Date(expiresAtMs).toISOString();
-  const refresh = String(payload.refresh_token || auth.refreshToken).trim();
-
-  try {
-    writeRefreshedTokens(auth.entryId, {
-      access,
-      refresh,
-      expiresAtIso,
-    });
-  } catch {
-    // Non-fatal
-  }
-
-  return {
-    ...auth,
-    token: access,
-    refreshToken: refresh,
-    expiresAtMs,
-  };
-}
-
-function needsRefresh(auth: ResolvedAuth): boolean {
-  if (!auth.token) return true;
-  if (auth.expiresAtMs == null) return false;
-  return auth.expiresAtMs <= Date.now() + EXPIRY_SKEW_MS;
-}
-
-async function resolveAuth(signal: AbortSignal, connectionId: string): Promise<ResolvedAuth> {
-  const file = readAuthFile();
-  if (!file) throw new Error("no grok auth — run `grok login`");
-  const auth = pickAuthEntry(file);
-  if (!auth) throw new Error("no usable Grok credentials — run `grok login`");
-  if (needsRefresh(auth)) {
-    return refreshAccessToken(auth, signal, connectionId);
-  }
-  return auth;
-}
 
 // ─── Billing fetch ───────────────────────────────────────────────────────────
 
@@ -338,7 +86,7 @@ function resetLocalLabel(endIso?: string): string {
 
 /**
  * Call xAI's shared weekly billing endpoint with an already-resolved Bearer token.
- * Used by grok-web (local CLI OIDC) and xai-oauth (connection access token).
+ * Used by xai-oauth (connection access token).
  *
  * Endpoint: GET https://cli-chat-proxy.grok.com/v1/billing?format=credits
  * `creditUsagePercent` is percent **used** (0–100), matching grok.com Usage UI.
@@ -431,95 +179,4 @@ function snapshotToQuotaInfo(snap: UsageSnapshot): QuotaInfo {
       },
     },
   };
-}
-
-/**
- * Fetch current weekly quota for a grok-web connection.
- *
- * Unlike most provider fetchers, this does NOT use the connection's stored
- * accessToken/cookie — instead it reads the local Grok CLI OIDC tokens
- * (~/.grok/auth.json) which represent the same xAI account. This is because
- * grok-web uses cookie auth (SSO) but the billing endpoint requires a Bearer
- * token, and both auth paths share the same underlying account.
- *
- * If no local Grok CLI auth is found, returns null (fail-open — don't block
- * grok-web requests on missing quota data).
- *
- * @param connectionId - Connection ID from the DB (used as cache key)
- * @param _connection - Ignored for grok-web; auth is resolved from local CLI
- * @returns QuotaInfo with a single "weekly" window, or null
- */
-export async function fetchGrokWebQuota(
-  connectionId: string,
-  _connection?: Record<string, unknown>
-): Promise<QuotaInfo | null> {
-  // Check cache first
-  const cached = quotaCache.get(connectionId);
-  if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
-    return cached.quota;
-  }
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-    try {
-      let auth: ResolvedAuth;
-      try {
-        auth = await resolveAuth(controller.signal, connectionId);
-      } catch {
-        // No local grok auth — fail open
-        quotaCache.set(connectionId, { quota: null, error: null, fetchedAt: Date.now() });
-        return null;
-      }
-
-      try {
-        const snap = await fetchBilling(auth.token, controller.signal, connectionId);
-        const quota = snapshotToQuotaInfo(snap);
-        quotaCache.set(connectionId, { quota, error: null, fetchedAt: Date.now() });
-        return quota;
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "";
-        // One retry with token refresh on auth errors
-        if (msg.startsWith("auth ") && auth.refreshToken) {
-          auth = await refreshAccessToken(auth, controller.signal, connectionId);
-          const snap = await fetchBilling(auth.token, controller.signal, connectionId);
-          const quota = snapshotToQuotaInfo(snap);
-          quotaCache.set(connectionId, { quota, error: null, fetchedAt: Date.now() });
-          return quota;
-        }
-        // Non-auth error — fail open
-        quotaCache.set(connectionId, { quota: null, error: msg, fetchedAt: Date.now() });
-        return null;
-      }
-    } finally {
-      clearTimeout(timeout);
-    }
-  } catch {
-    quotaCache.set(connectionId, { quota: null, error: null, fetchedAt: Date.now() });
-    return null;
-  }
-}
-
-// ─── Invalidation ────────────────────────────────────────────────────────────
-
-/**
- * Force-invalidate the cache for a connection.
- */
-export function invalidateGrokWebQuotaCache(connectionId: string): void {
-  quotaCache.delete(connectionId);
-}
-
-// ─── Registration ────────────────────────────────────────────────────────────
-
-/**
- * Register the grok-web quota fetcher with the preflight and monitor systems.
- * Call this once at server startup (in chat.ts), before registerGenericQuotaFetchers()
- * so the generic path doesn't try to override this bespoke fetcher.
- */
-export function registerGrokWebQuotaFetcher(): void {
-  registerQuotaFetcher("grok-web", fetchGrokWebQuota);
-  registerQuotaCacheInvalidator("grok-web", invalidateGrokWebQuotaCache);
-  registerMonitorFetcher("grok-web", fetchGrokWebQuota);
-  registerQuotaWindows("grok-web", [GROK_WINDOW_WEEKLY]);
 }

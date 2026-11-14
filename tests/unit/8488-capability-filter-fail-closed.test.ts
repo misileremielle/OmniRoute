@@ -12,11 +12,8 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 
 const core = await import("../../src/lib/db/core.ts");
 const { saveModelsDevCapabilities } = await import("../../src/lib/modelsDevSync.ts");
-const {
-  filterTargetsByRequestCompatibility,
-  describeCapabilityFilterExhaustion,
-  providerSupportsEmulatedToolCalling,
-} = await import("../../open-sse/services/combo/comboStructure.ts");
+const { filterTargetsByRequestCompatibility, describeCapabilityFilterExhaustion } =
+  await import("../../open-sse/services/combo/comboStructure.ts");
 const { resolveAutoStrategyOrder } =
   await import("../../open-sse/services/combo/resolveAutoStrategy.ts");
 const { handleComboChat } = await import("../../open-sse/services/combo.ts");
@@ -119,45 +116,6 @@ test("#8488 filter: zero tool-capable targets → empty (fail closed)", () => {
   assert.match(exhaustion!.message, /supports tool calling/i);
   assert.equal(exhaustion!.terminalReason, "capability_mismatch");
   assert.ok(exhaustion!.excluded.some((e) => e.reason.includes("tools")));
-});
-
-test("#8488 filter: Gemini Web emulation stays eligible for tools (#5240)", () => {
-  // Registry honestly tags Gemini Web models toolCalling:false; the prompt
-  // shim is what makes tools work. Fail-closed must not hard-reject them.
-  assert.equal(providerSupportsEmulatedToolCalling("gemini-web"), true);
-  assert.equal(providerSupportsEmulatedToolCalling("gweb"), true);
-  assert.equal(providerSupportsEmulatedToolCalling("claude-web"), false); // toolCalling:"none"
-  assert.equal(providerSupportsEmulatedToolCalling("openai"), false);
-
-  const kept = filterTargetsByRequestCompatibility(
-    [
-      target("gemini-web", "gemini-web/gemini-3.1-pro"),
-      target("gemini-web", "gemini-web/gemini-3.7-flash"),
-    ],
-    {
-      messages: [{ role: "user", content: "Use a tool." }],
-      tools: [{ type: "function", function: { name: "lookup", parameters: {} } }],
-    },
-    log
-  );
-  assert.equal(kept.length, 2);
-  assert.deepEqual(
-    kept.map((t) => t.modelStr),
-    ["gemini-web/gemini-3.1-pro", "gemini-web/gemini-3.7-flash"]
-  );
-
-  const exhaustion = describeCapabilityFilterExhaustion(
-    [
-      target("gemini-web", "gemini-web/gemini-3.1-pro"),
-      target("gemini-web", "gemini-web/gemini-3.7-flash"),
-    ],
-    {
-      messages: [{ role: "user", content: "Use a tool." }],
-      tools: [{ type: "function", function: { name: "lookup", parameters: {} } }],
-    },
-    "web-cookie-tools"
-  );
-  assert.equal(exhaustion, null, "emulation-capable pool must not report capability_mismatch");
 });
 
 test("#8488 auto: Gemini Web emulation survives tool pre-filter (#5240)", async () => {

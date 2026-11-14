@@ -17,11 +17,6 @@ const TOOL_ONLY_SERVICE_KINDS = new Set<string>(["webSearch", "webFetch"]);
  * console API (see volcenginePlanModelDiscovery.ts) and merged into the synced
  * catalog, so the static registry only acts as a capability-seed fallback. */
 const CURATED_MODEL_ONLY_PROVIDERS = new Set<string>([
-  "kimi-web",
-  "zai-web",
-  // The clean-room browser integration exposes only model/effort routes
-  // observed in the first-party picker. It has no upstream model-list API.
-  "chatgpt-web",
   // CodeBuddy Intl has no verified live model-catalog endpoint; CN discovers
   // its authenticated, account-specific roster from /v3/config.
   "codebuddy-intl",

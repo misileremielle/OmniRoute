@@ -289,7 +289,6 @@ OmniRoute scrubs inbound client headers before forwarding so a request that arri
 
 - `open-sse/services/__tests__/claudeTlsClient.test.ts` — shared TLS wrapper behavior
 - `tests/unit/anthropic-cache-fingerprint.test.ts` — fingerprint determinism
-- `tests/unit/chatgpt-web-source-retirement.test.ts` — common ChatGPT Web stealth source remains absent while Codex Web stays present
 
 ---
 

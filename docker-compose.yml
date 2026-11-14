@@ -12,7 +12,7 @@
 #
 #  Usage:
 #    docker compose --profile base up -d
-#    docker compose --profile web up -d   # gemini-web / claude-web / claude-turnstile
+#    docker compose --profile web up -d   # cloudflare-playground / Volcano Engine console login
 #    docker compose --profile cli up -d
 #    # Windows Docker Desktop: use the bundled CLI image and rebuild it
 #    docker compose --profile cli up -d --build
@@ -115,7 +115,7 @@ services:
       - base
 
   # ── Profile: web (runner-web + Chromium/Playwright) ────────────────
-  # Required for web-cookie providers (gemini-web, claude-web, claude-turnstile).
+  # Required for browser-backed integrations (cloudflare-playground, Volcano Engine console login).
   # The default `base` image ships without Chromium, so those providers fail
   # with "Executable doesn't exist at .../ms-playwright/chromium..." (#2832).
   omniroute-web:

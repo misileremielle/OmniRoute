@@ -10,9 +10,6 @@ type ValidateFormFields = {
   awsAccessKeyId: string;
   awsSessionToken: string;
   cx: string;
-  runtimeKey: string;
-  tunnelId: string;
-  connectorName: string;
   commandCodeZdrEnabled?: boolean;
   accountId?: string;
 };
@@ -30,13 +27,10 @@ function validateRegion(
 }
 
 /** Fields that only apply to one provider family; undefined otherwise. */
-function familyFields(formData: ValidateFormFields, isAwsPolly: boolean, webCodex: boolean) {
+function familyFields(formData: ValidateFormFields, isAwsPolly: boolean) {
   return {
     accessKeyId: isAwsPolly ? trimmedOrUndefined(formData.awsAccessKeyId) : undefined,
     sessionToken: isAwsPolly ? trimmedOrUndefined(formData.awsSessionToken) : undefined,
-    runtimeKey: webCodex ? trimmedOrUndefined(formData.runtimeKey) : undefined,
-    tunnelId: webCodex ? trimmedOrUndefined(formData.tunnelId) : undefined,
-    connectorName: webCodex ? trimmedOrUndefined(formData.connectorName) : undefined,
   };
 }
 
@@ -47,10 +41,9 @@ export function buildProviderValidateRequestBody(options: {
   isAwsPolly: boolean;
   showsRegion: boolean;
   defaultRegion: string;
-  isChatGptWebCodex: boolean;
 }) {
   const { provider, apiKey, formData, isAwsPolly, showsRegion, defaultRegion } = options;
-  const family = familyFields(formData, isAwsPolly, options.isChatGptWebCodex);
+  const family = familyFields(formData, isAwsPolly);
   return {
     provider,
     apiKey,
@@ -61,9 +54,6 @@ export function buildProviderValidateRequestBody(options: {
     accessKeyId: family.accessKeyId,
     sessionToken: family.sessionToken,
     cx: trimmedOrUndefined(formData.cx),
-    runtimeKey: family.runtimeKey,
-    tunnelId: family.tunnelId,
-    connectorName: family.connectorName,
     zdrEnabled:
       provider === "command-code" && formData.commandCodeZdrEnabled === true ? true : undefined,
     accountId: formData.accountId ? trimmedOrUndefined(formData.accountId) : undefined,

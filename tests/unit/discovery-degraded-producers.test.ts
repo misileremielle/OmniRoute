@@ -18,12 +18,6 @@ const causeModule = await import("../../src/shared/discovery/degradedCause").cat
 const applyDiscoveryDegradation = causeModule?.applyDiscoveryDegradation;
 const { buildNoAuthModelsResponse } =
   await import("../../src/app/api/providers/[id]/models/modelRouteProjection");
-const { maybeHandleConolModelDiscovery } =
-  await import("../../src/app/api/providers/[id]/models/conolDiscovery");
-const { maybeHandleSyntxModelDiscovery } =
-  await import("../../src/app/api/providers/[id]/models/syntxDiscovery");
-const { maybeHandleTwinmindModelDiscovery } =
-  await import("../../src/app/api/providers/[id]/models/twinmindDiscovery");
 const { maybeHandleVertexModelDiscovery } =
   await import("../../src/app/api/providers/[id]/models/vertexDiscovery");
 const originalFetch = globalThis.fetch;
@@ -123,51 +117,6 @@ test("the no-auth producer reports an empty live catalog", async () => {
   assert.equal(body.degraded, true);
   assert.equal(body.error, "EMPTY_CATALOG");
   assert.equal("failure" in body, false);
-});
-
-test("the conol producer reports the missing cookie and the failed discovery", async () => {
-  const withoutCookie = await bodyOf(
-    await maybeHandleConolModelDiscovery(stubOptions("conol-web", { apiKey: "" }))
-  );
-  assert.equal(withoutCookie.degraded, true);
-  assert.equal(withoutCookie.error, "NO_CREDENTIAL");
-  assert.equal("failure" in withoutCookie, false);
-
-  globalThis.fetch = async () => new Response("upstream down", { status: 500 });
-  const failedDiscovery = await bodyOf(
-    await maybeHandleConolModelDiscovery(stubOptions("conol-web", { apiKey: "session-cookie" }))
-  );
-  assert.equal(failedDiscovery.degraded, true);
-  assert.equal(failedDiscovery.error, "UPSTREAM_ERROR");
-  assert.equal("failure" in failedDiscovery, false);
-});
-
-test("the syntx producer reports the missing token and the failed discovery", async () => {
-  const withoutToken = await bodyOf(
-    await maybeHandleSyntxModelDiscovery(stubOptions("syntx", { apiKey: "not-a-jwt" }))
-  );
-  assert.equal(withoutToken.degraded, true);
-  assert.equal(withoutToken.error, "NO_CREDENTIAL");
-  assert.equal("failure" in withoutToken, false);
-
-  globalThis.fetch = async () => new Response("upstream down", { status: 500 });
-  const failedDiscovery = await bodyOf(
-    await maybeHandleSyntxModelDiscovery(
-      stubOptions("syntx", { apiKey: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.signature" })
-    )
-  );
-  assert.equal(failedDiscovery.degraded, true);
-  assert.equal(failedDiscovery.error, "UPSTREAM_ERROR");
-  assert.equal("failure" in failedDiscovery, false);
-});
-
-test("the twinmind producer reports the missing token", async () => {
-  const withoutToken = await bodyOf(
-    await maybeHandleTwinmindModelDiscovery(stubOptions("twinmind", { apiKey: "" }))
-  );
-  assert.equal(withoutToken.degraded, true);
-  assert.equal(withoutToken.error, "NO_CREDENTIAL");
-  assert.equal("failure" in withoutToken, false);
 });
 
 test("the vertex producer reports the missing credential, the rejected key and the empty catalog", async () => {

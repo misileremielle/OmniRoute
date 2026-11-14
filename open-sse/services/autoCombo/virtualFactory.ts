@@ -10,7 +10,6 @@ import { NOAUTH_PROVIDERS } from "@/shared/constants/providers";
 import { isMicrosoftDesignerWebRetiredProviderId } from "@/shared/constants/designerWebRetirement";
 import { isRuntimeRetiredProviderId } from "@/shared/constants/providerRetirement";
 import { isCommonChatGptWebRetiredProviderId } from "@/shared/constants/chatgptWebRetirement";
-import { hasUsableWebSessionCredential } from "@/shared/providers/webSessionCredentials";
 import { toNumber } from "../../utils/numeric.ts";
 import { isCompatibleProviderConnectionId } from "@/shared/utils/compatibleProviderId";
 import { defaultLogger as log } from "@omniroute/open-sse/utils/logger";
@@ -314,10 +313,6 @@ function hasUsableOAuthToken(conn: VirtualFactoryConn): boolean {
   return expiryMs === null || expiryMs > Date.now();
 }
 
-function hasProviderSpecificSessionData(conn: VirtualFactoryConn): boolean {
-  return hasUsableWebSessionCredential(conn.provider, conn.providerSpecificData);
-}
-
 /**
  * #11180: a custom compatible connection (`openai-compatible-*` /
  * `anthropic-compatible-*`) may legitimately carry no credential at all,
@@ -337,12 +332,7 @@ function isKeylessEligibleConnection(conn: VirtualFactoryConn): boolean {
 
 function hasUsableConnectionCredential(conn: VirtualFactoryConn): boolean {
   const hasApiKey = typeof conn.apiKey === "string" && conn.apiKey.trim().length > 0;
-  return (
-    hasApiKey ||
-    hasUsableOAuthToken(conn) ||
-    hasProviderSpecificSessionData(conn) ||
-    isKeylessEligibleConnection(conn)
-  );
+  return hasApiKey || hasUsableOAuthToken(conn) || isKeylessEligibleConnection(conn);
 }
 
 const SYNTHETIC_NOAUTH_CONNECTION_ID = RESILIENCE_NOAUTH_CONNECTION_ID;

@@ -67,10 +67,8 @@ describe("2026 discontinued free tiers — providers.ts hasFree reconciliation",
   });
 
   it("phind is fully removed (service shut down 2026-01) from both catalogs", async () => {
-    const { APIKEY_PROVIDERS, WEB_COOKIE_PROVIDERS } =
-      await import("../../src/shared/constants/providers.ts");
+    const { APIKEY_PROVIDERS } = await import("../../src/shared/constants/providers.ts");
     assert.ok(!("phind" in APIKEY_PROVIDERS), "phind must not be in APIKEY_PROVIDERS");
-    assert.ok(!("phind" in WEB_COOKIE_PROVIDERS), "phind must not be in WEB_COOKIE_PROVIDERS");
   });
 
   it("intentionally-kept providers still advertise free (genuinely free / ToS-flagged, not flipped)", async () => {

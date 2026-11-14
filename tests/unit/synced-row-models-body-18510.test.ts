@@ -94,9 +94,10 @@ test("another provider's synced rows keep the tip's body, whatever they declare"
 });
 
 test("a synced row cannot turn on tools for a model the registry refuses them", async () => {
-  await seedSynced("adapta-web", [{ id: "adapta-one", name: "One", supportsTools: true }]);
-  const row = await catalogRow("adapta-web/adapta-one");
-  assert.deepEqual(row.capabilities, { tool_calling: false, reasoning: true });
+  const modelId = "aphrodite/TheDrummer/Cydonia-24B-v4.3";
+  await seedSynced("aihorde", [{ id: modelId, name: "Cydonia", supportsTools: true }]);
+  const row = await catalogRow(`aihorde/${modelId}`);
+  assert.equal(row.capabilities?.tool_calling, false);
 });
 
 test("a Mistral card differs from the tip only by its context window", async () => {

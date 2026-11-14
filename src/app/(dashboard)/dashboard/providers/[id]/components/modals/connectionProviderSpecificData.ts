@@ -3,7 +3,6 @@ import {
   assignCcCompatibleRequestDefaults,
   mergeCcCompatibleRequestDefaults,
 } from "./ccCompatibleRequestDefaults";
-import { applyM365Tier, isM365TierCapableProvider, type M365TierValue } from "./m365Tier";
 import {
   assignQuotaScrapingProviderData,
   type QuotaScrapingFieldValues,
@@ -29,8 +28,6 @@ type FormData = QuotaScrapingFieldValues &
     cx: string;
     excludedModels: string;
     importFreeModelsOnly: boolean;
-    m365Tier?: M365TierValue;
-    m365RefreshToken?: string;
     newApiAggregatorBalance: boolean;
     newApiUserId: string;
     passthroughModels: boolean;
@@ -39,9 +36,6 @@ type FormData = QuotaScrapingFieldValues &
     routingTags: string;
     tag?: string;
     validationModelId?: string;
-    tunnelId: string;
-    connectorName: string;
-    runtimeKey?: string;
   };
 type ProviderSpecificData = Record<string, unknown>;
 
@@ -50,18 +44,6 @@ type ProviderSpecificData = Record<string, unknown>;
 // newApiUserId (the New-Api-User header value). See agentrouterQuotaFetcher.ts.
 // tokenrouter stores its optional Management Key here (open-sse/services/usage/tokenrouter.ts).
 const CONSOLE_API_KEY_PROVIDERS = new Set(["bailian-coding-plan", "agentrouter", "tokenrouter"]);
-
-export function assignM365RefreshToken(
-  provider: string | undefined,
-  formData: Pick<FormData, "m365RefreshToken">,
-  target: ProviderSpecificData
-) {
-  if (provider !== "copilot-m365-web") return;
-  // Only explicit input may replace a credential, never copied/validation metadata.
-  delete target.refreshToken;
-  const token = formData.m365RefreshToken?.trim();
-  if (token) target.refreshToken = token;
-}
 
 export function buildAddProviderSpecificData(options: {
   provider?: string;
@@ -135,11 +117,6 @@ export function buildAddProviderSpecificData(options: {
       data.quotaPerUnit = parsedQuotaPerUnit;
     }
   }
-  if (provider === "chatgpt-web-codex") {
-    if (formData.tunnelId.trim()) data.tunnelId = formData.tunnelId.trim();
-    if (formData.connectorName.trim()) data.connectorName = formData.connectorName.trim();
-  }
-  assignM365RefreshToken(provider, formData, data);
   return Object.keys(data).length > 0 ? data : undefined;
 }
 
@@ -210,7 +187,6 @@ export function assignEditApiKeyProviderSpecificData(options: {
     o.target.accountId = o.formData.accountId.trim();
   }
   if (o.isAntigravityFamily) o.target.projectId = o.trimmedCloudCodeProjectId || null;
-  if (isM365TierCapableProvider(o.provider)) applyM365Tier(o.target, o.formData.m365Tier ?? "");
   if (o.isCcCompatible) {
     o.target.requestDefaults = mergeCcCompatibleRequestDefaults(
       o.target.requestDefaults,
@@ -232,9 +208,4 @@ export function assignEditApiKeyProviderSpecificData(options: {
     o.target.newApiAggregatorBalance = undefined;
     o.target.quotaPerUnit = undefined;
   }
-  if (o.provider === "chatgpt-web-codex") {
-    o.target.tunnelId = o.formData.tunnelId.trim() || undefined;
-    o.target.connectorName = o.formData.connectorName.trim() || undefined;
-  }
-  assignM365RefreshToken(o.provider, o.formData, o.target);
 }

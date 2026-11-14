@@ -162,28 +162,6 @@ async function cleanup(): Promise<void> {
     } catch (error) {
       console.error("[Shutdown] Database cleanup failed:", (error as Error).message);
     }
-    // Tear down any persistent VNC login browser containers so they don't leak
-    // past the server process. Best-effort; no-op if the feature was never used
-    // or the docker CLI is unavailable.
-    try {
-      const { stopAllSessions, listSessions } = await import("@/lib/vncSession/service");
-      if (listSessions().length > 0) {
-        await stopAllSessions();
-        console.log("[Shutdown] VNC login sessions stopped.");
-      }
-    } catch {
-      /* feature unused / docker missing */
-    }
-
-    try {
-      const { stopChatGptWebCodexRuntime } =
-        await import("@omniroute/open-sse/executors/chatgpt-web-codex/runtime.ts");
-      await stopChatGptWebCodexRuntime();
-      console.log("[Shutdown] ChatGPT Web (Codex) runtime stopped.");
-    } catch {
-      /* feature unused */
-    }
-
     await closeSharedLoggerResource();
     closeLogRotation();
     console.log("[Shutdown] Logger transport and log rotation stopped.");

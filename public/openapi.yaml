@@ -9506,15 +9506,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/providers/{id}/chatgpt-web-codex-doctor:
-    get:
-      tags:
-        - Providers
-      summary: "GET providers › <id> › chatgpt web codex doctor"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
   /api/providers/{id}/claude-auth/apply-local:
     post:
       tags:
@@ -9573,15 +9564,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/providers/{id}/login:
-    post:
-      tags:
-        - Providers
-      summary: "POST providers › <id> › login"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
   /api/providers/{id}/param-filters:
     delete:
       tags:
@@ -9621,14 +9603,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/providers/{id}/refresh-token:
-    post:
-      tags:
-        - Providers
-      summary: "POST providers › <id> › refresh token"
-      responses:
-        "200":
-          description: OK
   /api/providers/{id}/sync-models:
     post:
       tags:
@@ -9643,14 +9617,6 @@ paths:
         - Providers
       summary: "POST providers › bulk"
       description: "The devin CLI-spawn fallback (webProvidersB.ts) is call-site gated on the trusted peer-locality header — loopback/LAN only (Hard Rules #15/#16, audit #15159 S-01, #15766 shape); the route is management-auth remote-reachable."
-      responses:
-        "200":
-          description: OK
-  /api/providers/bulk-web-session:
-    post:
-      tags:
-        - Providers
-      summary: "POST providers › bulk web session"
       responses:
         "200":
           description: OK
@@ -9865,14 +9831,6 @@ paths:
         - Providers
       summary: "GET providers › volcengine plan › connect › <sessionId> › status"
       x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/providers/web-session-contract:
-    get:
-      tags:
-        - Providers
-      summary: "GET providers › web session contract"
       responses:
         "200":
           description: OK
@@ -11966,40 +11924,6 @@ paths:
       tags:
         - Version manager
       summary: "POST version manager › stop"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/vnc-session:
-    get:
-      tags:
-        - Vnc session
-      summary: "GET vnc session"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/vnc-session/{params}:
-    delete:
-      tags:
-        - Vnc session
-      summary: "DELETE vnc session › <params>"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - Vnc session
-      summary: "GET vnc session › <params>"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Vnc session
-      summary: "POST vnc session › <params>"
       x-loopback-only: true
       responses:
         "200":

@@ -51,19 +51,6 @@ test("mode=auto (default): unknown previous_response_id is virtualized and fails
   assert.equal(payload.error?.code, "previous_response_not_found");
 });
 
-test("mode=auto: ChatGPT Web Codex defers previous_response_id resolution to its executor", async () => {
-  const { status, payload } = await postResponses(
-    "resp_owned_by_chatgpt_web_codex",
-    "chatgpt-web-codex/instant"
-  );
-
-  assert.notEqual(payload.error?.code, "previous_response_not_found");
-  assert.ok(
-    status === 401 || status === 404,
-    `expected provider routing after deferring continuation resolution, got ${status}`
-  );
-});
-
 test("mode=preserve: previous_response_id is left untouched, request proceeds to normal routing instead of local virtualization", async () => {
   await settingsDb.updateSettings({ responsesPreviousResponseIdMode: "preserve" });
 

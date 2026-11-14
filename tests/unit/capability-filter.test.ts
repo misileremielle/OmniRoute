@@ -117,12 +117,12 @@ test("checkRequestCapabilityFit: tools OK when model supports tools", () => {
 });
 
 test("checkRequestCapabilityFit: tools bypassed for emulated-tool provider", () => {
-  // gemini-web has toolCalling: "emulated" in the provider registry,
+  // duckduckgo-web has toolCalling: "emulated" in the provider registry,
   // so the filter must not reject it even when capabilities report false.
   const result = checkRequestCapabilityFit(
     caps({ supportsTools: false, toolCalling: false }),
     req({ requiresTools: true }),
-    "gemini-web"
+    "duckduckgo-web"
   );
   assert.equal(result.compatible, true);
   assert.deepEqual(result.failures, []);

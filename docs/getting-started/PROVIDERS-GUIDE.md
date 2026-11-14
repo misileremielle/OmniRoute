@@ -16,16 +16,12 @@ Think of a provider like a **phone carrier**. Just as you need a phone carrier t
 
 ### Types of Providers
 
-| Type           | What It Is                | Examples                        | Cost                   |
-| -------------- | ------------------------- | ------------------------------- | ---------------------- |
-| **Free**       | No payment required       | Kiro, Pollinations              | $0                     |
-| **API Key**    | You need an API key       | OpenAI, Anthropic, Google       | Pay per use            |
-| **OAuth**      | Login with your account   | Claude Code, GitHub Copilot     | Subscription           |
-| **Web Cookie** | Uses your browser session | ChatGPT Web (Codex), Gemini Web | $0 (uses your account) |
+| Type        | What It Is              | Examples                    | Cost         |
+| ----------- | ----------------------- | --------------------------- | ------------ |
+| **Free**    | No payment required     | Kiro, Pollinations          | $0           |
+| **API Key** | You need an API key     | OpenAI, Anthropic, Google   | Pay per use  |
+| **OAuth**   | Login with your account | Claude Code, GitHub Copilot | Subscription |
 
-### Web Cookie Providers
-
-See **[WEB-COOKIE-GUIDE.md](./WEB-COOKIE-GUIDE.md)** for general setup instructions, limitations, troubleshooting, and provider-specific authentication guidance.
 ---
 
 ## Quick Start: Connect Your First Provider

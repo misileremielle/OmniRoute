@@ -696,7 +696,7 @@ export function classifyProviderError(
 //     fraction of it — a multi-paragraph answer that merely *mentions* the
 //     topic is long and/or the phrase is a small fraction of it, so it is
 //     never misclassified.
-const FAKE_SUCCESS_BODY_ALLOWLIST = new Set(["pollinations", "perplexity-web"]);
+const FAKE_SUCCESS_BODY_ALLOWLIST = new Set(["pollinations"]);
 
 /** Exported for tests; not meant as a general-purpose provider predicate. */
 export function isFakeSuccessBodyAllowlistedProvider(provider?: string | null): boolean {

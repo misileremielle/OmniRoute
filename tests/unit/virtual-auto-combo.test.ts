@@ -106,24 +106,6 @@ test("createVirtualAutoCombo includes OAuth accessToken connections with real ex
   assert.ok(combo.autoConfig.candidatePool.includes("anthropic"));
 });
 
-test("createVirtualAutoCombo includes configured web-session providers without apiKey fields", async () => {
-  await providersDb.createProviderConnection({
-    provider: "kimi-web",
-    authType: "apikey",
-    name: "Kimi Web Session",
-    providerSpecificData: { token: "kimi-web-session-token" },
-    defaultModel: "k3",
-  });
-
-  const combo: VirtualComboResult = await virtualFactory.createVirtualAutoCombo("coding");
-
-  const kimiWeb = combo.models.find(
-    (model) => model.providerId === "kimi-web" && model.model === "kimi-web/k3"
-  );
-  assert.ok(kimiWeb, "the configured web-session model should be an auto candidate");
-  assert.ok(combo.autoConfig.candidatePool.includes("kimi-web"));
-});
-
 test("createVirtualAutoCombo excludes web-session providers with empty required token data", async () => {
   await providersDb.createProviderConnection({
     provider: "kimi-web",
@@ -160,41 +142,6 @@ test("createVirtualAutoCombo excludes web-session providers with irrelevant prov
     "web-session providers with irrelevant providerSpecificData must not be auto-combo candidates"
   );
   assert.equal(combo.autoConfig.candidatePool.includes("perplexity-web"), false);
-});
-
-test("createVirtualAutoCombo groups same-provider web sessions behind one logical model", async () => {
-  const connA = await providersDb.createProviderConnection({
-    provider: "kimi-web",
-    authType: "apikey",
-    name: "Kimi Web Session A",
-    providerSpecificData: { token: "kimi-web-session-token-a" },
-    defaultModel: "k3",
-  });
-  const connB = await providersDb.createProviderConnection({
-    provider: "kimi-web",
-    authType: "apikey",
-    name: "Kimi Web Session B",
-    providerSpecificData: { token: "kimi-web-session-token-b" },
-    defaultModel: "k3",
-  });
-
-  const combo: VirtualComboResult = await virtualFactory.createVirtualAutoCombo("coding");
-
-  const kimiWebModel = combo.models.find(
-    (model) => model.providerId === "kimi-web" && model.model === "kimi-web/k3"
-  );
-  assert.ok(kimiWebModel, "the provider model should remain in the candidate pool");
-  assert.equal(kimiWebModel.connectionId, null);
-  assert.deepEqual(
-    new Set(kimiWebModel.allowedConnectionIds),
-    new Set([connA.id, connB.id]),
-    "same-provider web sessions should remain available as account fallbacks"
-  );
-  assert.equal(
-    combo.autoConfig.candidatePool.filter((provider) => provider === "kimi-web").length,
-    1,
-    "provider pool remains provider-scoped while model entries preserve connection identity"
-  );
 });
 
 test("createVirtualAutoCombo excludes trigger-bypassed retired Qwen rows", async () => {

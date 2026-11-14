@@ -44,16 +44,6 @@
       "count": 1
     }
   },
-  "open-sse/executors/blackbox-web.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "open-sse/executors/claude-web.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "open-sse/executors/cliproxyapi.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
@@ -62,16 +52,6 @@
   "open-sse/executors/codex.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "open-sse/executors/copilot-web.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
-    }
-  },
-  "open-sse/executors/deepseek-web.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 12
     }
   },
   "open-sse/executors/default.ts": {
@@ -87,11 +67,6 @@
   "open-sse/executors/duckduckgo-web.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "open-sse/executors/gemini-web.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
     }
   },
   "open-sse/executors/ghe-copilot.ts": {
@@ -114,16 +89,6 @@
       "count": 1
     }
   },
-  "open-sse/executors/grok-web/tool-bridge.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "open-sse/executors/hyperagent.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "open-sse/executors/kiro.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -134,34 +99,9 @@
       "count": 1
     }
   },
-  "open-sse/executors/muse-spark-web.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "open-sse/executors/perplexity-web/protocol.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "open-sse/executors/pollinations.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 7
-    }
-  },
-  "open-sse/executors/t3-chat-web.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 11
-    }
-  },
-  "open-sse/executors/tinycms.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    }
-  },
-  "open-sse/executors/tinycmsSigner.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "open-sse/handlers/chatCore/executorHelpers.ts": {
@@ -258,11 +198,6 @@
       "count": 3
     }
   },
-  "open-sse/services/adobeFireflySession.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "open-sse/services/agentrouterQuotaFetcher.ts": {
     "no-restricted-syntax": {
       "count": 1
@@ -314,19 +249,6 @@
   "open-sse/services/browserBackedChat.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 4
-    }
-  },
-  "open-sse/services/claudeTurnstileSolver.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "open-sse/services/claudeWebAutoRefresh.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "open-sse/services/codexAccount/index.ts": {
@@ -405,11 +327,6 @@
       "count": 1
     }
   },
-  "open-sse/services/grokQuotaFetcher.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "open-sse/services/inAppLoginService.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 2
@@ -418,11 +335,6 @@
   "open-sse/services/manifestAdapter.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 3
-    }
-  },
-  "open-sse/services/notionWebModels.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "open-sse/services/opencodeOllamaUsage.ts": {
@@ -657,7 +569,7 @@
   },
   "src/app/(dashboard)/dashboard/providers/page.tsx": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 2
+      "count": 1
     }
   },
   "src/app/(dashboard)/dashboard/providers/utils/buildCurl.ts": {
@@ -820,19 +732,9 @@
       "count": 1
     }
   },
-  "src/app/api/providers/[id]/models/discovery/providerModelsConfig.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/api/providers/[id]/models/route.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 5
-    }
-  },
-  "src/app/api/providers/bulk-web-session/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "src/app/api/search/stats/route.ts": {
@@ -1673,11 +1575,6 @@
       "count": 9
     }
   },
-  "tests/live/deepseek-web-live.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
   "tests/translator/testFromFile.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 3
@@ -1846,7 +1743,7 @@
   },
   "tests/unit/auth-terminal-status.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 15
+      "count": 12
     }
   },
   "tests/unit/autoCombo/tieredRotation.test.ts": {
@@ -1908,11 +1805,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 3
-    }
-  },
-  "tests/unit/blackbox-web.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 10
     }
   },
   "tests/unit/body-timeout-integration.test.ts": {
@@ -2062,16 +1954,6 @@
   "tests/unit/claude-to-openai-image-toolresult.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 8
-    }
-  },
-  "tests/unit/claude-web-auto-refresh.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/claude-web.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "tests/unit/claudeAuthImport.test.ts": {
@@ -2781,16 +2663,6 @@
       "count": 5
     }
   },
-  "tests/unit/deepseek-web-autorefresh-401-response.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 4
-    }
-  },
-  "tests/unit/deepseek-web.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "tests/unit/display-and-error-utils.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 4
@@ -2966,11 +2838,6 @@
       "count": 2
     }
   },
-  "tests/unit/gemini-web.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 8
-    }
-  },
   "tests/unit/github-claude-reasoning-effort-granular.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 9
@@ -3004,11 +2871,6 @@
       "count": 7
     }
   },
-  "tests/unit/grok-web.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 25
-    }
-  },
   "tests/unit/guardrails/visionBridgeHelpers.callVisionModel.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -3032,16 +2894,6 @@
   "tests/unit/json-size-exactness.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "tests/unit/kimi-credentials-extract.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/kimi-web-401-retry.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "tests/unit/kiro-tool-args-streaming.test.ts": {
@@ -3072,16 +2924,6 @@
   "tests/unit/llamacpp-model-delete.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "tests/unit/lmarena-split-cookie-4271.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/lmarena-string-chunk-repro.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "tests/unit/log-retention.test.ts": {
@@ -3267,16 +3109,6 @@
       "count": 2
     }
   },
-  "tests/unit/perplexity-web-streaming-tools-5927.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "tests/unit/perplexity-web.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 7
-    }
-  },
   "tests/unit/persist-429-cooldown-account-fallback.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 7
@@ -3324,7 +3156,7 @@
   },
   "tests/unit/provider-metadata-5461-5470-5534.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 3
+      "count": 2
     }
   },
   "tests/unit/provider-models-management-route.test.ts": {
@@ -3377,12 +3209,12 @@
   },
   "tests/unit/provider-validation-specialty.test.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 4
+      "count": 3
     }
   },
   "tests/unit/providers-route-managed-catalog.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 4
+      "count": 3
     }
   },
   "tests/unit/providers-validate-route.test.ts": {
@@ -3867,18 +3699,8 @@
       "count": 1
     }
   },
-  "tests/unit/t3-chat-web.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/t31-t33-t34-t38-model-specs.test.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/t3chat-web-cookie-hint-5465.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
       "count": 1
     }
   },
@@ -4212,11 +4034,6 @@
   "tests/unit/warmupScheduler.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "tests/unit/web-cookie-providers-new.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 5
     }
   },
   "tests/unit/web-runtime-env.test.ts": {

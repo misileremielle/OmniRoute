@@ -6,7 +6,6 @@
     "tests/golden-set/compression-caveman-v2.test.ts",
     "tests/golden-set/compression-quality.test.ts",
     "tests/golden-set/compression-savings.test.ts",
-    "tests/golden-set/compression-upstream-parity.test.ts",
-    "tests/live/deepseek-web-live.test.ts"
+    "tests/golden-set/compression-upstream-parity.test.ts"
   ]
 }

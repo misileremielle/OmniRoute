@@ -46,7 +46,7 @@ A boolean flag is considered **enabled** when its effective value is `"true"`,
 
 ## Flag Catalog
 
-117 flags across 6 categories. **Default** is the definition default — the value
+116 flags across 6 categories. **Default** is the definition default — the value
 used when neither a DB override nor an environment variable is present.
 
 ### Security (11)
@@ -120,7 +120,7 @@ Invalid enum values and unreadable feature-flag storage fail closed. Neither opt
 priced spend or a failed pricing lookup. Enforcement and the administrator report resolve the
 same effective policy.
 
-### Runtime (58)
+### Runtime (57)
 
 | Key                                            | Type    | Default | Restart | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------------------------------------------- | ------- | ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -173,7 +173,6 @@ same effective policy.
 | `AUTO_COMBO_KEYLESS_TRANSPORT_GATE`            | boolean | `false` |         | Hold keyless (no-auth) providers whose transport needs a local browser (`browserBacked`) or a locally installed CLI (`isLocalCli`) out of the `auto/*` candidate pool, so a hung member cannot stall an auto request until the per-target timeout (#17036). Off by default: the keyless pool is unchanged. Direct `<alias>/<model>` calls work either way.                                                                                                                                                                                                                                                                                      |
 | `CODEBUDDY_CN_INLINE_REASONING`                | boolean | `false` |         | For `codebuddy-cn` thinking models (DeepSeek-V4 / Kimi-K2 families that need reasoning replay), inline each replayed assistant `reasoning_content` as a visible `<thought>` block at the front of the message content, so it survives a gateway that drops the field (#13632). Off by default: requests are sent unchanged; `reasoning_content` itself is always kept.                                                                                                                                                                                                                                                                          |
 | `PROVIDER_SAFETY_STOPS_TERMINAL`               | boolean | `false` |         | Keep an explicit provider safety stop (`misalignment_policy_violation`, `content_policy_violation`, or the exact legacy "blocked by our safety systems" rejection labelled `provider_safety_rejection`) as a terminal, request-scoped refusal: its code is preserved through HTTP, Responses, WebSocket and completed-stream errors, and a combo stops at it instead of retrying other targets (#17049). Off by default: existing handling and routing are unchanged.                                                                                                                                                                           |
-| `LMARENA_SYNTHESIZED_CX_ENABLED`               | boolean | `false` |         | Attach a synthesized programmatic `cx` client-interaction blob (the value arena.ai itself sends for a page with no recorded interaction) to every Arena (`lmarena`) create-evaluation request that has no operator-supplied `providerSpecificData.cx`. Off by default: `cx` is an Arena anti-automation signal, so OmniRoute only forwards a value the operator captured from a real browser session (`providerSpecificData.cx`) and otherwise sends no `cx` at all. Unproven upstream benefit; enable only if Arena starts rejecting requests without `cx`.                                                                                    |
 | `CONTENT_POLICY_REFUSAL_COMBO_STOP_ENABLED`    | boolean | `false` |         | When a combo target answers with an exact content-policy refusal (`code`/`type` `cyber_policy` or `content_policy_violation`), stop the combo and return that refusal even when the remaining targets are different models, instead of advancing to the next target (#15917). Off by default: the refusal never cools the account or trips the provider breaker, a same-model remainder still stops, and a heterogeneous combo advances to its next target exactly like any other request-scoped 400.                                                                                                                                           |
 | `NATIVE_CODEX_REACTIVE_COMPACTION_ENABLED`     | boolean | `false` |         | Let the reactive (threshold) and last-resort context compaction passes also rewrite native Codex passthrough histories (`POST /v1/responses` to the `codex` provider) when they exceed the context budget, using the Responses `input[]` adapter. Off by default: native Codex histories are owned by the Codex client and are never rewritten by compaction; oversized requests keep failing the context budget check exactly as before. Requires global compression to be on and the model not to be excluded.                                                                                                                                |
 | `COOLDOWN_RETRY_SKIP_REFUSALS_ENABLED`         | boolean | `false` |         | When every account is cooling down and the cooldown that ends first was caused by a 403 (access refused) or a 410 (gone), return that refusal at once instead of waiting the cooldown out and re-sending the request (#16305). A renewing agentrouter connection-scoped quota 403 is then persisted with `errorCode` 429 so it stays retryable. Off by default: only a 401 skips the wait, and every refusal is persisted with the status it arrived with.                                                                                                                                                                                      |
@@ -279,10 +278,10 @@ Returns every flag with its effective value, source, and a summary.
       "requiresRestart": false,
       "warningLevel": "caution",
     },
-    // ... all 117 flags
+    // ... all 116 flags
   ],
   "summary": {
-    "total": 117,
+    "total": 116,
     "active": 0,
     "inactive": 0,
     "overriddenByDb": 0,

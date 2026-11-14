@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import ConnectionTestModelField from "@/shared/components/ConnectionTestModelField";
 import { useConnectionTestModelDraft } from "@/shared/components/useConnectionTestModelDraft";
 import { Button, Badge, Input, Modal, Toggle, Select } from "@/shared/components";
-import { CHATGPT_WEB_CODEX_CONNECTOR_NAME } from "@/shared/constants/chatgptWebCodex";
 import {
   isOpenAICompatibleProvider,
   isAnthropicCompatibleProvider,
@@ -28,7 +27,6 @@ import {
   buildRateLimitOverridesFromForm,
   modelConcurrencyFormValue,
 } from "./rateLimitOverridesFromForm";
-import { resolveDashboardProviderInfo } from "../../../providerPageUtils";
 import {
   isBaseUrlConfigurableProvider,
   isBaseUrlOverrideEligibleProvider,
@@ -41,9 +39,6 @@ import {
   parseExcludedModelsInput,
   formatRoutingTagsInput,
   formatExcludedModelsInput,
-  getWebSessionCredentialLabel,
-  getWebSessionCredentialHint,
-  getWebSessionCredentialCheckLabel,
   getLocalProviderMetadata,
   normalizeAndValidateHttpBaseUrl,
   getCodexFingerprintMode,
@@ -57,10 +52,7 @@ import {
   ERROR_TYPE_LABELS,
   formatTimeAgo,
 } from "../../providerPageHelpers";
-import { getWebSessionCredentialRequirement } from "../../webSessionCredentials";
 import { useOpenRouterPresetControl } from "../OpenRouterPresetInput";
-import WebSessionCredentialGuide from "../WebSessionCredentialGuide";
-import HarImportButton from "../HarImportButton";
 import CcCompatibleRequestDefaultsFields from "./CcCompatibleRequestDefaultsFields";
 import type { ApiKeyHealthMap } from "./connectionApiKeyHealth";
 import ClaudeConnectionFields from "./ClaudeConnectionFields";
@@ -70,7 +62,6 @@ import {
 } from "./claudeConnectionFieldValues";
 import { CodexConnectionFields } from "./CodexFingerprintFields";
 import { assignEditApiKeyProviderSpecificData } from "./connectionProviderSpecificData";
-import { isM365TierCapableProvider, normalizeM365TierValue, type M365TierValue } from "./m365Tier";
 import ProviderTierField from "./ProviderTierField";
 import AgentrouterConsoleFields from "./AgentrouterConsoleFields";
 import CommandCodeZdrToggle from "./CommandCodeZdrToggle";
@@ -120,7 +111,6 @@ export default function EditConnectionModal({
   isOpen,
   connection,
   providerId,
-  providerWebsite,
   onSave,
   onResyncModels,
   onClose,
@@ -147,7 +137,6 @@ export default function EditConnectionModal({
     rateLimitMaxConcurrent: "",
     modelConcurrency: "",
     apiKey: "",
-    m365RefreshToken: "",
     healthCheckInterval: "" as number | "",
     baseUrl: "",
     targetFormat: "",
@@ -190,12 +179,6 @@ export default function EditConnectionModal({
     keepMidConversationSystem: connectionProviderSpecificData?.keepMidConversationSystem === true,
     importFreeModelsOnly: connectionProviderSpecificData?.importFreeModelsOnly === true,
     commandCodeZdrEnabled: connectionProviderSpecificData?.zdrEnabled === true,
-    tunnelId: stringField(connectionProviderSpecificData?.tunnelId),
-    runtimeKey: "",
-    connectorName:
-      stringField(connectionProviderSpecificData?.connectorName) ||
-      CHATGPT_WEB_CODEX_CONNECTOR_NAME,
-    m365Tier: normalizeM365TierValue(connectionProviderSpecificData?.tier) as M365TierValue,
     peakHourProtection: { ...EMPTY_PEAK_HOUR_PROTECTION, windows: [] } as PeakHourProtectionConfig,
   });
   const [testing, setTesting] = useState(false);
@@ -205,8 +188,6 @@ export default function EditConnectionModal({
   const [validatedProviderSpecificData, setValidatedProviderSpecificData] = useState<
     Record<string, unknown> | undefined
   >();
-  const [doctorStatus, setDoctorStatus] = useState<Record<string, any> | null>(null);
-  const [doctorLoading, setDoctorLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const testModel = useConnectionTestModelDraft(isOpen ? connection : null, saving);
   const credits = useGitHubCreditLimitDraft(isOpen ? connection : null);
@@ -251,42 +232,26 @@ export default function EditConnectionModal({
   const localProviderMetadata = getLocalProviderMetadata(provider);
   const isLocalSelfHostedProvider = !!localProviderMetadata;
   const isGooglePse = provider === "google-pse-search";
-  const isChatGptWebCodex = provider === "chatgpt-web-codex";
   const isAwsPolly = provider === "aws-polly";
-  const isM365TierCapable = isM365TierCapableProvider(provider);
-  const webSessionCredential = getWebSessionCredentialRequirement(provider);
-  const isNoAuthWebSessionCredential = webSessionCredential?.kind === "none";
-  const isWebSessionCredential = !!webSessionCredential && webSessionCredential.kind !== "none";
-  const providerDisplayName =
-    (provider ? resolveDashboardProviderInfo(provider)?.name : null) ||
-    localProviderMetadata?.name ||
-    provider ||
-    "";
-  const apiKeyOptional =
-    providerAllowsOptionalApiKey(provider) || Boolean(isNoAuthWebSessionCredential);
+  const apiKeyOptional = providerAllowsOptionalApiKey(provider);
   const isCcCompatible = isClaudeCodeCompatibleProvider(provider);
   const isPlainAnthropicCompatible = isAnthropicCompatibleProvider(provider) && !isCcCompatible;
   const isCompatible =
     isOpenAICompatibleProvider(provider) || isAnthropicCompatibleProvider(provider);
   const vertexCopy = isVertex ? getVertexCredentialCopy(t) : null;
-  const apiCredentialLabel = webSessionCredential
-    ? getWebSessionCredentialLabel(t, webSessionCredential, apiKeyOptional)
-    : isAwsPolly
-      ? providerText(t, "awsPollySecretAccessKeyLabel", "AWS Secret Access Key")
-      : (vertexCopy?.label ?? (apiKeyOptional ? t("apiKeyOptionalLabel") : t("apiKeyLabel")));
-  const apiCredentialPlaceholder = isWebSessionCredential
-    ? webSessionCredential.placeholder
-    : (vertexCopy?.placeholder ?? t("enterNewApiKey"));
-  const apiCredentialHint = isWebSessionCredential
-    ? getWebSessionCredentialHint(t, webSessionCredential, providerDisplayName, true)
-    : (vertexCopy?.hint ??
-      (isLocalSelfHostedProvider
-        ? t("localProviderApiKeyOptionalHint", {
-            provider: localProviderMetadata?.name || provider || "",
-          })
-        : apiKeyOptional
-          ? t("apiKeyOptionalHint")
-          : t("leaveBlankKeepCurrentApiKey")));
+  const apiCredentialLabel = isAwsPolly
+    ? providerText(t, "awsPollySecretAccessKeyLabel", "AWS Secret Access Key")
+    : (vertexCopy?.label ?? (apiKeyOptional ? t("apiKeyOptionalLabel") : t("apiKeyLabel")));
+  const apiCredentialPlaceholder = vertexCopy?.placeholder ?? t("enterNewApiKey");
+  const apiCredentialHint =
+    vertexCopy?.hint ??
+    (isLocalSelfHostedProvider
+      ? t("localProviderApiKeyOptionalHint", {
+          provider: localProviderMetadata?.name || provider || "",
+        })
+      : apiKeyOptional
+        ? t("apiKeyOptionalHint")
+        : t("leaveBlankKeepCurrentApiKey"));
   // Modal-open form initialization from the loaded connection — applied as a
   // render-phase adjustment guarded by the previously initialized connection
   // (react.dev "adjusting state when a prop changes") instead of the former
@@ -423,13 +388,6 @@ export default function EditConnectionModal({
           connection?.providerSpecificData?.keepMidConversationSystem === true,
         importFreeModelsOnly: connection?.providerSpecificData?.importFreeModelsOnly === true,
         commandCodeZdrEnabled: connection.providerSpecificData?.zdrEnabled === true,
-        tunnelId: stringField(connection.providerSpecificData?.tunnelId),
-        runtimeKey: "",
-        connectorName:
-          stringField(connection.providerSpecificData?.connectorName) ||
-          CHATGPT_WEB_CODEX_CONNECTOR_NAME,
-        m365Tier: normalizeM365TierValue(connection.providerSpecificData?.tier) as M365TierValue,
-        m365RefreshToken: "",
         peakHourProtection: {
           ...EMPTY_PEAK_HOUR_PROTECTION,
           ...((connection.providerSpecificData?.peakHourProtection as PeakHourProtectionConfig) ||
@@ -453,11 +411,7 @@ export default function EditConnectionModal({
       setApiKeyHealth(health || {});
       setNewExtraKey("");
       setOpenRouterPreset(existingOpenRouterPreset);
-      setShowAdvanced(
-        !!existingCustomUserAgent ||
-          !!existingHuggingfaceBillTo ||
-          normalizeM365TierValue(connection.providerSpecificData?.tier) !== ""
-      );
+      setShowAdvanced(!!existingCustomUserAgent || !!existingHuggingfaceBillTo);
       setTestResult(null);
       setValidationResult(null);
       setValidatedProviderSpecificData(undefined);
@@ -503,13 +457,11 @@ export default function EditConnectionModal({
         isAwsPolly,
         showsRegion,
         defaultRegion,
-        isChatGptWebCodex,
       })
     );
   const handleValidate = async () => {
     if (
       !provider ||
-      isNoAuthWebSessionCredential ||
       (!isCompatible && !apiKeyOptional && !formData.apiKey) ||
       (isAwsPolly && !formData.awsAccessKeyId.trim())
     ) {
@@ -628,13 +580,7 @@ export default function EditConnectionModal({
           }
         }
         if (isValid) {
-          updates.apiKey = isChatGptWebCodex
-            ? JSON.stringify({
-                version: 1,
-                cookie: formData.apiKey.trim().replace(/^cookie\s*:\s*/i, ""),
-                ...(formData.runtimeKey.trim() ? { runtimeKey: formData.runtimeKey.trim() } : {}),
-              })
-            : formData.apiKey;
+          updates.apiKey = formData.apiKey;
           updates.testStatus = "active";
           updates.lastError = null;
           updates.lastErrorAt = null;
@@ -1021,133 +967,35 @@ export default function EditConnectionModal({
         )}
         {!isOAuth && (
           <>
-            {webSessionCredential && (
-              <WebSessionCredentialGuide
-                requirement={webSessionCredential}
-                providerName={providerDisplayName}
-                providerWebsite={providerWebsite}
-                t={t}
+            <div className="flex gap-2">
+              <Input
+                label={apiCredentialLabel}
+                type="password"
+                value={formData.apiKey}
+                onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                placeholder={apiCredentialPlaceholder}
+                hint={apiCredentialHint}
+                className="flex-1"
+                autoComplete="off"
+                spellCheck={false}
+                autoCapitalize="off"
               />
-            )}
-            {provider && (
-              <HarImportButton
-                provider={provider}
-                onImport={(apiKey) => setFormData({ ...formData, apiKey })}
-              />
-            )}
-            {!isNoAuthWebSessionCredential && (
-              <div className="flex gap-2">
-                <Input
-                  label={apiCredentialLabel}
-                  type="password"
-                  value={formData.apiKey}
-                  onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                  placeholder={apiCredentialPlaceholder}
-                  hint={apiCredentialHint}
-                  className="flex-1"
-                  autoComplete="off"
-                  spellCheck={false}
-                  autoCapitalize="off"
-                />
-                <div className="pt-6">
-                  <Button
-                    onClick={handleValidate}
-                    disabled={
-                      (!isCompatible && !apiKeyOptional && !formData.apiKey) ||
-                      (isAwsPolly && !formData.awsAccessKeyId.trim()) ||
-                      (isGooglePse && !formData.cx.trim()) ||
-                      validating ||
-                      saving
-                    }
-                    variant="secondary"
-                  >
-                    {validating
-                      ? t("checking")
-                      : webSessionCredential
-                        ? getWebSessionCredentialCheckLabel(t, webSessionCredential)
-                        : t("check")}
-                  </Button>
-                </div>
-              </div>
-            )}
-            {isChatGptWebCodex && (
-              <div className="space-y-3 rounded-lg border border-border bg-bg-subtle p-3">
-                <p className="text-sm font-medium text-text-main">{t("codexTunnelTitle")}</p>
-                <Input
-                  label={t("tunnelIdLabel")}
-                  value={formData.tunnelId}
-                  onChange={(event) => setFormData({ ...formData, tunnelId: event.target.value })}
-                  placeholder="tunnel_0123456789abcdef0123456789abcdef"
-                />
-                <Input
-                  label={t("tunnelRuntimeKeyNewLabel")}
-                  type="password"
-                  value={formData.runtimeKey}
-                  onChange={(event) => setFormData({ ...formData, runtimeKey: event.target.value })}
-                  hint={t("tunnelRuntimeKeyNewHint")}
-                  autoComplete="off"
-                />
-                <Input
-                  label={t("chatgptConnectorLabel")}
-                  value={formData.connectorName}
-                  onChange={(event) =>
-                    setFormData({ ...formData, connectorName: event.target.value })
-                  }
-                  placeholder={CHATGPT_WEB_CODEX_CONNECTOR_NAME}
-                />
+              <div className="pt-6">
                 <Button
+                  onClick={handleValidate}
+                  disabled={
+                    (!isCompatible && !apiKeyOptional && !formData.apiKey) ||
+                    (isAwsPolly && !formData.awsAccessKeyId.trim()) ||
+                    (isGooglePse && !formData.cx.trim()) ||
+                    validating ||
+                    saving
+                  }
                   variant="secondary"
-                  disabled={doctorLoading || !connection.id}
-                  onClick={async () => {
-                    if (!connection.id) return;
-                    setDoctorLoading(true);
-                    try {
-                      const response = await fetch(
-                        `/api/providers/${connection.id}/chatgpt-web-codex-doctor`
-                      );
-                      const payload = await response.json();
-                      setDoctorStatus(response.ok ? payload.status : { error: payload.error });
-                    } finally {
-                      setDoctorLoading(false);
-                    }
-                  }}
                 >
-                  {doctorLoading ? t("doctorChecking") : t("doctorCheck")}
+                  {validating ? t("checking") : t("check")}
                 </Button>
-                {doctorStatus && (
-                  <div className="grid grid-cols-2 gap-2 text-xs text-text-muted">
-                    {[
-                      ["Browser", doctorStatus.browser?.ready],
-                      ["Storage-State", doctorStatus.storageState?.ready],
-                      ["ChatGPT-Anmeldung", doctorStatus.login?.ready],
-                      ["Temporary Chat", doctorStatus.temporaryChats?.ready],
-                      ["Tunnel-Binary", doctorStatus.tunnelBinary?.ready],
-                      ["Tunnel", doctorStatus.tunnel?.ready],
-                      ["Connector", doctorStatus.connector?.ready],
-                      ["Tool-Roundtrip", doctorStatus.toolRoundtrip?.ready],
-                      ["Aktive Turns", doctorStatus.runtime?.activeTurns],
-                      ["Wartende Turns", doctorStatus.runtime?.waitingTurns],
-                    ].map(([label, ready]) => (
-                      <div key={String(label)}>
-                        {label}:{" "}
-                        {typeof ready === "number" ? ready : ready ? "bereit" : "nicht bereit"}
-                      </div>
-                    ))}
-                    {doctorStatus.recovery?.interactiveLoginRequired && (
-                      <div className="col-span-2 text-warning">
-                        Interaktive Anmeldung erforderlich. Nutze den geschützten
-                        Browser-/VNC-Recovery-Pfad.
-                      </div>
-                    )}
-                    {doctorStatus.lastError && (
-                      <div className="col-span-2 break-words text-danger">
-                        Letzter Fehler: {String(doctorStatus.lastError)}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
-            )}
+            </div>
             {isGooglePse && (
               <Input
                 label={t("searchEngineIdLabel")}
@@ -1251,31 +1099,6 @@ export default function EditConnectionModal({
                   />
                 )}
                 <ProviderTierField provider={provider} />
-                {provider === "copilot-m365-web" && (
-                  <Input
-                    type="password"
-                    autoComplete="new-password"
-                    label={t("m365RefreshTokenLabel")}
-                    value={formData.m365RefreshToken}
-                    onChange={(e) => setFormData({ ...formData, m365RefreshToken: e.target.value })}
-                    hint={t("m365RefreshTokenEditHint")}
-                  />
-                )}
-                {isM365TierCapable && (
-                  <Select
-                    label={t("m365TierLabel")}
-                    value={formData.m365Tier ?? ""}
-                    options={[
-                      { value: "", label: t("m365TierIndividualOption") },
-                      { value: "edu", label: t("m365TierEduOption") },
-                      { value: "enterprise", label: t("m365TierEnterpriseOption") },
-                    ]}
-                    onChange={(e) =>
-                      setFormData({ ...formData, m365Tier: e.target.value as M365TierValue })
-                    }
-                    hint={t("m365TierHint")}
-                  />
-                )}
                 <Toggle
                   size="sm"
                   checked={formData.passthroughModels}

@@ -26,6 +26,11 @@ import {
   SUPERSEDED_DUPLICATE_MIGRATIONS,
 } from "./migrationRunner/constants";
 import { getExtraMigrationFiles } from "./migrationRunner/extraDirs";
+import {
+  applyProviderRemoval,
+  isProviderRemovalMigration,
+  prepareProviderRemoval,
+} from "./providerRemovalMigration";
 import { migrationConsole as console } from "./migrationRunner/logger";
 import {
   createPreMigrationBackup,
@@ -1179,9 +1184,12 @@ export function runMigrations(
         if (migration.name === "remove_opencode_free_provider") {
           ensureOpencodeFreeRemovalColumns(db);
         }
+        const providerRemoval = isProviderRemovalMigration(migration.name);
+        if (providerRemoval) prepareProviderRemoval(db);
         const sql = fs.readFileSync(migration.path, "utf-8");
         genericSql = sql;
         db.exec(sql);
+        if (providerRemoval) applyProviderRemoval(db);
       }
       db.prepare("INSERT INTO _omniroute_migrations (version, name) VALUES (?, ?)").run(
         migration.version,

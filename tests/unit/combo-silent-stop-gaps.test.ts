@@ -236,16 +236,16 @@ test("G8: autoRefreshDaemon logs network errors instead of swallowing them", asy
     throw new Error("ECONNRESET");
   }) as typeof fetch;
   try {
-    autoRefreshDaemon.registerCredential("claude-web", "cookie-value");
+    autoRefreshDaemon.registerCredential("volcengine-console", "cookie-value");
     await autoRefreshDaemon.check();
     assert.ok(
-      warnings.some((w) => w.includes("claude-web") && w.includes("ECONNRESET")),
+      warnings.some((w) => w.includes("volcengine-console") && w.includes("ECONNRESET")),
       "expected a warn naming the provider and the network error, got: " + warnings.join(" | ")
     );
   } finally {
     globalThis.fetch = originalFetch;
     console.warn = originalWarn;
-    autoRefreshDaemon.unregisterCredential("claude-web");
+    autoRefreshDaemon.unregisterCredential("volcengine-console");
   }
 });
 

@@ -33,11 +33,8 @@ const { createProviderNodeSchema, updateProviderNodeSchema } =
   await import("../../src/shared/validation/schemas.ts");
 const { RESERVED_PROVIDER_PREFIXES, isReservedProviderPrefix, RESERVED_PREFIX_COUNT } =
   await import("../../src/shared/constants/reservedProviderPrefixes.ts");
-const { buildReservedPrefixes, getProviderPrefixIndex } =
-  await import("../../src/lib/providerNodePrefixes.ts");
+const { getProviderPrefixIndex } = await import("../../src/lib/providerNodePrefixes.ts");
 const providerNodesDb = await import("../../src/lib/db/providers/nodes.ts");
-const { isCommonChatGptWebRetiredProviderId } =
-  await import("../../src/shared/constants/chatgptWebRetirement.ts");
 
 async function resetStorage() {
   core.resetDbInstance();
@@ -108,23 +105,6 @@ test("shared guard keeps retired Qwen Web ids reserved after registry removal", 
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("qw"), true);
   assert.equal(isReservedProviderPrefix(" QwEn-WeB "), true);
   assert.equal(isReservedProviderPrefix("\u00a0QW\uFEFF"), true);
-});
-
-test("clean-room ChatGPT Web and its retired alias stay reserved without capturing Codex variants", () => {
-  assert.equal(isReservedProviderPrefix("chatgpt-web"), true);
-  for (const prefix of ["cgpt-web", " CGPT-Web ", "CGPT-WEB"]) {
-    assert.equal(isReservedProviderPrefix(prefix), true, `${prefix} must stay reserved`);
-  }
-  assert.equal(buildReservedPrefixes().has("chatgpt-web"), true);
-  assert.equal(buildReservedPrefixes().has("cgpt-web"), true);
-
-  for (const prefix of ["chatgpt-web-codex", "cgpt-codex"]) {
-    assert.equal(isReservedProviderPrefix(prefix), true, `${prefix} remains a live built-in`);
-    assert.equal(isCommonChatGptWebRetiredProviderId(prefix), false);
-  }
-  assert.equal(isReservedProviderPrefix("ChatGPT-Web"), false);
-  assert.equal(isReservedProviderPrefix("chatgpt-web-preview"), false);
-  assert.equal(isCommonChatGptWebRetiredProviderId("chatgpt-web-preview"), false);
 });
 
 test("mixed-case legacy aliases stay retired while live ids retain case-sensitive semantics", async () => {
@@ -227,7 +207,9 @@ test("shared set size includes live REGISTRY and retired Designer + Felo + Qwen 
   // Upstream v3.8.54 second sync (+12, measured against the fork parent): cerebrium, chatgpt,
   // empiriolabs, grokified, hetzner, megabrain/mb, opencode-server/ocs, paraloncloud/paralon,
   // replicate — 431 -> 443.
-  assert.equal(RESERVED_PREFIX_COUNT, 443);
+  // Web-cookie providers removed from this fork: their ids and aliases are no longer
+  // registry members — 443 -> 379.
+  assert.equal(RESERVED_PREFIX_COUNT, 379);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("ainetcafe"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("tokenharbor"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("runcrate"), true);
@@ -238,13 +220,6 @@ test("shared set size includes live REGISTRY and retired Designer + Felo + Qwen 
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("megabrain"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("mb"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("chatgpt"), true);
-});
-
-test("notrack-web registry id and alias stay reserved", () => {
-  assert.equal(RESERVED_PROVIDER_PREFIXES.has("notrack-web"), true);
-  assert.equal(RESERVED_PROVIDER_PREFIXES.has("ntw"), true);
-  assert.equal(isReservedProviderPrefix("notrack-web"), true);
-  assert.equal(isReservedProviderPrefix("ntw"), true);
 });
 
 test("isReservedProviderPrefix rejects non-string input", () => {
@@ -330,8 +305,8 @@ test("provider node schemas reject retired Qwen Web prefixes and normalized vari
   }
 });
 
-test("provider-node schemas reject the live canonical id and normalized retired alias", () => {
-  for (const prefix of ["chatgpt-web", "cgpt-web", "CGPT-WEB"]) {
+test("provider-node schemas reject the normalized retired ChatGPT Web alias", () => {
+  for (const prefix of ["cgpt-web", "CGPT-WEB"]) {
     const createResult = createProviderNodeSchema.safeParse({
       name: "Retired provider shadow",
       prefix,

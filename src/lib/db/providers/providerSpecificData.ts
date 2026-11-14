@@ -1,6 +1,4 @@
 import { normalizeProviderSpecificData } from "@/lib/providers/requestDefaults";
-import { WEB_COOKIE_PROVIDERS } from "@/shared/constants/providers";
-import { withDerivedCookieExpiry } from "@/shared/utils/webCookieExpiry";
 import { ensureCodexFingerprintSeed } from "@omniroute/open-sse/config/codexIdentity.ts";
 
 type Metadata = Record<string, unknown>;
@@ -17,7 +15,7 @@ export function normalizeConnectionProviderSpecificData(
   existingProviderSpecificData?: unknown
 ) {
   const normalized = normalizeProviderSpecificData(provider, providerSpecificData);
-  const withExpiry = withDerivedCookieExpiryForProvider(provider, normalized, credentials);
+  const withExpiry = normalized as Metadata;
   if (provider !== "codex") return withExpiry;
 
   if (isMetadata(providerSpecificData) && isMetadata(existingProviderSpecificData)) {
@@ -36,23 +34,4 @@ export function normalizeConnectionProviderSpecificData(
     credentials,
     (existingProviderSpecificData as Metadata | null) ?? null
   );
-}
-
-function withDerivedCookieExpiryForProvider(
-  provider: string | null,
-  providerSpecificData: unknown,
-  credentials: unknown
-): Metadata {
-  const key = String(provider || "").toLowerCase();
-  if (!(WEB_COOKIE_PROVIDERS as Metadata)[key]) {
-    return (providerSpecificData ?? {}) as Metadata;
-  }
-  const source = credentials as Metadata | null;
-  const credential =
-    source && typeof source === "object"
-      ? (typeof source.apiKey === "string" && source.apiKey) ||
-        (typeof source.cookie === "string" && source.cookie) ||
-        null
-      : null;
-  return withDerivedCookieExpiry(providerSpecificData, credential);
 }

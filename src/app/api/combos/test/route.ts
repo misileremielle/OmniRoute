@@ -9,11 +9,6 @@ import {
   resolveModelTestTimeoutMs,
 } from "@/lib/api/modelTestRunner";
 import { getRuntimePorts } from "@/lib/runtime/ports";
-import {
-  CHAT_PROBE_NOT_ISOLATED_MESSAGE,
-  chatProbeLeavesNoConversation,
-  isChatProbeRefusal,
-} from "@/lib/providers/chatProbePolicy";
 import { resolveNestedComboTargets } from "@omniroute/open-sse/services/combo.ts";
 import type { ComboLike, ResolvedComboTarget } from "@omniroute/open-sse/services/combo/types.ts";
 import { testComboSchema } from "@/shared/validation/schemas";
@@ -108,18 +103,6 @@ function buildComboTestResult(
   };
 }
 
-/**
- * A target the conversation-isolation policy kept off a signed-in account. It carries no
- * status code: it was never sent, so it must not count as a removable failure.
- */
-function skippedTarget(target: ResolvedComboTarget): ComboTestResult {
-  return buildComboTestResult(target, {
-    status: "error",
-    error: CHAT_PROBE_NOT_ISOLATED_MESSAGE,
-    latencyMs: 0,
-  });
-}
-
 async function testComboTarget(
   target: ResolvedComboTarget,
   baseInternalUrl: string,
@@ -142,10 +125,6 @@ async function testComboTarget(
         error: "Combo step is missing a model id (modelStr). Re-save the combo to refresh it.",
         latencyMs: 0,
       });
-    }
-    // The policy the chat pipeline enforces (#14780), asked before anything is sent.
-    if (!(await chatProbeLeavesNoConversation(String(target.provider ?? "")))) {
-      return skippedTarget(target);
     }
     const modelLower = modelStr.toLowerCase();
     const isEmbedding =
@@ -221,8 +200,6 @@ async function testComboTarget(
     let errorMsg = "";
     try {
       const errBody = await res.json();
-      // A target that reached a non-isolated provider indirectly (a nested combo or alias).
-      if (isChatProbeRefusal(errBody)) return skippedTarget(target);
       errorMsg = extractProviderErrorMessage(errBody, res.statusText);
     } catch {
       errorMsg = res.statusText;

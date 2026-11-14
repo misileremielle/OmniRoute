@@ -37,7 +37,6 @@ import { zed } from "./zed";
 import { zedHosted } from "./zed-hosted";
 import { museCode } from "./muse-code";
 import { minimaxCode } from "./minimax-code";
-import { copilotM365 } from "./copilot-m365-web";
 
 export const PROVIDERS = {
   claude,
@@ -84,7 +83,6 @@ export const PROVIDERS = {
   // local MiniMax Code profile (the profile the CLI and the local agent
   // read), so the provider itself still stores no credential.
   "minimax-code": minimaxCode,
-  "copilot-m365-web": copilotM365,
 };
 
 export default PROVIDERS;

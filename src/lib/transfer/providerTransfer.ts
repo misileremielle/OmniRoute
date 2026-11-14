@@ -29,7 +29,7 @@ import {
   updateProviderConnection,
   updateProviderNode,
 } from "@/lib/db/providers";
-import { isWebCookieProviderId, webSessionCredentialKey } from "@/lib/db/webSessionDedup";
+import { webSessionCredentialKey } from "@/lib/db/webSessionDedup";
 import { resolveStaticProviderCatalogEntry } from "@/lib/providers/catalog";
 import { isCommonChatGptWebRetiredProviderId } from "@/shared/constants/chatgptWebRetirement";
 import { isMicrosoftDesignerWebRetiredProviderId } from "@/shared/constants/designerWebRetirement";
@@ -437,11 +437,11 @@ function findByEmail(candidates: JsonRecord[], source: JsonRecord): JsonRecord |
 function findByWebSession(
   candidates: JsonRecord[],
   source: JsonRecord,
-  provider: string
+  _provider: string
 ): JsonRecord | undefined {
   const sessionKey = webSessionCredentialKey(specificData(source));
   if (!sessionKey) return undefined;
-  if (source.authType !== "cookie" && !isWebCookieProviderId(provider)) return undefined;
+  if (source.authType !== "cookie") return undefined;
   return candidates.find(
     (connection) => webSessionCredentialKey(specificData(connection)) === sessionKey
   );
@@ -450,10 +450,10 @@ function findByWebSession(
 function findByApiKeyName(
   candidates: JsonRecord[],
   source: JsonRecord,
-  provider: string
+  _provider: string
 ): JsonRecord | undefined {
   const name = str(source.name);
-  if (source.authType !== "apikey" || !name || isWebCookieProviderId(provider)) return undefined;
+  if (source.authType !== "apikey" || !name) return undefined;
   return candidates.find(
     (connection) => connection.authType === "apikey" && str(connection.name) === name
   );

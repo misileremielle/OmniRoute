@@ -135,7 +135,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "open-sse/handlers/search/searchProxy.ts": 1,
     // The deep research tool reads one connection by id to take its cookie and
     // check its cooldown. The caller names the connection; this is not selection.
-    "open-sse/mcp-server/tools/perplexityResearch.ts": 1,
     // v3.8.50 back-merge additions (f95b03d7): combo routing infra and the
     // volcengine-plan binding/auto-sync services query connections the same
     // way as their classified siblings.
@@ -172,7 +171,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/app/api/oauth/[provider]/[action]/route.ts": 4,
     // Microsoft 365 sign-in: behind the OAuth route's management guard, the authorize step reads
     // the rows only to confirm a reconnect target exists; no selection or dispatch (class C).
-    "src/app/api/oauth/[provider]/[action]/m365Auth.ts": 1,
     // #15201: the ChatGPT sign-in session route reads the target connection row twice
     // (existing-registration check on start, and again on completion) behind management
     // auth — state reads, never connection selection or dispatch (class C).
@@ -184,8 +182,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/app/api/oauth/kiro/social-exchange/route.ts": 1,
     "src/app/api/playground/simulate-route/route.ts": 1,
     "src/app/api/provider-nodes/[id]/route.ts": 1,
-    "src/app/api/providers/[id]/chatgpt-web-codex-doctor/route.ts": 1,
-    "src/app/api/providers/[id]/refresh-token/route.ts": 1,
     // #15130: the connection test re-reads the row uncached right before its write so an
     // operator disable that landed mid-probe is honored — a state re-read of the connection
     // under test, never a connection selection (class C).
@@ -261,7 +257,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/lib/embeddings/service.ts": 1,
     "src/lib/freeProviderRankings.ts": 1,
     "src/lib/guardrails/visionBridgeCredentials.ts": 2,
-    "src/lib/kimi/tokenRefresh.ts": 1,
     // Test&Add re-reads selected credentials behind the canonical auxiliary lease
     // guard. Class B: FREE lease-capable connections remain usable; ACTIVE leases
     // block the fresh lookup and every physical dispatch (behavioral runner/service tests).
@@ -334,7 +329,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/lib/usage/resetCreditCooldownRelease.ts": 1,
     "src/lib/usage/resilienceExplain.ts": 1,
     "src/lib/usage/usageStats.ts": 1,
-    "src/lib/vncSession/service.ts": 2,
     "src/lib/warmupScheduler.ts": 1,
     "src/shared/services/codexCatalogRevalidation.ts": 2,
     "src/shared/services/modelSyncScheduler.ts": 1,
@@ -392,7 +386,6 @@ const CLASSIFICATION: Record<InventoryKind, Record<string, BypassClass>> = {
         "src/lib/usage/glmResetCards.ts",
         "src/lib/usage/grokResetCredits.ts",
         "src/lib/usage/providerLimits.ts",
-        "src/lib/vncSession/service.ts",
         "src/lib/warmupScheduler.ts",
         "src/shared/services/modelSyncScheduler.ts",
         "src/sse/services/auth.ts",
@@ -504,7 +497,6 @@ test("managed request surfaces are fenced centrally or rejected before independe
     "src/lib/usage/codexResetCredits.ts",
     "src/lib/usage/glmResetCards.ts",
     "src/lib/usage/grokResetCredits.ts",
-    "src/lib/vncSession/service.ts",
     "src/lib/warmupScheduler.ts",
     "src/shared/services/modelSyncScheduler.ts",
   ].map((file) => fs.readFileSync(path.join(REPO_ROOT, file), "utf8"));

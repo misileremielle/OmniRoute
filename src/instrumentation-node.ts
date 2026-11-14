@@ -286,7 +286,6 @@ export async function registerQuotaFetchers(): Promise<void> {
     { registerMoonshotQuotaFetcher, registerMoonshotFetchersForNodes },
     { registerOpenrouterQuotaFetcher },
     { registerOpencodeQuotaFetcher },
-    { registerGrokWebQuotaFetcher },
     { registerGenericQuotaFetchers },
   ] = await Promise.all([
     import("@omniroute/open-sse/services/codexQuotaFetcher"),
@@ -297,7 +296,6 @@ export async function registerQuotaFetchers(): Promise<void> {
     import("@omniroute/open-sse/services/moonshotQuotaFetcher"),
     import("@omniroute/open-sse/services/openrouterQuotaFetcher"),
     import("@omniroute/open-sse/services/opencodeQuotaFetcher"),
-    import("@omniroute/open-sse/services/grokQuotaFetcher"),
     import("@omniroute/open-sse/services/genericQuotaFetcher"),
   ]);
 
@@ -322,7 +320,6 @@ export async function registerQuotaFetchers(): Promise<void> {
   }
   registerOpenrouterQuotaFetcher();
   registerOpencodeQuotaFetcher();
-  registerGrokWebQuotaFetcher();
   registerGenericQuotaFetchers();
 
   console.log("[STARTUP] Quota fetchers registered");

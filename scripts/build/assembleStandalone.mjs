@@ -350,11 +350,6 @@ export const EXTRA_MODULE_ENTRIES = [
     dest: ["httpClientAbortGuard.mjs"],
   },
   {
-    label: "ChatGPT Web Codex MCP tunnel entrypoint",
-    src: ["bin", "chatgpt-web-codex-mcp.mjs"],
-    dest: ["bin", "chatgpt-web-codex-mcp.mjs"],
-  },
-  {
     label: "webdav-handler (server-ws.mjs dependency)",
     src: ["scripts", "dev", "webdav-handler.mjs"],
     dest: ["webdav-handler.mjs"],

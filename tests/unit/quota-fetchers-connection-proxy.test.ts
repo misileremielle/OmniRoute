@@ -8,8 +8,6 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import {
@@ -52,10 +50,6 @@ import {
   fetchGrokCliQuota,
   invalidateGrokCliQuotaCache,
 } from "../../open-sse/services/grokCliQuotaFetcher.ts";
-import {
-  fetchGrokWebQuota,
-  invalidateGrokWebQuotaCache,
-} from "../../open-sse/services/grokQuotaFetcher.ts";
 import {
   fetchQwenTokenPlanQuota,
   invalidateQwenTokenPlanQuotaCache,
@@ -550,66 +544,6 @@ test("grok cli quota reads inside the proxy context", async () => {
   } finally {
     globalThis.fetch = wrappedFetch;
     invalidateGrokCliQuotaCache(connectionId);
-  }
-});
-
-function createGrokAuthFile(): string {
-  const dir = mkdtempSync(join(tmpdir(), "grok-auth-proxy-test-"));
-  const entry = {
-    key: "test-access-token",
-    refresh_token: "test-refresh-token",
-    expires_at: new Date(Date.now() + 3600_000).toISOString(),
-    email: "test@example.com",
-    auth_mode: "device_code",
-    oidc_issuer: "https://auth.x.ai",
-    oidc_client_id: "test-client-id",
-  };
-  const authFile = join(dir, "auth.json");
-  writeFileSync(authFile, JSON.stringify({ "test-entry": entry }, null, 2) + "\n");
-  return authFile;
-}
-
-test("grok web billing reads inside the proxy context", async () => {
-  useAssignedProxy();
-  const authFile = createGrokAuthFile();
-  process.env.GROK_AUTH_PATH = authFile;
-  const connectionId = `grok-proxy-${Date.now()}`;
-  const contexts: boolean[] = [];
-  const wrappedFetch = globalThis.fetch;
-  globalThis.fetch = (async (input: RequestInfo | URL) => {
-    contexts.push(hasAmbientProxyContext());
-    const urlStr = String(input);
-    if (urlStr.includes("billing")) {
-      return new Response(
-        JSON.stringify({
-          config: {
-            creditUsagePercent: 15.3,
-            currentPeriod: { type: "WEEKLY", end: "2026-07-24T06:34:33.775Z" },
-            productUsage: [{ product: "Api", usagePercent: 15 }],
-            onDemandCap: { val: 0 },
-            onDemandUsed: { val: 0 },
-            prepaidBalance: { val: 0 },
-          },
-        }),
-        { status: 200 }
-      );
-    }
-    return new Response("not found", { status: 404 });
-  }) as typeof globalThis.fetch;
-  try {
-    const quota = await fetchGrokWebQuota(connectionId);
-    assert.ok(quota);
-    assert.ok(contexts.length >= 1);
-    assert.ok(contexts.every(Boolean));
-  } finally {
-    globalThis.fetch = wrappedFetch;
-    invalidateGrokWebQuotaCache(connectionId);
-    try {
-      rmSync(authFile, { force: true });
-      rmSync(join(authFile, ".."), { force: true });
-    } catch {
-      // best effort cleanup
-    }
   }
 });
 

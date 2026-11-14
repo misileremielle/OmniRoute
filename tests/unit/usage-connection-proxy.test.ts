@@ -15,8 +15,6 @@ import {
   connectionProxyTestOverride,
   fetchWithConnectionProxy,
 } from "../../open-sse/services/connectionProxyFetch.ts";
-import { hasAmbientProxyContext } from "../../open-sse/utils/proxyFetch.ts";
-import { getUsageForProvider } from "../../open-sse/services/usage.ts";
 
 const ASSIGNED_PROXY = { type: "socks5", host: "127.0.0.1", port: 9 };
 const BALANCE_BODY = JSON.stringify({
@@ -41,108 +39,9 @@ function useAssignedProxy(): void {
   });
 }
 
-function useNoProxy(): void {
-  connectionProxyTestOverride.resolveProxyForConnection = async () => ({ proxy: null });
-}
-
 test.afterEach(() => {
   globalThis.fetch = originalFetch;
   connectionProxyTestOverride.resolveProxyForConnection = null;
-});
-
-test("conol reading with an assigned proxy runs inside the proxy context", async () => {
-  useAssignedProxy();
-  let observedInContext: boolean | null = null;
-  let observedCookie = "";
-  const cookie = "session-token=abc123";
-  globalThis.fetch = (async (_url: unknown, init?: RequestInit) => {
-    observedInContext = hasAmbientProxyContext();
-    observedCookie = String((init?.headers as Record<string, string> | undefined)?.cookie ?? "");
-    return balanceResponse();
-  }) as typeof globalThis.fetch;
-  const result = (await getUsageForProvider({
-    provider: "conol-web",
-    apiKey: cookie,
-    id: "conn-proxy",
-  })) as { plan?: string; quotas?: Record<string, { remaining?: number }> };
-  assert.equal(observedInContext, true);
-  assert.equal(observedCookie, cookie);
-  assert.equal(result.plan, "Subscription");
-  assert.equal(result.quotas?.credits.remaining, 35);
-});
-
-test("conol reading without a proxy calls the console directly", async () => {
-  useNoProxy();
-  let observedInContext: boolean | null = null;
-  let observedUrl = "";
-  const cookie = "session-token=abc123";
-  globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
-    observedInContext = hasAmbientProxyContext();
-    observedUrl = String(url);
-    void init;
-    return balanceResponse();
-  }) as typeof globalThis.fetch;
-  const result = (await getUsageForProvider({
-    provider: "conol-web",
-    apiKey: cookie,
-    id: "conn-direct",
-  })) as { plan?: string; quotas?: Record<string, { remaining?: number }> };
-  assert.equal(observedInContext, false);
-  assert.equal(observedUrl, "https://conol.ai/api/billing/balance");
-  assert.equal(result.plan, "Subscription");
-  assert.equal(result.quotas?.credits.remaining, 35);
-});
-
-test("a proxied conol failure surfaces the existing message without a direct retry", async () => {
-  useAssignedProxy();
-  let calls = 0;
-  let observedInContext: boolean | null = null;
-  globalThis.fetch = (async () => {
-    calls += 1;
-    observedInContext = hasAmbientProxyContext();
-    throw new Error("proxy blocked the console domain");
-  }) as typeof globalThis.fetch;
-  const result = (await getUsageForProvider({
-    provider: "conol-web",
-    apiKey: "session-token=abc123",
-    id: "conn-blocked",
-  })) as { message?: string };
-  assert.equal(observedInContext, true);
-  assert.equal(result.message, "Conol balance request failed");
-  assert.equal(calls, 1);
-});
-
-test("syntx reading with two bearer tokens sends the JWT to both requests", async () => {
-  useNoProxy();
-  const plain = "plainA";
-  const jwt = "eyJhbGciOiJub25lIn0.eyJzdWIiOiIxIn0.x";
-  const seen: string[] = [];
-  globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
-    seen.push(String((init?.headers as Record<string, string> | undefined)?.authorization ?? ""));
-    if (String(url).includes("/llm/limits")) {
-      return new Response(
-        JSON.stringify({
-          plan: "pro",
-          window_6h: { percent_left: 80 },
-          window_7d: { percent_left: 70 },
-        }),
-        { status: 200, headers: { "content-type": "application/json" } }
-      );
-    }
-    return new Response(JSON.stringify({ tokens: "100", type: "pro" }), {
-      status: 200,
-      headers: { "content-type": "application/json" },
-    });
-  }) as typeof globalThis.fetch;
-  const result = (await getUsageForProvider({
-    provider: "syntx",
-    apiKey: plain,
-    accessToken: jwt,
-  })) as { plan?: string; message?: string | null };
-  assert.equal(seen.length, 2);
-  assert.deepEqual(seen, [`Bearer ${jwt}`, `Bearer ${jwt}`]);
-  assert.equal(result.message, null);
-  assert.equal(result.plan, "SYNTX Pro");
 });
 
 test("a reading without a connection identifier makes no fetch", async () => {

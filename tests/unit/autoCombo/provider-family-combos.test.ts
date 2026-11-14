@@ -291,11 +291,10 @@ describe("additional auto-routing families (#13214)", () => {
     }
   });
 
-  it("materializes Kimi across coding, web and Moonshot without unrelated models", async () => {
+  it("materializes Kimi across coding and Moonshot without unrelated models", async () => {
     for (const [provider, defaultModel] of [
       ["kimi-coding", "k3"],
       ["kimi-coding-apikey", "k3"],
-      ["kimi-web", "k3"],
       ["moonshot", "kimi-k2.5"],
       ["openai", "gpt-4o"],
     ]) {
@@ -310,7 +309,7 @@ describe("additional auto-routing families (#13214)", () => {
     const combo = await builtinCatalog.createBuiltinAutoCombo("auto/kimi", "kimi");
     assert.equal(combo.id, "auto/kimi");
     assert.equal(combo.strategy, "auto");
-    for (const provider of ["kimi-coding", "kimi-coding-apikey", "kimi-web", "moonshot"]) {
+    for (const provider of ["kimi-coding", "kimi-coding-apikey", "moonshot"]) {
       assert.ok(
         combo.models.some((model) => model.providerId === provider),
         provider
@@ -352,7 +351,7 @@ describe("additional auto-routing families (#13214)", () => {
 
   it("includes Kimi k3 only on known Kimi backends, alongside prefix matches", () => {
     const filter = buildFamilyCandidateFilter("kimi");
-    for (const provider of ["kimi-coding", "kimi-web", "kimi-coding-apikey"]) {
+    for (const provider of ["kimi-coding", "kimi-coding-apikey"]) {
       for (const model of ["k3", "k3.1-pro", "k3.1-pro-highspeed"]) {
         assert.equal(filter({ provider, model }), true);
         assert.equal(filter({ provider, model: `${provider}/${model}` }), true);
@@ -363,7 +362,10 @@ describe("additional auto-routing families (#13214)", () => {
     assert.equal(filter({ provider: "custom", model: "kimi-k2.5" }), true);
     assert.equal(filter({ provider: "custom", model: "k3" }), false);
     assert.equal(filter({ provider: "custom", model: "k3.1-pro" }), false);
-    assert.equal(buildFamilyCandidateFilter("gpt")({ provider: "kimi-web", model: "k3" }), false);
+    assert.equal(
+      buildFamilyCandidateFilter("gpt")({ provider: "kimi-coding", model: "k3" }),
+      false
+    );
     assert.equal(buildFamilyCandidateFilter("zai")({ provider: "glm", model: "glm-5.2" }), false);
   });
 

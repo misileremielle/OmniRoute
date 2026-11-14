@@ -23,7 +23,6 @@ const leases = await import("../../src/lib/db/exclusiveConnectionLeases.ts");
 const translator = await import("../../src/app/api/translator/send/route.ts");
 const translatorPreview = await import("../../src/app/api/translator/translate/route.ts");
 const modelTests = await import("../../src/lib/api/modelTestRunner.ts");
-const vnc = await import("../../src/lib/vncSession/service.ts");
 const usageRoute = await import("../../src/app/api/usage/[connectionId]/route.ts");
 const providerLimits = await import("../../src/lib/usage/providerLimits.ts");
 
@@ -161,34 +160,6 @@ test("translator request preview never materializes an ACTIVE leased credential"
   assert.equal(externalCalls, 0);
 });
 
-test("browser-login start accepts FREE lease-capable connection past isolation check", async () => {
-  const connection = await seedConnection("vnc-free-lease");
-  await markLeaseOnly(connection.id);
-
-  await assert.rejects(
-    vnc.startSession(connection.id),
-    /Browser login is not supported for provider 'openai'/
-  );
-  assert.equal(externalCalls, 0);
-});
-
-test("browser-login start rejects ACTIVE leased connections before Docker or provider access", async () => {
-  const connection = await seedConnection("vnc-active-lease-start");
-  const acquired = leases.acquireExclusiveConnectionLease({
-    leaseOwnerId: OWNER,
-    apiKeyId: "managed-key",
-    provider: "openai",
-    connectionId: connection.id,
-  });
-  assert.equal(acquired.kind, "ACQUIRED");
-
-  await assert.rejects(
-    vnc.startSession(connection.id),
-    /unavailable for managed lease connections/
-  );
-  assert.equal(externalCalls, 0);
-});
-
 test("forced model tests accept FREE lease-capable connections and attempt model dispatch", async () => {
   await apiKeys.createApiKey("internal test key", "test");
   const connection = await seedConnection("model-test-free-lease");
@@ -222,23 +193,6 @@ test("forced model tests reject ACTIVE leased connections before any model dispa
   });
 
   assert.equal(result.httpStatus, 409);
-  assert.equal(externalCalls, 0);
-});
-
-test("browser-login harvest rejects ACTIVE leased connections before credential mutation", async () => {
-  const connection = await seedConnection("vnc-active-lease");
-  const acquired = leases.acquireExclusiveConnectionLease({
-    leaseOwnerId: OWNER,
-    apiKeyId: "managed-key",
-    provider: "openai",
-    connectionId: connection.id,
-  });
-  assert.equal(acquired.kind, "ACQUIRED");
-
-  await assert.rejects(
-    vnc.harvestSession(connection.id, "missing-session"),
-    /unavailable for managed lease connections/
-  );
   assert.equal(externalCalls, 0);
 });
 

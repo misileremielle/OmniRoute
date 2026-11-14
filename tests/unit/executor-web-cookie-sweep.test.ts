@@ -1,5 +1,5 @@
 /**
- * Web-Cookie + NoAuth executor wrapper contract sweep.
+ * NoAuth executor wrapper contract sweep.
  *
  * Why this file exists
  * --------------------
@@ -16,8 +16,7 @@
  *
  * The duckduckgo-web executor was the first known case. To prevent any
  * future executor from regressing on the same contract, this sweep test
- * imports every executor in `WEB_COOKIE_PROVIDERS` + `NOAUTH_PROVIDERS`
- * (26 web-cookie + 2 noauth = 28 total), calls `execute()` with a minimal
+ * imports the keyless `NOAUTH_PROVIDERS` executors, calls `execute()` with a minimal
  * but valid input, and asserts the wrapper shape. Tests use the
  * pre-aborted signal path or empty-creds path so no real upstream call
  * is needed.
@@ -28,18 +27,9 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { getExecutor } from "../../open-sse/executors/index.ts";
-import { WEB_COOKIE_PROVIDERS, NOAUTH_PROVIDERS } from "../../src/shared/constants/providers.ts";
-import { FAKE_CREDS } from "./fixtures/web-cookie-fake-creds.fixture.ts";
+import { NOAUTH_PROVIDERS } from "../../src/shared/constants/providers.ts";
 
-type WebCookieId = keyof typeof WEB_COOKIE_PROVIDERS;
 type NoauthId = keyof typeof NOAUTH_PROVIDERS;
-
-// Providers with no service kind (e.g. adobe-firefly, whose media executor was removed with
-// image/video generation) have no chat executor to sweep.
-const WEB_COOKIE_IDS = (Object.keys(WEB_COOKIE_PROVIDERS) as WebCookieId[]).filter((id) => {
-  const kinds = (WEB_COOKIE_PROVIDERS[id] as { serviceKinds?: readonly string[] }).serviceKinds;
-  return !Array.isArray(kinds) || kinds.length > 0;
-});
 const NOAUTH_IDS = Object.keys(NOAUTH_PROVIDERS) as NoauthId[];
 
 const VALID_BODY = {
@@ -90,43 +80,7 @@ function assertExecutorWrapperShape(
   );
 }
 
-describe("web-cookie + noauth executor wrapper contract sweep", () => {
-  describe("WEB_COOKIE_PROVIDERS", () => {
-    for (const providerId of WEB_COOKIE_IDS) {
-      it(`${providerId} executor returns wrapper shape`, async () => {
-        const executor = await getExecutor(providerId);
-        assert.ok(executor, `[${providerId}] getExecutor must return an executor`);
-
-        const result = await executor.execute({
-          model: providerId,
-          body: VALID_BODY,
-          stream: false,
-          credentials: { apiKey: FAKE_CREDS[providerId] ?? "fake" },
-          signal: null,
-        } as never);
-
-        assertExecutorWrapperShape(result, providerId);
-
-        // Result should never be a JS TypeError. Real executor returns
-        // a proper Response with a JSON error body for invalid creds.
-        // If a regression introduces a raw Response return, the shape
-        // assertion above will fail.
-        const body = await result.response.text();
-        // Most executors return JSON error bodies for invalid creds.
-        // We don't require JSON, but we DO require the body to be a
-        // non-empty string (not the literal "[object Response]" or
-        // a TypeError stack trace).
-        assert.ok(body.length > 0, `[${providerId}] response body must be non-empty`);
-        // And it must NOT be the duckduckgo-web regression signature.
-        assert.doesNotMatch(
-          body,
-          /Cannot read properties of undefined \(reading 'status'\)/,
-          `[${providerId}] must not surface the chatCore-side TypeError`
-        );
-      });
-    }
-  });
-
+describe("noauth executor wrapper contract sweep", () => {
   describe("NOAUTH_PROVIDERS (4 total; 2 require cookie='') ", () => {
     // Only noauth providers that should be probed without creds:
     // duckduckgo-web and veoaifree-web. opencode/notice have dedicated

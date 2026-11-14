@@ -25,10 +25,7 @@ function supportedProfiles() {
 // literal) and pin only the emulation OS.
 const TRANSPORT_CLIENTS = {
   "open-sse/services/claudeTlsClient.ts": { family: "chrome", os: "linux" },
-  "open-sse/services/perplexityTlsClient.ts": { family: "firefox", os: "macos" },
   "open-sse/services/grokTlsClient.ts": { family: "chrome", os: "linux" },
-  "open-sse/services/notionTlsClient.ts": { family: "chrome", os: "windows" },
-  "open-sse/services/lmarenaTlsClient.ts": { family: "chrome", os: "windows" },
 };
 
 // Source files that hand a browser profile directly to wreq-js — scanned for
@@ -37,8 +34,6 @@ const SOURCES = [
   "src/app/api/internal/codex-responses-ws/route.ts",
   "open-sse/executors/codex.ts",
   "open-sse/executors/codex/appServerClient.ts",
-  "open-sse/executors/grok-web.ts",
-  "open-sse/executors/notion-web.ts",
   "open-sse/utils/proxyFetch.ts",
   "scripts/dev/responses-ws-proxy.mjs",
   "open-sse/utils/tlsClient.ts",
@@ -72,8 +67,6 @@ test("#5591 all configured browser TLS profiles exist in pinned wreq-js", () => 
 
   // Executors must not freeze a profile literal. A version the library ships
   // still passes the check above, so this one rejects the literal itself.
-  // grok-web / notion-web are intentionally absent: they delegate to their
-  // *TlsClient services and never hand a profile to wreq-js directly.
   const NO_LITERAL = [
     "open-sse/executors/codex.ts",
     "open-sse/executors/codex/appServerClient.ts",

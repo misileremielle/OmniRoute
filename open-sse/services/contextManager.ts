@@ -19,10 +19,6 @@ const DEFAULT_LIMITS: Record<string, number> = {
   openai: 128000,
   gemini: 1000000,
   codex: 400000,
-  // HyperAgent Claude-family agents (fable/opus/sonnet) — 1M default; was falling
-  // through to 128k and blocking normal agentic tool loops with huge catalogs.
-  hyperagent: 1_000_000,
-  ha: 1_000_000,
   default: 128000,
 };
 

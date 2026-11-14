@@ -61,11 +61,7 @@ test("SPAWN_CAPABLE_PATTERNS covers every regex-tier LOCAL_ONLY spawn route (GHS
   // spawn-capable regex route) must have a matching pattern here — otherwise the
   // two layers drift and a spawn route loses its exact early-deny. This guards
   // against the chatgpt-web-codex-doctor drift and any future one.
-  const spawnRoutes = [
-    "/api/providers/acct-1/login",
-    "/api/providers/acct-1/refresh-cursor",
-    "/api/providers/acct-1/chatgpt-web-codex-doctor",
-  ];
+  const spawnRoutes = ["/api/providers/acct-1/refresh-cursor"];
   for (const p of spawnRoutes) {
     assert.equal(isLocalOnlyPath(p), true, `${p} must be LOCAL_ONLY`);
     assert.equal(

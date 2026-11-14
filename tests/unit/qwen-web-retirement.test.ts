@@ -14,7 +14,6 @@ import {
   assertRuntimeProviderAvailable,
   isRuntimeRetiredProviderId,
 } from "../../src/shared/constants/providerRetirement.ts";
-import { getWebSessionCredentialRequirement } from "../../src/shared/providers/webSessionCredentials.ts";
 
 test("Qwen Web provenance-hold integration is absent from runtime dispatch", () => {
   assert.equal(REGISTRY["qwen-web"], undefined);
@@ -64,7 +63,6 @@ test("Qwen Web admission surfaces are absent from the shipped runtime", () => {
   assert.deepEqual(qwenWebModels, []);
   assert.equal(PROVIDER_MODELS_CONFIG["qwen-web"], undefined);
   assert.equal(getExtractionConfig("qwen-web"), undefined);
-  assert.equal(getWebSessionCredentialRequirement("qwen-web"), null);
   assert.equal(getLobeProviderIcon("qwen-web"), null);
 });
 

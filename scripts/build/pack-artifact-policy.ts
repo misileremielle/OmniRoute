@@ -48,7 +48,6 @@ export const APP_STAGING_ALLOWED_EXACT_PATHS: string[] = [
   "head-response-guard.cjs",
   "http-method-guard.cjs",
   "open-sse/mcp-server/server.js",
-  "open-sse/vendor/codex-chatgpt-web/adapters/chatgpt-web/mcp-server.js",
   // LLMLingua ONNX worker — esbuild'd standalone .js spawned via worker_threads
   // (the Next.js bundler can't trace the computed Worker path). Kept like the MCP server.
   "open-sse/services/compression/engines/llmlingua/onnxWorker.js",
@@ -68,7 +67,6 @@ export const APP_STAGING_ALLOWED_EXACT_PATHS: string[] = [
   // tests/unit/pack-artifact-server-ws-closure.test.ts.
   "systemd-notify.mjs",
   "responses-ws-proxy.mjs",
-  "bin/chatgpt-web-codex-mcp.mjs",
   "scripts/dev/sync-env.mjs",
   "scripts/dev/tls-options.mjs",
   "server.js",
@@ -119,7 +117,6 @@ export const PACK_ARTIFACT_ROOT_ALLOWED_EXACT_PATHS: string[] = [
   "config/release/wreq-js-rust-license-inventory.json",
   "config/release/wreq-js-rust-notices.md",
   "bin/aliasResolver.mjs",
-  "bin/chatgpt-web-codex-mcp.mjs",
   // #7808: ESM loader hook split out of bin/aliasResolver.mjs to silence CodeQL
   // js/incomplete-url-substring-sanitization (the old code built a
   // `data:text/javascript,...` URL dynamically). Loaded via pathToFileURL() at
@@ -222,7 +219,6 @@ export const PACK_ARTIFACT_REQUIRED_PATHS: string[] = [
   "dist/src/lib/usage/callLogArtifactWorker.js",
   // Unbundled destination helper also ships through package.json's src/lib/ prefix.
   "dist/src/lib/db/healthCheckWorker.js",
-  "dist/open-sse/vendor/codex-chatgpt-web/adapters/chatgpt-web/mcp-server.js",
   "dist/open-sse/services/compression/rules/en/filler.json",
   "dist/server.js",
   "dist/server-ws.mjs",

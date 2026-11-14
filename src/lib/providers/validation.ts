@@ -9,7 +9,6 @@ import {
   isSelfHostedChatProvider,
   providerAllowsOptionalApiKey,
   resolveProviderId,
-  WEB_COOKIE_PROVIDERS,
 } from "@/shared/constants/providers";
 import { MODAL_DEFAULT_VALIDATION_MODEL_ID } from "@/shared/constants/modal";
 import { usesCcWireImage } from "@omniroute/open-sse/services/ccWireImageBuiltins.ts";
@@ -29,29 +28,7 @@ import {
 import { toValidationErrorResult } from "./validation/transport";
 import { validateOpencodeProvider } from "./validation/opencode";
 import { validateCloudflareAiProvider } from "./validation/cloudflareAi";
-import {
-  validateDeepSeekWebProvider,
-  validateGrokWebProvider,
-  validatePerplexityWebProvider,
-  validateBlackboxWebProvider,
-  validateKimiWebProvider,
-} from "./validation/webProvidersA";
-import {
-  validateMuseSparkWebProvider,
-  validateAdaptaWebProvider,
-  validateKagiAssistantProvider,
-  validateTinyCmsWebProvider,
-  validateClaudeWebProvider,
-  validateGeminiWebProvider,
-  validateCopilotM365WebProvider,
-  validateCopilotWebProvider,
-  validateT3WebProvider,
-  validateJulesProvider,
-  validateDevinCloudAgentProvider,
-  validateInnerAiProvider,
-  validateNotionWebProvider,
-  validateSyntxProvider,
-} from "./validation/webProvidersB";
+import { validateJulesProvider, validateDevinCloudAgentProvider } from "./validation/cloudAgents";
 import {
   validateHerokuProvider,
   validateDatabricksProvider,
@@ -76,7 +53,6 @@ import {
   validatePoeProvider,
 } from "./validation/audioMiscProviders";
 import { validateTypesafeProvider } from "./validation/typesafe";
-import { validateZaiWebProvider } from "./validation/zaiWeb";
 import { validateSearchProvider, SEARCH_VALIDATOR_CONFIGS } from "./validation/searchProviders";
 import {
   validateClarifaiProvider,
@@ -97,11 +73,7 @@ import {
   validateAnthropicCompatibleProvider,
   validateClaudeCodeCompatibleProvider,
 } from "./validation/anthropicFormat";
-import {
-  validateWebCookieProvider,
-  bytezValidationResultFromStatus,
-  validateBytezProvider,
-} from "./validation/webCookie";
+import { bytezValidationResultFromStatus, validateBytezProvider } from "./validation/bytez";
 import { validateAiHordeProvider } from "./validation/aihorde";
 import { validateDifyProvider } from "./validation/dify";
 import { validateZyloApiProvider } from "./validation/zylo";
@@ -133,13 +105,9 @@ export { validateCommandCodeProvider, validateClaudeCodeCompatibleProvider };
 // here to preserve the historical public surface (tests + route handlers import them via this module).
 export { isRetryableProxyTarget, isSecurityBlockError } from "./validation/transport";
 
-// validateWebCookieProvider + bytezValidationResultFromStatus have external importers (tests +
-// the web-cookie fallback suites) — re-export to preserve the historical public surface.
-export { validateWebCookieProvider, bytezValidationResultFromStatus };
-
-// validateWebCookieProvider, bytezValidationResultFromStatus, validateBytezProvider, and
-// validateKiroApiKeyRuntimeProbe now live in ./validation/webCookie and ./validation/kiro.
-// They are re-exported above to preserve the historical public surface.
+// bytezValidationResultFromStatus has external importers (tests) — re-export to preserve the
+// historical public surface. It lives in ./validation/bytez.
+export { bytezValidationResultFromStatus };
 
 export async function validateFreebuffProvider({ apiKey }: { apiKey: string }) {
   if (!apiKey) {
@@ -344,32 +312,6 @@ export async function validateProviderApiKey({
     typesafe: ({ apiKey }: any) => validateTypesafeProvider({ apiKey }),
     snowflake: validateSnowflakeProvider,
     gigachat: validateGigachatProvider,
-    "deepseek-web": validateDeepSeekWebProvider,
-    "zai-web": validateZaiWebProvider,
-    "grok-web": validateGrokWebProvider,
-    "kimi-web": validateKimiWebProvider,
-    "chatgpt-web-codex": (input: {
-      apiKey?: string;
-      providerSpecificData?: Record<string, unknown>;
-    }) =>
-      import("./validation/chatgptWebCodex").then((mod) =>
-        mod.validateChatGptWebCodexProvider(input)
-      ),
-    "perplexity-web": validatePerplexityWebProvider,
-    "blackbox-web": validateBlackboxWebProvider,
-    "muse-spark-web": validateMuseSparkWebProvider,
-    "inner-ai": validateInnerAiProvider,
-    "adapta-web": validateAdaptaWebProvider,
-    "kagi-assistant": validateKagiAssistantProvider,
-    "tinycms-web": validateTinyCmsWebProvider,
-    "claude-web": validateClaudeWebProvider,
-    "gemini-web": validateGeminiWebProvider,
-    "notion-web": validateNotionWebProvider,
-    "copilot-m365-web": validateCopilotM365WebProvider,
-    "copilot-web": validateCopilotWebProvider,
-    "t3-web": validateT3WebProvider,
-    syntx: validateSyntxProvider,
-    stx: validateSyntxProvider,
     "azure-openai": validateAzureOpenAIProvider,
     "azure-ai": validateAzureAiProvider,
     "voyage-ai": ({ apiKey, providerSpecificData }: any) => {
@@ -424,24 +366,6 @@ export async function validateProviderApiKey({
         providerSpecificData,
         allowLocalSpawn,
         credentials,
-      });
-    } catch (error: any) {
-      return toValidationErrorResult(error);
-    }
-  }
-
-  // Web-cookie providers WITHOUT a dedicated specialty validator above fall back to the generic
-  // session-ping check (AUTH_007 SESSION_EXPIRED on 401/403). Providers that DO have a rich
-  // per-provider validator (grok-web, perplexity-web, claude-web, etc.) are handled by
-  // SPECIALTY_VALIDATORS first and must not be shadowed by this generic probe (issue: the
-  // #4023 dispatch was placed too early and intercepted every web-cookie provider).
-  const canonicalProvider = resolveProviderId(provider);
-  if (WEB_COOKIE_PROVIDERS[canonicalProvider]) {
-    try {
-      return await validateWebCookieProvider({
-        provider: canonicalProvider,
-        apiKey,
-        providerSpecificData,
       });
     } catch (error: any) {
       return toValidationErrorResult(error);

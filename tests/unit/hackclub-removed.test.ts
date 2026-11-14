@@ -27,7 +27,6 @@ import { fileURLToPath } from "node:url";
 
 import {
   APIKEY_PROVIDERS,
-  WEB_COOKIE_PROVIDERS,
   OAUTH_PROVIDERS,
   FREE_PROVIDERS,
   NOAUTH_PROVIDERS,
@@ -41,7 +40,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", ".
 
 const CATALOGS: Record<string, Record<string, { id?: string; alias?: string }>> = {
   APIKEY_PROVIDERS,
-  WEB_COOKIE_PROVIDERS,
   OAUTH_PROVIDERS: OAUTH_PROVIDERS as Record<string, { id?: string; alias?: string }>,
   FREE_PROVIDERS: FREE_PROVIDERS as Record<string, { id?: string; alias?: string }>,
   NOAUTH_PROVIDERS: NOAUTH_PROVIDERS as Record<string, { id?: string; alias?: string }>,

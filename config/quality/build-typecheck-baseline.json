@@ -164,9 +164,6 @@
   "src/app/api/provider-nodes/validate/route.ts": {
     "TS2339": 2
   },
-  "src/app/api/providers/[id]/login/route.ts": {
-    "TS2739": 1
-  },
   "src/app/api/providers/[id]/models/route.ts": {
     "TS2367": 1,
     "TS2339": 2,

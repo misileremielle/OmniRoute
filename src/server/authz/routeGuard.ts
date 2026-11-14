@@ -27,7 +27,6 @@ import {
   SPAWN_CAPABLE_PATTERNS,
   isSpawnCapableBypassPrefix,
 } from "@/shared/constants/spawnCapablePrefixes";
-import { VNC_ROUTE_PREFIX } from "@/lib/vncSession/manifest";
 
 const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
@@ -81,12 +80,11 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
   "/api/oauth/kiro/auto-import", // reads host-local Kiro credential files (homedir kiro-cli data) — must reach the loopback-only gate, not the PUBLIC /api/oauth/ prefix (GHSA-wgwc-crjm-pmwv, GHSA-gxv4-955v-v6cm). Excluded from PUBLIC in publicApiRoutes.ts.
   "/api/skills/collect/", // Chaos Mode dispatch: fans a task out across providers — the exact public entry in publicApiRoutes.ts covers the Bearer-authenticated POST; everything else under this prefix stays loopback-only
   "/api/discovery/", // Discovery tool (opt-in provider scanner): the scan route makes outbound probes to provider endpoints (SSRF-adjacent) and the whole surface is an admin research tool — strict-loopback only, no manage-scope bypass (NOT in LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES). See _tasks/features-v3.8.42/gaps/DISCOVERY_TOOL_DESIGN.md.
-  VNC_ROUTE_PREFIX, // #7892: /api/vnc-session/* spawns Docker containers via child_process.spawn (src/lib/vncSession/service.ts) — RCE-via-tunnel surface (Hard Rules #15 + #16), same CVE class (GHSA-fhh6-4qxv-rpqj).
   "/api/resilience/connections", // Per-account resilience state. NOTE: prefix matching also gates future /api/resilience/connections-* paths.
   // Dashboard HTML stays out of this list: a reverse proxy is not loopback, so
   // gating the page logged the session out. The JSON API above stays local-only.
   "/api/providers/agy-auth/apply-local", // spawns `secret-tool` through detectLocalAgyTokenRaw() and reads host-local token files (Hard Rules #15 + #16). Exact entry on purpose: the sibling import, import-bulk and zip-extract routes only parse what the request carries, and tunnel-served dashboards use them.
-  "/api/providers/cursor/agent-availability", // credential-free dashboard-nudge check: spawns `cursor-agent status --format json` via checkCursorAgentAvailability()/getCachedCursorAgentAvailability() (src/lib/cursor/renewal.ts) — RCE-via-tunnel surface (Hard Rules #15 + #16). Narrow-scoped like /login and /refresh-cursor, not the whole /api/providers/ tree. Placed under /api/providers/ rather than /api/oauth/ because /api/oauth/ is PUBLIC-classified and never reaches this LOCAL_ONLY gate.
+  "/api/providers/cursor/agent-availability", // credential-free dashboard-nudge check: spawns `cursor-agent status --format json` via checkCursorAgentAvailability()/getCachedCursorAgentAvailability() (src/lib/cursor/renewal.ts) — RCE-via-tunnel surface (Hard Rules #15 + #16). Narrow-scoped like /refresh-cursor, not the whole /api/providers/ tree. Placed under /api/providers/ rather than /api/oauth/ because /api/oauth/ is PUBLIC-classified and never reaches this LOCAL_ONLY gate.
 ];
 
 /**
@@ -100,25 +98,19 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
  * dynamic segment, so there is no decode/normalization mismatch between what
  * this regex sees and what actually gets dispatched to the route handler.
  *
- *   - `POST /api/providers/{id}/login` launches a headful Playwright Chromium
- *     (a child process) to drive a web-cookie login. Loopback enforcement must
- *     happen unconditionally before any auth check (Hard Rules #15 + #16), so a
- *     leaked JWT via tunnel cannot trigger a browser spawn.
  *   - `POST /api/providers/{id}/refresh-cursor` nudges `cursor-agent`
  *     (`--list-models`/`status`, via `src/lib/cursor/renewal.ts`) as part of
  *     a manual Cursor session renewal attempt — the same RCE-via-tunnel
  *     surface (Hard Rules #15 + #16). The rest of `/api/providers/`,
  *     including the generic `/refresh` route, intentionally stays
  *     remote-reachable — only this Cursor-specific spawn-capable path is
- *     gated, matching the `/login` precedent's narrow-scoping rationale.
+ *     gated.
  */
 export const LOCAL_ONLY_API_PATTERNS: ReadonlyArray<RegExp> = [
-  /^\/api\/providers\/[^/]+\/login\/?$/,
   /^\/api\/providers\/volcengine-plan\/connect(\/.*)?$/, // manual headful flow + session-based phone/SMS auto-login (both spawn Playwright)
   /^\/api\/providers\/[^/]+\/refresh-cursor\/?$/,
-  /^\/api\/providers\/[^/]+\/chatgpt-web-codex-doctor\/?$/,
   // S-01 (#15159): spawn(bin, ["acp", "--agent-type", "summarizer"], …) in
-  // src/lib/providers/validation/webProvidersB.ts:535 — fixed binary list + fixed argv (not
+  // src/lib/providers/validation/cloudAgents.ts — fixed binary list + fixed argv (not
   // caller-controlled RCE) but Hard Rules #15 + #16 still require loopback enforcement before
   // any auth check.
   //
@@ -133,7 +125,7 @@ export const LOCAL_ONLY_API_PATTERNS: ReadonlyArray<RegExp> = [
   // resolves `{id}` to an arbitrary CONNECTION id, and the spawn
   // (src/lib/providerModels/cursorAgent.ts:17, via fetchCursorAgentModels) only runs on the
   // `provider === "cursor"` branch of that route. A `[^/]+/models` pattern would lock remote
-  // model discovery for EVERY provider — the over-broadening the /login precedent above
+  // model discovery for EVERY provider — the over-broadening the narrow patterns above
   // exists to avoid. Instead the route gates the spawn on the trusted peer-locality header,
   // mirroring cursorAgentImage.ts (see the guard in src/app/api/providers/[id]/models/route.ts).
 ];
@@ -419,7 +411,7 @@ export function isLocalOnlyPath(path: string, method?: string): boolean {
  */
 export function isLocalOnlyBypassableByManageScope(path: string): boolean {
   // Precise, unconditional early-deny for regex-matched spawn-capable routes
-  // (e.g. /api/providers/{id}/login, /api/providers/{id}/refresh-cursor).
+  // (e.g. /api/providers/{id}/refresh-cursor).
   // Unlike the flat-prefix defence-in-depth check below, this has the
   // concrete resolved `path` already, so it's an exact match — no
   // reachability heuristics needed.

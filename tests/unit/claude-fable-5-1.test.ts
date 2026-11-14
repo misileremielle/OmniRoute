@@ -29,7 +29,6 @@ test("Claude Fable 5.1 is registered only on verified launch surfaces", () => {
   for (const [providerId, modelId] of [
     ["anthropic", MODEL_ID],
     ["claude", MODEL_ID],
-    ["claude-web", MODEL_ID],
     ["bedrock", BEDROCK_MODEL_ID],
     ["vertex", MODEL_ID],
     ["vertex-partner", MODEL_ID],

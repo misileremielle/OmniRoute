@@ -31,14 +31,19 @@ test("anthropicFormat exposes its four validators (incl. the internal claude-oau
     "validateAnthropicCompatibleProvider",
     "validateClaudeCodeCompatibleProvider",
   ]) {
-    assert.equal(typeof (anthropic as Record<string, unknown>)[name], "function", `missing ${name}`);
+    assert.equal(
+      typeof (anthropic as Record<string, unknown>)[name],
+      "function",
+      `missing ${name}`
+    );
   }
 });
 
 test("host re-exports the two historically-public validators + keeps the dispatcher", () => {
   assert.equal(typeof (HOST as Record<string, unknown>).validateProviderApiKey, "function");
   assert.equal(typeof (HOST as Record<string, unknown>).validateCommandCodeProvider, "function");
-  assert.equal(typeof (HOST as Record<string, unknown>).validateClaudeCodeCompatibleProvider, "function");
-  // and the web-cookie validator stays in the host
-  assert.equal(typeof (HOST as Record<string, unknown>).validateWebCookieProvider, "function");
+  assert.equal(
+    typeof (HOST as Record<string, unknown>).validateClaudeCodeCompatibleProvider,
+    "function"
+  );
 });

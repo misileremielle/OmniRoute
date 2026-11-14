@@ -10,7 +10,7 @@
  *
  * `matchesSharedWalletCreditsBody` expects a pre-lowercased string.
  */
-const SHARED_WALLET_402_PROVIDERS = new Set(["grok-cli", "grok-web", "xai-oauth"]);
+const SHARED_WALLET_402_PROVIDERS = new Set(["grok-cli", "xai-oauth"]);
 
 export const GROK_BUILD_USAGE_BALANCE_SIGNAL = "usage balance exhausted";
 
@@ -23,7 +23,11 @@ export function isSharedWalletCredits402(
   status: number,
   errorText?: string | null
 ): boolean {
-  if (status !== 402 || typeof provider !== "string" || !SHARED_WALLET_402_PROVIDERS.has(provider)) {
+  if (
+    status !== 402 ||
+    typeof provider !== "string" ||
+    !SHARED_WALLET_402_PROVIDERS.has(provider)
+  ) {
     return false;
   }
   if (errorText == null || String(errorText).trim() === "") return true;

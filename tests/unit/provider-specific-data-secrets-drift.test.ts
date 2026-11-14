@@ -1,12 +1,11 @@
 // ONE allowlist — PROVIDER_SPECIFIC_SECRET_FIELDS — names the credential-bearing
-// `providerSpecificData` fields. Four consumers read it and must not drift from each
+// `providerSpecificData` fields. Three consumers read it and must not drift from each
 // other: the at-rest encryptor (encryptConnectionFields, #16863), the API response
-// sanitizer (strips them, masks the list-valued pool like `apiKey`), the compliance audit
-// summary, and the web-session credential storage keys. Every assertion below iterates
+// sanitizer (strips them, masks the list-valued pool like `apiKey`) and the compliance audit
+// summary. Every assertion below iterates
 // the live constant, so a field added to the list is automatically checked on every side.
 import test from "node:test";
 import assert from "node:assert/strict";
-import type { WebSessionCredentialRequirement } from "../../src/shared/providers/webSessionCredentials.ts";
 
 process.env.STORAGE_ENCRYPTION_KEY = "psd-secrets-drift-synthetic-key";
 
@@ -20,8 +19,6 @@ const { summarizeProviderConnectionForAudit } =
   await import("../../src/lib/compliance/providerAudit.ts");
 const apiKeyMask = await import("../../src/shared/utils/apiKeyMask.ts");
 const apiKeyExposure = await import("../../src/lib/apiKeyExposure.ts");
-const { WEB_SESSION_CREDENTIAL_REQUIREMENTS } =
-  await import("../../src/shared/providers/webSessionCredentials.ts");
 
 type Psd = Record<string, unknown>;
 
@@ -146,19 +143,6 @@ test("the compliance audit strips every declared field, ciphertext or legacy pla
       assert.deepEqual(audit?.providerSpecificData, { workspaceId: "ws-visible", count: 2 }, key);
       assert.ok(!JSON.stringify(audit).includes(SECRET), `${key}: secret reached the audit record`);
     }
-  }
-});
-
-test("every web-session credential requirement stores its credential under a declared field", () => {
-  const requirements: Record<string, WebSessionCredentialRequirement> =
-    WEB_SESSION_CREDENTIAL_REQUIREMENTS;
-  for (const [provider, requirement] of Object.entries(requirements)) {
-    if (requirement.kind === "none") continue;
-    const covered = requirement.storageKeys.filter((key: string) => SECRET_FIELDS.has(key));
-    assert.ok(
-      covered.length > 0,
-      `${provider}: none of its storageKeys [${requirement.storageKeys.join(", ")}] is a declared secret field`
-    );
   }
 });
 

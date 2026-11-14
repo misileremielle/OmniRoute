@@ -20,7 +20,7 @@ import { getRegistryModelThinkingEfforts } from "../../open-sse/config/providerR
  *   This registry follows Anthropic's per-model table so a suffixed combo id folds
  *   the same way as the first-party claude/anthropic entries. Relays that speak
  *   Anthropic Messages (agentrouter, tabitoken, uc-direct, poe, cline, orcarouter,
- *   gitlab-duo, dit, kie, blackbox, freebuff, freeaiapikey, zenmux, tinycms) inherit
+ *   gitlab-duo, dit, kie, blackbox, freebuff, freeaiapikey, zenmux) inherit
  *   the same mapping. Claude 3.7 / 3.5 / opus-4 (t3-web, coze, api-airforce,
  *   token-kiosk) stay without an array: they only accept budget_tokens.
  */
@@ -39,7 +39,6 @@ const FIVE_TIER: Array<[string, string]> = [
   ["orcarouter", "anthropic/claude-opus-4.8"],
   ["poe", "claude-opus-4.8"],
   ["tabitoken", "claude-opus-5"],
-  ["tinycms-web", "claude-fable-5"],
   ["uc-direct", "claude-opus-5"],
   ["bedrock", "anthropic.claude-opus-4-7"],
 ];

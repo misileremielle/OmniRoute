@@ -366,8 +366,7 @@ export function applyReasoningInputPolicy(
       transport,
       incompatibleReasoning || mixedState,
       body.store === false,
-      options.preserveWebSearchCalls === true,
-      options.provider === "chatgpt-web-codex"
+      options.preserveWebSearchCalls === true
     );
   }
   return { incompatibleReasoning: false };

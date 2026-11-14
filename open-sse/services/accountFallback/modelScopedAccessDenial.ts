@@ -4,7 +4,6 @@
  * revoked credential. Scope this exception to known ModelScope wire signatures;
  * an ordinary 401/403 must still expire or cool the credentials as usual.
  */
-import { getM365FailureScope } from "../m365ErrorPolicy.ts";
 
 const MODELSCOPE_MODEL_MESSAGE =
   /the model does not exist or you do not have access to it(?:[.!?\s]|$)/i;
@@ -18,7 +17,6 @@ export function isModelScopedAccessDenial(
   errorText: unknown,
   structuredError?: { code?: unknown; message?: unknown } | null
 ): boolean {
-  if (getM365FailureScope(provider, status, errorText, structuredError) === "model") return true;
   return isModelScopeAccessDenial(provider, status, errorText, structuredError);
 }
 

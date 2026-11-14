@@ -1,0 +1,166 @@
+{
+  "_comment": "Providers removed from this fork. Guarded by tests/unit/removed-providers-blocklist.test.ts; documented in docs/reference/REMOVED_PROVIDERS.md. The matching migrations delete their stored connections.",
+  "batches": [
+    {
+      "name": "web-cookie",
+      "removedOn": "2026-11-15",
+      "migration": "240_remove_web_cookie_providers.sql",
+      "reason": "Browser-session (web-cookie) providers removed from the fork.",
+      "providers": [
+        {
+          "id": "chatgpt-web",
+          "alias": null
+        },
+        {
+          "id": "chatgpt-web-codex",
+          "alias": "cgpt-codex"
+        },
+        {
+          "id": "grok-web",
+          "alias": "gw"
+        },
+        {
+          "id": "gemini-web",
+          "alias": "gweb"
+        },
+        {
+          "id": "perplexity-web",
+          "alias": "pplx-web"
+        },
+        {
+          "id": "blackbox-web",
+          "alias": "bb-web"
+        },
+        {
+          "id": "muse-spark-web",
+          "alias": "ms-web"
+        },
+        {
+          "id": "claude-web",
+          "alias": "cw"
+        },
+        {
+          "id": "deepseek-web",
+          "alias": "ds-web"
+        },
+        {
+          "id": "copilot-web",
+          "alias": "copilot"
+        },
+        {
+          "id": "copilot-m365-web",
+          "alias": "m365copilot"
+        },
+        {
+          "id": "t3-web",
+          "alias": "t3chat"
+        },
+        {
+          "id": "inner-ai",
+          "alias": "in-ai"
+        },
+        {
+          "id": "adapta-web",
+          "alias": "adp-web"
+        },
+        {
+          "id": "lmarena",
+          "alias": "lma"
+        },
+        {
+          "id": "yuanbao-web",
+          "alias": "ybw"
+        },
+        {
+          "id": "tencent-aistudio-web",
+          "alias": "tasw"
+        },
+        {
+          "id": "huggingchat",
+          "alias": "huggingchat"
+        },
+        {
+          "id": "kagi-assistant",
+          "alias": "kagi"
+        },
+        {
+          "id": "poe-web",
+          "alias": null,
+          "note": "Its alias \"poe\" is also the id of the separate Poe API-key gateway, so it is not guarded here."
+        },
+        {
+          "id": "venice-web",
+          "alias": "ven"
+        },
+        {
+          "id": "v0-vercel-web",
+          "alias": "v0-vercel-web"
+        },
+        {
+          "id": "kimi-web",
+          "alias": "kimi-web"
+        },
+        {
+          "id": "doubao-web",
+          "alias": "db"
+        },
+        {
+          "id": "zenmux-free",
+          "alias": "zmf"
+        },
+        {
+          "id": "tinycms-web",
+          "alias": "tcw"
+        },
+        {
+          "id": "zai-web",
+          "alias": "zw"
+        },
+        {
+          "id": "promptql",
+          "alias": "pql"
+        },
+        {
+          "id": "notion-web",
+          "alias": "nw"
+        },
+        {
+          "id": "adobe-firefly",
+          "alias": "firefly"
+        },
+        {
+          "id": "hyperagent",
+          "alias": "ha"
+        },
+        {
+          "id": "notrack-web",
+          "alias": "ntw"
+        },
+        {
+          "id": "conol-web",
+          "alias": "cnl"
+        },
+        {
+          "id": "twinmind",
+          "alias": "tm"
+        },
+        {
+          "id": "syntx",
+          "alias": "stx"
+        },
+        {
+          "id": "maxai",
+          "alias": "mx"
+        },
+        {
+          "id": "uc",
+          "alias": "ucn"
+        },
+        {
+          "id": "chatplayground",
+          "alias": "cpl"
+        }
+      ]
+    }
+  ]
+}

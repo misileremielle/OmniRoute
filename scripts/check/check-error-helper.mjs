@@ -97,10 +97,6 @@ export const KNOWN_MISSING_ERROR_HELPER = new Set([
   "src/app/api/providers/[id]/codex-auth/apply-local/route.ts",
   "src/app/api/providers/[id]/codex-auth/export/route.ts",
 
-  // --- Executors forwarding a raw caught error into the response body.
-  "open-sse/executors/copilot-web.ts",
-  "open-sse/executors/yuanbao-web.ts",
-
   // --- API routes returning a caught error message directly. Note
   // grok-build-settings:230 forwards a TYPED `GrokBuildConfigConflictError` (an
   // app-defined message, not upstream text) and is latent for the same reason as the

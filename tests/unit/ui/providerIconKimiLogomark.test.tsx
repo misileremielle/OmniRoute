@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * ProviderIcon — Kimi (Moonshot AI) official-partnership theme-aware logomark
- * (2026-07) for the 3 visible Kimi provider cards (kimi-coding, kimi-web,
+ * (2026-07) for the visible Kimi provider cards (kimi-coding,
  * moonshot). Mirrors the "ProviderIcon — Qwen Cloud local asset" pattern in
  * ProviderIcon-icon-url.test.tsx; the lmarena/lma THEMED_SVGS pair is the
  * existing precedent this follows.
@@ -68,7 +68,7 @@ afterEach(async () => {
 });
 
 describe("ProviderIcon — Kimi official-partnership logomark", () => {
-  it.each(["kimi-coding", "kimi-web", "moonshot"])(
+  it.each(["kimi-coding", "moonshot"])(
     "uses the light-background logomark for %s in light theme",
     (providerId) => {
       const container = renderIcon(providerId);
@@ -78,7 +78,7 @@ describe("ProviderIcon — Kimi official-partnership logomark", () => {
     }
   );
 
-  it.each(["kimi-coding", "kimi-web", "moonshot"])(
+  it.each(["kimi-coding", "moonshot"])(
     "uses the dark-background logomark for %s in dark theme",
     (providerId) => {
       useThemeStore.getState().setTheme("dark");

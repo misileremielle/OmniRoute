@@ -35,7 +35,6 @@ import { isRequestScoped400 } from "../accountFallback/requestScoped400.ts";
 import { isAssistantPrefillUnsupported400 } from "../assistantPrefillError.ts";
 import { isResourceNotFoundResponse } from "../errorClassifier.ts";
 import { isOpencodeFreeTierRefusal } from "../../executors/opencodeGeoBlock.ts";
-import { isChatGptWebBridgeFailure } from "../../utils/chatgptWebBridgeFailure.ts";
 import { getTrustedLocalRateLimitResponse } from "../rateLimitManager/errors.ts";
 import { TRANSLATION_FAILURE_CODE } from "../../handlers/chatCore/translationFailure.ts";
 import { isLocalModelPolicyResponse } from "../resolvedModelAccess.ts";
@@ -613,8 +612,6 @@ export function shouldSkipConnDisable(
     (isRequestScopedUpstreamFailure({ code: result.errorCode, type: result.errorType }) &&
       !(provider === "cursor" && isModelNotFound404(result.status, errorText))) ||
     isSelfInflictedUpstreamTimeout(result.status, result.errorType, provider) ||
-    // #14948: a ChatGPT Web browser-bridge failure is local, not an account failure.
-    isChatGptWebBridgeFailure(provider, result.error) ||
     isReqScoped400
   );
 }

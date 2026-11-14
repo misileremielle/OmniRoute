@@ -21,7 +21,6 @@ export interface CompactProviderEntryOptions<TProvider> {
   enterpriseProviderEntries: ProviderCategoryEntries<TProvider>;
   embeddingRerankProviderEntries: ProviderCategoryEntries<TProvider>;
   imageProviderEntries: ProviderCategoryEntries<TProvider>;
-  webCookieProviderEntries: ProviderCategoryEntries<TProvider>;
   searchProviderEntries: ProviderCategoryEntries<TProvider>;
   webFetchEntries: ProviderCategoryEntries<TProvider>;
   localProviderEntries: ProviderCategoryEntries<TProvider>;
@@ -42,7 +41,6 @@ function getCompactProviderEntryGroups<TProvider>({
   enterpriseProviderEntries,
   embeddingRerankProviderEntries,
   imageProviderEntries,
-  webCookieProviderEntries,
   searchProviderEntries,
   webFetchEntries,
   localProviderEntries,
@@ -67,7 +65,6 @@ function getCompactProviderEntryGroups<TProvider>({
   if (activeCategory === "no-auth") return [noAuthEntries];
   if (activeCategory === "upstream-proxy") return [upstreamProxyEntries];
   if (activeCategory === "apikey") return apiKeyEntries;
-  if (activeCategory === "webcookie") return [webCookieProviderEntries];
   if (activeCategory === "search") return [searchProviderEntries];
   if (activeCategory === "webfetch") return [webFetchEntries];
   if (activeCategory === "local") return [localProviderEntries];
@@ -77,7 +74,6 @@ function getCompactProviderEntryGroups<TProvider>({
     compatibleProviderEntries,
     oauthEntries,
     ideProviderEntries,
-    webCookieProviderEntries,
     llmProviderEntries,
     upstreamProxyEntries,
     aggregatorProviderEntries,
@@ -103,7 +99,6 @@ const CATEGORY_AUTH_TYPES: Record<string, string> = {
   "cloud-agent": "cloud-agent",
   "no-auth": "no-auth",
   "upstream-proxy": "upstream-proxy",
-  "web-cookie": "web-cookie",
   audio: "audio",
   local: "local",
   search: "search",

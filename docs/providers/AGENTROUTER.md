@@ -190,7 +190,6 @@ compatible providers. The native provider needs no wire-image configuration and 
 
 ## See also
 
-- [`docs/providers/CLAUDE_WEB.md`](./CLAUDE_WEB.md) — Claude Web provider integration notes
 - [`docs/reference/FREE_TIERS.md`](../reference/FREE_TIERS.md) — Free-tier provider
   catalog
 - [`open-sse/services/claudeCodeCompatible.ts`](../../open-sse/services/claudeCodeCompatible.ts)

@@ -1025,18 +1025,6 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     warningLevel: "info",
   },
   {
-    key: "LMARENA_SYNTHESIZED_CX_ENABLED",
-    label: "Arena Synthesized cx Telemetry",
-    description:
-      "Attach a synthesized programmatic cx client-interaction blob (the value arena.ai itself sends for a page with no recorded interaction) to every Arena (lmarena) create-evaluation request that has no operator-supplied providerSpecificData.cx. Off by default: the cx field is an Arena anti-automation signal, so OmniRoute only forwards a value the operator captured from a real browser session (providerSpecificData.cx) and otherwise sends no cx at all. Unproven upstream benefit; enable only if Arena starts rejecting requests without cx.",
-    descriptionI18nKey: "featureFlagLmarenaSynthesizedCxEnabledDescription",
-    category: "runtime",
-    defaultValue: "false",
-    type: "boolean",
-    requiresRestart: false,
-    warningLevel: "caution",
-  },
-  {
     key: "NATIVE_CODEX_REACTIVE_COMPACTION_ENABLED",
     label: "Native Codex Reactive Compaction",
     description:

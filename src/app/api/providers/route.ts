@@ -61,27 +61,13 @@ import {
   fetchModelSyncInternal,
   getModelSyncInternalBaseUrl,
 } from "@/shared/services/modelSyncScheduler";
-// Dynamically imported below, inside the one `provider === "chatgpt-web-codex"`
-// branch that needs it: this module's transitive chain pulls in tiktoken's
-// WASM tokenizer, which Turbopack dev mode fails to resolve for this graph
-// even with `tiktoken` listed in serverExternalPackages (the standalone
-// Node require works fine; only Turbopack's bundling of this import path
-// doesn't). A static top-level import evaluates that whole chain on EVERY
-// /api/providers request regardless of provider, turning an unrelated-
-// provider bug into a route-wide 500. Loading it lazily, only when actually
-// needed, avoids paying that cost (and that risk) on the common path.
 import { isAutoFetchModelsEnabled } from "@/lib/providerModels/modelDiscovery";
 import { testSingleConnection } from "./[id]/test/route";
 import { rejectRetiredCommonChatGptWebProvider } from "@/lib/providers/chatgptWebRetirementResponse";
-import {
-  chatGptWebStorageStateFromCookieHeader,
-  normalizeChatGptWebStorageState,
-} from "@omniroute/open-sse/utils/chatgptWebExecutorAdapter.ts";
 import { applyOperatorActivationIntent } from "@/lib/providers/operatorDisable";
 import { getRequestPeerLocality } from "@/shared/utils/apiAuth";
 import { hydrateCompatibleNodeCreation } from "@/lib/providers/compatibleNodeCreation";
 import { sanitizeErrorMessage } from "@omniroute/open-sse/utils/error.ts";
-import { parseM365RefreshToken } from "@/lib/providers/m365RefreshToken";
 import { runConnectionFollowUp } from "@/lib/providers/connectionFollowUps";
 
 function projectCodexAccountPoolWithRoutingQuota(
@@ -287,76 +273,8 @@ export async function POST(request: Request) {
     let providerSpecificData = incomingPsd || null;
     let persistedApiKey = apiKey;
 
-    const m365Token = parseM365RefreshToken(provider, incomingPsd);
-    if (!m365Token.success) {
-      return NextResponse.json(
-        {
-          error: {
-            message: sanitizeErrorMessage("Invalid request"),
-            details: [
-              {
-                field: "providerSpecificData.refreshToken",
-                message: sanitizeErrorMessage("Refresh token must be a bounded plaintext string"),
-              },
-            ],
-          },
-        },
-        { status: 400 }
-      );
-    }
-    if (provider === "copilot-m365-web" && providerSpecificData) {
-      providerSpecificData = { ...providerSpecificData };
-      delete providerSpecificData.refreshToken;
-    }
-
     if (provider === "qoder") {
       providerSpecificData = normalizeQoderPatProviderData(providerSpecificData || {});
-    }
-
-    if (provider === "chatgpt-web" && typeof apiKey === "string") {
-      try {
-        persistedApiKey = JSON.stringify(normalizeChatGptWebStorageState(JSON.parse(apiKey)));
-      } catch (error) {
-        if (!(error instanceof SyntaxError)) {
-          return NextResponse.json(
-            { error: "ChatGPT Web storage state JSON is invalid or contains foreign origins" },
-            { status: 400 }
-          );
-        }
-        try {
-          persistedApiKey = JSON.stringify(chatGptWebStorageStateFromCookieHeader(apiKey));
-        } catch {
-          return NextResponse.json(
-            { error: "ChatGPT Web storage state JSON or Cookie header is invalid" },
-            { status: 400 }
-          );
-        }
-      }
-    }
-
-    if (provider === "chatgpt-web-codex") {
-      const validationId =
-        providerSpecificData && typeof providerSpecificData.validationId === "string"
-          ? providerSpecificData.validationId
-          : "";
-      try {
-        const { finalizeValidatedChatGptWebCodexSecrets } =
-          await import("@omniroute/open-sse/services/chatgptWebCodexAdmin.ts");
-        const finalized = finalizeValidatedChatGptWebCodexSecrets(apiKey || "", validationId);
-        persistedApiKey = finalized.encodedCredential;
-        providerSpecificData = { ...(providerSpecificData || {}) };
-        delete providerSpecificData.validationId;
-      } catch (error) {
-        return NextResponse.json(
-          {
-            error:
-              error instanceof Error
-                ? error.message
-                : "Die ChatGPT-Browserprüfung konnte nicht abgeschlossen werden.",
-          },
-          { status: 400 }
-        );
-      }
     }
 
     if (isOpenAICompatibleProvider(provider)) {
@@ -412,7 +330,6 @@ export async function POST(request: Request) {
       authType: "apikey",
       name,
       apiKey: persistedApiKey,
-      ...(m365Token.data.refreshToken ? { refreshToken: m365Token.data.refreshToken } : {}),
       priority: priority || 1,
       globalPriority: globalPriority || null,
       defaultModel: defaultModel || null,

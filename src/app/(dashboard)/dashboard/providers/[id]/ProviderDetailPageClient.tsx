@@ -91,7 +91,6 @@ export default function ProviderDetailPageClient() {
   const [siliconFlowInitialBaseUrl, setSiliconFlowInitialBaseUrl] = useState<string | undefined>();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showEditNodeModal, setShowEditNodeModal] = useState(false);
-  const [showTutorialModal, setShowTutorialModal] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState(null);
   const [proxyTarget, setProxyTarget] = useState(null);
   const [importCodexModalOpen, setImportCodexModalOpen] = useState(false);
@@ -271,7 +270,6 @@ export default function ProviderDetailPageClient() {
 
   const oauthProviderId = resolveProviderOAuthBackendId(providerId, providerInfo);
   const providerSupportsOAuth =
-    providerId === "copilot-m365-web" ||
     providerInfo?.toggleAuthType === "oauth" ||
     providerInfo?.toggleAuthType === "free" ||
     oauthProviderId !== providerId ||
@@ -586,7 +584,6 @@ export default function ProviderDetailPageClient() {
         connectionsCount={displayConnectionCount}
         isOpenAICompatible={isOpenAICompatible}
         isAnthropicProtocolCompatible={isAnthropicProtocolCompatible}
-        onOpenTutorial={() => setShowTutorialModal(true)}
         t={t}
       />
 
@@ -972,8 +969,6 @@ export default function ProviderDetailPageClient() {
         importProgress={importProgress}
         showImportModal={showImportModal}
         setShowImportModal={setShowImportModal}
-        showTutorialModal={showTutorialModal}
-        setShowTutorialModal={setShowTutorialModal}
         t={t}
       />
 

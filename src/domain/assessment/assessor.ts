@@ -16,12 +16,6 @@ import type {
   AssessmentScope,
   AssessmentTrigger,
 } from "./types";
-import {
-  ASSESSMENT_PROBE_MARK,
-  CHAT_PROBE_NOT_ISOLATED_MESSAGE,
-  chatProbeLeavesNoConversation,
-  isChatProbeRefusal,
-} from "@/lib/providers/chatProbePolicy";
 import { DEFAULT_ASSESSMENT_CONFIG, PROBE_MESSAGES, PROBE_MAX_TOKENS } from "./types";
 
 interface ProbeResult {
@@ -31,13 +25,6 @@ interface ProbeResult {
   supportsStreaming?: boolean;
   content?: string;
 }
-
-/** Not assessed, rather than broken, when the probe policy keeps it off a signed-in account. */
-const NOT_ASSESSED: ProbeResult = {
-  status: "unknown",
-  latencyMs: 0,
-  error: CHAT_PROBE_NOT_ISOLATED_MESSAGE,
-};
 
 /** The assessment status a probe response stands for. */
 async function readProbeResponse(response: Response, latencyMs: number): Promise<ProbeResult> {
@@ -52,18 +39,6 @@ async function readProbeResponse(response: Response, latencyMs: number): Promise
   if (response.status === 400) {
     const body = await response.text();
     return { status: "broken", latencyMs, error: `Bad request: ${body.slice(0, 200)}` };
-  }
-
-  if (
-    response.status === 422 &&
-    isChatProbeRefusal(
-      await response
-        .clone()
-        .json()
-        .catch(() => null)
-    )
-  ) {
-    return NOT_ASSESSED;
   }
 
   if (!response.ok) {
@@ -100,9 +75,6 @@ export class Assessor {
     modelId: string,
     level: ProbeLevel = "quick"
   ): Promise<ProbeResult> {
-    // An assessment is an automated probe: it must not leave a conversation on a signed-in
-    // account (#14780).
-    if (!(await chatProbeLeavesNoConversation(providerId))) return NOT_ASSESSED;
     const messages = PROBE_MESSAGES[level];
     const maxTokens = PROBE_MAX_TOKENS[level];
     const controller = new AbortController();
@@ -115,8 +87,6 @@ export class Assessor {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${this.apiKey}`,
-          // Lets the chat pipeline gate every target this probe reaches, e.g. inside a combo.
-          "X-Internal-Test": ASSESSMENT_PROBE_MARK,
         },
         body: JSON.stringify({
           model: `${providerId}/${modelId}`,
@@ -155,9 +125,6 @@ export class Assessor {
       if (result.status === "auth_error" || result.status === "broken") break;
     }
 
-    // Every probe refused by the isolation gate: the model was not tested, so its
-    // failure streak and probe count stay as they were.
-    const notAssessed = probeResults.every((r) => r === NOT_ASSESSED);
     const bestResult = probeResults.find((r) => r.status === "working") ?? probeResults[0];
     const latencies = probeResults.filter((r) => r.status === "working").map((r) => r.latencyMs);
 
@@ -180,11 +147,8 @@ export class Assessor {
       tier: "balanced",
       lastTested: now,
       lastError: bestResult.error ?? null,
-      consecutiveFails:
-        bestResult.status === "working"
-          ? 0
-          : (existing?.consecutiveFails ?? 0) + (notAssessed ? 0 : 1),
-      probeCount: (existing?.probeCount ?? 0) + (notAssessed ? 0 : probeResults.length),
+      consecutiveFails: bestResult.status === "working" ? 0 : (existing?.consecutiveFails ?? 0) + 1,
+      probeCount: (existing?.probeCount ?? 0) + probeResults.length,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };
@@ -214,8 +178,6 @@ export class Assessor {
 
     for (const { providerId, modelId } of models) {
       const assessment = await this.assessModel(providerId, modelId);
-      // A model the isolation gate kept from every probe was not tested.
-      if (assessment.status === NOT_ASSESSED.status) continue;
       run.modelsTested++;
       if (assessment.status === "working") run.modelsPassed++;
       else if (assessment.status === "rate_limited") run.modelsRateLimited++;

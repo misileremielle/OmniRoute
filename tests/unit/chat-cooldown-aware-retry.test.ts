@@ -91,49 +91,6 @@ test.after(async () => {
   await harness.cleanup();
 });
 
-test("handleChat does not probe Claude Web repeatedly after an upstream 429", async () => {
-  await seedConnection("claude-web", {
-    apiKey: "sessionKey=fake-session",
-  });
-  await settingsDb.updateSettings({
-    requestRetry: 3,
-    maxRetryIntervalSec: 3,
-  });
-
-  let completionCalls = 0;
-  __setTlsFetchOverrideForTesting(async (url) => {
-    if (url.endsWith("/organizations")) {
-      return {
-        status: 200,
-        headers: new Headers({ "Content-Type": "application/json" }),
-        text: JSON.stringify([{ uuid: "org-test" }]),
-        body: null,
-      };
-    }
-
-    completionCalls += 1;
-    return {
-      status: 429,
-      headers: new Headers({ "Content-Type": "application/json" }),
-      text: JSON.stringify({ error: { message: "Rate limited." } }),
-      body: null,
-    };
-  });
-
-  const response = await handleChat(
-    buildRequest({
-      body: {
-        model: "claude-web/claude-opus-5",
-        stream: false,
-        messages: [{ role: "user", content: "do not retry a Claude Web 429" }],
-      },
-    })
-  );
-
-  assert.equal(response.status, 429);
-  assert.equal(completionCalls, 1);
-});
-
 test(
   "handleChat waits for a short cooldown and retries once within the configured budget",
   { timeout: 30_000 },

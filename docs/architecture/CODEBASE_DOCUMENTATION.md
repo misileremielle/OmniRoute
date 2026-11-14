@@ -476,14 +476,14 @@ open-sse/
 directly or through `DefaultExecutor` or another executor; the remaining modules are per-provider
 helpers (tool schemas, fetch/TTS adapters, quirk handlers). Executors include:
 
-`antigravity`, `azure-openai`, `blackbox-web`, `cliproxyapi`,
-`chatgpt-web-codex`, `cloudflare-ai`, `codex`, `commandCode`, `cursor`, `default`, `devin-cli`,
-`muse-spark-web`, `nlpcloud`, `opencode`, `perplexity-web`, `petals`,
+`antigravity`, `azure-openai`, `cliproxyapi`,
+`cloudflare-ai`, `codex`, `commandCode`, `cursor`, `default`, `devin-cli`,
+`nlpcloud`, `opencode`, `petals`,
 `pollinations`, `qoder`, `vertex`, `devin-desktop`, plus `claudeIdentity.ts`
 (shared identity helper) and `index.ts` (registry).
 
 > Note: providers not listed here are served by `default.ts` using the generic
-> OpenAI-compatible executor. The full provider catalog (367 providers) lives in
+> OpenAI-compatible executor. The full provider catalog (329 providers) lives in
 > `src/shared/constants/providers.ts`.
 
 ### 4.3 `open-sse/translator/`

@@ -13,12 +13,9 @@ export function buildConnectionConcurrencyFields(connection: ProviderConnectionV
   rateLimitMaxConcurrent: number | null;
   modelConcurrency: Record<string, number> | null;
 } {
-  // M365 admits one turn per account, across all models. Use the existing
-  // account semaphore via credentials; overrides must not reopen parallel turns.
-  const serialM365 = connection.provider === "copilot-m365-web";
   return {
-    maxConcurrent: serialM365 ? 1 : connection.maxConcurrent,
-    rateLimitMaxConcurrent: serialM365 ? 1 : connection.rateLimitMaxConcurrent,
+    maxConcurrent: connection.maxConcurrent,
+    rateLimitMaxConcurrent: connection.rateLimitMaxConcurrent,
     modelConcurrency: normalizeModelConcurrencyMap(connection.rateLimitOverrides?.modelConcurrency),
   };
 }

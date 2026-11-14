@@ -7,8 +7,6 @@ import { NOAUTH_PROVIDERS } from "./providers/noauth";
 export { supportsNoAuthProviderProxy } from "./providers/noauth";
 import { OAUTH_PROVIDERS } from "./providers/oauth";
 import { NOAUTH_DEVICE_CODE_PROVIDER_IDS } from "./oauthDeviceCodeProviders";
-import { WEB_COOKIE_PROVIDERS, resolveWebProviderHost } from "./providers/web-cookie";
-export { resolveWebProviderHost };
 import { APIKEY_PROVIDERS } from "./providers/apikey";
 import { LOCAL_PROVIDERS } from "./providers/local";
 import { SEARCH_PROVIDERS } from "./providers/search";
@@ -50,7 +48,6 @@ export function supportsApiKeyOnFreeProvider(providerId: unknown): boolean {
 // Providers presented as one dashboard card with OAuth as the primary action
 // and a direct API-key alternative. Keep these out of FREE_APIKEY_PROVIDER_IDS.
 const DUAL_AUTH_PROVIDER_IDS = new Set([
-  "copilot-m365-web",
   "clinepass",
   "codebuddy-cn",
   "codebuddy-intl",
@@ -267,20 +264,17 @@ export function isSelfHostedChatProvider(providerId: unknown): boolean {
 const EXPLICIT_OPTIONAL_APIKEY_PROVIDER_IDS = new Set([
   "searxng-search",
   "firecrawl",
-  "copilot-web",
   "g4f-groq",
   "g4f-gemini",
   "g4f-pollinations",
   "g4f-ollama",
   "g4f-nvidia",
-  "huggingchat",
   "gitlawb",
   "gitlawb-gmi",
   "naga-ac",
   // UC (uncensored.com) persona: un-metered subscription chat with NO API key —
   // auth is a durable Clerk credential stored in providerSpecificData, from which
   // the executor mints a short-lived session token per connect.
-  "uc",
 ]);
 
 export function providerAllowsOptionalApiKey(providerId: unknown): boolean {
@@ -309,13 +303,6 @@ const BULK_API_KEY_EXCLUDED = new Set([
   "mlx-gemma",
   "mlx-qwen",
   "ollama-local",
-  "grok-web",
-  "perplexity-web",
-  "blackbox-web",
-  "muse-spark-web",
-  "deepseek-web",
-  "chatgpt-web",
-  "inner-ai",
   "qoder",
   "google-pse-search",
   "command-code",
@@ -337,7 +324,6 @@ const _PROVIDER_SECTIONS = [
   NOAUTH_PROVIDERS,
   OAUTH_PROVIDERS,
   APIKEY_PROVIDERS,
-  WEB_COOKIE_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,
   UPSTREAM_PROXY_PROVIDERS,
@@ -352,7 +338,6 @@ function ensureProvidersValidated() {
   validateProviders(NOAUTH_PROVIDERS, "NOAUTH_PROVIDERS");
   validateProviders(OAUTH_PROVIDERS, "OAUTH_PROVIDERS");
   validateProviders(APIKEY_PROVIDERS, "APIKEY_PROVIDERS");
-  validateProviders(WEB_COOKIE_PROVIDERS, "WEB_COOKIE_PROVIDERS");
   validateProviders(LOCAL_PROVIDERS, "LOCAL_PROVIDERS");
   validateProviders(SEARCH_PROVIDERS, "SEARCH_PROVIDERS");
   validateProviders(UPSTREAM_PROXY_PROVIDERS, "UPSTREAM_PROXY_PROVIDERS");
@@ -406,7 +391,6 @@ export function getProviderById(id: string) {
     (NOAUTH_PROVIDERS as Record<string, any>)[id] ??
     (OAUTH_PROVIDERS as Record<string, any>)[id] ??
     (APIKEY_PROVIDERS as Record<string, any>)[id] ??
-    (WEB_COOKIE_PROVIDERS as Record<string, any>)[id] ??
     (LOCAL_PROVIDERS as Record<string, any>)[id] ??
     (SEARCH_PROVIDERS as Record<string, any>)[id] ??
     (UPSTREAM_PROXY_PROVIDERS as Record<string, any>)[id] ??
@@ -440,7 +424,6 @@ export type AiProviderDefinition =
   | (typeof NOAUTH_PROVIDERS)[keyof typeof NOAUTH_PROVIDERS]
   | (typeof OAUTH_PROVIDERS)[keyof typeof OAUTH_PROVIDERS]
   | (typeof APIKEY_PROVIDERS)[keyof typeof APIKEY_PROVIDERS]
-  | (typeof WEB_COOKIE_PROVIDERS)[keyof typeof WEB_COOKIE_PROVIDERS]
   | (typeof LOCAL_PROVIDERS)[keyof typeof LOCAL_PROVIDERS]
   | (typeof SEARCH_PROVIDERS)[keyof typeof SEARCH_PROVIDERS]
   | (typeof UPSTREAM_PROXY_PROVIDERS)[keyof typeof UPSTREAM_PROXY_PROVIDERS]
@@ -522,7 +505,6 @@ export { USAGE_SUPPORTED_PROVIDERS } from "@omniroute/open-sse/services/usage/su
 export {
   NOAUTH_PROVIDERS,
   OAUTH_PROVIDERS,
-  WEB_COOKIE_PROVIDERS,
   APIKEY_PROVIDERS,
   LOCAL_PROVIDERS,
   SEARCH_PROVIDERS,

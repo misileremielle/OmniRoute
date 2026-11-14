@@ -324,8 +324,8 @@ CMD ["node", "dev/run-standalone.mjs"]
 #    runner-base  →  omniroute:VERSION        Lean base (~500 MB). No browsers.
 #    runner-web   →  omniroute:VERSION-web    +Chromium/Playwright (~800 MB).
 #
-#  Use runner-web when you need web-cookie providers (gemini-web, claude-web,
-#  claude-turnstile). For all other providers runner-base is sufficient.
+#  Use runner-web when you need browser-backed integrations (cloudflare-playground,
+#  the Volcano Engine console login). For all other providers runner-base is sufficient.
 #
 #  Build:
 #    docker build --target runner-web -t omniroute:web .

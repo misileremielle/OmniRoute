@@ -22,8 +22,8 @@ test.after(() => cleanupTempDataDir(TEST_DATA_DIR));
 
 test("built-ins are registered at module load and resolve through the registry", async () => {
   const aliases = listExecutorAliases();
-  assert.ok(aliases.length >= 100, `expected the built-in table, got ${aliases.length} aliases`);
-  for (const alias of ["antigravity", "kiro", "glm", "9router", "conol-web"]) {
+  assert.ok(aliases.length >= 50, `expected the built-in table, got ${aliases.length} aliases`);
+  for (const alias of ["antigravity", "kiro", "glm", "9router", "codex"]) {
     assert.ok(hasRegisteredExecutor(alias), `missing built-in: ${alias}`);
     assert.equal(await getExecutor(alias), getRegisteredExecutor(alias));
     assert.ok((await getExecutor(alias)) instanceof BaseExecutor);

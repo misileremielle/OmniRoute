@@ -26,7 +26,6 @@ import { QWEN_CLOUD_TEXT_MODELS } from "@omniroute/open-sse/config/providers/reg
 import { filterAlibabaFreeEligibleModels } from "@omniroute/open-sse/services/alibabaFreeTierDiscovery.ts";
 import { shouldUseLiveAlibabaFreeModelDiscovery } from "@omniroute/open-sse/services/alibabaFreeTier.ts";
 import { isDashscopeTextModelId } from "@omniroute/open-sse/services/dashscopeTextModels.ts";
-import { extractZaiToken } from "@omniroute/open-sse/services/zaiWebCredentials.ts";
 import { buildOpencodeBackgroundHeaders } from "@omniroute/open-sse/utils/opencodeHeaders.ts";
 import { CODEBUDDY_CN_USER_AGENT } from "@omniroute/open-sse/config/providerHeaderProfiles.ts";
 import { isFeatureFlagEnabled } from "@/shared/utils/featureFlags";
@@ -36,7 +35,6 @@ import {
   nextCloudflareModelsPageUrl,
   parseCloudflareModelsSearch,
 } from "./cloudflareModels";
-import { buildChatPlaygroundModelsDiscoveryEntry } from "@omniroute/open-sse/services/chatplaygroundModels.ts";
 import {
   normalizeCodeBuddyCnModelsResponse,
   normalizeOpenAiLikeModelsResponse,
@@ -1077,8 +1075,6 @@ export const PROVIDER_MODELS_CONFIG: Record<string, ProviderModelsConfigEntry> =
     authPrefix: "Bearer ",
     parseResponse: (data) => data.data || data.models || [],
   },
-  chatplayground: buildChatPlaygroundModelsDiscoveryEntry(),
-  cpl: buildChatPlaygroundModelsDiscoveryEntry(),
   // CodeBuddy CN's official CLI reads this authenticated product catalog. Keep
   // the registry snapshot as offline fallback and replace it with the account's
   // live chat roster after a successful discovery sync.

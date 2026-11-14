@@ -265,7 +265,6 @@ function ProvidersPageContent() {
     cloud: "cloudagent",
     noauth: "no-auth",
     proxy: "upstream-proxy",
-    web: "webcookie",
   };
   const showSection = (category: string) => {
     const normalizedCategory = sectionCategoryAliases[category] ?? category;
@@ -273,11 +272,6 @@ function ProvidersPageContent() {
   };
   const t = useTranslations("providers");
   const tc = useTranslations("common");
-  const webCookieProvidersDesc = providerText(
-    t,
-    "webCookieProvidersDesc",
-    "These providers use browser web sessions, cookies, or web tokens instead of API keys. Open a provider to add the required session credential."
-  );
   const ccCompatibleLabel = t("ccCompatibleLabel");
   const addCcCompatibleLabel = t("addCcCompatible");
   const searchParams = useSearchParams();
@@ -659,18 +653,6 @@ function ProvidersPageContent() {
     connections
   );
 
-  const webCookieProviderEntriesAll = buildStaticProviderEntries("web-cookie", getProviderStats);
-  const webCookieProviderEntries = filterConfiguredProviderEntries(
-    webCookieProviderEntriesAll,
-    effectiveShowConfiguredOnly,
-    searchQuery,
-    showFreeOnly,
-    modelSearchQuery,
-    activeServiceKind,
-    liveModelsByProviderId,
-    connections
-  );
-
   const localProviderEntriesAll = buildStaticProviderEntries("local", getProviderStats);
   const localProviderEntries = filterConfiguredProviderEntries(
     localProviderEntriesAll,
@@ -764,7 +746,6 @@ function ProvidersPageContent() {
     ...oauthProviderEntriesAll,
     ...noAuthEntriesAll,
     ...apiKeyProviderEntriesAll,
-    ...webCookieProviderEntriesAll,
     ...localProviderEntriesAll,
     ...searchProviderEntriesAll,
     ...cloudAgentProviderEntriesAll,
@@ -840,7 +821,6 @@ function ProvidersPageContent() {
     enterpriseProviderEntries,
     embeddingRerankProviderEntries,
     imageProviderEntries,
-    webCookieProviderEntries,
     searchProviderEntries,
     webFetchEntries,
     localProviderEntries,
@@ -854,7 +834,6 @@ function ProvidersPageContent() {
     oauth: countConfigured(oauthOnlyEntriesAll),
     apikey: countConfigured(apiKeyProviderEntriesAll),
     compatible: countConfigured(compatibleProviderEntriesAll),
-    webcookie: countConfigured(webCookieProviderEntriesAll),
     search: countConfigured(searchProviderEntriesAll),
     local: countConfigured(localProviderEntriesAll),
     upstreamproxy: countConfigured(upstreamProxyEntriesAll),
@@ -1210,57 +1189,6 @@ function ProvidersPageContent() {
                     )}
                   </ProviderCardGrid>
                 )}
-              </div>
-            )}
-
-            {/* Web / Cookie Providers */}
-            {showSection("web") && webCookieProviderEntries.length > 0 && (
-              <div className="flex flex-col gap-4">
-                <SectionHeader
-                  title={
-                    <span className="flex items-center gap-2">
-                      {t("webCookieProviders")}{" "}
-                      <CategoryDot
-                        category="web-cookie"
-                        size="md"
-                        label={t("webCookieProviders")}
-                      />
-                      <ProviderCountBadge {...countConfigured(webCookieProviderEntriesAll)} />
-                    </span>
-                  }
-                  description={t("webCookieProvidersDesc")}
-                  actions={
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        icon="play_arrow"
-                        loading={testingMode === "web-cookie"}
-                        onClick={() => handleBatchTest("web-cookie")}
-                        disabled={!!testingMode}
-                        title={t("testAll")}
-                      >
-                        {testingMode === "web-cookie" ? t("testing") : t("testAll")}
-                      </Button>
-                    </>
-                  }
-                />
-                <ProviderCardGrid>
-                  {webCookieProviderEntries.map(
-                    ({ providerId, provider, stats, toggleAuthType }) => (
-                      <HighlightableProviderCard
-                        key={providerId}
-                        providerId={providerId}
-                        provider={provider}
-                        stats={stats}
-                        authType="web-cookie"
-                        onToggle={(active) =>
-                          handleToggleProvider(providerId, toggleAuthType, active)
-                        }
-                      />
-                    )
-                  )}
-                </ProviderCardGrid>
               </div>
             )}
 

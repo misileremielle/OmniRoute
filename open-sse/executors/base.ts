@@ -1505,9 +1505,8 @@ export class BaseExecutor {
         // `anthropic-compatible-cc-*` relays — the latter advertise Claude Code
         // compatibility, so they are the relays most likely to accept the beta. A
         // rejecting upstream is caught by the 400-fallback below. Deliberately
-        // EXCLUDED: `claude-web` (a browser relay with a `create_conversation_params`
-        // request shape that never sees `context_management`) and generic
-        // `anthropic-compatible-*` (third-party endpoints with uncertain beta support).
+        // EXCLUDED: generic `anthropic-compatible-*` (third-party endpoints with
+        // uncertain beta support).
         // `contextEditingDisabled` (set by the 400-fallback) suppresses re-injection
         // when a fresh `transformedBody` is built for a retry/fallback URL.
         if (

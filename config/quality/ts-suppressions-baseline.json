@@ -1,5 +1,4 @@
 {
-  "open-sse/executors/copilot-web.ts": 1,
   "open-sse/mcp-server/server.ts": 21,
   "open-sse/services/usage/qoder.ts": 1,
   "src/app/api/system/env/repair/route.ts": 1,

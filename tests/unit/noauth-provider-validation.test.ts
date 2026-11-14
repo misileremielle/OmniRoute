@@ -25,11 +25,6 @@ test("kimi API key provider uses the specialized Moonshot executor", () => {
   assert.equal(hasSpecializedExecutor("kimi"), true);
 });
 
-// no regression: kimi-web and kimi-coding still have their executors
-test("kimi-web still has specialized executor", () => {
-  assert.equal(hasSpecializedExecutor("kimi-web"), true);
-});
-
 test("kimi-coding-apikey still has specialized executor", () => {
   assert.equal(hasSpecializedExecutor("kimi-coding-apikey"), true);
 });

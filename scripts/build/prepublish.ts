@@ -257,42 +257,6 @@ if (existsSync(mcpSrcFile)) {
   }
 }
 
-const chatGptWebCodexMcpSrcFile = join(
-  ROOT,
-  "open-sse",
-  "vendor",
-  "codex-chatgpt-web",
-  "adapters",
-  "chatgpt-web",
-  "mcp-server.ts"
-);
-const chatGptWebCodexMcpDestFile = join(
-  DIST_DIR,
-  "open-sse",
-  "vendor",
-  "codex-chatgpt-web",
-  "adapters",
-  "chatgpt-web",
-  "mcp-server.js"
-);
-if (existsSync(chatGptWebCodexMcpSrcFile)) {
-  console.log("  🔨 Bundling ChatGPT Web (Codex) MCP bridge...");
-  mkdirSync(dirname(chatGptWebCodexMcpDestFile), { recursive: true });
-  runBuildTool(
-    "esbuild",
-    "esbuild",
-    [
-      "open-sse/vendor/codex-chatgpt-web/adapters/chatgpt-web/mcp-server.ts",
-      "--bundle",
-      "--platform=node",
-      "--packages=external",
-      "--format=esm",
-      `--outfile=${chatGptWebCodexMcpDestFile}`,
-    ],
-    { cwd: ROOT, stdio: "inherit" }
-  );
-}
-
 // ── Step 8.6: Bundle call-log artifact worker ────────────────────────
 const healthWorkerDest = join(DIST_DIR, "src/lib/db/healthCheckWorker.js");
 mkdirSync(dirname(healthWorkerDest), { recursive: true });

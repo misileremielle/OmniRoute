@@ -24,23 +24,13 @@ import type { AlternateFormat } from "@omniroute/open-sse/config/providers/alter
 import {
   type ProviderMessageTranslator,
   providerText,
-  getWebSessionCredentialLabel,
-  getWebSessionCredentialHint,
-  getWebSessionCredentialCheckLabel,
   getAddCredentialModalTitle,
 } from "./providerCredentialText";
 
 // Re-exported for backward compatibility — these used to be defined here
 // (Issue #3501 strangler-fig home), but were extracted to providerCredentialText.ts
 // once this leaf hit its frozen file-size cap (#1904 own growth).
-export {
-  type ProviderMessageTranslator,
-  providerText,
-  getWebSessionCredentialLabel,
-  getWebSessionCredentialHint,
-  getWebSessionCredentialCheckLabel,
-  getAddCredentialModalTitle,
-};
+export { type ProviderMessageTranslator, providerText, getAddCredentialModalTitle };
 
 // ---------------------------------------------------------------------------
 // Types shared between page + modals

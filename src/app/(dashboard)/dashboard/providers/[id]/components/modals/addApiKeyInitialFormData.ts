@@ -1,4 +1,3 @@
-import { CHATGPT_WEB_CODEX_CONNECTOR_NAME } from "@/shared/constants/chatgptWebCodex";
 import { defaultValidationModelIdForProvider } from "../../providerPageHelpers";
 import { computeConnectionDefaultName } from "./computeConnectionDefaultName";
 import { EMPTY_QUOTA_SCRAPING_FIELDS } from "./QuotaScrapingFields";
@@ -31,7 +30,6 @@ export function createInitialAddApiKeyFormData({
     name: computeConnectionDefaultName(existingConnectionNames),
     apiKey: "",
     tokenSecret: "", // #5446 — Modal Token Secret (joined with apiKey as id:secret)
-    m365RefreshToken: "",
     defaultModel: "",
     priority: 1,
     baseUrl: initialBaseUrl || defaultBaseUrl,
@@ -58,8 +56,5 @@ export function createInitialAddApiKeyFormData({
     passthroughModels: false,
     importFreeModelsOnly: false,
     commandCodeZdrEnabled: false,
-    tunnelId: "",
-    runtimeKey: "",
-    connectorName: CHATGPT_WEB_CODEX_CONNECTOR_NAME,
   };
 }

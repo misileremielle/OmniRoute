@@ -73,23 +73,6 @@ describe("resolveKeepaliveThreshold", () => {
     assert.equal(resolveKeepaliveThreshold("opencode-zen/gpt-4"), DEFAULT_MS);
   });
 
-  it("uses a longer threshold for clean-room ChatGPT Web but not its retired alias", () => {
-    assert.equal(resolveKeepaliveThreshold("chatgpt-web/gpt-5"), SLOW_MS);
-    assert.equal(resolveKeepaliveThreshold("cgpt-web/gpt-5"), DEFAULT_MS);
-  });
-
-  it("keeps the longer threshold for ChatGPT Web Codex", () => {
-    assert.equal(resolveKeepaliveThreshold("chatgpt-web-codex/high"), SLOW_MS);
-  });
-
-  it("returns the slow threshold for web-session provider (grok-web)", () => {
-    assert.equal(resolveKeepaliveThreshold("grok-web/grok-4"), SLOW_MS);
-  });
-
-  it("returns the slow threshold for web-session provider (claude-web)", () => {
-    assert.equal(resolveKeepaliveThreshold("claude-web/claude-sonnet-4"), SLOW_MS);
-  });
-
   it("keeps the default tier strictly below the observed client first-byte watchdog", () => {
     // The regression this pins: the old 2 000 ms default equalled the watchdog, so
     // the keepalive byte and the client's abort raced and the abort won — every
@@ -125,10 +108,6 @@ describe("resolveKeepaliveThreshold", () => {
     assert.ok(SLOW_KEEPALIVE_PROVIDERS.has("pollinations"));
     assert.ok(SLOW_KEEPALIVE_PROVIDERS.has("pol"));
     assert.ok(!SLOW_KEEPALIVE_PROVIDERS.has("opencode-zen"));
-    assert.ok(SLOW_KEEPALIVE_PROVIDERS.has("chatgpt-web"));
-    assert.ok(SLOW_KEEPALIVE_PROVIDERS.has("chatgpt-web-codex"));
-    assert.ok(SLOW_KEEPALIVE_PROVIDERS.has("grok-web"));
-    assert.ok(SLOW_KEEPALIVE_PROVIDERS.has("claude-web"));
   });
 
   it("SLOW_KEEPALIVE_PROVIDERS does not contain normal providers", () => {

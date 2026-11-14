@@ -126,7 +126,7 @@ export function buildFamilyCandidateFilter(
     const bareModel = candidate.model.slice(candidate.model.lastIndexOf("/") + 1);
     return (
       family === "kimi" &&
-      ["kimi-coding", "kimi-coding-apikey", "kimi-web"].includes(candidate.provider) &&
+      ["kimi-coding", "kimi-coding-apikey"].includes(candidate.provider) &&
       /^k3(?:$|[.-])/.test(bareModel.toLowerCase())
     );
   };

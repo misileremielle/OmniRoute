@@ -614,5 +614,4 @@ export const PROVIDERS = {
   ZED_HOSTED: "zed-hosted",
   MUSE_CODE: "muse-code",
   MINIMAX_CODE: "minimax-code",
-  COPILOT_M365_WEB: "copilot-m365-web",
 };

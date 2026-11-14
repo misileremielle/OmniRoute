@@ -21,7 +21,6 @@ export interface ProviderSummaryStats {
   oauth: SummaryStat;
   apikey: SummaryStat;
   compatible: SummaryStat;
-  webcookie: SummaryStat;
   search: SummaryStat;
   local: SummaryStat;
   upstreamproxy: SummaryStat;
@@ -128,11 +127,6 @@ export default function ProviderSummaryCard({
       key: "compatible",
       label: t("compatibleLabel"),
       stat: summaryStats.compatible,
-    },
-    {
-      key: "webcookie",
-      label: providerText(t, "categoryWebCookie", "Web Cookie"),
-      stat: summaryStats.webcookie,
     },
     {
       key: "search",

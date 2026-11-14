@@ -640,12 +640,10 @@ function isCachedPoolMemberSetAside(entry: ProxyResolutionCacheEntry): boolean {
 // Providers that need a STABLE egress across requests, never rotated under them by this
 // cache-invalidation path (#13575): opencode's free-tier quota is bucketed by egress IP
 // (EGRESS_BUCKETED_LOCK_PROVIDERS — rotating would fragment one connection's quota across
-// several IPs), and grok-web's cf_clearance cookie is pinned to the IP/User-Agent/TLS
-// fingerprint that earned it (src/shared/providers/webSessionCredentials.ts "grok-web" —
-// rotating the egress would turn every subsequent request into a Cloudflare 403).
+// several IPs).
 function requiresStableEgress(provider: string | null): boolean {
   if (!provider) return false;
-  return isEgressBucketedLockScope(provider) || provider.toLowerCase() === "grok-web";
+  return isEgressBucketedLockScope(provider);
 }
 
 // The chat-path cache (below) exists so a hot connection does not pay the full resolution

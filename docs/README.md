@@ -22,7 +22,6 @@ Simple guides for using OmniRoute — no technical background needed.
 - [AUTO-COMBO-GUIDE.md](getting-started/AUTO-COMBO-GUIDE.md) — let OmniRoute pick the best AI for you.
 - [PROVIDERS-GUIDE.md](getting-started/PROVIDERS-GUIDE.md) — how to connect AI providers.
 - [FREE-TIERS-GUIDE.md](getting-started/FREE-TIERS-GUIDE.md) — get free AI with no credit card.
-- [WEB-COOKIE-GUIDE.md](getting-started/WEB-COOKIE-GUIDE.md) — web cookie providers (session-credential setup).
 
 ### guides/
 
@@ -146,9 +145,6 @@ Prompt compression engines, rules, and language packs.
 
 Provider-specific integration guides.
 
-- [CLAUDE_WEB.md](providers/CLAUDE_WEB.md) — Claude Web (cookie-auth) provider.
-- [CHATGPT_WEB.md](providers/CHATGPT_WEB.md) — ChatGPT Web (Codex) provider and common-provider retirement note.
-- [COPILOT-M365.md](providers/COPILOT-M365.md) — Microsoft 365 Copilot (BizChat) provider.
 - [ALIBABA-QWEN-PROVIDER-FAMILIES.md](providers/ALIBABA-QWEN-PROVIDER-FAMILIES.md) — Alibaba and Qwen provider families.
 - [AGENTROUTER.md](providers/AGENTROUTER.md) — AgentRouter setup.
 - [ZED-DOCKER.md](providers/ZED-DOCKER.md) — Zed IDE integration under Docker.

@@ -20,25 +20,6 @@ async function apikeyRows(provider: string) {
   return rows.filter((r) => r.authType === "apikey");
 }
 
-test("web-cookie provider, apikey path: same name + different session keeps both accounts", async () => {
-  await db.createProviderConnection({
-    provider: "claude-web",
-    authType: "apikey",
-    name: "work",
-    apiKey: "session=A_SESSION",
-    isActive: true,
-  });
-  await db.createProviderConnection({
-    provider: "claude-web",
-    authType: "apikey",
-    name: "work",
-    apiKey: "session=B_SESSION",
-    isActive: true,
-  });
-  const keys = (await apikeyRows("claude-web")).map((r) => r.apiKey).sort();
-  assert.deepEqual(keys, ["session=A_SESSION", "session=B_SESSION"]);
-});
-
 test("web-cookie provider, apikey path: same session re-added still dedups in place", async () => {
   await db.createProviderConnection({
     provider: "grok-web",

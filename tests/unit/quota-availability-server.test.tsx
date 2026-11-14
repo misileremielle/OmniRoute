@@ -136,9 +136,6 @@ vi.mock("@/app/api/providers/[id]/test/route", () =>
 vi.mock("@/lib/usage/providerLimits/credentialRefresh", () => ({
   refreshAndUpdateCredentialsWithResolver: guard.blocked("refreshAndUpdateCredentialsWithResolver"),
 }));
-vi.mock("@/lib/kimi/tokenRefresh", () => ({
-  refreshKimiProviderConnection: guard.blocked("refreshKimiProviderConnection"),
-}));
 vi.mock("@/lib/oauth/services/cursorLogin", () => ({
   refreshCursorAccessToken: guard.blocked("refreshCursorAccessToken"),
 }));
@@ -246,7 +243,6 @@ it("availability GET reads snapshots without fetchers, writes, refreshes or shar
       import("@/lib/api/modelTestRunner"),
       import("@/lib/db/providerLimits"),
       import("@/lib/usage/providerLimits/credentialRefresh"),
-      import("@/lib/kimi/tokenRefresh"),
       import("@/lib/oauth/services/cursorLogin"),
       import("@/lib/tokenHealthCheckCopilot"),
     ]);

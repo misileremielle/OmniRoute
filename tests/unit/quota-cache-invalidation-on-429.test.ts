@@ -37,7 +37,6 @@ import { registerCrofUsageFetcher } from "../../open-sse/services/crofUsageFetch
 import { registerDeepseekQuotaFetcher } from "../../open-sse/services/deepseekQuotaFetcher.ts";
 import { registerFirecrawlQuotaFetcher } from "../../open-sse/services/firecrawlQuotaFetcher.ts";
 import { registerGrokCliQuotaFetcher } from "../../open-sse/services/grokCliQuotaFetcher.ts";
-import { registerGrokWebQuotaFetcher } from "../../open-sse/services/grokQuotaFetcher.ts";
 import { registerJinaQuotaFetcher } from "../../open-sse/services/jinaQuotaFetcher.ts";
 import { registerLlmgatewayQuotaFetcher } from "../../open-sse/services/llmgatewayQuotaFetcher.ts";
 import { registerLyceumQuotaFetcher } from "../../open-sse/services/lyceumQuotaFetcher.ts";
@@ -330,7 +329,6 @@ test("every bespoke quota fetcher registers an invalidator for all of its provid
   registerDeepseekQuotaFetcher();
   registerFirecrawlQuotaFetcher();
   registerGrokCliQuotaFetcher();
-  registerGrokWebQuotaFetcher();
   registerJinaQuotaFetcher();
   registerLlmgatewayQuotaFetcher();
   registerLyceumQuotaFetcher();
@@ -351,7 +349,6 @@ test("every bespoke quota fetcher registers an invalidator for all of its provid
     "deepseek",
     "firecrawl",
     "grok-cli",
-    "grok-web",
     "jina-search",
     "jina",
     "jina-ai",

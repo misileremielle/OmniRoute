@@ -61,7 +61,6 @@ test("startup still registers bespoke, batch, and generic quota fetchers", async
     "deepseek",
     "openrouter",
     "opencode-go",
-    "grok-web",
     "antigravity",
   ]) {
     assert.equal(typeof getQuotaFetcher(provider), "function", `${provider} quota fetcher missing`);

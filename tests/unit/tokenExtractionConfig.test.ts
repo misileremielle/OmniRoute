@@ -16,8 +16,8 @@ describe("tokenExtractionConfig", () => {
     assert.ok(TOKEN_EXTRACTION_CONFIGS instanceof Map);
   });
 
-  it("has at least 21 registered providers (18 existing + 3 new)", () => {
-    assert.ok(TOKEN_EXTRACTION_CONFIGS.size >= 21);
+  it("registers only the Volcano Engine console login (web-cookie providers were removed)", () => {
+    assert.deepEqual([...TOKEN_EXTRACTION_CONFIGS.keys()], ["volcengine-console"]);
   });
 
   it("every config has required fields", () => {
@@ -91,59 +91,10 @@ describe("tokenExtractionConfig", () => {
     assert.equal(result, undefined);
   });
 
-  it("getExtractionConfig returns config for known providers", () => {
-    const providers = ["claude-web", "perplexity-web", "gemini-web", "grok-web", "deepseek-web"];
-    for (const id of providers) {
-      const cfg = getExtractionConfig(id);
-      assert.ok(cfg !== undefined, `getExtractionConfig("${id}") returned undefined`);
-      assert.equal(cfg?.providerId, id);
-    }
-  });
-
-  it("does not reduce ChatGPT Web storage-state auth to token extraction", () => {
-    // Clean-room ChatGPT Web requires a complete Playwright storage state, not
-    // a token extracted from localStorage or a raw Cookie header.
-    assert.equal(getExtractionConfig("chatgpt-web"), undefined);
-    assert.equal(getExtractionConfig("cgpt-web"), undefined);
-  });
-
-  it("captures Copilot's bearer authorization header instead of an unrelated cookie", () => {
-    const cfg = getExtractionConfig("copilot-web");
-    assert.deepEqual(cfg?.tokenSources, [{ type: "header", name: "Authorization" }]);
-    assert.doesNotMatch(cfg?.instructions || "", /RPSCAuth/i);
-  });
-
-  it("extracts zai-web auth from localStorage rather than a cookie", () => {
-    const cfg = getExtractionConfig("zai-web");
-    assert.deepEqual(cfg?.tokenSources, [{ type: "localStorage", key: "token" }]);
-    assert.match(cfg?.instructions ?? "", /CAPTCHA/);
-  });
-
   it("listExtractionConfigs returns all configs as an array", () => {
     const all = listExtractionConfigs();
     assert.ok(Array.isArray(all));
     assert.equal(all.length, TOKEN_EXTRACTION_CONFIGS.size);
-  });
-
-  it("includes the 3 new missing providers", () => {
-    const newProviders = ["chatglm-web", "xiaomimimo-web", "manus-web"];
-    for (const id of newProviders) {
-      const cfg = getExtractionConfig(id);
-      assert.ok(cfg !== undefined, `Missing provider "${id}" not found in config`);
-    }
-  });
-
-  it("every provider ID matches the executor naming convention", () => {
-    // volcengine-console is exempt: it extracts a console session cookie for
-    // provider binding (volcenginePlanBinding), not a chat-web credential, so
-    // the "-web" suffix convention does not apply to it.
-    const exempt = new Set(["volcengine-console", "kagi-assistant"]);
-    for (const providerId of TOKEN_EXTRACTION_CONFIGS.keys()) {
-      assert.ok(
-        providerId.endsWith("-web") || exempt.has(providerId),
-        `Provider ID "${providerId}" should follow the "-web" naming convention`
-      );
-    }
   });
 
   it("each cookie token source has a valid domain when specified", () => {

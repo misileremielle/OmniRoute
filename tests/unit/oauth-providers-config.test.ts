@@ -19,8 +19,6 @@ const oauthModule = await import("../../src/lib/oauth/constants/oauth.ts");
 const antigravityHeadersModule = await import("../../open-sse/services/antigravityHeaders.ts");
 const antigravityVersionModule = await import("../../open-sse/services/antigravityVersion.ts");
 const oauthHelpersModule = await import("../../src/lib/oauth/providers.ts");
-const { M365_NATIVE_OAUTH_CONFIG } =
-  await import("../../src/lib/oauth/providers/copilot-m365-web.ts");
 
 const PROVIDERS = providersModule.default;
 const { resolveBrowserOAuthRedirectUri } = oauthHelpersModule;
@@ -95,7 +93,6 @@ const EXPECTED_PROVIDER_KEYS = [
   "zed-hosted",
   "muse-code",
   "minimax-code",
-  "copilot-m365-web",
 ];
 
 const browserUrl = "http://localhost:20128/callback";
@@ -136,7 +133,6 @@ const EXPECTED_CONFIG_BY_PROVIDER = {
   "zed-hosted": ZED_HOSTED_CONFIG,
   "muse-code": MUSE_CODE_CONFIG,
   "minimax-code": MINIMAX_CODE_CONFIG,
-  "copilot-m365-web": M365_NATIVE_OAUTH_CONFIG,
 };
 
 const KIRO_REQUIRED_FIELDS = [
@@ -284,7 +280,7 @@ test("OAuth constants include all provider ids and use a sane timeout", () => {
 });
 
 /** Providers whose token mapper validates the token response and fails closed on bad input. */
-const FAIL_CLOSED_TOKEN_MAPPERS = new Set(["copilot-m365-web"]);
+const FAIL_CLOSED_TOKEN_MAPPERS = new Set<string>([]);
 
 test("every registered OAuth provider has a valid config object, flow type and token mapper", () => {
   const allowedFlowTypes = new Set([

@@ -18,7 +18,6 @@
     "tests/unit/db-proxies-ventilated.test.ts",
     "tests/unit/db-settings-split.test.ts",
     "tests/unit/db-usageanalytics-split.test.ts",
-    "tests/unit/deepseek-web-images.test.ts",
     "tests/unit/log-rotation-reopen-16373.test.ts",
     "tests/unit/model-concurrency-input.test.ts",
     "tests/unit/openai-compatible-tools.test.ts",

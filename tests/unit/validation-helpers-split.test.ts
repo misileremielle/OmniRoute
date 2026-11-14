@@ -16,7 +16,6 @@ test("host preserves its public surface (dispatcher + claude-code validator + re
   for (const name of [
     "validateProviderApiKey",
     "validateClaudeCodeCompatibleProvider",
-    "validateWebCookieProvider",
     "validateCommandCodeProvider",
     "isRetryableProxyTarget",
     "isSecurityBlockError",

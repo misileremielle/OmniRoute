@@ -31,7 +31,6 @@ import {
   shouldFallbackToPublicCodeSuggestions,
 } from "@/lib/oauth/gitlab";
 import { providerAllowsOptionalApiKey } from "@/shared/constants/providers";
-import { shouldUseApiKeyConnectionTest } from "./webSessionTestDispatch";
 import { testCodexAppServerConnection, makeDiagnosis } from "./codexAppServerHealth";
 import { persistConnectionTestHealth } from "./connectionTestHealth";
 import { lockModelIfPerModelQuota } from "@omniroute/open-sse/services/accountFallback.ts";
@@ -1044,7 +1043,7 @@ export async function testSingleConnection(
     result = await runWithProxyContext(proxyInfo?.proxy || null, () =>
       Promise.resolve(appServerResult)
     );
-  } else if (shouldUseApiKeyConnectionTest(connection.authType, provider)) {
+  } else if (connection.authType === "apikey") {
     const enrichedConnection = validationModelId
       ? {
           ...connection,

@@ -8,7 +8,6 @@ import {
   getModelsByProviderId,
 } from "../../open-sse/config/providerModels.ts";
 import { PROVIDER_MODELS_CONFIG } from "../../src/app/api/providers/[id]/models/discovery/providerModelsConfig.ts";
-import { getResolvedModelCapabilities } from "../../src/lib/modelCapabilities.ts";
 
 const providerPageUtils =
   await import("../../src/app/(dashboard)/dashboard/providers/providerPageUtils.ts");
@@ -44,7 +43,7 @@ test("kmca stable fallback only carries documented static capabilities", () => {
   }
 });
 
-test("Kimi exposes one Code card plus Web and Moonshot services", () => {
+test("Kimi exposes one Code card plus the Moonshot service", () => {
   const entries = providerPageUtils.buildProviderEntries(
     providers.APIKEY_PROVIDERS,
     "apikey",
@@ -59,24 +58,7 @@ test("Kimi exposes one Code card plus Web and Moonshot services", () => {
   assert.equal(providers.APIKEY_PROVIDERS["kimi-coding-apikey"].name, "Kimi Code API Key");
   assert.equal(providers.APIKEY_PROVIDERS["kimi-coding-apikey"].hiddenFromDashboard, true);
   assert.equal(providers.OAUTH_PROVIDERS["kimi-coding"].name, "Kimi Code CLI");
-  assert.equal(providers.WEB_COOKIE_PROVIDERS["kimi-web"].name, "Kimi Web");
   assert.equal(providerCatalog.isManagedProviderConnectionId("kimi-coding"), false);
-});
-
-test("Kimi Web models do not advertise unsupported function tools", () => {
-  const models = getModelsByProviderId("kimi-web");
-  assert.deepEqual(
-    models.map(({ id, toolCalling }) => ({ id, toolCalling })),
-    [
-      { id: "k3", toolCalling: false },
-      { id: "k2d6", toolCalling: false },
-    ]
-  );
-  for (const model of models) {
-    const capabilities = getResolvedModelCapabilities({ provider: "kimi-web", model: model.id });
-    assert.equal(capabilities.toolCalling, false);
-    assert.equal(capabilities.supportsTools, false);
-  }
 });
 
 test("Kimi API-key connections fold into the Code provider card", () => {
@@ -97,7 +79,6 @@ test("Kimi API-key connections fold into the Code provider card", () => {
 test("retired Qwen Web surfaces stay absent while official Qwen providers remain", () => {
   assert.equal(PROVIDER_ID_TO_ALIAS["qwen-web"], undefined);
   assert.deepEqual(getModelsByProviderId("qwen-web"), []);
-  assert.equal(Object.hasOwn(providers.WEB_COOKIE_PROVIDERS, "qwen-web"), false);
   assert.equal(PROVIDER_MODELS_CONFIG["qwen-web"], undefined);
 
   assert.equal(PROVIDER_ID_TO_ALIAS["qwen-cloud"], "qwc");

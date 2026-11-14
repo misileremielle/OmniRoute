@@ -2,20 +2,7 @@ export { isPassiveCodex } from "@omniroute/open-sse/services/tokenRefresh/passiv
 import { PROVIDER_ERROR_TYPES } from "@omniroute/open-sse/services/errorClassifier.ts";
 import { isCreditsExhausted } from "@omniroute/open-sse/services/accountFallback.ts";
 import { takeMistralAmbiguous401SoftStrike } from "@omniroute/open-sse/services/accountFallback/mistralAmbiguousAuth.ts";
-import { resolveProviderId, WEB_COOKIE_PROVIDERS } from "@/shared/constants/providers";
 
-// #8200: cookie-auth providers (perplexity-web, grok-web, ...) use a rotating browser
-// session, not a static API key — a 401 means "session needs a refresh", not "dead".
-export function isRecoverableCookieAuth401(
-  provider: string | null,
-  providerErrorType: string | null
-): boolean {
-  return (
-    providerErrorType !== PROVIDER_ERROR_TYPES.ACCOUNT_DEACTIVATED &&
-    provider != null &&
-    resolveProviderId(provider) in WEB_COOKIE_PROVIDERS
-  );
-}
 // #12242 (402 variant of #3027): a bare 402 on a passthrough/gateway
 // provider that multiplexes many models behind one credential
 // (kilo-gateway, ollama-cloud, etc.) is a PER-MODEL billing signal, not
@@ -74,16 +61,11 @@ function isNonTerminalProviderError(providerErrorType: string | null): boolean {
   );
 }
 
-function isExpiredAuthFailure(
-  status: number,
-  providerErrorType: string | null,
-  provider: string | null
-): boolean {
+function isExpiredAuthFailure(status: number, providerErrorType: string | null): boolean {
   return (
-    (providerErrorType === PROVIDER_ERROR_TYPES.ACCOUNT_DEACTIVATED ||
-      providerErrorType === PROVIDER_ERROR_TYPES.UNAUTHORIZED ||
-      status === 401) &&
-    !isRecoverableCookieAuth401(provider, providerErrorType)
+    providerErrorType === PROVIDER_ERROR_TYPES.ACCOUNT_DEACTIVATED ||
+    providerErrorType === PROVIDER_ERROR_TYPES.UNAUTHORIZED ||
+    status === 401
   );
 }
 
@@ -91,7 +73,7 @@ export function resolveTerminalConnectionStatus(
   status: number,
   result: { permanent?: boolean; creditsExhausted?: boolean; ambiguousAuth?: boolean },
   providerErrorType: string | null = null,
-  provider: string | null = null,
+  _provider: string | null = null,
   isPerModelQuotaProvider = false,
   errorText: string = "",
   connectionId: string | null = null
@@ -105,7 +87,7 @@ export function resolveTerminalConnectionStatus(
   if (result.permanent || providerErrorType === PROVIDER_ERROR_TYPES.FORBIDDEN) {
     return "banned";
   }
-  if (isExpiredAuthFailure(status, providerErrorType, provider)) {
+  if (isExpiredAuthFailure(status, providerErrorType)) {
     // #13609: checkFallbackError only sets ambiguousAuth for a bare Mistral 401
     // with MISTRAL_AMBIGUOUS_401_SOFT_LOCKOUT on. Bounded per connection: past
     // the strike limit the connection parks as expired like any other 401.

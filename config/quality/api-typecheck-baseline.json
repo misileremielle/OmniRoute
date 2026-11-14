@@ -91,9 +91,6 @@
   "src/app/api/provider-nodes/validate/route.ts": {
     "TS2339": 2
   },
-  "src/app/api/providers/[id]/login/route.ts": {
-    "TS2739": 1
-  },
   "src/app/api/providers/[id]/models/route.ts": {
     "TS2367": 1,
     "TS2339": 2,
@@ -354,7 +351,6 @@
     "src/lib/usage/migrations.ts"
   ],
   "_suppressions": {
-    "open-sse/executors/copilot-web.ts": 1,
     "open-sse/mcp-server/server.ts": 21,
     "open-sse/services/usage/qoder.ts": 1,
     "src/app/api/system/env/repair/route.ts": 1,

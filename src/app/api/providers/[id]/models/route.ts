@@ -66,18 +66,6 @@ import {
   isBedrockNativeApiError,
 } from "@omniroute/open-sse/services/bedrock.ts";
 import {
-  discoverPromptQlModels,
-  PROMPTQL_FALLBACK_MODELS,
-} from "@omniroute/open-sse/services/promptqlModels.ts";
-import {
-  discoverNotionWebModels,
-  NOTION_WEB_FALLBACK_MODELS,
-} from "@omniroute/open-sse/services/notionWebModels.ts";
-import {
-  discoverMaxaiModels,
-  MAXAI_REGISTRY_MODELS,
-} from "@omniroute/open-sse/services/maxaiModels.ts";
-import {
   AZURE_AI_DEFAULT_BASE_URL,
   buildAzureAiModelsUrl,
 } from "@omniroute/open-sse/config/azureAi.ts";
@@ -158,8 +146,6 @@ import {
 } from "@omniroute/open-sse/config/codexClient.ts";
 import { fetchClaudeDiscoveryModels } from "./discovery/claude";
 import { applyConnectionCustomHeaders } from "./discovery/connectionCustomHeaders";
-import { maybeHandleConolOrSyntxModelDiscovery } from "./webSessionDiscovery";
-import { maybeHandleTwinmindModelDiscovery } from "./twinmindDiscovery";
 import { maybeHandleDevinDesktopModelDiscovery } from "./devinDesktopDiscovery";
 import { maybeHandleMuseCodeModelDiscovery } from "./museCodeDiscovery";
 import { maybeHandleVertexModelDiscovery } from "./vertexDiscovery";
@@ -502,182 +488,6 @@ export async function GET(
       if (localCatalog) return localCatalog;
     }
 
-    if (provider === "lmarena") {
-      // Direct-chat allowlist is the intended source — no arena.ai HTML scrape
-      // (avoids CF bot burn and thrashy initialModels rows).
-      const localCatalog = buildLocalCatalogResponse(undefined, true);
-      if (localCatalog) return localCatalog;
-    }
-
-    // PromptQL playground: live catalog via GraphQL FetchLlmConfigs (Bearer JWT).
-    if (provider === "promptql" || provider === "pql") {
-      const cachedResponse = maybeReturnCachedDiscovery();
-      if (cachedResponse) return cachedResponse;
-
-      const autoFetchDisabledResponse = maybeReturnAutoFetchDisabled();
-      if (autoFetchDisabledResponse) return autoFetchDisabledResponse;
-
-      const token = (apiKey || accessToken || "").replace(/^Bearer\s+/i, "").trim();
-      const seedModels = PROMPTQL_FALLBACK_MODELS.map((m) => ({
-        id: m.id,
-        name: m.name,
-      }));
-      if (!token) {
-        const fallback = buildDiscoveryFallbackResponse({
-          cacheWarning: "No JWT configured — using cached catalog",
-          localWarning: "No JWT configured — using local catalog",
-          failure: { code: "NO_CREDENTIAL" },
-        });
-        if (fallback) return fallback;
-        return buildResponse({
-          provider,
-          connectionId,
-          models: seedModels,
-          source: "local_catalog",
-          intentional: true,
-          warning: "No PromptQL Bearer JWT — using seed model list",
-        });
-      }
-
-      try {
-        const graphqlEndpoint =
-          (typeof connection.providerSpecificData?.graphqlEndpoint === "string" &&
-            connection.providerSpecificData.graphqlEndpoint) ||
-          process.env.PROMPTQL_GRAPHQL_ENDPOINT ||
-          "https://data.prompt.ql.app/promptql/playground-v2-hge/v1/graphql";
-        const discovered = await discoverPromptQlModels({
-          token,
-          graphqlEndpoint,
-        });
-        const models = discovered.map((m) => ({ id: m.id, name: m.name }));
-        return buildApiDiscoveryResponse(models);
-      } catch (error) {
-        console.log("Error fetching models from promptql", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-        const fallback = buildDiscoveryFallbackResponse({
-          cacheWarning: "PromptQL FetchLlmConfigs failed — using cached catalog",
-          localWarning: "PromptQL FetchLlmConfigs failed — using seed catalog",
-          failure: toDiscoveryFailure(error),
-        });
-        if (fallback) return fallback;
-        return buildResponse({
-          provider,
-          connectionId,
-          models: seedModels,
-          source: "local_catalog",
-          intentional: true,
-          warning: "API unavailable — using seed PromptQL model list",
-        });
-      }
-    }
-
-    // #7600 follow-up: notion-web live catalog via cookie-auth getAvailableModels.
-    // Needs spaceId (from cookie or getSpaces); falls back to seeded local catalog.
-    if (provider === "notion-web") {
-      const cachedResponse = maybeReturnCachedDiscovery();
-      if (cachedResponse) return cachedResponse;
-
-      const autoFetchDisabledResponse = maybeReturnAutoFetchDisabled();
-      if (autoFetchDisabledResponse) return autoFetchDisabledResponse;
-
-      const token = apiKey || accessToken;
-      if (!token) {
-        const fallback = buildDiscoveryFallbackResponse({
-          cacheWarning: "No token configured — using cached catalog",
-          localWarning: "No token configured — using local catalog",
-          failure: { code: "NO_CREDENTIAL" },
-        });
-        if (fallback) return fallback;
-        return buildResponse({
-          provider,
-          connectionId,
-          models: NOTION_WEB_FALLBACK_MODELS,
-          source: "local_catalog",
-          intentional: true,
-          warning: "No token_v2 cookie — using seed Notion AI model list",
-        });
-      }
-
-      try {
-        const discovery = await discoverNotionWebModels({
-          token,
-          fetchImpl: (url, init) =>
-            safeOutboundFetch(url, {
-              ...SAFE_OUTBOUND_FETCH_PRESETS.modelsDiscovery,
-              guard: getProviderOutboundGuard(),
-              proxyConfig: proxy,
-              ...init,
-            }),
-        });
-        // Pass through plan-lock warnings (e.g. Fable 5 requires Business/Enterprise).
-        return buildApiDiscoveryResponse(discovery.models, discovery.warning);
-      } catch (error) {
-        console.log("Error fetching models from notion-web", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-        const fallback = buildDiscoveryFallbackResponse({
-          cacheWarning: "Notion getAvailableModels failed — using cached catalog",
-          localWarning: "Notion getAvailableModels failed — using seed catalog",
-          failure: toDiscoveryFailure(error),
-        });
-        if (fallback) return fallback;
-        return buildResponse({
-          provider,
-          connectionId,
-          models: NOTION_WEB_FALLBACK_MODELS,
-          source: "local_catalog",
-          intentional: true,
-          warning: "API unavailable — using seed Notion AI model list",
-        });
-      }
-    }
-
-    // MaxAI: live catalog + per-model context windows from the signed
-    // /models/get_config (the call the web app makes on load). Falls back to the
-    // curated static registry catalog on any auth/transport/shape failure.
-    if (provider === "maxai") {
-      const cachedResponse = maybeReturnCachedDiscovery();
-      if (cachedResponse) return cachedResponse;
-
-      const autoFetchDisabledResponse = maybeReturnAutoFetchDisabled();
-      if (autoFetchDisabledResponse) return autoFetchDisabledResponse;
-
-      try {
-        const discovery = await discoverMaxaiModels({
-          providerSpecificData: connection.providerSpecificData as
-            Record<string, unknown> | null | undefined,
-          accessToken: apiKey || accessToken,
-          fetchImpl: (url, init) =>
-            safeOutboundFetch(url, {
-              ...SAFE_OUTBOUND_FETCH_PRESETS.modelsDiscovery,
-              guard: getProviderOutboundGuard(),
-              proxyConfig: proxy,
-              ...init,
-            }),
-        });
-        return buildApiDiscoveryResponse(discovery.models, discovery.warning);
-      } catch (error) {
-        console.log("Error fetching models from maxai", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-        const fallback = buildDiscoveryFallbackResponse({
-          cacheWarning: "MaxAI models/get_config failed — using cached catalog",
-          localWarning: "MaxAI models/get_config failed — using curated catalog",
-          failure: toDiscoveryFailure(error),
-        });
-        if (fallback) return fallback;
-        return buildResponse({
-          provider,
-          connectionId,
-          models: MAXAI_REGISTRY_MODELS,
-          source: "local_catalog",
-          intentional: true,
-          warning: "MaxAI catalog unavailable — using curated model list",
-        });
-      }
-    }
-
     const webDiscoveryArgs = {
       provider,
       connectionId,
@@ -691,15 +501,6 @@ export async function GET(
       buildResponse,
       buildApiDiscoveryResponse,
     };
-    const conolResponse = await maybeHandleConolOrSyntxModelDiscovery(webDiscoveryArgs);
-    if (conolResponse) return conolResponse;
-
-    const twinmindResponse = await maybeHandleTwinmindModelDiscovery({
-      ...webDiscoveryArgs,
-      refreshToken: (connection as { refreshToken?: unknown }).refreshToken,
-    });
-    if (twinmindResponse) return twinmindResponse;
-
     const devinDesktopResponse = await maybeHandleDevinDesktopModelDiscovery(webDiscoveryArgs);
     if (devinDesktopResponse) return devinDesktopResponse;
 
@@ -1540,115 +1341,6 @@ export async function GET(
         { error: `Failed to fetch Cursor models: ${detail}` },
         { status: 502 }
       );
-    }
-
-    if (provider === "inner-ai") {
-      const cachedResponse = maybeReturnCachedDiscovery();
-      if (cachedResponse) return cachedResponse;
-
-      const autoFetchDisabledResponse = maybeReturnAutoFetchDisabled();
-      if (autoFetchDisabledResponse) return autoFetchDisabledResponse;
-
-      try {
-        // Parse "TOKEN EMAIL" credential format
-        const raw = apiKey.trim();
-        const eqIdx = raw.indexOf("=");
-        const stripped = eqIdx > 0 && !raw.startsWith("eyJ") ? raw.slice(eqIdx + 1).trim() : raw;
-        const lastSpace = stripped.lastIndexOf(" ");
-        let innerAiToken = stripped;
-        let innerAiEmail = "";
-        if (lastSpace > 0) {
-          const possibleEmail = stripped.slice(lastSpace + 1).trim();
-          if (possibleEmail.includes("@")) {
-            innerAiToken = stripped.slice(0, lastSpace).trim();
-            innerAiEmail = possibleEmail;
-          }
-        }
-
-        // Decode device_id from JWT payload
-        let innerAiDeviceId = "";
-        try {
-          const parts = innerAiToken.split(".");
-          if (parts.length >= 2) {
-            const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-            const payload = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
-            innerAiDeviceId = String(
-              payload?.device_id ??
-                payload?.deviceId ??
-                payload?.["device-id"] ??
-                payload?.did ??
-                ""
-            ).trim();
-          }
-        } catch {
-          /* ignore */
-        }
-
-        const innerAiHeaders: Record<string, string> = {
-          "USER-TOKEN": innerAiToken,
-          "User-Agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-          Origin: "https://app.innerai.com",
-          Referer: "https://app.innerai.com/",
-        };
-        if (innerAiEmail) innerAiHeaders["USER-EMAIL"] = innerAiEmail;
-        if (innerAiDeviceId) innerAiHeaders["DEVICE-ID"] = innerAiDeviceId;
-
-        const modelsResp = await safeOutboundFetch(
-          "https://platformapi.innerai.com/api/v1/ai_models",
-          // The guard is an option, not a third positional argument; passing it
-          // separately left this request running under the default "none".
-          { headers: innerAiHeaders, guard: getProviderOutboundGuard() }
-        );
-        if (!modelsResp.ok) {
-          throw new Error(`Inner.ai models API returned HTTP ${modelsResp.status}`);
-        }
-
-        const modelsBody = await modelsResp.json().catch(() => null);
-        const rawModels: Array<Record<string, unknown>> = Array.isArray(modelsBody?.ai_models)
-          ? modelsBody.ai_models
-          : Array.isArray(modelsBody)
-            ? modelsBody
-            : [];
-
-        // Filter: enabled, available, text/chat category only.
-        // Use ai_model_categories[].unique_identifier === "text" when available;
-        // fall back to llm_model name heuristic for models without categories.
-        const nonTextPattern =
-          /image|video|audio|img|vid|sound|music|voice|tts|stt|track|clip|avatar|cartoon|flux|stable.diff|recraft|ideogram|leonardo|magnific|bria|seedream|luma|kling|pika|veo|wan-|heygen|did-|vidu|pixverse|sora-|gen-[0-9]|playground|gemini-fal|gamma|lyria|clothes|whisper/i;
-        const textModels = rawModels.filter((m) => {
-          if (m.enable === false || m.unavailable_api) return false;
-          if (typeof m.llm_model !== "string") return false;
-          const cats = Array.isArray(m.ai_model_categories) ? m.ai_model_categories : null;
-          if (cats && cats.length > 0) {
-            return cats.some(
-              (c: Record<string, unknown>) =>
-                String(c.unique_identifier ?? c.name ?? "").toLowerCase() === "text"
-            );
-          }
-          // No categories field — fall back to name heuristic
-          return !nonTextPattern.test(m.llm_model as string);
-        });
-
-        const models = textModels.map((m) => ({
-          id: String(m.llm_model),
-          name: String(m.name || m.llm_model),
-        }));
-
-        return buildApiDiscoveryResponse(models);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        const fallback = buildDiscoveryFallbackResponse({
-          cacheWarning: `Inner.ai models unavailable (${message}) — using cached catalog`,
-          localWarning: `Inner.ai models unavailable (${message}) — using local catalog`,
-          failure: toDiscoveryFailure(err),
-        });
-        if (fallback) return fallback;
-        return NextResponse.json(
-          { error: `Failed to fetch Inner.ai models: ${message}` },
-          { status: 502 }
-        );
-      }
     }
 
     if (provider === "glm" || provider === "glm-cn" || provider === "glmt") {
