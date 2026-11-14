@@ -47,6 +47,7 @@ const ROUTE_LIMITS: BodySizeRule[] = [
   { prefix: "/api/db-backups/import", limit: MAX_BODY_BYTES_IMPORT },
   { prefix: "/api/v1/chat/completions", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
   { prefix: "/api/v1/responses", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
+  { prefix: "/api/v1/messages", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
   { prefix: "/api/v1/files", limit: MAX_BODY_BYTES_FILE },
 ];
 

@@ -108,7 +108,7 @@ export function PayloadSection({
     <div>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
-          <h3 className="text-[11px] text-text-muted uppercase tracking-wider font-bold">
+          <h3 className="text-[11px] text-text-muted uppercase tracking-wider font-semibold">
             {title}
           </h3>
           {collapsible && (
@@ -182,6 +182,26 @@ function asConversationResponse(responseBody: unknown): ConversationResponse {
     responseHeaders: {},
     responseBody: responseBody != null ? JSON.stringify(responseBody) : null,
   };
+}
+
+// The request's own turns, plus its response or the partial text captured so far.
+function getConversationTurns(detail): NormalizedTurn[] {
+  const requestBody = detail?.requestBody ?? detail?.pipelinePayloads?.clientRequest ?? null;
+  const requestTurns = buildRequestTurns(requestBody) ?? [];
+  const responseBody = detail?.responseBody ?? null;
+  const responseTurns: NormalizedTurn[] =
+    responseBody != null
+      ? buildResponseTurns(asConversationResponse(responseBody))
+      : detail?.partialAssistantText
+        ? [{ role: "assistant", blocks: [{ type: "text", text: detail.partialAssistantText }] }]
+        : [];
+  return [...requestTurns, ...responseTurns];
+}
+
+/** Whether the Conversation tab has anything to show. An active request counts even with no turn
+ * yet: the section polls while it is mounted, and that poll is what brings the first text in. */
+export function hasConversationTurns(detail) {
+  return Boolean(detail?.active) || getConversationTurns(detail).length > 0;
 }
 
 export function ConversationContextSection({ log, detail }) {
@@ -258,24 +278,7 @@ export function ConversationContextSection({ log, detail }) {
     });
   };
 
-  const requestBody =
-    liveDetail?.requestBody ?? liveDetail?.pipelinePayloads?.clientRequest ?? null;
-  const requestTurns = buildRequestTurns(requestBody) ?? [];
-
-  const responseBody = liveDetail?.responseBody ?? null;
-  const responseTurns: NormalizedTurn[] =
-    responseBody != null
-      ? buildResponseTurns(asConversationResponse(responseBody))
-      : liveDetail?.partialAssistantText
-        ? [
-            {
-              role: "assistant",
-              blocks: [{ type: "text", text: liveDetail.partialAssistantText }],
-            },
-          ]
-        : [];
-
-  const allTurns: NormalizedTurn[] = [...requestTurns, ...responseTurns];
+  const allTurns = getConversationTurns(liveDetail);
 
   // Follow new content as it streams in — same idea as StreamSection's
   // autoscroll effect, tied to the same liveRefresh toggle.
@@ -284,13 +287,17 @@ export function ConversationContextSection({ log, detail }) {
     scrollToBottom();
   }, [allTurns.length, liveDetail?.partialAssistantText, liveRefresh, open]);
 
-  if (allTurns.length === 0) return null;
+  if (allTurns.length === 0) {
+    return liveDetail?.active ? (
+      <p className="p-8 text-center text-sm text-text-muted">{t("loadingDetails")}</p>
+    ) : null;
+  }
 
   return (
     <div>
       <div className="flex items-center justify-between gap-3 mb-2">
         <div className="flex items-center gap-3">
-          <h3 className="text-[11px] text-text-muted uppercase tracking-wider font-bold">
+          <h3 className="text-[11px] text-text-muted uppercase tracking-wider font-semibold">
             {t("conversationContext")}
           </h3>
           <Button

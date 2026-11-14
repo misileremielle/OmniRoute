@@ -15,7 +15,12 @@ import { createTranslationFailureResult } from "./translationFailure.ts";
 type LoggerLike =
   { debug?: (...args: unknown[]) => void; warn?: (...args: unknown[]) => void } | null | undefined;
 
-type ThrownLike = { statusCode?: unknown; message?: unknown; errorType?: unknown } | null;
+type ThrownLike = {
+  statusCode?: unknown;
+  message?: unknown;
+  errorType?: unknown;
+  details?: { error_code?: unknown } | null;
+} | null;
 
 export async function buildRequestTranslationErrorResult({
   error,
@@ -50,7 +55,14 @@ export async function buildRequestTranslationErrorResult({
   } catch {
     // Hostile thrown values may expose throwing classification accessors.
   }
-  const result = createTranslationFailureResult(statusCode, message, errorType);
+  let detailCode: string | null = null;
+  try {
+    const candidate = thrown?.details?.error_code;
+    detailCode = typeof candidate === "string" ? candidate : null;
+  } catch {
+    // Hostile thrown values may expose throwing detail accessors.
+  }
+  const result = createTranslationFailureResult(statusCode, message, errorType, detailCode);
   // Server log only (never the response body): keep the translator's stack so a
   // failure can be traced. Guarded like the reads above — the thrown value may be hostile.
   let stack = "";

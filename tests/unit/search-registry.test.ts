@@ -43,6 +43,7 @@ test("SEARCH_PROVIDERS has all registered providers", () => {
   // #11140: context7 provides library-docs search
   assert.ok(SEARCH_PROVIDERS["context7"], "context7 should exist");
   assert.ok(SEARCH_PROVIDERS["parallel-search"], "parallel-search should exist");
+  assert.ok(SEARCH_PROVIDERS["codex-search"], "codex-search should exist");
   assert.equal(Object.keys(SEARCH_PROVIDERS).length, 23);
 });
 
@@ -179,6 +180,7 @@ test("getAllSearchProviders returns flat list", () => {
   const all = getAllSearchProviders();
   assert.equal(all.length, 23);
   assert.ok(all.some((p) => p.id === "parallel-search"));
+  assert.ok(all.some((p) => p.id === "codex-search"));
   assert.ok(all.some((p) => p.id === "duckduckgo-free"));
   assert.ok(all.some((p) => p.id === "jina-search"));
   assert.ok(all.some((p) => p.id === "x-search"));

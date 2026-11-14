@@ -67,7 +67,10 @@ const {
 // moved to a per-connection opt-in (-1), PROXY_STRICT_POST_REPLAY_ENABLED +
 // RESPONSES_TRANSPORT_KEEPALIVE_ENABLED (#18312, +2), OPENCODE_FREE_TIER_EGRESS_PROBE (+1) and
 // PROXY_REFUSAL_MODEL_SCOPE (#18686, +1) take this fork from 111 to 115.
-const EXPECTED_FEATURE_FLAG_COUNT = 115;
+// Upstream v3.8.54 sync: CODEX_SEARCH_AUTO_FALLBACK_ENABLED (#17933, +1) and
+// CODE_ASSIST_INELIGIBLE_ONBOARD_LEGACY_TIER (#18060, +1) take it to 117. FAL_NATIVE_ENABLED
+// (#18849) is not carried: this fork has no image/Fal gateway.
+const EXPECTED_FEATURE_FLAG_COUNT = 117;
 // tool_call wrapper repair, default on) to 86; OPENCODE_V2_CLIENT_FINGERPRINT_ENABLED
 // (#16571, OpenCode v2 client fingerprint, default off) to 87.
 // tool_call wrapper repair, default on) to 86; CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED

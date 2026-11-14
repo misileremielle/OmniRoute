@@ -27,6 +27,7 @@ import {
   resolveBaseUrl,
 } from "./validation/urlHelpers";
 import { toValidationErrorResult } from "./validation/transport";
+import { validateOpencodeProvider } from "./validation/opencode";
 import { validateCloudflareAiProvider } from "./validation/cloudflareAi";
 import {
   validateDeepSeekWebProvider,
@@ -107,6 +108,7 @@ import { validateZyloApiProvider } from "./validation/zylo";
 import { validateInceptionProvider } from "./validation/inception";
 import { validateClineProvider } from "./validation/cline";
 import { validateKilocodeProvider } from "./validation/kilocode";
+import { validateMegabrainProvider } from "./validation/megabrain";
 import {
   validateV0VercelProvider,
   validateAuggieProvider,
@@ -295,6 +297,9 @@ export async function validateProviderApiKey({
     // Kilo Code serves unauthenticated GET /models (open catalog returning 200 for any key).
     // Authenticate against /chat/completions with the required X-KILOCODE-EDITORNAME header.
     kilocode: validateKilocodeProvider,
+    // MegaBrain's /api/openrouter/models is public too; its validator probes the
+    // authenticated /api/profile/limits instead.
+    megabrain: validateMegabrainProvider,
     kie: validateKieProvider,
     "bailian-coding-plan": validateBailianCodingPlanProvider,
     "qwen-cloud-token-plan": validateQwenCloudTokenPlanProvider,
@@ -471,6 +476,11 @@ export async function validateProviderApiKey({
     : resolveBaseUrl(validationEntry, providerSpecificData);
 
   try {
+    // OpenCode Zen/Go: probe with the discovery identity, never a free-tier chat probe.
+    if (entry.executor === "opencode") {
+      return await validateOpencodeProvider({ provider, apiKey, providerSpecificData, isLocal });
+    }
+
     if (OPENAI_LIKE_FORMATS.has(entry.format)) {
       return await validateOpenAILikeProvider({
         apiKey,

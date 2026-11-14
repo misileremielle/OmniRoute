@@ -88,9 +88,9 @@ test("importing the barrel registers the four default guardrails in priority ord
     guardrailRegistry.list().map((g) => [g.name, g.priority, g.enabled]),
     [
       ["vision-bridge", 5, true],
+      ["credential-masker", 9, true],
       ["pii-masker", 10, true],
       ["prompt-injection", 20, true],
-      ["credential-masker", 95, true],
     ]
   );
 });

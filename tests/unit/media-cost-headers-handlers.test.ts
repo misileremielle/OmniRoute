@@ -30,21 +30,25 @@ test.after(() => {
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });
 
-// Shared assertions: every successful media Response must carry the
-// X-OmniRoute-* cost telemetry headers (parity with chat/embeddings).
-// Cost may legitimately be 0 (free / unpriced modality) — formatOmniRouteCost
-// still emits a fixed-10-decimal string ("0.0000000000"), so the format check
-// holds regardless.
-function assertCostTelemetryHeaders(response: Response) {
+// Unknown media charges omit the numeric header; explicitly free charges retain zero.
+function assertCostTelemetryHeaders(
+  response: Response,
+  expectedCost: "known" | "unknown" = "known"
+) {
   assert.equal(response.status, 200);
 
   const cost = response.headers.get(OMNIROUTE_RESPONSE_HEADERS.responseCost);
-  assert.ok(cost, "response cost header must be present");
-  assert.match(
-    cost as string,
-    /^\d+\.\d{10}$/,
-    `cost header must be a fixed-10-decimal number, got: ${cost}`
-  );
+  if (expectedCost === "unknown") {
+    assert.equal(cost, null, "missing usage or tariffs must not be reported as zero cost");
+    assert.equal(response.headers.get("X-OmniRoute-Cost-Status"), "unknown");
+  } else {
+    assert.ok(cost, "response cost header must be present");
+    assert.match(
+      cost as string,
+      /^\d+\.\d{10}$/,
+      `cost header must be a fixed-10-decimal number, got: ${cost}`
+    );
+  }
 
   const version = response.headers.get(OMNIROUTE_RESPONSE_HEADERS.version);
   assert.ok(version && version.trim().length > 0, "version header must be non-empty");

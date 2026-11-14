@@ -1,7 +1,7 @@
 {
   "name": "omniroute",
   "version": "3.8.54",
-  "description": "Unified AI router with 356 providers, RTK+Caveman compression, auto fallback, MCP, PWA, and OpenAI-compatible APIs.",
+  "description": "Unified AI router with 367 providers, RTK+Caveman compression, auto fallback, MCP, PWA, and OpenAI-compatible APIs.",
   "type": "module",
   "bin": {
     "omniroute": "bin/omniroute.mjs",
@@ -131,6 +131,8 @@
     "lint:json": "node scripts/quality/run-eslint-json.mjs",
     "lint:md": "pnpm dlx markdownlint-cli2 \"docs/**/*.md\" \"*.md\" \"!docs/research\"",
     "lint:prose": "vale docs",
+    "mcp:markitdown": "node scripts/integrations/launch-markitdown-mcp.mjs",
+    "mcp:markitdown:http": "node scripts/integrations/launch-markitdown-mcp.mjs --http",
     "test": "pnpm run test:unit",
     "test:unit": "node scripts/test/run-unit-core.mjs",
     "test:unit:full": "cross-env DISABLE_SQLITE_AUTO_BACKUP=true node --max-old-space-size=8192 --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit --test-concurrency=4 tests/unit/*.test.ts \"tests/unit/{api,auth,authz,build,chatcore,cli,cli-helper,combo,compression,correctness,cors,db,db-adapters,docs,guardrails,lib,mcp,memory,runtime,security,services,settings,shared,translator,ui,usage}/**/*.test.ts\" \"tests/unit/**/*.test.mjs\" && cross-env DISABLE_SQLITE_AUTO_BACKUP=true node --max-old-space-size=8192 --import tsx --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit --test-concurrency=4 \"tests/unit/dashboard/**/*.test.ts\" && pnpm run test:unit:serial",
@@ -233,6 +235,7 @@
     "check:circular-deps": "node scripts/check/check-circular-deps.mjs",
     "check:mutation-ratchet": "node scripts/check/check-mutation-ratchet.mjs",
     "check:rtl-ratchet": "node scripts/check/check-rtl-ratchet.mjs",
+    "check:type-scale-ratchet": "node scripts/check/check-type-scale-ratchet.mjs",
     "check:licenses": "node scripts/check/check-licenses.mjs",
     "check:pr-evidence": "node scripts/check/check-pr-evidence.mjs",
     "check:vuln-ratchet": "node scripts/check/check-vuln-ratchet.mjs",
@@ -252,6 +255,7 @@
     "quality:scan:fast": "node scripts/quality/run-all-gates.mjs --fast",
     "audit:deps": "pnpm audit --audit-level=critical && (pnpm audit --audit-level=high || echo '::warning::high-severity advisories present (non-blocking)')",
     "typecheck:core": "tsc --pretty false -p tsconfig.typecheck-core.json",
+    "typecheck:build": "tsc --pretty false -p tsconfig.build.json",
     "typecheck:noimplicit:core": "tsc --pretty false -p tsconfig.typecheck-noimplicit-core.json",
     "check:dashboard-typecheck": "node scripts/check/check-dashboard-typecheck.mjs",
     "check:build-typecheck": "node scripts/check/check-build-typecheck.mjs",

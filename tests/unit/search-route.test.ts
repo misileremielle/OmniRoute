@@ -77,6 +77,7 @@ test("v1 search GET lists all search providers", async () => {
     "xquik-search",
     "anysearch-search",
     "parallel-search",
+    "codex-search",
   ]);
 });
 

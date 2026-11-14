@@ -11,7 +11,7 @@ import Button from "@/shared/components/Button";
 import Card from "@/shared/components/Card";
 import { CardSkeleton } from "@/shared/components/Loading";
 import Modal from "@/shared/components/Modal";
-import SegmentedControl from "@/shared/components/SegmentedControl";
+import SegmentedControl, { SegmentedTabs } from "@/shared/components/SegmentedControl";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import { isPublicDisplayBaseUrl, useDisplayBaseUrl } from "@/shared/hooks";
 import { useTranslations } from "next-intl";
@@ -426,7 +426,11 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       candidates.findIndex((other) => other.url === candidate.url) === index
   );
   return (
-    <div className="flex flex-col gap-8">
+    <SegmentedTabs
+      value={activeEndpointTab}
+      onChange={(value) => setActiveEndpointTab(value as EndpointTab)}
+      className="gap-8"
+    >
       {/* Guided connection header (#11228): /v1 URL + test action lead; advanced protocols demoted */}
       <div className="flex flex-col gap-2">
         <PageHeader compact title={t("title")} description={t("subtitle")} />
@@ -443,9 +447,8 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
         </div>
       </div>
       <SegmentedControl
+        semantics="tabs"
         options={ENDPOINT_TABS.map((tab) => ({ ...tab, label: t(tab.labelKey) }))}
-        value={activeEndpointTab}
-        onChange={(value) => setActiveEndpointTab(value as EndpointTab)}
         aria-label={t("endpointSections")}
         className="w-fit"
       />
@@ -984,7 +987,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
           onClose={() => setSelectedProvider(null)}
         />
       )}
-    </div>
+    </SegmentedTabs>
   );
 }
 

@@ -97,6 +97,7 @@ test(`APIKEY_PROVIDERS merges the 6 family files plus the beatapi extract into $
   const families: [string, string][] = [
     ["gateways", "APIKEY_PROVIDERS_GATEWAYS"],
     ["beatapi", "APIKEY_PROVIDERS_BEATAPI"],
+    ["empiriolabs", "APIKEY_PROVIDERS_EMPIRIOLABS"],
     ["frontier-labs", "APIKEY_PROVIDERS_FRONTIER"],
     ["inference-hosts", "APIKEY_PROVIDERS_INFERENCE"],
     ["enterprise-cloud", "APIKEY_PROVIDERS_ENTERPRISE"],

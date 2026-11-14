@@ -178,21 +178,28 @@ export function resolveKnipBin(opts = {}) {
 }
 
 /**
- * knip loads the project's Next config, and plugins in it can log to stdout before the
- * report. The JSON reporter writes the
- * report as the last line, so a leading log line must not make the run look unparseable.
+ * Parse knip's `--reporter json` stdout.
  *
- * @param {string} stdout - raw knip stdout
- * @returns {string} the JSON document, or the trimmed text when no line looks like one
+ * knip >= 6.44 loads `next.config.*`, and ours calls fumadocs-mdx `createMDX()`,
+ * which prints "[MDX] generated files in …ms" to stdout before the report. The
+ * report is still intact, so read it from the first line that opens a JSON object.
+ * Output with no JSON report still throws a SyntaxError.
+ *
+ * Exported for unit testing.
+ *
+ * @param {string} stdout
+ * @returns {unknown} the parsed report
  */
-export function extractKnipJson(stdout) {
-  const text = typeof stdout === "string" ? stdout.trim() : "";
-  if (!text || text.startsWith("{")) return text;
-  const lines = text.split("\n");
-  for (let i = lines.length - 1; i >= 0; i--) {
-    if (lines[i].trimStart().startsWith("{")) return lines.slice(i).join("\n").trim();
+export function parseKnipStdout(stdout) {
+  const text = String(stdout ?? "").trim();
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    const lines = text.split(/\r?\n/);
+    const start = lines.findIndex((line) => line.trimStart().startsWith("{"));
+    if (start <= 0) throw err;
+    return JSON.parse(lines.slice(start).join("\n"));
   }
-  return text;
 }
 
 /**
@@ -222,7 +229,7 @@ export function classifyKnipFailure(execError, stdout) {
   // reporting findings. This is a successful measurement, not a failure.
   if (text) {
     try {
-      JSON.parse(text);
+      parseKnipStdout(text);
       return {
         kind: "ok",
         exitCode: DEAD_CODE_EXIT.OK,
@@ -334,7 +341,7 @@ function runKnip(cwd = ROOT) {
 
   let knipJson;
   try {
-    knipJson = JSON.parse(extractKnipJson(String(stdout)));
+    knipJson = parseKnipStdout(stdout);
   } catch (parseErr) {
     // Unreachable via classifyKnipFailure (it already JSON-parsed), kept as a
     // defensive guard so a future change cannot turn this into exit 2.

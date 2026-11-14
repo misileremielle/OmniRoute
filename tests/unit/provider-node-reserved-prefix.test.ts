@@ -231,6 +231,10 @@ test("shared set size includes live REGISTRY and retired Designer + Felo + Qwen 
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("gisoo"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("minimax-code"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("mmcode"), true);
+  assert.equal(RESERVED_PROVIDER_PREFIXES.has("empiriolabs"), true);
+  assert.equal(RESERVED_PROVIDER_PREFIXES.has("megabrain"), true);
+  assert.equal(RESERVED_PROVIDER_PREFIXES.has("mb"), true);
+  assert.equal(RESERVED_PROVIDER_PREFIXES.has("chatgpt"), true);
 });
 
 test("notrack-web registry id and alias stay reserved", () => {

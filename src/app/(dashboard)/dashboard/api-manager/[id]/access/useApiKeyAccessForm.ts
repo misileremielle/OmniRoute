@@ -129,6 +129,7 @@ export interface ApiKeyAccessData {
   usageLimitEnabled?: boolean | null;
   dailyUsageLimitUsd?: number | null;
   weeklyUsageLimitUsd?: number | null;
+  fiveHourUsageLimitUsd?: number | null;
   createdAt?: string;
   lastUsedAt?: string | null;
   totalRequests?: number;
@@ -178,6 +179,7 @@ export interface ApiKeyAccessFormState {
   usageLimitEnabled: boolean;
   dailyUsageLimitUsd: string;
   weeklyUsageLimitUsd: string;
+  fiveHourUsageLimitUsd: string;
 }
 
 export function sanitizeInput(input: string): string {
@@ -317,7 +319,21 @@ type UsageBehaviourField =
   | "allowUsageCommand"
   | "usageLimitEnabled"
   | "dailyUsageLimitUsd"
-  | "weeklyUsageLimitUsd";
+  | "weeklyUsageLimitUsd"
+  | "fiveHourUsageLimitUsd";
+
+function initialUsdLimitState(
+  apiKey: StoredApiKey
+): Pick<
+  ApiKeyAccessFormState,
+  "dailyUsageLimitUsd" | "weeklyUsageLimitUsd" | "fiveHourUsageLimitUsd"
+> {
+  return {
+    dailyUsageLimitUsd: positiveUsdLimitText(apiKey?.dailyUsageLimitUsd),
+    weeklyUsageLimitUsd: positiveUsdLimitText(apiKey?.weeklyUsageLimitUsd),
+    fiveHourUsageLimitUsd: positiveUsdLimitText(apiKey?.fiveHourUsageLimitUsd),
+  };
+}
 
 type BehaviourStateField = CatalogBehaviourField | UsageBehaviourField;
 
@@ -341,8 +357,7 @@ function initialUsageBehaviourState(
     disableNonPublicModels: apiKey?.disableNonPublicModels === true,
     allowUsageCommand: apiKey?.allowUsageCommand === true,
     usageLimitEnabled: apiKey?.usageLimitEnabled === true,
-    dailyUsageLimitUsd: positiveUsdLimitText(apiKey?.dailyUsageLimitUsd),
-    weeklyUsageLimitUsd: positiveUsdLimitText(apiKey?.weeklyUsageLimitUsd),
+    ...initialUsdLimitState(apiKey),
   };
 }
 
@@ -520,6 +535,7 @@ export function buildApiKeyAccessPayload(
     usageLimitEnabled: formState.usageLimitEnabled,
     dailyUsageLimitUsd: parseUsdLimitInput(formState.dailyUsageLimitUsd),
     weeklyUsageLimitUsd: parseUsdLimitInput(formState.weeklyUsageLimitUsd),
+    fiveHourUsageLimitUsd: parseUsdLimitInput(formState.fiveHourUsageLimitUsd),
     forcedModel: formState.forcedModel.trim() || null,
   };
 }
@@ -997,6 +1013,13 @@ function useLimitSetters(setFormState: FormStateSetter) {
     [setFormState]
   );
 
+  const setFiveHourUsageLimitUsd = useCallback(
+    (fiveHourUsageLimitUsd: string) => {
+      setFormState((prev) => ({ ...prev, fiveHourUsageLimitUsd }));
+    },
+    [setFormState]
+  );
+
   return {
     setMaxSessions,
     setThrottleDelayMs,
@@ -1006,6 +1029,7 @@ function useLimitSetters(setFormState: FormStateSetter) {
     setUsageLimitEnabled,
     setDailyUsageLimitUsd,
     setWeeklyUsageLimitUsd,
+    setFiveHourUsageLimitUsd,
   };
 }
 

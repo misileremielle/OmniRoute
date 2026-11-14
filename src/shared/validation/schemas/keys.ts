@@ -50,6 +50,15 @@ const requireConsistentModelAccess = (
   }
 };
 
+// Per-key self-service settings (migration 233). null = share every provider the
+// key reaches; [] = share none.
+const sharedQuotaProvidersField = z
+  .array(z.string().trim().min(1).max(64))
+  .max(100)
+  .nullable()
+  .optional();
+const anthropicRateLimitHeadersField = z.enum(["auto", "forward", "strip"]).optional();
+
 export const createKeySchema = z
   .object({
     name: z.string().min(1, "Name is required").max(200),
@@ -61,6 +70,7 @@ export const createKeySchema = z
     usageLimitEnabled: z.boolean().optional(),
     dailyUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
     weeklyUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
+    fiveHourUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
     expiresAt: z.string().datetime().nullable().optional(),
     scopes: z.array(z.string().trim().min(1).max(64)).max(32).optional(),
     allowedConnections: z.array(z.string().uuid()).min(1).max(100).optional(),
@@ -204,6 +214,9 @@ export const updateKeyPermissionsSchema = z
     usageLimitEnabled: z.boolean().optional(),
     dailyUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
     weeklyUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
+    fiveHourUsageLimitUsd: z.coerce.number().min(0).optional().nullable(),
+    sharedQuotaProviders: sharedQuotaProvidersField,
+    anthropicRateLimitHeaders: anthropicRateLimitHeadersField,
   })
   .superRefine((value, ctx) => {
     if (value.modelAccessMode === "all" && value.allowedModels && value.allowedModels.length > 0) {
@@ -266,7 +279,10 @@ export const updateKeyPermissionsSchema = z
       value.allowUsageCommand === undefined &&
       value.usageLimitEnabled === undefined &&
       value.dailyUsageLimitUsd === undefined &&
-      value.weeklyUsageLimitUsd === undefined
+      value.weeklyUsageLimitUsd === undefined &&
+      value.fiveHourUsageLimitUsd === undefined &&
+      value.sharedQuotaProviders === undefined &&
+      value.anthropicRateLimitHeaders === undefined
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -286,6 +302,21 @@ export const updateKeyPermissionsSchema = z
           path: ["preferredConnections"],
         });
       }
+    }
+  });
+
+export const updateApiKeySelfServiceSchema = z
+  .object({
+    sharedQuotaProviders: sharedQuotaProvidersField,
+    anthropicRateLimitHeaders: anthropicRateLimitHeadersField,
+  })
+  .superRefine((value, ctx) => {
+    if (value.sharedQuotaProviders === undefined && value.anthropicRateLimitHeaders === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "No valid fields to update",
+        path: [],
+      });
     }
   });
 

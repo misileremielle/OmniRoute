@@ -47,6 +47,7 @@ import { getCompatibleFallbackModels } from "@/lib/providers/managedAvailableMod
 import {
   isDiscoveryImportedCustomSource,
   providerUsesCuratedModelsOnly,
+  providerIsCursor,
   providerUsesExclusiveSyncedListing,
 } from "@/lib/providers/modelListingCapability";
 import { ensureCursorAutoCatalogEntry } from "@/lib/providerModels/cursorAutoCatalog";
@@ -878,6 +879,18 @@ async function buildUnifiedModelsResponseCore(
       };
     };
 
+    // A combo's metadata describes its own resolved targets, minus hidden models.
+    const getVisibleComboTargets = (combo: Parameters<typeof resolveNestedComboTargets>[0]) =>
+      (
+        resolveNestedComboTargets(
+          combo,
+          combos as Parameters<typeof resolveNestedComboTargets>[1]
+        ) as ComboCatalogTarget[]
+      ).filter((target) => {
+        const resolved = getComboTargetModelId(target);
+        return resolved ? !isModelHiddenStrict(resolved.providerId, resolved.modelId) : true;
+      });
+
     // Collect models from active providers (or all if none active)
     const models = [];
     const timestamp = Math.floor(Date.now() / 1000);
@@ -957,7 +970,7 @@ async function buildUnifiedModelsResponseCore(
         earlyKeyMeta.allowedQuotas,
         combos,
         timestamp,
-        (c) => buildComboCatalogMetadata(c, combos)
+        (c) => buildComboCatalogMetadata(c, getVisibleComboTargets(c))
       );
       const quotaFinal = await applyCatalogPostFilters(request, quotaModels, postFilterContext);
       return finalizeCatalogResponse(request, quotaFinal, () => undefined, {
@@ -1074,14 +1087,9 @@ async function buildUnifiedModelsResponseCore(
       if (listedIds.has(combo.name)) continue; // #4164: don't shadow a built-in auto/* id
 
       // Skip combos whose any underlying target model is hidden
-      const comboTargets = resolveNestedComboTargets(
-        combo as Parameters<typeof resolveNestedComboTargets>[0],
-        combos as Parameters<typeof resolveNestedComboTargets>[1]
-      ) as ComboCatalogTarget[];
-      const visibleTargets = comboTargets.filter((target) => {
-        const resolved = getComboTargetModelId(target);
-        return resolved ? !isModelHiddenStrict(resolved.providerId, resolved.modelId) : true;
-      });
+      const visibleTargets = getVisibleComboTargets(
+        combo as Parameters<typeof resolveNestedComboTargets>[0]
+      );
       if (visibleTargets.length === 0) continue;
 
       const comboMetadata = buildComboCatalogMetadata(combo, visibleTargets);
@@ -1348,11 +1356,10 @@ async function buildUnifiedModelsResponseCore(
           continue;
         }
 
-        for (const sm of ["cursor", "cu"].includes(providerId.trim().toLowerCase())
+        for (const sm of providerIsCursor(providerId)
           ? ensureCursorAutoCatalogEntry(
               syncedModels.map((row) => ({
                 ...row,
-                id: row.id,
                 name: row.name || row.id,
                 owned_by: "cursor",
               }))
@@ -2116,7 +2123,7 @@ async function buildUnifiedModelsResponseCore(
           keyMeta.allowedQuotas,
           combos,
           timestamp,
-          (c) => buildComboCatalogMetadata(c, combos)
+          (c) => buildComboCatalogMetadata(c, getVisibleComboTargets(c))
         );
       } else if (!keyMeta) {
         // #6406: A valid apiKey without a DB metadata row is an env-var master key

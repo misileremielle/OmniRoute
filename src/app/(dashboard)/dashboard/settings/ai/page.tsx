@@ -8,6 +8,7 @@ import ModalityBridgeMovedCard from "../components/ModalityBridgeMovedCard";
 import ResponsesStatePolicyTab from "../components/ResponsesStatePolicyTab";
 import CodexFastTierTab from "../components/CodexFastTierTab";
 import CodexAutoPingTab from "../components/CodexAutoPingTab";
+import BankedResetAutoApplyTab from "../components/BankedResetAutoApplyTab";
 import ClaudeFastModeTab from "../components/ClaudeFastModeTab";
 import ModelsDevSyncTab from "../components/ModelsDevSyncTab";
 import UsageTokenBufferTab from "../components/UsageTokenBufferTab";
@@ -26,6 +27,7 @@ export default function SettingsAiPage() {
       <CodexFastTierTab />
       <ConnectionTestSettings />
       <CodexAutoPingTab />
+      <BankedResetAutoApplyTab />
       <ClaudeFastModeTab />
       <ModelCapabilityOverridesTab />
       <ModelsDevSyncTab />
