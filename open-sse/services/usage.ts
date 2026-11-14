@@ -50,16 +50,12 @@ import { getKiroUsage, buildKiroUsageResult, discoverKiroProfileArn } from "./us
 export { buildKiroUsageResult, discoverKiroProfileArn } from "./usage/kiro.ts";
 import { getOpenrouterUsage } from "./usage/openrouter.ts";
 import { getOpenAiCompatibleUsage } from "./usage/openaiCompatible.ts";
-import { getLlmgatewayUsage } from "./usage/llmgateway.ts";
-import { getLyceumUsage } from "./usage/lyceum.ts";
 import { getOllamaCloudUsage } from "./opencodeOllamaUsage.ts";
 import { getCodeBuddyCnUsage } from "./usage/codebuddy-cn.ts";
 import { getCodeBuddyIntlUsage } from "./usage/codebuddy-intl.ts";
 import { getGitHubUsage, formatGitHubQuotaSnapshot, inferGitHubPlanName } from "./usage/github.ts";
-import { getCrofUsage } from "./usage/crof.ts";
 import { getClinepassUsage } from "./usage/clinepass.ts";
 import { getNanoGptUsage } from "./usage/nanogpt.ts";
-import { getNanUsage } from "./usage/nan.ts";
 import { getApmixUsage } from "./usage/apmix.ts";
 import { getQoderUsage, parseQoderUserStatusUsage } from "./usage/qoder.ts";
 // Re-exported para o teste qoder-usage-quota (importa parseQoderUserStatusUsage de services/usage).
@@ -85,14 +81,10 @@ import { getContext7Usage } from "./usage/context7.ts";
 import { getTavilyUsage } from "./usage/tavily.ts";
 import { getJinaUsage } from "./usage/jina.ts";
 import { getVolcenginePlanUsage } from "./usage/volcenginePlan.ts";
-import { getCommandCodeUsage } from "./usage/command-code.ts";
 import { getQwenTokenPlanUsage } from "./usage/qwen-token-plan.ts";
-import { getAgentrouterUsage } from "./usage/agentrouter.ts";
 import { getKilocodeUsage } from "./usage/kilocode.ts";
 import { getMegabrainUsage } from "./usage/megabrain.ts";
-import { getTokenRouterUsage } from "./usage/tokenrouter.ts";
 import { getCloudflareAiUsage } from "./usage/cloudflareAi.ts";
-import { getXkiroUsage } from "./usage/xkiro.ts";
 import { getZedHostedUsage } from "./usage/zedHosted.ts";
 import { getMuseUsage } from "./usage/museCode.ts";
 
@@ -205,8 +197,6 @@ export async function getUsageForProvider(
     case "minimax":
     case "minimax-cn":
       return await getMiniMaxUsage(apiKey || "", provider);
-    case "crof":
-      return await getCrofUsage(apiKey || "");
     case "clinepass":
       // Dual-auth: OAuth WorkOS token in `accessToken`, or a BYOK key in `apiKey`.
       return await getClinepassUsage(accessToken, apiKey);
@@ -216,8 +206,6 @@ export async function getUsageForProvider(
       return await getQwenTokenPlanUsage(id || "", apiKey || "", providerSpecificData);
     case "nanogpt":
       return await getNanoGptUsage(apiKey || "");
-    case "nan":
-      return await getNanUsage(apiKey || "");
     case "apmix":
       return await getApmixUsage(apiKey || "");
     case "deepseek":
@@ -232,10 +220,6 @@ export async function getUsageForProvider(
       return await getMoonshotOpenPlatformUsage(connection);
     case "openrouter":
       return await getOpenrouterUsage(id || "", apiKey || "", providerSpecificData);
-    case "llmgateway":
-      return await getLlmgatewayUsage(id || "", apiKey || "");
-    case "lyceum":
-      return await getLyceumUsage(id || "", apiKey || "");
     case "opencode-zen":
       return await getOpencodeUsage(id || "", apiKey || "");
     case "xiaomi-mimo":
@@ -269,12 +253,6 @@ export async function getUsageForProvider(
     case "volcengine-agent-plan":
     case "volcengine-coding-plan":
       return await getVolcenginePlanUsage(apiKey || "", provider, providerSpecificData);
-    case "command-code":
-      return await getCommandCodeUsage(apiKey || accessToken || "", id || "");
-    case "agentrouter":
-      return await getAgentrouterUsage(id, connection);
-    case "tokenrouter":
-      return await getTokenRouterUsage(apiKey || "", providerSpecificData);
     case "kilocode":
       return await getKilocodeUsage(id, connection);
     case "megabrain":
@@ -289,9 +267,6 @@ export async function getUsageForProvider(
     case "cloudflare-ai":
       // Daily neurons from GraphQL Analytics (needs Account Analytics: Read on the token).
       return await getCloudflareAiUsage(apiKey || "", providerSpecificData);
-    case "xkiro":
-      // Daily free tokens only; the paid wallet never counts as free allowance.
-      return await getXkiroUsage(id || "", apiKey || "");
     case "zed-hosted":
       // USD credit from the operator-pasted Orb billing portal link; display-only.
       return await getZedHostedUsage(id || "", providerSpecificData);
@@ -331,7 +306,6 @@ export const __testing = {
   getContext7Usage,
   getTavilyUsage,
   getJinaUsage,
-  getCommandCodeUsage,
   getVertexUsage,
   getMiniMaxAuthErrorMessage,
   getMiniMaxErrorSummary,

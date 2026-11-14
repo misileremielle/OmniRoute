@@ -578,14 +578,6 @@ export const EMBEDDING_PROVIDERS: Record<string, EmbeddingProvider> = {
     ],
   },
 
-  nan: {
-    id: "nan",
-    baseUrl: "https://api.nan.builders/v1/embeddings",
-    authType: "apikey",
-    authHeader: "bearer",
-    models: [{ id: "qwen3-embedding", name: "Qwen3 Embedding", dimensions: 4096 }],
-  },
-
   // ParalonCloud — OpenAI-compatible /v1/embeddings behind the chat API key.
   paraloncloud: {
     id: "paraloncloud",

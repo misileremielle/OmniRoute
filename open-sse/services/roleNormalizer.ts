@@ -97,14 +97,7 @@ function isGlmWithoutSystemRole(modelLower: string): boolean {
   return true;
 }
 
-const PROVIDER_SCOPED_MODELS_WITHOUT_SYSTEM_ROLE: Record<string, RegExp[]> = {
-  // ZenMux exposes Z.AI GLM through OpenAI-compatible model ids such as
-  // "z-ai/glm-5.2". Z.AI rejects compressed histories that start with a
-  // system summary followed by an assistant/tool bundle, while OpenRouter
-  // tolerates the same shape. Treat these vendor-prefixed GLM ids like native
-  // GLM so normalizeSystemRole moves system/developer content into a user turn.
-  zenmux: [/(?:^|\/)glm(?:-|$)/i],
-};
+const PROVIDER_SCOPED_MODELS_WITHOUT_SYSTEM_ROLE: Record<string, RegExp[]> = {};
 
 interface MessageContentPart {
   type?: string;

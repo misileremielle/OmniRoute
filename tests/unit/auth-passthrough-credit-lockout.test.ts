@@ -17,9 +17,6 @@ const auth = await import("../../src/sse/services/auth.ts");
 const accountFallback = await import("../../open-sse/services/accountFallback.ts");
 const { COOLDOWN_MS } = await import("../../open-sse/config/errorConfig.ts");
 
-const BAI_INSUFFICIENT_BALANCE_400 =
-  "[400]: credit insufficient balance: balance=0 required=6792 (request id: 20260913093939137112807c955d5685unboZPV)";
-
 async function resetStorage() {
   core.resetDbInstance();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
@@ -48,42 +45,6 @@ async function seedConnection(
 test.after(() => {
   core.resetDbInstance();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-});
-
-test("b.ai HTTP 400 credit insufficient balance locks only the requested model, connection stays active", async () => {
-  await resetStorage();
-  accountFallback.clearAllModelLockouts();
-
-  const conn = await seedConnection("bai", {
-    name: "ggdayup",
-  });
-
-  const result = await auth.markAccountUnavailable(
-    conn.id,
-    400,
-    BAI_INSUFFICIENT_BALANCE_400,
-    "bai",
-    "glm-5.3-flash"
-  );
-
-  assert.equal(result.shouldFallback, true);
-  assert.ok(result.cooldownMs > 0);
-
-  // Connection must NOT be terminated or rate-limited connection-wide
-  const after = await providersDb.getProviderConnectionById(conn.id);
-  assert.equal(after?.testStatus, "active", "connection testStatus must remain active");
-  assert.ok(!after?.rateLimitedUntil, "connection rateLimitedUntil must not be set");
-  assert.equal(after?.lastErrorType, "quota_exhausted");
-  assert.equal(Number(after?.errorCode), 400);
-
-  // The paid/exhausted model is locked out for this connection
-  const glmLockout = accountFallback.getModelLockoutInfo("bai", conn.id, "glm-5.3-flash");
-  assert.ok(glmLockout, "glm-5.3-flash must be locked out");
-  assert.equal(glmLockout?.reason, "quota_exhausted");
-
-  // Other models on b.ai (e.g. free model qwen3.8-flash) remain eligible
-  const qwenLockout = accountFallback.getModelLockoutInfo("bai", conn.id, "qwen3.8-flash");
-  assert.equal(qwenLockout, null, "qwen3.8-flash must not be locked out");
 });
 
 test("compatible provider HTTP 400 insufficient balance locks only the model", async () => {

@@ -33,7 +33,7 @@ function toTextContent(content: unknown): string {
  * self-hosted Qwen3.5+/3.6 model, whose chat template enforces the same
  * single-leading-system-message constraint as xiaomi-mimo.
  */
-const BUILTIN_PROVIDERS_SYSTEM_MUST_BE_FIRST = new Set(["xiaomi-mimo", "mimo", "tokenrouter"]);
+const BUILTIN_PROVIDERS_SYSTEM_MUST_BE_FIRST = new Set(["xiaomi-mimo", "mimo"]);
 
 /**
  * Parses OMNIROUTE_STRICT_SYSTEM_PROVIDERS into a normalized id list.

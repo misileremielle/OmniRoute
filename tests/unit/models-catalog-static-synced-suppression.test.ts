@@ -107,18 +107,16 @@ test("authoritative live catalog suppresses static effort-tier variants on sync"
 });
 
 test("partial discovery provider preserves uncovered static models when synced", async () => {
-  const connection = await seedConnection("command-code", "command-code-partial-discovery");
-  const uncoveredStaticModel = "deepseek/deepseek-v4-flash";
-  const coveredSyncedModel = "claude-opus-4-7";
+  const connection = await seedConnection("glm", "glm-partial-discovery");
+  const uncoveredStaticModel = "glm-5.3-flash";
+  const coveredSyncedModel = "glm-5.3";
 
-  await modelsDb.replaceSyncedAvailableModelsForConnection(
-    "command-code",
-    connection.id as string,
-    [{ id: coveredSyncedModel, name: "Claude Opus 4.7", source: "imported" }]
-  );
+  await modelsDb.replaceSyncedAvailableModelsForConnection("glm", connection.id as string, [
+    { id: coveredSyncedModel, name: "GLM 5.3", source: "imported" },
+  ]);
 
   const ids = await getCatalogIds();
 
-  assert.equal(ids.has(`cmd/${coveredSyncedModel}`), true);
-  assert.equal(ids.has(`cmd/${uncoveredStaticModel}`), true);
+  assert.equal(ids.has(`glm/${coveredSyncedModel}`), true);
+  assert.equal(ids.has(`glm/${uncoveredStaticModel}`), true);
 });

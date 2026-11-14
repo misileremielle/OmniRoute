@@ -100,56 +100,6 @@ async function runChatRequest({ provider, model, apiKey, tools }) {
   return { result, captured };
 }
 
-test("#13789 agentrouter+glm: a request with non-function tools reaches the executor with none", async () => {
-  const { result, captured } = await runChatRequest({
-    provider: "agentrouter",
-    model: "glm-5.3",
-    apiKey: "test-...ey",
-    tools: [
-      {
-        type: "function",
-        function: {
-          name: "get_weather",
-          description: "Get weather",
-          parameters: { type: "object", properties: {} },
-        },
-      },
-      // Acceptance shape from the issue: a hosted `{ type: "web_search" }` tool.
-      // The web-search fallback converts this to the omniroute_web_search function
-      // tool on this provider, so it never reaches upstream as a non-function type.
-      { type: "web_search" },
-      // The shapes that actually leak on the current tip: a named Claude server
-      // tool (must convert to function) and a nameless hosted tool (must drop).
-      // Both forwarded verbatim, agentrouter GLM 400s the WHOLE request with
-      // `tools[0].type:type is illegal`.
-      { type: "computer_20241022", name: "computer", display_width_px: 1024 },
-      { type: "code_interpreter" },
-    ],
-  });
-
-  assert.equal(result.success, true);
-  assert.ok(captured, "the executor was reached");
-  assert.equal(captured.url, "https://agentrouter.org/v1/chat/completions");
-
-  const tools = captured.body.tools ?? [];
-  for (const tool of tools) {
-    assert.equal(
-      tool.type,
-      "function",
-      `non-function tool reached agentrouter upstream: ${JSON.stringify(tool)}`
-    );
-  }
-  const names = new Set(tools.map((t) => t.function?.name));
-  assert.ok(names.has("get_weather"), "the plain function tool survives");
-  assert.ok(names.has("computer"), "the named server tool is converted, not forwarded raw");
-  assert.ok(names.has("omniroute_web_search"), "web_search lands as the fallback function tool");
-  assert.equal(
-    names.has("code_interpreter"),
-    false,
-    "the nameless hosted tool is dropped, not forwarded"
-  );
-});
-
 test("#13789 openai: `custom` tools stay untouched (allowlist is conservative)", async () => {
   const customTool = {
     type: "custom",

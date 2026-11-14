@@ -29,16 +29,11 @@ const FIVE = ["low", "medium", "high", "xhigh", "max"] as const;
 const FOUR = ["low", "medium", "high", "max"] as const;
 
 const FIVE_TIER: Array<[string, string]> = [
-  ["agentrouter", "claude-opus-4-8"],
-  ["agentrouter", "claude-opus-5"],
   ["blackbox", "claude-fable-5"],
   ["cline", "anthropic/claude-opus-4.8"],
   ["freebuff", "anthropic/claude-fable-5"],
   ["kie", "claude-fable-5"],
   ["kiro", "claude-sonnet-5"],
-  ["orcarouter", "anthropic/claude-opus-4.8"],
-  ["poe", "claude-opus-4.8"],
-  ["tabitoken", "claude-opus-5"],
   ["uc-direct", "claude-opus-5"],
   ["bedrock", "anthropic.claude-opus-4-7"],
 ];
@@ -46,23 +41,15 @@ const FIVE_TIER: Array<[string, string]> = [
 const FOUR_TIER: Array<[string, string]> = [
   ["bedrock", "anthropic.claude-sonnet-4-6"],
   ["bedrock", "anthropic.claude-opus-4-6"],
-  ["freeaiapikey", "anthropic/claude-opus-4.6"],
-  ["freeaiapikey", "anthropic/claude-sonnet-4.6"],
   ["gitlab-duo", "claude-sonnet-4-6"],
-  ["dit", "claude-sonnet-4-6"],
 ];
 
 const NO_EFFORT: Array<[string, string]> = [
-  ["api-airforce", "anthropic/claude-3.7-sonnet"],
   ["bedrock", "anthropic.claude-sonnet-4-5"],
   ["bedrock", "anthropic.claude-haiku-4-5"],
   ["coze", "claude-3-7-sonnet-20250514"],
   ["kiro", "claude-sonnet-4.5"],
   ["kiro", "claude-haiku-4.5"],
-  ["t3-web", "claude-opus-4"],
-  ["token-kiosk", "claude-3-5-sonnet"],
-  ["zenmux", "anthropic/claude-sonnet-4.5"],
-  ["zenmux", "anthropic/claude-opus-4.5"],
 ];
 
 test("relay Claude models that speak adaptive effort declare the official tier list", () => {

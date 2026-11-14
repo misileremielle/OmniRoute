@@ -147,8 +147,8 @@ export const MODELS_DEV_PROVIDER_MAP: Record<string, string[]> = {
   // OAuth / special providers
   bedrock: ["kiro", "kr"], // kr = Kiro (AWS Bedrock)
   "github-copilot": ["github", "gh"],
-  kilo: ["kilocode", "kc", "kilo-gateway"],
-  kilocode: ["kilocode", "kc", "kilo-gateway"],
+  kilo: ["kilocode", "kc"],
+  kilocode: ["kilocode", "kc"],
   "kimi-for-coding": ["kimi-coding", "kmc", "kimi-coding-apikey", "kmca"],
   // The `opencode` models.dev entry is OpenCode Zen.
   opencode: ["opencode-zen"],

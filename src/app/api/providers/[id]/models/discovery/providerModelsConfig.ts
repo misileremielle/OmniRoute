@@ -15,7 +15,6 @@ import {
   parseClineModels,
   parseClinepassRecommendedModels,
 } from "@omniroute/open-sse/services/clinepassModels.ts";
-import { buildClaudeCodeCompatibleHeaders } from "@omniroute/open-sse/services/claudeCodeCompatible.ts";
 import {
   buildKimiCodeIdentityHeaders,
   getKimiCodeCliUserAgent,
@@ -672,28 +671,6 @@ export const PROVIDER_MODELS_CONFIG: Record<string, ProviderModelsConfigEntry> =
     body: {},
     parseResponse: (data) => data.models || [],
   },
-  // #7016: AgentRouter rejects /v1/models unless the request carries the same
-  // Claude Code wire image the chat path uses (it adopts the dynamic CC wire
-  // image while keeping its own x-api-key auth — see #6056). Without these
-  // headers the gateway WAF 4xx's the request and model import silently falls
-  // back to the local catalog ("API unavailable — using local catalog").
-  agentrouter: {
-    url: "https://agentrouter.org/v1/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    buildHeaders: (token: string) => {
-      const wire = buildClaudeCodeCompatibleHeaders(token, false, undefined, {});
-      const out: Record<string, string> = { ...wire };
-      // Keep AgentRouter's own x-api-key auth scheme (#6056); the CC helper
-      // adds a Bearer Authorization we must not send.
-      for (const key of Object.keys(out)) {
-        if (key.toLowerCase() === "authorization") delete out[key];
-      }
-      if (token) out["x-api-key"] = token;
-      return out;
-    },
-    parseResponse: (data: any) => (Array.isArray(data) ? data : data?.data || data?.models || []),
-  },
   openai: {
     url: "https://api.openai.com/v1/models",
     method: "GET",
@@ -724,53 +701,6 @@ export const PROVIDER_MODELS_CONFIG: Record<string, ProviderModelsConfigEntry> =
     authHeader: "Authorization",
     authPrefix: "Bearer ",
     parseResponse: (data) => data.data || [],
-  },
-  aimlapi: {
-    // #5570: AI/ML API's live catalog lives at the public, auth-free /models
-    // database endpoint (NOT /v1/models). The registry has no modelsUrl, so
-    // without this entry the route falls back to the static seed.
-    //
-    // The two premises in the original #5570 comment went stale and silently
-    // zeroed this provider out (936 catalog rows -> 0 discovered models -> the
-    // 6-entry static seed):
-    //   1. the response is NOT a bare array — it is the OpenAI-style envelope
-    //      `{ "object": "list", "data": [...] }`, so `Array.isArray(data)` was
-    //      false and every row was discarded before the filter even ran;
-    //   2. the chat `type` vocabulary is now `openai/chat-completions`; the old
-    //      `chat-completion` spelling matches 0 of 936 rows (verified against the
-    //      live catalog 2026-09-03).
-    // Both spellings are accepted below so a future vocabulary change degrades to
-    // "older models missing" rather than "provider has no models", and the bare
-    // array is still unwrapped for the same reason. Non-chat rows (video, image,
-    // TTS, batches) are dropped outright — the previous `chat.length ? chat : all`
-    // fallback would have surfaced 583 non-chat ids in a chat model picker, which
-    // is what hid defect 2 from the tests.
-    url: "https://api.aimlapi.com/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    parseResponse: (data) => {
-      const rows = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
-      return rows
-        .filter((m) => AIMLAPI_CHAT_MODEL_TYPES.has(m?.type))
-        .map((m) => ({ id: m?.id, name: m?.info?.name || m?.id }))
-        .filter((m) => typeof m.id === "string" && m.id);
-    },
-  },
-  thebai: {
-    url: "https://api.theb.ai/v1/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    authHeader: "Authorization",
-    authPrefix: "Bearer ",
-    parseResponse: (data) => data.data || data.models || [],
-  },
-  fenayai: {
-    url: "https://fenayai.com/v1/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    authHeader: "Authorization",
-    authPrefix: "Bearer ",
-    parseResponse: (data) => data.data || data.models || [],
   },
   chutes: {
     url: "https://llm.chutes.ai/v1/models",
@@ -874,14 +804,6 @@ export const PROVIDER_MODELS_CONFIG: Record<string, ProviderModelsConfigEntry> =
     authHeader: "Authorization",
     authPrefix: "Bearer ",
     parseResponse: (data) => data.data || data.models || [],
-  },
-  empiriolabs: {
-    url: "https://api.empiriolabs.ai/v1/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    authHeader: "Authorization",
-    authPrefix: "Bearer ",
-    parseResponse: parseEmpirioLabsChatModels,
   },
   openference: {
     url: "https://api.openference.com/v1/models",
@@ -1022,30 +944,6 @@ export const PROVIDER_MODELS_CONFIG: Record<string, ProviderModelsConfigEntry> =
     parseResponse: parseCloudflareModelsSearch,
     nextPageUrl: nextCloudflareModelsPageUrl,
   },
-  synthetic: {
-    url: "https://api.synthetic.new/openai/v1/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    authHeader: "Authorization",
-    authPrefix: "Bearer ",
-    parseResponse: (data) => data.data || data.models || [],
-  },
-  "kilo-gateway": {
-    url: "https://api.kilo.ai/api/gateway/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    authHeader: "Authorization",
-    authPrefix: "Bearer ",
-    parseResponse: (data) => data.data || data.models || [],
-  },
-  "command-code": {
-    url: "https://api.commandcode.ai/provider/v1/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    authHeader: "Authorization",
-    authPrefix: "Bearer ",
-    parseResponse: (data) => data.data || data.models || [],
-  },
   // OpenCode CLI identity headers on both opencode-family entries (see
   // buildOpencodeModelsDiscoveryEntry above for why — bare "Bun fetch" calls
   // without x-opencode-session are what OpenCode's operator warning names).
@@ -1053,22 +951,6 @@ export const PROVIDER_MODELS_CONFIG: Record<string, ProviderModelsConfigEntry> =
   "opencode-go": buildOpencodeModelsDiscoveryEntry("https://opencode.ai/zen/go/v1/models"),
   "glm-cn": {
     url: "https://open.bigmodel.cn/api/coding/paas/v4/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    authHeader: "Authorization",
-    authPrefix: "Bearer ",
-    parseResponse: (data) => data.data || data.models || [],
-  },
-  gitlawb: {
-    url: "https://opengateway.gitlawb.com/v1/xiaomi-mimo/models",
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    authHeader: "Authorization",
-    authPrefix: "Bearer ",
-    parseResponse: (data) => data.data || data.models || [],
-  },
-  "gitlawb-gmi": {
-    url: "https://opengateway.gitlawb.com/v1/gmi-cloud/models",
     method: "GET",
     headers: { "Content-Type": "application/json" },
     authHeader: "Authorization",

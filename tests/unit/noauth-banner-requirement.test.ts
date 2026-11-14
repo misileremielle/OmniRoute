@@ -6,7 +6,6 @@ import { NextIntlClientProvider } from "next-intl";
 import enMessages from "../../src/i18n/messages/en.json" with { type: "json" };
 import { NOAUTH_PROVIDERS } from "../../src/shared/constants/providers/noauth.ts";
 import NoAuthProviderCard from "../../src/shared/components/NoAuthProviderCard.tsx";
-import NoAuthAccountCard from "../../src/shared/components/NoAuthAccountCard.tsx";
 
 const PLAIN = enMessages.noAuthProvider.description;
 
@@ -32,21 +31,4 @@ test("a no-auth banner stays the plain ready message when the provider has no no
 
   assert.match(html, new RegExp(PLAIN.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(html, /DuckDuckGo AI Chat is anonymous/);
-});
-
-test("an account no-auth banner includes the stored notice beside the account message", () => {
-  const html = reactRenderToStaticMarkup(
-    React.createElement(
-      NextIntlClientProvider,
-      { locale: "en", timeZone: "UTC", messages: { noAuthProvider: enMessages.noAuthProvider } },
-      React.createElement(NoAuthAccountCard, {
-        providerId: "uncloseai",
-        providerName: "UncloseAI",
-        generateAccountId: () => "account-1",
-      })
-    )
-  );
-
-  assert.match(html, /Ready to use/);
-  assert.match(html, /UncloseAI needs no API key/);
 });

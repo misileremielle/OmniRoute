@@ -215,20 +215,20 @@ test("/v1/models keeps a hidden effort variant out of the claude/ discovery mirr
 
 test("/v1/models keeps a hidden effort variant out of functional-gateway mirrors", async () => {
   const gateway = await createProviderConnection({
-    provider: "agentrouter",
+    provider: "openrouter",
     authType: "apikey",
     name: "catalog gateway fixture",
-    apiKey: "synthetic-agentrouter",
+    apiKey: "synthetic-openrouter",
     isActive: true,
     testStatus: "active",
   });
   assert.ok(gateway.id);
   setFeatureFlagOverride("EXPOSE_FUNCTIONAL_GATEWAY_MIRRORS", "true");
-  setFunctionalGatewayProviderSetting("agentrouter", "on");
+  setFunctionalGatewayProviderSetting("openrouter", "on");
   try {
     const before = await catalogIds();
     const mirror = before.find(
-      (id) => id.startsWith("agentrouter/") && id.endsWith("/claude-opus-4-7-high")
+      (id) => id.startsWith("openrouter/") && id.endsWith("/claude-opus-4-7-high")
     );
     assert.ok(mirror, "baseline must advertise the gateway -high variant; do not skip this");
     const base = mirror.slice(0, -"-high".length);
@@ -243,7 +243,7 @@ test("/v1/models keeps a hidden effort variant out of functional-gateway mirrors
     assert.ok(after.includes(base), "the gateway mirror of the base stays");
   } finally {
     removeFeatureFlagOverride("EXPOSE_FUNCTIONAL_GATEWAY_MIRRORS");
-    setFunctionalGatewayProviderSetting("agentrouter", null);
+    setFunctionalGatewayProviderSetting("openrouter", null);
     setModelIsHidden("command-code", "claude-opus-4-7-high", false);
   }
 });

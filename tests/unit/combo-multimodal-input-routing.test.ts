@@ -9,12 +9,9 @@ process.env.DATA_DIR = dataDir;
 process.env.DISABLE_SQLITE_AUTO_BACKUP = "true";
 const core = await import("../../src/lib/db/core.ts");
 const { filterTargetsByRequestCompatibility } = await import("../../open-sse/services/combo.ts");
-const { computeCompatRejectedTargets, deriveRequestCompatibilityRequirements } =
+const { computeCompatRejectedTargets } =
   await import("../../open-sse/services/combo/comboStructure.ts");
-const { getResolvedModelCapabilities } = await import("../../src/lib/modelCapabilities.ts");
 const { detectMediaParts } = await import("../../open-sse/utils/mediaParts.ts");
-const { normalizeDiscoveredModels } =
-  await import("../../src/lib/providerModels/modelDiscovery.ts");
 const { CloudflarePlaygroundExecutor } =
   await import("../../open-sse/executors/cloudflare-playground.ts");
 const { replaceSyncedAvailableModelsForConnection } = await import("../../src/lib/db/models.ts");
@@ -23,9 +20,6 @@ const { buildTargetTimeoutRunner } =
 const { tryPinnedModelDispatch } = await import("../../open-sse/services/combo/dispatchPrelude.ts");
 const { resolveComboSetupConfig } = await import("../../open-sse/services/comboConfig.ts");
 const { handleComboChat } = await import("../../open-sse/services/combo.ts");
-const { resolveAutoStrategyOrder } =
-  await import("../../open-sse/services/combo/resolveAutoStrategy.ts");
-const { DEFAULT_RESILIENCE_SETTINGS } = await import("../../src/lib/resilience/settings.ts");
 test.after(() => {
   core.resetDbInstance();
   rmSync(dataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
@@ -43,49 +37,15 @@ const target = (modelStr: string) => ({
   label: null,
 });
 const blind = target("cfp/moonshotai/kimi-k2.7-code");
-const capable = target("cinf/gemini-4-argon");
-test("PDF/video require proven CI transports despite advertisements, including fail-open", () => {
-  const advertised = target("cheaperinference/gpt-4o-mini");
-  const oldVideo = target("cheaperinference/gemini-2.5-flash");
-  for (const fixture of [fixtures[1], fixtures[2]]) {
-    assert.deepEqual(
-      filterTargetsByRequestCompatibility([advertised, oldVideo, capable], body(fixture.part), log),
-      [capable]
-    );
-    assert.deepEqual(
-      filterTargetsByRequestCompatibility([advertised, oldVideo], body(fixture.part), log, "test", {
-        failOpen: true,
-      }),
-      []
-    );
-    assert.deepEqual(
-      computeCompatRejectedTargets([advertised, oldVideo], [], body(fixture.part)),
-      []
-    );
-  }
-  assert.equal(getResolvedModelCapabilities(advertised.modelStr).supportsPdf, false);
-  assert.equal(getResolvedModelCapabilities(oldVideo.modelStr).supportsVideo, false);
-});
-test("Chat audio excludes transcription-only and unverified transports", () => {
-  const transcribe = target("cinf/gpt-4o-mini-transcribe");
-  const oldChat = target("cinf/gemini-2.5-flash");
-  const provenChat = target("cinf/gemini-3.7-flash");
-  assert.deepEqual(
-    filterTargetsByRequestCompatibility(
-      [transcribe, oldChat, provenChat, capable],
-      body(fixtures[0].part),
-      log,
-      "test",
-      { failOpen: true }
-    ),
-    [provenChat, capable]
-  );
-  assert.deepEqual(
-    computeCompatRejectedTargets([transcribe, oldChat], [], body(fixtures[0].part)),
-    []
-  );
-  assert.equal(getResolvedModelCapabilities(transcribe.modelStr).supportsAudio, false);
-});
+// A connection whose synced catalog explicitly declares every input kind.
+await replaceSyncedAvailableModelsForConnection("openrouter", "capable-conn", [
+  {
+    id: "google/gemini-2.5-pro",
+    name: "Capable",
+    supportedInputTypes: ["text", "image", "audio", "video", "pdf", "file"],
+  },
+]);
+const capable = { ...target("openrouter/google/gemini-2.5-pro"), connectionId: "capable-conn" };
 const body = (part: unknown) => ({
   messages: [
     { role: "user", content: [part] },
@@ -150,63 +110,13 @@ test("mixed media requires every capability; image-only models cannot take video
     messages: [{ role: "user", content: fixtures.slice(0, 3).map((f) => f.part) }],
   };
   assert.deepEqual(
-    filterTargetsByRequestCompatibility([target("cinf/gpt-5.6-sol"), blind, capable], request, log),
+    filterTargetsByRequestCompatibility(
+      [target("openai/gpt-4o-mini"), blind, capable],
+      request,
+      log
+    ),
     [capable]
   );
-});
-test("Auto rechecks media after expansion and cannot restore rejected routes without telemetry", async () => {
-  const advertised = target("cinf/gpt-4o-mini");
-  const run = async (targets: ReturnType<typeof target>[]) =>
-    resolveAutoStrategyOrder({
-      orderedTargets: targets,
-      body: body(fixtures[2].part),
-      combo: { name: "media-auto", models: targets.map((t) => t.modelStr), strategy: "auto" },
-      settings: null,
-      config: { compatFilterFailOpen: true },
-      resilienceSettings: DEFAULT_RESILIENCE_SETTINGS,
-      log,
-      buildAutoCandidates: async () => [],
-    });
-  const rejected = await run([advertised]);
-  assert.ok("earlyResponse" in rejected);
-  if ("earlyResponse" in rejected) assert.equal(rejected.earlyResponse.status, 400);
-  const accepted = await run([advertised, capable]);
-  assert.ok("orderedTargets" in accepted);
-  if ("orderedTargets" in accepted) assert.deepEqual(accepted.orderedTargets, [capable]);
-});
-test("PDF and generic files are distinct from image vision and extracted plain text", () => {
-  assert.equal(getResolvedModelCapabilities("cinf/gemini-4-argon").supportsVideo, true);
-  const opaque = body({ type: "input_file", filename: "report.docx", file_data: "opaque-bytes" });
-  assert.deepEqual(
-    filterTargetsByRequestCompatibility([blind, capable], opaque, log, "test", { failOpen: true }),
-    []
-  );
-  assert.equal(
-    filterTargetsByRequestCompatibility(
-      [blind],
-      body({ type: "document", source: { type: "text", data: "already extracted text" } }),
-      log
-    ).length,
-    1
-  );
-  assert.equal(
-    deriveRequestCompatibilityRequirements(
-      body({ type: "text", text: "video_url and report.pdf are words here" })
-    ).requiresVision,
-    false
-  );
-});
-
-test("discovery preserves CI's distinct input features instead of turning all vision models into PDF/video models", () => {
-  const models = normalizeDiscoveredModels(
-    [
-      { id: "native-media", features: ["image-input", "file-input", "audio-input", "video-input"] },
-      { id: "image-only", features: ["image-input"] },
-    ],
-    "cheaperinference"
-  );
-  assert.deepEqual(models[0].supportedInputTypes, ["text", "image", "audio", "video", "pdf"]);
-  assert.deepEqual(models[1].supportedInputTypes, ["text", "image"]);
 });
 
 test("direct Cloudflare media requests fail before opening a browser transport", async () => {
@@ -241,11 +151,11 @@ test("tool declarations and extracted text do not create phantom attachments", (
 test("a capable account cannot lend video support to a text-only account of the same provider", async () => {
   const first = "10000000-0000-4000-8000-000000000001";
   const second = "10000000-0000-4000-8000-000000000002";
-  await replaceSyncedAvailableModelsForConnection("cheaperinference", first, [
-    { id: "gemini-4-argon", name: "fixture", supportedInputTypes: ["text", "video"] },
+  await replaceSyncedAvailableModelsForConnection("openrouter", first, [
+    { id: "google/gemini-2.5-pro", name: "fixture", supportedInputTypes: ["text", "video"] },
   ]);
-  await replaceSyncedAvailableModelsForConnection("cheaperinference", second, [
-    { id: "gemini-4-argon", name: "fixture", supportedInputTypes: ["text"] },
+  await replaceSyncedAvailableModelsForConnection("openrouter", second, [
+    { id: "google/gemini-2.5-pro", name: "fixture", supportedInputTypes: ["text"] },
   ]);
   try {
     const yes = { ...capable, connectionId: first },
@@ -254,8 +164,8 @@ test("a capable account cannot lend video support to a text-only account of the 
       yes,
     ]);
   } finally {
-    await replaceSyncedAvailableModelsForConnection("cheaperinference", first, []);
-    await replaceSyncedAvailableModelsForConnection("cheaperinference", second, []);
+    await replaceSyncedAvailableModelsForConnection("openrouter", first, []);
+    await replaceSyncedAvailableModelsForConnection("openrouter", second, []);
   }
 });
 
@@ -343,14 +253,13 @@ test("an unrelated model's declaration does not suppress this connection's capab
   ]);
 });
 
-test("non-CI unknown PDF/file capabilities preserve fallback while explicit denials and CI stay strict", async () => {
+test("unknown PDF/file capabilities preserve fallback while explicit denials stay strict", async () => {
   const { nonImageMediaFailures } =
     await import("../../open-sse/services/combo/mediaCompatibility.ts");
   const unknown = target("openrouter/undeclared-compatible-model");
   for (const requirements of [{ requiresPdf: true }, { requiresFiles: true }]) {
     assert.deepEqual(nonImageMediaFailures(unknown, requirements), []);
     assert.ok(nonImageMediaFailures(blind, requirements).length > 0);
-    assert.ok(nonImageMediaFailures(target("cinf/gpt-4o-mini"), requirements).length > 0);
   }
   await replaceSyncedAvailableModelsForConnection("openrouter", "scoped-denial", [
     { id: "explicitly-text-only", name: "Explicit", supportedInputTypes: ["text"] },

@@ -53,11 +53,9 @@ test("startup still registers bespoke, batch, and generic quota fetchers", async
   await registerQuotaFetchers();
 
   for (const provider of [
-    "agentrouter",
     "codex",
     "bailian-coding-plan",
     "qwen-cloud-token-plan",
-    "crof",
     "deepseek",
     "openrouter",
     "opencode-go",

@@ -15,8 +15,7 @@
  * This is intentionally the STRICT variant — it does NOT use `parseFloat`
  * (which would accept `"12abc"` -> `12`). A small number of call sites in the
  * codebase intentionally keep `parseFloat` (leniency is a documented,
- * deliberate behavior choice there, not a bug) — see
- * `open-sse/services/crofUsageFetcher.ts` for the annotated exception.
+ * deliberate behavior choice there, not a bug).
  *
  * Migration is happening tier-by-tier (report/analytics first, then
  * quota/billing, then hot-path auth/costRules/combo) to avoid silently

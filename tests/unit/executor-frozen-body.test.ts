@@ -35,7 +35,6 @@ const { PROVIDERS } = await import("../../open-sse/config/constants.ts");
 const { getRegistryEntry } = await import("../../open-sse/config/providerRegistry.ts");
 const { getModelTargetFormat } = await import("../../open-sse/config/providerModels.ts");
 const { AI_PROVIDERS } = await import("../../src/shared/constants/providers.ts");
-const { resetWafRateLimit } = await import("../../open-sse/services/wafRateLimit.ts");
 const core = await import("../../src/lib/db/core.ts");
 
 type Json = Record<string, unknown>;
@@ -380,7 +379,6 @@ async function localErrorText(response: unknown): Promise<string> {
 async function runCase(c: Case): Promise<Outcome> {
   const body = deepFreeze(BODIES[c.bucket](c.model));
   assert.ok(isDeepFrozen(body), `${c.label}: the ${c.bucket} corpus body must be frozen`);
-  resetWafRateLimit(); // agentrouter's WAF gate would otherwise sleep between runs
   clearEgressHits();
   const logged: string[] = [];
   const record = (...args: unknown[]) => void logged.push(args.map(String).join(" "));

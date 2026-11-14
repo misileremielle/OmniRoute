@@ -4,8 +4,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-// #13459: usage_history rows written under a provider alias ("af") and under the
-// canonical id ("api-airforce") split one provider into two analytics buckets.
+// #13459: usage_history rows written under a provider alias ("vag") and under the
+// canonical id ("vercel-ai-gateway") split one provider into two analytics buckets.
 
 const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-usage-alias-"));
 process.env.DATA_DIR = TEST_DATA_DIR;
@@ -24,7 +24,7 @@ test("#13459 saveRequestUsage stores the canonical provider id for an alias", as
   // one timestamp between the two writes would collapse them to a single row
   // on fast/loaded CI runners (same-ms Date.now()).
   const base = Date.now();
-  for (const [i, provider] of ["af", "api-airforce"].entries()) {
+  for (const [i, provider] of ["vag", "vercel-ai-gateway"].entries()) {
     await usageHistory.saveRequestUsage({
       provider,
       model: "gpt-4o-mini",
@@ -38,5 +38,5 @@ test("#13459 saveRequestUsage stores the canonical provider id for an alias", as
     .getDbInstance()
     .prepare("SELECT provider, COUNT(*) AS n FROM usage_history GROUP BY provider")
     .all() as Array<{ provider: string; n: number }>;
-  assert.deepEqual(rows, [{ provider: "api-airforce", n: 2 }]);
+  assert.deepEqual(rows, [{ provider: "vercel-ai-gateway", n: 2 }]);
 });

@@ -303,18 +303,18 @@ test("#8926: live authority defaults to strict and honors explicit partial-disco
   assert.equal(providerUsesAuthoritativeLiveCatalog("github"), true);
   assert.equal(providerUsesAuthoritativeLiveCatalog("cursor"), true);
   assert.equal(providerUsesAuthoritativeLiveCatalog("unknown-provider-8926"), true);
-  assert.equal(providerUsesAuthoritativeLiveCatalog("command-code"), false);
+  assert.equal(providerUsesAuthoritativeLiveCatalog("glm"), false);
 });
 
 test("#8926: partial passthrough discovery remains non-authoritative", async () => {
-  await seedProviderCatalog("command-code", "command-code-partial-live-8926", ["gpt-5.6-luna"]);
+  await seedProviderCatalog("glm", "glm-partial-live-8926", ["glm-5.3"]);
 
-  const catalog = await getActiveSyncedCatalog("command-code");
+  const catalog = await getActiveSyncedCatalog("glm");
 
   assert.equal(catalog.authoritative, false);
   assert.deepEqual(
     catalog.models.map((model) => model.id),
-    ["gpt-5.6-luna"]
+    ["glm-5.3"]
   );
 });
 

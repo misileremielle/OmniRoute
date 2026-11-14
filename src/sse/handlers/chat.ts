@@ -210,7 +210,6 @@ import {
 } from "@omniroute/open-sse/services/codexQuotaFetcher.ts";
 import { registerBailianCodingPlanQuotaFetcher } from "@omniroute/open-sse/services/bailianQuotaFetcher.ts";
 import { registerQwenTokenPlanQuotaFetcher } from "@omniroute/open-sse/services/qwenTokenPlanQuotaFetcher.ts";
-import { registerCrofUsageFetcher } from "@omniroute/open-sse/services/crofUsageFetcher.ts";
 import { registerDeepseekQuotaFetcher } from "@omniroute/open-sse/services/deepseekQuotaFetcher.ts";
 import {
   registerMoonshotQuotaFetcher,
@@ -256,10 +255,6 @@ registerBailianCodingPlanQuotaFetcher();
 // Runs before registerGenericQuotaFetchers so the bespoke fetcher wins.
 registerQwenTokenPlanQuotaFetcher();
 
-// Register CrofAI usage fetcher (subscription requests + credits balance).
-// Surfaces usable_requests + credits in the monitor and only blocks (preflight
-// opt-in) when the active bucket reaches zero.
-registerCrofUsageFetcher();
 // Register DeepSeek balance quota fetcher.
 // Hooks into quotaPreflight + quotaMonitor so combos can switch accounts before balance is exhausted.
 registerDeepseekQuotaFetcher();

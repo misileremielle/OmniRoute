@@ -39,7 +39,6 @@ import {
   resolveAccountKey,
   isFreeVariantModel,
 } from "../services/openrouterFreeWindow.ts";
-import { gateOutboundRequest } from "../services/wafRateLimit.ts";
 import { readErrorBodyText } from "../utils/error.ts";
 import { ClaudeUsageLimitGuard } from "./claudeUsageLimit.ts";
 import {
@@ -637,8 +636,8 @@ export class BaseExecutor {
 
   // Intra-URL retry config: retry same URL before falling back to next node
   static readonly RETRY_CONFIG = { maxAttempts: 2, delayMs: 2000 };
-  // WAF (400 content-blocked) retry config: agentrouter.org's WAF is burst-sensitive
-  // and recovers after a short cooldown. Use exponential backoff with a higher
+  // WAF (400 content-blocked) retry config: gateway WAFs are burst-sensitive
+  // and recover after a short cooldown. Use exponential backoff with a higher
   // starting delay than the generic 429 retry (which is 2s) because the WAF
   // needs more time to clear its per-IP suspicion bucket.
   static readonly WAF_RETRY_CONFIG = {
@@ -1613,11 +1612,6 @@ export class BaseExecutor {
           recordFreeWindowAttempt(openrouterFreeWindowAccountKey);
         }
 
-        // WAF burst guard for agentrouter.org's content filter — see wafRateLimit.ts.
-        if (this.provider === "agentrouter") {
-          await gateOutboundRequest(`agentrouter:${url}`);
-        }
-
         let response = await fetchWithStartTimeout(url, fetchOptions);
 
         if (openrouterFreeWindowAccountKey) {
@@ -1809,10 +1803,10 @@ export class BaseExecutor {
           continue;
         }
 
-        // Intra-URL retry: agentrouter.org WAF returns 400 content-blocked
+        // Intra-URL retry: some gateway WAFs return 400 content-blocked
         // intermittently (burst-sensitive, recovers after cooldown). Retry the
         // same URL with exponential backoff before falling through to the
-        // 429/401/fallback chain. See docs/security/AGENTROUTER_WAF.md.
+        // 429/401/fallback chain.
         if (
           !skipUpstreamRetry &&
           response.status === HTTP_STATUS.BAD_REQUEST &&

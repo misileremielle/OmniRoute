@@ -8440,14 +8440,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/dahl/tokens:
-    post:
-      tags:
-        - Dahl
-      summary: "POST dahl › tokens"
-      responses:
-        "200":
-          description: OK
   /api/db-backups/export:
     get:
       tags:
@@ -9665,45 +9657,6 @@ paths:
       tags:
         - Providers
       summary: "POST providers › codex auth › zip extract"
-      responses:
-        "200":
-          description: OK
-  /api/providers/command-code/auth/apply:
-    post:
-      tags:
-        - Providers
-      summary: "POST providers › command code › auth › apply"
-      responses:
-        "200":
-          description: OK
-  /api/providers/command-code/auth/callback:
-    post:
-      tags:
-        - Providers
-      summary: "POST providers › command code › auth › callback"
-      responses:
-        "200":
-          description: OK
-  /api/providers/command-code/auth/start:
-    post:
-      tags:
-        - Providers
-      summary: "POST providers › command code › auth › start"
-      responses:
-        "200":
-          description: OK
-  /api/providers/command-code/auth/status:
-    get:
-      tags:
-        - Providers
-      summary: "GET providers › command code › auth › status"
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Providers
-      summary: "POST providers › command code › auth › status"
       responses:
         "200":
           description: OK

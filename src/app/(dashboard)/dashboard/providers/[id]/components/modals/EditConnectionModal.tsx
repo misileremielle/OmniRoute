@@ -63,8 +63,6 @@ import {
 import { CodexConnectionFields } from "./CodexFingerprintFields";
 import { assignEditApiKeyProviderSpecificData } from "./connectionProviderSpecificData";
 import ProviderTierField from "./ProviderTierField";
-import AgentrouterConsoleFields from "./AgentrouterConsoleFields";
-import CommandCodeZdrToggle from "./CommandCodeZdrToggle";
 import { buildProviderValidateRequestBody } from "./providerValidateRequestBody";
 import { getVertexCredentialCopy } from "./vertexCredentialCopy";
 import QuotaScrapingFields, {
@@ -178,7 +176,6 @@ export default function EditConnectionModal({
     requireUserLastMessage: connectionProviderSpecificData?.requireUserLastMessage === true,
     keepMidConversationSystem: connectionProviderSpecificData?.keepMidConversationSystem === true,
     importFreeModelsOnly: connectionProviderSpecificData?.importFreeModelsOnly === true,
-    commandCodeZdrEnabled: connectionProviderSpecificData?.zdrEnabled === true,
     peakHourProtection: { ...EMPTY_PEAK_HOUR_PROTECTION, windows: [] } as PeakHourProtectionConfig,
   });
   const [testing, setTesting] = useState(false);
@@ -387,7 +384,6 @@ export default function EditConnectionModal({
         keepMidConversationSystem:
           connection?.providerSpecificData?.keepMidConversationSystem === true,
         importFreeModelsOnly: connection?.providerSpecificData?.importFreeModelsOnly === true,
-        commandCodeZdrEnabled: connection.providerSpecificData?.zdrEnabled === true,
         peakHourProtection: {
           ...EMPTY_PEAK_HOUR_PROTECTION,
           ...((connection.providerSpecificData?.peakHourProtection as PeakHourProtectionConfig) ||
@@ -860,11 +856,6 @@ export default function EditConnectionModal({
           {openaiResponsesStoreToggle}
           {requireUserLastMessageToggle}
           {keepMidConversationSystemToggle}
-          <CommandCodeZdrToggle
-            provider={provider}
-            checked={formData.commandCodeZdrEnabled}
-            onChange={(checked) => setFormData({ ...formData, commandCodeZdrEnabled: checked })}
-          />
           <Toggle
             checked={formData.disableCooling}
             onChange={(checked) => setFormData({ ...formData, disableCooling: checked })}
@@ -1116,12 +1107,6 @@ export default function EditConnectionModal({
                     type="password"
                   />
                 )}
-                <AgentrouterConsoleFields
-                  provider={provider}
-                  values={formData}
-                  onChange={(patch) => setFormData({ ...formData, ...patch })}
-                  t={t}
-                />
                 <div className="border-t border-border/30 pt-3 mt-1">
                   <p className="text-xs font-medium text-text-muted mb-2">
                     {t("rateLimitOverridesSection")}

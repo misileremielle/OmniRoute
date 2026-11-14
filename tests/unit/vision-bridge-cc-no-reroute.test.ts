@@ -103,15 +103,6 @@ test("CC-VB-SANITY: getResolvedModelCapabilities reports vision for CC vision mo
   }
 });
 
-test("CC-VB-SANITY: text-only cmd/gpt-5.3-codex resolves as non-vision (#10703)", () => {
-  const caps = getResolvedModelCapabilities("command-code/gpt-5.3-codex");
-  assert.equal(
-    caps.supportsVision,
-    false,
-    "command-code/gpt-5.3-codex is text-only — must NOT have supportsVision: true"
-  );
-});
-
 // ── THE FIX: CC vision models pass through, no reroute ──────────────────────
 
 test("CC-VB-01: gpt-5.5 via command-code does NOT reroute", async () => {
@@ -207,23 +198,6 @@ test("CC-VB-06: all CC vision models pass through unmodified (loop)", async () =
 // so an image request must be rerouted (or described) rather than passed
 // through blind. gpt-5.4-mini is intentionally left as vision-capable — it's a
 // real OpenAI multimodal model that the Command Code gateway forwards correctly.
-
-test("CC-VB-07: cmd/gpt-5.3-codex reroutes instead of passing through (#10703)", async () => {
-  const guardrail = createGuardrail();
-  const model = "command-code/gpt-5.3-codex";
-
-  visionCallCount = 0;
-  const payload = imagePayload(model);
-  const result = await guardrail.preCall(payload, createContext({ model }));
-
-  assert.strictEqual(result.block, false, `${model}: must not block`);
-  const caps = getResolvedModelCapabilities(model);
-  assert.equal(caps.supportsVision, false, `${model}: must be flagged text-only (#10703)`);
-  assert.ok(
-    result.modifiedPayload !== undefined || visionCallCount > 0,
-    `${model}: image request must be rerouted/described, not passed through blind`
-  );
-});
 
 // ── Regression: text-only CC models still handled correctly ─────────────────
 

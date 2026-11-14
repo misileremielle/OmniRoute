@@ -1,13 +1,12 @@
 // Audio/speech + miscellaneous API-key provider validators: deepgram, assemblyai, elevenlabs,
-// inworld, kie, aws-polly, bailian-coding-plan, reka, maritalk, nlpcloud, runwayml, nous-research,
-// poe. Extracted from validation.ts (god-file decomposition) — top-level functions with no
+// inworld, kie, aws-polly, bailian-coding-plan, reka, maritalk, nlpcloud, runwayml,
+// nous-research. Extracted from validation.ts (god-file decomposition) — top-level functions with no
 // dispatcher-state captures; behavior is byte-identical to the original inline defs.
 // Audio/speech + miscellaneous API-key provider validators: deepgram, assemblyai, elevenlabs,
-// inworld, kie, aws-polly, bailian-coding-plan, reka, maritalk, nlpcloud, runwayml, nous-research,
-// poe. Extracted from validation.ts (god-file decomposition) — top-level functions with no
+// inworld, kie, aws-polly, bailian-coding-plan, reka, maritalk, nlpcloud, runwayml,
+// nous-research. Extracted from validation.ts (god-file decomposition) — top-level functions with no
 // dispatcher-state captures; behavior is byte-identical to the original inline defs.
 import { getRegistryEntry } from "@omniroute/open-sse/config/providerRegistry.ts";
-import { POE_DEFAULT_BASE_URL } from "@omniroute/open-sse/config/providers/registry/poe/index.ts";
 import { normalizeBaseUrl } from "./urlHelpers";
 import {
   applyCustomUserAgent,
@@ -339,58 +338,6 @@ export async function validateNlpCloudProvider({ apiKey, providerSpecificData = 
   return { valid: false, error: "Connection failed while testing NLP Cloud" };
 }
 
-export async function validateOneMinAiProvider({ apiKey, providerSpecificData = {} }: any) {
-  const modelId =
-    typeof providerSpecificData.validationModelId === "string" &&
-    providerSpecificData.validationModelId.trim()
-      ? providerSpecificData.validationModelId.trim()
-      : "gpt-4o-mini";
-
-  try {
-    const response = await validationWrite("https://api.1min.ai/api/chat-with-ai", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "API-KEY": apiKey },
-      body: JSON.stringify({
-        type: "UNIFY_CHAT_WITH_AI",
-        model: modelId,
-        promptObject: { prompt: "test" },
-      }),
-    });
-
-    if (response.ok) {
-      return { valid: true, error: null, method: "oneminai_chat_with_ai" };
-    }
-
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-
-    if (response.status === 429) {
-      return {
-        valid: true,
-        error: null,
-        method: "oneminai_chat_with_ai",
-        warning: "Rate limited, but credentials are valid",
-      };
-    }
-
-    // 400/422 with a valid key still means the key authenticated — 1min.ai
-    // rejects an unrecognized/unauthorized model this same way as a bad
-    // request body, so a validation-shaped 4xx is treated as "key is valid".
-    if (response.status === 400 || response.status === 422) {
-      return { valid: true, error: null, method: "oneminai_chat_with_ai" };
-    }
-
-    if (response.status >= 500) {
-      return { valid: false, error: `Provider unavailable (${response.status})` };
-    }
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-
-  return { valid: false, error: "Connection failed while testing 1min.ai" };
-}
-
 export async function validateNousResearchProvider({ apiKey, providerSpecificData = {} }: any) {
   const baseUrl =
     normalizeBaseUrl(providerSpecificData.baseUrl) || "https://inference-api.nousresearch.com/v1";
@@ -455,41 +402,4 @@ export async function validateNousResearchProvider({ apiKey, providerSpecificDat
   }
 
   return { valid: false, error: "Connection failed while testing Nous Research" };
-}
-
-export async function validatePoeProvider({ apiKey, providerSpecificData = {} }: any) {
-  const baseUrl = normalizeBaseUrl(providerSpecificData.baseUrl) || POE_DEFAULT_BASE_URL;
-  const balanceUrl = new URL("/usage/current_balance", baseUrl).toString();
-
-  try {
-    const response = await validationRead(balanceUrl, {
-      method: "GET",
-      headers: buildBearerHeaders(apiKey, providerSpecificData),
-    });
-
-    if (response.ok) {
-      return { valid: true, error: null, method: "poe_current_balance" };
-    }
-
-    if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: "Invalid API key" };
-    }
-
-    if (response.status === 429) {
-      return {
-        valid: true,
-        error: null,
-        method: "poe_current_balance",
-        warning: "Rate limited, but credentials are valid",
-      };
-    }
-
-    if (response.status >= 500) {
-      return { valid: false, error: `Provider unavailable (${response.status})` };
-    }
-  } catch (error: any) {
-    return toValidationErrorResult(error);
-  }
-
-  return { valid: false, error: "Connection failed while testing Poe" };
 }

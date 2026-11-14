@@ -23,7 +23,6 @@ import {
   isQuotaExhaustedSignal,
   isWorkspacePolicyBudget429,
 } from "./modelScopedQuotaFailure.ts"; // #13548, #19314
-import { isCIPayloadQuotaFailure } from "./ciPayloadQuotaFailure.ts";
 import {
   getCachedRawProviderConnections,
   getCachedProviderNodes,
@@ -2589,11 +2588,6 @@ export async function markAccountUnavailable(
   if (provider === "muse-code" && isMusePolicyRefusal(status, errorText)) {
     return { shouldFallback: true, cooldownMs: 0 };
   }
-  // Preserve the transport's original 429; cooling Opus would hide the cause and
-  // prevent healthy small requests from using the same connection afterward.
-  if (isCIPayloadQuotaFailure(provider, status, options.structuredError?.code))
-    return { shouldFallback: false, cooldownMs: 0 };
-
   const currentMutex = markMutexes.get(connectionId) || Promise.resolve();
   let resolveMutex: (() => void) | undefined;
   markMutexes.set(

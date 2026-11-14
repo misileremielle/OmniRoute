@@ -27,83 +27,12 @@ import { getAlternateFormats } from "../../src/app/(dashboard)/dashboard/provide
 import { AI_PROVIDERS, AGGREGATOR_PROVIDER_IDS } from "../../src/shared/constants/providers.ts";
 import { APIKEY_PROVIDERS_GATEWAYS } from "../../src/shared/constants/providers/apikey/gateways.ts";
 import { APIKEY_PROVIDERS_REGIONAL } from "../../src/shared/constants/providers/apikey/regional.ts";
-import { PROVIDER_ENDPOINTS } from "../../src/shared/constants/config.ts";
 
 const KEY = { apiKey: "sk-test" } as never;
 const withFormat = (targetFormat: string) =>
   ({ apiKey: "sk-test", providerSpecificData: { targetFormat } }) as never;
 
 // ── tabitoken ─────────────────────────────────────────────────────────────────
-
-test("tabitoken registry entry is Claude-first with an OpenAI alternate", () => {
-  const entry = getRegistryEntry("tabitoken");
-  assert.equal(entry?.format, "claude");
-  assert.equal(entry?.executor, "default");
-  assert.equal(entry?.authType, "apikey");
-  assert.equal(entry?.authHeader, "x-api-key");
-  assert.equal(entry?.baseUrl, "https://tabitoken.com/v1/messages");
-  assert.equal(entry?.modelsUrl, "https://tabitoken.com/v1/models");
-  assert.equal(entry?.passthroughModels, true);
-  // The generic claude-format path in default.ts::buildHeaders only defaults
-  // anthropic-version for `anthropic-compatible-*` ids, so the entry carries it.
-  assert.equal(entry?.headers?.["Anthropic-Version"], "2023-06-01");
-  // Only the two protocols tabitoken's own /api/pricing reports per model
-  // (supported_endpoint_types: ["anthropic","openai"]).
-  assert.deepEqual(
-    (entry?.alternateFormats || []).map((a) => a.format),
-    ["openai"]
-  );
-});
-
-test("tabitoken catalog matches the four Claude models its public pricing endpoint lists", () => {
-  const entry = getRegistryEntry("tabitoken");
-  assert.deepEqual(
-    (entry?.models || []).map((m) => m.id),
-    ["claude-opus-5", "claude-opus-5-thinking", "claude-opus-4-8", "claude-opus-4-8-thinking"]
-  );
-  for (const model of entry?.models || []) {
-    assert.equal(typeof model.name, "string");
-    assert.ok(model.name.length > 0, `${model.id} must carry a display name`);
-  }
-});
-
-test("tabitoken defaults to /v1/messages + x-api-key and switches to Bearer on the OpenAI alternate", () => {
-  const executor = new DefaultExecutor("tabitoken");
-
-  assert.equal(getTargetFormat("tabitoken", null), "claude");
-  assert.equal(
-    executor.buildUrl("claude-opus-5", true, 0, KEY),
-    "https://tabitoken.com/v1/messages"
-  );
-  const claudeHeaders = executor.buildHeaders(KEY, true) as Record<string, string>;
-  assert.equal(claudeHeaders["x-api-key"], "sk-test");
-  assert.equal(claudeHeaders["Authorization"], undefined);
-  assert.equal(claudeHeaders["Anthropic-Version"], "2023-06-01");
-
-  assert.equal(getTargetFormat("tabitoken", { targetFormat: "openai" }), "openai");
-  const openaiCreds = withFormat("openai");
-  assert.equal(
-    executor.buildUrl("claude-opus-5", true, 0, openaiCreds),
-    "https://tabitoken.com/v1/chat/completions"
-  );
-  const openaiHeaders = executor.buildHeaders(openaiCreds, true) as Record<string, string>;
-  assert.equal(openaiHeaders["Authorization"], "Bearer sk-test");
-  assert.equal(openaiHeaders["x-api-key"], undefined);
-});
-
-test("tabitoken ignores a targetFormat it does not declare", () => {
-  const executor = new DefaultExecutor("tabitoken");
-  // Unknown alternate → resolveAlternateFormat returns null → default format/route/auth.
-  assert.equal(getTargetFormat("tabitoken", { targetFormat: "gemini" }), "claude");
-  const creds = withFormat("gemini");
-  assert.equal(
-    executor.buildUrl("claude-opus-5", true, 0, creds),
-    "https://tabitoken.com/v1/messages"
-  );
-  const headers = executor.buildHeaders(creds, true) as Record<string, string>;
-  assert.equal(headers["x-api-key"], "sk-test");
-  assert.equal(headers["x-goog-api-key"], undefined);
-});
 
 // ── hcnsec ────────────────────────────────────────────────────────────────────
 
@@ -234,38 +163,17 @@ test("the native gemini provider still resolves its own generateContent route", 
 
 // ── dashboard / catalog registration ──────────────────────────────────────────
 
-test("both hosts surface in the dashboard alternate-protocol picker", () => {
-  assert.deepEqual(
-    getAlternateFormats("tabitoken").map((a) => a.format),
-    ["openai"]
-  );
+test("hcnsec surfaces in the dashboard alternate-protocol picker", () => {
   assert.deepEqual(
     getAlternateFormats("hcnsec").map((a) => a.format),
     ["claude", "openai-responses", "gemini"]
   );
   // Every alternate needs a label — it is the string the picker renders.
-  for (const id of ["tabitoken", "hcnsec"]) {
+  for (const id of ["hcnsec"]) {
     for (const alternate of getAlternateFormats(id)) {
       assert.ok(alternate.label, `${id}/${alternate.format} must declare a label`);
     }
   }
-});
-
-test("tabitoken is catalogued as an aggregator gateway with a display endpoint", () => {
-  const provider = (AI_PROVIDERS as Record<string, Record<string, unknown>>).tabitoken;
-  assert.ok(provider, "tabitoken must be present in AI_PROVIDERS");
-  assert.equal(provider.id, "tabitoken");
-  assert.equal(provider.alias, "tabitoken");
-  assert.equal(provider.passthroughModels, true);
-  assert.equal(typeof provider.name, "string");
-  assert.equal(typeof provider.website, "string");
-  assert.equal(typeof provider.apiHint, "string");
-  assert.ok(AGGREGATOR_PROVIDER_IDS.has("tabitoken"), "tabitoken must be an aggregator");
-  // The display endpoint must name the protocol the gateway defaults to.
-  assert.equal(
-    (PROVIDER_ENDPOINTS as Record<string, string>).tabitoken,
-    "https://tabitoken.com/v1/messages"
-  );
 });
 
 test("extending hcnsec's protocols leaves its existing catalog classification alone", () => {

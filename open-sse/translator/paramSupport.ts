@@ -149,60 +149,6 @@ const STRIP_RULES: StripRule[] = [
   // to read), hence the fixed cap.
   { provider: "azure-openai", match: /^gpt-4o-mini/i, maxOutputCap: 16384 },
   { provider: "azure-ai", match: /^gpt-4o-mini/i, maxOutputCap: 16384 },
-  // AI/ML API validates optional fields with a strict schema that rejects a
-  // literal `null` ("Expected number, received null") instead of reading null as
-  // "unset". The OpenAI SDKs serialise an unset optional as `null`, so an SDK
-  // client that never touches temperature still puts `temperature: null` on the
-  // wire — and OmniRoute relays the caller's body verbatim, so the request 400s.
-  //
-  // Field-by-field sweep against POST /v1/chat/completions, 2026-09-03:
-  //   400 on null, every model:  seed, tools, tool_choice, response_format,
-  //                              stream, stream_options, parallel_tool_calls,
-  //                              max_tokens, max_completion_tokens,
-  //                              reasoning_effort
-  //   400 on null, model-dependent: temperature, top_p (400 on
-  //                              claude-sonnet-4.6 and deepseek-chat, 200 on
-  //                              gpt-5 — so an integration smoke-tested only
-  //                              against gpt-5 looks healthy)
-  //   200 on null (left alone):  stop, presence_penalty, frequency_penalty, n,
-  //                              user, logprobs, logit_bias, top_logprobs,
-  //                              metadata
-  //
-  // Provider-wide, and only for the null value: an explicit `temperature: 0` or
-  // `stream: false` is forwarded untouched. Dropping is the correct reading —
-  // every field here means "unset" when the caller sends null.
-  //
-  // The 400 body's top-level `message` is generic; `details[].path` / `.reason`
-  // name the offending field, which is what this list was built from.
-  {
-    provider: "aimlapi",
-    match: /.*/,
-    dropIfNull: [
-      "temperature",
-      "top_p",
-      "seed",
-      "tools",
-      "tool_choice",
-      "response_format",
-      "stream",
-      "stream_options",
-      "parallel_tool_calls",
-      "max_tokens",
-      "max_completion_tokens",
-      "reasoning_effort",
-    ],
-  },
-  // AgentRouter routes GLM models through the generic DefaultExecutor (no
-  // GLM-specific handling), so a Claude-style `thinking.type: "adaptive"`
-  // (the default a Claude-format client like Claude Code sends) reaches
-  // AgentRouter's upstream GLM endpoint verbatim and 400s: `thinking.type
-  // "adaptive" is not supported by glm models; must be one of enabled,
-  // disabled`. The native GLM/ZAI executor already remaps adaptive->enabled
-  // for its own provider (glm.ts); AgentRouter needs the same mapping since
-  // it never reaches that code path. Scoped to the whole glm-* family, not a
-  // single model id, since AgentRouter's static catalog carries no glm-*
-  // entries (passthroughModels: true lets arbitrary GLM ids through). #13696.
-  { provider: "agentrouter", match: /glm-/i, mapThinkingType: { adaptive: "enabled" } },
   // OpenCode Go's Claude lane (/v1/messages) is a strict Anthropic proxy that rejects
   // `output_config.task_budget` with 400 "Extra inputs are not permitted" even when the
   // task-budgets beta travels with it. `output_config.effort` stays: the adaptive-thinking

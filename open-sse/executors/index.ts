@@ -57,15 +57,11 @@ const lazyExecutors: Record<string, () => Promise<BaseExecutor>> = {
   cua: () => import("./cursor.ts").then((m) => new m.CursorExecutor("cursor-api")),
   "azure-openai": () => import("./azure-openai.ts").then((m) => new m.AzureOpenAIExecutor()),
   "azure-ai": () => import("./azure-ai.ts").then((m) => new m.AzureAiExecutor()),
-  "command-code": () => import("./commandCode.ts").then((m) => new m.CommandCodeExecutor()),
-  cmd: () => import("./commandCode.ts").then((m) => new m.CommandCodeExecutor()), // Alias
   gitlab: () => import("./gitlab.ts").then((m) => new m.GitlabExecutor()),
   "gitlab-duo": () => import("./gitlab.ts").then((m) => new m.GitlabExecutor("gitlab-duo")),
   nlpcloud: () => import("./nlpcloud.ts").then((m) => new m.NlpCloudExecutor()),
   replicate: () => import("./replicate.ts").then((m) => new m.ReplicateExecutor()),
   cerebrium: () => import("./cerebrium.ts").then((m) => new m.CerebriumExecutor()),
-  oneminai: () => import("./oneminai.ts").then((m) => new m.OneMinAiExecutor()),
-  "1min": () => import("./oneminai.ts").then((m) => new m.OneMinAiExecutor()), // Alias
   pollinations: () => import("./pollinations.ts").then((m) => new m.PollinationsExecutor()),
   pol: () => import("./pollinations.ts").then((m) => new m.PollinationsExecutor()), // Alias
   "cloudflare-ai": () => import("./cloudflare-ai.ts").then((m) => new m.CloudflareAIExecutor()),
@@ -103,10 +99,6 @@ const lazyExecutors: Record<string, () => Promise<BaseExecutor>> = {
   "kimi-coding": () => import("./kimi.ts").then((m) => new m.KimiExecutor()), // Alias
   moonshot: () => import("./moonshot.ts").then((m) => new m.MoonshotExecutor()),
   kimi: () => import("./moonshot.ts").then((m) => new m.MoonshotExecutor("kimi")), // Hidden legacy Moonshot provider id
-  cheaperinference: () =>
-    import("./cheaperinference.ts").then((m) => new m.CheaperInferenceExecutor()),
-  cinf: () =>
-    import("./cheaperinference.ts").then((m) => new m.CheaperInferenceExecutor("cheaperinference")), // Alias
   "grok-cli": () => import("./grok-cli.ts").then((m) => new m.GrokCliExecutor()),
   gc: () => import("./grok-cli.ts").then((m) => new m.GrokCliExecutor()), // Alias
   "codebuddy-cn": () => import("./codebuddy-cn.ts").then((m) => new m.CodeBuddyCnExecutor()),

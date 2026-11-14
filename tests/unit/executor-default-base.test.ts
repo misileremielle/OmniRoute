@@ -93,14 +93,17 @@ test("DefaultExecutor.buildUrl handles Gemini and Claude variants", () => {
 });
 
 test("DefaultExecutor.buildUrl uses full chat endpoints for hosted OpenAI-compatible providers", () => {
-  const bazaarlink = new DefaultExecutor("bazaarlink");
-  const crof = new DefaultExecutor("crof");
+  const chutes = new DefaultExecutor("chutes");
+  const novita = new DefaultExecutor("novita");
 
   assert.equal(
-    bazaarlink.buildUrl("auto:free", true),
-    "https://bazaarlink.ai/api/v1/chat/completions"
+    chutes.buildUrl("deepseek-ai/DeepSeek-V3", true),
+    "https://llm.chutes.ai/v1/chat/completions"
   );
-  assert.equal(crof.buildUrl("gpt-4.1", true), "https://crof.ai/v1/chat/completions");
+  assert.equal(
+    novita.buildUrl("gpt-4.1", true),
+    "https://api.novita.ai/openai/v1/chat/completions"
+  );
 });
 
 test("DefaultExecutor.buildUrl honors a custom providerSpecificData.baseUrl for the built-in openai provider", () => {

@@ -27,15 +27,6 @@ const PROVIDER_MODEL_ALIASES: ProviderModelAliasMap = {
     "gpt-oss-20b": "openai/gpt-oss-20b",
     "nvidia/gpt-oss-20b": "openai/gpt-oss-20b",
   },
-  synthetic: {
-    "syn:gpt-oss-120b": "hf:openai/gpt-oss-120b",
-    "syn:large:text": "hf:zai-org/GLM-5.2",
-    "syn:large:vision": "hf:moonshotai/Kimi-K2.7-Code",
-    "syn:small:vision": "hf:Qwen/Qwen3.6-27B",
-    "syn:minimax-m3": "hf:MiniMaxAI/MiniMax-M3",
-    "syn:small:text": "hf:zai-org/GLM-4.7-Flash",
-    "syn:nemotron-3-super": "hf:nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4",
-  },
   antigravity: {},
   deepseek: {
     "deepseek-v4.1-flash": "deepseek-flash",

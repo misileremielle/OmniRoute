@@ -181,6 +181,427 @@
           "alias": "codex-cloud"
         }
       ]
+    },
+    {
+      "name": "router-gateway",
+      "removedOn": "2026-11-15",
+      "migration": "242_remove_router_gateway_providers.sql",
+      "reason": "Router/gateway providers outside the kept set (OpenRouter, Vercel AI Gateway, Chutes, Novita, NanoGPT, OpenCode Zen, OpenCode Go).",
+      "providers": [
+        {
+          "id": "ainetcafe",
+          "alias": "ainetcafe"
+        },
+        {
+          "id": "onomeo",
+          "alias": "onomeo"
+        },
+        {
+          "id": "unifically",
+          "alias": "unifically"
+        },
+        {
+          "id": "oneminai",
+          "alias": "1min"
+        },
+        {
+          "id": "cheaperinference",
+          "alias": "cinf"
+        },
+        {
+          "id": "charm-hyper",
+          "alias": "charm-hyper"
+        },
+        {
+          "id": "agentrouter",
+          "alias": "agentrouter"
+        },
+        {
+          "id": "unorouter",
+          "alias": "unorouter"
+        },
+        {
+          "id": "command-code",
+          "alias": "cmd"
+        },
+        {
+          "id": "opper",
+          "alias": "opper"
+        },
+        {
+          "id": "requesty",
+          "alias": "requesty"
+        },
+        {
+          "id": "zylo-api",
+          "alias": "zylo"
+        },
+        {
+          "id": "fastrouter",
+          "alias": "fastrouter"
+        },
+        {
+          "id": "anyapi",
+          "alias": "anyapi"
+        },
+        {
+          "id": "electronhub",
+          "alias": "electronhub"
+        },
+        {
+          "id": "llmgateway",
+          "alias": "llmgateway"
+        },
+        {
+          "id": "lyceum",
+          "alias": "lyceum"
+        },
+        {
+          "id": "llm-kiwi",
+          "alias": "llmkiwi"
+        },
+        {
+          "id": "literouter",
+          "alias": "literouter"
+        },
+        {
+          "id": "greenpt",
+          "alias": "greenpt"
+        },
+        {
+          "id": "eurouter",
+          "alias": "eurouter"
+        },
+        {
+          "id": "y-api",
+          "alias": "y-api"
+        },
+        {
+          "id": "mnn-ai",
+          "alias": "mnn-ai"
+        },
+        {
+          "id": "meganova-ai",
+          "alias": "meganova-ai"
+        },
+        {
+          "id": "mixlayer",
+          "alias": "mixlayer"
+        },
+        {
+          "id": "speka",
+          "alias": "speka"
+        },
+        {
+          "id": "tokenreply",
+          "alias": "tokenreply"
+        },
+        {
+          "id": "yolo-auto",
+          "alias": "yolo-auto"
+        },
+        {
+          "id": "dxnt",
+          "alias": "dxnt"
+        },
+        {
+          "id": "cloudcode-one",
+          "alias": "cloudcode-one"
+        },
+        {
+          "id": "ofoxai",
+          "alias": "ofoxai"
+        },
+        {
+          "id": "zerolimitai",
+          "alias": "zerolimitai"
+        },
+        {
+          "id": "chatanywhere",
+          "alias": "chatanywhere"
+        },
+        {
+          "id": "helyxai",
+          "alias": "helyxai"
+        },
+        {
+          "id": "auriko",
+          "alias": "auriko"
+        },
+        {
+          "id": "poixe-ai",
+          "alias": "poixe-ai"
+        },
+        {
+          "id": "naga-ai",
+          "alias": "naga-ai"
+        },
+        {
+          "id": "chat-oripe",
+          "alias": "chat-oripe"
+        },
+        {
+          "id": "freeinference",
+          "alias": "freeinference"
+        },
+        {
+          "id": "free-ai",
+          "alias": "free-ai"
+        },
+        {
+          "id": "dgrid",
+          "alias": "dgrid"
+        },
+        {
+          "id": "qiniu",
+          "alias": "qiniu"
+        },
+        {
+          "id": "orcarouter",
+          "alias": "orcarouter"
+        },
+        {
+          "id": "api-airforce",
+          "alias": "af"
+        },
+        {
+          "id": "crof",
+          "alias": "crof"
+        },
+        {
+          "id": "bazaarlink",
+          "alias": "bzl"
+        },
+        {
+          "id": "synthetic",
+          "alias": "synthetic"
+        },
+        {
+          "id": "kilo-gateway",
+          "alias": "kg"
+        },
+        {
+          "id": "wafer",
+          "alias": "wafer"
+        },
+        {
+          "id": "dahl",
+          "alias": "dahl"
+        },
+        {
+          "id": "freetheai",
+          "alias": "fta"
+        },
+        {
+          "id": "g4f-groq",
+          "alias": "g4fgroq"
+        },
+        {
+          "id": "g4f-gemini",
+          "alias": "g4fgem"
+        },
+        {
+          "id": "g4f-pollinations",
+          "alias": "g4fpol"
+        },
+        {
+          "id": "g4f-ollama",
+          "alias": "g4foll"
+        },
+        {
+          "id": "g4f-nvidia",
+          "alias": "g4fnv"
+        },
+        {
+          "id": "llm7",
+          "alias": "llm7"
+        },
+        {
+          "id": "llamagate",
+          "alias": "llamagate"
+        },
+        {
+          "id": "gitlawb",
+          "alias": "glb"
+        },
+        {
+          "id": "gitlawb-gmi",
+          "alias": "glb-gmi"
+        },
+        {
+          "id": "nan",
+          "alias": "nan"
+        },
+        {
+          "id": "aimlapi",
+          "alias": "aiml"
+        },
+        {
+          "id": "piapi",
+          "alias": null,
+          "note": "Its alias \"pi\" is also the id of the Pi coding-agent CLI tool, so it is not guarded here."
+        },
+        {
+          "id": "getgoapi",
+          "alias": "ggo"
+        },
+        {
+          "id": "laozhang",
+          "alias": "lz"
+        },
+        {
+          "id": "thebai",
+          "alias": "thebai"
+        },
+        {
+          "id": "bai",
+          "alias": "bai"
+        },
+        {
+          "id": "fenayai",
+          "alias": "fenayai"
+        },
+        {
+          "id": "empower",
+          "alias": "empower"
+        },
+        {
+          "id": "poe",
+          "alias": "poe"
+        },
+        {
+          "id": "factory",
+          "alias": "factory"
+        },
+        {
+          "id": "bluesminds",
+          "alias": "bm"
+        },
+        {
+          "id": "freemodel-dev",
+          "alias": "fmd"
+        },
+        {
+          "id": "freeaiapikey",
+          "alias": "faik"
+        },
+        {
+          "id": "zenmux",
+          "alias": "zm"
+        },
+        {
+          "id": "openadapter",
+          "alias": "oad"
+        },
+        {
+          "id": "dit",
+          "alias": "dai"
+        },
+        {
+          "id": "tokenrouter",
+          "alias": "trk"
+        },
+        {
+          "id": "token-kiosk",
+          "alias": "tk"
+        },
+        {
+          "id": "sumopod",
+          "alias": "sumopod"
+        },
+        {
+          "id": "x5lab",
+          "alias": "x5lab"
+        },
+        {
+          "id": "chenzk",
+          "alias": "chenzk"
+        },
+        {
+          "id": "kenari",
+          "alias": "kenari"
+        },
+        {
+          "id": "tokenmarket",
+          "alias": "tokenmarket"
+        },
+        {
+          "id": "tokenharbor",
+          "alias": "tokenharbor"
+        },
+        {
+          "id": "navy",
+          "alias": "navy"
+        },
+        {
+          "id": "ainative",
+          "alias": "ainative"
+        },
+        {
+          "id": "aion",
+          "alias": "aion"
+        },
+        {
+          "id": "routeway",
+          "alias": "routeway"
+        },
+        {
+          "id": "nara",
+          "alias": "nara"
+        },
+        {
+          "id": "xkiro",
+          "alias": "xkiro"
+        },
+        {
+          "id": "regolo",
+          "alias": "regolo"
+        },
+        {
+          "id": "naga-ac",
+          "alias": "naga"
+        },
+        {
+          "id": "void-ai",
+          "alias": "void-ai"
+        },
+        {
+          "id": "helixmind",
+          "alias": "helixmind"
+        },
+        {
+          "id": "logfare",
+          "alias": "logfare"
+        },
+        {
+          "id": "tabitoken",
+          "alias": "tabitoken"
+        },
+        {
+          "id": "seekai",
+          "alias": "ska"
+        },
+        {
+          "id": "demonroute",
+          "alias": "demonroute"
+        },
+        {
+          "id": "daoxe",
+          "alias": "daoxe"
+        },
+        {
+          "id": "gisoo",
+          "alias": "gisoo"
+        },
+        {
+          "id": "beatapi",
+          "alias": "beatapi"
+        },
+        {
+          "id": "empiriolabs",
+          "alias": "empiriolabs"
+        }
+      ]
     }
   ]
 }

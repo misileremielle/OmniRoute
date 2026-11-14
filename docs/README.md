@@ -124,7 +124,6 @@ Guardrails, compliance, stealth, and the mandatory patterns for handling public 
 - [CLI_TOKEN.md](security/CLI_TOKEN.md) — CLI machine-ID token (HMAC + legacy SHA-256) auth.
 - [EGRESS_POLICY.md](security/EGRESS_POLICY.md) — egress IP family (IPv4/IPv6) policy.
 - [BAN_DETECTION.md](security/BAN_DETECTION.md) — account-ban / banned-keyword detection.
-- [AGENTROUTER_WAF.md](security/AGENTROUTER_WAF.md) — agentrouter.org WAF.
 - [CORS.md](security/CORS.md) — CORS configuration & security.
 - [SUPPLY_CHAIN.md](security/SUPPLY_CHAIN.md) — supply-chain gates (SLSA, SBOM, Trivy, osv-scanner, Scorecard).
 - [SOCKET_DEV_FINDINGS.md](security/SOCKET_DEV_FINDINGS.md) — supply-chain finding attestations.
@@ -146,7 +145,6 @@ Prompt compression engines, rules, and language packs.
 Provider-specific integration guides.
 
 - [ALIBABA-QWEN-PROVIDER-FAMILIES.md](providers/ALIBABA-QWEN-PROVIDER-FAMILIES.md) — Alibaba and Qwen provider families.
-- [AGENTROUTER.md](providers/AGENTROUTER.md) — AgentRouter setup.
 - [ZED-DOCKER.md](providers/ZED-DOCKER.md) — Zed IDE integration under Docker.
 - [CURSOR-DOCKER.md](providers/CURSOR-DOCKER.md) — Cursor model listing under Docker.
 

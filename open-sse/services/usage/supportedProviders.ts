@@ -39,10 +39,8 @@ export const USAGE_SUPPORTED_PROVIDERS: readonly string[] = [
   "ollama-cloud",
   "minimax",
   "minimax-cn",
-  "crof",
   "clinepass",
   "nanogpt",
-  "nan",
   // Apmix (apmix.ai) — monthly weighted-token allowance + self-set daily/weekly caps
   // + top-up credits (GET https://api.apmix.ai/v1/usage, Bearer key)
   "apmix",
@@ -80,15 +78,12 @@ export const USAGE_SUPPORTED_PROVIDERS: readonly string[] = [
   "volcengine-agent-plan",
   "volcengine-coding-plan",
   // Command Code credits + 5h/weekly rolling windows
-  "command-code",
   // Alibaba Coding Plan triple-window quota (#9603 UI gap — fetcher existed, list entry missing)
   "bailian-coding-plan",
   // Qwen Cloud / Model Studio personal Token Plan (cookie-authenticated console gateway)
   "qwen-cloud-token-plan",
   // AgentRouter (New-API) console balance quota (consoleApiKey + newApiUserId)
-  "agentrouter",
   // TokenRouter wallet + per-key quota (optional Management Key in consoleApiKey)
-  "tokenrouter",
   // Kilo Code personal USD balance (GET /api/profile/balance, existing OAuth token)
   "kilocode",
   // MegaBrain plan session + weekly limits (GET /api/profile/limits, OAuth token or mb-v1 key)
@@ -99,16 +94,13 @@ export const USAGE_SUPPORTED_PROVIDERS: readonly string[] = [
   // Muse Code has no live quota endpoint; its fetcher surfaces persisted subscription metadata.
   "muse-code",
   // LLM Gateway DevPass allowance (GET /v1/key → monthly + weekly premium)
-  "llmgateway",
   // Lyceum credit balance (GET /api/v2/external/billing/credits)
-  "lyceum",
   // Devin CLI agentic quota (Codeium seat-management GetUserStatus, protobuf)
   "devin-cli",
   // ChatPlayground subscription and daily credits (GET /api/user)
   // Cloudflare Workers AI daily neurons vs the 10k/day free allocation (needs Analytics: Read)
   "cloudflare-ai",
   // xKiro daily free-token quota (GET /v1/usage → free_tokens; wallet ignored)
-  "xkiro",
   // Zed Hosted Models USD credit (optional Orb billing portal link)
   "zed-hosted",
 ];

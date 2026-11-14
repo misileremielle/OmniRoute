@@ -27,21 +27,16 @@ import {
   getAddCredentialModalTitle,
   getLocalProviderMetadata,
   normalizeAndValidateHttpBaseUrl,
-  extractCommandCodeCredentialInput,
   combineModalCredential,
   providerText,
   validationBadgeProps,
   validationErrorMessage,
-  type CommandCodeAuthFlowState,
 } from "../../providerPageHelpers";
 import { useOpenRouterPresetControl } from "../OpenRouterPresetInput";
 import CcCompatibleRequestDefaultsFields from "./CcCompatibleRequestDefaultsFields";
 import { buildAddProviderSpecificData } from "./connectionProviderSpecificData";
-import CommandCodeZdrToggle from "./CommandCodeZdrToggle";
 import { buildProviderValidateRequestBody } from "./providerValidateRequestBody";
-import { getCommandCodeAuthPhaseLabel } from "./commandCodeAuthPhase";
 import { createInitialAddApiKeyFormData } from "./addApiKeyInitialFormData";
-import AgentrouterConsoleFields from "./AgentrouterConsoleFields";
 import QuotaScrapingFields from "./QuotaScrapingFields";
 import GlmTeamQuotaFields from "./GlmTeamQuotaFields";
 import * as ProviderRegion from "./AlibabaProviderRegionField";
@@ -58,9 +53,6 @@ export interface AddApiKeyModalProps {
   isCompatible?: boolean;
   isAnthropic?: boolean;
   isCcCompatible?: boolean;
-  isCommandCode?: boolean;
-  commandCodeAuthState?: CommandCodeAuthFlowState;
-  onStartCommandCodeAuth?: () => void;
   onSave: (data: {
     name: string;
     apiKey?: string;
@@ -81,9 +73,6 @@ export default function AddApiKeyModal({
   isCompatible,
   isAnthropic,
   isCcCompatible,
-  isCommandCode,
-  commandCodeAuthState,
-  onStartCommandCodeAuth,
   onSave,
   onClose,
 }: AddApiKeyModalProps) {
@@ -105,7 +94,6 @@ export default function AddApiKeyModal({
   const isAwsPolly = provider === "aws-polly";
   const providerDisplayName = providerName || provider || "";
   const apiKeyOptional = providerAllowsOptionalApiKey(provider);
-  const commandCodeAuthPhaseLabel = getCommandCodeAuthPhaseLabel(commandCodeAuthState);
   const [formData, setFormData] = useState(() =>
     createInitialAddApiKeyFormData({
       provider,
@@ -121,7 +109,6 @@ export default function AddApiKeyModal({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [copiedCommandCodeField, setCopiedCommandCodeField] = useState<string | null>(null);
   const [mode, setMode] = useState<"single" | "bulk">("single");
   const [bulkText, setBulkText] = useState("");
   const [bulkValidateKeys, setBulkValidateKeys] = useState(false);
@@ -221,13 +208,9 @@ export default function AddApiKeyModal({
   const credentialValidationFailedMessage = t("apiKeyValidationFailed");
   const validationBadge = validationResult ? validationBadgeProps(validationResult) : null;
   // Normalize raw credential field(s) into the single value stored as `apiKey`
-  // (#5088 command-code extract; #5446 Modal id:secret join; else verbatim).
+  // (#5446 Modal id:secret join; else verbatim).
   const resolveCredentialInput = () =>
-    isCommandCode
-      ? extractCommandCodeCredentialInput(formData.apiKey)
-      : isModal
-        ? combineModalCredential(formData.apiKey, formData.tokenSecret)
-        : formData.apiKey;
+    isModal ? combineModalCredential(formData.apiKey, formData.tokenSecret) : formData.apiKey;
 
   const validateRequestBody = (apiKey: string) =>
     JSON.stringify(
@@ -262,16 +245,6 @@ export default function AddApiKeyModal({
       setValidationResult("failed");
     } finally {
       setValidating(false);
-    }
-  };
-  const copyCommandCodeValue = async (value: string | undefined, key: string) => {
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedCommandCodeField(key);
-      window.setTimeout(() => setCopiedCommandCodeField(null), 1500);
-    } catch {
-      setSaveError("Copy failed. Select the text and copy it manually.");
     }
   };
 
@@ -594,98 +567,6 @@ export default function AddApiKeyModal({
                 </div>
               </div>
             )}
-            {isCommandCode && onStartCommandCodeAuth && (
-              <div className="rounded-lg border border-info/20 bg-info/10 px-3 py-3 text-sm">
-                <div className="flex items-start gap-3">
-                  <Icon name="open_in_new" size={18} className="mt-0.5 text-info" />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-text-main">
-                      {t("providerDetailBrowserManualConnect")}
-                    </p>
-                    <p className="mt-1 text-xs text-text-muted">
-                      Open Command Code Studio, then paste the returned key/JSON/URL into the API
-                      key field below.
-                    </p>
-                    {commandCodeAuthState?.message && (
-                      <p className="mt-2 text-xs text-text-muted">
-                        {commandCodeAuthPhaseLabel}: {commandCodeAuthState.message}
-                      </p>
-                    )}
-                    {commandCodeAuthState?.authUrl && (
-                      <div className="mt-3 space-y-2">
-                        <div>
-                          <p className="mb-1 text-xs font-medium text-text-main">
-                            {t("providerDetailAuthUrl")}
-                          </p>
-                          <div className="flex gap-2">
-                            <Input
-                              value={commandCodeAuthState.authUrl}
-                              readOnly
-                              className="flex-1 font-mono text-xs"
-                            />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              icon={copiedCommandCodeField === "authUrl" ? "check" : "content_copy"}
-                              onClick={() =>
-                                copyCommandCodeValue(commandCodeAuthState.authUrl, "authUrl")
-                              }
-                            />
-                          </div>
-                        </div>
-                        {commandCodeAuthState.callbackUrl && (
-                          <div>
-                            <p className="mb-1 text-xs font-medium text-text-main">
-                              {t("providerDetailCallbackUrl")}
-                            </p>
-                            <div className="flex gap-2">
-                              <Input
-                                value={commandCodeAuthState.callbackUrl}
-                                readOnly
-                                className="flex-1 font-mono text-xs"
-                              />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                icon={
-                                  copiedCommandCodeField === "callbackUrl"
-                                    ? "check"
-                                    : "content_copy"
-                                }
-                                onClick={() =>
-                                  copyCommandCodeValue(
-                                    commandCodeAuthState.callbackUrl,
-                                    "callbackUrl"
-                                  )
-                                }
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    icon="open_in_new"
-                    loading={
-                      commandCodeAuthState?.phase === "starting" ||
-                      commandCodeAuthState?.phase === "polling" ||
-                      commandCodeAuthState?.phase === "applying"
-                    }
-                    onClick={onStartCommandCodeAuth}
-                  >
-                    Connect in browser
-                  </Button>
-                </div>
-              </div>
-            )}
-            <CommandCodeZdrToggle
-              provider={provider}
-              checked={formData.commandCodeZdrEnabled}
-              onChange={(checked) => setFormData({ ...formData, commandCodeZdrEnabled: checked })}
-            />
             <Input
               label={t("nameLabel")}
               value={formData.name}
@@ -920,12 +801,6 @@ export default function AddApiKeyModal({
                     type="password"
                   />
                 )}
-                <AgentrouterConsoleFields
-                  provider={provider}
-                  values={formData}
-                  onChange={(patch) => setFormData({ ...formData, ...patch })}
-                  t={t}
-                />
               </div>
             )}
             <Input

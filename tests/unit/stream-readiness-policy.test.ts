@@ -193,13 +193,13 @@ test("preserves zero timeout so readiness checks can be disabled", () => {
   assert.deepEqual(result.reasons, ["disabled"]);
 });
 
-test("bumps small requests to third-party Claude-format replicas (agentrouter, ZAI, bailian) — guards against #3825-class false 504s on long reasoning warm-ups", () => {
-  // Provider registry lists agentrouter with `format: "claude"` — the readiness budget
+test("bumps small requests to third-party Claude-format replicas (ZAI, bailian) — guards against #3825-class false 504s on long reasoning warm-ups", () => {
+  // Provider registry lists zai with `format: "claude"` — the readiness budget
   // must fire UNCONDITIONALLY for those replicas, like the codex_gpt_5_5_high
   // bump, because their reasoning warm-ups routinely exceed the default 80s window.
   const result = resolveStreamReadinessTimeout({
     baseTimeoutMs: 80_000,
-    provider: "agentrouter",
+    provider: "zai",
     model: "claude-opus-4-8",
     body: { messages: items(3), tools: tools(2) },
   });
@@ -278,7 +278,7 @@ test("does NOT double-bump when codex-high reasoning and Claude-format replica b
   // Claude-format providers later, the readiness bump must not stack.
   const result = resolveStreamReadinessTimeout({
     baseTimeoutMs: 80_000,
-    provider: "agentrouter",
+    provider: "zai",
     model: "claude-opus-4-8-high",
     body: { messages: items(3), tools: tools(2), reasoning_effort: "high" },
   });
@@ -292,7 +292,7 @@ test("caps Claude-format replica bump at the configured maxTimeoutMs", () => {
   const result = resolveStreamReadinessTimeout({
     baseTimeoutMs: 80_000,
     maxTimeoutMs: 100_000,
-    provider: "agentrouter",
+    provider: "zai",
     model: "claude-opus-4-8",
     body: { messages: items(500), tools: tools(20), instructions: "x".repeat(800_000) },
   });
@@ -349,7 +349,7 @@ test("does NOT stack extended-thinking with the Claude-format replica bump", () 
   // serving a `-thinking` alias must get 30s once, not 60s twice.
   const result = resolveStreamReadinessTimeout({
     baseTimeoutMs: 80_000,
-    provider: "agentrouter",
+    provider: "zai",
     model: "claude-sonnet-4-6-thinking",
     body: { messages: items(2) },
   });

@@ -1,5 +1,4 @@
 import { containsMediaKind, type MediaKind } from "../../utils/mediaParts.ts";
-import { ciTransportSupportsInput } from "../../utils/ciTransportInput.ts";
 import {
   getInputModalities,
   getResolvedModelCapabilities,
@@ -39,7 +38,7 @@ export function hasMediaRequirements(requirements: RequestCompatibilityRequireme
     requirements.requiresFiles
   );
 }
-/** Find required media the transport denies, preserving unknown non-CI PDF/file eligibility. */
+/** Find required media the transport denies, preserving unknown PDF/file eligibility. */
 export function nonImageMediaFailures(
   target: Pick<ResolvedComboTarget, "provider" | "providerId" | "modelStr" | "connectionId">,
   requirements: MediaRequirements
@@ -57,17 +56,13 @@ export function nonImageMediaFailures(
   });
   const declared = getInputModalities(caps.provider, caps.model, undefined, target.connectionId);
   const textOnly = isTextOnlyChatTransport(caps.provider);
-  const ciProvider = caps.provider === "cinf" || caps.provider === "cheaperinference";
-  // Preserve unknown PDF/file eligibility on other providers; explicit declarations
-  // and proven CI transport limits still override permissive fallback behavior.
-  /** Prefer explicit declarations and verified transport limits over compatibility fallbacks. */
+  // Preserve unknown PDF/file eligibility; explicit declarations still override the
+  // permissive fallback.
   const supports = (kind: string, fallback: boolean | null | undefined) =>
     !textOnly &&
-    ciTransportSupportsInput(caps.provider ?? "", caps.model ?? "", kind) &&
     (declared
       ? declared.includes(kind) || (kind === "pdf" && declared.includes("file"))
-      : fallback === true ||
-        (!ciProvider && (kind === "pdf" || kind === "file") && fallback == null));
+      : fallback === true || ((kind === "pdf" || kind === "file") && fallback == null));
   return [
     requirements.requiresAudio && !supports("audio", caps.supportsAudio) ? "audio" : null,
     requirements.requiresVideo && !supports("video", caps.supportsVideo) ? "video" : null,

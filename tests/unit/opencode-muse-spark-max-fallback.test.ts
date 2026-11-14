@@ -184,30 +184,3 @@ test("max-fallback: execute does not retry when the first attempt succeeds", asy
 });
 
 // ─── command-code: max passes through natively ────────────────────────────────
-
-test("max-fallback: command-code passes reasoning_effort=max through untouched", async () => {
-  const { CommandCodeExecutor } =
-    (await import("../../open-sse/executors/commandCode.ts")) as unknown as {
-      CommandCodeExecutor: new (provider: string) => {
-        transformRequest: (
-          model: string,
-          body: Record<string, unknown>,
-          stream: boolean,
-          credentials: unknown
-        ) => Record<string, unknown>;
-      };
-    };
-  const executor = new CommandCodeExecutor("command-code");
-  const out = executor.transformRequest(
-    "meta/muse-spark-1.3-contributor",
-    {
-      model: "meta/muse-spark-1.3-contributor",
-      messages: [{ role: "user", content: "hi" }],
-      reasoning_effort: "max",
-    },
-    true,
-    CREDENTIALS
-  );
-
-  assert.equal(out.reasoning_effort, "max");
-});

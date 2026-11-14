@@ -20,7 +20,6 @@ export const FREE_PROVIDERS = {};
 
 export const FREE_APIKEY_PROVIDER_IDS = new Set([
   "qoder",
-  "dahl",
   // auggie is a fully local, credential-less CLI passthrough (auth handled by
   // `auggie login` outside OmniRoute). Admitted here purely so POST /api/providers
   // accepts an optional connection row for display/priority/testStatus tracking —
@@ -111,71 +110,9 @@ export const IMAGE_ONLY_PROVIDER_IDS = new Set(["deepai"]);
 
 export const AGGREGATOR_PROVIDER_IDS = new Set([
   "openrouter",
-  "synthetic",
-  "kilo-gateway",
-  "aimlapi",
   "novita",
-  "opper",
-  "piapi",
-  "getgoapi",
-  "laozhang",
   "vercel-ai-gateway",
-  "unorouter",
-  "xkiro",
-  "agentrouter",
-  "thebai",
-  "fenayai",
-  "empower",
-  "poe",
   "chutes",
-  "freetheai",
-  "g4f-groq",
-  "g4f-gemini",
-  "g4f-pollinations",
-  "g4f-ollama",
-  "g4f-nvidia",
-  "naga-ac",
-  "chatanywhere",
-  "zylo-api",
-  "fastrouter",
-  "anyapi",
-  "beatapi",
-  "electronhub",
-  "llmgateway",
-  "lyceum",
-  "llm-kiwi",
-  "literouter",
-  "onomeo",
-  "eurouter",
-  "unifically",
-  "y-api",
-  "mnn-ai",
-  "meganova-ai",
-  "mixlayer",
-  "speka",
-  "tokenreply",
-  "yolo-auto",
-  "dxnt",
-  "cloudcode-one",
-  "ofoxai",
-  "zerolimitai",
-  "helyxai",
-  "auriko",
-  "poixe-ai",
-  "naga-ai",
-  "chat-oripe",
-  "freeinference",
-  "free-ai",
-  "void-ai",
-  "helixmind",
-  "tabitoken",
-  "logfare",
-  "seekai",
-  "tokenmarket",
-  "tokenharbor",
-  "demonroute",
-  "daoxe",
-  "gisoo",
 ]);
 
 export const ENTERPRISE_CLOUD_PROVIDER_IDS = new Set([
@@ -263,14 +200,6 @@ export function isSelfHostedChatProvider(providerId: unknown): boolean {
 const EXPLICIT_OPTIONAL_APIKEY_PROVIDER_IDS = new Set([
   "searxng-search",
   "firecrawl",
-  "g4f-groq",
-  "g4f-gemini",
-  "g4f-pollinations",
-  "g4f-ollama",
-  "g4f-nvidia",
-  "gitlawb",
-  "gitlawb-gmi",
-  "naga-ac",
   // UC (uncensored.com) persona: un-metered subscription chat with NO API key —
   // auth is a durable Clerk credential stored in providerSpecificData, from which
   // the executor mints a short-lived session token per connect.
@@ -304,7 +233,6 @@ const BULK_API_KEY_EXCLUDED = new Set([
   "ollama-local",
   "qoder",
   "google-pse-search",
-  "command-code",
   "azure",
 ]);
 

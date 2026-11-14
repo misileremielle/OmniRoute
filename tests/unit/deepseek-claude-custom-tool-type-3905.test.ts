@@ -37,12 +37,3 @@ test("minimax still gets the #2195 type:'custom' default", () => {
   ) as Tool[];
   assert.equal(out[0].type, "custom");
 });
-
-test("agentrouter still strips type:'custom'", () => {
-  const out = normalizeClaudeToolsForDispatch(
-    [{ type: "custom", name: "t" }, { name: "u" }],
-    "agentrouter"
-  ) as Tool[];
-  assert.equal(out[0].type, undefined);
-  assert.equal(out[1].type, undefined);
-});

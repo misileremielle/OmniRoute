@@ -32,7 +32,6 @@ test("isClaudeWireFormatModel: true for anthropic and claude-format registry pro
   assert.strictEqual(isClaudeWireFormatModel("anthropic/claude-sonnet-4"), true);
   assert.strictEqual(isClaudeWireFormatModel("zai/glm-5"), true);
   assert.strictEqual(isClaudeWireFormatModel("claude/claude-opus"), true);
-  assert.strictEqual(isClaudeWireFormatModel("wafer/wafer-model"), true);
 });
 
 test("isClaudeWireFormatModel: false for openai-format providers", () => {

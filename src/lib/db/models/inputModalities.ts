@@ -2,7 +2,6 @@ import { getDbInstance } from "../core";
 import { getModelCatalogCacheVersion } from "../readCache";
 import { normalizeSyncedAvailableModels } from "./synced";
 import { getKeyValue } from "./shared";
-import { CI_INPUT_MODALITIES } from "@/shared/constants/cheaperInferenceInputModalities";
 
 export type InputModalityMap = ReadonlyMap<string, ReadonlyMap<string, readonly string[]>>;
 let cache: { version: number; values: InputModalityMap } | undefined;
@@ -56,8 +55,6 @@ export function getInputModalities(
     ? values.get(`${provider}:${connectionId}`)?.get(model)
     : values.get(provider)?.get(model);
   if (found) return found;
-  if (provider === "cheaperinference" || provider === "cinf")
-    return Object.hasOwn(CI_INPUT_MODALITIES, model) ? CI_INPUT_MODALITIES[model] : undefined;
   if (connectionId && values.get(provider)?.has(model)) return [];
   return undefined;
 }

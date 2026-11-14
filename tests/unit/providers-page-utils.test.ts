@@ -383,16 +383,11 @@ test("provider display mode storage round-trips and migrates the old configured-
 
 test("managed provider connection ids include supported static categories and exclude upstream proxy", () => {
   assert.equal(providerCatalog.isManagedProviderConnectionId("qoder"), true);
-  assert.equal(providerCatalog.isManagedProviderConnectionId("synthetic"), true);
   assert.equal(providerCatalog.isManagedProviderConnectionId("gitlab"), true);
-  assert.equal(providerCatalog.isManagedProviderConnectionId("thebai"), true);
-  assert.equal(providerCatalog.isManagedProviderConnectionId("fenayai"), true);
   assert.equal(providerCatalog.isManagedProviderConnectionId("chutes"), true);
   assert.equal(providerCatalog.isManagedProviderConnectionId("datarobot"), true);
   assert.equal(providerCatalog.isManagedProviderConnectionId("clarifai"), true);
-  assert.equal(providerCatalog.isManagedProviderConnectionId("empower"), true);
   assert.equal(providerCatalog.isManagedProviderConnectionId("nous-research"), true);
-  assert.equal(providerCatalog.isManagedProviderConnectionId("poe"), true);
   assert.equal(providerCatalog.isManagedProviderConnectionId("azure-openai"), true);
   assert.equal(providerCatalog.isManagedProviderConnectionId("azure-ai"), true);
   assert.equal(providerCatalog.isManagedProviderConnectionId("bedrock"), true);

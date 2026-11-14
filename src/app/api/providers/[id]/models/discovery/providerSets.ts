@@ -1,18 +1,14 @@
 export const NAMED_OPENAI_STYLE_PROVIDERS = new Set([
   "modal",
   "reka",
-  "empower",
   "nous-research",
-  "poe",
   "siliconflow",
   // #3976: these carry a real modelsUrl but were not classified by any live-fetch
   // branch, so their hardcoded registry catalog was served instead of the live
   // `<baseUrl>/models` list. Live fetch falls back to the local catalog on error.
-  "llm7",
   "byteplus",
   // #4202: zenmux is the same case — its free models (e.g. z-ai/glm-5.2-free,
   // moonshotai/kimi-k2.7-code-free) live only on the upstream /models list.
-  "zenmux",
   // #4249: vercel-ai-gateway carries a real baseUrl (.../v1/chat/completions) but
   // was unclassified, so import served the 5-entry hardcoded catalog instead of the
   // live `https://ai-gateway.vercel.sh/v1/models` list. Falls back to local on error.
@@ -20,10 +16,6 @@ export const NAMED_OPENAI_STYLE_PROVIDERS = new Set([
   // #4239 / #4155 / #3841: OpenAI-compatible aggregators whose real catalog lives
   // on the upstream `/v1/models` list — serve it live, fall back to the seeded
   // registry catalog on error (same case as zenmux).
-  "openadapter",
-  "dit",
-  "tokenrouter",
-  "token-kiosk",
   // provider-model-sweep (2026-06-19): same class as #3976/#4202/#4249 — keyed
   // openai-style providers with a real live `<baseUrl>/models` catalog, served
   // their small hardcoded seed because unclassified. Seed stays as offline fallback.
@@ -40,12 +32,9 @@ export const NAMED_OPENAI_STYLE_PROVIDERS = new Set([
   // hosting large, volatile OSS catalogs. The sweep confirmed each exposes a live
   // `<baseUrl>/v1/models` endpoint (200 public or 401/403 = exists + keyed), so live
   // fetch keeps the catalog fresh; the registry seed remains the offline fallback.
-  "crof",
   "featherless-ai",
   "ovhcloud",
   "sambanova",
-  "orcarouter",
-  "unorouter",
   "uncloseai",
   "opencode-go",
   "baseten",
@@ -56,18 +45,14 @@ export const NAMED_OPENAI_STYLE_PROVIDERS = new Set([
   // escalated cmqlvxg4o: api-airforce has a live `https://api.airforce/v1/models` catalog
   // but was left out of the sweep, so it served a stale hardcoded seed (grok-3, grok-2-1212,
   // claude-3.7-sonnet …). Live fetch keeps it fresh; seed stays as the offline fallback.
-  "api-airforce",
   // DGrid is an OpenAI-compatible gateway whose default seed is the free auto-router;
   // the full model catalog is discovered live from https://api.dgrid.ai/v1/models.
-  "dgrid",
   // b.ai is an OpenAI-compatible LLM gateway with no static seed — it proxies many
   // upstream models (GPT, Claude, Gemini, MiniMax, Kimi, GLM...) behind one key, so the
   // full catalog is discovered live from https://api.b.ai/v1/models.
-  "bai",
   // Qiniu (七牛云 AI inference) is an OpenAI-compatible gateway with no static seed —
   // it proxies many upstream models (DeepSeek, Claude, Kimi...) behind one key, so the
   // full catalog is discovered live from https://api.qnaigc.com/v1/models.
-  "qiniu",
   // OpenVecta (https://openvecta.com/) is an OpenAI-compatible AI inference gateway
   // hosting LLMs (GLM, Claude, DeepSeek, GPT OSS, Llama, Kimi, Nemotron…) plus
   // text-embedding-* models behind a single Bearer key. The full catalog is
@@ -101,16 +86,12 @@ export const NAMED_OPENAI_STYLE_PROVIDERS = new Set([
   "nanogpt",
   // NaN.Builders — GET https://api.nan.builders/v1/models is key-gated; the registry
   // seed is only the offline fallback for its frequently-renamed model aliases.
-  "nan",
-  "nara",
   // Logfare (https://logfare.ai) — free OpenAI-compatible gateway live-verified
   // 2026-08-21: GET https://logfare.ai/v1/models returns a real 20-model catalog
   // (11 chat-capable). Live fetch keeps it fresh; the registry seed stays as the
   // offline fallback.
-  "logfare",
   // Token Market is an OpenAI-compatible multi-model gateway. Its catalog is
   // discovered from the authenticated https://api.tokensmarket.ai/v1/models endpoint.
-  "tokenmarket",
   // Agnes hosts a live OpenAI-style /v1/models catalog on both the
   // international (apihub.agnes-ai.com) and CN (api.agnes-ai.cn) hosts.
   // Without this, sync-models serves the static registry seed and CN
@@ -135,11 +116,9 @@ export const NAMED_OPENAI_STYLE_PROVIDERS = new Set([
   // Demon Route has a key-scoped /v1/models endpoint. Without this classification,
   // the dashboard only shows static seeds and cannot synchronize the live catalog
   // of vendor-qualified open-weight model IDs (#16979).
-  "demonroute",
   // Token Harbor is an OpenAI-compatible API-key gateway whose live catalog is
   // served from its key-gated /v1/models endpoint; the registry seed stays as the
   // offline fallback.
-  "tokenharbor",
   // ParalonCloud — GET https://paraloncloud.com/v1/models is key-gated; the registry
   // seed is only the offline fallback.
   "paraloncloud",

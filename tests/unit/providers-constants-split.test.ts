@@ -66,7 +66,9 @@ const P = await import("../../src/shared/constants/providers.ts");
 // Upstream v3.8.54 second sync adds empiriolabs, paraloncloud, replicate, cerebrium, hetzner,
 // grokified and deapi (+7) to this fork's 243; upstream's image/video/audio gateways
 // (fal-ai, stability-ai, runwayml, …) are not carried — 250.
-const APIKEY_PROVIDER_COUNT = 250;
+// Router/gateway providers outside the kept set (and the beatapi/empiriolabs extracts)
+// removed from this fork — 147.
+const APIKEY_PROVIDER_COUNT = 147;
 
 test("barrel still exports every catalog + key helpers", () => {
   for (const name of [
@@ -88,18 +90,15 @@ test("barrel still exports every catalog + key helpers", () => {
   }
 });
 
-test(`APIKEY_PROVIDERS merges the 6 family files plus the beatapi extract into ${APIKEY_PROVIDER_COUNT} entries (no loss / no dup)`, async () => {
+test(`APIKEY_PROVIDERS merges the 6 family files into ${APIKEY_PROVIDER_COUNT} entries (no loss / no dup)`, async () => {
   const keys = Object.keys((P as Record<string, object>).APIKEY_PROVIDERS);
   assert.equal(keys.length, APIKEY_PROVIDER_COUNT);
   assert.equal(new Set(keys).size, APIKEY_PROVIDER_COUNT, "duplicate keys after spread-merge");
-  assert.ok(keys.includes("ainetcafe"), "ainetcafe must be in APIKEY_PROVIDERS");
-  // the merged object's entry-count equals the sum of the 6 semantic family files plus the
-  // beatapi overflow extract; they are a strict partition (every provider in exactly one),
+  // the merged object's entry-count equals the sum of the 6 semantic family files; they are
+  // a strict partition (every provider in exactly one),
   // so the sum must be exactly APIKEY_PROVIDER_COUNT.
   const families: [string, string][] = [
     ["gateways", "APIKEY_PROVIDERS_GATEWAYS"],
-    ["beatapi", "APIKEY_PROVIDERS_BEATAPI"],
-    ["empiriolabs", "APIKEY_PROVIDERS_EMPIRIOLABS"],
     ["frontier-labs", "APIKEY_PROVIDERS_FRONTIER"],
     ["inference-hosts", "APIKEY_PROVIDERS_INFERENCE"],
     ["enterprise-cloud", "APIKEY_PROVIDERS_ENTERPRISE"],
@@ -122,7 +121,6 @@ test(`APIKEY_PROVIDERS merges the 6 family files plus the beatapi extract into $
     APIKEY_PROVIDER_COUNT,
     `families must partition all ${APIKEY_PROVIDER_COUNT} providers`
   );
-  assert.ok(seen.has("ainetcafe"), "ainetcafe must live in a family file");
 });
 
 test("AI_PROVIDERS Proxy aggregates all sections; lookups resolve", () => {

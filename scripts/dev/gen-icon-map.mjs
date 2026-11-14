@@ -34,12 +34,10 @@ const TERNARY_RE = /\?\s*\"([a-z][a-z0-9_]+)\"\s*:\s*\"([a-z][a-z0-9_]+)\"/g;
  */
 export const NOT_ICON_NAMES = new Set([
   "anthropic", // RoutingTab PROVIDER_TILE_DISPLAY.icon (field unused)
-  "dahl", // provider catalog logo keys (src/shared/constants/providers/**) ↓
-  "opencode",
+  "opencode", // provider catalog logo keys (src/shared/constants/providers/**) ↓
   "openference",
   "proxy",
   "server",
-  "unorouter",
   "vector_polygon",
   "icon", // Button ICON_SIZE / size map key `icon: "icon"`
 ]);

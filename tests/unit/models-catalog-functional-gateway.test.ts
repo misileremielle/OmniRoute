@@ -17,7 +17,7 @@ const NO_THINK_FLAG = "NO_THINKING_ALIAS_ENABLED";
 after(() => {
   removeFeatureFlagOverride(FLAG_KEY);
   removeFeatureFlagOverride(NO_THINK_FLAG);
-  setFunctionalGatewayProviderSetting("agentrouter", null);
+  setFunctionalGatewayProviderSetting("openrouter", null);
   resetDbInstance();
 });
 
@@ -44,14 +44,14 @@ test("catalog post-filters do not add mirrors when gate off (default)", async ()
 
 test("final catalog permission filtering does not let a mirror inherit base access", async () => {
   setFeatureFlagOverride(FLAG_KEY, "true");
-  setFunctionalGatewayProviderSetting("agentrouter", "on");
+  setFunctionalGatewayProviderSetting("openrouter", "on");
 
   const models = [{ id: "kmc/k3", owned_by: "kimi-coding", root: "k3" }];
   const withMirror = await applyCatalogPostFilters(makeRequest(), models, {
     connections: [
       {
         id: "conn-1",
-        provider: "agentrouter",
+        provider: "openrouter",
         isActive: true,
         providerSpecificData: {},
       },
@@ -74,18 +74,18 @@ test("final catalog permission filtering does not let a mirror inherit base acce
   const gatewayAllowed = await filterUnauthorizedFunctionalGatewayMirrors(
     withMirror,
     "gateway-key",
-    async (_key, modelId) => modelId === "agentrouter/kmc/k3"
+    async (_key, modelId) => modelId === "openrouter/kmc/k3"
   );
   assert.deepEqual(
     gatewayAllowed.map((model) => model.id),
-    ["kmc/k3", "agentrouter/kmc/k3"],
+    ["kmc/k3", "openrouter/kmc/k3"],
     "an independently authorized gateway mirror must remain visible"
   );
 });
 
 test("catalog post-filters synthesize a gateway mirror when gate on and gateway has a connection", async () => {
   setFeatureFlagOverride(FLAG_KEY, "true");
-  setFunctionalGatewayProviderSetting("agentrouter", "on");
+  setFunctionalGatewayProviderSetting("openrouter", "on");
 
   const models = [
     { id: "deepseek/deepseek-v4-flash", owned_by: "deepseek", root: "deepseek-v4-flash" },
@@ -94,7 +94,7 @@ test("catalog post-filters synthesize a gateway mirror when gate on and gateway 
     connections: [
       {
         id: "conn-1",
-        provider: "agentrouter",
+        provider: "openrouter",
         isActive: true,
         providerSpecificData: {},
       },
@@ -102,11 +102,11 @@ test("catalog post-filters synthesize a gateway mirror when gate on and gateway 
     prefixMode: "dual",
     aliasToProviderId: {},
   });
-  // The mirror pass is wired and synthesizes agentrouter/deepseek/deepseek-v4-flash
-  // when the gate is on AND agentrouter (a passthrough gateway) has an active
+  // The mirror pass is wired and synthesizes openrouter/deepseek/deepseek-v4-flash
+  // when the gate is on AND openrouter (a passthrough gateway) has an active
   // connection covering the model.
   assert.ok(
-    out.some((m) => m.id === "agentrouter/deepseek/deepseek-v4-flash"),
+    out.some((m) => m.id === "openrouter/deepseek/deepseek-v4-flash"),
     `expected mirror to be synthesized, got: ${out.map((m) => m.id).join(", ")}`
   );
 });

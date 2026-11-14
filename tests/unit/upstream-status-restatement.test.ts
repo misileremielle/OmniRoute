@@ -2,33 +2,51 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 /**
- * Gateways like agentrouter.org misstate TEMPORARY quota exhaustion as 403/400
- * (Chinese body "用户额度不足"), which Claude Code treats as permanent and dies.
+ * Some gateways misstate TEMPORARY quota exhaustion as 403/400 (e.g. a Chinese body
+ * "用户额度不足"), which Claude Code treats as permanent and dies.
  * applyStatusRestatement() rewrites such statuses to 429 (+ synthetic
  * Retry-After) in ONE place, before fallback classification and before the
- * status ever reaches the client. Registry-driven: future gateways with the
- * same defect register one rule array — no pipeline changes.
+ * status ever reaches the client. Registry-driven: a gateway with the defect
+ * registers one rule array — no pipeline changes. No built-in provider needs one
+ * today, so these tests register a fixture gateway rule.
  */
 
 const { applyStatusRestatement, statusRestatementRegistry } =
   await import("../../open-sse/config/upstreamStatusRestatement.ts");
 
-test("R1: agentrouter 403 + 用户额度不足 → 429 with synthetic Retry-After", () => {
+const FIXTURE = "fixture-gateway";
+test.before(() => {
+  statusRestatementRegistry.set(FIXTURE, [
+    {
+      id: "fixture-quota-misstatus",
+      fromStatuses: new Set([403, 400]),
+      toStatus: 429,
+      textMarkers: ["额度不足"],
+      excludeMarkers: ["无权访问"],
+      defaultRetryAfterMs: 60_000,
+    },
+  ]);
+});
+test.after(() => {
+  statusRestatementRegistry.delete(FIXTURE);
+});
+
+test("R1: gateway 403 + 用户额度不足 → 429 with synthetic Retry-After", () => {
   const out = applyStatusRestatement({
-    provider: "agentrouter",
+    provider: FIXTURE,
     status: 403,
     message: '{"error":{"message":"用户额度不足","type":"insufficient_user_quota"}}',
     retryAfterMs: null,
   });
   assert.equal(out.status, 429);
   assert.equal(out.fromStatus, 403);
-  assert.equal(out.ruleId, "agentrouter-quota-misstatus");
+  assert.equal(out.ruleId, "fixture-quota-misstatus");
   assert.equal(out.retryAfterMs, 60_000);
 });
 
-test("R2: agentrouter 403 + 无权访问模型 (no model access) is NOT restated", () => {
+test("R2: gateway 403 + 无权访问模型 (no model access) is NOT restated", () => {
   const out = applyStatusRestatement({
-    provider: "agentrouter",
+    provider: FIXTURE,
     status: 403,
     message: "无权访问模型 claude-sonnet-4",
     retryAfterMs: null,
@@ -39,7 +57,7 @@ test("R2: agentrouter 403 + 无权访问模型 (no model access) is NOT restated
 
 test("R3: quota marker in body (not message) still restates", () => {
   const out = applyStatusRestatement({
-    provider: "agentrouter",
+    provider: FIXTURE,
     status: 403,
     message: "Forbidden",
     body: { error: { message: "用户额度不足，请充值" } },
@@ -50,7 +68,7 @@ test("R3: quota marker in body (not message) still restates", () => {
 
 test("R4: upstream-provided retryAfterMs wins over the synthetic default", () => {
   const out = applyStatusRestatement({
-    provider: "agentrouter",
+    provider: FIXTURE,
     status: 403,
     message: "用户额度不足",
     retryAfterMs: 5_000,
@@ -59,9 +77,9 @@ test("R4: upstream-provided retryAfterMs wins over the synthetic default", () =>
   assert.equal(out.retryAfterMs, 5_000);
 });
 
-test("R5: agentrouter 400 with quota marker also restates (gateway variant)", () => {
+test("R5: gateway 400 with quota marker also restates (gateway variant)", () => {
   const out = applyStatusRestatement({
-    provider: "agentrouter",
+    provider: FIXTURE,
     status: 400,
     message: "额度不足",
     retryAfterMs: null,
@@ -69,9 +87,9 @@ test("R5: agentrouter 400 with quota marker also restates (gateway variant)", ()
   assert.equal(out.status, 429);
 });
 
-test("R6: agentrouter 403 without quota markers is untouched (real auth error)", () => {
+test("R6: gateway 403 without quota markers is untouched (real auth error)", () => {
   const out = applyStatusRestatement({
-    provider: "agentrouter",
+    provider: FIXTURE,
     status: 403,
     message: "Invalid API key",
     retryAfterMs: null,
@@ -80,7 +98,7 @@ test("R6: agentrouter 403 without quota markers is untouched (real auth error)",
   assert.equal(out.ruleId, null);
 });
 
-test("R7: other providers never match agentrouter rules (registry-scoped)", () => {
+test("R7: other providers never match the gateway rules (registry-scoped)", () => {
   const out = applyStatusRestatement({
     provider: "openai",
     status: 403,
@@ -92,7 +110,7 @@ test("R7: other providers never match agentrouter rules (registry-scoped)", () =
 
 test("R8: statuses a rule does not list pass through (already-correct 429)", () => {
   const out = applyStatusRestatement({
-    provider: "agentrouter",
+    provider: FIXTURE,
     status: 429,
     message: "用户额度不足",
     retryAfterMs: 1_000,
@@ -102,9 +120,11 @@ test("R8: statuses a rule does not list pass through (already-correct 429)", () 
   assert.equal(out.retryAfterMs, 1_000);
 });
 
-test("R9: registry exposes agentrouter so future gateways copy the one-line recipe", () => {
-  const rules = statusRestatementRegistry.get("agentrouter");
-  assert.ok(rules && rules.length > 0);
+test("R9: no built-in provider registers a restatement rule", () => {
+  assert.deepEqual(
+    [...statusRestatementRegistry.keys()].filter((id) => id !== FIXTURE),
+    []
+  );
 });
 
 test("R10: chatCore wires applyStatusRestatement into the providerFailure block", async () => {

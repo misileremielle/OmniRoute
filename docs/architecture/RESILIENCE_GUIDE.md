@@ -732,109 +732,61 @@ single-shot, so usage accounting and semaphore release are not duplicated.
 **Purpose:** correct a misleading status BEFORE classification, so downstream consumers (fallback engine, combo aggregation, the client-facing response) see the true retryable nature of the failure.
 
 Some gateways signal TEMPORARY quota exhaustion with a non-retryable HTTP
-status. `agentrouter.org` returns `403` (sometimes `400`) with a Chinese body
-(`用户额度不足` / `额度不足`) instead of the standard `429`. Clients like Claude
-Code treat `403` as permanent and abort the session, and without correction
-the fallback engine would classify it as `AUTH_ERROR` instead of a quota
-event.
+status (for example a `403` with a quota message in the body instead of a
+`429`). Clients like Claude Code treat `403` as permanent and abort the
+session, and without correction the fallback engine would classify it as
+`AUTH_ERROR` instead of a quota event. No built-in provider needs a
+restatement today; the registry is empty and the hook stays for future ones.
 
 **Implementation:**
 
 - Registry + matcher: `open-sse/config/upstreamStatusRestatement.ts` — a
   per-provider list of rules (`{id, fromStatuses, toStatus, textMarkers,
 excludeMarkers, defaultRetryAfterMs}`), matched via `applyStatusRestatement()`.
-- Call site: the `providerFailure:` block in `open-sse/handlers/chatCore.ts`
-  (around line 3654), right after `parseUpstreamError()` parses an upstream
-  response with an error HTTP status (`!providerResponse.ok`), and before any
-  classification runs, so every downstream consumer sees the corrected
-  status. Errors embedded inside a `200` SSE stream follow a separate,
-  later stream-parsing path and are **not** covered by this hook today — a
-  known limitation, not yet needed for agentrouter's misstatus (which
-  surfaces as an error HTTP status).
+- Call sites: `open-sse/handlers/chatCore/providerExecutionPipeline.ts` and
+  `open-sse/handlers/chatCore/streamingResponse.ts`, right after the upstream
+  error is parsed and before any classification runs, so every downstream
+  consumer sees the corrected status. Errors embedded inside a `200` SSE
+  stream follow a separate, later stream-parsing path and are **not** covered
+  by this hook.
 - Retry eligibility: `429` is in `RETRY_AFTER_ELIGIBLE_STATUSES`
   (`open-sse/services/combo/unavailableRetryGate.ts`), so a restated error
   carries a real retry window instead of surfacing as a dead `403`.
-- The synthetic `60s` `defaultRetryAfterMs` (`upstreamStatusRestatement.ts`)
-  is only what the restated response tells the **client**; it is not itself
-  the connection's internal cooldown/lockout duration — that is governed
-  separately by whichever mechanism actually handles the restated error
-  (Connection Cooldown's escalating backoff, §2, base `3s` for API-key
-  providers; or Model Lockout, §3, for per-model-quota providers like
-  agentrouter). The router can become eligible to retry internally sooner
-  than the 60s window it advertises to the client — intentional headroom,
-  not a bug.
+- A rule's `defaultRetryAfterMs` is only what the restated response tells the
+  **client**; the connection's internal cooldown/lockout is governed by
+  whichever mechanism handles the restated error (Connection Cooldown, §2, or
+  Model Lockout, §3).
 
-Permanent errors (agentrouter's `无权访问模型` — no access to this model) are
-NEVER restated: `excludeMarkers` vetoes the rule even when `textMarkers` hit,
-so the error keeps its original status and nothing retries it forever. The
-matching provider classification rule
-(`agentrouter-model-access-denied` in `open-sse/config/providerErrorRules.ts`:
-`reason: "auth_error"`, `scope: "model"`, a `6h` declared base cooldown) is
-consulted by `checkFallbackError` (`open-sse/services/accountFallback.ts`)
-_before_ the generic apikey-category `FORBIDDEN` early-return, gated on
-`honorsRuleLockScope(provider)` (#10334 — currently agentrouter-exclusive via
-the `HONORS_RULE_LOCK_SCOPE_PROVIDERS` allowlist in
-`providerErrorRules.ts`). The rule's declared 6h cooldown flows through as
-`fallbackResult.baseCooldownMs`, but it still feeds the pre-existing
-per-model-quota lockout path (`lockModelIfPerModelQuota()` /
-`recordModelLockoutFailure()`, unchanged by #10334 except for the cooldown
-source): it is clamped down to the operator's `mlSettings.maxCooldownMs`
-(default `1_800_000ms` / 30min), like every other model lockout, and the
-_persisted lockout reason_ stays the pre-existing hardcoded `"forbidden"`,
-not the rule's `"auth_error"` — only the cooldown duration is honored
-end-to-end, not the reason string. The connection itself stays active;
-sibling models on the same connection are unaffected.
+Permanent errors are NEVER restated: `excludeMarkers` vetoes a rule even when
+`textMarkers` hit, so the error keeps its original status and nothing retries
+it forever.
 
-Restated quota errors (`额度不足`) reach a provider rule in production
-(`agentrouter-user-quota-exhausted`: `reason: "quota_exhausted"`, `scope:
-"connection"`, no declared cooldown of its own — the persistence layer's
-scaled backoff default applies). Since #10334, `scope` on
+Since #10334, a provider classification rule's `scope` on
 `ProviderErrorRuleMatch` IS consumed end-to-end, but **only** for providers in
 the `HONORS_RULE_LOCK_SCOPE_PROVIDERS` allowlist (`providerErrorRules.ts` —
-today only `"agentrouter"`, gated via `honorsRuleLockScope()`). For every
-other provider `scope` remains informational, exactly as before #10334.
-`checkFallbackError` surfaces the matched rule's scope as
+the opencode family, gated via `honorsRuleLockScope()`) or with an
+operator-declared rule. For every other provider `scope` remains
+informational. `checkFallbackError` surfaces the matched rule's scope as
 `fallbackResult.ruleScope`; `isAgentrouterConnectionQuotaScope()`
-(`src/sse/services/auth.ts`) is the shared guard that confirms a
-`ruleScope` is genuinely safe to honor as a connection-wide, self-recovering
-signal (scope `"connection"`, reason `quota_exhausted`, never `permanent`,
-never `creditsExhausted` — a defense against a future rule pairing scope
-`"connection"` with a permanent account state). Two consumers call it:
+(`src/sse/services/auth.ts`, named after the provider it was first written
+for) is the shared guard that confirms a `ruleScope` is safe to honor as a
+connection-wide, self-recovering signal (scope `"connection"`, reason
+`quota_exhausted`, never `permanent`, never `creditsExhausted`). Two
+consumers call it:
 
 - **Persistence** (`markAccountUnavailable()`, `src/sse/services/auth.ts`):
-  instead of falling into the passthrough-provider **per-model** lockout
-  branch (agentrouter is `passthroughModels: true` → `hasPerModelQuota()`
-  returns `true`), it applies a **temporary connection cooldown** —
-  `testStatus: "unavailable"` + `rateLimitedUntil`, never a terminal status
-  (`credits_exhausted`/`banned`/`expired`) — so the connection self-recovers
-  once the cooldown lapses instead of requiring a manual credential reset.
-  Skipped for connections with `disableCooling: true` (#2997): that opt-out
-  falls through to the per-model lockout instead (a documented trade-off —
-  see the code comment above the branch).
+  instead of falling into the per-model lockout branch, it applies a
+  **temporary connection cooldown** — `testStatus: "unavailable"` +
+  `rateLimitedUntil`, never a terminal status — so the connection
+  self-recovers once the cooldown lapses. Skipped for connections with
+  `disableCooling: true` (#2997).
 - **Same-request combo routing** (`applyComboTargetExhaustion()`,
   `open-sse/services/combo/targetExhaustion.ts`): the same guard marks the
   connection into the in-memory `exhaustedConnections` set, keyed
-  `${provider}:${connectionId}`. This only skips a remaining SAME-REQUEST
-  target that _itself already carries that exact `connectionId`_ on its own
-  target object (`getExhaustedTargetSkipReason()`,
-  `open-sse/services/combo/comboPredicates.ts`, `if (provider &&
-connectionId)` before the `exhaustedConnections` lookup) — a plain
-  model-list combo, where sibling targets carry no pinned `connectionId` of
-  their own and one is only resolved per-dispatch from the response's
-  `X-OmniRoute-Selected-Connection-Id` header, never hits that key match. For
-  that common case, the real protection against a remaining leg reusing the
-  just-exhausted account is NOT this Set — it is the persistence layer above
-  (the connection's `rateLimitedUntil` is now in the future) combined with
-  this same guard suppressing `transientRateLimitedProviders` for the
-  failure (see "Two-stage design" and the code comment on the
-  `isAgentrouterConnectionQuotaScope` branch in `targetExhaustion.ts`): with
-  that Set left unmarked, `combo.ts`'s `allowRateLimitedConnection` force-allow
-  (`open-sse/services/combo.ts:1005-1013`, `:2734-2738`) does NOT kick in for
-  the provider's remaining legs, so credential selection's `rateLimitedUntil`
-  filter (`src/sse/services/auth.ts:1238`) is honored normally and a
-  remaining leg either picks a different, still-eligible agentrouter
-  connection or fails with no credentials available — it does not force its
-  way back onto the connection this branch just cooled down.
+  `${provider}:${connectionId}`, and suppresses
+  `transientRateLimitedProviders` for the failure, so credential selection's
+  `rateLimitedUntil` filter keeps a remaining leg off the connection that was
+  just cooled down.
 
 ### Two-stage design: status restatement, then classification
 
@@ -849,7 +801,8 @@ classification rules pick the fallback `reason` and lock `scope`
 
 Classification rules only see full error **text** (needed to match body
 markers like `额度不足`) for providers listed in the `FULL_TEXT_RULE_PROVIDERS`
-allowlist in `providerErrorRules.ts` — currently only `"agentrouter"`. For
+allowlist in `providerErrorRules.ts` — empty by default; the opencode and
+cloudflare-ai families join it behind opt-in feature flags. For
 every other **built-in catalog** provider, `checkFallbackError` hands
 `getProviderErrorRuleMatch` only the structured error (`{code, type}`), which
 is enough for header/status/code-based rules but blind to body-text markers.
@@ -863,7 +816,7 @@ A rule's `scope` (`model` / `provider` / `connection`) is a separate opt-in
 from `FULL_TEXT_RULE_PROVIDERS`: `checkFallbackError` only surfaces it as
 `fallbackResult.ruleScope`, and downstream consumers only honor it as
 anything other than an informational label, for providers in the
-`HONORS_RULE_LOCK_SCOPE_PROVIDERS` allowlist in the same file (gated via `honorsRuleLockScope()` — today only `"agentrouter"`). See "Restated quota
+`HONORS_RULE_LOCK_SCOPE_PROVIDERS` allowlist in the same file (gated via `honorsRuleLockScope()` — the opencode family). See "Restated quota
 errors" above for what a `scope: "connection"` match actually does once a
 provider is on that allowlist.
 
@@ -939,13 +892,13 @@ behavior) and is out of scope for a single-provider rule addition.
    `scope: "connection"` and the intent is an actual connection-wide cooldown
    plus same-request combo skip (not just an informational label), add the
    provider id to `HONORS_RULE_LOCK_SCOPE_PROVIDERS` in the same file — this
-   is what gates `isAgentrouterConnectionQuotaScope()`-style consumption in
+   is what gates `isAgentrouterConnectionQuotaScope()` consumption in
    `markAccountUnavailable()` (`src/sse/services/auth.ts`) and
    `applyComboTargetExhaustion()`
    (`open-sse/services/combo/targetExhaustion.ts`); without it, `scope`
    still flows through `fallbackResult.ruleScope` but nothing acts on it.
 3. Add unit tests mirroring `tests/unit/upstream-status-restatement.test.ts`
-   and `tests/unit/agentrouter-error-rules.test.ts` (including the
+   (including the
    not-permanent / not-creditsExhausted guards, and — if the provider needs
    the allowlist — a test asserting `resolveRuleMatchBody()` returns the
    full text only for that provider).
@@ -988,9 +941,9 @@ rate limit is the same signal as an exhausted quota. Honest limits:
   `providerErrorRules.ts`), never honored so far because opencode is not in
   `HONORS_RULE_LOCK_SCOPE_PROVIDERS`. The branch writes the failing
   connection's cooldown + `backoffLevel` itself, mirroring the
-  connection-scoped agentrouter branch, and returns — the per-model block and
+  connection-scoped quota branch, and returns — the per-model block and
   the generic path below are never reached.
-- **Combo included**: like the agentrouter branch, the scope deliberately
+- **Combo included**: like the connection-scoped quota branch, the scope deliberately
   ignores the `persistUnavailableState`/`isCombo` downgrade a combo caller
   applies to a 429. A per-model lockout is not a weaker form of this scope, it
   is the wrong unit: it says nothing about the exhausted IP, so the combo

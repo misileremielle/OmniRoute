@@ -11,7 +11,6 @@ process.env.API_KEY_SECRET = process.env.API_KEY_SECRET || "deepseek-efforts-tes
 const core = await import("../../src/lib/db/core.ts");
 const providersDb = await import("../../src/lib/db/providers.ts");
 const modelsDb = await import("../../src/lib/db/models.ts");
-const modelDiscovery = await import("../../src/lib/providerModels/modelDiscovery.ts");
 const { getModelInfo } = await import("../../src/sse/services/model.ts");
 const v1ModelsCatalog = await import("../../src/app/api/v1/models/catalog.ts");
 const { REGISTRY } = await import("../../open-sse/config/providerRegistry.ts");
@@ -100,102 +99,6 @@ test("OpenCode Go catalog derives the declared V4 effort aliases from base model
     assert.equal(models.has(`${baseId}-medium`), false);
   }
 });
-test("Crof synced reasoning metadata exposes exactly none/low/medium/high/max aliases", async () => {
-  const connection = await providersDb.createProviderConnection({
-    provider: "crof",
-    authType: "apikey",
-    name: "crof-live-efforts",
-    apiKey: "crof-test-key",
-    isActive: true,
-    testStatus: "active",
-  });
-  const modelId = "crof-live-reasoning-model";
-
-  await modelDiscovery.persistDiscoveredModels("crof", connection.id, [
-    { id: modelId, name: "Crof Live Reasoning Model", reasoning_effort: true },
-  ]);
-
-  const response = await v1ModelsCatalog.getUnifiedModelsResponse(
-    new Request("http://localhost/api/v1/models")
-  );
-  const body = (await response.json()) as { data: Array<{ id: string }> };
-  const aliases = new Set(
-    body.data.map((model) => model.id).filter((id) => id.startsWith(`crof/${modelId}-`))
-  );
-  assert.deepEqual(
-    aliases,
-    new Set([
-      `crof/${modelId}-none`,
-      `crof/${modelId}-low`,
-      `crof/${modelId}-medium`,
-      `crof/${modelId}-high`,
-      `crof/${modelId}-max`,
-    ])
-  );
-});
-
-test("Crof static GLM 5.2 effort aliases survive a stale synced cache", async () => {
-  const connection = await providersDb.createProviderConnection({
-    provider: "crof",
-    authType: "apikey",
-    name: "crof-stale-glm-5-2",
-    apiKey: "crof-stale-glm-5-2-key",
-    isActive: true,
-    testStatus: "active",
-  });
-
-  await modelsDb.replaceSyncedAvailableModelsForConnection("crof", connection.id, [
-    {
-      id: "glm-5.2",
-      name: "GLM 5.2",
-      supportedEndpoints: ["chat"],
-    },
-  ]);
-
-  const response = await v1ModelsCatalog.getUnifiedModelsResponse(
-    new Request("http://localhost/api/v1/models")
-  );
-  const body = (await response.json()) as { data: Array<{ id: string }> };
-  const aliases = new Set(
-    body.data.map((model) => model.id).filter((id) => id.startsWith("crof/glm-5.2-"))
-  );
-
-  assert.deepEqual(
-    aliases,
-    new Set([
-      "crof/glm-5.2-none",
-      "crof/glm-5.2-low",
-      "crof/glm-5.2-medium",
-      "crof/glm-5.2-high",
-      "crof/glm-5.2-max",
-    ])
-  );
-});
-
-test("Crof synced effort aliases resolve to the base model at request time", async () => {
-  const connection = await providersDb.createProviderConnection({
-    provider: "crof",
-    authType: "apikey",
-    name: "crof-runtime-efforts",
-    apiKey: "crof-runtime-key",
-    isActive: true,
-    testStatus: "active",
-  });
-  const modelId = "crof-runtime-reasoning-model";
-
-  await modelDiscovery.persistDiscoveredModels("crof", connection.id, [
-    { id: modelId, reasoning_effort: true },
-  ]);
-
-  const info = await getModelInfo(`crof/${modelId}-medium`);
-  assert.equal(info.provider, "crof");
-  assert.equal(info.model, modelId);
-  assert.equal(info.resolvedThinkingEffort, "medium");
-
-  const maxInfo = await getModelInfo(`crof/${modelId}-max`);
-  assert.equal(maxInfo.model, modelId);
-  assert.equal(maxInfo.resolvedThinkingEffort, "max");
-});
 
 test("hardcoded DeepSeek effort suffixes resolve through the static registry", async () => {
   const flashLow = await getModelInfo("ds/deepseek-v4-flash-low");
@@ -232,47 +135,6 @@ test("native DeepSeek preserves the documented low effort for Flash and Pro", ()
       `${model} must pass low through unchanged`
     );
   }
-});
-
-test("non-DeepSeek static reasoning models do not advertise unresolvable effort aliases", async () => {
-  // cheaperinference declares deepseek-v4-flash/pro with supportsReasoning: true
-  // but no supportedThinkingEfforts — the catalog must NOT synthesize
-  // cheaperinference/deepseek-v4-flash-{low,high,...} ids for them (#9485 review #1).
-  await providersDb.createProviderConnection({
-    provider: "cheaperinference",
-    authType: "apikey",
-    name: "cheaperinference-blast-radius",
-    apiKey: "cheaperinference-test-key",
-    isActive: true,
-    testStatus: "active",
-  });
-
-  const response = await v1ModelsCatalog.getUnifiedModelsResponse(
-    new Request("http://localhost/api/v1/models")
-  );
-  const body = (await response.json()) as { data: Array<{ id: string }> };
-  const ids = body.data.map((model) => model.id);
-
-  // Static base models for cheaperinference should still be present
-  assert.ok(
-    ids.some((id) => id.endsWith("cheaperinference/deepseek-v4-flash")),
-    "cheaperinference/deepseek-v4-flash base entry should still be present"
-  );
-  // But NO effort-suffixed aliases should be synthesized
-  assert.equal(
-    ids.some((id) =>
-      /cheaperinference\/deepseek-v4-flash-(none|low|medium|high|max|xhigh)$/.test(id)
-    ),
-    false,
-    "cheaperinference static reasoning models must not advertise unresolvable effort aliases"
-  );
-  assert.equal(
-    ids.some((id) =>
-      /cheaperinference\/deepseek-v4-pro-(none|low|medium|high|max|xhigh)$/.test(id)
-    ),
-    false,
-    "cheaperinference static reasoning models must not advertise unresolvable effort aliases"
-  );
 });
 
 test("custom model named deepseek-v4-flash-low is not rewritten by registry suffix resolution", async () => {

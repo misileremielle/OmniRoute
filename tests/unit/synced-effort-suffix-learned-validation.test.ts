@@ -117,8 +117,8 @@ test("leaves a listed model id ending in a tier token untouched even with learne
 });
 
 test("strips a learned-only tier suffix for a registry model without declared tiers", async () => {
-  recordLearnedReasoningEffort("registry-learn-conn", "gpt-5", ["low"]);
-  const info = await getModelInfo("aimlapi/gpt-5-low");
-  assert.equal(info.model, "gpt-5");
+  recordLearnedReasoningEffort("registry-learn-conn", "kimi-k2.6", ["low"]);
+  const info = await getModelInfo("ollama-cloud/kimi-k2.6-low");
+  assert.equal(info.model, "kimi-k2.6");
   assert.equal(info.resolvedThinkingEffort, "low");
 });

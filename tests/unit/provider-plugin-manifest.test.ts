@@ -79,7 +79,7 @@ test("provider plugin manifest is JSON-safe and stable enough for sidecars", () 
   assert.equal(roundTripped.providers.length, 4);
   assert.deepEqual(
     roundTripped.providers.map((provider: { id: string }) => provider.id),
-    [...roundTripped.providers.map((provider: { id: string }) => provider.id)].sort(),
+    [...roundTripped.providers.map((provider: { id: string }) => provider.id)].sort()
   );
 });
 
@@ -159,29 +159,29 @@ test("manifest omits usage-fetch for providers without a usage fetcher (#11722)"
 
 test("usage-fetch matches the fetcher list by alias too (#11722)", () => {
   // USAGE_FETCHER_PROVIDERS is keyed by the strings `getUsageForProvider` accepts, which
-  // mixes canonical ids ("hyperagent") with aliases ("ha"). Resolve on both, the same way
+  // mixes canonical ids ("megabrain") with aliases ("mb"). Resolve on both, the same way
   // getProviderPluginManifestEntryFromRegistry already resolves a lookup.
   const aliasOnlyFixture: Record<string, RegistryEntry> = {
-    "hyperagent-eu": {
-      id: "hyperagent-eu",
-      alias: "ha",
+    "megabrain-eu": {
+      id: "megabrain-eu",
+      alias: "mb",
       format: "openai",
       executor: "default",
-      baseUrl: "https://eu.hyperagent.example/v1/chat/completions",
+      baseUrl: "https://eu.megabrain.example/v1/chat/completions",
       authType: "apikey",
       authHeader: "bearer",
-      models: [{ id: "ha-1", name: "HyperAgent 1" }],
+      models: [{ id: "mb-1", name: "MegaBrain 1" }],
     },
   };
 
   assert.equal(
-    (USAGE_FETCHER_PROVIDERS as readonly string[]).includes("hyperagent-eu"),
+    (USAGE_FETCHER_PROVIDERS as readonly string[]).includes("megabrain-eu"),
     false,
     "fixture guard: the id must NOT be in the list, only the alias"
   );
-  assert.ok((USAGE_FETCHER_PROVIDERS as readonly string[]).includes("ha"));
+  assert.ok((USAGE_FETCHER_PROVIDERS as readonly string[]).includes("mb"));
 
-  const entry = getProviderPluginManifestEntryFromRegistry(aliasOnlyFixture, "hyperagent-eu");
+  const entry = getProviderPluginManifestEntryFromRegistry(aliasOnlyFixture, "megabrain-eu");
 
   assert.ok(entry);
   assert.ok(entry.capabilities.includes("usage-fetch"));
@@ -269,12 +269,12 @@ test("manifest emits free-tier for a provider with documented free models", () =
   const entry = getProviderPluginManifestEntryFromRegistry(
     {
       ...registryFixture,
-      "api-airforce": {
-        id: "api-airforce",
-        alias: "af",
+      groq: {
+        id: "groq",
+        alias: "groq",
         format: "openai",
         executor: "default",
-        baseUrl: "https://api.airforce/v1/chat/completions",
+        baseUrl: "https://api.groq.com/openai/v1/chat/completions",
         authType: "apikey",
         authHeader: "bearer",
         defaultContextLength: 128000,
@@ -282,7 +282,7 @@ test("manifest emits free-tier for a provider with documented free models", () =
       },
       "legacy-free": {
         id: "legacy-free",
-        alias: "api-airforce",
+        alias: "groq",
         format: "openai",
         executor: "default",
         baseUrl: "https://legacy.example/v1",
@@ -309,7 +309,7 @@ test("manifest emits free-tier for a provider with documented free models", () =
         models: [{ id: "openai", name: "OpenAI (free)" }],
       },
     },
-    "api-airforce"
+    "groq"
   );
   assert.ok(entry);
   assert.ok(entry.capabilities.includes("free-tier"));
@@ -317,13 +317,13 @@ test("manifest emits free-tier for a provider with documented free models", () =
 
 test("manifest emits free-tier via alias-only branch (id outside set, alias inside)", () => {
   assert.equal(hasFreeTierProvider("legacy-free"), false);
-  assert.equal(hasFreeTierProvider("api-airforce"), true);
+  assert.equal(hasFreeTierProvider("groq"), true);
   const entry = getProviderPluginManifestEntryFromRegistry(
     {
       ...registryFixture,
       "legacy-free": {
         id: "legacy-free",
-        alias: "api-airforce",
+        alias: "groq",
         format: "openai",
         executor: "default",
         baseUrl: "https://legacy.example/v1",

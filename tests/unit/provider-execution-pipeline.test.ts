@@ -434,29 +434,6 @@ test("401 refresh succeeds then retries once on same connection", async () => {
   }
 });
 
-test("status restatement rewrites agentrouter 403 quota exhaustion to 429 before classification", async () => {
-  const { runProviderExecutionPipeline } =
-    await import("../../open-sse/handlers/chatCore/providerExecutionPipeline.ts");
-  let sendCount = 0;
-  const input = makeInput({
-    policy: { allowAccountRotation: true, allowModelFallback: true },
-    provider: "agentrouter",
-    connectionId: "ar-a",
-    send: async () => {
-      sendCount += 1;
-      return makeAttempt({ error: { message: "用户额度不足", type: "forbidden" } }, 403);
-    },
-  });
-
-  const outcome = await runProviderExecutionPipeline(input);
-  assert.equal(sendCount, 1);
-  assert.equal(outcome.kind, "error");
-  if (outcome.kind === "error") {
-    assert.equal(outcome.result.status, 429, "restated before classification");
-    assert.equal(outcome.connectionId, "ar-a");
-  }
-});
-
 test("thinking-signature recovery returns winning response", async () => {
   const { runProviderExecutionPipeline } =
     await import("../../open-sse/handlers/chatCore/providerExecutionPipeline.ts");

@@ -255,7 +255,7 @@ test("Issue #14200: mergeClientAnthropicBeta drops client-negotiated skills beta
   );
 });
 
-test("Issue #14200: Claude-Code-Compatible providers (agentrouter and anthropic-compatible-cc-*) include skills beta only with code_execution", () => {
+test("Issue #14200: Claude-Code-Compatible providers (anthropic-compatible-cc-*) include skills beta only with code_execution", () => {
   // 0. Explicit null body check
   const nullBodyHeaders = buildProviderHeaders("anthropic", { apiKey: "test-key" }, true, null);
   const nullBodyBeta = nullBodyHeaders["Anthropic-Beta"] || nullBodyHeaders["anthropic-beta"] || "";
@@ -265,32 +265,6 @@ test("Issue #14200: Claude-Code-Compatible providers (agentrouter and anthropic-
       .map((s) => s.trim())
       .includes(SKILLS),
     `explicit null body must not have skills beta: ${nullBodyBeta}`
-  );
-
-  // 1. Built-in usesCcWireImage provider (agentrouter)
-  const noToolHeaders = buildProviderHeaders("agentrouter", { apiKey: "test-key" }, true, {
-    messages: [{ role: "user", content: "hi" }],
-  });
-  const noToolBeta = noToolHeaders["Anthropic-Beta"] || noToolHeaders["anthropic-beta"] || "";
-  assert.ok(
-    !noToolBeta
-      .split(",")
-      .map((s) => s.trim())
-      .includes(SKILLS),
-    `tool-less agentrouter must not have skills beta: ${noToolBeta}`
-  );
-
-  const toolHeaders = buildProviderHeaders("agentrouter", { apiKey: "test-key" }, true, {
-    messages: [{ role: "user", content: "run code" }],
-    tools: [{ type: "code_execution_20250825", name: "code_execution" }],
-  });
-  const toolBeta = toolHeaders["Anthropic-Beta"] || toolHeaders["anthropic-beta"] || "";
-  assert.ok(
-    toolBeta
-      .split(",")
-      .map((s) => s.trim())
-      .includes(SKILLS),
-    `agentrouter with code_execution must have skills beta: ${toolBeta}`
   );
 
   // 2. Prefix-based Claude-Code-Compatible provider (anthropic-compatible-cc-custom)

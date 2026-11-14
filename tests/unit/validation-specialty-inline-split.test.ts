@@ -24,8 +24,6 @@ test("specialtyInline exposes the extracted leaf validators", () => {
     "validateNvidiaProvider",
     "validateZaiProvider",
     "validateXiaomiMimoProvider",
-    "buildOpengatewayValidator",
-    "buildGitlawbValidators",
   ]) {
     assert.equal(typeof (M as Record<string, unknown>)[name], "function", `missing ${name}`);
   }
@@ -33,19 +31,6 @@ test("specialtyInline exposes the extracted leaf validators", () => {
 
 test("host dispatcher surface stays intact after the move", () => {
   assert.equal(typeof (HOST as Record<string, unknown>).validateProviderApiKey, "function");
-});
-
-test("buildGitlawbValidators returns one entry per config id", () => {
-  const map = M.buildGitlawbValidators(
-    [
-      ["gitlawb", "https://opengateway.gitlawb.com/v1/xiaomi-mimo", "mimo-v2.5-pro"],
-      ["gitlawb-gmi", "https://opengateway.gitlawb.com/v1/gmi-cloud", "XiaomiMiMo/MiMo-V2.5-Pro"],
-    ],
-    false
-  );
-  assert.deepEqual(Object.keys(map).sort(), ["gitlawb", "gitlawb-gmi"]);
-  assert.equal(typeof map.gitlawb, "function");
-  assert.equal(typeof map["gitlawb-gmi"], "function");
 });
 
 test("validateVertexProvider: Express-mode key is accepted without JWT mint", async () => {

@@ -46,7 +46,7 @@ describe("virtualFactory pool diagnosis wiring", () => {
     const { classifyStrictZeroCostCandidate, findBudgetEntry } =
       await import("../../open-sse/services/autoCombo/strictZeroCostFilter.ts");
     const candidate = {
-      provider: "bluesminds",
+      provider: "blackbox",
       model: "gpt-4o",
       connectionId: "c1",
       allowedConnectionIds: ["c1"],

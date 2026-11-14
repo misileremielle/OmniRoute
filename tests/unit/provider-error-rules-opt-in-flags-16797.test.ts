@@ -97,10 +97,6 @@ test("full-text bodies: the opencode family keeps the structured body unless opt
       );
     });
   }
-  assert.equal(
-    rules.resolveRuleMatchBody("agentrouter", STRUCTURED, "用户额度不足"),
-    "用户额度不足"
-  );
 });
 
 test("full-text bodies: cloudflare-ai keeps the structured body unless opted in", () => {

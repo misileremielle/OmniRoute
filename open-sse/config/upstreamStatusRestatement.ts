@@ -66,27 +66,9 @@ export type StatusRestatementResult = {
   fromStatus: number;
 };
 
-// ─── agentrouter ────────────────────────────────────────────────────────────
-// Observed misstatus (ClaudeShield field reports + upstream behavior):
-//   403 "用户额度不足" / "额度不足"  → temporary user-quota exhaustion → 429
-//   400 variants carrying the same quota text                        → 429
-//   403 "无权访问模型" (no access to this model) → genuinely permanent, NEVER
-//   restated — it must keep flowing as 403 so nothing retries it forever.
-const AGENTROUTER_RULES: UpstreamStatusRestatementRule[] = [
-  {
-    id: "agentrouter-quota-misstatus",
-    fromStatuses: new Set([403, 400]),
-    toStatus: 429,
-    textMarkers: ["额度不足"],
-    excludeMarkers: ["无权访问"],
-    defaultRetryAfterMs: 60_000,
-  },
-];
-
 /** Provider id (lowercase) → ordered rules; first match wins. */
-export const statusRestatementRegistry = new Map<string, UpstreamStatusRestatementRule[]>([
-  ["agentrouter", AGENTROUTER_RULES],
-]);
+// No built-in provider needs a restatement today; the hook stays for future ones.
+export const statusRestatementRegistry = new Map<string, UpstreamStatusRestatementRule[]>();
 
 function stringifyBody(body: unknown): string {
   if (body === null || body === undefined) return "";

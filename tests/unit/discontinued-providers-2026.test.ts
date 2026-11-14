@@ -16,7 +16,7 @@ describe("2026 discontinued free tiers — providers.ts hasFree reconciliation",
     // they are KEPT with hasFree:false. phind is NOT here: the whole phind.com service
     // shut down 2026-01-16, so it was removed entirely (registry/executor/catalogs),
     // matching the dead-service-removal precedent (#5246 Gemini CLI).
-    for (const id of ["chutes", "gitlawb", "gitlawb-gmi", "aimlapi", "yi"]) {
+    for (const id of ["chutes", "yi"]) {
       const p = (APIKEY_PROVIDERS as Record<string, { hasFree?: boolean }>)[id];
       assert.ok(
         p,
@@ -26,42 +26,6 @@ describe("2026 discontinued free tiers — providers.ts hasFree reconciliation",
         p.hasFree,
         false,
         `${id} should have hasFree:false (discontinued in 2026)`
-      );
-    }
-  });
-
-  it("g4f.space sub-providers no longer advertise an anonymous free tier", async () => {
-    const { APIKEY_PROVIDERS } = await import("../../src/shared/constants/providers.ts");
-    // 2026-08-22 live re-verification: every g4f.space sub-path still lists models keylessly, but a
-    // keyless POST /v1/chat/completions returns HTTP 402 {"type":"insufficient_credits"} pointing at
-    // a proof-of-work "cake" wall (g4f.dev/chat) or a member key (g4f.dev/members.html). The gateway
-    // is NOT dead - it works with a g4f.dev member key - so the registry entries and their
-    // authType:"optional" are deliberately untouched; only the free-tier advertisement is corrected.
-    for (const id of ["g4f-groq", "g4f-gemini", "g4f-pollinations", "g4f-ollama", "g4f-nvidia"]) {
-      const p = (
-        APIKEY_PROVIDERS as Record<
-          string,
-          { hasFree?: boolean; freeNote?: string; authHint?: string }
-        >
-      )[id];
-      assert.ok(
-        p,
-        `${id} should still exist in APIKEY_PROVIDERS (gateway still usable with a member key)`
-      );
-      assert.strictEqual(
-        p.hasFree,
-        false,
-        `${id} should have hasFree:false (anonymous tier walled behind proof-of-work credits in 2026)`
-      );
-      assert.match(
-        p.freeNote ?? "",
-        /proof-of-work/i,
-        `${id} freeNote should explain the proof-of-work credit wall`
-      );
-      assert.match(
-        p.authHint ?? "",
-        /member key/i,
-        `${id} authHint should state that a g4f.dev member key is required`
       );
     }
   });

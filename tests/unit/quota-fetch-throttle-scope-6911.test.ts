@@ -3,7 +3,7 @@
  * wired into codexQuotaFetcher.ts even though quotaFetchThrottle.ts documents
  * itself as "used by the provider quota fetchers" (plural). This asserts the
  * shared throttle is now honored by fetchDeepseekQuota, fetchBailianQuota
- * (both fetch sites), fetchOpencodeQuota, and fetchCrofUsage — and that cache
+ * (both fetch sites) and fetchOpencodeQuota — and that cache
  * hits are never delayed (only genuine upstream network calls are throttled).
  */
 import test from "node:test";
@@ -21,10 +21,6 @@ import {
   fetchOpencodeQuota,
   invalidateOpencodeQuotaCache,
 } from "../../open-sse/services/opencodeQuotaFetcher.ts";
-import {
-  fetchCrofUsage,
-  invalidateCrofUsageCache,
-} from "../../open-sse/services/crofUsageFetcher.ts";
 import { resetQuotaFetchThrottle } from "../../open-sse/services/quotaFetchThrottle.ts";
 import {
   connectionProxyTestOverride,
@@ -114,8 +110,6 @@ const opencodeBody = {
   },
 };
 
-const crofBody = { usable_requests: 99, credits: 1.5 };
-
 async function assertSpacedByThrottle(
   label: string,
   responseBody: unknown,
@@ -165,12 +159,6 @@ test("#6911 fetchOpencodeQuota is spaced by the shared quota-fetch throttle", as
       fetchOpencodeQuota(idA, { apiKey: "sk-a" }),
       fetchOpencodeQuota(idB, { apiKey: "sk-b" }),
     ])
-  );
-});
-
-test("#6911 fetchCrofUsage is spaced by the shared quota-fetch throttle", async () => {
-  await assertSpacedByThrottle("crof", crofBody, (idA, idB) =>
-    Promise.all([fetchCrofUsage(idA, { apiKey: "sk-a" }), fetchCrofUsage(idB, { apiKey: "sk-b" })])
   );
 });
 

@@ -34,7 +34,3 @@ test("#13430 original V4 ids still match and unrelated ids do not", () => {
     false
   );
 });
-
-test("#13430 command-code requires reasoning replay", () => {
-  assert.equal(requiresReasoningReplay({ provider: "command-code", model: "any-model" }), true);
-});

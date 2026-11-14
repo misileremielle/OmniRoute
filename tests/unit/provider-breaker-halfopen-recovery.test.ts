@@ -24,24 +24,9 @@ import {
   clearCooldownState,
 } from "../../open-sse/services/providerCooldownTracker.ts";
 import { connectionCircuitBreakerName } from "../../open-sse/services/connectionCircuitBreaker.ts";
-import { isProviderInCooldown as isBreakerInCooldown } from "../../open-sse/services/accountFallback.ts";
 
 const uniqueProvider = (suffix: string) =>
   `halfopen-test-${suffix}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
-
-test("cmd alias uses the command-code provider and connection breaker identities", () => {
-  assert.equal(
-    connectionCircuitBreakerName("cmd", "a"),
-    connectionCircuitBreakerName("command-code", "a")
-  );
-  const provider = getCircuitBreaker("command-code", { failureThreshold: 1, resetTimeout: 60_000 });
-  provider._onFailure();
-  assert.equal(isBreakerInCooldown("cmd"), true);
-  provider.reset();
-  recordProviderFailure("cmd", undefined, "a", { failureThreshold: 1, resetTimeoutMs: 60_000 });
-  assert.equal(isBreakerInCooldown("command-code", "a"), true);
-  assert.equal(isBreakerInCooldown("command-code", "b"), false);
-});
 
 test("externally observed probe success does not close an occupied provider probe twice", async (t) => {
   t.mock.timers.enable({ apis: ["Date"], now: 1_000 });

@@ -164,8 +164,8 @@ The live, pool-deduplicated catalog currently reports:
 
 | Metric                         |   Current audited value | Interpretation                                                      |
 | ------------------------------ | ----------------------: | ------------------------------------------------------------------- |
-| Recurring quantified grant     | **~1.62B tokens/month** | Shared pools counted once; excludes uncapped providers from the sum |
-| First month with signup grants |       **~2.22B tokens** | Recurring total plus one-time and recurring credits                 |
+| Recurring quantified grant     | **~1.07B tokens/month** | Shared pools counted once; excludes uncapped providers from the sum |
+| First month with signup grants |       **~1.47B tokens** | Recurring total plus one-time and recurring credits                 |
 
 These are catalog-wide estimates across separate eligible accounts, not an allowance supplied by OmniRoute or a prediction for a fresh installation. Your usable capacity depends on the providers you connect and their current conditions. The values are computed from `open-sse/config/freeModelCatalog.ts`; see the
 [Free Tiers Reference](../reference/FREE_TIERS.md) for pool deduplication, ToS flags,

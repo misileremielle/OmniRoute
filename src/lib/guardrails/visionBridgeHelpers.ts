@@ -162,8 +162,7 @@ export type RequestContentPart =
  * Supports OpenAI image_url format, base64 image format, and Anthropic-style
  * image source blocks with either `source.type: "base64"` or `source.type: "url"`.
  *
- * The URL-source branch mirrors the executor-level handling in
- * `open-sse/executors/commandCode.ts::extractImageUrl` — without it, a
+ * Without the URL-source branch, a
  * Claude-Code-compatible client (e.g. Zoo Code) sending
  * `{ type: "image", source: { type: "url", url } }` was invisible to the
  * vision-bridge guardrail, so the image was silently dropped by a text-only

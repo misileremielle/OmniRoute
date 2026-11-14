@@ -1,12 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-const {
-  validateProviderApiKey,
-  validateClaudeCodeCompatibleProvider,
-  validateCommandCodeProvider,
-  isSecurityBlockError,
-} = await import("../../src/lib/providers/validation.ts");
+const { validateProviderApiKey, validateClaudeCodeCompatibleProvider, isSecurityBlockError } =
+  await import("../../src/lib/providers/validation.ts");
 
 const { SafeOutboundFetchError } = await import("../../src/shared/network/safeOutboundFetch.ts");
 
@@ -26,64 +22,6 @@ function toPlainHeaders(headers: HeadersInit | undefined) {
     Object.entries(headers || {}).map(([key, value]) => [key, String(value)])
   );
 }
-
-function metaAiSseText(content: string, streamingState = "DONE") {
-  return `event: next
-data: ${JSON.stringify({
-    data: {
-      sendMessageStream: {
-        __typename: "AssistantMessage",
-        id: "meta-msg-1",
-        content,
-        streamingState,
-        error:
-          streamingState === "ERROR"
-            ? { message: content, code: null, stack: "Error: " + content }
-            : null,
-        contentRenderer: { __typename: "TextContentRenderer", text: content },
-      },
-    },
-  })}
-
-event: complete
-data:
-
-`;
-}
-
-test("validateCommandCodeProvider ignores caller baseUrl and chatPath overrides", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    assert.equal(String(url), "https://api.commandcode.ai/provider/v1/chat/completions");
-    const headers = init.headers as Record<string, string>;
-    assert.equal(headers.Authorization, "Bearer cc-key");
-    const body = JSON.parse(String(init.body));
-    assert.equal(body.model, "command-code-validation-model");
-    return new Response(JSON.stringify({ ok: true }), { status: 200 });
-  };
-
-  const result = await validateCommandCodeProvider({
-    apiKey: "cc-key",
-    providerSpecificData: {
-      baseUrl: "https://evil.example/api",
-      chatPath: "/v1/chat/completions",
-      validationModelId: "command-code-validation-model",
-    },
-  });
-
-  assert.equal(result.valid, true);
-});
-
-test("validateCommandCodeProvider defaults probe model to DeepSeek flash", async () => {
-  globalThis.fetch = async (_url, init = {}) => {
-    const body = JSON.parse(String(init.body));
-    assert.equal(body.model, "deepseek/deepseek-v4-flash");
-    return new Response("", { status: 400 });
-  };
-
-  const result = await validateCommandCodeProvider({ apiKey: "cc-key" });
-
-  assert.deepEqual(result, { valid: true, error: null });
-});
 
 test("specialty providers surface network failures and non-auth upstream failures", async () => {
   globalThis.fetch = async (url) => {
@@ -1215,28 +1153,6 @@ test("specialty validator rejects invalid Modal credentials", async () => {
   assert.equal(modal.error, "Invalid API key");
 });
 
-test("specialty validator accepts Poe credentials on the current balance endpoint", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    const target = String(url);
-
-    if (target === "https://api.poe.com/usage/current_balance") {
-      const headers = init.headers as Record<string, string>;
-      assert.equal(headers.Authorization, "Bearer poe-key");
-      return new Response(JSON.stringify({ current_point_balance: 123456 }), { status: 200 });
-    }
-
-    throw new Error(`unexpected fetch: ${target}`);
-  };
-
-  const poe = await validateProviderApiKey({
-    provider: "poe",
-    apiKey: "poe-key",
-  });
-
-  assert.equal(poe.valid, true);
-  assert.equal(poe.method, "poe_current_balance");
-});
-
 test("specialty validator accepts Nous Research credentials on chat completions", async () => {
   globalThis.fetch = async (url, init = {}) => {
     const target = String(url);
@@ -1341,27 +1257,6 @@ test("specialty validator accepts Nous Research key when probe model is rejected
 
   assert.equal(nous.valid, true);
   assert.equal(nous.method, "nous_chat_completions");
-});
-
-test("specialty validator rejects invalid Poe credentials", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    const target = String(url);
-
-    if (target === "https://api.poe.com/usage/current_balance") {
-      const headers = init.headers as Record<string, string>;
-      assert.equal(headers.Authorization, "Bearer poe-bad");
-      return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
-    }
-
-    throw new Error(`unexpected fetch: ${target}`);
-  };
-
-  const poe = await validateProviderApiKey({
-    provider: "poe",
-    apiKey: "poe-bad",
-  });
-
-  assert.equal(poe.error, "Invalid API key");
 });
 
 test("specialty validator accepts Clarifai credentials through the OpenAI-compatible models probe", async () => {
@@ -1500,117 +1395,6 @@ test("specialty validator rejects invalid NLP Cloud credentials", async () => {
   assert.equal(nlpCloud.error, "Invalid API key");
 });
 
-test("validateCommandCodeProvider sends Command Code probe URL, headers, and flat OpenAI body", async () => {
-  const calls: Array<{
-    url: string;
-    method?: string;
-    headers?: HeadersInit;
-    body?: BodyInit | null;
-  }> = [];
-  globalThis.fetch = async (url, init = {}) => {
-    calls.push({
-      url: String(url),
-      method: init.method,
-      headers: toPlainHeaders(init.headers),
-      body: JSON.parse(String(init.body)),
-    });
-    return new Response("", { status: 400 });
-  };
-
-  const result = await validateCommandCodeProvider({
-    apiKey: "cc_test_key",
-    providerSpecificData: { validationModelId: "gpt-5.4-mini" },
-  });
-
-  assert.deepEqual(result, { valid: true, error: null });
-  assert.equal(calls.length, 1);
-  // Probe targets the documented /provider/v1/chat/completions endpoint, not
-  // the CLI-only /alpha/generate (#10265).
-  assert.equal(calls[0].url, "https://api.commandcode.ai/provider/v1/chat/completions");
-  assert.equal(calls[0].method, "POST");
-  assert.equal(calls[0].headers.Authorization, "Bearer cc_test_key");
-  assert.equal(calls[0].headers["Content-Type"], "application/json");
-  // No CLI-impersonation headers.
-  assert.equal(calls[0].headers["x-command-code-version"], undefined);
-  assert.equal(calls[0].headers["x-cli-environment"], undefined);
-  assert.equal(calls[0].headers["x-project-slug"], undefined);
-  // Flat OpenAI chat.completions body (no CLI wrapper).
-  assert.equal(calls[0].body.params, undefined, "CLI envelope params wrapper must not be sent");
-  assert.equal(calls[0].body.model, "gpt-5.4-mini");
-  assert.equal(calls[0].body.stream, true);
-  assert.equal(calls[0].body.max_tokens, 1);
-});
-
-for (const status of [400, 422, 429]) {
-  test(`validateCommandCodeProvider accepts ${status} as direct validator auth success`, async () => {
-    globalThis.fetch = async () => new Response("", { status });
-    assert.deepEqual(await validateCommandCodeProvider({ apiKey: "cc_test_key" }), {
-      valid: true,
-      error: null,
-    });
-  });
-}
-
-test("validateCommandCodeProvider rejects auth failures and provider outages", async () => {
-  globalThis.fetch = async () => new Response("unauthorized", { status: 401 });
-  assert.deepEqual(await validateCommandCodeProvider({ apiKey: "bad" }), {
-    valid: false,
-    error: "Invalid API key",
-  });
-
-  globalThis.fetch = async () => new Response("server down", { status: 500 });
-  assert.deepEqual(await validateCommandCodeProvider({ apiKey: "cc_test_key" }), {
-    valid: false,
-    error: "Provider unavailable (500)",
-  });
-});
-
-test("validateCommandCodeProvider falls back to /alpha/generate when /provider/v1 returns 403 (Go plan)", async () => {
-  const calls: Array<{
-    url: string;
-    headers: Record<string, string>;
-    body: Record<string, unknown>;
-  }> = [];
-  globalThis.fetch = async (url, init = {}) => {
-    const urlStr = String(url);
-    calls.push({
-      url: urlStr,
-      headers: (init.headers || {}) as Record<string, string>,
-      body: JSON.parse(String(init.body)) as Record<string, unknown>,
-    });
-
-    if (urlStr.includes("/provider/v1/chat/completions")) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            message: "Your Go plan doesn't include API access.",
-            type: "permission_error",
-            code: "upgrade_required",
-          },
-        }),
-        { status: 403, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    if (urlStr.includes("/alpha/generate")) {
-      return new Response("ok", { status: 200 });
-    }
-
-    return new Response("Not found", { status: 404 });
-  };
-
-  const result = await validateCommandCodeProvider({ apiKey: "cc_go_plan_key" });
-
-  assert.equal(result.valid, true);
-  assert.equal(result.error, null);
-  assert.equal(calls.length, 2);
-  assert.ok(calls[0].url.includes("/provider/v1/chat/completions"));
-  assert.ok(calls[1].url.includes("/alpha/generate"));
-  assert.equal(calls[1].headers["x-cli-environment"], "external");
-  assert.equal(calls[1].headers["x-command-code-version"], "1.15.1");
-  assert.equal(calls[1].body.config.environment, "external");
-});
-
 // ─── claude-web validator ────────────────────────────────────────────────────
 
 const { __setTlsFetchOverrideForTesting: __setClaudeTlsFetchOverride } =
@@ -1660,190 +1444,7 @@ test("llama-cpp is classified as a self-hosted chat provider", async () => {
 
 // ─── Gitlawb Opengateway specialty validators ──────────────────────────────
 
-test("gitlawb validator: accepts valid API key via chat/completions probe", async () => {
-  const calls: Array<{ url: string; headers?: HeadersInit; body?: BodyInit | null }> = [];
-  globalThis.fetch = async (url, init = {}) => {
-    calls.push({ url: String(url), headers: init.headers || {}, body: init.body });
-    assert.equal(String(url), "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions");
-    assert.equal((init.headers as Record<string, string>).Authorization, "Bearer glb-valid-key");
-    const body = JSON.parse(String(init.body));
-    assert.equal(body.model, "mimo-v2.5-pro");
-    assert.equal(body.messages[0].content, "test");
-    assert.equal(body.max_tokens, 1);
-    return new Response(JSON.stringify({ choices: [{ message: { content: "ok" } }] }), {
-      status: 200,
-    });
-  };
-
-  const result = await validateProviderApiKey({ provider: "gitlawb", apiKey: "glb-valid-key" });
-  assert.equal(result.valid, true);
-  assert.equal(calls.length, 1);
-});
-
-test("gitlawb validator: 400/422/429 treated as auth success", async () => {
-  for (const status of [400, 422, 429]) {
-    globalThis.fetch = async (url) => {
-      assert.equal(String(url), "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions");
-      return new Response(JSON.stringify({ error: "bad request" }), { status });
-    };
-    const result = await validateProviderApiKey({ provider: "gitlawb", apiKey: "glb-key" });
-    assert.equal(result.valid, true, `status ${status} should pass auth`);
-    assert.equal(result.error, null, `status ${status} should not return error`);
-  }
-});
-
-test("gitlawb validator: rejects invalid API key (401)", async () => {
-  globalThis.fetch = async (url) => {
-    assert.equal(String(url), "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions");
-    return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
-  };
-
-  const result = await validateProviderApiKey({ provider: "gitlawb", apiKey: "glb-bad-key" });
-  assert.equal(result.valid, false);
-  assert.equal(result.error, "Invalid API key");
-});
-
-test("gitlawb validator: rejects invalid API key (403)", async () => {
-  globalThis.fetch = async (url) => {
-    assert.equal(String(url), "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions");
-    return new Response(JSON.stringify({ error: "forbidden" }), { status: 403 });
-  };
-
-  const result = await validateProviderApiKey({ provider: "gitlawb", apiKey: "glb-bad-key" });
-  assert.equal(result.valid, false);
-  assert.equal(result.error, "Invalid API key");
-});
-
-test("gitlawb validator: surfaces network failures", async () => {
-  globalThis.fetch = async () => {
-    throw new Error("gitlawb opengateway offline");
-  };
-
-  const result = await validateProviderApiKey({ provider: "gitlawb", apiKey: "glb-key" });
-  assert.equal(result.valid, false);
-  assert.match(result.error || "", /gitlawb opengateway offline/i);
-});
-
-test("gitlawb validator: accepts custom baseUrl override", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    assert.equal(String(url), "https://custom-gateway.example.com/v1/xiaomi-mimo/chat/completions");
-    assert.equal((init.headers as Record<string, string>).Authorization, "Bearer glb-key");
-    return new Response(JSON.stringify({ choices: [{ message: { content: "ok" } }] }), {
-      status: 200,
-    });
-  };
-
-  const result = await validateProviderApiKey({
-    provider: "gitlawb",
-    apiKey: "glb-key",
-    providerSpecificData: {
-      baseUrl: "https://custom-gateway.example.com/v1/xiaomi-mimo",
-    },
-  });
-  assert.equal(result.valid, true);
-});
-
 // ─── Gitlawb-GMI (GMI Cloud) ─────────────────────────────────────────────
-
-test("gitlawb-gmi validator: accepts valid API key via chat/completions probe", async () => {
-  const calls: Array<{ url: string; headers?: HeadersInit }> = [];
-  globalThis.fetch = async (url, init = {}) => {
-    calls.push({ url: String(url), headers: init.headers || {} });
-    assert.equal(String(url), "https://opengateway.gitlawb.com/v1/gmi-cloud/chat/completions");
-    assert.equal(
-      (init.headers as Record<string, string>).Authorization,
-      "Bearer glb-gmi-valid-key"
-    );
-    const body = JSON.parse(String(init.body));
-    assert.equal(body.model, "XiaomiMiMo/MiMo-V2.5-Pro");
-    assert.equal(body.messages[0].content, "test");
-    assert.equal(body.max_tokens, 1);
-    return new Response(JSON.stringify({ choices: [{ message: { content: "ok" } }] }), {
-      status: 200,
-    });
-  };
-
-  const result = await validateProviderApiKey({
-    provider: "gitlawb-gmi",
-    apiKey: "glb-gmi-valid-key",
-  });
-  assert.equal(result.valid, true);
-  assert.equal(calls.length, 1);
-});
-
-test("gitlawb-gmi validator: accepts 400/422/429 as auth success", async () => {
-  for (const status of [400, 422, 429]) {
-    globalThis.fetch = async (url) => {
-      assert.equal(String(url), "https://opengateway.gitlawb.com/v1/gmi-cloud/chat/completions");
-      return new Response(JSON.stringify({ error: "bad request" }), { status });
-    };
-    const result = await validateProviderApiKey({
-      provider: "gitlawb-gmi",
-      apiKey: "glb-gmi-key",
-    });
-    assert.equal(result.valid, true, `status ${status} should pass auth`);
-  }
-});
-
-test("gitlawb-gmi validator: rejects invalid API key (401)", async () => {
-  globalThis.fetch = async (url) => {
-    assert.equal(String(url), "https://opengateway.gitlawb.com/v1/gmi-cloud/chat/completions");
-    return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
-  };
-
-  const result = await validateProviderApiKey({
-    provider: "gitlawb-gmi",
-    apiKey: "glb-gmi-bad-key",
-  });
-  assert.equal(result.valid, false);
-  assert.equal(result.error, "Invalid API key");
-});
-
-test("gitlawb-gmi validator: rejects invalid API key (403)", async () => {
-  globalThis.fetch = async (url) => {
-    assert.equal(String(url), "https://opengateway.gitlawb.com/v1/gmi-cloud/chat/completions");
-    return new Response(JSON.stringify({ error: "forbidden" }), { status: 403 });
-  };
-
-  const result = await validateProviderApiKey({
-    provider: "gitlawb-gmi",
-    apiKey: "glb-gmi-bad-key",
-  });
-  assert.equal(result.valid, false);
-  assert.equal(result.error, "Invalid API key");
-});
-
-test("gitlawb-gmi validator: surfaces network failures", async () => {
-  globalThis.fetch = async () => {
-    throw new Error("gitlawb-gmi opengateway offline");
-  };
-
-  const result = await validateProviderApiKey({
-    provider: "gitlawb-gmi",
-    apiKey: "glb-gmi-key",
-  });
-  assert.equal(result.valid, false);
-  assert.match(result.error || "", /gitlawb-gmi opengateway offline/i);
-});
-
-test("gitlawb-gmi validator: accepts custom baseUrl override", async () => {
-  globalThis.fetch = async (url, init = {}) => {
-    assert.equal(String(url), "https://custom-gateway.example.com/v1/gmi-cloud/chat/completions");
-    assert.equal((init.headers as Record<string, string>).Authorization, "Bearer glb-gmi-key");
-    return new Response(JSON.stringify({ choices: [{ message: { content: "ok" } }] }), {
-      status: 200,
-    });
-  };
-
-  const result = await validateProviderApiKey({
-    provider: "gitlawb-gmi",
-    apiKey: "glb-gmi-key",
-    providerSpecificData: {
-      baseUrl: "https://custom-gateway.example.com/v1/gmi-cloud",
-    },
-  });
-  assert.equal(result.valid, true);
-});
 
 // #3288 / #3758: a blocked redirect (REDIRECT_BLOCKED) to a PUBLIC host is benign — the
 // redirect was never followed, so it must NOT be mislabeled as an SSRF security block.

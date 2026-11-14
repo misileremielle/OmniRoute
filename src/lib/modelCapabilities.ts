@@ -17,7 +17,6 @@ import {
   type ModelSpec,
 } from "@/shared/constants/modelSpecs";
 import { getSyncedCapability } from "@/lib/modelsDevSync";
-import { ciTransportSupportsInput } from "@omniroute/open-sse/utils/ciTransportInput.ts";
 import { knownReasoningEffortTiers, MODELS_DEV_PROVIDER_MAP } from "@/lib/modelsDevSync/transform";
 import { isModelsDevEffortTiersEnabled } from "@/shared/utils/featureFlags";
 import { getModelContextOverride } from "@/lib/db/modelContextOverrides";
@@ -564,19 +563,10 @@ export function modelIdLikelyVision(modelId: string | null | undefined): boolean
  * models are text-only (mimo.mi.com .../image-understanding; hermes-agent#18884).
  * Anchored to the full id (`$`) and tolerant of a `provider/` prefix so `mimo-v2.5-pro`
  * never matches the multimodal `mimo-v2.5`, and `mimo-v2-pro` never matches `mimo-v2-omni`.
- *
- * Command Code `cmd/gpt-5.3-codex*` (#10703): the Command Code registry marks
- * `gpt-5.3-codex` as `supportsVision: true`, but the gateway actually exposes
- * it as a text-only code model — selecting it as a Vision Bridge candidate
- * failed every image describe call (#10703, CONTRIBUTOR-reported). Scoped to
- * the command-code alias/id so only the Command-Code-gateway Codex variants
- * are overridden; genuine multimodal `gpt-5.x` chat models (e.g. `gpt-5.5`,
- * `gpt-5.4-mini`, real OpenAI `openai/gpt-5.3-codex`) keep their vision verdict.
  */
 const KNOWN_TEXT_ONLY_DESPITE_SYNC: readonly RegExp[] = [
   /(?:^|\/)mimo-v2\.5-pro$/i,
   /(?:^|\/)mimo-v2-pro$/i,
-  /^(?:cmd|command-code)\/gpt-5\.3-codex(?:-|$)/i,
 ];
 
 function isKnownTextOnlyDespiteSync(modelId: string | null | undefined): boolean {
@@ -1082,20 +1072,16 @@ export function getResolvedModelCapabilities(
     /^(?:global:|cn:)?deepseek-v4\.1-flash$/i.test(resolved.model ?? "")
       ? true
       : supportsVision;
-  const supportsAudio =
-    textOnlyTransport ||
-    !ciTransportSupportsInput(resolved.provider ?? "", resolved.model ?? "", "audio")
-      ? false
-      : inputDeclarations
-        ? inputDeclarations.includes("audio")
-        : resolveAudioCapability(spec, registryModel, modalitiesInput);
-  const supportsVideo =
-    textOnlyTransport ||
-    !ciTransportSupportsInput(resolved.provider ?? "", resolved.model ?? "", "video")
-      ? false
-      : inputDeclarations
-        ? inputDeclarations.includes("video")
-        : resolveVideoCapability(spec, registryModel, modalitiesInput);
+  const supportsAudio = textOnlyTransport
+    ? false
+    : inputDeclarations
+      ? inputDeclarations.includes("audio")
+      : resolveAudioCapability(spec, registryModel, modalitiesInput);
+  const supportsVideo = textOnlyTransport
+    ? false
+    : inputDeclarations
+      ? inputDeclarations.includes("video")
+      : resolveVideoCapability(spec, registryModel, modalitiesInput);
   const supportsFiles = textOnlyTransport
     ? false
     : inputDeclarations
@@ -1103,20 +1089,16 @@ export function getResolvedModelCapabilities(
       : modalitiesInput.includes("file")
         ? true
         : null;
-  const supportsPdf =
-    textOnlyTransport ||
-    !ciTransportSupportsInput(resolved.provider ?? "", resolved.model ?? "", "pdf")
-      ? false
-      : inputDeclarations
-        ? inputDeclarations.includes("pdf") || inputDeclarations.includes("file")
-        : modalitiesInput.includes("pdf") || modalitiesInput.includes("application/pdf")
+  const supportsPdf = textOnlyTransport
+    ? false
+    : inputDeclarations
+      ? inputDeclarations.includes("pdf") || inputDeclarations.includes("file")
+      : modalitiesInput.includes("pdf") || modalitiesInput.includes("application/pdf")
+        ? true
+        : supportsVision === true &&
+            ["openai", "claude", "anthropic", "gemini", "vertex"].includes(resolved.provider ?? "")
           ? true
-          : supportsVision === true &&
-              ["openai", "claude", "anthropic", "gemini", "vertex"].includes(
-                resolved.provider ?? ""
-              )
-            ? true
-            : null;
+          : null;
 
   // #8250: when resolve promoted vision over a contradictory attachment=false,
   // expose attachment=true so catalog / Vision Bridge / clients see one verdict.
@@ -1162,15 +1144,7 @@ export function getResolvedModelCapabilities(
     knowledgeCutoff: synced?.knowledge_cutoff ?? null,
     releaseDate: synced?.release_date ?? null,
     lastUpdated: synced?.last_updated ?? null,
-    modalitiesInput: textOnlyTransport
-      ? ["text"]
-      : inputDeclarations
-        ? inputDeclarations.filter((kind) =>
-            ciTransportSupportsInput(resolved.provider ?? "", resolved.model ?? "", kind)
-          )
-        : modalitiesInput.filter((kind) =>
-            ciTransportSupportsInput(resolved.provider ?? "", resolved.model ?? "", kind)
-          ),
+    modalitiesInput: textOnlyTransport ? ["text"] : [...(inputDeclarations ?? modalitiesInput)],
     modalitiesOutput: textOnlyTransport ? ["text"] : modalitiesOutput,
     interleavedField:
       synced?.interleaved_field ??

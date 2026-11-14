@@ -17,7 +17,7 @@ const FREE_TYPES = [
 ];
 
 test("FREE_MODEL_BUDGETS is a non-empty array of well-formed per-model records", () => {
-  assert.ok(Array.isArray(FREE_MODEL_BUDGETS) && FREE_MODEL_BUDGETS.length >= 400);
+  assert.ok(Array.isArray(FREE_MODEL_BUDGETS) && FREE_MODEL_BUDGETS.length >= 200);
   for (const m of FREE_MODEL_BUDGETS) {
     assert.equal(typeof m.provider, "string");
     assert.equal(typeof m.modelId, "string");
@@ -63,9 +63,9 @@ test("recurring-uncapped models are surfaced but NEVER summed into the steady he
     if (m.freeType === "recurring-uncapped")
       assert.equal(m.monthlyTokens, 0, `${m.provider}/${m.modelId} uncapped but counted`);
   }
-  // uncappedProviders is the de-duped provider list and is non-empty (glm-cn, kilo…)
+  // uncappedProviders is the de-duped provider list and is non-empty (glm-cn, …)
   assert.ok(Array.isArray(t.uncappedProviders) && t.uncappedProviders.length >= 3);
-  for (const p of ["glm-cn", "kilo-gateway"]) {
+  for (const p of ["glm-cn"]) {
     assert.ok(t.uncappedProviders.includes(p), `expected ${p} among uncapped providers`);
   }
   assert.ok(!t.uncappedProviders.includes("tencent"), "retired Hunyuan must not be uncapped");
@@ -92,7 +92,7 @@ test("2026-06-17 refresh: discontinued providers dropped, new free providers add
   // discovered in the refresh — must be present
   // opencode-zen's free rows were dropped with the OpenCode Free removal
   // (docs/reference/REMOVED_PROVIDERS.md): the free models only work from the OpenCode client.
-  for (const fresh of ["kilo-gateway", "glm-cn"]) {
+  for (const fresh of ["glm-cn"]) {
     assert.ok(providers.has(fresh), `${fresh} should be added`);
   }
 });

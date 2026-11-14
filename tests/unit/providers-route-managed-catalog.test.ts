@@ -74,14 +74,14 @@ test("DELETE /api/providers batch deletes connections", async () => {
       })
     );
 
-  const r1 = await createReq("synthetic", "Conn 1", "key-1");
-  const r2 = await createReq("synthetic", "Conn 2", "key-2");
-  const r3 = await createReq("synthetic", "Conn 3", "key-3");
+  const r1 = await createReq("together", "Conn 1", "key-1");
+  const r2 = await createReq("together", "Conn 2", "key-2");
+  const r3 = await createReq("together", "Conn 3", "key-3");
   const id1 = (await r1.json()).connection.id;
   const id2 = (await r2.json()).connection.id;
   const id3 = (await r3.json()).connection.id;
-  await modelsDb.addCustomModel("synthetic", "manual-model", "Manual", "manual");
-  await modelsDb.addCustomModel("synthetic", "imported-model", "Imported", "imported");
+  await modelsDb.addCustomModel("together", "manual-model", "Manual", "manual");
+  await modelsDb.addCustomModel("together", "imported-model", "Imported", "imported");
 
   const deleteRes = await providersRoute.DELETE(
     await makeManagementSessionRequest("http://localhost/api/providers", {
@@ -103,7 +103,7 @@ test("DELETE /api/providers batch deletes connections", async () => {
   assert.equal(remainingIds.includes(id3), false);
   assert.equal(remainingIds.includes(id2), true);
   assert.deepEqual(
-    (await modelsDb.getCustomModels("synthetic")).map((model: { id: string }) => model.id),
+    (await modelsDb.getCustomModels("together")).map((model: { id: string }) => model.id),
     ["manual-model", "imported-model"]
   );
 
@@ -115,7 +115,7 @@ test("DELETE /api/providers batch deletes connections", async () => {
   );
   assert.equal(deleteLastRes.status, 200);
   assert.deepEqual(
-    (await modelsDb.getCustomModels("synthetic")).map((model: { id: string }) => model.id),
+    (await modelsDb.getCustomModels("together")).map((model: { id: string }) => model.id),
     ["manual-model"]
   );
 });

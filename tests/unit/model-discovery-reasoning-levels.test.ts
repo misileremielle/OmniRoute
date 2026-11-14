@@ -104,23 +104,6 @@ test("thinking.levels alone still populates supportedThinkingEfforts via normali
   ]);
   assert.deepEqual(models[0].supportedThinkingEfforts, ["high"]);
 });
-test("CrofAI reasoning_effort true maps to the supported effort tiers", () => {
-  const [model] = normalizeDiscoveredModels(
-    [{ id: "crof-reasoning-model", reasoning_effort: true }],
-    "crof"
-  );
-  assert.equal(model.supportsThinking, true);
-  assert.deepEqual(model.supportedThinkingEfforts, ["none", "low", "medium", "high", "max"]);
-});
-
-test("Command Code discovery supplies provider-wide effort tiers when /models omits them", () => {
-  const [model] = normalizeDiscoveredModels(
-    [{ id: "command-code-live-model", name: "Command Code Live Model" }],
-    "command-code"
-  );
-  assert.equal(model.supportsThinking, true);
-  assert.deepEqual(model.supportedThinkingEfforts, ["low", "medium", "high", "xhigh", "max"]);
-});
 
 test("CrofAI false or absent reasoning_effort adds no reasoning metadata", () => {
   const models = normalizeDiscoveredModels(

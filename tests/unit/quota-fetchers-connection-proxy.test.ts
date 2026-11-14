@@ -17,10 +17,6 @@ import {
 } from "../../open-sse/services/connectionProxyFetch.ts";
 import { hasAmbientProxyContext } from "../../open-sse/utils/proxyFetch.ts";
 import {
-  fetchAgentrouterQuota,
-  invalidateAgentrouterQuotaCache,
-} from "../../open-sse/services/agentrouterQuotaFetcher.ts";
-import {
   fetchAlibabaFreeTierQuotaEntries,
   getAlibabaConsoleCookie,
 } from "../../open-sse/services/alibabaFreeTierQuotaFetcher.ts";
@@ -58,14 +54,6 @@ import {
   fetchJinaQuota,
   invalidateJinaQuotaCache,
 } from "../../open-sse/services/jinaQuotaFetcher.ts";
-import {
-  fetchLlmgatewayQuota,
-  invalidateLlmgatewayQuotaCache,
-} from "../../open-sse/services/llmgatewayQuotaFetcher.ts";
-import {
-  fetchLyceumQuota,
-  invalidateLyceumQuotaCache,
-} from "../../open-sse/services/lyceumQuotaFetcher.ts";
 import {
   fetchMoonshotQuota,
   invalidateMoonshotQuotaCache,
@@ -258,27 +246,6 @@ test("qwen token plan quota reads the dashboard and gateway inside the proxy con
   } finally {
     globalThis.fetch = wrappedFetch;
     invalidateQwenTokenPlanQuotaCache(connectionId);
-  }
-});
-
-test("agentrouter quota reads inside the proxy context", async () => {
-  useAssignedProxy();
-  const connectionId = `agentrouter-proxy-${Date.now()}`;
-  let observed: boolean | null = null;
-  const wrappedFetch = globalThis.fetch;
-  globalThis.fetch = (async () => {
-    observed = hasAmbientProxyContext();
-    return new Response(JSON.stringify({ data: { quota: 250_000 } }), { status: 200 });
-  }) as typeof globalThis.fetch;
-  try {
-    const quota = await fetchAgentrouterQuota(connectionId, {
-      providerSpecificData: { consoleApiKey: "system-access-token", newApiUserId: "42" },
-    });
-    assert.ok(quota);
-    assert.equal(observed, true);
-  } finally {
-    globalThis.fetch = wrappedFetch;
-    invalidateAgentrouterQuotaCache(connectionId);
   }
 });
 
@@ -572,60 +539,6 @@ test("jina quota reads inside the proxy context", async () => {
   }
 });
 
-test("llmgateway quota reads inside the proxy context", async () => {
-  useAssignedProxy();
-  const connectionId = `llmgw-proxy-${Date.now()}`;
-  let observed: boolean | null = null;
-  const wrappedFetch = globalThis.fetch;
-  globalThis.fetch = (async () => {
-    observed = hasAmbientProxyContext();
-    return new Response(
-      JSON.stringify({
-        data: {
-          devPlan: "pro",
-          devPlanCreditsUsed: "25",
-          devPlanCreditsLimit: "237",
-          devPlanCreditsRemaining: "212.00",
-          devPlanPremiumWeeklyLimit: "35.55",
-          devPlanPremiumCreditsUsed: "5.00",
-          devPlanPremiumWeekResetsAt: "2026-08-28T12:00:00.000Z",
-        },
-      }),
-      { status: 200 }
-    );
-  }) as typeof globalThis.fetch;
-  try {
-    const quota = await fetchLlmgatewayQuota(connectionId, { apiKey: "llmgtwy_test" });
-    assert.ok(quota);
-    assert.equal(observed, true);
-  } finally {
-    globalThis.fetch = wrappedFetch;
-    invalidateLlmgatewayQuotaCache(connectionId);
-  }
-});
-
-test("lyceum quota reads inside the proxy context", async () => {
-  useAssignedProxy();
-  const connectionId = `lyceum-proxy-${Date.now()}`;
-  let observed: boolean | null = null;
-  const wrappedFetch = globalThis.fetch;
-  globalThis.fetch = (async () => {
-    observed = hasAmbientProxyContext();
-    return new Response(
-      JSON.stringify({ available_credits: 50, used_credits: 10, remaining_credits: 40 }),
-      { status: 200 }
-    );
-  }) as typeof globalThis.fetch;
-  try {
-    const quota = await fetchLyceumQuota(connectionId, { apiKey: "lk_test" });
-    assert.ok(quota);
-    assert.equal(observed, true);
-  } finally {
-    globalThis.fetch = wrappedFetch;
-    invalidateLyceumQuotaCache(connectionId);
-  }
-});
-
 test("moonshot quota reads inside the proxy context", async () => {
   useAssignedProxy();
   const connectionId = `ms-proxy-${Date.now()}`;
@@ -855,8 +768,6 @@ test("every remaining quota fetcher routes through the connection proxy helper",
   const dir = join(here, "..", "..", "open-sse", "services");
   const targets = [
     "jinaQuotaFetcher.ts",
-    "llmgatewayQuotaFetcher.ts",
-    "lyceumQuotaFetcher.ts",
     "moonshotQuotaFetcher.ts",
     "newApiAggregatorQuotaFetcher.ts",
     "opencodeQuotaFetcher.ts",

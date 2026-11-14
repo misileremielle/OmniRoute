@@ -41,7 +41,6 @@ import { useDevinAgenticAuthStatus } from "../hooks/useDevinAgenticAuthStatus";
 import { useProviderQuota } from "./hooks/useProviderQuota";
 import { useProviderSettings } from "./hooks/useProviderSettings";
 import { useProviderModels } from "./hooks/useProviderModels";
-import { useCommandCodeAuth } from "./hooks/useCommandCodeAuth";
 import { useConnectionAutoSync } from "./hooks/useConnectionAutoSync";
 import { useExternalLinkFlow } from "./hooks/useExternalLinkFlow";
 import { useAuthFileHandlers } from "./hooks/useAuthFileHandlers";
@@ -102,7 +101,6 @@ export default function ProviderDetailPageClient() {
   const [connectingVolcengineAccount, setConnectingVolcengineAccount] = useState(false);
   const isOpenAICompatible = isOpenAICompatibleProvider(providerId);
   const isCcCompatible = isClaudeCodeCompatibleProvider(providerId);
-  const isCommandCode = providerId === "command-code";
   const isAnthropicCompatible =
     isAnthropicCompatibleProvider(providerId) && !isClaudeCodeCompatibleProvider(providerId);
   // System One (Jev) decision endpoints: keys + node settings like any compatible
@@ -445,18 +443,10 @@ export default function ProviderDetailPageClient() {
     setShowVolcengineConnectModal(true);
   }, []);
 
-  const {
-    commandCodeAuthState,
-    handleCloseAddApiKeyModal,
-    handleStartCommandCodeAuth,
-    handleOpenCommandCodeConnect,
-  } = useCommandCodeAuth({
-    providerId,
-    fetchConnections,
-    setSiliconFlowInitialBaseUrl,
-    setShowAddApiKeyModal,
-    notify,
-  });
+  const handleCloseAddApiKeyModal = useCallback(() => {
+    setSiliconFlowInitialBaseUrl(undefined);
+    setShowAddApiKeyModal(false);
+  }, [setSiliconFlowInitialBaseUrl, setShowAddApiKeyModal]);
 
   // Phase 1s: handleSaveApiKey extracted to hooks/useApiKeySave.ts
   const { handleSaveApiKey } = useApiKeySave({
@@ -645,7 +635,6 @@ export default function ProviderDetailPageClient() {
             providerId={providerId}
             providerInfo={providerInfo}
             isCompatible={isCompatible}
-            isCommandCode={isCommandCode}
             isOAuth={isOAuth}
             supportsDualAuth={supportsDualAuth}
             providerSupportsPat={providerSupportsPat}
@@ -683,8 +672,6 @@ export default function ProviderDetailPageClient() {
             connectVolcengineAccount={connectVolcengineAccount}
             connectingVolcengineAccount={connectingVolcengineAccount}
             openExternalLinkFlow={openExternalLinkFlow}
-            handleOpenCommandCodeConnect={handleOpenCommandCodeConnect}
-            commandCodeAuthState={commandCodeAuthState}
             onOpenOAuthModal={() => setShowOAuthModal(true)}
             onOpenCodexCliGuide={() => setCodexCliGuideOpen(true)}
             onOpenImportCodex={() => setImportCodexModalOpen(true)}
@@ -699,15 +686,12 @@ export default function ProviderDetailPageClient() {
             <EmptyConnectionsPlaceholder
               isOAuth={isOAuth}
               isCompatible={isCompatible}
-              isCommandCode={isCommandCode}
               providerId={providerId}
               supportsDualAuth={supportsDualAuth}
               providerSupportsPat={providerSupportsPat}
-              commandCodeAuthState={commandCodeAuthState}
               gateConnectionFlow={gateConnectionFlow}
               openApiKeyAddFlow={openApiKeyAddFlow}
               openPrimaryAddFlow={openPrimaryAddFlow}
-              handleOpenCommandCodeConnect={handleOpenCommandCodeConnect}
               onOpenOAuthModal={() => setShowOAuthModal(true)}
               onOpenImportCodex={() => setImportCodexModalOpen(true)}
               onOpenImportClaude={() => setImportClaudeModalOpen(true)}
@@ -896,7 +880,6 @@ export default function ProviderDetailPageClient() {
         isCompatible={isCompatible}
         isAnthropicProtocolCompatible={isAnthropicProtocolCompatible}
         isCcCompatible={isCcCompatible}
-        isCommandCode={isCommandCode}
         isUpstreamProxyProvider={isUpstreamProxyProvider}
         subscriptionRisk={subscriptionRisk}
         existingConnectionNames={connections.map((c) => c.name ?? "").filter(Boolean)}
@@ -915,8 +898,6 @@ export default function ProviderDetailPageClient() {
         setShowAddApiKeyModal={setShowAddApiKeyModal}
         showAddApiKeyModal={showAddApiKeyModal}
         siliconFlowInitialBaseUrl={siliconFlowInitialBaseUrl}
-        commandCodeAuthState={commandCodeAuthState}
-        handleStartCommandCodeAuth={handleStartCommandCodeAuth}
         handleSaveApiKey={handleSaveApiKey}
         handleCloseAddApiKeyModal={handleCloseAddApiKeyModal}
         batchDeleteConfirmOpen={batchDeleteConfirmOpen}

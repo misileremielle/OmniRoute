@@ -64,26 +64,6 @@ test("groq free plan: 200K TPD per model × 30 = 6M per model, each cap independ
   for (const id of ids("groq")) assert.ok(registryIds.has(id), `${id} must be routable`);
 });
 
-test("nara free plan: 7M tokens/day account-wide → 210M/month, one pool, the 8 plan models", () => {
-  const free = [
-    "agnes-2.0-flash",
-    "agnes-2.5-flash",
-    "laguna-s-2.1",
-    "minimax-m3-free",
-    "mistral-large",
-    "mistral-medium-3-5",
-    "qwen3.8-27b",
-    "stepfun-3.7-flash",
-  ];
-  assert.deepEqual(ids("nara"), free);
-  for (const m of rows("nara")) {
-    assert.equal(m.monthlyTokens, 210_000_000, m.modelId);
-    assert.equal(m.poolKey, "nara-free");
-    assert.equal(m.freeType, "recurring-daily");
-  }
-  assert.deepEqual(REGISTRY.nara.models.map((m) => m.id).sort(), free);
-});
-
 test("mistral keeps its 1B pool only with a dated console verification on record", () => {
   const src = readFileSync(
     new URL("../../open-sse/config/freeModelCatalog.data.ts", import.meta.url),
@@ -116,7 +96,6 @@ test("legacy provider-level catalog agrees with the per-model catalog for the re
   assert.equal(FREE_TIER_BUDGETS.gemini, undefined);
   assert.equal(FREE_TIER_BUDGETS["ollama-cloud"], undefined);
   assert.equal(FREE_TIER_BUDGETS.groq, 30_000_000);
-  assert.equal(FREE_TIER_BUDGETS.nara, 210_000_000);
 });
 
 test("modelscope: 250 魔粒/day → 6M/month, one pool, behind mainland real-name verification", () => {

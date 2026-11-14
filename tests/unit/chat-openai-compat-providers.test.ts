@@ -22,7 +22,6 @@ const CHAT_OPENAI_COMPAT_PROVIDER_IDS = [
   "morph",
   "featherless-ai",
   "friendliai",
-  "llamagate",
   "heroku",
   "galadriel",
   "databricks",
@@ -46,7 +45,6 @@ const CHAT_OPENAI_COMPAT_PROVIDER_IDS = [
   "bytez",
   "reka",
   "byteplus",
-  "orcarouter",
   "typhoon",
   "inception",
   "sarvam",
@@ -66,21 +64,6 @@ test("chat-openai-compat providers are registered across provider metadata, regi
     assert.ok(Array.isArray(models), `${providerId} models must be an array`);
     assert.ok(models.length > 0, `${providerId} models must not be empty`);
   }
-});
-
-test("orcarouter models keep the orcarouter/ namespace prefix and enable passthrough", () => {
-  const modelIds = REGISTRY.orcarouter.models.map((model) => model.id);
-
-  // OrcaRouter's distributor matches channels by the namespaced id, so a bare
-  // "auto" returns 503 "No available channel" — the router id must stay prefixed.
-  assert.ok(modelIds.includes("orcarouter/auto"), "expected namespaced orcarouter/auto");
-  assert.equal(modelIds.includes("auto"), false, "bare 'auto' would 503 upstream");
-
-  // Pinned vendor models also carry their upstream namespace.
-  assert.ok(modelIds.includes("anthropic/claude-opus-4.8"));
-
-  // The 150+ catalog beyond the curated flagship list is reachable via passthrough.
-  assert.equal(APIKEY_PROVIDERS.orcarouter.passthroughModels, true);
 });
 
 test("upstage chat catalog does not include non-chat specialty models", () => {

@@ -231,48 +231,6 @@ for (const redirect of ["background", "alias"]) {
   }
 }
 
-for (const failure of ["empty"]) {
-  for (const mode of ["plain", "explicit", "suffix"]) {
-    test(`${failure} family fallback preserves only explicit effort: ${mode}`, async () => {
-      const provider = "cheaperinference";
-      const model = "claude-sonnet-4.6";
-      const fallback = "claude-sonnet-4.5";
-      const connection = await seedConnection(provider);
-      await persistDiscoveredModels(provider, connection.id, [
-        { id: model, reasoning: { supported_efforts: ["low", "high"] } },
-        { id: fallback, reasoning: { supported_efforts: ["low", "high"] } },
-      ]);
-      const bodies: Record<string, unknown>[] = [];
-      globalThis.fetch = async (_url, init) => {
-        const sent = JSON.parse(String(init?.body));
-        bodies.push(sent);
-        if (sent.model === model) return buildOpenAIResponse("", model);
-        return buildOpenAIResponse("The requested example is complete.", sent.model);
-      };
-      const response = await handleChat(
-        buildRequest({
-          // #16810: a cross-version family hop (4.6 → 4.5) only runs when the caller opts in.
-          headers: { "x-omniroute-allow-cross-version-fallback": "true" },
-          body: {
-            model: `${provider}/${model}${mode === "suffix" ? "-high" : ""}`,
-            stream: false,
-            ...(mode === "explicit" ? { reasoning_effort: "low" } : {}),
-            messages: [{ role: "user", content: "Explain a small example." }],
-          },
-        })
-      );
-      assert.equal(response.status, 200, await response.text());
-      assert.equal(bodies[0].model, model);
-      assert.equal(bodies.at(-1)?.model, fallback);
-      assert.equal(
-        bodies[0].reasoning_effort,
-        mode === "suffix" ? "high" : mode === "explicit" ? "low" : undefined
-      );
-      assert.equal(bodies.at(-1)?.reasoning_effort, mode === "explicit" ? "low" : undefined);
-    });
-  }
-}
-
 test("server tool follow-up materializes suffix effort on the fresh translated transcript", async () => {
   const apiKey = await harness.seedApiKey();
   const { builtinServerTools } = harness.serverToolBuiltins;

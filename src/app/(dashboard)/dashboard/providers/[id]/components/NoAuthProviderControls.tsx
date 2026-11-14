@@ -2,14 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, NoAuthAccountCard, NoAuthProviderCard } from "@/shared/components";
+import { Button, NoAuthProviderCard } from "@/shared/components";
 import { getProviderAlias, supportsNoAuthProviderProxy } from "@/shared/constants/providers";
 import { useNotificationStore } from "@/store/notificationStore";
-import { providerText } from "../providerPageHelpers";
-
-const ACCOUNT_PROVIDER_NAMES: Record<string, string> = {
-  dahl: "Dahl",
-};
 
 interface NoAuthProviderControlsProps {
   providerId: string;
@@ -92,37 +87,6 @@ export default function NoAuthProviderControls({
     [blockedProviders, noAuthT, notify, providerAlias, providerId, providerName]
   );
 
-  const handleManualApiKeyAdd = useCallback(
-    async (apiKey: string) => {
-      setSavingEnabled(true);
-      try {
-        const response = await fetch("/api/providers", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            provider: "dahl",
-            apiKey: apiKey.trim(),
-            name: "Dahl Manual",
-            priority: 1,
-            isActive: true,
-            testStatus: "unknown",
-          }),
-        });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          throw new Error(data?.error?.message || data?.error || noAuthT("updateProviderFailed"));
-        }
-        notify.success(noAuthT("providerAdded", { provider: providerName }));
-      } catch (error) {
-        notify.error(error instanceof Error ? error.message : noAuthT("updateProviderFailed"));
-      } finally {
-        setSavingEnabled(false);
-      }
-    },
-    [noAuthT, notify, providerName]
-  );
-
-  const accountProviderName = ACCOUNT_PROVIDER_NAMES[providerId];
   const host = providerProxy?.host;
   const providerProxyControl = supportsNoAuthProviderProxy(providerId) ? (
     <Button
@@ -140,37 +104,6 @@ export default function NoAuthProviderControls({
       <span className="max-w-30 truncate">{host || t("providerProxy")}</span>
     </Button>
   ) : null;
-
-  if (accountProviderName) {
-    return (
-      <NoAuthAccountCard
-        providerId={providerId}
-        providerName={accountProviderName}
-        generateAccountId={() => crypto.randomUUID().replace(/-/g, "")}
-        generateApiKey={
-          providerId === "dahl"
-            ? async () => {
-                const res = await fetch("/api/dahl/tokens", { method: "POST" });
-                const data = await res.json();
-                if (!res.ok || !data.token) {
-                  throw new Error(
-                    data?.error ||
-                      providerText(t, "createDahlTokenFailed", "Failed to create Dahl token")
-                  );
-                }
-                return data.token as string;
-              }
-            : undefined
-        }
-        showManualKeyInput={providerId === "dahl"}
-        onManualApiKeyAdd={providerId === "dahl" ? handleManualApiKeyAdd : undefined}
-        enabled={enabled}
-        savingEnabled={savingEnabled}
-        onEnabledChange={handleEnabledChange}
-        providerProxyControl={providerProxyControl}
-      />
-    );
-  }
 
   return (
     <NoAuthProviderCard

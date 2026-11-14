@@ -906,23 +906,6 @@ test("sanitizeReasoningEffortForProvider: ollama-cloud still maps xhigh to max",
   assert.equal(result.reasoning_effort, "max");
 });
 
-test("sanitizeReasoningEffortForProvider: command-code maps unsupported minimal to low", () => {
-  const log = makeLog();
-  const body = { reasoning_effort: "minimal", messages: [] };
-  const result = sanitizeReasoningEffortForProvider(
-    body,
-    "command-code",
-    "poolside/laguna-s-2.1-free",
-    log
-  ) as Record<string, unknown>;
-  // Upstream rejects minimal (400 "expected one of low|medium|high|xhigh|max").
-  assert.equal(result.reasoning_effort, "low");
-  assert.ok(
-    log.messages.some(([, msg]) => msg.includes("minimal → low")),
-    "sanitizer logs the downgrade"
-  );
-});
-
 test("sanitizeReasoningEffortForProvider: opencode-go with non-DeepSeek model passes max through (new default)", () => {
   // opencode-go non-DeepSeek models are not explicitly flagged as rejecting max,
   // so max passes through unchanged under the new default. MiMo V2.5/V2.6 are

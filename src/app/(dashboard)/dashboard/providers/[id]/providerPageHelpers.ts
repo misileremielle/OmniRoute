@@ -42,16 +42,6 @@ export type LocalProviderMetadata = {
   [key: string]: unknown;
 };
 
-export type CommandCodeAuthFlowState = {
-  phase:
-    "idle" | "starting" | "polling" | "received" | "applying" | "applied" | "expired" | "error";
-  state: string;
-  authUrl: string;
-  callbackUrl: string;
-  expiresAt: string | null;
-  message?: string;
-};
-
 // ---------------------------------------------------------------------------
 // Compat model map types (shared by upstream-headers helpers and the page)
 // ---------------------------------------------------------------------------
@@ -906,52 +896,6 @@ export function combineModalCredential(tokenId: string, tokenSecret: string): st
   if (!secret) return id;
   if (!id) return secret;
   return `${id}:${secret}`;
-}
-
-export function extractCommandCodeCredentialInput(value: string): string {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-
-  try {
-    const parsed = JSON.parse(trimmed) as unknown;
-    if (parsed && typeof parsed === "object") {
-      const record = parsed as Record<string, unknown>;
-      const direct = record.apiKey || record.api_key || record.key || record.token;
-      if (typeof direct === "string" && direct.trim()) return direct.trim();
-      const nested = record.data;
-      if (nested && typeof nested === "object") {
-        const nestedRecord = nested as Record<string, unknown>;
-        const nestedKey = nestedRecord.apiKey || nestedRecord.api_key || nestedRecord.key;
-        if (typeof nestedKey === "string" && nestedKey.trim()) return nestedKey.trim();
-      }
-    }
-  } catch {
-    // Not JSON; continue with URL/raw parsing.
-  }
-
-  try {
-    const url = new URL(trimmed);
-    const key =
-      url.searchParams.get("apiKey") ||
-      url.searchParams.get("api_key") ||
-      url.searchParams.get("key") ||
-      url.searchParams.get("token");
-    if (key?.trim()) return key.trim();
-    const hash = url.hash.replace(/^#/, "");
-    if (hash) {
-      const hashParams = new URLSearchParams(hash);
-      const hashKey =
-        hashParams.get("apiKey") ||
-        hashParams.get("api_key") ||
-        hashParams.get("key") ||
-        hashParams.get("token");
-      if (hashKey?.trim()) return hashKey.trim();
-    }
-  } catch {
-    // Not a URL; use the raw value.
-  }
-
-  return trimmed;
 }
 
 export function normalizeAndValidateHttpBaseUrl(

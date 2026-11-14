@@ -66,18 +66,18 @@ test.after(async () => {
 
 test("alias-keyed model finds a row stored under the canonical provider id (#10702)", async () => {
   await resetStorage();
-  // The connection is stored under the canonical id "command-code".
+  // The connection is stored under the canonical id "vercel-ai-gateway".
   await providersDb.createProviderConnection({
-    provider: "command-code",
+    provider: "vercel-ai-gateway",
     authType: "apikey",
-    apiKey: "cc-real-key",
+    apiKey: "vag-real-key",
     isActive: true,
     testStatus: "active",
   });
 
-  // The model id uses the public alias prefix "cmd" — before the fix this
-  // queried provider = "cmd", found no row, and returned false.
-  const usable = await hasUsableCredentialsForModel("cmd/deepseek-v4-flash");
+  // The model id uses the public alias prefix "vag" — before the fix this
+  // queried provider = "vag", found no row, and returned false.
+  const usable = await hasUsableCredentialsForModel("vag/openai/gpt-4o");
   assert.equal(usable, true, "alias prefix must resolve to the canonical provider id");
 });
 

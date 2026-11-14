@@ -281,7 +281,6 @@ export async function registerQuotaFetchers(): Promise<void> {
     { registerCodexQuotaFetcher },
     { registerBailianCodingPlanQuotaFetcher },
     { registerQwenTokenPlanQuotaFetcher },
-    { registerCrofUsageFetcher },
     { registerDeepseekQuotaFetcher },
     { registerMoonshotQuotaFetcher, registerMoonshotFetchersForNodes },
     { registerOpenrouterQuotaFetcher },
@@ -291,7 +290,6 @@ export async function registerQuotaFetchers(): Promise<void> {
     import("@omniroute/open-sse/services/codexQuotaFetcher"),
     import("@omniroute/open-sse/services/bailianQuotaFetcher"),
     import("@omniroute/open-sse/services/qwenTokenPlanQuotaFetcher"),
-    import("@omniroute/open-sse/services/crofUsageFetcher"),
     import("@omniroute/open-sse/services/deepseekQuotaFetcher"),
     import("@omniroute/open-sse/services/moonshotQuotaFetcher"),
     import("@omniroute/open-sse/services/openrouterQuotaFetcher"),
@@ -302,7 +300,6 @@ export async function registerQuotaFetchers(): Promise<void> {
   registerCodexQuotaFetcher();
   registerBailianCodingPlanQuotaFetcher();
   registerQwenTokenPlanQuotaFetcher();
-  registerCrofUsageFetcher();
   registerDeepseekQuotaFetcher();
   registerMoonshotQuotaFetcher();
   try {

@@ -95,7 +95,6 @@ export const PROVIDER_COLORS: Record<string, LabeledBadgeColors> = {
   qoder: labeled("chart-5", "Qoder"),
   fireworks: labeled("chart-6", "Fireworks"),
   kimi: labeled("chart-7", "Kimi"),
-  cheaperinference: labeled("chart-1", "Cheaper Inference"),
 };
 
 // ═══════════════════════════════════════════

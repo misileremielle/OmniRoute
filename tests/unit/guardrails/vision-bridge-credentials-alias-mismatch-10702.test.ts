@@ -18,22 +18,6 @@ test.after(() => {
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });
 
-test("issue #10702: hasUsableCredentialsForModel resolves alias-prefixed model to the raw provider id (command-code / alias cmd)", async () => {
-  await providersDb.createProviderConnection({
-    provider: "command-code",
-    authType: "apikey",
-    apiKey: "sk-test-command-code-key",
-    isActive: true,
-  });
-
-  const result = await hasUsableCredentialsForModel("cmd/some-vision-model");
-  assert.equal(
-    result,
-    true,
-    "the credentialed command-code connection must be found via its public alias 'cmd'"
-  );
-});
-
 test("issue #10702: hasUsableCredentialsForModel resolves alias-prefixed model to the raw provider id (uncloseai / alias unc)", async () => {
   await providersDb.createProviderConnection({
     provider: "uncloseai",

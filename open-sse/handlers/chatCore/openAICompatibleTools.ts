@@ -4,11 +4,11 @@ type Tool = Record<string, unknown>;
 
 // Built-in providers whose OpenAI Chat wire format was observed to accept only
 // `type: "function"` tools. Keep this list conservative: only add a provider
-// after a concrete upstream rejection of a non-function tool type (#13789,
-// agentrouter GLM: `400 tools[0].type:type is illegal`). Providers that support
+// after a concrete upstream rejection of a non-function tool type (#13789).
+// None is listed today. Providers that support
 // richer tool types (openai `custom`, responses hosted tools) must NOT appear
 // here — normalization would silently rewrite their requests.
-const BUILTIN_FUNCTION_TOOLS_ONLY_PROVIDERS: ReadonlySet<string> = new Set(["agentrouter"]);
+const BUILTIN_FUNCTION_TOOLS_ONLY_PROVIDERS: ReadonlySet<string> = new Set<string>();
 
 /**
  * Whether non-function tool types must be converted/dropped before translation.

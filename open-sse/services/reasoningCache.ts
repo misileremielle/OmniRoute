@@ -48,7 +48,6 @@ const REASONING_REPLAY_PROVIDERS = new Set([
   "xiaomi-mimo",
   // Command Code routes upstream DeepSeek models and requires the same
   // reasoning_content replay contract.
-  "command-code",
 ]);
 
 const REASONING_REPLAY_MODEL_PATTERNS = [

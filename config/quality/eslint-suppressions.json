@@ -198,11 +198,6 @@
       "count": 3
     }
   },
-  "open-sse/services/agentrouterQuotaFetcher.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
   "open-sse/services/alibabaFreeTierQuotaFetcher.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -315,11 +310,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 3
-    }
-  },
-  "open-sse/services/crofUsageFetcher.ts": {
-    "no-restricted-syntax": {
-      "count": 1
     }
   },
   "open-sse/services/deepseekQuotaFetcher.ts": {
@@ -1636,11 +1626,6 @@
       "count": 3
     }
   },
-  "tests/unit/agentrouter-quota-visibility.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "tests/unit/agy-usage-quota.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 4
@@ -2368,16 +2353,6 @@
       "count": 4
     }
   },
-  "tests/unit/command-code-executor.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "tests/unit/command-code-maxtokens-negative-5166.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    }
-  },
   "tests/unit/commandClassification.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -2848,11 +2823,6 @@
       "count": 6
     }
   },
-  "tests/unit/gitlawb-provider.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
   "tests/unit/glm-executor.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 19
@@ -2864,11 +2834,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    }
-  },
-  "tests/unit/grok-quota-fetcher.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 7
     }
   },
   "tests/unit/guardrails/visionBridgeHelpers.callVisionModel.test.ts": {
@@ -3166,7 +3131,7 @@
   },
   "tests/unit/provider-models-route.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 51
+      "count": 48
     }
   },
   "tests/unit/provider-models-token-limits.test.ts": {
@@ -3209,7 +3174,7 @@
   },
   "tests/unit/provider-validation-specialty.test.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 3
+      "count": 2
     }
   },
   "tests/unit/providers-route-managed-catalog.test.ts": {
@@ -3293,7 +3258,7 @@
   },
   "tests/unit/quota-fetch-throttle-scope-6911.test.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 2
+      "count": 1
     }
   },
   "tests/unit/quota-groups-crud.test.ts": {
@@ -3402,11 +3367,6 @@
   "tests/unit/repro-7023.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "tests/unit/repro-9406-claude-web-429-valid.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "tests/unit/request-log-payloads.test.ts": {

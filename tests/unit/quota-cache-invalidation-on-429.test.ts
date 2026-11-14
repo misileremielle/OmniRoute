@@ -30,16 +30,12 @@ import {
   invalidateCodexQuotaCache,
   registerCodexQuotaFetcher,
 } from "../../open-sse/services/codexQuotaFetcher.ts";
-import { registerAgentrouterQuotaFetcher } from "../../open-sse/services/agentrouterQuotaFetcher.ts";
 import { registerBailianCodingPlanQuotaFetcher } from "../../open-sse/services/bailianQuotaFetcher.ts";
 import { registerContext7QuotaFetcher } from "../../open-sse/services/context7QuotaFetcher.ts";
-import { registerCrofUsageFetcher } from "../../open-sse/services/crofUsageFetcher.ts";
 import { registerDeepseekQuotaFetcher } from "../../open-sse/services/deepseekQuotaFetcher.ts";
 import { registerFirecrawlQuotaFetcher } from "../../open-sse/services/firecrawlQuotaFetcher.ts";
 import { registerGrokCliQuotaFetcher } from "../../open-sse/services/grokCliQuotaFetcher.ts";
 import { registerJinaQuotaFetcher } from "../../open-sse/services/jinaQuotaFetcher.ts";
-import { registerLlmgatewayQuotaFetcher } from "../../open-sse/services/llmgatewayQuotaFetcher.ts";
-import { registerLyceumQuotaFetcher } from "../../open-sse/services/lyceumQuotaFetcher.ts";
 import { registerMoonshotQuotaFetcher } from "../../open-sse/services/moonshotQuotaFetcher.ts";
 import { registerOpencodeQuotaFetcher } from "../../open-sse/services/opencodeQuotaFetcher.ts";
 import { registerOpenrouterQuotaFetcher } from "../../open-sse/services/openrouterQuotaFetcher.ts";
@@ -321,17 +317,13 @@ test("empty identifiers are ignored and an unknown provider keeps the generic dr
 test("every bespoke quota fetcher registers an invalidator for all of its provider keys", () => {
   __resetQuotaCacheInvalidatorsForTests();
 
-  registerAgentrouterQuotaFetcher();
   registerBailianCodingPlanQuotaFetcher();
   registerCodexQuotaFetcher();
   registerContext7QuotaFetcher();
-  registerCrofUsageFetcher();
   registerDeepseekQuotaFetcher();
   registerFirecrawlQuotaFetcher();
   registerGrokCliQuotaFetcher();
   registerJinaQuotaFetcher();
-  registerLlmgatewayQuotaFetcher();
-  registerLyceumQuotaFetcher();
   registerMoonshotQuotaFetcher();
   registerOpencodeQuotaFetcher();
   registerOpenrouterQuotaFetcher();
@@ -341,11 +333,9 @@ test("every bespoke quota fetcher registers an invalidator for all of its provid
   registerXaiOauthQuotaFetcher();
 
   const keys = [
-    "agentrouter",
     "bailian-coding-plan",
     "codex",
     "context7",
-    "crof",
     "deepseek",
     "firecrawl",
     "grok-cli",
@@ -353,8 +343,6 @@ test("every bespoke quota fetcher registers an invalidator for all of its provid
     "jina",
     "jina-ai",
     "jina-reader",
-    "llmgateway",
-    "lyceum",
     "moonshot",
     "kimi",
     "opencode-go",

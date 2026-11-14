@@ -14,7 +14,7 @@ const { generateLegacyProviders } = await import("../../open-sse/config/provider
 test("generateLegacyProviders copies fetchStartTimeoutCapMs into the executor config", () => {
   const providers = generateLegacyProviders();
 
-  for (const id of ["opencode-go", "command-code"]) {
+  for (const id of ["opencode-go"]) {
     const legacy = providers[id];
     assert.ok(legacy, `${id} must exist in the legacy provider map`);
     assert.equal(

@@ -41,14 +41,12 @@ export const USAGE_FETCHER_PROVIDERS = [
   "ollama-cloud",
   "minimax",
   "minimax-cn",
-  "crof",
   // ClinePass 5-hour / weekly / monthly limits (GET /api/v1/users/me/plan/usage-limits)
   "clinepass",
   "bailian-coding-plan",
   "qwen-cloud-token-plan",
   "nanogpt",
   // NaN.Builders per-model token counters (GET cloud-api.nan.builders/api/usage/quota)
-  "nan",
   "apmix",
   "deepseek",
   "moonshot",
@@ -70,9 +68,7 @@ export const USAGE_FETCHER_PROVIDERS = [
   // returns persisted subscription metadata instead of "not implemented".
   "muse-code",
   // LLM Gateway DevPass allowance (GET /v1/key → monthly + weekly premium)
-  "llmgateway",
   // Lyceum credit balance (GET /api/v2/external/billing/credits)
-  "lyceum",
   // PromptQL playground credits (data.pro.ql.app getCreditSummary)
   // Adobe Firefly credit balance (GET firefly.adobe.io/v1/credits/balance).
   // Dispatched since #8006; the registration list was missed at the time, so the
@@ -95,11 +91,8 @@ export const USAGE_FETCHER_PROVIDERS = [
   "volcengine-agent-plan",
   "volcengine-coding-plan",
   // Command Code credits + 5h/weekly windows (GET /alpha/billing/credits)
-  "command-code",
   // AgentRouter (New-API) console balance (GET /api/user/self)
-  "agentrouter",
   // TokenRouter Management API (optional Management Key in consoleApiKey)
-  "tokenrouter",
   "kilocode",
   // StepFun account balance (GET /v1/accounts; base URL override selects
   // China vs international platform, mirroring the chat path)
@@ -113,7 +106,6 @@ export const USAGE_FETCHER_PROVIDERS = [
   // Cloudflare Workers AI daily neurons (GraphQL Analytics aiInferenceAdaptiveGroups)
   "cloudflare-ai",
   // xKiro daily free-token quota only, never the paid wallet (GET /v1/usage)
-  "xkiro",
   // Zed Hosted Models USD credit from an optional Orb billing portal link
   "zed-hosted",
 ] as const;

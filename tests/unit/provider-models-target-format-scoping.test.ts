@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { getModelTargetFormat } from "../../open-sse/config/providerModels.ts";
-import { resolveChatCoreTargetFormat } from "../../open-sse/handlers/chatCore/targetFormat.ts";
 
 // Regression: #8835 tagged gpt-5.6-* with targetFormat "openai-responses" in the
 // ghe-copilot catalog. getModelTargetFormat falls back to getGlobalModel() when
@@ -22,17 +21,4 @@ test("model-level targetFormat does not leak across provider catalogs", () => {
   assert.equal(getModelTargetFormat("ghe-copilot", "gpt-5.6-luna"), "openai-responses");
   // unrelated models are unaffected
   assert.equal(getModelTargetFormat("cmd", "kimi-k2"), null);
-});
-
-test("chat completions to command-code gpt-5.6-luna resolve to chat format", () => {
-  const resolved = resolveChatCoreTargetFormat({
-    provider: "command-code",
-    resolvedModel: "gpt-5.6-luna",
-    apiFormat: undefined,
-    sourceFormat: "openai",
-    customModelTargetFormat: undefined,
-    providerSpecificData: null,
-  });
-  assert.equal(resolved.alias, "cmd");
-  assert.equal(resolved.targetFormat, "openai");
 });

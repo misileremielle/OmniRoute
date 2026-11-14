@@ -503,7 +503,7 @@ test("#15789: requestRetry=3 dispatches upstream exactly 4 times and never logs 
 });
 
 // #16305 — COOLDOWN_RETRY_SKIP_REFUSALS_ENABLED (default off) lets a 403/410 cooldown skip the
-// cooldown-aware wait like a 401, and persists a renewing agentrouter quota 403 as 429.
+// cooldown-aware wait like a 401.
 const SKIP_REFUSALS_FLAG = "COOLDOWN_RETRY_SKIP_REFUSALS_ENABLED";
 function setSkipRefusals(enabled: boolean | null) {
   if (enabled === null) delete process.env[SKIP_REFUSALS_FLAG];
@@ -623,38 +623,6 @@ test("cooldown-aware retry decision: 403/410 retry by default, skip only with th
   assert.equal(shouldRetryAfterCooldown(null), true);
 });
 
-async function markAgentrouterQuota403() {
-  const connection = await seedConnection("agentrouter", { apiKey: "sk-agentrouter-quota" });
-  const id = (connection as unknown as { id: string }).id;
-  const result = await auth.markAccountUnavailable(
-    id,
-    403,
-    '{"error":{"message":"账户额度不足，请充值后重试"}}',
-    "agentrouter",
-    "claude-opus-5"
-  );
-  const updated = (await getProviderConnectionById(id)) as unknown as Record<string, unknown>;
-  return { result, updated };
-}
-
-test("[flag off] a connection-scoped agentrouter quota 403 keeps its persisted 403 (default)", async () => {
-  const { result, updated } = await markAgentrouterQuota403();
-  assert.equal(result.shouldFallback, true);
-  assert.ok(result.cooldownMs > 0);
-  assert.equal(Number(updated.errorCode), 403);
-  // Default policy: the 403 cooldown is still waited out.
-  assert.equal(shouldRetryAfterCooldown(updated.errorCode), true);
-});
-
-test("[flag on] a connection-scoped agentrouter quota 403 persists as 429 and stays retryable", async () => {
-  setSkipRefusals(true);
-  const { result, updated } = await markAgentrouterQuota403();
-  assert.equal(result.shouldFallback, true);
-  assert.ok(result.cooldownMs > 0);
-  assert.equal(Number(updated.errorCode), 429);
-  assert.equal(shouldRetryAfterCooldown(updated.errorCode), true);
-});
-
 test("[flag on] a generic apikey 403 keeps its 403 error code and skips the cooldown wait", async () => {
   setSkipRefusals(true);
   const connection = await seedConnection("glm", { apiKey: "sk-glm-generic-403" });
@@ -715,28 +683,4 @@ test("[flag on] handleChat still retries after a short cooldown when the earlies
   assert.equal(response.status, 200);
   assert.equal(fetchCalls, 1);
   assert.equal(body.choices[0].message.content, "recovered after mixed cooldown");
-});
-
-test("a 403 model-scoped refusal keeps the connection usable for other models", async () => {
-  const { isModelLocked } = await import("../../open-sse/services/accountFallback.ts");
-  const connection = await seedConnection("agentrouter", { apiKey: "sk-agentrouter-model" });
-
-  const result = await auth.markAccountUnavailable(
-    (connection as unknown as { id: string }).id,
-    403,
-    '{"error":{"message":"无权访问模型 claude-opus-5"}}',
-    "agentrouter",
-    "claude-opus-5"
-  );
-
-  assert.equal(result.shouldFallback, true);
-
-  const updated = (await getProviderConnectionById(
-    (connection as unknown as { id: string }).id
-  )) as unknown as Record<string, unknown>;
-  assert.ok(!updated.rateLimitedUntil, "a model-scoped refusal must not cool the connection");
-  assert.equal(
-    isModelLocked("agentrouter", (connection as unknown as { id: string }).id, "claude-opus-5"),
-    true
-  );
 });

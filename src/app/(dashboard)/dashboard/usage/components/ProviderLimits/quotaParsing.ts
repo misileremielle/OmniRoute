@@ -337,27 +337,6 @@ function parseDeepseek(data: any) {
   return quotaEntries(data).map(([quotaKey, quota]) => parseDeepseekQuota(quotaKey, quota));
 }
 
-// #10078 follow-up: AgentRouter's `quotas.balance` entry (open-sse/services/usage/agentrouter.ts)
-// carries a real USD amount in `remaining` + `currency: "USD"`. The generic path
-// (normalizeQuotaEntry via parseGeneric) drops `currency` entirely and never sets
-// `isCredits`/`creditCount`, so QuotaCardExpanded's dollar-formatted
-// renderer (which only activates on `q.isCredits`) never triggers — the balance was
-// rendered as a bare "100%/0% left" percentage instead of "$X.XX". Route it through
-// buildCreditsQuota() (same shape DeepSeek/Claude-extra-usage credits rows use) so the
-// dollar figure — and an exhausted ($0.00) balance — render unambiguously as USD.
-function parseAgentrouterQuota(quotaKey: string, quota: any) {
-  if (quotaKey !== "balance") return normalizeQuotaEntry(quotaKey, quota);
-  const remaining = Math.max(0, Number(quota?.remaining ?? 0));
-  const currency = quota?.currency || "USD";
-  const remainingPercentage =
-    safePercentage(quota?.remainingPercentage) ?? (remaining > 0 ? 100 : 0);
-  return buildCreditsQuota(currency, remaining, remainingPercentage, { currency });
-}
-
-function parseAgentrouter(data: any) {
-  return quotaEntries(data).map(([quotaKey, quota]) => parseAgentrouterQuota(quotaKey, quota));
-}
-
 // Ollama Cloud `/api/balance` (open-sse/services/ollamaCloudBalance.ts) reports purchased
 // credits as a `credits` USD balance next to the monthly/session/weekly percent windows. Route
 // that row through buildCreditsQuota() so it renders as "$X.XX", not as a percentage bar.
@@ -549,8 +528,6 @@ function parseProviderQuotas(providerId: string, data: any) {
   if (providerId === "claude") return parseClaude(data);
   if (providerId === "deepseek") return parseDeepseek(data);
   if (providerId === "kilocode") return parseKilocode(data);
-  // TokenRouter shares the `quotas.balance` USD credits-row shape (usage/tokenrouter.ts).
-  if (providerId === "agentrouter" || providerId === "tokenrouter") return parseAgentrouter(data);
   if (providerId === "ollama-cloud") return parseOllamaCloud(data);
   if (providerId === "openrouter") return parseOpenrouter(data);
   return parseGeneric(data);

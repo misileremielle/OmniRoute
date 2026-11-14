@@ -12,28 +12,20 @@
  * and `instrumentation-node.ts` after `await import`.
  */
 
-import { registerAgentrouterQuotaFetcher } from "./agentrouterQuotaFetcher.ts";
 import { registerV0QuotaFetcher } from "./v0QuotaFetcher.ts";
-import { registerFreeModelQuotaFetcher } from "./freeModelQuotaFetcher.ts";
 import { registerGrokCliQuotaFetcher } from "./grokCliQuotaFetcher.ts";
 import { registerXaiOauthQuotaFetcher } from "./xaiOauthQuotaFetcher.ts";
 import { registerFirecrawlQuotaFetcher } from "./firecrawlQuotaFetcher.ts";
 import { registerContext7QuotaFetcher } from "./context7QuotaFetcher.ts";
 import { registerTavilyQuotaFetcher } from "./tavilyQuotaFetcher.ts";
 import { registerJinaQuotaFetcher } from "./jinaQuotaFetcher.ts";
-import { registerLlmgatewayQuotaFetcher } from "./llmgatewayQuotaFetcher.ts";
-import { registerLyceumQuotaFetcher } from "./lyceumQuotaFetcher.ts";
 
 export function registerQuotaTrackersBatch(): void {
-  registerAgentrouterQuotaFetcher();
   registerV0QuotaFetcher();
-  registerFreeModelQuotaFetcher();
   registerGrokCliQuotaFetcher();
   registerXaiOauthQuotaFetcher();
   registerFirecrawlQuotaFetcher();
   registerContext7QuotaFetcher();
   registerTavilyQuotaFetcher();
   registerJinaQuotaFetcher();
-  registerLlmgatewayQuotaFetcher();
-  registerLyceumQuotaFetcher();
 }

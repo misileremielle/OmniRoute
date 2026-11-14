@@ -82,46 +82,6 @@ test("provider models route returns a static local catalog for non-LLM search/ag
   }
 });
 
-test("provider models route fetches the live AI/ML API catalog from the auth-free /models endpoint (#5570)", async () => {
-  const connection = await seedConnection("aimlapi", {
-    providerSpecificData: { autoFetchModels: true },
-    apiKey: "aiml-key",
-  });
-  let calledUrl = "";
-  globalThis.fetch = async (url) => {
-    calledUrl = String(url);
-    return Response.json([
-      { id: "openai/gpt-5.5", type: "chat-completion", info: { name: "GPT-5.5" } },
-      { id: "zhipu/glm-5.2", type: "chat-completion", info: { name: "GLM 5.2" } },
-      { id: "flux/flux-pro", type: "image", info: { name: "FLUX Pro" } },
-    ]);
-  };
-
-  const response = await callRoute(connection.id);
-  const body = (await response.json()) as any;
-
-  // RED before the fix: aimlapi had no PROVIDER_MODELS_CONFIG entry → stale
-  // 6-model local seed (source "local_catalog"), live endpoint never called.
-  assert.equal(response.status, 200);
-  assert.equal(body.source, "api");
-  assert.equal(calledUrl, "https://api.aimlapi.com/models");
-  const ids = body.models.map((m: any) => m.id);
-  assert.ok(ids.includes("openai/gpt-5.5") && ids.includes("zhipu/glm-5.2"));
-  assert.ok(!ids.includes("flux/flux-pro"), "non-chat model types are filtered out");
-});
-
-test("provider models route falls back to the local AI/ML API catalog when the live fetch fails (#5570)", async () => {
-  const connection = await seedConnection("aimlapi", { apiKey: "aiml-key" });
-  globalThis.fetch = async () => new Response("upstream down", { status: 500 });
-
-  const response = await callRoute(connection.id);
-  const body = (await response.json()) as any;
-
-  assert.equal(response.status, 200);
-  assert.equal(body.source, "local_catalog");
-  assert.ok(body.models.length > 0);
-});
-
 test("provider models route returns 404 for unknown connections", async () => {
   const response = await callRoute("missing-connection");
 
@@ -599,7 +559,7 @@ test("provider models route does NOT flag a degraded remote-fetch fallback as in
   // aimlapi normally discovers remotely; when the live fetch fails it falls back
   // to the local catalog — that IS degraded and must NOT be flagged intentional,
   // so model-sync still surfaces the failure (502) for it.
-  const connection = await seedConnection("aimlapi", { apiKey: "aiml-key" });
+  const connection = await seedConnection("chutes", { apiKey: "aiml-key" });
   globalThis.fetch = async () => new Response("upstream down", { status: 500 });
 
   // refresh=true is the live attempt; without it the discovery never leaves the
@@ -615,7 +575,7 @@ test("provider models route does NOT flag a degraded remote-fetch fallback as in
 test("provider models route flags a discovery the operator turned off as intentional", async () => {
   // Auto-fetch is opt-in: with it off, the built-in catalog is the expected
   // source, so the response is NOT a degraded discovery.
-  const connection = await seedConnection("aimlapi", { apiKey: "aiml-key" });
+  const connection = await seedConnection("chutes", { apiKey: "aiml-key" });
   globalThis.fetch = async () => new Response("upstream down", { status: 500 });
 
   const body = (await (await callRoute(connection.id)).json()) as {

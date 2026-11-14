@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { FREE_MODEL_BUDGETS } from "../../open-sse/config/freeModelCatalog.ts";
 import {
   isCatalogFreeModel,
   isFreeModel,
@@ -69,13 +68,4 @@ test("#17028 seven exact free offers have evidence while regional and account ga
   // Removed from the catalog with the end of Ollama's free tier (#19334): neither evidence nor debt.
   assert.equal(evidence.has("ollama-cloud/qwen3.5:397b"), false);
   assert.equal(policy.debt.includes("ollama-cloud/qwen3.5:397b"), false);
-});
-
-test("#17028 Requesty NVIDIA trial retains its published training and use restrictions", () => {
-  const row = FREE_MODEL_BUDGETS.find(
-    (model) => model.provider === "requesty" && model.modelId === "nvidia/nemotron-3-nano-30b-a3b"
-  );
-  assert.ok(row);
-  assert.equal(row.trainsOnPrompts, true);
-  assert.equal(row.tos, "caution");
 });

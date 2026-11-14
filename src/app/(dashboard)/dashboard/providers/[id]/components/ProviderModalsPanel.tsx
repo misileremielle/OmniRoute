@@ -57,7 +57,6 @@ interface ProviderModalsPanelProps {
   isCompatible: boolean;
   isAnthropicProtocolCompatible: boolean;
   isCcCompatible: boolean;
-  isCommandCode: boolean;
   isUpstreamProxyProvider: boolean;
   subscriptionRisk: boolean;
   existingConnectionNames?: string[];
@@ -81,8 +80,6 @@ interface ProviderModalsPanelProps {
   // AddApiKey
   showAddApiKeyModal: boolean;
   siliconFlowInitialBaseUrl: string | undefined;
-  commandCodeAuthState: import("../providerPageHelpers").CommandCodeAuthFlowState;
-  handleStartCommandCodeAuth: () => void;
   handleSaveApiKey: (data: any) => Promise<void>;
   handleCloseAddApiKeyModal: () => void;
   // Batch delete confirm
@@ -179,11 +176,8 @@ export default function ProviderModalsPanel({
   setShowAddApiKeyModal,
   showAddApiKeyModal,
   siliconFlowInitialBaseUrl,
-  commandCodeAuthState,
-  handleStartCommandCodeAuth,
   handleSaveApiKey,
   handleCloseAddApiKeyModal,
-  isCommandCode,
   batchDeleteConfirmOpen,
   setBatchDeleteConfirmOpen,
   handleBatchDeleteConfirm,
@@ -331,9 +325,6 @@ export default function ProviderModalsPanel({
           isCompatible={isCompatible}
           isAnthropic={isAnthropicProtocolCompatible}
           isCcCompatible={isCcCompatible}
-          isCommandCode={isCommandCode}
-          commandCodeAuthState={commandCodeAuthState}
-          onStartCommandCodeAuth={handleStartCommandCodeAuth}
           onSave={handleSaveApiKey}
           onClose={handleCloseAddApiKeyModal}
         />

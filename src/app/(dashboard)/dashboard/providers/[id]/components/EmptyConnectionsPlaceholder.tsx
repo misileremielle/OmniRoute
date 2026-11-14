@@ -8,23 +8,15 @@ import { Button } from "@/shared/components";
 import ChatGptSignInButton from "@/shared/components/ChatGptSignInButton";
 import type { ProviderMessageTranslator } from "../providerPageHelpers";
 
-interface CommandCodeAuthState {
-  phase: string;
-  [key: string]: unknown;
-}
-
 interface EmptyConnectionsPlaceholderProps {
   isOAuth: boolean;
   isCompatible: boolean;
-  isCommandCode: boolean;
   providerId: string;
   supportsDualAuth: boolean;
   providerSupportsPat: boolean;
-  commandCodeAuthState: CommandCodeAuthState;
   gateConnectionFlow: (callback: () => void) => void;
   openApiKeyAddFlow: () => void;
   openPrimaryAddFlow: () => void;
-  handleOpenCommandCodeConnect: () => void;
   onOpenOAuthModal: () => void;
   onOpenImportCodex: () => void;
   onOpenImportClaude: () => void;
@@ -79,15 +71,12 @@ type EmptyConnectionsActionsProps = Omit<
 >;
 
 function EmptyConnectionsActions({
-  isCommandCode,
   providerId,
   supportsDualAuth,
   providerSupportsPat,
-  commandCodeAuthState,
   gateConnectionFlow,
   openApiKeyAddFlow,
   openPrimaryAddFlow,
-  handleOpenCommandCodeConnect,
   onOpenOAuthModal,
   onOpenImportCodex,
   onOpenImportClaude,
@@ -97,20 +86,9 @@ function EmptyConnectionsActions({
 }: EmptyConnectionsActionsProps) {
   return (
     <>
-      {isCommandCode || supportsDualAuth ? (
+      {supportsDualAuth ? (
         <>
-          <Button
-            icon="open_in_new"
-            loading={
-              isCommandCode &&
-              (commandCodeAuthState.phase === "starting" ||
-                commandCodeAuthState.phase === "polling" ||
-                commandCodeAuthState.phase === "applying")
-            }
-            onClick={() =>
-              gateConnectionFlow(isCommandCode ? handleOpenCommandCodeConnect : openPrimaryAddFlow)
-            }
-          >
+          <Button icon="open_in_new" onClick={() => gateConnectionFlow(openPrimaryAddFlow)}>
             Connect
           </Button>
           <Button

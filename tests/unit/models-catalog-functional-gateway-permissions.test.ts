@@ -76,9 +76,9 @@ test("v1 models catalog requires independent permission for functional gateway m
     apiKey: null,
     accessToken: "kimi-access",
   });
-  await seedConnection("agentrouter");
+  await seedConnection("openrouter");
   featureFlagsDb.setFeatureFlagOverride("EXPOSE_FUNCTIONAL_GATEWAY_MIRRORS", "true");
-  functionalGatewayDb.setFunctionalGatewayProviderSetting("agentrouter", "on");
+  functionalGatewayDb.setFunctionalGatewayProviderSetting("openrouter", "on");
 
   const restrictedKey = await apiKeysDb.createApiKey(
     "catalog-functional-mirror",
@@ -97,14 +97,14 @@ test("v1 models catalog requires independent permission for functional gateway m
 
   assert.equal(restrictedResponse.status, 200);
   assert.equal(restrictedIds.has("kmc/k3"), true);
-  assert.equal(restrictedIds.has("agentrouter/kmc/k3"), false);
+  assert.equal(restrictedIds.has("openrouter/kmc/k3"), false);
 
   const gatewayKey = await apiKeysDb.createApiKey(
     "catalog-functional-mirror-allowed",
     "machine-functional-allowed"
   );
   await apiKeysDb.updateApiKeyPermissions(gatewayKey.id, {
-    allowedModels: ["kimi-coding/*", "agentrouter/*"],
+    allowedModels: ["kimi-coding/*", "openrouter/*"],
   });
 
   const gatewayResponse = await v1ModelsCatalog.getUnifiedModelsResponse(
@@ -116,7 +116,7 @@ test("v1 models catalog requires independent permission for functional gateway m
 
   assert.equal(gatewayResponse.status, 200);
   assert.equal(gatewayIds.has("kmc/k3"), true);
-  assert.equal(gatewayIds.has("agentrouter/kmc/k3"), true);
+  assert.equal(gatewayIds.has("openrouter/kmc/k3"), true);
 });
 
 // ── CATALOG_MIRROR_REFINEMENTS_ENABLED ─────────────────────────────────────────
@@ -136,16 +136,16 @@ async function gatewayCatalogIds(refined: boolean): Promise<Set<string>> {
 }
 
 async function enableAgentrouterMirrors() {
-  const gateway = (await seedConnection("agentrouter")) as { id: string };
+  const gateway = (await seedConnection("openrouter")) as { id: string };
   featureFlagsDb.setFeatureFlagOverride("EXPOSE_FUNCTIONAL_GATEWAY_MIRRORS", "true");
-  functionalGatewayDb.setFunctionalGatewayProviderSetting("agentrouter", "on");
+  functionalGatewayDb.setFunctionalGatewayProviderSetting("openrouter", "on");
   return gateway;
 }
 
 test("refinements: a model whose owner is connected under an alias prefix is not mirrored", async () => {
   // `kmc/` is kimi-coding's alias. The historical owner check compares the alias
   // prefix against connection provider ids, never matches, and advertises
-  // `agentrouter/kmc/k3` even though kimi-coding itself is connected.
+  // `openrouter/kmc/k3` even though kimi-coding itself is connected.
   await seedConnection("kimi-coding", {
     authType: "oauth",
     apiKey: null,
@@ -155,23 +155,23 @@ test("refinements: a model whose owner is connected under an alias prefix is not
 
   const off = await gatewayCatalogIds(false);
   assert.equal(off.has("kmc/k3"), true);
-  assert.equal(off.has("agentrouter/kmc/k3"), true, "flag off keeps the historical mirror");
+  assert.equal(off.has("openrouter/kmc/k3"), true, "flag off keeps the historical mirror");
 
   const on = await gatewayCatalogIds(true);
   assert.equal(on.has("kmc/k3"), true);
-  assert.equal(on.has("agentrouter/kmc/k3"), false);
+  assert.equal(on.has("openrouter/kmc/k3"), false);
 });
 
 /**
- * Two unowned models the refined catalog mirrors through agentrouter, picked from
+ * Two unowned models the refined catalog mirrors through openrouter, picked from
  * the live registry instead of hard-coding an id the provider catalogs may drop.
- * Returns the ORIGINAL ids (without the `agentrouter/` prefix).
+ * Returns the ORIGINAL ids (without the `openrouter/` prefix).
  */
 async function pickUnownedMirroredIds(): Promise<[string, string]> {
   const ids = await gatewayCatalogIds(true);
   const originals = [...ids]
-    .filter((id) => id.startsWith("agentrouter/"))
-    .map((id) => id.slice("agentrouter/".length))
+    .filter((id) => id.startsWith("openrouter/"))
+    .map((id) => id.slice("openrouter/".length))
     // exactly `<prefix>/<model>`: keeps the `<prefix>/*` permission glob unambiguous
     .filter((id) => id.split("/").length === 2 && !id.startsWith("auto/") && ids.has(id));
   assert.ok(originals.length >= 2, "registry must expose at least two unowned mirrored models");
@@ -199,24 +199,24 @@ test("refinements: an unowned model is still mirrored and still needs its own pe
 
   const restricted = await listFor([`${ownerPrefix}/*`], "refined-restricted");
   assert.equal(restricted.has(unowned), true);
-  assert.equal(restricted.has(`agentrouter/${unowned}`), false);
+  assert.equal(restricted.has(`openrouter/${unowned}`), false);
 
-  const allowed = await listFor([`${ownerPrefix}/*`, "agentrouter/*"], "refined-allowed");
+  const allowed = await listFor([`${ownerPrefix}/*`, "openrouter/*"], "refined-allowed");
   assert.equal(allowed.has(unowned), true);
-  assert.equal(allowed.has(`agentrouter/${unowned}`), true);
+  assert.equal(allowed.has(`openrouter/${unowned}`), true);
 });
 
 test("refinements: combos never get a gateway mirror", async () => {
   await enableAgentrouterMirrors();
   const off = await gatewayCatalogIds(false);
   assert.equal(
-    off.has("agentrouter/auto/best-coding"),
+    off.has("openrouter/auto/best-coding"),
     true,
     "flag off keeps the historical mirror"
   );
   const on = await gatewayCatalogIds(true);
   assert.equal(
-    [...on].some((id) => id.startsWith("agentrouter/auto/")),
+    [...on].some((id) => id.startsWith("openrouter/auto/")),
     false
   );
 });
@@ -227,16 +227,16 @@ test("refinements: gateway mirrors outside the gateway's authoritative live cata
   // A fresh, authoritative live catalog for the gateway that serves exactly one of the
   // two models. The request path rejects everything else ("not available in the
   // active live catalog"), so only that model may be mirrored.
-  await modelsDb.replaceSyncedAvailableModelsForConnection("agentrouter", gateway.id, [
+  await modelsDb.replaceSyncedAvailableModelsForConnection("openrouter", gateway.id, [
     { id: served, name: "Served" },
   ]);
 
   const off = await gatewayCatalogIds(false);
-  assert.equal(off.has(`agentrouter/${notServed}`), true, "flag off ignores the live catalog");
+  assert.equal(off.has(`openrouter/${notServed}`), true, "flag off ignores the live catalog");
 
   const on = await gatewayCatalogIds(true);
-  assert.equal(on.has(`agentrouter/${served}`), true);
-  assert.equal(on.has(`agentrouter/${notServed}`), false);
+  assert.equal(on.has(`openrouter/${served}`), true);
+  assert.equal(on.has(`openrouter/${notServed}`), false);
 });
 
 test("refinements: a prefix-stripped live-catalog match does not count for a gateway mirror", async () => {
@@ -245,10 +245,10 @@ test("refinements: a prefix-stripped live-catalog match does not count for a gat
   const gateway = await enableAgentrouterMirrors();
   const [unowned] = await pickUnownedMirroredIds();
   const stripped = unowned.slice(unowned.indexOf("/") + 1);
-  await modelsDb.replaceSyncedAvailableModelsForConnection("agentrouter", gateway.id, [
+  await modelsDb.replaceSyncedAvailableModelsForConnection("openrouter", gateway.id, [
     { id: stripped, name: "Stripped" },
   ]);
-  assert.equal((await gatewayCatalogIds(true)).has(`agentrouter/${unowned}`), false);
+  assert.equal((await gatewayCatalogIds(true)).has(`openrouter/${unowned}`), false);
 });
 
 test("refinements: no mirrors through a gateway disabled in blockedProviders", async () => {
@@ -256,17 +256,17 @@ test("refinements: no mirrors through a gateway disabled in blockedProviders", a
   // time, so its mirrors would all be advertised-but-dead.
   await enableAgentrouterMirrors();
   const [unowned] = await pickUnownedMirroredIds();
-  await settingsDb.updateSettings({ blockedProviders: ["agentrouter"] });
+  await settingsDb.updateSettings({ blockedProviders: ["openrouter"] });
 
   const off = await gatewayCatalogIds(false);
   assert.equal(
-    off.has(`agentrouter/${unowned}`),
+    off.has(`openrouter/${unowned}`),
     true,
     "flag off keeps the historical (blocked-gateway) mirrors"
   );
   const on = await gatewayCatalogIds(true);
   assert.equal(
-    [...on].some((id) => id.startsWith("agentrouter/")),
+    [...on].some((id) => id.startsWith("openrouter/")),
     false
   );
 });

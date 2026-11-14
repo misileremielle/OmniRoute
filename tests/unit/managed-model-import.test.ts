@@ -87,27 +87,6 @@ test("sync mode builds aliases from provider-level synced available models", asy
   assert.equal(aliases["model-a"], "openrouter/shared/model-a");
   assert.equal(aliases["model-b"], "openrouter/shared/model-b");
 });
-test("Crof managed import persists boolean reasoning effort metadata", async () => {
-  const result = await importManagedModels({
-    providerId: "crof",
-    connectionId: "conn-crof",
-    mode: "sync",
-    fetchedModels: [{ id: "crof-managed-model", reasoning_effort: true }],
-  });
-
-  const synced = await modelsDb.getSyncedAvailableModelsForConnection("crof", "conn-crof");
-  assert.deepEqual(synced[0]?.supportedThinkingEfforts, ["none", "low", "medium", "high", "max"]);
-  assert.equal(synced[0]?.supportsThinking, true);
-
-  assert.deepEqual(result.importedModels[0]?.supportedThinkingEfforts, [
-    "none",
-    "low",
-    "medium",
-    "high",
-    "max",
-  ]);
-  assert.equal(result.importedModels[0]?.supportsThinking, true);
-});
 
 test("merge mode builds aliases from discovered models without pruning missing provider aliases", async () => {
   await modelsDb.replaceSyncedAvailableModelsForConnection("openrouter", "conn-a", [

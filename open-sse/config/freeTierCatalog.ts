@@ -15,16 +15,11 @@ export type TosVerdict = "ok" | "caution" | "ambiguous" | "avoid" | "unknown";
 
 export const FREE_TIER_BUDGETS: Record<string, number> = {
   mistral: 1_000_000_000,
-  nara: 210_000_000,
   "cloudflare-ai": 122_000_000,
   doubao: 60_000_000,
   groq: 30_000_000,
-  "api-airforce": 24_000_000,
-  bluesminds: 7_200_000,
   sambanova: 6_000_000,
   "arcee-ai": 4_800_000,
-  llm7: 4_300_000,
-  bazaarlink: 3_600_000,
   openrouter: 1_200_000,
   cohere: 800_000,
   morph: 400_000,

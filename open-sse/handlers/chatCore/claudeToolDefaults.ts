@@ -28,8 +28,8 @@ export function defaultClaudeToolType(tools: unknown): unknown {
 
 /**
  * Strip the `type: "custom"` discriminator from Claude-format tools, leaving every
- * other field (name, description, input_schema, …) untouched. AgentRouter's upstream
- * (New-API, Rust serde) only accepts versioned tool types (`web_search_20250305`,
+ * other field (name, description, input_schema, …) untouched. Some Anthropic-compatible
+ * upstreams (e.g. DeepSeek's) only accept versioned tool types (`web_search_20250305`,
  * `web_search_20260209`); plain tools must omit `type` entirely, so `type: "custom"` —
  * whether client-declared (Claude Code v2.1+) or backfilled by defaultClaudeToolType()
  * (#2195) — is a hard 400 "unknown variant `custom`" that crashes the client session.
@@ -55,13 +55,9 @@ export function stripClaudeCustomToolType(tools: unknown): unknown {
 /**
  * Providers whose Anthropic-compatible endpoint rejects the `type: "custom"` tool
  * discriminator with HTTP 400 "unknown variant `custom`":
- * - agentrouter: New-API upstream (Rust serde), versioned tool types only.
  * - deepseek: api.deepseek.com/anthropic, same rejection (port from 9router#3905 / #3952).
  */
-const CLAUDE_CUSTOM_TOOL_TYPE_REJECTING_PROVIDERS: ReadonlySet<string> = new Set([
-  "agentrouter",
-  "deepseek",
-]);
+const CLAUDE_CUSTOM_TOOL_TYPE_REJECTING_PROVIDERS: ReadonlySet<string> = new Set(["deepseek"]);
 
 /**
  * Per-provider dispatch decision for Claude-format tool normalization. Some providers

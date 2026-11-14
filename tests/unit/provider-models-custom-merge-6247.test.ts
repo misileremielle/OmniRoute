@@ -75,10 +75,10 @@ test.after(async () => {
 });
 
 test("per-connection models route includes user-added custom models on the local_catalog path (#6247)", async () => {
-  const connection = await seedConnection("aimlapi", { apiKey: "aiml-key" });
+  const connection = await seedConnection("chutes", { apiKey: "aiml-key" });
 
   // A user-added custom model persisted under key_value namespace `customModels`.
-  await modelsDb.addCustomModel("aimlapi", "my-org/custom-model-6247", "My Custom 6247");
+  await modelsDb.addCustomModel("chutes", "my-org/custom-model-6247", "My Custom 6247");
 
   // Force the local_catalog fallback: the live models probe fails, so the route
   // serves the local catalog (source local_catalog) — the path that dropped
@@ -96,16 +96,16 @@ test("per-connection models route includes user-added custom models on the local
   const custom = (body.models || []).find((m) => m.id === "my-org/custom-model-6247");
   // RED before the fix: the custom model is absent (route never read getCustomModels).
   assert.ok(custom, "user-added custom model must appear in the per-connection catalog");
-  assert.equal(custom.owned_by, "aimlapi", "custom model must be stamped owned_by = provider");
+  assert.equal(custom.owned_by, "chutes", "custom model must be stamped owned_by = provider");
 });
 
 test("per-connection models route overlays same-id custom metadata", async () => {
-  const connection = await seedConnection("aimlapi", { apiKey: "aiml-key" });
-  await modelsDb.replaceSyncedAvailableModelsForConnection("aimlapi", connection.id, [
+  const connection = await seedConnection("chutes", { apiKey: "aiml-key" });
+  await modelsDb.replaceSyncedAvailableModelsForConnection("chutes", connection.id, [
     { id: "shared-model", name: "Discovered name", supportsVision: true },
   ]);
   await modelsDb.addCustomModel(
-    "aimlapi",
+    "chutes",
     "shared-model",
     "Operator name",
     "manual",
@@ -154,9 +154,9 @@ test("per-connection models route includes custom models on a curated-only provi
 });
 
 test("per-connection models route can exclude response-only custom models for sync", async () => {
-  const connection = await seedConnection("aimlapi", { apiKey: "aiml-key" });
+  const connection = await seedConnection("chutes", { apiKey: "aiml-key" });
 
-  await modelsDb.addCustomModel("aimlapi", "my-org/custom-model-sync", "My Custom Sync");
+  await modelsDb.addCustomModel("chutes", "my-org/custom-model-sync", "My Custom Sync");
   globalThis.fetch = (async () => new Response("upstream down", { status: 500 })) as typeof fetch;
 
   const response = await callRoute(connection.id, "?excludeCustom=true");

@@ -39,8 +39,8 @@ const QUOTA_SAFE = { provider: "groq", model: "openai/gpt-oss-120b", connectionI
 // A real quota-based entry WITHOUT a documented hard-stop guarantee → always
 // excluded as `no-hard-stop`, whatever the live allowance state reports.
 const QUOTA_UNGUARANTEED = {
-  provider: "agentrouter",
-  model: "claude-opus-5",
+  provider: "blackbox",
+  model: "gpt-4o",
   connectionId: REAL_CONN,
 };
 

@@ -79,10 +79,6 @@ export const GLM_52_FAMILY_PATTERN = /(?:^|\/|\b)glm-5\.2(?:$|-)/i;
  */
 export const MIMO_V25_V26_PATTERN = /(?:^|\/|\b)mimo-v2\.[56](?:$|-)/i;
 
-export function isCommandCodeProvider(provider: string): boolean {
-  return provider === "command-code" || provider === "cmd" || provider === "command_code";
-}
-
 export function isOllamaCloudProvider(provider: string): boolean {
   return provider === "ollama-cloud" || provider === "ollamacloud" || provider === "ollama_cloud";
 }
@@ -207,13 +203,10 @@ export function supportsMaxEffortForProvider(provider: string, model: string): b
   const isOpencodeGo = isOpencodeGoProvider(provider);
   const isOllamaCloud = isOllamaCloudProvider(provider);
   const isMoonshotK3 = /^kimi-k3(?:$|[.-])/i.test(resolvedModelId);
-  const isCommandCode = isCommandCodeProvider(provider);
   const isMaxTierModel =
     MAX_TIER_REASONING_MODEL_PATTERN.test(resolvedModelId) ||
     MAX_TIER_REASONING_MODEL_PATTERN.test(model);
-  return (
-    isClaude || isOpencodeGo || isOllamaCloud || isMoonshotK3 || isCommandCode || isMaxTierModel
-  );
+  return isClaude || isOpencodeGo || isOllamaCloud || isMoonshotK3 || isMaxTierModel;
 }
 
 // ── Effort carrier helpers (#7044) ────────────────────────────────────────────
@@ -679,33 +672,6 @@ export function sanitizeReasoningEffortForProvider(
       return writeEffortValue(working, "low", c);
     }
     return working;
-  }
-
-  // `minimal` is a sub-`low` reasoning tier some catalogs advertise (e.g.
-  // Muse Spark via models.dev) and the Codex provider accepts natively — but
-  // Command Code rejects it outright:
-  //   Validation error: Invalid option: expected one of
-  //   "low"|"medium"|"high"|"xhigh"|"max" at "params.reasoning_effort"
-  // Command Code rejects the OpenAI no-thinking carrier `none` with the same
-  // error.
-  // Map both to the closest supported value (`low`) for command-code only;
-  // other providers (codex etc.) keep their native `minimal` handling.
-  // Exception: a Responses-shaped body (`input`, no `messages`) is routed to
-  // /provider/v1/responses (#14692), which DOES honor `reasoning.effort: "none"`
-  // (verified live 2026-09-24: reasoning_tokens 0) — keep `none` there, or a
-  // no-thinking request silently turns reasoning back on.
-  const commandCodeResponsesNone =
-    effortStr === "none" && b.input !== undefined && b.messages === undefined;
-  if (
-    isCommandCodeProvider(provider) &&
-    (effortStr === "minimal" || effortStr === "none") &&
-    !commandCodeResponsesNone
-  ) {
-    log?.info?.(
-      "REASONING_SANITIZE",
-      `${provider}/${modelStr}: mapped reasoning_effort ${effortStr} → low`
-    );
-    return writeEffortValue(working, "low", c);
   }
 
   if (rejectsCloudflareNoneEffort(provider, modelStr, effortStr)) {

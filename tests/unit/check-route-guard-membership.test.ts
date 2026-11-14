@@ -286,7 +286,7 @@ test("#15438: WHATWG URL parsing resolves dot-segment variants into LOCAL_ONLY p
     ["/api/mcp/../mcp/sse", "/api/mcp/sse"],
     ["/api/mcp/%2e%2e/mcp/sse", "/api/mcp/sse"],
     ["/api/foo/../mcp/sse", "/api/mcp/sse"], // resolves INTO the prefix from outside
-    ["/api/x/../providers/cursor/login", "/api/providers/cursor/login"], // LOCAL_ONLY_API_PATTERNS match
+    ["/api/x/../providers/cursor/refresh-cursor", "/api/providers/cursor/refresh-cursor"], // LOCAL_ONLY_API_PATTERNS match
   ];
   for (const [raw, resolved] of cases) {
     const pathname = pipelinePathname(raw);

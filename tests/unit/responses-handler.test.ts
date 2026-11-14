@@ -346,47 +346,6 @@ test("handleResponsesCore transforms upstream OpenAI SSE into Responses API SSE"
   assert.match(sse, /data: \[DONE\]/);
 });
 
-test("handleResponsesCore transforms Command Code executor SSE through Responses shim", async () => {
-  const { call, result } = await invokeResponsesCore({
-    provider: "command-code",
-    model: "gpt-5.4-mini",
-    credentials: { apiKey: "cc_test_key", providerSpecificData: {} },
-    body: {
-      model: "gpt-5.4-mini",
-      input: "hello command code",
-    },
-    responseFactory() {
-      // /provider/v1/chat/completions returns standard OpenAI SSE (#10265).
-      const chunk = (delta: Record<string, unknown>) =>
-        `data: ${JSON.stringify({
-          id: "c1",
-          object: "chat.completion.chunk",
-          model: "gpt-5.4-mini",
-          choices: [{ index: 0, delta }],
-        })}\n\n`;
-      return new Response(
-        [chunk({ role: "assistant" }), chunk({ content: "command" }), chunk({})].join("") +
-          "data: [DONE]\n\n",
-        { status: 200, headers: { "Content-Type": "text/event-stream" } }
-      );
-    },
-  });
-
-  assert.equal(result.success, true);
-  assert.equal(call.url, "https://api.commandcode.ai/provider/v1/chat/completions");
-  assert.equal(call.headers.Authorization, "Bearer cc_test_key");
-  assert.equal(call.headers["x-command-code-version"], undefined);
-  assert.equal(call.body.model, "gpt-5.4-mini");
-  assert.equal(call.body.stream, true);
-
-  const sse = await result.response.text();
-  assert.match(sse, /event: response\.created/);
-  assert.match(sse, /event: response\.output_text\.delta/);
-  assert.match(sse, /command/);
-  assert.match(sse, /event: response\.completed/);
-  assert.match(sse, /data: \[DONE\]/);
-});
-
 test("handleResponsesCore propagates upstream failures without retrying", async () => {
   const { result, calls } = await invokeResponsesCore({
     body: {

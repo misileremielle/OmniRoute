@@ -10,7 +10,6 @@ type ValidateFormFields = {
   awsAccessKeyId: string;
   awsSessionToken: string;
   cx: string;
-  commandCodeZdrEnabled?: boolean;
   accountId?: string;
 };
 
@@ -54,8 +53,6 @@ export function buildProviderValidateRequestBody(options: {
     accessKeyId: family.accessKeyId,
     sessionToken: family.sessionToken,
     cx: trimmedOrUndefined(formData.cx),
-    zdrEnabled:
-      provider === "command-code" && formData.commandCodeZdrEnabled === true ? true : undefined,
     accountId: formData.accountId ? trimmedOrUndefined(formData.accountId) : undefined,
   };
 }

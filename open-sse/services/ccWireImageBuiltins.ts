@@ -4,8 +4,7 @@
  * WITHOUT inheriting the Claude-Code-Compatible family's default anthropic
  * baseUrl / Bearer auth.
  *
- * These providers keep their own registry `baseUrl` and auth scheme
- * (e.g. `agentrouter` → `https://agentrouter.org/v1/messages` + `x-api-key`),
+ * These providers keep their own registry `baseUrl` and auth scheme,
  * while the two CC predicates (`isClaudeCodeCompatible` /
  * `isClaudeCodeCompatibleProvider`) and `applyFingerprint` treat them as CC
  * for the wire-image concerns only. The CC-baseUrl / CC-Bearer branches in
@@ -15,7 +14,7 @@
  * Single source of truth — imported by both predicates so they never diverge.
  * See issue #6056.
  */
-export const CC_WIRE_IMAGE_BUILTINS: ReadonlySet<string> = new Set(["agentrouter"]);
+export const CC_WIRE_IMAGE_BUILTINS: ReadonlySet<string> = new Set<string>();
 
 /**
  * True when `provider` is a built-in that adopts the dynamic Claude-Code wire

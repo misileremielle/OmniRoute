@@ -102,7 +102,7 @@ test.after(() => {
 });
 
 test("a failed discovery is remembered for its connection", () => {
-  const connection = { provider: "aimlapi", connectionId: "conn-1" };
+  const connection = { provider: "chutes", connectionId: "conn-1" };
 
   recordDiscoveryOutcome({
     ...connection,
@@ -115,7 +115,7 @@ test("a failed discovery is remembered for its connection", () => {
   const states = discoveryStateDb.getDiscoveryStatesForConnections([
     { provider: connection.provider, id: connection.connectionId },
   ]);
-  const stored = states.get("aimlapi:conn-1");
+  const stored = states.get("chutes:conn-1");
   assert.equal(stored?.status, "degraded");
   assert.equal(stored?.cause, "HTTP 500");
   assert.ok(Number.isFinite(Date.parse(stored?.at ?? "")));
@@ -125,9 +125,9 @@ test("a later read does not erase the remembered failure", async () => {
   // Auto-fetch is off: a plain read answers from the catalog WITHOUT running a
   // discovery, so it has no outcome of its own to record. (With auto-fetch on, a
   // plain read is a live discovery and legitimately records its own outcome.)
-  const connection = await createConnection("aimlapi", "remembered", { autoFetchModels: false });
+  const connection = await createConnection("chutes", "remembered", { autoFetchModels: false });
   recordDiscoveryOutcome({
-    provider: "aimlapi",
+    provider: "chutes",
     connectionId: connection.id,
     degraded: true,
     error: "HTTP 500",
@@ -142,7 +142,7 @@ test("a later read does not erase the remembered failure", async () => {
   );
   assert.equal(response.status, 200);
 
-  const [row] = await listConnections("aimlapi");
+  const [row] = await listConnections("chutes");
   assert.equal(row.discoveryState?.status, "degraded");
   assert.equal(row.discoveryState?.cause, "HTTP 500");
 });
@@ -172,18 +172,18 @@ test("a successful discovery makes the remembered outcome healthy again", async 
 });
 
 test("two connections of one provider keep their own outcome", async () => {
-  const degraded = await createConnection("aimlapi", "degraded");
-  const healthy = await createConnection("aimlapi", "healthy");
+  const degraded = await createConnection("chutes", "degraded");
+  const healthy = await createConnection("chutes", "healthy");
 
   recordDiscoveryOutcome({
-    provider: "aimlapi",
+    provider: "chutes",
     connectionId: degraded.id,
     degraded: true,
     error: "HTTP 500",
     source: "cache",
   });
 
-  const rows = await listConnections("aimlapi");
+  const rows = await listConnections("chutes");
   const byId = new Map(rows.map((row) => [row.id, row]));
   assert.equal(byId.get(degraded.id)?.discoveryState?.status, "degraded");
   assert.equal(byId.get(degraded.id)?.discoveryState?.cause, "HTTP 500");
@@ -191,14 +191,14 @@ test("two connections of one provider keep their own outcome", async () => {
 });
 
 test("a connection that was never refreshed reads as unknown, never as healthy", async () => {
-  await createConnection("aimlapi", "never-refreshed");
+  await createConnection("chutes", "never-refreshed");
 
-  const [row] = await listConnections("aimlapi");
+  const [row] = await listConnections("chutes");
   assert.equal(row.discoveryState, null);
 });
 
 test("a local condition keeps the previous outcome and its own date", () => {
-  const connection = { provider: "aimlapi", connectionId: "conn-local" };
+  const connection = { provider: "chutes", connectionId: "conn-local" };
   recordDiscoveryOutcome({
     ...connection,
     degraded: true,
@@ -209,7 +209,7 @@ test("a local condition keeps the previous outcome and its own date", () => {
     .getDiscoveryStatesForConnections([
       { provider: connection.provider, id: connection.connectionId },
     ])
-    .get("aimlapi:conn-local");
+    .get("chutes:conn-local");
 
   recordDiscoveryOutcome({
     ...connection,
@@ -222,15 +222,15 @@ test("a local condition keeps the previous outcome and its own date", () => {
     .getDiscoveryStatesForConnections([
       { provider: connection.provider, id: connection.connectionId },
     ])
-    .get("aimlapi:conn-local");
+    .get("chutes:conn-local");
   assert.equal(after?.status, "degraded");
   assert.equal(after?.cause, "HTTP 500");
   assert.equal(after?.at, before?.at);
 });
 
 test("a remembered failure never touches the routing fields of the connection", async () => {
-  const connection = await createConnection("aimlapi", "routing-untouched");
-  const before = await providersDb.getProviderConnections({ provider: "aimlapi" });
+  const connection = await createConnection("chutes", "routing-untouched");
+  const before = await providersDb.getProviderConnections({ provider: "chutes" });
 
   globalThis.fetch = async () => new Response("upstream down", { status: 500 });
   const response = await discoveryRoute.GET(
@@ -239,7 +239,7 @@ test("a remembered failure never touches the routing fields of the connection", 
   );
   assert.equal(response.status, 200);
 
-  const after = await providersDb.getProviderConnections({ provider: "aimlapi" });
+  const after = await providersDb.getProviderConnections({ provider: "chutes" });
   assert.equal(after[0].lastError, before[0].lastError);
   assert.equal(after[0].lastErrorType, before[0].lastErrorType);
   assert.equal(after[0].lastErrorSource, before[0].lastErrorSource);
@@ -247,7 +247,7 @@ test("a remembered failure never touches the routing fields of the connection", 
 });
 
 test("a failed upstream discovery answers with its cause and is remembered", async () => {
-  const connection = await createConnection("aimlapi", "upstream-failure");
+  const connection = await createConnection("chutes", "upstream-failure");
   globalThis.fetch = async () => new Response("upstream down", { status: 500 });
 
   const response = await discoveryRoute.GET(
@@ -259,7 +259,7 @@ test("a failed upstream discovery answers with its cause and is remembered", asy
   assert.equal(body.degraded, true, "the response must say the discovery fell back");
   assert.equal(body.error, "HTTP 500", "the response must carry the reason of the failure");
 
-  const [row] = await listConnections("aimlapi");
+  const [row] = await listConnections("chutes");
   assert.equal(row.discoveryState?.status, "degraded");
   assert.equal(row.discoveryState?.cause, "HTTP 500");
 });
@@ -314,16 +314,16 @@ test("a no-auth provider whose live catalog fails is remembered too", async () =
 });
 
 test("deleting a connection drops its remembered outcome", async () => {
-  const connection = await createConnection("aimlapi", "deleted");
+  const connection = await createConnection("chutes", "deleted");
   recordDiscoveryOutcome({
-    provider: "aimlapi",
+    provider: "chutes",
     connectionId: connection.id,
     degraded: true,
     error: "HTTP 500",
     source: "cache",
   });
   assert.equal(
-    discoveryStateDb.getDiscoveryStatesForConnections([{ provider: "aimlapi", id: connection.id }])
+    discoveryStateDb.getDiscoveryStatesForConnections([{ provider: "chutes", id: connection.id }])
       .size,
     1
   );
@@ -331,16 +331,16 @@ test("deleting a connection drops its remembered outcome", async () => {
   await deletion.deleteProviderConnection(connection.id);
 
   assert.equal(
-    discoveryStateDb.getDiscoveryStatesForConnections([{ provider: "aimlapi", id: connection.id }])
+    discoveryStateDb.getDiscoveryStatesForConnections([{ provider: "chutes", id: connection.id }])
       .size,
     0
   );
 });
 
 test("a failed purge of the stored outcome leaves a trace and never fails the deletion", async () => {
-  const connection = await createConnection("aimlapi", "purge-failure");
+  const connection = await createConnection("chutes", "purge-failure");
   recordDiscoveryOutcome({
-    provider: "aimlapi",
+    provider: "chutes",
     connectionId: connection.id,
     degraded: true,
     error: "HTTP 500",

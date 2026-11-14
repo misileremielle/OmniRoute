@@ -9,11 +9,11 @@ import { REGISTRY } from "@omniroute/open-sse/config/providerRegistry.ts";
 import { AI_PROVIDERS } from "@/shared/constants/providers.ts";
 
 /**
- * Five OpenAI-compatible free-tier aggregators (ainative, aion, sealion,
- * routeway, nara). The tests pin the decisions that are easy to break silently.
+ * The OpenAI-compatible free-tier provider from the 2026-07 batch still in the fork (sealion).
+ * The tests pin the decisions that are easy to break silently.
  */
 
-const NEW_PROVIDERS = ["ainative", "aion", "sealion", "routeway", "nara"] as const;
+const NEW_PROVIDERS = ["sealion"] as const;
 const byProvider = (id: string) => FREE_MODEL_BUDGETS.filter((m) => m.provider === id);
 
 test("each new provider is both routable and canonically registered", () => {
@@ -25,15 +25,10 @@ test("each new provider is both routable and canonically registered", () => {
   }
 });
 
-test("routeway pins a browser User-Agent (Cloudflare rejects non-browser UAs with 1010)", () => {
-  const ua = REGISTRY.routeway.extraHeaders?.["User-Agent"] ?? "";
-  assert.match(ua, /Mozilla/, "routeway must send a browser-style User-Agent");
-});
-
 test("providers with no published token quota never inflate the headline", () => {
   // ainative ("claimed"), aion (per-day request cap), sealion (RPM only),
   // routeway (RPD): real free access, no verifiable monthly token figure.
-  for (const id of ["ainative", "aion", "sealion", "routeway"]) {
+  for (const id of ["sealion"]) {
     const rows = byProvider(id);
     assert.ok(
       rows.every((m) => m.monthlyTokens === 0 && m.creditTokens === 0),
@@ -42,18 +37,9 @@ test("providers with no published token quota never inflate the headline", () =>
     assert.ok(rows.every((m) => m.freeType === "recurring-uncapped"));
   }
   const totals = computeFreeModelTotals();
-  for (const id of ["ainative", "aion", "sealion", "routeway"]) {
+  for (const id of ["sealion"]) {
     assert.ok(totals.uncappedProviders.includes(id), `${id} must surface as uncapped`);
   }
-});
-
-test("nara is a single shared 7M/day pool, counted once", () => {
-  const rows = byProvider("nara");
-  assert.ok(rows.length >= 1);
-  // 7M tokens/day shared across all plan models => 210M/month (re-audited 2026-09-02, GET /api/plans).
-  assert.ok(rows.every((m) => m.poolKey === "nara-free"));
-  assert.ok(rows.every((m) => m.monthlyTokens === 210_000_000));
-  assert.ok(rows.every((m) => m.freeType === "recurring-daily"));
 });
 
 test("every catalog provider id still resolves to a canonical provider", () => {

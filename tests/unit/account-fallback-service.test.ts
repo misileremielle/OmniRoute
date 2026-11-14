@@ -462,7 +462,6 @@ test("hasPerModelQuota honors shared-registry passthrough providers (#11071)", (
   // shared-registry lookup a missing model on one of these cools the WHOLE connection.
   assert.equal(hasPerModelQuota("novita"), true);
   assert.equal(hasPerModelQuota("uncloseai"), true);
-  assert.equal(hasPerModelQuota("orcarouter"), true);
 
   // Already covered by the local/self-hosted branch — asserted so this port cannot regress it.
   assert.equal(hasPerModelQuota("ollama-local"), true);

@@ -55,6 +55,5 @@ export function createInitialAddApiKeyFormData({
     ccCompatibleSummarizeThinking: false,
     passthroughModels: false,
     importFreeModelsOnly: false,
-    commandCodeZdrEnabled: false,
   };
 }

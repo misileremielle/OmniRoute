@@ -88,9 +88,9 @@ test.after(async () => {
 
 // ──── Shared module ────
 
-test("shared set contains REGISTRY ids and aliases (tokenrouter + trk)", () => {
-  assert.equal(RESERVED_PROVIDER_PREFIXES.has("tokenrouter"), true);
-  assert.equal(RESERVED_PROVIDER_PREFIXES.has("trk"), true);
+test("shared set contains REGISTRY ids and aliases (vercel-ai-gateway + vag)", () => {
+  assert.equal(RESERVED_PROVIDER_PREFIXES.has("vercel-ai-gateway"), true);
+  assert.equal(RESERVED_PROVIDER_PREFIXES.has("vag"), true);
 });
 
 test("shared guard keeps retired Felo ids reserved after registry removal", () => {
@@ -128,9 +128,9 @@ test("mixed-case legacy aliases stay retired while live ids retain case-sensitiv
 });
 
 test("shared set is case-sensitive like the runtime guard", () => {
-  assert.equal(isReservedProviderPrefix("TokenRouter"), false);
-  assert.equal(isReservedProviderPrefix("TOKENROUTER"), false);
-  assert.equal(isReservedProviderPrefix("tokenrouter"), true);
+  assert.equal(isReservedProviderPrefix("Vercel-AI-Gateway"), false);
+  assert.equal(isReservedProviderPrefix("VERCEL-AI-GATEWAY"), false);
+  assert.equal(isReservedProviderPrefix("vercel-ai-gateway"), true);
 });
 
 test("shared set excludes manual aliases that never intercept nodes at runtime", () => {
@@ -209,14 +209,11 @@ test("shared set size includes live REGISTRY and retired Designer + Felo + Qwen 
   // replicate — 431 -> 443.
   // Web-cookie providers removed from this fork: their ids and aliases are no longer
   // registry members — 443 -> 379.
-  assert.equal(RESERVED_PREFIX_COUNT, 379);
-  assert.equal(RESERVED_PROVIDER_PREFIXES.has("ainetcafe"), true);
-  assert.equal(RESERVED_PROVIDER_PREFIXES.has("tokenharbor"), true);
+  // Router/gateway providers outside the kept set removed from this fork — 379 -> 255.
+  assert.equal(RESERVED_PREFIX_COUNT, 255);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("runcrate"), true);
-  assert.equal(RESERVED_PROVIDER_PREFIXES.has("gisoo"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("minimax-code"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("mmcode"), true);
-  assert.equal(RESERVED_PROVIDER_PREFIXES.has("empiriolabs"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("megabrain"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("mb"), true);
   assert.equal(RESERVED_PROVIDER_PREFIXES.has("chatgpt"), true);
@@ -230,26 +227,26 @@ test("isReservedProviderPrefix rejects non-string input", () => {
 
 // ──── Schema-level guard ────
 
-test("createProviderNodeSchema rejects reserved prefix 'tokenrouter'", () => {
+test("createProviderNodeSchema rejects reserved prefix 'vercel-ai-gateway'", () => {
   const result = createProviderNodeSchema.safeParse({
     name: "TokenRouter Node",
-    prefix: "tokenrouter",
+    prefix: "vercel-ai-gateway",
     apiType: "chat",
-    baseUrl: "https://api.tokenrouter.com/v1",
+    baseUrl: "https://ai-gateway.vercel.sh/v1",
   });
   assert.equal(result.success, false);
   if (!result.success) {
     const prefixIssue = result.error.issues.find((i) => i.path[0] === "prefix");
     assert.ok(prefixIssue, "expected a 'prefix' issue");
     assert.match(prefixIssue.message, /reserved/i);
-    assert.match(prefixIssue.message, /tokenrouter/);
+    assert.match(prefixIssue.message, /vercel-ai-gateway/);
   }
 });
 
-test("createProviderNodeSchema rejects reserved alias 'trk'", () => {
+test("createProviderNodeSchema rejects reserved alias 'vag'", () => {
   const result = createProviderNodeSchema.safeParse({
     name: "TRK Node",
-    prefix: "trk",
+    prefix: "vag",
     apiType: "chat",
   });
   assert.equal(result.success, false);
@@ -334,7 +331,7 @@ test("provider-node schemas reject the normalized retired ChatGPT Web alias", ()
 test("createProviderNodeSchema accepts mixed-case 'TokenRouter' (no runtime collision)", () => {
   const result = createProviderNodeSchema.safeParse({
     name: "Case Test",
-    prefix: "TokenRouter",
+    prefix: "Vercel-AI-Gateway",
     apiType: "chat",
   });
   assert.equal(result.success, true);
@@ -374,9 +371,9 @@ test("provider nodes route returns 400 with prefix issue for reserved prefix", a
   const response = await providerNodesRoute.POST(
     makeCreateRequest({
       name: "TokenRouter Node",
-      prefix: "tokenrouter",
+      prefix: "vercel-ai-gateway",
       apiType: "chat",
-      baseUrl: "https://api.tokenrouter.com/v1",
+      baseUrl: "https://ai-gateway.vercel.sh/v1",
     })
   );
   assert.equal(response.status, 400);

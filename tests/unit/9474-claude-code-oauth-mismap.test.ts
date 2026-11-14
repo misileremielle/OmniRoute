@@ -98,12 +98,3 @@ test("#9474: real Anthropic Claude OAuth is provider `claude` with browser PKCE 
   assert.notEqual(claude.flowType, "device_code");
   assert.equal(claude.config.authorizeUrl, "https://claude.ai/oauth/authorize");
 });
-
-test("#9474: command-code provider is the unrelated CommandCode.ai apikey provider (unchanged, sanity)", async () => {
-  const mod = await import("../../open-sse/config/providers/registry/command-code/index.ts");
-  const commandCodeProvider = mod.command_codeProvider;
-  assert.equal(commandCodeProvider.id, "command-code");
-  assert.equal(commandCodeProvider.baseUrl, "https://api.commandcode.ai");
-  // command-code must remain distinct from the Anthropic claude provider.
-  assert.notEqual(commandCodeProvider.id, "claude");
-});

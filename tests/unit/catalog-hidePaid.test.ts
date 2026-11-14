@@ -21,11 +21,11 @@ describe("catalog decideHidePaid", () => {
   });
 
   it("lists a catalog-free model that STRICT still excludes without hard-stop proof", async () => {
-    assert.equal(decideHidePaid(true, "bluesminds", "gpt-4o"), false);
+    assert.equal(decideHidePaid(true, "blackbox", "gpt-4o"), false);
     const { classifyStrictZeroCostCandidate, findBudgetEntry } =
       await import("../../open-sse/services/autoCombo/strictZeroCostFilter.ts");
     const candidate = {
-      provider: "bluesminds",
+      provider: "blackbox",
       model: "gpt-4o",
       connectionId: "c1",
       allowedConnectionIds: ["c1"],

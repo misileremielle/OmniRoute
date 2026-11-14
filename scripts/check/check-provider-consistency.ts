@@ -31,12 +31,6 @@ export const KNOWN_REGISTRY_ONLY: Record<string, string> = {};
 export const KNOWN_CATALOG_ONLY: Record<string, string> = {
   "amazon-q": "OAuth/IDE provider roteado via KiroExecutor sem entrada de registry.",
   zed: "OAuth/IDE provider (Zed) roteado via executor especializado; sem entrada de registry.",
-  piapi: "Gateway OpenAI-compatible roteado via baseUrl de conexão.",
-  getgoapi: "Gateway OpenAI-compatible roteado via baseUrl de conexão.",
-  laozhang: "Gateway OpenAI-compatible roteado via baseUrl de conexão.",
-  thebai: "Gateway OpenAI-compatible roteado via baseUrl de conexão.",
-  fenayai: "Gateway OpenAI-compatible roteado via baseUrl de conexão.",
-  empower: "Gateway OpenAI-compatible roteado via baseUrl de conexão.",
   "arcee-ai": "API-key provider roteado via baseUrl de conexão.",
   "azure-openai": "Azure OpenAI roteado via AzureOpenAIExecutor + baseUrl de conexão.",
   "azure-ai": "Azure AI Foundry roteado via AzureAiExecutor + baseUrl de conexão.",

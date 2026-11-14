@@ -37,12 +37,11 @@ test("stripStore preserves client store values for opted-in OpenAI-compatible Re
   assert.equal("store" in omitted, false);
 });
 
-test("stripStore keeps existing OpenAI and AgentRouter behavior", () => {
+test("stripStore keeps store only for OpenAI", () => {
   const cases = [
     { provider: "openai", targetFormat: FORMATS.OPENAI, expected: true },
     { provider: "openai", targetFormat: FORMATS.OPENAI_RESPONSES, expected: true },
-    { provider: "agentrouter", targetFormat: FORMATS.OPENAI_RESPONSES, expected: true },
-    { provider: "agentrouter", targetFormat: FORMATS.OPENAI, expected: false },
+    { provider: "anthropic", targetFormat: FORMATS.OPENAI_RESPONSES, expected: false },
   ];
 
   for (const { provider, targetFormat, expected } of cases) {

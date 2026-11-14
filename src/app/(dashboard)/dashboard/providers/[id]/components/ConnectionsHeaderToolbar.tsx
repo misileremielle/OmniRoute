@@ -12,7 +12,6 @@ type ConnectionsHeaderToolbarProps = {
   providerId: string;
   providerInfo: any; // resolveDashboardProviderInfo result
   isCompatible: boolean;
-  isCommandCode: boolean;
   isOAuth: boolean;
   supportsDualAuth: boolean;
   providerSupportsPat: boolean;
@@ -49,8 +48,6 @@ type ConnectionsHeaderToolbarProps = {
   connectVolcengineAccount?: () => void;
   connectingVolcengineAccount?: boolean;
   openExternalLinkFlow: () => void;
-  handleOpenCommandCodeConnect: () => void;
-  commandCodeAuthState: { phase: string };
   onOpenOAuthModal: () => void;
   onOpenCodexCliGuide: () => void;
   onOpenImportCodex: () => void;
@@ -65,7 +62,6 @@ export default function ConnectionsHeaderToolbar({
   providerId,
   providerInfo,
   isCompatible,
-  isCommandCode,
   isOAuth,
   supportsDualAuth,
   providerSupportsPat,
@@ -100,8 +96,6 @@ export default function ConnectionsHeaderToolbar({
   connectVolcengineAccount,
   connectingVolcengineAccount,
   openExternalLinkFlow,
-  handleOpenCommandCodeConnect,
-  commandCodeAuthState,
   onOpenOAuthModal,
   onOpenCodexCliGuide,
   onOpenImportCodex,
@@ -295,22 +289,12 @@ export default function ConnectionsHeaderToolbar({
         )}
         {!isCompatible ? (
           <>
-            {isCommandCode || supportsDualAuth ? (
+            {supportsDualAuth ? (
               <>
                 <Button
                   size="sm"
                   icon="open_in_new"
-                  loading={
-                    isCommandCode &&
-                    (commandCodeAuthState.phase === "starting" ||
-                      commandCodeAuthState.phase === "polling" ||
-                      commandCodeAuthState.phase === "applying")
-                  }
-                  onClick={() =>
-                    gateConnectionFlow(
-                      isCommandCode ? handleOpenCommandCodeConnect : openPrimaryAddFlow
-                    )
-                  }
+                  onClick={() => gateConnectionFlow(openPrimaryAddFlow)}
                 >
                   {providerText(t, "connect", "Connect")}
                 </Button>

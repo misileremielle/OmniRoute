@@ -90,9 +90,7 @@ const PROVIDER_LIMITS_APIKEY_PROVIDERS = new Set([
   "ollama-cloud",
   "minimax",
   "minimax-cn",
-  "crof",
   "nanogpt",
-  "nan",
   "apmix",
   "deepseek",
   // StepFun account balance (GET /v1/accounts; base-URL override selects
@@ -123,18 +121,14 @@ const PROVIDER_LIMITS_APIKEY_PROVIDERS = new Set([
   "volcengine-agent-plan",
   "volcengine-coding-plan",
   // Command Code API key → /alpha/billing/credits + windowLimits
-  "command-code",
   // Alibaba Coding Plan (console API key) + Qwen personal Token Plan (console cookie) — #9603
   "bailian-coding-plan",
   "qwen-cloud-token-plan",
   // AgentRouter (New-API) console System Access Token + New-Api-User id (providerSpecificData)
-  "agentrouter",
   // OpenRouter API key → /key limits + /credits account balance
   "openrouter",
   // LLM Gateway API key (llmgtwy_…) → GET /v1/key DevPass allowance
-  "llmgateway",
   // Lyceum API key (lk_…) → GET /api/v2/external/billing/credits balance
-  "lyceum",
 ]);
 const DEFAULT_PROVIDER_LIMITS_SYNC_INTERVAL_MINUTES = 70;
 const PROVIDER_LIMITS_AUTO_SYNC_SETTING_KEY = "provider_limits_auto_sync_last_run";
