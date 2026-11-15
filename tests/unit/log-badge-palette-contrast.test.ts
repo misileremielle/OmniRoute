@@ -260,7 +260,6 @@ test("white text on a brand fill and brand-coloured text are gone from the audit
     "src/app/(dashboard)/dashboard/providers/components/onboarding/ProviderOnboardingWizard.tsx",
     "src/app/(dashboard)/dashboard/providers/[id]/components/ProviderPageHeader.tsx",
     "src/app/(dashboard)/dashboard/settings/components/SecurityTab.tsx",
-    "src/app/(dashboard)/dashboard/batch/components/NewBatchWizard.tsx",
   ];
   for (const file of files) {
     const source = read(file);

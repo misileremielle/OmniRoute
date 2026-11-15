@@ -142,7 +142,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
   const availableEndpointCount = useMemo(() => {
     const chatCount = endpointData.chat.length > 0 ? 3 : 0; // chat + responses + messages
     const embeddingCount = endpointData.embeddings.length > 0 ? 1 : 0;
-    const utilityFixed = 3; // batch + files + list models (always available)
+    const utilityFixed = 1; // list models (always available)
     const modelUtility = endpointData.rerank.length > 0 ? 1 : 0;
     const searchCount = searchProviders.length > 0 ? 1 : 0;
     return chatCount + embeddingCount + utilityFixed + modelUtility + searchCount;
@@ -716,29 +716,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
               copied={copied}
               baseUrl={currentEndpoint}
               modelsLoading={modelsLoading}
-            />
-            <EndpointCard
-              icon="view_list"
-              iconColor="text-chart-4"
-              iconBg="bg-chart-4/10"
-              title={t("batchApi")}
-              path="/v1/batches"
-              models={null}
-              badge="OpenAI"
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
-            />
-            <EndpointCard
-              icon="folder"
-              iconColor="text-warning"
-              iconBg="bg-warning/10"
-              title={t("filesApi")}
-              path="/v1/files"
-              models={null}
-              copy={copy}
-              copied={copied}
-              baseUrl={currentEndpoint}
             />
             <EndpointCard
               icon="list"

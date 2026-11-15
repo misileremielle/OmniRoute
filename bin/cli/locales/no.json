@@ -832,59 +832,6 @@
     "context": "Serverkontekst/profil for denne kommandoen",
     "lang": "Angi CLI-visningsspråk (overstyrer OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Administrer filer (last opp, list, hent, last ned, slett)",
-    "list": {
-      "purpose": "Filtrer etter formål",
-      "limit": "Maksimalt antall resultater"
-    },
-    "get": {
-      "description": "Hent filmetadata"
-    },
-    "upload": {
-      "description": "Last opp en fil",
-      "purpose": "Filformål (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Last ned filinnhold",
-      "out": "Lagre til bane (standard: stdout)"
-    },
-    "delete": {
-      "yes": "Hopp over bekreftelse"
-    }
-  },
-  "batches": {
-    "description": "Administrer OpenAI-kompatible batchjobber",
-    "list": {
-      "status": "Filtrer etter status",
-      "limit": "Maks. antall resultater"
-    },
-    "create": {
-      "description": "Opprett en batchjobb",
-      "inputFile": "ID for inndatafil",
-      "endpoint": "Målendepunkt",
-      "window": "Fullføringsvindu",
-      "metadata": "Legg til metadata key=value"
-    },
-    "submit": {
-      "description": "Last opp JSONL-fil og opprett batch",
-      "jsonl": "Bane til JSONL-fil",
-      "endpoint": "Målendepunkt",
-      "wait": "Vent til fullføring"
-    },
-    "cancel": {
-      "yes": "Hopp over bekreftelse"
-    },
-    "wait": {
-      "timeout": "Tidsavbrudd i ms"
-    },
-    "output": {
-      "out": "Lagre utdata til bane"
-    },
-    "errors": {
-      "out": "Lagre feil til bane"
-    }
-  },
   "pricing": {
     "description": "Administrer prisdata for modeller",
     "sync": {

@@ -832,59 +832,6 @@
     "context": "سياق/ملف تعريف الخادم المستخدم في هذا الأمر",
     "lang": "تعيين لغة عرض CLI (يتجاوز OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "إدارة الملفات (رفع، عرض، الحصول، تنزيل، حذف)",
-    "list": {
-      "purpose": "التصفية حسب الغرض",
-      "limit": "الحد الأقصى للنتائج"
-    },
-    "get": {
-      "description": "الحصول على بيانات الملف الوصفية"
-    },
-    "upload": {
-      "description": "رفع ملف",
-      "purpose": "الغرض من الملف (batch، assistants، fine-tune)"
-    },
-    "content": {
-      "description": "تنزيل محتوى الملف",
-      "out": "الحفظ في مسار (الافتراضي: stdout)"
-    },
-    "delete": {
-      "yes": "تخطي التأكيد"
-    }
-  },
-  "batches": {
-    "description": "إدارة مهام الدُفعات المتوافقة مع OpenAI",
-    "list": {
-      "status": "التصفية حسب الحالة",
-      "limit": "الحد الأقصى للنتائج"
-    },
-    "create": {
-      "description": "إنشاء مهمة دُفعة",
-      "inputFile": "معرّف ملف الإدخال",
-      "endpoint": "نقطة النهاية المستهدفة",
-      "window": "مهلة الإكمال",
-      "metadata": "إضافة بيانات وصفية key=value"
-    },
-    "submit": {
-      "description": "رفع ملف JSONL وإنشاء دُفعة",
-      "jsonl": "مسار ملف JSONL",
-      "endpoint": "نقطة النهاية المستهدفة",
-      "wait": "انتظار الإكمال"
-    },
-    "cancel": {
-      "yes": "تخطي التأكيد"
-    },
-    "wait": {
-      "timeout": "المهلة بالمللي ثانية"
-    },
-    "output": {
-      "out": "حفظ المخرجات في مسار"
-    },
-    "errors": {
-      "out": "حفظ الأخطاء في مسار"
-    }
-  },
   "pricing": {
     "description": "إدارة بيانات تسعير النماذج",
     "sync": {

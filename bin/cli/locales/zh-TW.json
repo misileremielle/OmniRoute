@@ -832,59 +832,6 @@
     "context": "此命令使用的伺服器上下文/配置檔案",
     "lang": "設定 CLI 顯示語言（覆蓋 OMNIROUTE_LANG）"
   },
-  "files": {
-    "description": "管理檔案（上傳、列出、獲取、下載、刪除）",
-    "list": {
-      "purpose": "按用途篩選",
-      "limit": "最大結果數"
-    },
-    "get": {
-      "description": "獲取檔案後設資料"
-    },
-    "upload": {
-      "description": "上傳檔案",
-      "purpose": "檔案用途（batch, assistants, fine-tune）"
-    },
-    "content": {
-      "description": "下載檔案內容",
-      "out": "儲存到路徑（預設：stdout）"
-    },
-    "delete": {
-      "yes": "跳過確認"
-    }
-  },
-  "batches": {
-    "description": "管理相容 OpenAI 的批次作業",
-    "list": {
-      "status": "按狀態篩選",
-      "limit": "最大結果數"
-    },
-    "create": {
-      "description": "建立批次作業",
-      "inputFile": "輸入檔案 ID",
-      "endpoint": "目標端點",
-      "window": "完成視窗",
-      "metadata": "新增後設資料 key=value"
-    },
-    "submit": {
-      "description": "上傳 JSONL 檔案並建立批次作業",
-      "jsonl": "JSONL 檔案路徑",
-      "endpoint": "目標端點",
-      "wait": "等待完成"
-    },
-    "cancel": {
-      "yes": "跳過確認"
-    },
-    "wait": {
-      "timeout": "超時時間（毫秒）"
-    },
-    "output": {
-      "out": "將輸出儲存到路徑"
-    },
-    "errors": {
-      "out": "將錯誤儲存到路徑"
-    }
-  },
   "pricing": {
     "description": "管理模型定價資料",
     "sync": {

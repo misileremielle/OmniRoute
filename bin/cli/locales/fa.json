@@ -832,59 +832,6 @@
     "context": "زمینه/پروفایل سرور برای این دستور",
     "lang": "تنظیم زبان نمایش CLI (OMNIROUTE_LANG را نادیده می‌گیرد)"
   },
-  "files": {
-    "description": "مدیریت فایلها (بارگذاری، فهرستکردن، دریافت، دانلود، حذف)",
-    "list": {
-      "purpose": "فیلتر بر اساس کاربرد",
-      "limit": "حداکثر نتایج"
-    },
-    "get": {
-      "description": "دریافت فرادادهٔ فایل"
-    },
-    "upload": {
-      "description": "بارگذاری فایل",
-      "purpose": "هدف فایل (batch، assistants، fine-tune)"
-    },
-    "content": {
-      "description": "دانلود محتوای فایل",
-      "out": "ذخیره در مسیر (پیشفرض: stdout)"
-    },
-    "delete": {
-      "yes": "رد کردن تأیید"
-    }
-  },
-  "batches": {
-    "description": "مدیریت کارهای دستهای سازگار با OpenAI",
-    "list": {
-      "status": "فیلتر بر اساس وضعیت",
-      "limit": "حداکثر نتایج"
-    },
-    "create": {
-      "description": "ایجاد کار دستهای",
-      "inputFile": "شناسهٔ فایل ورودی",
-      "endpoint": "نقطهٔ پایانی مقصد",
-      "window": "بازهٔ تکمیل",
-      "metadata": "افزودن فراداده بهصورت key=value"
-    },
-    "submit": {
-      "description": "بارگذاری فایل JSONL و ایجاد کار دستهای",
-      "jsonl": "مسیر فایل JSONL",
-      "endpoint": "نقطهٔ پایانی مقصد",
-      "wait": "انتظار تا تکمیل"
-    },
-    "cancel": {
-      "yes": "رد کردن تأیید"
-    },
-    "wait": {
-      "timeout": "مهلت زمانی بر حسب ms"
-    },
-    "output": {
-      "out": "ذخیرهٔ خروجی در مسیر"
-    },
-    "errors": {
-      "out": "ذخیرهٔ خطاها در مسیر"
-    }
-  },
   "pricing": {
     "description": "مدیریت دادههای قیمتگذاری مدلها",
     "sync": {

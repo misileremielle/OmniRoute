@@ -832,59 +832,6 @@
     "context": "ဤ command အတွက် အသုံးပြုမည့် ဆာဗာ context/profile",
     "lang": "CLI ပြသဘာသာစကား သတ်မှတ်ရန် (OMNIROUTE_LANG ကို ထပ်ဆင့်အစားထိုးသည်)"
   },
-  "files": {
-    "description": "ဖိုင်များကို စီမံရန် (အပ်လုဒ်တင်ခြင်း၊ စာရင်းပြုစုခြင်း၊ ရယူခြင်း၊ ဒေါင်းလုဒ်လုပ်ခြင်း၊ ဖျက်ခြင်း)",
-    "list": {
-      "purpose": "ရည်ရွယ်ချက်အလိုက် စစ်ထုတ်ရန်",
-      "limit": "အများဆုံး ရလဒ်အရေအတွက်"
-    },
-    "get": {
-      "description": "ဖိုင် metadata ကို ရယူရန်"
-    },
-    "upload": {
-      "description": "ဖိုင်တစ်ခုကို အပ်လုဒ်တင်ရန်",
-      "purpose": "ဖိုင်ရည်ရွယ်ချက် (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "ဖိုင်အကြောင်းအရာကို ဒေါင်းလုဒ်လုပ်ရန်",
-      "out": "သိမ်းဆည်းမည့် path (မူလသတ်မှတ်ချက်: stdout)"
-    },
-    "delete": {
-      "yes": "အတည်ပြုချက်ကို ကျော်ရန်"
-    }
-  },
-  "batches": {
-    "description": "OpenAI နှင့် ကိုက်ညီသော batch အလုပ်များကို စီမံရန်",
-    "list": {
-      "status": "အခြေအနေအလိုက် စစ်ထုတ်ရန်",
-      "limit": "အများဆုံး ရလဒ်အရေအတွက်"
-    },
-    "create": {
-      "description": "Batch အလုပ်တစ်ခု ဖန်တီးရန်",
-      "inputFile": "ထည့်သွင်းဖိုင် ID",
-      "endpoint": "ပစ်မှတ် endpoint",
-      "window": "ပြီးစီးရမည့် အချိန်ကာလ",
-      "metadata": "Metadata key=value ထည့်ရန်"
-    },
-    "submit": {
-      "description": "JSONL ဖိုင်ကို အပ်လုဒ်တင်ပြီး batch ဖန်တီးရန်",
-      "jsonl": "JSONL ဖိုင်သို့ path",
-      "endpoint": "ပစ်မှတ် endpoint",
-      "wait": "ပြီးစီးသည်အထိ စောင့်ရန်"
-    },
-    "cancel": {
-      "yes": "အတည်ပြုချက်ကို ကျော်ရန်"
-    },
-    "wait": {
-      "timeout": "အချိန်ကုန်ဆုံးကာလကို ms ဖြင့်"
-    },
-    "output": {
-      "out": "အထွက်ကို path တွင် သိမ်းရန်"
-    },
-    "errors": {
-      "out": "အမှားများကို path တွင် သိမ်းရန်"
-    }
-  },
   "pricing": {
     "description": "မော်ဒယ်များအတွက် ဈေးနှုန်းဒေတာကို စီမံပါ",
     "sync": {

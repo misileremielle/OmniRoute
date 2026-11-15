@@ -832,59 +832,6 @@
     "context": "Contexto/perfil do servidor para este comando",
     "lang": "Definir idioma de apresentação do CLI (substitui OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Gerir ficheiros (carregar, listar, obter, transferir, eliminar)",
-    "list": {
-      "purpose": "Filtrar por finalidade",
-      "limit": "Número máximo de resultados"
-    },
-    "get": {
-      "description": "Obter metadados do ficheiro"
-    },
-    "upload": {
-      "description": "Carregar um ficheiro",
-      "purpose": "Finalidade do ficheiro (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Descarregar o conteúdo do ficheiro",
-      "out": "Guardar no caminho (predefinição: stdout)"
-    },
-    "delete": {
-      "yes": "Ignorar confirmação"
-    }
-  },
-  "batches": {
-    "description": "Gerir tarefas em lote compatíveis com OpenAI",
-    "list": {
-      "status": "Filtrar por estado",
-      "limit": "Máximo de resultados"
-    },
-    "create": {
-      "description": "Criar uma tarefa em lote",
-      "inputFile": "ID do ficheiro de entrada",
-      "endpoint": "Endpoint de destino",
-      "window": "Janela de conclusão",
-      "metadata": "Adicionar metadados chave=valor"
-    },
-    "submit": {
-      "description": "Carregar ficheiro JSONL e criar lote",
-      "jsonl": "Caminho para o ficheiro JSONL",
-      "endpoint": "Endpoint de destino",
-      "wait": "Aguardar pela conclusão"
-    },
-    "cancel": {
-      "yes": "Ignorar confirmação"
-    },
-    "wait": {
-      "timeout": "Tempo limite em ms"
-    },
-    "output": {
-      "out": "Guardar a saída no caminho"
-    },
-    "errors": {
-      "out": "Guardar os erros no caminho"
-    }
-  },
   "pricing": {
     "description": "Gerir dados de preços dos modelos",
     "sync": {

@@ -832,59 +832,6 @@
     "context": "Bu komut için sunucu bağlamı/profili",
     "lang": "CLI görüntüleme dilini ayarla (OMNIROUTE_LANG'ı geçersiz kılar)"
   },
-  "files": {
-    "description": "Dosyaları yönet (yükle, listele, getir, indir, sil)",
-    "list": {
-      "purpose": "Amaca göre filtrele",
-      "limit": "Azami sonuç sayısı"
-    },
-    "get": {
-      "description": "Dosya meta verilerini al"
-    },
-    "upload": {
-      "description": "Bir dosya yükle",
-      "purpose": "Dosya amacı (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Dosya içeriğini indir",
-      "out": "Yola kaydet (varsayılan: stdout)"
-    },
-    "delete": {
-      "yes": "Onayı atla"
-    }
-  },
-  "batches": {
-    "description": "OpenAI uyumlu toplu işleri yönet",
-    "list": {
-      "status": "Duruma göre filtrele",
-      "limit": "Maksimum sonuç sayısı"
-    },
-    "create": {
-      "description": "Bir toplu iş oluştur",
-      "inputFile": "Girdi dosyası kimliği",
-      "endpoint": "Hedef uç nokta",
-      "window": "Tamamlama aralığı",
-      "metadata": "Meta veri ekle: anahtar=değer"
-    },
-    "submit": {
-      "description": "JSONL dosyası yükle ve toplu iş oluştur",
-      "jsonl": "JSONL dosyasının yolu",
-      "endpoint": "Hedef uç nokta",
-      "wait": "Tamamlanmasını bekle"
-    },
-    "cancel": {
-      "yes": "Onayı atla"
-    },
-    "wait": {
-      "timeout": "Zaman aşımı (ms)"
-    },
-    "output": {
-      "out": "Çıktıyı yola kaydet"
-    },
-    "errors": {
-      "out": "Hataları yola kaydet"
-    }
-  },
   "pricing": {
     "description": "Modellerin fiyatlandırma verilerini yönet",
     "sync": {

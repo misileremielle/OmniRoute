@@ -112,7 +112,6 @@ const ESSENTIALS_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
 /** Hidden in Essentials sidebar but kept searchable in Command Palette. */
 export const ESSENTIALS_ADVANCED_TOOL_IDS: ReadonlySet<HideableSidebarItemId> = new Set([
   "logs",
-  "batch",
   "combos",
   "quota",
   "analytics",

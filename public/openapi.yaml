@@ -91,8 +91,6 @@ tags:
     description: Assess endpoints (generated route coverage)
   - name: Auth
     description: Auth endpoints (generated route coverage)
-  - name: Batches
-    description: Batches endpoints (generated route coverage)
   - name: Cache
     description: Cache endpoints (generated route coverage)
   - name: Chaos
@@ -119,8 +117,6 @@ tags:
     description: Docs endpoints (generated route coverage)
   - name: Evals
     description: Evals endpoints (generated route coverage)
-  - name: Files
-    description: Files endpoints (generated route coverage)
   - name: Free models
     description: Free models endpoints (generated route coverage)
   - name: Free provider rankings
@@ -197,16 +193,12 @@ tags:
     description: V1 Antigravity endpoints (generated route coverage)
   - name: V1 Auto-combo
     description: V1 Auto-combo endpoints (generated route coverage)
-  - name: V1 Batches
-    description: V1 Batches endpoints (generated route coverage)
   - name: V1 Classify
     description: V1 Classify endpoints (generated route coverage)
   - name: V1 Combos
     description: V1 Combos endpoints (generated route coverage)
   - name: V1 Completions
     description: V1 Completions endpoints (generated route coverage)
-  - name: V1 Files
-    description: V1 Files endpoints (generated route coverage)
   - name: V1 Issues
     description: V1 Issues endpoints (generated route coverage)
   - name: V1 Management
@@ -7871,22 +7863,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/batches:
-    get:
-      tags:
-        - Batches
-      summary: "GET batches"
-      responses:
-        "200":
-          description: OK
-  /api/batches/{id}:
-    get:
-      tags:
-        - Batches
-      summary: "GET batches › <id>"
-      responses:
-        "200":
-          description: OK
   /api/cache/entries:
     delete:
       tags:
@@ -8663,22 +8639,6 @@ paths:
       tags:
         - Evals
       summary: "PUT evals › suites › <suiteId>"
-      responses:
-        "200":
-          description: OK
-  /api/files:
-    get:
-      tags:
-        - Files
-      summary: "GET files"
-      responses:
-        "200":
-          description: OK
-  /api/files/{id}/content:
-    get:
-      tags:
-        - Files
-      summary: "GET files › <id> › content"
       responses:
         "200":
           description: OK
@@ -11411,52 +11371,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/v1/batches:
-    get:
-      tags:
-        - V1 Batches
-      summary: "GET batches"
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - V1 Batches
-      summary: "POST batches"
-      responses:
-        "200":
-          description: OK
-  /api/v1/batches/{id}:
-    delete:
-      tags:
-        - V1 Batches
-      summary: "DELETE batches › <id>"
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - V1 Batches
-      summary: "GET batches › <id>"
-      responses:
-        "200":
-          description: OK
-  /api/v1/batches/{id}/cancel:
-    post:
-      tags:
-        - V1 Batches
-      summary: "POST batches › <id> › cancel"
-      responses:
-        "200":
-          description: OK
-  /api/v1/batches/delete-completed:
-    delete:
-      tags:
-        - V1 Batches
-      summary: "DELETE batches › delete completed"
-      responses:
-        "200":
-          description: OK
   /api/v1/classify:
     post:
       tags:
@@ -11476,44 +11390,6 @@ paths:
             OK. When capabilities are included, each `model` step in `models[]` carries
             `supportsVision` (`true`, `false`, or `null` when no capability source knows),
             and `capabilities.multimodal` is true exactly when every member reports `true`.
-  /api/v1/files:
-    get:
-      tags:
-        - V1 Files
-      summary: "GET files"
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - V1 Files
-      summary: "POST files"
-      responses:
-        "200":
-          description: OK
-  /api/v1/files/{id}:
-    delete:
-      tags:
-        - V1 Files
-      summary: "DELETE files › <id>"
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - V1 Files
-      summary: "GET files › <id>"
-      responses:
-        "200":
-          description: OK
-  /api/v1/files/{id}/content:
-    get:
-      tags:
-        - V1 Files
-      summary: "GET files › <id> › content"
-      responses:
-        "200":
-          description: OK
   /api/v1/issues/report:
     post:
       tags:

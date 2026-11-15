@@ -832,59 +832,6 @@
     "context": "Àyíká/prófáìlì olupin láti lò fún àṣẹ yìí",
     "lang": "Ṣètò èdè àfihàn CLI (ó borí OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Ṣàkóso àwọn fáìlì (gbé sókè, ṣe àkójọ, gbà, ṣe ìgbàsílẹ̀, pa rẹ́)",
-    "list": {
-      "purpose": "Ṣàlẹ̀mọ́ gẹ́gẹ́ bí ète",
-      "limit": "Iye àbájáde tó pọ̀ jù"
-    },
-    "get": {
-      "description": "Gba metadata fáìlì"
-    },
-    "upload": {
-      "description": "Gbé fáìlì kan sókè",
-      "purpose": "Ète fáìlì (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Ṣe ìgbàsílẹ̀ àkóónú fáìlì",
-      "out": "Fi pamọ́ sí path (àìpéye: stdout)"
-    },
-    "delete": {
-      "yes": "Fò ìmúdájú"
-    }
-  },
-  "batches": {
-    "description": "Ṣàkóso àwọn iṣẹ́ batch tó bá OpenAI mu",
-    "list": {
-      "status": "Ṣàlẹ̀mọ́ gẹ́gẹ́ bí ipò",
-      "limit": "Iye àbájáde tó pọ̀ jù"
-    },
-    "create": {
-      "description": "Ṣẹ̀dá iṣẹ́ batch kan",
-      "inputFile": "ID fáìlì ìwọlé",
-      "endpoint": "Endpoint àfojúsùn",
-      "window": "Àkókò ìparí",
-      "metadata": "Ṣàfikún metadata key=value"
-    },
-    "submit": {
-      "description": "Gbé fáìlì JSONL sókè kí o sì ṣẹ̀dá batch",
-      "jsonl": "Path sí fáìlì JSONL",
-      "endpoint": "Endpoint àfojúsùn",
-      "wait": "Dúró de ìparí"
-    },
-    "cancel": {
-      "yes": "Fò ìmúdájú"
-    },
-    "wait": {
-      "timeout": "Àkókò ìparí ní ms"
-    },
-    "output": {
-      "out": "Fi àbájáde pamọ́ sí path"
-    },
-    "errors": {
-      "out": "Fi àwọn àṣìṣe pamọ́ sí path"
-    }
-  },
   "pricing": {
     "description": "Ṣàkóso dátà iye owó fún àwọn model",
     "sync": {

@@ -124,7 +124,6 @@ Main pages under `src/app/(dashboard)/dashboard/`:
 - `/dashboard/analytics` — usage analytics, evaluations, combo target health
 - `/dashboard/limits` — quota/rate controls
 - `/dashboard/cli-code` — CLI onboarding, runtime detection, config generation
-- `/dashboard/batch` — batch job submission and progress
 - `/dashboard/cache` — read-through and reasoning cache statistics, eviction controls
 - `/dashboard/onboarding` — first-run setup wizard for new installations
 - `/dashboard/search-tools` — search provider testing and history

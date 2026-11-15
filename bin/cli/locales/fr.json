@@ -832,59 +832,6 @@
     "context": "Contexte/profil du serveur pour cette commande",
     "lang": "Définir la langue d'affichage du CLI (remplace OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Gérer les fichiers (téléverser, lister, obtenir, télécharger, supprimer)",
-    "list": {
-      "purpose": "Filtrer par finalité",
-      "limit": "Nombre maximal de résultats"
-    },
-    "get": {
-      "description": "Obtenir les métadonnées du fichier"
-    },
-    "upload": {
-      "description": "Téléverser un fichier",
-      "purpose": "Usage du fichier (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Télécharger le contenu du fichier",
-      "out": "Enregistrer dans le chemin (par défaut : stdout)"
-    },
-    "delete": {
-      "yes": "Ignorer la confirmation"
-    }
-  },
-  "batches": {
-    "description": "Gérer les tâches batch compatibles avec OpenAI",
-    "list": {
-      "status": "Filtrer par statut",
-      "limit": "Nombre maximal de résultats"
-    },
-    "create": {
-      "description": "Créer une tâche batch",
-      "inputFile": "ID du fichier d’entrée",
-      "endpoint": "Point de terminaison cible",
-      "window": "Fenêtre d’exécution",
-      "metadata": "Ajouter une métadonnée key=value"
-    },
-    "submit": {
-      "description": "Téléverser un fichier JSONL et créer un batch",
-      "jsonl": "Chemin vers le fichier JSONL",
-      "endpoint": "Point de terminaison cible",
-      "wait": "Attendre la fin de l’exécution"
-    },
-    "cancel": {
-      "yes": "Ignorer la confirmation"
-    },
-    "wait": {
-      "timeout": "Délai d’expiration en ms"
-    },
-    "output": {
-      "out": "Enregistrer la sortie dans le chemin"
-    },
-    "errors": {
-      "out": "Enregistrer les erreurs dans le chemin"
-    }
-  },
   "pricing": {
     "description": "Gérer les données tarifaires des modèles",
     "sync": {

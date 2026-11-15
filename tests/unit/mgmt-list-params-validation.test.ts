@@ -7,8 +7,7 @@ import { SignJWT } from "jose";
 
 // The list routes of the dashboard and the management API parsed `?limit=`, `?offset=` and `?page=` with a bare
 // `Number` or `Number.parseInt`. `?limit=abc` reached the SQLite `LIMIT ?` bind as NaN ("datatype mismatch") and
-// came back as a 500 (or threw out of the handler). The `/v1/batches` and `/v1/files` siblings already answer a
-// bad `limit` with a 400; these routes now do the same, through one helper.
+// came back as a 500 (or threw out of the handler). These routes answer a bad `limit` with a 400, through one helper.
 
 const dataDir = mkdtempSync(join(tmpdir(), "omniroute-mgmt-list-params-"));
 process.env.DATA_DIR = dataDir;
@@ -39,20 +38,6 @@ const routes: Array<{
   auth: "key" | "session";
   params: Array<{ name: string; valid: string }>;
 }> = [
-  {
-    name: "/api/batches",
-    path: "/api/batches",
-    load: () => import("../../src/app/api/batches/route.ts"),
-    auth: "key",
-    params: [{ name: "limit", valid: "5" }],
-  },
-  {
-    name: "/api/files",
-    path: "/api/files",
-    load: () => import("../../src/app/api/files/route.ts"),
-    auth: "key",
-    params: [{ name: "limit", valid: "5" }],
-  },
   {
     name: "/api/logs/detail",
     path: "/api/logs/detail",

@@ -75,7 +75,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   "api-manager": "apiManagerDescription",
   providers: "providerDescription",
   combos: "comboDescription",
-  batch: "batchDescription",
   costs: "costsDescription",
   "costs-teams": "teamsDescription",
   analytics: "analyticsDescription",
@@ -95,8 +94,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   // Protocols
   "api-endpoints": "apiEndpointsDescription",
   // Agents & AI sub-pages
-  "batch-files": "batchFilesDescription",
-  // Analytics sub-pages
   "analytics-evals": "analyticsEvalsDescription",
   "analytics-search": "analyticsSearchDescription",
   "analytics-utilization": "analyticsUtilizationDescription",

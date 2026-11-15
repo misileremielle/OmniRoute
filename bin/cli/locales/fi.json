@@ -832,59 +832,6 @@
     "context": "Palvelimen konteksti/profiili tälle komennolle",
     "lang": "Aseta CLI-näyttökieli (ohittaa OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Hallitse tiedostoja (lähetä, listaa, hae, lataa, poista)",
-    "list": {
-      "purpose": "Suodata käyttötarkoituksen perusteella",
-      "limit": "Tulosten enimmäismäärä"
-    },
-    "get": {
-      "description": "Hae tiedoston metatiedot"
-    },
-    "upload": {
-      "description": "Lataa tiedosto palveluun",
-      "purpose": "Tiedoston käyttötarkoitus (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Lataa tiedoston sisältö",
-      "out": "Tallenna polkuun (oletus: stdout)"
-    },
-    "delete": {
-      "yes": "Ohita vahvistus"
-    }
-  },
-  "batches": {
-    "description": "Hallitse OpenAI-yhteensopivia erätöitä",
-    "list": {
-      "status": "Suodata tilan mukaan",
-      "limit": "Tulosten enimmäismäärä"
-    },
-    "create": {
-      "description": "Luo erätyö",
-      "inputFile": "Syötetiedoston tunnus",
-      "endpoint": "Kohdepäätepiste",
-      "window": "Valmistumisaikaikkuna",
-      "metadata": "Lisää metatieto avain=arvo"
-    },
-    "submit": {
-      "description": "Lataa JSONL-tiedosto palveluun ja luo erätyö",
-      "jsonl": "JSONL-tiedoston polku",
-      "endpoint": "Kohdepäätepiste",
-      "wait": "Odota valmistumista"
-    },
-    "cancel": {
-      "yes": "Ohita vahvistus"
-    },
-    "wait": {
-      "timeout": "Aikakatkaisu millisekunteina"
-    },
-    "output": {
-      "out": "Tallenna tuloste polkuun"
-    },
-    "errors": {
-      "out": "Tallenna virheet polkuun"
-    }
-  },
   "pricing": {
     "description": "Hallitse mallien hintatietoja",
     "sync": {

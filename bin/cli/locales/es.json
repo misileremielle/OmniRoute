@@ -832,59 +832,6 @@
     "context": "Contexto/perfil del servidor para este comando",
     "lang": "Establecer idioma del CLI (reemplaza OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Gestionar archivos (subir, listar, obtener, descargar y eliminar)",
-    "list": {
-      "purpose": "Filtrar por propósito",
-      "limit": "Máximo de resultados"
-    },
-    "get": {
-      "description": "Obtener metadatos del archivo"
-    },
-    "upload": {
-      "description": "Subir un archivo",
-      "purpose": "Propósito del archivo (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Descargar el contenido del archivo",
-      "out": "Guardar en la ruta (predeterminado: stdout)"
-    },
-    "delete": {
-      "yes": "Omitir confirmación"
-    }
-  },
-  "batches": {
-    "description": "Gestionar trabajos por lotes compatibles con OpenAI",
-    "list": {
-      "status": "Filtrar por estado",
-      "limit": "Máximo de resultados"
-    },
-    "create": {
-      "description": "Crear un trabajo por lotes",
-      "inputFile": "ID del archivo de entrada",
-      "endpoint": "Endpoint de destino",
-      "window": "Ventana de finalización",
-      "metadata": "Añadir metadatos clave=valor"
-    },
-    "submit": {
-      "description": "Subir un archivo JSONL y crear un lote",
-      "jsonl": "Ruta al archivo JSONL",
-      "endpoint": "Endpoint de destino",
-      "wait": "Esperar a que finalice"
-    },
-    "cancel": {
-      "yes": "Omitir confirmación"
-    },
-    "wait": {
-      "timeout": "Tiempo de espera en ms"
-    },
-    "output": {
-      "out": "Guardar la salida en la ruta"
-    },
-    "errors": {
-      "out": "Guardar los errores en la ruta"
-    }
-  },
   "pricing": {
     "description": "Gestionar datos de precios de los modelos",
     "sync": {

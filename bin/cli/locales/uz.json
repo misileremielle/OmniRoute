@@ -832,59 +832,6 @@
     "context": "Ushbu buyruq uchun ishlatiladigan server konteksti/profili",
     "lang": "CLI interfeysi tilini belgilash (OMNIROUTE_LANG qiymatini bekor qiladi)"
   },
-  "files": {
-    "description": "Fayllarni boshqarish (yuklash, ro‘yxatlash, olish, yuklab olish, o‘chirish)",
-    "list": {
-      "purpose": "Maqsad bo‘yicha filtrlash",
-      "limit": "Maksimal natijalar soni"
-    },
-    "get": {
-      "description": "Fayl metama’lumotlarini olish"
-    },
-    "upload": {
-      "description": "Fayl yuklash",
-      "purpose": "Fayl maqsadi (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Fayl tarkibini yuklab olish",
-      "out": "Yo‘lga saqlash (standart: stdout)"
-    },
-    "delete": {
-      "yes": "Tasdiqlashni o‘tkazib yuborish"
-    }
-  },
-  "batches": {
-    "description": "OpenAI bilan mos paketli vazifalarni boshqarish",
-    "list": {
-      "status": "Holat bo‘yicha filtrlash",
-      "limit": "Maksimal natijalar soni"
-    },
-    "create": {
-      "description": "Paketli vazifa yaratish",
-      "inputFile": "Kirish fayli IDsi",
-      "endpoint": "Maqsadli endpoint",
-      "window": "Yakunlash muddati",
-      "metadata": "key=value metama’lumotini qo‘shish"
-    },
-    "submit": {
-      "description": "JSONL faylini yuklash va paket yaratish",
-      "jsonl": "JSONL fayliga yo‘l",
-      "endpoint": "Maqsadli endpoint",
-      "wait": "Yakunlanishini kutish"
-    },
-    "cancel": {
-      "yes": "Tasdiqlashni o‘tkazib yuborish"
-    },
-    "wait": {
-      "timeout": "Kutish vaqti, ms"
-    },
-    "output": {
-      "out": "Natijani ko‘rsatilgan yo‘lga saqlash"
-    },
-    "errors": {
-      "out": "Xatolarni ko‘rsatilgan yo‘lga saqlash"
-    }
-  },
   "pricing": {
     "description": "Modellar uchun narx maʼlumotlarini boshqarish",
     "sync": {

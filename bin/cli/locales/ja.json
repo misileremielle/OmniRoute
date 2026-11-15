@@ -832,59 +832,6 @@
     "context": "このコマンドで使用するサーバーコンテキスト/プロファイル",
     "lang": "CLI表示言語を設定（OMNIROUTE_LANGを上書き）"
   },
-  "files": {
-    "description": "ファイルを管理（アップロード、一覧表示、取得、ダウンロード、削除）",
-    "list": {
-      "purpose": "用途でフィルタリング",
-      "limit": "最大結果数"
-    },
-    "get": {
-      "description": "ファイルのメタデータを取得"
-    },
-    "upload": {
-      "description": "ファイルをアップロード",
-      "purpose": "ファイルの用途（batch、assistants、fine-tune）"
-    },
-    "content": {
-      "description": "ファイルの内容をダウンロード",
-      "out": "保存先のパス（デフォルト: stdout）"
-    },
-    "delete": {
-      "yes": "確認をスキップ"
-    }
-  },
-  "batches": {
-    "description": "OpenAI互換のバッチジョブを管理",
-    "list": {
-      "status": "ステータスで絞り込む",
-      "limit": "最大結果数"
-    },
-    "create": {
-      "description": "バッチジョブを作成",
-      "inputFile": "入力ファイルID",
-      "endpoint": "ターゲットエンドポイント",
-      "window": "完了までの時間枠",
-      "metadata": "メタデータをkey=value形式で追加"
-    },
-    "submit": {
-      "description": "JSONLファイルをアップロードしてバッチを作成",
-      "jsonl": "JSONLファイルへのパス",
-      "endpoint": "ターゲットエンドポイント",
-      "wait": "完了まで待機"
-    },
-    "cancel": {
-      "yes": "確認をスキップ"
-    },
-    "wait": {
-      "timeout": "タイムアウト（ミリ秒）"
-    },
-    "output": {
-      "out": "出力の保存先パス"
-    },
-    "errors": {
-      "out": "エラーの保存先パス"
-    }
-  },
   "pricing": {
     "description": "モデルの料金データを管理",
     "sync": {

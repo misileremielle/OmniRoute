@@ -832,59 +832,6 @@
     "context": "Muktadha/wasifu wa seva wa kutumia kwa amri hii",
     "lang": "Weka lugha ya kuonyesha ya CLI (inabatilisha OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Dhibiti faili (pakia, orodhesha, pata, pakua, futa)",
-    "list": {
-      "purpose": "Chuja kulingana na kusudi",
-      "limit": "Idadi ya juu ya matokeo"
-    },
-    "get": {
-      "description": "Pata metadata ya faili"
-    },
-    "upload": {
-      "description": "Pakia faili",
-      "purpose": "Kusudi la faili (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Pakua maudhui ya faili",
-      "out": "Hifadhi kwenye njia (chaguomsingi: stdout)"
-    },
-    "delete": {
-      "yes": "Ruka uthibitisho"
-    }
-  },
-  "batches": {
-    "description": "Dhibiti kazi za batch zinazooana na OpenAI",
-    "list": {
-      "status": "Chuja kulingana na hali",
-      "limit": "Idadi ya juu ya matokeo"
-    },
-    "create": {
-      "description": "Unda kazi ya batch",
-      "inputFile": "Kitambulisho cha faili ya ingizo",
-      "endpoint": "Endpoint lengwa",
-      "window": "Kipindi cha ukamilishaji",
-      "metadata": "Ongeza metadata key=value"
-    },
-    "submit": {
-      "description": "Pakia faili ya JSONL na uunde batch",
-      "jsonl": "Njia ya faili ya JSONL",
-      "endpoint": "Endpoint lengwa",
-      "wait": "Subiri hadi ikamilike"
-    },
-    "cancel": {
-      "yes": "Ruka uthibitishaji"
-    },
-    "wait": {
-      "timeout": "Muda wa kusubiri kwa ms"
-    },
-    "output": {
-      "out": "Hifadhi matokeo kwenye njia"
-    },
-    "errors": {
-      "out": "Hifadhi hitilafu kwenye njia"
-    }
-  },
   "pricing": {
     "description": "Dhibiti data ya bei za modeli",
     "sync": {

@@ -832,59 +832,6 @@
     "context": "이 명령에 사용할 서버 컨텍스트/프로필",
     "lang": "CLI 표시 언어 설정 (OMNIROUTE_LANG 재정의)"
   },
-  "files": {
-    "description": "파일 관리(업로드, 목록 보기, 가져오기, 다운로드, 삭제)",
-    "list": {
-      "purpose": "용도별 필터링",
-      "limit": "최대 결과 수"
-    },
-    "get": {
-      "description": "파일 메타데이터 가져오기"
-    },
-    "upload": {
-      "description": "파일 업로드",
-      "purpose": "파일 용도 (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "파일 콘텐츠 다운로드",
-      "out": "저장 경로 (기본값: stdout)"
-    },
-    "delete": {
-      "yes": "확인 건너뛰기"
-    }
-  },
-  "batches": {
-    "description": "OpenAI 호환 배치 작업 관리",
-    "list": {
-      "status": "상태별 필터링",
-      "limit": "최대 결과 수"
-    },
-    "create": {
-      "description": "배치 작업 생성",
-      "inputFile": "입력 파일 ID",
-      "endpoint": "대상 엔드포인트",
-      "window": "완료 기간",
-      "metadata": "메타데이터 key=value 추가"
-    },
-    "submit": {
-      "description": "JSONL 파일 업로드 및 배치 생성",
-      "jsonl": "JSONL 파일 경로",
-      "endpoint": "대상 엔드포인트",
-      "wait": "완료될 때까지 대기"
-    },
-    "cancel": {
-      "yes": "확인 건너뛰기"
-    },
-    "wait": {
-      "timeout": "제한 시간(ms)"
-    },
-    "output": {
-      "out": "출력 저장 경로"
-    },
-    "errors": {
-      "out": "오류 저장 경로"
-    }
-  },
   "pricing": {
     "description": "모델 가격 데이터 관리",
     "sync": {

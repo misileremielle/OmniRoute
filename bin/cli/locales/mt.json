@@ -832,59 +832,6 @@
     "context": "Kuntest/profil tas-server biex jintuża għal din il-kmand",
     "lang": "Issettja l-lingwa tal-wiri tal-CLI (jissostitwixxi OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Immaniġġja l-fajls (ittella', elenka, ġib, niżżel, ħassar)",
-    "list": {
-      "purpose": "Iffiltra skont l-iskop",
-      "limit": "Massimu ta' riżultati"
-    },
-    "get": {
-      "description": "Ġib il-metadata tal-fajl"
-    },
-    "upload": {
-      "description": "Ittella' fajl",
-      "purpose": "Skop tal-fajl (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Niżżel il-kontenut tal-fajl",
-      "out": "Issejvja f'path (default: stdout)"
-    },
-    "delete": {
-      "yes": "Aqbeż il-konferma"
-    }
-  },
-  "batches": {
-    "description": "Immaniġġja xogħlijiet batch kompatibbli mal-OpenAI",
-    "list": {
-      "status": "Iffiltra skont l-istatus",
-      "limit": "Massimu ta' riżultati"
-    },
-    "create": {
-      "description": "Oħloq xogħol batch",
-      "inputFile": "ID tal-fajl tal-input",
-      "endpoint": "Endpoint fil-mira",
-      "window": "Tieqa ta' tlestija",
-      "metadata": "Żid metadata key=value"
-    },
-    "submit": {
-      "description": "Ittella' fajl JSONL u oħloq batch",
-      "jsonl": "Path tal-fajl JSONL",
-      "endpoint": "Endpoint fil-mira",
-      "wait": "Stenna għat-tlestija"
-    },
-    "cancel": {
-      "yes": "Aqbeż il-konferma"
-    },
-    "wait": {
-      "timeout": "Timeout f'ms"
-    },
-    "output": {
-      "out": "Issejvja l-output f'path"
-    },
-    "errors": {
-      "out": "Issejvja l-iżbalji f'path"
-    }
-  },
   "pricing": {
     "description": "Immaniġġa d-data tal-prezzijiet għall-mudelli",
     "sync": {

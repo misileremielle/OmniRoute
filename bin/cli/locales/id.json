@@ -832,59 +832,6 @@
     "context": "Konteks/profil server untuk perintah ini",
     "lang": "Atur bahasa tampilan CLI (menggantikan OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Kelola file (unggah, cantumkan, dapatkan, unduh, hapus)",
-    "list": {
-      "purpose": "Filter berdasarkan tujuan",
-      "limit": "Hasil maksimum"
-    },
-    "get": {
-      "description": "Dapatkan metadata file"
-    },
-    "upload": {
-      "description": "Unggah file",
-      "purpose": "Tujuan file (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Unduh konten file",
-      "out": "Simpan ke path (default: stdout)"
-    },
-    "delete": {
-      "yes": "Lewati konfirmasi"
-    }
-  },
-  "batches": {
-    "description": "Kelola tugas batch yang kompatibel dengan OpenAI",
-    "list": {
-      "status": "Filter berdasarkan status",
-      "limit": "Hasil maksimum"
-    },
-    "create": {
-      "description": "Buat tugas batch",
-      "inputFile": "ID file input",
-      "endpoint": "Endpoint target",
-      "window": "Jangka waktu penyelesaian",
-      "metadata": "Tambahkan metadata key=value"
-    },
-    "submit": {
-      "description": "Unggah file JSONL dan buat batch",
-      "jsonl": "Path ke file JSONL",
-      "endpoint": "Endpoint target",
-      "wait": "Tunggu hingga selesai"
-    },
-    "cancel": {
-      "yes": "Lewati konfirmasi"
-    },
-    "wait": {
-      "timeout": "Batas waktu dalam ms"
-    },
-    "output": {
-      "out": "Simpan output ke path"
-    },
-    "errors": {
-      "out": "Simpan kesalahan ke path"
-    }
-  },
   "pricing": {
     "description": "Kelola data harga untuk model",
     "sync": {

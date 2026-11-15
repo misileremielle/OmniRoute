@@ -832,59 +832,6 @@
     "context": "Kontekst/profil strežnika, uporabljen za ta ukaz",
     "lang": "Nastavi jezik prikaza CLI (preglasi OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Upravljaj datoteke (nalaganje, seznam, pridobivanje, prenos, brisanje)",
-    "list": {
-      "purpose": "Filtriraj po namenu",
-      "limit": "Največje število rezultatov"
-    },
-    "get": {
-      "description": "Pridobi metapodatke datoteke"
-    },
-    "upload": {
-      "description": "Naloži datoteko",
-      "purpose": "Namen datoteke (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Prenesi vsebino datoteke",
-      "out": "Shrani na pot (privzeto: stdout)"
-    },
-    "delete": {
-      "yes": "Preskoči potrditev"
-    }
-  },
-  "batches": {
-    "description": "Upravljaj paketna opravila, združljiva z OpenAI",
-    "list": {
-      "status": "Filtriraj po stanju",
-      "limit": "Največje število rezultatov"
-    },
-    "create": {
-      "description": "Ustvari paketno opravilo",
-      "inputFile": "ID vhodne datoteke",
-      "endpoint": "Ciljna končna točka",
-      "window": "Časovno okno za dokončanje",
-      "metadata": "Dodaj metapodatke ključ=vrednost"
-    },
-    "submit": {
-      "description": "Naloži datoteko JSONL in ustvari paket",
-      "jsonl": "Pot do datoteke JSONL",
-      "endpoint": "Ciljna končna točka",
-      "wait": "Počakaj na dokončanje"
-    },
-    "cancel": {
-      "yes": "Preskoči potrditev"
-    },
-    "wait": {
-      "timeout": "Časovna omejitev v ms"
-    },
-    "output": {
-      "out": "Shrani izpis na pot"
-    },
-    "errors": {
-      "out": "Shrani napake na pot"
-    }
-  },
   "pricing": {
     "description": "Upravljaj podatke o cenah modelov",
     "sync": {

@@ -832,59 +832,6 @@
     "context": "Context/profile ng server na gagamitin para sa command na ito",
     "lang": "Itakda ang wika ng display ng CLI (ino-override ang OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Pamahalaan ang mga file (upload, ilista, kunin, i-download, tanggalin)",
-    "list": {
-      "purpose": "I-filter ayon sa layunin",
-      "limit": "Pinakamaraming resulta"
-    },
-    "get": {
-      "description": "Kunin ang metadata ng file"
-    },
-    "upload": {
-      "description": "Mag-upload ng file",
-      "purpose": "Layunin ng file (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "I-download ang nilalaman ng file",
-      "out": "I-save sa path (default: stdout)"
-    },
-    "delete": {
-      "yes": "Laktawan ang kumpirmasyon"
-    }
-  },
-  "batches": {
-    "description": "Pamahalaan ang mga OpenAI-compatible na batch job",
-    "list": {
-      "status": "I-filter ayon sa status",
-      "limit": "Pinakamaraming resulta"
-    },
-    "create": {
-      "description": "Gumawa ng batch job",
-      "inputFile": "ID ng input file",
-      "endpoint": "Target na endpoint",
-      "window": "Palugit sa pagkumpleto",
-      "metadata": "Magdagdag ng metadata na key=value"
-    },
-    "submit": {
-      "description": "Mag-upload ng JSONL file at gumawa ng batch",
-      "jsonl": "Path patungo sa JSONL file",
-      "endpoint": "Target na endpoint",
-      "wait": "Hintayin ang pagkumpleto"
-    },
-    "cancel": {
-      "yes": "Laktawan ang kumpirmasyon"
-    },
-    "wait": {
-      "timeout": "Timeout sa ms"
-    },
-    "output": {
-      "out": "I-save ang output sa path"
-    },
-    "errors": {
-      "out": "I-save ang mga error sa path"
-    }
-  },
   "pricing": {
     "description": "Pamahalaan ang datos ng pagpepresyo para sa mga modelo",
     "sync": {

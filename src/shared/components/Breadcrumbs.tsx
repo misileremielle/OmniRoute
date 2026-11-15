@@ -64,8 +64,6 @@ const PATH_LABELS = {
   utilization: "utilization",
   "api-endpoints": "apiEndpoints",
   audit: "audit",
-  batch: "batch",
-  files: "files",
   cache: "cache",
   live: "live",
   studio: "studio",

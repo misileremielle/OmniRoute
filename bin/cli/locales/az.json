@@ -832,59 +832,6 @@
     "context": "Bu əmr üçün server konteksti/profili",
     "lang": "CLI ekran dilini təyin edin (OMNIROUTE_LANG-ı keçir)"
   },
-  "files": {
-    "description": "Faylları idarə et (yüklə, siyahıya al, əldə et, endir, sil)",
-    "list": {
-      "purpose": "Təyinata görə filtrlə",
-      "limit": "Maksimum nəticə sayı"
-    },
-    "get": {
-      "description": "Fayl metadatasını əldə edin"
-    },
-    "upload": {
-      "description": "Fayl yükləyin",
-      "purpose": "Faylın təyinatı (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Fayl məzmununu endirin",
-      "out": "Yaddaş yolu (standart: stdout)"
-    },
-    "delete": {
-      "yes": "Təsdiqi keçin"
-    }
-  },
-  "batches": {
-    "description": "OpenAI-uyğun paket tapşırıqlarını idarə edin",
-    "list": {
-      "status": "Statusa görə filtrləyin",
-      "limit": "Maksimum nəticə sayı"
-    },
-    "create": {
-      "description": "Paket tapşırığı yaradın",
-      "inputFile": "Giriş faylının ID-si",
-      "endpoint": "Hədəf son nöqtə",
-      "window": "Tamamlanma müddəti",
-      "metadata": "Metadata əlavə edin: key=value"
-    },
-    "submit": {
-      "description": "JSONL faylını yükləyib paket yaradın",
-      "jsonl": "JSONL faylının yolu",
-      "endpoint": "Hədəf son nöqtə",
-      "wait": "Tamamlanmasını gözləyin"
-    },
-    "cancel": {
-      "yes": "Təsdiqi keçin"
-    },
-    "wait": {
-      "timeout": "Taymaut, ms ilə"
-    },
-    "output": {
-      "out": "Çıxışı göstərilən yolda yadda saxlayın"
-    },
-    "errors": {
-      "out": "Xətaları göstərilən yolda yadda saxlayın"
-    }
-  },
   "pricing": {
     "description": "Modellər üçün qiymət məlumatlarını idarə edin",
     "sync": {

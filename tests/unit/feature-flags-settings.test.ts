@@ -73,7 +73,8 @@ const {
 // Removing the web-cookie providers drops LMARENA_SYNTHESIZED_CX_ENABLED (-1): 116.
 // Removing the MCP server drops OMNIROUTE_MCP_ENFORCE_SCOPES and
 // OMNIROUTE_MCP_COMPRESS_DESCRIPTIONS (-2): 114.
-const EXPECTED_FEATURE_FLAG_COUNT = 114;
+// Removing the Batch API drops BATCH_AND_FILE_AUTO_CLEANUP_ENABLED (-1): 113.
+const EXPECTED_FEATURE_FLAG_COUNT = 113;
 // tool_call wrapper repair, default on) to 86; OPENCODE_V2_CLIENT_FINGERPRINT_ENABLED
 // (#16571, OpenCode v2 client fingerprint, default off) to 87.
 // tool_call wrapper repair, default on) to 86; CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED

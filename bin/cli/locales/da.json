@@ -832,59 +832,6 @@
     "context": "Server-kontekst/profil til denne kommando",
     "lang": "Angiv CLI-visningssprog (tilsidesætter OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Administrer filer (upload, vis, hent, download, slet)",
-    "list": {
-      "purpose": "Filtrer efter formål",
-      "limit": "Maksimalt antal resultater"
-    },
-    "get": {
-      "description": "Hent filmetadata"
-    },
-    "upload": {
-      "description": "Upload en fil",
-      "purpose": "Filformål (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Download filindhold",
-      "out": "Gem til sti (standard: stdout)"
-    },
-    "delete": {
-      "yes": "Spring bekræftelse over"
-    }
-  },
-  "batches": {
-    "description": "Administrer OpenAI-kompatible batchjob",
-    "list": {
-      "status": "Filtrer efter status",
-      "limit": "Maks. antal resultater"
-    },
-    "create": {
-      "description": "Opret et batchjob",
-      "inputFile": "Inputfil-id",
-      "endpoint": "Målslutpunkt",
-      "window": "Fuldførelsesvindue",
-      "metadata": "Tilføj metadata key=value"
-    },
-    "submit": {
-      "description": "Upload JSONL-fil, og opret batch",
-      "jsonl": "Sti til JSONL-fil",
-      "endpoint": "Målslutpunkt",
-      "wait": "Vent på fuldførelse"
-    },
-    "cancel": {
-      "yes": "Spring bekræftelse over"
-    },
-    "wait": {
-      "timeout": "Timeout i ms"
-    },
-    "output": {
-      "out": "Gem output på sti"
-    },
-    "errors": {
-      "out": "Gem fejl på sti"
-    }
-  },
   "pricing": {
     "description": "Administrer prisdata for modeller",
     "sync": {

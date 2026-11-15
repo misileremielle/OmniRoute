@@ -832,59 +832,6 @@
     "context": "ለዚህ ትዕዛዝ የሚያገለግል የአገልጋይ ዐውድ/መገለጫ",
     "lang": "የCLI ማሳያ ቋንቋን አዘጋጅ (OMNIROUTE_LANGን ይሽራል)"
   },
-  "files": {
-    "description": "ፋይሎችን አስተዳድር (ስቀል፣ ዘርዝር፣ አግኝ፣ አውርድ፣ ሰርዝ)",
-    "list": {
-      "purpose": "በዓላማ አጣራ",
-      "limit": "ከፍተኛው የውጤቶች ብዛት"
-    },
-    "get": {
-      "description": "የፋይል ሜታዳታን አግኝ"
-    },
-    "upload": {
-      "description": "ፋይል ስቀል",
-      "purpose": "የፋይል ዓላማ (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "የፋይል ይዘትን አውርድ",
-      "out": "ወደ ዱካ አስቀምጥ (ነባሪ፦ stdout)"
-    },
-    "delete": {
-      "yes": "ማረጋገጫን ዝለል"
-    }
-  },
-  "batches": {
-    "description": "ከOpenAI ጋር ተኳሃኝ የቡድን ሥራዎችን አስተዳድር",
-    "list": {
-      "status": "በሁኔታ አጣራ",
-      "limit": "ከፍተኛው የውጤቶች ብዛት"
-    },
-    "create": {
-      "description": "የቡድን ሥራ ፍጠር",
-      "inputFile": "የግቤት ፋይል ID",
-      "endpoint": "የታለመ endpoint",
-      "window": "የማጠናቀቂያ ጊዜ መስኮት",
-      "metadata": "ሜታዳታ key=value አክል"
-    },
-    "submit": {
-      "description": "JSONL ፋይል ስቀልና የቡድን ሥራ ፍጠር",
-      "jsonl": "ወደ JSONL ፋይል የሚወስድ ዱካ",
-      "endpoint": "የታለመ endpoint",
-      "wait": "እስኪጠናቀቅ ጠብቅ"
-    },
-    "cancel": {
-      "yes": "ማረጋገጫን ዝለል"
-    },
-    "wait": {
-      "timeout": "የጊዜ ገደብ በms"
-    },
-    "output": {
-      "out": "ውጤቱን ወደ ዱካ አስቀምጥ"
-    },
-    "errors": {
-      "out": "ስህተቶችን ወደ ዱካ አስቀምጥ"
-    }
-  },
   "pricing": {
     "description": "የሞዴሎችን የዋጋ መረጃ አስተዳድር",
     "sync": {

@@ -832,59 +832,6 @@
     "context": "此命令使用的服务器上下文/配置文件",
     "lang": "设置 CLI 显示语言（覆盖 OMNIROUTE_LANG）"
   },
-  "files": {
-    "description": "管理文件（上传、列出、获取、下载、删除）",
-    "list": {
-      "purpose": "按用途筛选",
-      "limit": "最大结果数"
-    },
-    "get": {
-      "description": "获取文件元数据"
-    },
-    "upload": {
-      "description": "上传文件",
-      "purpose": "文件用途（batch, assistants, fine-tune）"
-    },
-    "content": {
-      "description": "下载文件内容",
-      "out": "保存到路径（默认：stdout）"
-    },
-    "delete": {
-      "yes": "跳过确认"
-    }
-  },
-  "batches": {
-    "description": "管理兼容 OpenAI 的批量作业",
-    "list": {
-      "status": "按状态筛选",
-      "limit": "最大结果数"
-    },
-    "create": {
-      "description": "创建批量作业",
-      "inputFile": "输入文件 ID",
-      "endpoint": "目标端点",
-      "window": "完成窗口",
-      "metadata": "添加元数据 key=value"
-    },
-    "submit": {
-      "description": "上传 JSONL 文件并创建批量作业",
-      "jsonl": "JSONL 文件路径",
-      "endpoint": "目标端点",
-      "wait": "等待完成"
-    },
-    "cancel": {
-      "yes": "跳过确认"
-    },
-    "wait": {
-      "timeout": "超时时间（毫秒）"
-    },
-    "output": {
-      "out": "将输出保存到路径"
-    },
-    "errors": {
-      "out": "将错误保存到路径"
-    }
-  },
   "pricing": {
     "description": "管理模型定价数据",
     "sync": {

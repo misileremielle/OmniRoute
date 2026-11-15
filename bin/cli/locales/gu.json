@@ -832,59 +832,6 @@
     "context": "આ કમાન્ડ માટે ઉપયોગ કરવાનો સર્વર કોન્ટેક્સ્ટ/પ્રોફાઇલ",
     "lang": "CLI ડિસ્પ્લેની ભાષા સેટ કરો (OMNIROUTE_LANGને ઓવરરાઇડ કરે છે)"
   },
-  "files": {
-    "description": "ફાઇલો મેનેજ કરો (અપલોડ, સૂચિ, મેળવો, ડાઉનલોડ, કાઢી નાખો)",
-    "list": {
-      "purpose": "હેતુ પ્રમાણે ફિલ્ટર કરો",
-      "limit": "મહત્તમ પરિણામો"
-    },
-    "get": {
-      "description": "ફાઇલ મેટાડેટા મેળવો"
-    },
-    "upload": {
-      "description": "ફાઇલ અપલોડ કરો",
-      "purpose": "ફાઇલનો હેતુ (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "ફાઇલની સામગ્રી ડાઉનલોડ કરો",
-      "out": "પાથ પર સાચવો (ડિફૉલ્ટ: stdout)"
-    },
-    "delete": {
-      "yes": "પુષ્ટિકરણ અવગણો"
-    }
-  },
-  "batches": {
-    "description": "OpenAI-સુસંગત batch જોબ્સ મેનેજ કરો",
-    "list": {
-      "status": "સ્થિતિ પ્રમાણે ફિલ્ટર કરો",
-      "limit": "મહત્તમ પરિણામો"
-    },
-    "create": {
-      "description": "batch જોબ બનાવો",
-      "inputFile": "ઇનપુટ ફાઇલ ID",
-      "endpoint": "લક્ષ્ય endpoint",
-      "window": "પૂર્ણતાની સમયમર્યાદા",
-      "metadata": "મેટાડેટા key=value ઉમેરો"
-    },
-    "submit": {
-      "description": "JSONL ફાઇલ અપલોડ કરીને batch બનાવો",
-      "jsonl": "JSONL ફાઇલનો પાથ",
-      "endpoint": "લક્ષ્ય endpoint",
-      "wait": "પૂર્ણ થવાની રાહ જુઓ"
-    },
-    "cancel": {
-      "yes": "પુષ્ટિ છોડો"
-    },
-    "wait": {
-      "timeout": "સમયસમાપ્તિ ms માં"
-    },
-    "output": {
-      "out": "આઉટપુટ પાથ પર સાચવો"
-    },
-    "errors": {
-      "out": "ભૂલો પાથ પર સાચવો"
-    }
-  },
   "pricing": {
     "description": "મોડેલ્સ માટેના કિંમત ડેટાનું સંચાલન કરો",
     "sync": {

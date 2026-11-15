@@ -36,7 +36,8 @@ const apiKeysDb = await import("../../src/lib/db/apiKeys.ts");
 const { runJsonMigration } = await import("../../src/lib/db/jsonMigration.ts");
 const { opaqueTokenFingerprint } = await import("../../open-sse/utils/opaqueTokenFingerprint.ts");
 const revealRoute = await import("../../src/app/api/keys/[id]/reveal/route.ts");
-const filesRoute = await import("../../src/app/api/v1/files/route.ts");
+const candidatesRoute =
+  await import("../../src/app/api/v1/auto-combo/[channel]/candidates/route.ts");
 
 type Row = Record<string, unknown>;
 
@@ -231,19 +232,22 @@ test("export -> import round-trip restores a usable key, stored encrypted and ha
 });
 
 test("a /v1 route handler still authenticates the bearer end to end", async () => {
-  const created = await apiKeysDb.createApiKey("v1-files-key", "machine-v1", []);
+  const created = await apiKeysDb.createApiKey("v1-candidates-key", "machine-v1", []);
+  const params = Promise.resolve({ channel: "auto" });
 
-  const ok = await filesRoute.GET(
-    new Request("http://localhost:20128/v1/files", {
+  const ok = await candidatesRoute.GET(
+    new Request("http://localhost:20128/v1/auto-combo/auto/candidates", {
       headers: { authorization: `Bearer ${created.key}` },
-    })
+    }),
+    { params }
   );
   assert.equal(ok.status, 200);
 
-  const denied = await filesRoute.GET(
-    new Request("http://localhost:20128/v1/files", {
+  const denied = await candidatesRoute.GET(
+    new Request("http://localhost:20128/v1/auto-combo/auto/candidates", {
       headers: { authorization: "Bearer sk-synthetic-not-a-key" },
-    })
+    }),
+    { params }
   );
   assert.equal(denied.status, 401);
 });

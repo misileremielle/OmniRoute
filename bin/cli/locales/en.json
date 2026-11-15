@@ -832,59 +832,6 @@
     "context": "Server context/profile to use for this command",
     "lang": "Set CLI display language (overrides OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Manage files (upload, list, get, download, delete)",
-    "list": {
-      "purpose": "Filter by purpose",
-      "limit": "Max results"
-    },
-    "get": {
-      "description": "Get file metadata"
-    },
-    "upload": {
-      "description": "Upload a file",
-      "purpose": "File purpose (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Download file content",
-      "out": "Save to path (default: stdout)"
-    },
-    "delete": {
-      "yes": "Skip confirmation"
-    }
-  },
-  "batches": {
-    "description": "Manage OpenAI-compatible batch jobs",
-    "list": {
-      "status": "Filter by status",
-      "limit": "Max results"
-    },
-    "create": {
-      "description": "Create a batch job",
-      "inputFile": "Input file ID",
-      "endpoint": "Target endpoint",
-      "window": "Completion window",
-      "metadata": "Add metadata key=value"
-    },
-    "submit": {
-      "description": "Upload JSONL file and create batch",
-      "jsonl": "Path to JSONL file",
-      "endpoint": "Target endpoint",
-      "wait": "Wait for completion"
-    },
-    "cancel": {
-      "yes": "Skip confirmation"
-    },
-    "wait": {
-      "timeout": "Timeout in ms"
-    },
-    "output": {
-      "out": "Save output to path"
-    },
-    "errors": {
-      "out": "Save errors to path"
-    }
-  },
   "pricing": {
     "description": "Manage pricing data for models",
     "sync": {

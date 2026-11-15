@@ -832,59 +832,6 @@
     "context": "Selle käsu jaoks kasutatav serveri kontekst/profiil",
     "lang": "Määra CLI kuvamiskeel (tühistab OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Failide haldamine (üleslaadimine, loend, hankimine, allalaadimine, kustutamine)",
-    "list": {
-      "purpose": "Filtreeri otstarbe järgi",
-      "limit": "Maksimaalne tulemuste arv"
-    },
-    "get": {
-      "description": "Hangi faili metaandmed"
-    },
-    "upload": {
-      "description": "Laadi fail üles",
-      "purpose": "Faili otstarve (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Laadi faili sisu alla",
-      "out": "Salvesta asukohta (vaikimisi: stdout)"
-    },
-    "delete": {
-      "yes": "Jäta kinnitus vahele"
-    }
-  },
-  "batches": {
-    "description": "Halda OpenAI-ühilduvaid partiitöid",
-    "list": {
-      "status": "Filtreeri oleku järgi",
-      "limit": "Maksimaalne tulemuste arv"
-    },
-    "create": {
-      "description": "Loo partiitöö",
-      "inputFile": "Sisendfaili ID",
-      "endpoint": "Sihtpunkt (endpoint)",
-      "window": "Lõpetamise ajaaken",
-      "metadata": "Lisa metaandmete võti=väärtus"
-    },
-    "submit": {
-      "description": "Laadi üles JSONL fail ja loo partii",
-      "jsonl": "JSONL faili asukoht",
-      "endpoint": "Sihtpunkt (endpoint)",
-      "wait": "Oota lõpetamist"
-    },
-    "cancel": {
-      "yes": "Jäta kinnitus vahele"
-    },
-    "wait": {
-      "timeout": "Ajalõpp millisekundites"
-    },
-    "output": {
-      "out": "Salvesta väljund asukohta"
-    },
-    "errors": {
-      "out": "Salvesta vead asukohta"
-    }
-  },
   "pricing": {
     "description": "Halda mudelite hinnaandmeid",
     "sync": {

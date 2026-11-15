@@ -190,14 +190,6 @@
       "count": 1
     }
   },
-  "open-sse/services/batchProcessor.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 17
-    },
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
   "open-sse/services/browserBackedChat.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 4
@@ -402,11 +394,6 @@
   "src/app/(dashboard)/dashboard/HomePageClient.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    }
-  },
-  "src/app/(dashboard)/dashboard/batch/components/wizard/InputStep.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "src/app/(dashboard)/dashboard/cli-agents/CliAgentsPageClient.tsx": {
@@ -844,11 +831,6 @@
       "count": 1
     }
   },
-  "src/lib/db/files.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/lib/db/healthCheck.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -1134,67 +1116,67 @@
   },
   "src/shared/validation/schemas/auth.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/cli.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/cloud.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/combo.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 9
+      "count": 8
     }
   },
   "src/shared/validation/schemas/evals.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/gemini.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/keys.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/misc.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 9
+      "count": 8
     }
   },
   "src/shared/validation/schemas/payloadRules.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/pricing.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/proxy.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/routing.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/shared/validation/schemas/settings.ts": {
     "@typescript-eslint/no-unused-vars": {
-      "count": 11
+      "count": 10
     }
   },
   "src/sse/handlers/chatHelpers.ts": {
@@ -1663,34 +1645,6 @@
       "count": 6
     }
   },
-  "tests/unit/batch-a-domain.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/batch-b-final.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/batch-processor.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 6
-    }
-  },
-  "tests/unit/batch_api.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 7
-    }
-  },
-  "tests/unit/batch_results.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
-    }
-  },
   "tests/unit/body-timeout-integration.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -1850,14 +1804,6 @@
       "count": 13
     }
   },
-  "tests/unit/cli-batches-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 16
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
-    }
-  },
   "tests/unit/cli-chat.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 17
@@ -1897,14 +1843,6 @@
   "tests/unit/cli-expanded-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
-    }
-  },
-  "tests/unit/cli-files-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 12
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "tests/unit/cli-helper/config-generator.test.ts": {
@@ -2063,14 +2001,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    }
-  },
-  "tests/unit/cli-translator-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 16
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
     }
   },
   "tests/unit/cli-usage.test.ts": {
@@ -2344,16 +2274,6 @@
   "tests/unit/custom-headers-provider-nodes.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 6
-    }
-  },
-  "tests/unit/dashboard/batch/components/NewBatchWizard.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/dashboard/batch/sanitization.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/unit/db-backup-export-streaming-9045.test.ts": {
@@ -2640,14 +2560,6 @@
       "count": 1
     }
   },
-  "tests/unit/file-expiration-policy.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/fix-tool-adjacency.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 4
@@ -2726,11 +2638,6 @@
   },
   "tests/unit/kiro-tool-args-streaming.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "tests/unit/lib/batches/csvToJsonl.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
   },
@@ -3608,21 +3515,6 @@
       "count": 1
     }
   },
-  "tests/unit/translator-friendly-page-client.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/translator-friendly-raw-json-panel.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "tests/unit/translator-friendly-translate-tab.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/translator-helper-branches.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 25
@@ -3862,6 +3754,16 @@
   "tests/unit/xiaomi-providers-registry.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
+    }
+  },
+  "tests/unit/batch-a-domain.test.ts": {
+    "@typescript-eslint/no-unused-vars": {
+      "count": 1
+    }
+  },
+  "tests/unit/batch-b-final.test.ts": {
+    "@typescript-eslint/no-unused-vars": {
+      "count": 1
     }
   }
 }

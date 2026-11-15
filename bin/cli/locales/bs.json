@@ -832,59 +832,6 @@
     "context": "Server kontekst/profil koji će se koristiti za ovu komandu",
     "lang": "Postavi jezik prikaza CLI-ja (nadjačava OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Upravljajte datotekama (učitaj, izlistaj, preuzmi, preuzmi datoteku, izbriši)",
-    "list": {
-      "purpose": "Filtriraj po namjeni",
-      "limit": "Maksimalno rezultata"
-    },
-    "get": {
-      "description": "Preuzmi metapodatke datoteke"
-    },
-    "upload": {
-      "description": "Otpremite datoteku",
-      "purpose": "Svrha datoteke (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Preuzmi sadržaj datoteke",
-      "out": "Sačuvaj na putanju (podrazumijevano: stdout)"
-    },
-    "delete": {
-      "yes": "Preskoči potvrdu"
-    }
-  },
-  "batches": {
-    "description": "Upravljajte OpenAI-kompatibilnim batch poslovima",
-    "list": {
-      "status": "Filtriraj po statusu",
-      "limit": "Maksimalno rezultata"
-    },
-    "create": {
-      "description": "Kreiraj batch posao",
-      "inputFile": "ID ulazne datoteke",
-      "endpoint": "Ciljna krajnja tačka",
-      "window": "Prozor za dopunu",
-      "metadata": "Dodaj metapodatke ključ=vrednost"
-    },
-    "submit": {
-      "description": "Otpremite JSONL datoteku i kreirajte batch",
-      "jsonl": "Putanja do JSONL datoteke",
-      "endpoint": "Ciljna krajnja tačka",
-      "wait": "Sačekajte završetak"
-    },
-    "cancel": {
-      "yes": "Preskoči potvrdu"
-    },
-    "wait": {
-      "timeout": "Vremenski okvir u ms"
-    },
-    "output": {
-      "out": "Spremi izlaz na putanju"
-    },
-    "errors": {
-      "out": "Spremi greške na putanju"
-    }
-  },
   "pricing": {
     "description": "Upravljajte podacima o cijenama za modele",
     "sync": {

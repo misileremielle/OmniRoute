@@ -128,7 +128,7 @@ restart.
   can surface a revoked or mistyped key (#5242): the pipeline's own 401 keeps the
   echo, and a route that refuses the key itself after the pipeline served it as
   anonymous (`/v1/models` and `/v1beta/models` with management auth configured,
-  the owner-scoped `/v1/files`, `/v1/batches`, `/v1/media`, `/v1/session-leases`
+  the owner-scoped `/v1/media`, `/v1/session-leases`
   and auto-combo candidate routes) adds the echo to that 401 via
   `credentialRejectionHeaders()`. The echo is keyed on the request carrying a
   credential header (`Authorization`, `x-api-key`, `x-goog-api-key` or the

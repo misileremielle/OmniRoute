@@ -64,9 +64,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "audit",
   // Dev Tools
   "search-tools",
-  // Other Features > Batch
-  "batch",
-  "batch-files",
   // Configuration
   "settings-general",
   "settings-appearance",

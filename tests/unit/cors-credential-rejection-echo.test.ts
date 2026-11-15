@@ -23,9 +23,6 @@ const core = await import("../../src/lib/db/core.ts");
 const apiKeysDb = await import("../../src/lib/db/apiKeys.ts");
 const settingsModule = await import("../../src/lib/db/settings.ts");
 const v1ModelsCatalog = await import("../../src/app/api/v1/models/catalog.ts");
-const filesRoute = await import("../../src/app/api/v1/files/route.ts");
-const fileByIdRoute = await import("../../src/app/api/v1/files/[id]/route.ts");
-const { resolveListScope } = await import("../../src/app/api/v1/_helpers/apiKeyScope.ts");
 const sessionLeasesRoute = await import("../../src/app/api/v1/session-leases/route.ts");
 
 const ORIGIN = "https://app.example";
@@ -94,21 +91,6 @@ test("/v1/models served to an anonymous caller with a junk key does not echo the
   assert.equal(res.headers.get("Access-Control-Allow-Origin"), null);
 });
 
-test("/v1/files 401 for a refused key echoes the Origin", async () => {
-  const list = await filesRoute.GET(
-    crossOrigin("http://localhost/api/v1/files", { authorization: "Bearer junk" })
-  );
-  assert.equal(list.status, 401);
-  assert.equal(list.headers.get("Access-Control-Allow-Origin"), ORIGIN);
-
-  const byId = await fileByIdRoute.GET(
-    crossOrigin("http://localhost/api/v1/files/file-x", { authorization: "Bearer junk" }),
-    { params: Promise.resolve({ id: "file-x" }) }
-  );
-  assert.equal(byId.status, 401);
-  assert.equal(byId.headers.get("Access-Control-Allow-Origin"), ORIGIN);
-});
-
 test("/v1/session-leases 401 for a refused key echoes the Origin", async () => {
   const res = await sessionLeasesRoute.POST(
     new Request("http://localhost/api/v1/session-leases", {
@@ -120,28 +102,4 @@ test("/v1/session-leases 401 for a refused key echoes the Origin", async () => {
   assert.equal(res.status, 401);
   assert.equal(res.headers.get("Access-Control-Allow-Origin"), ORIGIN);
   assert.equal(res.headers.get("Content-Type"), "application/json");
-});
-
-test("resolveListScope 401 echoes the Origin only when given the request", () => {
-  const scope = {
-    apiKey: "junk",
-    apiKeyId: null,
-    apiKeyMetadata: null,
-    keyState: "missing",
-    rejection: null,
-    isSessionAuth: false,
-  } as unknown as Parameters<typeof resolveListScope>[0];
-  const req = crossOrigin("http://localhost/api/v1/files", { "x-api-key": "junk" });
-
-  const withRequest = resolveListScope(scope, undefined, req);
-  assert.equal(withRequest.mode, "rejected");
-  if (withRequest.mode === "rejected") {
-    assert.equal(withRequest.response.headers.get("Access-Control-Allow-Origin"), ORIGIN);
-  }
-
-  const withoutRequest = resolveListScope(scope);
-  assert.equal(withoutRequest.mode, "rejected");
-  if (withoutRequest.mode === "rejected") {
-    assert.equal(withoutRequest.response.headers.get("Access-Control-Allow-Origin"), null);
-  }
 });

@@ -832,59 +832,6 @@
     "context": "Servera konteksts/profils šai komandai",
     "lang": "Iestatīt CLI displeja valodu (pārraksta OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Pārvaldīt failus (augšupielādēt, uzskaitīt, iegūt, lejupielādēt, dzēst)",
-    "list": {
-      "purpose": "Filtrēt pēc mērķa",
-      "limit": "Maks. rezultāti"
-    },
-    "get": {
-      "description": "Iegūt faila metadatus"
-    },
-    "upload": {
-      "description": "Augšupielādēt failu",
-      "purpose": "Faila mērķis (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Lejupielādēt faila saturu",
-      "out": "Saglabāt ceļā (noklusējums: stdout)"
-    },
-    "delete": {
-      "yes": "Izlaidiet apstiprinājumu"
-    }
-  },
-  "batches": {
-    "description": "Pārvaldīt OpenAI savietojamus partijas darbus",
-    "list": {
-      "status": "Filtrēt pēc statusa",
-      "limit": "Maks. rezultāti"
-    },
-    "create": {
-      "description": "Izveidot partijas darbu",
-      "inputFile": "Ievades faila ID",
-      "endpoint": "Mērķa gala punkts",
-      "window": "Pabeigšanas logs",
-      "metadata": "Pievienot metadatus atslēga=vērtība"
-    },
-    "submit": {
-      "description": "Augšupielādēt JSONL failu un izveidot partiju",
-      "jsonl": "Ceļš uz JSONL failu",
-      "endpoint": "Mērķa gala punkts",
-      "wait": "Gaidīt pabeigšanu"
-    },
-    "cancel": {
-      "yes": "Izlaidiet apstiprinājumu"
-    },
-    "wait": {
-      "timeout": "Taimauts ms"
-    },
-    "output": {
-      "out": "Saglabāt izvadu ceļā"
-    },
-    "errors": {
-      "out": "Saglabāt kļūdas ceļā"
-    }
-  },
   "pricing": {
     "description": "Pārvaldīt cenu datus modeļiem",
     "sync": {

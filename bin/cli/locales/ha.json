@@ -832,59 +832,6 @@
     "context": "Mahallin/fayil ɗin saitin sabar da za a yi amfani da shi don wannan umarni",
     "lang": "Saita harshen nunawar CLI (yana maye gurbin OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Sarrafa fayiloli (ɗorawa, jere, samu, saukewa, gogewa)",
-    "list": {
-      "purpose": "Tace bisa manufa",
-      "limit": "Matsakaicin sakamako"
-    },
-    "get": {
-      "description": "Samu bayanan siffanta fayil"
-    },
-    "upload": {
-      "description": "Ɗora fayil",
-      "purpose": "Manufar fayil (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Sauke abun cikin fayil",
-      "out": "Ajiye zuwa path (tsoho: stdout)"
-    },
-    "delete": {
-      "yes": "Tsallake tabbatarwa"
-    }
-  },
-  "batches": {
-    "description": "Sarrafa ayyukan batch masu dacewa da OpenAI",
-    "list": {
-      "status": "Tace bisa matsayi",
-      "limit": "Matsakaicin sakamako"
-    },
-    "create": {
-      "description": "Ƙirƙiri aikin batch",
-      "inputFile": "ID na fayil ɗin shigarwa",
-      "endpoint": "Endpoint da aka nufa",
-      "window": "Wa'adin kammalawa",
-      "metadata": "Ƙara metadata key=value"
-    },
-    "submit": {
-      "description": "Ɗora fayil ɗin JSONL sannan a ƙirƙiri batch",
-      "jsonl": "Path zuwa fayil ɗin JSONL",
-      "endpoint": "Endpoint da aka nufa",
-      "wait": "Jira har sai an kammala"
-    },
-    "cancel": {
-      "yes": "Tsallake tabbatarwa"
-    },
-    "wait": {
-      "timeout": "Wa'adin ƙarewa a cikin ms"
-    },
-    "output": {
-      "out": "Ajiye fitarwa zuwa path"
-    },
-    "errors": {
-      "out": "Ajiye kurakurai zuwa path"
-    }
-  },
   "pricing": {
     "description": "Sarrafa bayanan farashi na models",
     "sync": {

@@ -832,59 +832,6 @@
     "context": "Serverkontext/profil för det här kommandot",
     "lang": "Ange CLI-visningsspråk (åsidosätter OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Hantera filer (ladda upp, lista, hämta, ladda ner, ta bort)",
-    "list": {
-      "purpose": "Filtrera efter syfte",
-      "limit": "Maximalt antal resultat"
-    },
-    "get": {
-      "description": "Hämta filmetadata"
-    },
-    "upload": {
-      "description": "Ladda upp en fil",
-      "purpose": "Filens syfte (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Ladda ned filinnehåll",
-      "out": "Spara till sökväg (standard: stdout)"
-    },
-    "delete": {
-      "yes": "Hoppa över bekräftelse"
-    }
-  },
-  "batches": {
-    "description": "Hantera OpenAI-kompatibla batchjobb",
-    "list": {
-      "status": "Filtrera efter status",
-      "limit": "Maximalt antal resultat"
-    },
-    "create": {
-      "description": "Skapa ett batchjobb",
-      "inputFile": "ID för indatafil",
-      "endpoint": "Målslutpunkt",
-      "window": "Tidsfönster för slutförande",
-      "metadata": "Lägg till metadata key=value"
-    },
-    "submit": {
-      "description": "Ladda upp JSONL-fil och skapa batch",
-      "jsonl": "Sökväg till JSONL-fil",
-      "endpoint": "Målslutpunkt",
-      "wait": "Vänta på slutförande"
-    },
-    "cancel": {
-      "yes": "Hoppa över bekräftelse"
-    },
-    "wait": {
-      "timeout": "Tidsgräns i ms"
-    },
-    "output": {
-      "out": "Spara utdata till sökväg"
-    },
-    "errors": {
-      "out": "Spara fel till sökväg"
-    }
-  },
   "pricing": {
     "description": "Hantera prisdata för modeller",
     "sync": {

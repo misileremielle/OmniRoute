@@ -832,59 +832,6 @@
     "context": "הקשר/פרופיל שרת לשימוש עבור פקודה זו",
     "lang": "הגדרת שפת התצוגה של CLI (דורסת את OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "ניהול קבצים (העלאה, הצגת רשימה, אחזור, הורדה, מחיקה)",
-    "list": {
-      "purpose": "סינון לפי מטרה",
-      "limit": "מספר תוצאות מרבי"
-    },
-    "get": {
-      "description": "אחזור מטא-נתונים של קובץ"
-    },
-    "upload": {
-      "description": "העלאת קובץ",
-      "purpose": "מטרת הקובץ (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "הורדת תוכן הקובץ",
-      "out": "שמירה לנתיב (ברירת מחדל: stdout)"
-    },
-    "delete": {
-      "yes": "דילוג על האישור"
-    }
-  },
-  "batches": {
-    "description": "ניהול משימות אצווה תואמות OpenAI",
-    "list": {
-      "status": "סינון לפי סטטוס",
-      "limit": "מספר תוצאות מרבי"
-    },
-    "create": {
-      "description": "יצירת משימת אצווה",
-      "inputFile": "מזהה קובץ הקלט",
-      "endpoint": "נקודת קצה יעד",
-      "window": "חלון זמן להשלמה",
-      "metadata": "הוספת מטא-נתונים key=value"
-    },
-    "submit": {
-      "description": "העלאת קובץ JSONL ויצירת אצווה",
-      "jsonl": "נתיב לקובץ JSONL",
-      "endpoint": "נקודת קצה יעד",
-      "wait": "המתנה להשלמה"
-    },
-    "cancel": {
-      "yes": "דילוג על אישור"
-    },
-    "wait": {
-      "timeout": "זמן קצוב באלפיות שנייה"
-    },
-    "output": {
-      "out": "שמירת הפלט בנתיב"
-    },
-    "errors": {
-      "out": "שמירת שגיאות בנתיב"
-    }
-  },
   "pricing": {
     "description": "ניהול נתוני תמחור למודלים",
     "sync": {

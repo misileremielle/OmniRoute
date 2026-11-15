@@ -61,18 +61,6 @@ export const ENDPOINT_CATEGORIES: readonly EndpointCategory[] = [
     prefixes: ["/v1/ocr"],
   },
   {
-    id: "batches",
-    label: "Batch Processing",
-    description: "Batch API operations",
-    prefixes: ["/v1/batches"],
-  },
-  {
-    id: "files",
-    label: "Files",
-    description: "File upload and management",
-    prefixes: ["/v1/files"],
-  },
-  {
     id: "web-fetch",
     label: "Web Fetch",
     description: "Web page fetching",

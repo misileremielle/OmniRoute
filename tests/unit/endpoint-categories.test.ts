@@ -23,6 +23,10 @@ test("resolveEndpointCategory: maps /v1/messages to 'chat'", () => {
   assert.equal(resolveEndpointCategory("/v1/messages"), "chat");
 });
 
+test("resolveEndpointCategory: handles sub-paths under category", () => {
+  assert.equal(resolveEndpointCategory("/v1/responses/some/path"), "chat");
+});
+
 test("resolveEndpointCategory: maps /v1/responses to 'chat'", () => {
   assert.equal(resolveEndpointCategory("/v1/responses"), "chat");
 });
@@ -72,14 +76,6 @@ test("resolveEndpointCategory: removed media and agent endpoints no longer map t
   }
 });
 
-test("resolveEndpointCategory: maps /v1/batches to 'batches'", () => {
-  assert.equal(resolveEndpointCategory("/v1/batches"), "batches");
-});
-
-test("resolveEndpointCategory: maps /v1/files to 'files'", () => {
-  assert.equal(resolveEndpointCategory("/v1/files"), "files");
-});
-
 test("resolveEndpointCategory: maps /v1/web/fetch to 'web-fetch'", () => {
   assert.equal(resolveEndpointCategory("/v1/web/fetch"), "web-fetch");
 });
@@ -94,16 +90,6 @@ test("resolveEndpointCategory: returns null for management /api/keys", () => {
 
 test("resolveEndpointCategory: returns null for root path", () => {
   assert.equal(resolveEndpointCategory("/"), null);
-});
-
-test("resolveEndpointCategory: handles sub-paths under category", () => {
-  assert.equal(resolveEndpointCategory("/v1/files/some-file-id"), "files");
-  assert.equal(resolveEndpointCategory("/v1/batches/batch-123"), "batches");
-  assert.equal(resolveEndpointCategory("/v1/responses/some/path"), "chat");
-});
-
-test("resolveEndpointCategory: maps /v1/batches/delete-completed to 'batches' (bulk sweep is policy-gated)", () => {
-  assert.equal(resolveEndpointCategory("/v1/batches/delete-completed"), "batches");
 });
 
 // ─── resolveCanonicalEndpointPath: alias spellings from next.config.mjs ───

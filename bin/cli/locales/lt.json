@@ -832,59 +832,6 @@
     "context": "Šiai komandai naudotinas serverio kontekstas / profilis",
     "lang": "Nustatyti CLI rodymo kalbą (nepaisyti OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Tvarkyti failus (įkelti, pateikti sąrašą, gauti, atsisiųsti, ištrinti)",
-    "list": {
-      "purpose": "Filtruoti pagal paskirtį",
-      "limit": "Didžiausias rezultatų skaičius"
-    },
-    "get": {
-      "description": "Gauti failo metaduomenis"
-    },
-    "upload": {
-      "description": "Įkelti failą",
-      "purpose": "Failo paskirtis (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Atsisiųsti failo turinį",
-      "out": "Išsaugoti nurodytu keliu (numatytasis: stdout)"
-    },
-    "delete": {
-      "yes": "Praleisti patvirtinimą"
-    }
-  },
-  "batches": {
-    "description": "Tvarkyti su OpenAI suderinamas paketines užduotis",
-    "list": {
-      "status": "Filtruoti pagal būseną",
-      "limit": "Didžiausias rezultatų skaičius"
-    },
-    "create": {
-      "description": "Sukurti paketinę užduotį",
-      "inputFile": "Įvesties failo ID",
-      "endpoint": "Tikslinis galinis taškas",
-      "window": "Užbaigimo laikotarpis",
-      "metadata": "Pridėti metaduomenis key=value"
-    },
-    "submit": {
-      "description": "Įkelti JSONL failą ir sukurti paketą",
-      "jsonl": "Kelias į JSONL failą",
-      "endpoint": "Tikslinis galinis taškas",
-      "wait": "Laukti užbaigimo"
-    },
-    "cancel": {
-      "yes": "Praleisti patvirtinimą"
-    },
-    "wait": {
-      "timeout": "Skirtasis laikas, ms"
-    },
-    "output": {
-      "out": "Išsaugoti išvestį nurodytu keliu"
-    },
-    "errors": {
-      "out": "Išsaugoti klaidas nurodytu keliu"
-    }
-  },
   "pricing": {
     "description": "Tvarkyti modelių kainodaros duomenis",
     "sync": {

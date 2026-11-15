@@ -832,59 +832,6 @@
     "context": "Server-Kontext/Profil für diesen Befehl",
     "lang": "CLI-Anzeigesprache festlegen (überschreibt OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Dateien verwalten (hochladen, auflisten, abrufen, herunterladen, löschen)",
-    "list": {
-      "purpose": "Nach Verwendungszweck filtern",
-      "limit": "Maximale Anzahl an Ergebnissen"
-    },
-    "get": {
-      "description": "Dateimetadaten abrufen"
-    },
-    "upload": {
-      "description": "Eine Datei hochladen",
-      "purpose": "Dateizweck (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Dateiinhalt herunterladen",
-      "out": "Unter Pfad speichern (Standard: stdout)"
-    },
-    "delete": {
-      "yes": "Bestätigung überspringen"
-    }
-  },
-  "batches": {
-    "description": "OpenAI-kompatible Batch-Aufträge verwalten",
-    "list": {
-      "status": "Nach Status filtern",
-      "limit": "Maximale Anzahl an Ergebnissen"
-    },
-    "create": {
-      "description": "Batch-Auftrag erstellen",
-      "inputFile": "Eingabedatei-ID",
-      "endpoint": "Ziel-Endpunkt",
-      "window": "Abschlusszeitfenster",
-      "metadata": "Metadaten im Format key=value hinzufügen"
-    },
-    "submit": {
-      "description": "JSONL-Datei hochladen und Batch erstellen",
-      "jsonl": "Pfad zur JSONL-Datei",
-      "endpoint": "Ziel-Endpunkt",
-      "wait": "Auf Abschluss warten"
-    },
-    "cancel": {
-      "yes": "Bestätigung überspringen"
-    },
-    "wait": {
-      "timeout": "Zeitüberschreitung in ms"
-    },
-    "output": {
-      "out": "Ausgabe unter Pfad speichern"
-    },
-    "errors": {
-      "out": "Fehler unter Pfad speichern"
-    }
-  },
   "pricing": {
     "description": "Preisdaten für Modelle verwalten",
     "sync": {

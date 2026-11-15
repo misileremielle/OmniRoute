@@ -4,8 +4,6 @@ import { registerLogin } from "./login.mjs";
 import { registerEval } from "./eval.mjs";
 import { registerPolicy } from "./policy.mjs";
 import { registerCompression } from "./compression.mjs";
-import { registerFiles } from "./files.mjs";
-import { registerBatches } from "./batches.mjs";
 import { registerPricing } from "./pricing.mjs";
 import { registerResilience } from "./resilience.mjs";
 import { registerNodes } from "./nodes.mjs";
@@ -86,8 +84,6 @@ export function registerCommands(program) {
   registerEval(program);
   registerPolicy(program);
   registerCompression(program);
-  registerFiles(program);
-  registerBatches(program);
   registerPricing(program);
   registerResilience(program);
   registerNodes(program);

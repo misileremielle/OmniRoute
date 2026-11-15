@@ -832,59 +832,6 @@
     "context": "இந்தக் கட்டளைக்குப் பயன்படுத்த வேண்டிய சேவையகச் சூழல்/profile",
     "lang": "CLI காட்சி மொழியை அமை (OMNIROUTE_LANG-ஐ மீறும்)"
   },
-  "files": {
-    "description": "கோப்புகளை நிர்வகி (பதிவேற்றம், பட்டியலிடுதல், பெறுதல், பதிவிறக்கம், நீக்குதல்)",
-    "list": {
-      "purpose": "நோக்கத்தின் அடிப்படையில் வடிகட்டு",
-      "limit": "அதிகபட்ச முடிவுகள்"
-    },
-    "get": {
-      "description": "கோப்பின் metadata-வைப் பெறு"
-    },
-    "upload": {
-      "description": "ஒரு கோப்பைப் பதிவேற்று",
-      "purpose": "கோப்பின் நோக்கம் (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "கோப்பின் உள்ளடக்கத்தைப் பதிவிறக்கு",
-      "out": "பாதையில் சேமி (இயல்புநிலை: stdout)"
-    },
-    "delete": {
-      "yes": "உறுதிப்படுத்தலைத் தவிர்"
-    }
-  },
-  "batches": {
-    "description": "OpenAI-இணக்கமான batch பணிகளை நிர்வகி",
-    "list": {
-      "status": "நிலையின் அடிப்படையில் வடிகட்டு",
-      "limit": "அதிகபட்ச முடிவுகள்"
-    },
-    "create": {
-      "description": "ஒரு batch பணியை உருவாக்கு",
-      "inputFile": "உள்ளீட்டுக் கோப்பு ID",
-      "endpoint": "இலக்கு endpoint",
-      "window": "நிறைவு காலவரம்பு",
-      "metadata": "metadata key=value-ஐச் சேர்"
-    },
-    "submit": {
-      "description": "JSONL கோப்பைப் பதிவேற்றி batch-ஐ உருவாக்கு",
-      "jsonl": "JSONL கோப்பிற்கான பாதை",
-      "endpoint": "இலக்கு endpoint",
-      "wait": "நிறைவடையும் வரை காத்திரு"
-    },
-    "cancel": {
-      "yes": "உறுதிப்படுத்தலைத் தவிர்"
-    },
-    "wait": {
-      "timeout": "காலாவதி நேரம் (ms)"
-    },
-    "output": {
-      "out": "வெளியீட்டை பாதையில் சேமி"
-    },
-    "errors": {
-      "out": "பிழைகளை பாதையில் சேமி"
-    }
-  },
   "pricing": {
     "description": "மாதிரிகளுக்கான விலைத் தரவை நிர்வகி",
     "sync": {

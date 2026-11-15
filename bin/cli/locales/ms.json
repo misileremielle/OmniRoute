@@ -832,59 +832,6 @@
     "context": "Konteks/profil pelayan untuk digunakan bagi perintah ini",
     "lang": "Tetapkan bahasa paparan CLI (mengatasi OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Urus fail (muat naik, senaraikan, dapatkan, muat turun, padam)",
-    "list": {
-      "purpose": "Tapis mengikut tujuan",
-      "limit": "Hasil maksimum"
-    },
-    "get": {
-      "description": "Dapatkan metadata fail"
-    },
-    "upload": {
-      "description": "Muat naik fail",
-      "purpose": "Tujuan fail (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Muat turun kandungan fail",
-      "out": "Simpan ke laluan (lalai: stdout)"
-    },
-    "delete": {
-      "yes": "Langkau pengesahan"
-    }
-  },
-  "batches": {
-    "description": "Urus tugas kelompok yang serasi dengan OpenAI",
-    "list": {
-      "status": "Tapis mengikut status",
-      "limit": "Hasil maksimum"
-    },
-    "create": {
-      "description": "Cipta tugas kelompok",
-      "inputFile": "ID fail input",
-      "endpoint": "Titik akhir sasaran",
-      "window": "Tempoh penyiapan",
-      "metadata": "Tambah metadata key=value"
-    },
-    "submit": {
-      "description": "Muat naik fail JSONL dan cipta kelompok",
-      "jsonl": "Laluan ke fail JSONL",
-      "endpoint": "Titik akhir sasaran",
-      "wait": "Tunggu sehingga selesai"
-    },
-    "cancel": {
-      "yes": "Langkau pengesahan"
-    },
-    "wait": {
-      "timeout": "Had masa dalam ms"
-    },
-    "output": {
-      "out": "Simpan output ke laluan"
-    },
-    "errors": {
-      "out": "Simpan ralat ke laluan"
-    }
-  },
   "pricing": {
     "description": "Urus data harga untuk model",
     "sync": {

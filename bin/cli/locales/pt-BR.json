@@ -832,59 +832,6 @@
     "context": "Contexto/perfil do servidor a usar neste comando",
     "lang": "Definir idioma de exibição do CLI (substitui OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Gerenciar arquivos (upload, listar, obter, baixar, deletar)",
-    "list": {
-      "purpose": "Filtrar por propósito",
-      "limit": "Máximo de resultados"
-    },
-    "get": {
-      "description": "Obter metadados do arquivo"
-    },
-    "upload": {
-      "description": "Fazer upload de um arquivo",
-      "purpose": "Propósito do arquivo (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Baixar conteúdo do arquivo",
-      "out": "Salvar no caminho (padrão: stdout)"
-    },
-    "delete": {
-      "yes": "Pular confirmação"
-    }
-  },
-  "batches": {
-    "description": "Gerenciar jobs em batch (compatível com OpenAI)",
-    "list": {
-      "status": "Filtrar por status",
-      "limit": "Máximo de resultados"
-    },
-    "create": {
-      "description": "Criar um job em batch",
-      "inputFile": "ID do arquivo de entrada",
-      "endpoint": "Endpoint destino",
-      "window": "Janela de conclusão",
-      "metadata": "Adicionar metadado key=value"
-    },
-    "submit": {
-      "description": "Fazer upload do JSONL e criar batch",
-      "jsonl": "Caminho para o arquivo JSONL",
-      "endpoint": "Endpoint destino",
-      "wait": "Aguardar conclusão"
-    },
-    "cancel": {
-      "yes": "Pular confirmação"
-    },
-    "wait": {
-      "timeout": "Timeout em ms"
-    },
-    "output": {
-      "out": "Salvar output no caminho"
-    },
-    "errors": {
-      "out": "Salvar erros no caminho"
-    }
-  },
   "pricing": {
     "description": "Gerenciar dados de precificação dos modelos",
     "sync": {

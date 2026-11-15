@@ -13,7 +13,7 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 // ---------------------------------------------------------------------------
 // Silent-stop gap fixes — regression tests
 // ---------------------------------------------------------------------------
-// These lock the G1–G10 fixes for loops that could terminate silently:
+// These lock the G1–G9 fixes for loops that could terminate silently:
 //   G1  combo.ts globalPromise safety timer (hung target → 504, never hang)
 //   G2  combo.ts task wrapper catch resolves globalPromise (unexpected throw → 502)
 //   G3  targetTimeoutRunner warns when per-model timeout is disabled
@@ -21,14 +21,12 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 //   G5  chaosEngine logs all-panel failures with per-model errors
 //   G7  evalRunner rejects catastrophic regex (ReDoS) via safe-regex
 //   G8  autoRefreshDaemon logs network errors per provider
-//   G10 batchProcessor item dispatch timeout (hung item fails fast)
 // ---------------------------------------------------------------------------
 
 const { buildTargetTimeoutRunner } =
   await import("../../open-sse/services/combo/targetTimeoutRunner.ts");
 const { handleComboChat } = await import("../../open-sse/services/combo.ts");
 const { evaluateCase } = await import("../../src/lib/evals/evalRunner.ts");
-const { withItemDispatchTimeout } = await import("../../open-sse/services/batchProcessor.ts");
 const { saveModelsDevCapabilities } = await import("../../src/lib/modelsDevSync.ts");
 
 function capabilityEntry(limitContext: unknown, overrides: Record<string, unknown> = {}) {
@@ -247,29 +245,4 @@ test("G8: autoRefreshDaemon logs network errors instead of swallowing them", asy
     console.warn = originalWarn;
     autoRefreshDaemon.unregisterCredential("volcengine-console");
   }
-});
-
-// ── G10: batch item dispatch timeout ────────────────────────────────────────
-test("G10: hung batch item dispatch fails fast via wall-clock timeout", async () => {
-  const startedAt = Date.now();
-  await assert.rejects(
-    withItemDispatchTimeout(
-      new Promise<Response>(() => {}), // never settles
-      50,
-      "Batch item dispatch (/v1/chat/completions)"
-    ),
-    /timed out after 50ms/
-  );
-  const elapsed = Date.now() - startedAt;
-  assert.ok(elapsed < 5000, `timeout fired after ${elapsed}ms — too slow`);
-});
-
-test("G10: fast dispatch wins the race untouched", async () => {
-  const res = await withItemDispatchTimeout(
-    Promise.resolve(new Response("ok", { status: 200 })),
-    1000,
-    "Batch item dispatch"
-  );
-  assert.equal(res.status, 200);
-  assert.equal(await res.text(), "ok");
 });

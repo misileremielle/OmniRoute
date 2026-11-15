@@ -28,10 +28,9 @@ test("known ids are kept and unknown or non-string entries are dropped", () => {
 });
 
 test("duplicates collapse and the canonical order wins over the stored order", () => {
-  assert.deepEqual(normalizeHiddenSidebarGroupLabels(["batch", "audit", "batch", "tools"]), [
+  assert.deepEqual(normalizeHiddenSidebarGroupLabels(["audit", "tools", "audit"]), [
     "tools",
     "audit",
-    "batch",
   ]);
 });
 

@@ -222,7 +222,7 @@ export function applyCorsHeaders(
  * not validate as anonymous, so the middleware keeps the fail-closed origin
  * policy for it (no echo). A route that then refuses that key with its own 401
  * (the `/v1/models` catalog when management auth is configured, the
- * owner-scoped batches/files/media routes) would otherwise be unreadable to a
+ * owner-scoped media routes) would otherwise be unreadable to a
  * browser/Electron client, which needs the 401 to report a mistyped or revoked
  * key (#5242). The body is a fixed error envelope, so echoing the Origin here
  * exposes nothing; a 2xx served to an anonymous caller never gets this header.

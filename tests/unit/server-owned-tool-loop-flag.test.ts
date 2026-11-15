@@ -78,8 +78,9 @@ describe("feature-flags-settings count update", () => {
     // (#13505, default off) to 85; KIRO_TOOL_CALL_REPAIR_ENABLED (default on) to 86;
     // OPENCODE_PUBLISHED_CATALOG_ROUTING_ENABLED (#16798, default off) to 87.
     // This fork removed LMARENA_SYNTHESIZED_CX_ENABLED (web-cookie providers) and the two
-    // MCP flags, taking the count from 117 to 114.
-    assert.equal(FEATURE_FLAG_DEFINITIONS.length, 114);
+    // MCP flags, taking the count from 117 to 114; removing the Batch API drops
+    // BATCH_AND_FILE_AUTO_CLEANUP_ENABLED, taking it to 113.
+    assert.equal(FEATURE_FLAG_DEFINITIONS.length, 113);
     // COMPRESSION_CACHE_AUTOMATIC_PREFIX_ESTIMATE (#17114, default off) to 114.
     // CURSOR_GROK_47_DROP_MAX_EFFORT (#17386, default off) to 112.
     // UNPRICED_USAGE_BUDGET_POLICY (#14604, default fail_closed) to 113.

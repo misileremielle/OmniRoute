@@ -832,59 +832,6 @@
     "context": "Szerverkontextus/profil ehhez a parancshoz",
     "lang": "CLI megjelenítési nyelv beállítása (felülírja az OMNIROUTE_LANG-ot)"
   },
-  "files": {
-    "description": "Fájlok kezelése (feltöltés, listázás, lekérés, letöltés, törlés)",
-    "list": {
-      "purpose": "Szűrés rendeltetés alapján",
-      "limit": "Találatok maximális száma"
-    },
-    "get": {
-      "description": "Fájl metaadatainak lekérése"
-    },
-    "upload": {
-      "description": "Fájl feltöltése",
-      "purpose": "Fájl célja (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Fájltartalom letöltése",
-      "out": "Mentés elérési útra (alapértelmezett: stdout)"
-    },
-    "delete": {
-      "yes": "Megerősítés kihagyása"
-    }
-  },
-  "batches": {
-    "description": "OpenAI-kompatibilis kötegelt feladatok kezelése",
-    "list": {
-      "status": "Szűrés állapot szerint",
-      "limit": "Találatok maximális száma"
-    },
-    "create": {
-      "description": "Kötegelt feladat létrehozása",
-      "inputFile": "Bemeneti fájl azonosítója",
-      "endpoint": "Célvégpont",
-      "window": "Befejezési időablak",
-      "metadata": "Metaadat hozzáadása kulcs=érték formátumban"
-    },
-    "submit": {
-      "description": "JSONL-fájl feltöltése és köteg létrehozása",
-      "jsonl": "A JSONL-fájl elérési útja",
-      "endpoint": "Célvégpont",
-      "wait": "Várakozás a befejezésre"
-    },
-    "cancel": {
-      "yes": "Megerősítés kihagyása"
-    },
-    "wait": {
-      "timeout": "Időtúllépés ezredmásodpercben"
-    },
-    "output": {
-      "out": "Kimenet mentése elérési útra"
-    },
-    "errors": {
-      "out": "Hibák mentése elérési útra"
-    }
-  },
   "pricing": {
     "description": "Modellek árképzési adatainak kezelése",
     "sync": {

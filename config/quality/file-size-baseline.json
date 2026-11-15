@@ -306,7 +306,6 @@
     "_rebaseline_2026_10_15_owner_batch_1015": "Owner merge-batch 2026-10-15 follow-up, re-measured with split(\"\\n\").length on release/v3.8.52 @d50cd807. tests/unit/provider-validation-specialty.test.ts 2912->2965 (#16625). No slack. The frozen-object copy of this test file is a different key and was left unchanged.",
     "tests/integration/chat-pipeline.test.ts": 2108,
     "tests/unit/account-fallback-service.test.ts": 2495,
-    "tests/unit/batch_api.test.ts": 1624,
     "tests/unit/cc-compatible-provider.test.ts": 1470,
     "tests/unit/chatcore-translation-paths.test.ts": 4270,
     "tests/unit/combo-routing-engine.test.ts": 4396,

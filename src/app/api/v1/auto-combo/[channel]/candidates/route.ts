@@ -35,10 +35,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ chan
   // OPPOSITE: it is the anonymous scope, and `getAutoComboCandidates()` then
   // applies no per-key exclusions at all, so an invalid key would receive a
   // wider pool than a valid one. A presented key that did not validate is
-  // therefore refused, exactly like `resolveListScope()` does for list reads.
-  // Session auth is left alone, so an operator's dashboard request is unaffected
-  // even when it carries a stale bearer header (the precedence question is #14333
-  // LEDGER-21, deliberately not settled here).
+  // therefore refused with a 401 here. Session auth is left alone, so an
+  // operator's dashboard request is unaffected even when it carries a stale
+  // bearer header (the precedence question is #14333 LEDGER-21, deliberately
+  // not settled here).
   if (!scope.isSessionAuth && scope.apiKey && !scope.apiKeyId) {
     return NextResponse.json(buildErrorBody(401, "Invalid API key"), {
       status: 401,

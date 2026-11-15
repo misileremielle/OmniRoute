@@ -832,59 +832,6 @@
     "context": "Servercontext/profiel voor dit commando",
     "lang": "CLI-weergavetaal instellen (overschrijft OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Bestanden beheren (uploaden, weergeven, ophalen, downloaden, verwijderen)",
-    "list": {
-      "purpose": "Filteren op doel",
-      "limit": "Maximaal aantal resultaten"
-    },
-    "get": {
-      "description": "Bestandsmetadata ophalen"
-    },
-    "upload": {
-      "description": "Een bestand uploaden",
-      "purpose": "Bestandsdoel (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Bestandsinhoud downloaden",
-      "out": "Opslaan in pad (standaard: stdout)"
-    },
-    "delete": {
-      "yes": "Bevestiging overslaan"
-    }
-  },
-  "batches": {
-    "description": "OpenAI-compatibele batchtaken beheren",
-    "list": {
-      "status": "Filteren op status",
-      "limit": "Maximumaantal resultaten"
-    },
-    "create": {
-      "description": "Een batchtaak aanmaken",
-      "inputFile": "Invoerbestands-ID",
-      "endpoint": "Doelendpoint",
-      "window": "Voltooiingsvenster",
-      "metadata": "Metagegevens key=value toevoegen"
-    },
-    "submit": {
-      "description": "JSONL-bestand uploaden en batch aanmaken",
-      "jsonl": "Pad naar JSONL-bestand",
-      "endpoint": "Doelendpoint",
-      "wait": "Wachten op voltooiing"
-    },
-    "cancel": {
-      "yes": "Bevestiging overslaan"
-    },
-    "wait": {
-      "timeout": "Time-out in ms"
-    },
-    "output": {
-      "out": "Uitvoer opslaan in pad"
-    },
-    "errors": {
-      "out": "Fouten opslaan in pad"
-    }
-  },
   "pricing": {
     "description": "Prijsgegevens voor modellen beheren",
     "sync": {

@@ -832,59 +832,6 @@
     "context": "Kontext/profil serveru pro tento příkaz",
     "lang": "Nastavit jazyk CLI (přepisuje OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Spravovat soubory (nahrát, vypsat, získat, stáhnout, odstranit)",
-    "list": {
-      "purpose": "Filtrovat podle účelu",
-      "limit": "Maximální počet výsledků"
-    },
-    "get": {
-      "description": "Získat metadata souboru"
-    },
-    "upload": {
-      "description": "Nahrát soubor",
-      "purpose": "Účel souboru (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Stáhnout obsah souboru",
-      "out": "Uložit do cesty (výchozí: stdout)"
-    },
-    "delete": {
-      "yes": "Přeskočit potvrzení"
-    }
-  },
-  "batches": {
-    "description": "Spravovat dávkové úlohy kompatibilní s OpenAI",
-    "list": {
-      "status": "Filtrovat podle stavu",
-      "limit": "Maximální počet výsledků"
-    },
-    "create": {
-      "description": "Vytvořit dávkovou úlohu",
-      "inputFile": "ID vstupního souboru",
-      "endpoint": "Cílový endpoint",
-      "window": "Časové okno pro dokončení",
-      "metadata": "Přidat metadata key=value"
-    },
-    "submit": {
-      "description": "Nahrát soubor JSONL a vytvořit dávku",
-      "jsonl": "Cesta k souboru JSONL",
-      "endpoint": "Cílový endpoint",
-      "wait": "Čekat na dokončení"
-    },
-    "cancel": {
-      "yes": "Přeskočit potvrzení"
-    },
-    "wait": {
-      "timeout": "Časový limit v ms"
-    },
-    "output": {
-      "out": "Uložit výstup do cesty"
-    },
-    "errors": {
-      "out": "Uložit chyby do cesty"
-    }
-  },
   "pricing": {
     "description": "Spravovat cenové údaje modelů",
     "sync": {

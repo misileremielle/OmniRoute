@@ -33,8 +33,12 @@ const cases: Case[] = [
   { name: "/api/v1/responses", path: "/api/v1/responses", expectedClass: "CLIENT_API" },
   { name: "/api/v1/models", path: "/api/v1/models", expectedClass: "CLIENT_API" },
   { name: "/api/v1/embeddings", path: "/api/v1/embeddings", expectedClass: "CLIENT_API" },
-  { name: "/api/v1/files", path: "/api/v1/files", expectedClass: "CLIENT_API" },
-  { name: "/api/v1/batches", path: "/api/v1/batches", expectedClass: "CLIENT_API" },
+  { name: "/api/v1/messages", path: "/api/v1/messages", expectedClass: "CLIENT_API" },
+  {
+    name: "/api/v1/auto-combo/candidates",
+    path: "/api/v1/auto-combo/best/candidates",
+    expectedClass: "CLIENT_API",
+  },
   { name: "/api/v1/ws", path: "/api/v1/ws", expectedClass: "CLIENT_API" },
   { name: "/api/mcp/* stays management", path: "/api/mcp/status", expectedClass: "MANAGEMENT" },
 

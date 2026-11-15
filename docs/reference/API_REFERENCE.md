@@ -25,8 +25,6 @@ Each deployment serves its own copy of the spec at `/openapi.yaml`, generated fr
 - [List Models](#list-models)
 - [Provider Plugin Manifest](#provider-plugin-manifest)
 - [Compatibility Endpoints](#compatibility-endpoints)
-- [Files API](#files-api)
-- [Batches API](#batches-api)
 - [Search API](#search-api)
 - [WebSocket Streaming](#websocket-streaming)
 - [Quotas & Issues Reporting](#quotas--issues-reporting)
@@ -745,48 +743,6 @@ POST /v1/providers/{provider}/images/generations
 ```
 
 The provider prefix is auto-added if missing. Mismatched models return `400`.
-
----
-
-## Files API
-
-OpenAI-compatible files endpoint for batch input/output and file-purpose uploads.
-
-| Method | Path                     | Description                                                                                                   |
-| ------ | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| POST   | `/v1/files`              | Upload a file (multipart: `file`, `purpose`, `expires_after[anchor]`, `expires_after[seconds]`) — 512 MiB max |
-| GET    | `/v1/files`              | List files for the authenticated API key                                                                      |
-| GET    | `/v1/files/[id]`         | Retrieve a file's metadata                                                                                    |
-| DELETE | `/v1/files/[id]`         | Delete a file                                                                                                 |
-| GET    | `/v1/files/[id]/content` | Stream the raw file body back                                                                                 |
-
-**Auth:** Bearer API key — files are scoped per-API-key via `getApiKeyRequestScope`. A key
-sees, downloads and deletes its own files only; a dashboard session without a key reads the
-whole instance; a file with no owner (anonymous or dashboard-session upload) is denied to every
-non-session caller. `GET /v1/files` rejects an anonymous caller — and a presented key that does
-not resolve — with `401` even when `REQUIRE_API_KEY=false`, instead of listing every tenant's
-files (GHSA-m3hp-hq9g-fpmv, GHSA-2jm2-mpx8-6523).
-
----
-
-## Batches API
-
-OpenAI-compatible batch processing.
-
-| Method | Path                      | Description                                                                                               |
-| ------ | ------------------------- | --------------------------------------------------------------------------------------------------------- |
-| POST   | `/v1/batches`             | Create batch — body validated by `v1BatchCreateSchema` (`input_file_id`, `endpoint`, `completion_window`) |
-| GET    | `/v1/batches`             | List batches                                                                                              |
-| GET    | `/v1/batches/[id]`        | Retrieve batch status + `request_counts`                                                                  |
-| DELETE | `/v1/batches/[id]`        | Delete a finished/failed batch                                                                            |
-| POST   | `/v1/batches/[id]/cancel` | Cancel an in-progress batch                                                                               |
-
-**Auth:** Bearer API key. Batches are scoped per-API-key under the same three-way rule as
-files: own key only, dashboard session instance-wide, null-owner records denied to every
-non-session caller (retrieve, delete, cancel, and the `input_file_id` check on create).
-`GET /v1/batches` rejects an anonymous caller with `401` even when `REQUIRE_API_KEY=false`.
-
----
 
 ## Search API
 

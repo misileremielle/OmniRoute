@@ -832,59 +832,6 @@
     "context": "Bối cảnh/hồ sơ máy chủ cho lệnh này",
     "lang": "Đặt ngôn ngữ hiển thị CLI (ghi đè OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Quản lý tệp (tải lên, liệt kê, lấy, tải xuống, xóa)",
-    "list": {
-      "purpose": "Lọc theo mục đích",
-      "limit": "Số kết quả tối đa"
-    },
-    "get": {
-      "description": "Lấy siêu dữ liệu tệp"
-    },
-    "upload": {
-      "description": "Tải tệp lên",
-      "purpose": "Mục đích của tệp (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Tải xuống nội dung tệp",
-      "out": "Lưu vào đường dẫn (mặc định: stdout)"
-    },
-    "delete": {
-      "yes": "Bỏ qua xác nhận"
-    }
-  },
-  "batches": {
-    "description": "Quản lý các tác vụ batch tương thích với OpenAI",
-    "list": {
-      "status": "Lọc theo trạng thái",
-      "limit": "Số kết quả tối đa"
-    },
-    "create": {
-      "description": "Tạo tác vụ batch",
-      "inputFile": "ID tệp đầu vào",
-      "endpoint": "Điểm cuối đích",
-      "window": "Khoảng thời gian hoàn tất",
-      "metadata": "Thêm siêu dữ liệu key=value"
-    },
-    "submit": {
-      "description": "Tải tệp JSONL lên và tạo tác vụ batch",
-      "jsonl": "Đường dẫn đến tệp JSONL",
-      "endpoint": "Điểm cuối đích",
-      "wait": "Chờ hoàn tất"
-    },
-    "cancel": {
-      "yes": "Bỏ qua xác nhận"
-    },
-    "wait": {
-      "timeout": "Thời gian chờ tính bằng ms"
-    },
-    "output": {
-      "out": "Lưu đầu ra vào đường dẫn"
-    },
-    "errors": {
-      "out": "Lưu lỗi vào đường dẫn"
-    }
-  },
   "pricing": {
     "description": "Quản lý dữ liệu giá cho các mô hình",
     "sync": {

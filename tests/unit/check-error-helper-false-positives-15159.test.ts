@@ -27,8 +27,8 @@ function run(source: string): string[] {
 }
 
 test("FP-1: a raw error inside a message-first logger call is an audit row, not a leak", () => {
-  // Real shape from src/app/api/v1/batches/delete-completed/route.ts:99-103 — the
-  // client response on the next lines is a static buildErrorBody, so nothing leaked:
+  // Real message-first logger shape — the client response on the next lines is
+  // a static buildErrorBody, so nothing leaked:
   //
   //   log.error("BATCHES", "delete-completed sweep failed", {
   //     error: err instanceof Error ? { message: err.message, stack: err.stack } : String(err),

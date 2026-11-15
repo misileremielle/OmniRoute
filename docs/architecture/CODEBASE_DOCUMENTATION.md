@@ -113,7 +113,7 @@ Top-level segments under `src/app/`:
 
 #### 3.1.1 `src/app/(dashboard)/dashboard/` — UI pages
 
-`agents`, `analytics`, `api-manager`, `audit`, `auto-combo`, `batch`, `cache`,
+`agents`, `analytics`, `api-manager`, `audit`, `auto-combo`, `cache`,
 `changelog`, `cli-tools`, `combos`, `compression`, `context`,
 `costs`, `endpoint`, `health`, `limits`, `logs`, `memory`, `onboarding`,
 `providers`, `search-tools`, `settings`, `skills`, `system`,
@@ -130,7 +130,6 @@ src/app/api/
 ├── analytics/
 ├── assess/
 ├── auth/
-├── batches/
 ├── cache/
 ├── cli-tools/
 ├── cloud/{codex-responses-ws}
@@ -228,10 +227,8 @@ v1/
 ├── agents/tasks/[id]/, agents/tasks/    A2A-flavored task endpoints
 ├── api/                                 internal API helpers exposed under v1/api
 ├── audio/{speech, transcriptions}/      TTS + STT
-├── batches/[id]/{cancel}, batches/      OpenAI Batches API
 ├── chat/completions/                    Chat Completions (the main endpoint)
 ├── embeddings/                          Embeddings
-├── files/[id]/, files/                  Files API
 ├── _helpers/                            Shared route helpers (no public URL)
 ├── images/{edits, generations}/         Image gen + edit
 ├── issues/                              Triage helper endpoints
@@ -269,7 +266,6 @@ table groups the actual directories and notable top-level files.
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `api/`            | Internal API helpers: `requireManagementAuth.ts`, `requireCliToolsAuth.ts`, `errorResponse.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `auth/`           | `managementPassword.ts` (password reset / hashing)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `batches/`        | OpenAI Batches API service (`service.ts`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `catalog/`        | OpenRouter catalog sync (`openrouterCatalog.ts`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `combos/`         | Combo resolution helpers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `compliance/`     | Audit + provider audit: `index.ts`, `providerAudit.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -321,11 +317,11 @@ Singleton SQLite database (`getDbInstance()` in `core.ts`, WAL journaling).
 > Source: [diagrams/db-schema-overview.mmd](../diagrams/db-schema-overview.mmd)
 
 Domain modules (each owns one or more tables): `apiKeys.ts`, `backup.ts`,
-`batches.ts`, `cleanup.ts`, `cliToolState.ts`, `combos.ts`,
+`cleanup.ts`, `cliToolState.ts`, `combos.ts`,
 `commandCodeAuth.ts`, `compression.ts`, `compressionAnalytics.ts`,
 `compressionCacheStats.ts`, `compressionCombos.ts`, `compressionScheduler.ts`,
 `contextHandoffs.ts`, `core.ts`, `creditBalance.ts`, `databaseSettings.ts`,
-`detailedLogs.ts`, `domainState.ts`, `encryption.ts`, `evals.ts`, `files.ts`,
+`detailedLogs.ts`, `domainState.ts`, `encryption.ts`, `evals.ts`,
 `healthCheck.ts`, `jsonMigration.ts`, `migrationRunner.ts`,
 `modelComboMappings.ts`, `models.ts`, `oneproxy.ts`, `prompts.ts`,
 `providers.ts`, `providerLimits.ts`, `proxies.ts`, `quotaSnapshots.ts`,
@@ -334,18 +330,18 @@ Domain modules (each owns one or more tables): `apiKeys.ts`, `backup.ts`,
 `syncTokens.ts`, `tierConfig.ts`, `upstreamProxy.ts`, `versionManager.ts`,
 `webhooks.ts`.
 
-`migrations/` holds 168 versioned `.sql` files (idempotent, transactional) and is
+`migrations/` holds 246 versioned `.sql` files (idempotent, transactional) and is
 executed by `migrationRunner.ts` at boot.
 
 Tables created across the migrations (123 total):
 
-`a`, `account_key_limits`, `api_keys`, `batches`, `call_logs`,
+`a`, `account_key_limits`, `api_keys`, `call_logs`,
 `combo_adaptation_state`, `combos`, `command_code_auth_sessions`,
 `compression_analytics`, `compression_cache_stats`,
 `compression_combo_assignments`, `compression_combos`, `context_handoffs`,
 `daily_usage_summary`, `db_meta`, `domain_budgets`, `domain_circuit_breakers`,
 `domain_cost_history`, `domain_fallback_chains`, `domain_lockout_state`,
-`eval_cases`, `eval_runs`, `eval_suites`, `files`, `hourly_usage_summary`,
+`eval_cases`, `eval_runs`, `eval_suites`, `hourly_usage_summary`,
 `key_value`, `mcp_tool_audit`, `memories`, `model_combo_mappings`,
 `provider_connections`, `provider_key_limits`, `provider_nodes`,
 `proxy_assignments`, `proxy_logs`, `proxy_registry`, `quota_snapshots`,
@@ -403,7 +399,7 @@ Split into focused subdirectories:
   `modelSpecs.ts`, `modelCompat.ts`, `pricing.ts`, `cliTools.ts`,
   `cliCompatProviders.ts`, `routingStrategies.ts`, `comboConfigMode.ts`,
   `headers.ts`, `upstreamHeaders.ts` (denylist), `mcpScopes.ts`,
-  `errorCodes.ts`, `publicApiRoutes.ts`, `batch.ts`, `batchEndpoints.ts`,
+  `errorCodes.ts`, `publicApiRoutes.ts`,
   `bodySize.ts`, `colors.ts`, `appConfig.ts`, `config.ts`,
   `sidebarVisibility.ts`, `visionBridgeDefaults.ts`.
 - `validation/` — `schemas.ts` (~80 Zod schemas), `compressionConfigSchemas.ts`,
@@ -526,7 +522,6 @@ Highlights (full list under `open-sse/services/`):
 | Token + session      | `tokenRefresh.ts`, `sessionManager.ts`, `apiKeyRotator.ts`, `contextManager.ts`, `contextHandoff.ts`, `roleNormalizer.ts`, `responsesInputSanitizer.ts`, `toolSchemaSanitizer.ts`, `toolLimitDetector.ts`, `thinkingBudget.ts`                           |
 | Tier / manifest      | `tierResolver.ts`, `tierConfig.ts`, `tierDefaults.json`, `tierTypes.ts`, `manifestAdapter.ts`                                                                                                                                                            |
 | IP / network         | `ipFilter.ts`, `webSearchFallback.ts`                                                                                                                                                                                                                    |
-| Batches              | `batchProcessor.ts`                                                                                                                                                                                                                                      |
 | Usage                | `usage.ts`                                                                                                                                                                                                                                               |
 
 ### 4.7 `open-sse/config/`

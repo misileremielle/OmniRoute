@@ -832,59 +832,6 @@
     "context": "Contextul/profilul serverului pentru această comandă",
     "lang": "Setează limba de afișare CLI (suprascrie OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Gestionează fișierele (încărcare, listare, obținere, descărcare, ștergere)",
-    "list": {
-      "purpose": "Filtrează după scop",
-      "limit": "Numărul maxim de rezultate"
-    },
-    "get": {
-      "description": "Obține metadatele fișierului"
-    },
-    "upload": {
-      "description": "Încarcă un fișier",
-      "purpose": "Scopul fișierului (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Descarcă conținutul fișierului",
-      "out": "Salvează în calea specificată (implicit: stdout)"
-    },
-    "delete": {
-      "yes": "Omite confirmarea"
-    }
-  },
-  "batches": {
-    "description": "Gestionează joburile batch compatibile cu OpenAI",
-    "list": {
-      "status": "Filtrează după stare",
-      "limit": "Număr maxim de rezultate"
-    },
-    "create": {
-      "description": "Creează un job batch",
-      "inputFile": "ID-ul fișierului de intrare",
-      "endpoint": "Endpoint țintă",
-      "window": "Fereastra de finalizare",
-      "metadata": "Adaugă metadate cheie=valoare"
-    },
-    "submit": {
-      "description": "Încarcă fișierul JSONL și creează un job batch",
-      "jsonl": "Calea către fișierul JSONL",
-      "endpoint": "Endpoint țintă",
-      "wait": "Așteaptă finalizarea"
-    },
-    "cancel": {
-      "yes": "Omite confirmarea"
-    },
-    "wait": {
-      "timeout": "Timp-limită în ms"
-    },
-    "output": {
-      "out": "Salvează rezultatul în calea specificată"
-    },
-    "errors": {
-      "out": "Salvează erorile în calea specificată"
-    }
-  },
   "pricing": {
     "description": "Gestionează datele de preț pentru modele",
     "sync": {

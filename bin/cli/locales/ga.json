@@ -832,59 +832,6 @@
     "context": "Comhthéacs/próifíl freastalaí le húsáid don ordú seo",
     "lang": "Socraigh teanga taispeáinte CLI (forbronnar OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Bainisteáil comhaid (uaslódáil, liostáil, faigh, íoslódáil, scrios)",
-    "list": {
-      "purpose": "Scag de réir cuspóra",
-      "limit": "Uasmhéid torthaí"
-    },
-    "get": {
-      "description": "Faigh meiteashonraí comhaid"
-    },
-    "upload": {
-      "description": "Uaslódáil comhad",
-      "purpose": "Cuspóir comhaid (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Íoslódáil ábhar comhaid",
-      "out": "Sábháil go cosán (réamhshocrú: stdout)"
-    },
-    "delete": {
-      "yes": "Scipeáil dearbhú"
-    }
-  },
-  "batches": {
-    "description": "Bainisteáil poist bathais comhoiriúnach le OpenAI",
-    "list": {
-      "status": "Scag de réir stádais",
-      "limit": "Uasmhéid torthaí"
-    },
-    "create": {
-      "description": "Cruthaigh post bathais",
-      "inputFile": "ID comhaid ionchuir",
-      "endpoint": "Sprioc-deireadh pointe",
-      "window": "Fuinneog críochnaithe",
-      "metadata": "Cuir eochair meiteashonraí leis key=value"
-    },
-    "submit": {
-      "description": "Uaslódáil comhad JSONL agus cruthaigh bathais",
-      "jsonl": "Cosán go comhad JSONL",
-      "endpoint": "Sprioc-deireadh pointe",
-      "wait": "Fan le críochnú"
-    },
-    "cancel": {
-      "yes": "Scipeáil dearbhú"
-    },
-    "wait": {
-      "timeout": "Am ama i soicindí milliúmana"
-    },
-    "output": {
-      "out": "Sábháil aschur go cosán"
-    },
-    "errors": {
-      "out": "Sábháil earráidí go cosán"
-    }
-  },
   "pricing": {
     "description": "Bainistigh sonraí praghsála do shamhlanna",
     "sync": {

@@ -22,9 +22,6 @@ import {
 /** Larger limit for backup/import routes: 100 MB */
 export const MAX_BODY_BYTES_IMPORT = 100 * 1024 * 1024;
 
-/** Larger limit for file uploads: 500 MB */
-export const MAX_BODY_BYTES_FILE = 500 * 1024 * 1024;
-
 /**
  * Default limit for LLM request payloads: 50 MB. A saved `maxBodySizeMb` replaces it, up or down;
  * without one, this stays the floor so long-context agent payloads keep working.
@@ -48,7 +45,6 @@ const ROUTE_LIMITS: BodySizeRule[] = [
   { prefix: "/api/v1/chat/completions", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
   { prefix: "/api/v1/responses", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
   { prefix: "/api/v1/messages", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
-  { prefix: "/api/v1/files", limit: MAX_BODY_BYTES_FILE },
 ];
 
 export function getConfiguredBodySizeLimitBytes(settings?: Record<string, unknown>): number {

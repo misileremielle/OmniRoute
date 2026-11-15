@@ -832,59 +832,6 @@
     "context": "Kontekst/profil serwera dla tego polecenia",
     "lang": "Ustaw język wyświetlania CLI (nadpisuje OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Zarządzaj plikami (przesyłanie, wyświetlanie, pobieranie informacji, pobieranie, usuwanie)",
-    "list": {
-      "purpose": "Filtruj według przeznaczenia",
-      "limit": "Maksymalna liczba wyników"
-    },
-    "get": {
-      "description": "Pobierz metadane pliku"
-    },
-    "upload": {
-      "description": "Prześlij plik",
-      "purpose": "Przeznaczenie pliku (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Pobierz zawartość pliku",
-      "out": "Zapisz w ścieżce (domyślnie: stdout)"
-    },
-    "delete": {
-      "yes": "Pomiń potwierdzenie"
-    }
-  },
-  "batches": {
-    "description": "Zarządzaj zadaniami wsadowymi zgodnymi z OpenAI",
-    "list": {
-      "status": "Filtruj według statusu",
-      "limit": "Maksymalna liczba wyników"
-    },
-    "create": {
-      "description": "Utwórz zadanie wsadowe",
-      "inputFile": "Identyfikator pliku wejściowego",
-      "endpoint": "Docelowy endpoint",
-      "window": "Okno realizacji",
-      "metadata": "Dodaj metadane klucz=wartość"
-    },
-    "submit": {
-      "description": "Prześlij plik JSONL i utwórz zadanie wsadowe",
-      "jsonl": "Ścieżka do pliku JSONL",
-      "endpoint": "Docelowy endpoint",
-      "wait": "Czekaj na zakończenie"
-    },
-    "cancel": {
-      "yes": "Pomiń potwierdzenie"
-    },
-    "wait": {
-      "timeout": "Limit czasu w ms"
-    },
-    "output": {
-      "out": "Zapisz dane wyjściowe w ścieżce"
-    },
-    "errors": {
-      "out": "Zapisz błędy w ścieżce"
-    }
-  },
   "pricing": {
     "description": "Zarządzaj danymi cenowymi modeli",
     "sync": {

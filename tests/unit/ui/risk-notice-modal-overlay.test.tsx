@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
 // RiskNoticeModal on the Modal adapter (KEA-7886, lote 7): Escape cancels, as the legacy dialog
 // did; an overlay click does not (the legacy backdrop had no click handler, so a stray click
-// outside never counted as a decision). The overlay positive control (the same dispatch closing
-// a default Modal) lives in tests/unit/dashboard/batch/components/NewBatchWizard.test.tsx.
+// outside never counted as a decision).
 import React, { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

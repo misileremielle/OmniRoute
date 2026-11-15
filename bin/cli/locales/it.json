@@ -832,59 +832,6 @@
     "context": "Contesto/profilo del server per questo comando",
     "lang": "Imposta la lingua di visualizzazione della CLI (sovrascrive OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Gestisci i file (carica, elenca, recupera, scarica, elimina)",
-    "list": {
-      "purpose": "Filtra per scopo",
-      "limit": "Numero massimo di risultati"
-    },
-    "get": {
-      "description": "Ottieni i metadati del file"
-    },
-    "upload": {
-      "description": "Carica un file",
-      "purpose": "Scopo del file (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Scarica il contenuto del file",
-      "out": "Salva nel percorso (predefinito: stdout)"
-    },
-    "delete": {
-      "yes": "Salta la conferma"
-    }
-  },
-  "batches": {
-    "description": "Gestisci i processi batch compatibili con OpenAI",
-    "list": {
-      "status": "Filtra per stato",
-      "limit": "Numero massimo di risultati"
-    },
-    "create": {
-      "description": "Crea un processo batch",
-      "inputFile": "ID del file di input",
-      "endpoint": "Endpoint di destinazione",
-      "window": "Finestra di completamento",
-      "metadata": "Aggiungi metadati chiave=valore"
-    },
-    "submit": {
-      "description": "Carica un file JSONL e crea un processo batch",
-      "jsonl": "Percorso del file JSONL",
-      "endpoint": "Endpoint di destinazione",
-      "wait": "Attendi il completamento"
-    },
-    "cancel": {
-      "yes": "Salta la conferma"
-    },
-    "wait": {
-      "timeout": "Timeout in ms"
-    },
-    "output": {
-      "out": "Salva l'output nel percorso"
-    },
-    "errors": {
-      "out": "Salva gli errori nel percorso"
-    }
-  },
   "pricing": {
     "description": "Gestisci i dati sui prezzi dei modelli",
     "sync": {

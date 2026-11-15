@@ -832,59 +832,6 @@
     "context": "Ọnọdụ/profaịlụ sava a ga-eji maka iwu a",
     "lang": "Tọọ asụsụ ngosipụta CLI (na-akagbu OMNIROUTE_LANG)"
   },
-  "files": {
-    "description": "Jikwaa faịlụ (bulite, depụta, nweta, budata, hichapụ)",
-    "list": {
-      "purpose": "Yọchaa site na ebumnuche",
-      "limit": "Ọnụọgụ nsonaazụ kacha elu"
-    },
-    "get": {
-      "description": "Nweta metadata faịlụ"
-    },
-    "upload": {
-      "description": "Bulite faịlụ",
-      "purpose": "Ebumnuche faịlụ (batch, assistants, fine-tune)"
-    },
-    "content": {
-      "description": "Budata ọdịnaya faịlụ",
-      "out": "Chekwaa n'ụzọ (ndabara: stdout)"
-    },
-    "delete": {
-      "yes": "Mafere nkwenye"
-    }
-  },
-  "batches": {
-    "description": "Jikwaa ọrụ batch dakọtara na OpenAI",
-    "list": {
-      "status": "Yọchaa site na ọnọdụ",
-      "limit": "Ọnụọgụ nsonaazụ kacha elu"
-    },
-    "create": {
-      "description": "Mepụta ọrụ batch",
-      "inputFile": "ID faịlụ ntinye",
-      "endpoint": "Endpoint e lekwasịrị anya",
-      "window": "Oge mmecha",
-      "metadata": "Tinye metadata key=value"
-    },
-    "submit": {
-      "description": "Bulite faịlụ JSONL ma mepụta batch",
-      "jsonl": "Ụzọ faịlụ JSONL",
-      "endpoint": "Endpoint e lekwasịrị anya",
-      "wait": "Chere ka ọ mezue"
-    },
-    "cancel": {
-      "yes": "Mafere nkwenye"
-    },
-    "wait": {
-      "timeout": "Oge nchere na ms"
-    },
-    "output": {
-      "out": "Chekwaa mmepụta n'ụzọ"
-    },
-    "errors": {
-      "out": "Chekwaa njehie n'ụzọ"
-    }
-  },
   "pricing": {
     "description": "Jikwaa data ọnụahịa maka model",
     "sync": {
