@@ -10,13 +10,14 @@ import {
   getProviderDisplayName,
   resolveProviderChoice,
 } from "../provider-catalog.mjs";
-import { registerSetupOpenCode } from "./setup-open-code.mjs";
 import { t } from "../i18n.mjs";
 
 const PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 async function getListCliTools() {
-  const { listCliTools } = await import(pathToFileURL(resolve(PROJECT_ROOT, "src/shared/constants/cliTools.ts")).href);
+  const { listCliTools } = await import(
+    pathToFileURL(resolve(PROJECT_ROOT, "src/shared/constants/cliTools.ts")).href
+  );
   return listCliTools;
 }
 
@@ -175,11 +176,6 @@ export function registerSetup(program) {
       const exitCode = await runSetupCommand(mergeSetupOptions(opts, globalOpts));
       if (exitCode !== 0) process.exit(exitCode);
     });
-
-  // Wire up `omniroute setup opencode` subcommand. Kept inside registerSetup
-  // so it always travels with the parent command (avoids a separate register
-  // call in the registry that would silently break if the parent renames).
-  registerSetupOpenCode(program.commands.find((c) => c.name() === "setup"));
 }
 
 export async function runSetupCommand(opts = {}) {

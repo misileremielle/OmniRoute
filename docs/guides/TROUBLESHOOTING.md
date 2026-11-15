@@ -450,20 +450,9 @@ see [`docs/guides/KIRO_SETUP.md`](./KIRO_SETUP.md).
 
 ### CLI Tool Shows Not Installed
 
-1. Check runtime fields: `curl http://localhost:20128/api/cli-tools/runtime/codex | jq`
-2. For portable mode: use image target `runner-cli` (bundled CLIs)
-3. For host mount mode: set `CLI_EXTRA_PATHS` and mount host bin directory as read-only
-4. If `installed=true` and `runnable=false`: binary was found but failed healthcheck
-
-### Quick Runtime Validation
-
-```bash
-curl -s http://localhost:20128/api/cli-tools/codex-settings | jq '{installed,runnable,commandPath,runtimeMode,reason}'
-curl -s http://localhost:20128/api/cli-tools/claude-settings | jq '{installed,runnable,commandPath,runtimeMode,reason}'
-curl -s http://localhost:20128/api/cli-tools/openclaw-settings | jq '{installed,runnable,commandPath,runtimeMode,reason}'
-```
-
----
+The dashboard CLI tool configurators were removed. Point the tool at OmniRoute
+manually (base URL `http://localhost:20128/v1` + an OmniRoute API key) or use
+`omniroute config set <tool>` / `omniroute configure codex`.
 
 ## Cost Issues
 

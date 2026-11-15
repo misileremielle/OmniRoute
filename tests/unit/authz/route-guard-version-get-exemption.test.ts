@@ -73,8 +73,8 @@ describe("isLocalOnlyPath - GET exemption for /api/system/version (#5083)", () =
     assert.equal(isLocalOnlyPath("/api/services/9router/start", "GET"), true);
   });
 
-  test("GET /api/cli-tools/runtime/claude still local-only", () => {
-    assert.equal(isLocalOnlyPath("/api/cli-tools/runtime/claude", "GET"), true);
+  test("GET /api/services/9router/status still local-only", () => {
+    assert.equal(isLocalOnlyPath("/api/services/9router/status", "GET"), true);
   });
 
   test("GET /api/db-backups/exportAll still local-only (spawns tar)", () => {

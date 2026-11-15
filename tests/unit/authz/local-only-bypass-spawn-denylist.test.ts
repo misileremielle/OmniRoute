@@ -49,16 +49,11 @@ test.after(() => {
 /** Code-exec / spawn routes that were LOCAL_ONLY but missing from the deny-list. */
 const CODE_EXEC_ROUTES: ReadonlyArray<{ prefix: string; sample: string }> = [
   { prefix: "/api/middleware/", sample: "/api/middleware/hooks" }, // new vm.Script
-  { prefix: "/api/cli-tools/runtime/status", sample: "/api/cli-tools/runtime/status" }, // execFileSync({ shell })
+  { prefix: "/api/services/cliproxy/install", sample: "/api/services/cliproxy/install" }, // npm install + spawn
   { prefix: "/api/system/version", sample: "/api/system/version" }, // git + npm install
   { prefix: "/api/db-backups/exportAll", sample: "/api/db-backups/exportAll" }, // tar
   { prefix: "/api/db/health", sample: "/api/db/health" }, // forked diagnostics
   { prefix: "/api/oauth/cursor/auto-import", sample: "/api/oauth/cursor/auto-import" },
-  { prefix: "/api/cli-tools/omp-settings", sample: "/api/cli-tools/omp-settings" },
-  { prefix: "/api/cli-tools/letta-settings", sample: "/api/cli-tools/letta-settings" },
-  { prefix: "/api/cli-tools/grok-build-settings", sample: "/api/cli-tools/grok-build-settings" },
-  { prefix: "/api/cli-tools/forge-settings", sample: "/api/cli-tools/forge-settings" },
-  { prefix: "/api/cli-tools/jcode-settings", sample: "/api/cli-tools/jcode-settings" },
   { prefix: "/dashboard/providers/services/", sample: "/dashboard/providers/services/x/embed/" },
   { prefix: "/api/discovery/", sample: "/api/discovery/scan" },
   { prefix: "/api/issue-agent/", sample: "/api/issue-agent/runs" },
@@ -119,14 +114,7 @@ for (const { prefix, sample } of CALL_SITE_GATED_SPAWN_ROUTES) {
 }
 
 test("schema refuses a parent prefix that would cover a spawn-capable route", () => {
-  for (const parent of [
-    "/api/",
-    "/api/cli-tools/",
-    "/api/cli-tools/",
-    "/api/middleware",
-    "/api/oauth/kiro/",
-    "/",
-  ]) {
+  for (const parent of ["/api/", "/api/middleware", "/api/oauth/kiro/", "/"]) {
     assert.equal(schemaRejectsBypassPrefix(parent), true, parent);
   }
 });
@@ -143,8 +131,7 @@ test("runtime snapshot drops spawn-capable prefixes coming from a malformed sett
   await applyBypass([
     "/api/jobs/",
     "/api/middleware/",
-    "/api/cli-tools/runtime/status",
-    "/api/cli-tools/runtime/",
+    "/api/services/cliproxy/install",
     "/api/providers/validate",
     "/api/resilience/connections",
   ]);

@@ -1154,19 +1154,6 @@ test("serve: cwd .env cannot supply PATH when the shell lacks it", async () => {
 const RESOLVERS: Array<[string, string, string]> = [
   ["launch", "../../bin/cli/commands/launch.mjs", "resolveLaunchTarget"],
   ["launch codex", "../../bin/cli/commands/launch-codex.mjs", "resolveCodexTarget"],
-  ["setup kilo", "../../bin/cli/commands/setup-kilo.mjs", "resolveKiloTarget"],
-  ["setup continue", "../../bin/cli/commands/setup-continue.mjs", "resolveContinueTarget"],
-  ["setup roo", "../../bin/cli/commands/setup-roo.mjs", "resolveRooTarget"],
-  ["setup goose", "../../bin/cli/commands/setup-goose.mjs", "resolveGooseTarget"],
-  ["setup cursor", "../../bin/cli/commands/setup-cursor.mjs", "resolveCursorTarget"],
-  ["setup whycodes", "../../bin/cli/commands/setup-whycodes.mjs", "resolveWhyCodesTarget"],
-  ["setup opencode", "../../bin/cli/commands/setup-opencode.mjs", "resolveOpencodeTarget"],
-  ["setup aider", "../../bin/cli/commands/setup-aider.mjs", "resolveAiderTarget"],
-  ["setup cline", "../../bin/cli/commands/setup-cline.mjs", "resolveClineTarget"],
-  ["setup crush", "../../bin/cli/commands/setup-crush.mjs", "resolveCrushTarget"],
-  ["setup 5dive", "../../bin/cli/commands/setup-5dive.mjs", "resolveFivediveTarget"],
-  ["setup qwen", "../../bin/cli/commands/setup-qwen.mjs", "resolveQwenTarget"],
-  ["setup gemini", "../../bin/cli/commands/setup-gemini.mjs", "resolveGeminiTarget"],
   ["configure", "../../bin/cli/commands/configure.mjs", "resolveConfigureTargetOptions"],
 ];
 

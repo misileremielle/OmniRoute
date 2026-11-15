@@ -125,26 +125,6 @@ Comprehensive settings panel with **7 tabs**:
 
 ---
 
-## 🔧 CLI Tools
-
-One-click configuration for AI coding tools: Claude Code, Codex CLI, OpenClaw, Kilo Code, Antigravity, Cline, Continue, Cursor, and Factory Droid. Features automated config apply/reset, connection profiles, and model mapping.
-
-![CLI Tools Dashboard](../screenshots/07-cli-tools.png)
-
----
-
-## 🤖 CLI Agents _(v2.0.11+)_
-
-Dashboard for discovering and managing CLI agents. Shows a grid of 16 built-in agents (Codex, Claude, Goose, OpenClaw, Aider, OpenCode, Cline, ForgeCode, Amazon Q, Open Interpreter, Cursor CLI, Warp, **Windsurf**, **Devin CLI**, **Kimi Coding**, **Command Code**) with:
-
-- **Installation status** — Installed / Not Found with version detection
-- **Protocol badges** — stdio, HTTP, etc.
-- **Custom agents** — Register any CLI tool via form (name, binary, version command, spawn args)
-- **CLI Fingerprint Matching** — Per-provider toggle to match native CLI request signatures, reducing ban risk while preserving proxy IP
-- **Local Devin authentication** — Devin CLI uses `devin auth login`; no browser OAuth flow is required
-
----
-
 ## 🔗 Context Relay _(v3.5.5+)_
 
 A combo strategy that preserves session continuity when account rotation happens mid-conversation. Before the active account is exhausted, OmniRoute generates a structured handoff summary in the background. After the next request resolves to a different account, the summary is injected as a system message so the new account continues with full context.

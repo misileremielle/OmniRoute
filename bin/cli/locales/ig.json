@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Jiri OmniRoute malite ebumnuche CLI a na-akwado"
   },
-  "setupClaude": {
-    "description": "Mepụta profaịlụ Claude Code na ~/.claude/profiles site na katalọgụ modelụ OmniRoute"
-  },
   "connect": {
     "description": "Jikọọ na sava OmniRoute dị anya wee banye na ọnọdụ dị anya"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Malite Codex CLI nke e duziri na OmniRoute (VPS mpaghara ma ọ bụ nke dị anya)"
-  },
-  "setupCodex": {
-    "description": "Mepụta faịlụ profaịlụ ~/.codex site na katalọgụ modelụ OmniRoute dị ndụ"
   },
   "packs": {
     "description": "Jikwaa ngwugwu runtime ndị nhọrọ (ML / akpaaka ihe nchọgharị)",

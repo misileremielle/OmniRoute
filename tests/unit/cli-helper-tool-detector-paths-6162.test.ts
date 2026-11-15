@@ -18,8 +18,6 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 const CLI_HELPER_FILES = [
   "src/lib/cli-helper/tool-detector.ts",
-  "src/lib/cli-helper/claudeProfileAutoSync.ts",
-  "src/lib/cli-helper/codexProfileAutoSync.ts",
   "src/lib/cli-helper/config-generator/opencode.ts",
 ];
 
@@ -41,18 +39,6 @@ test("tool-detector.ts is importable at runtime (regression for #6162)", async (
   const mod = await import("../../src/lib/cli-helper/tool-detector.ts");
   assert.equal(typeof mod.detectAllTools, "function");
   assert.equal(typeof mod.detectTool, "function");
-});
-
-test("claudeProfileAutoSync.ts is importable at runtime (regression for #6162)", async () => {
-  const mod = await import("../../src/lib/cli-helper/claudeProfileAutoSync.ts");
-  // The module exports at least the sync function; we don't care about its
-  // specific name, only that the import resolves without throwing.
-  assert.equal(typeof mod, "object");
-});
-
-test("codexProfileAutoSync.ts is importable at runtime (regression for #6162)", async () => {
-  const mod = await import("../../src/lib/cli-helper/codexProfileAutoSync.ts");
-  assert.equal(typeof mod, "object");
 });
 
 test("config-generator/opencode.ts is importable at runtime (regression for #6162)", async () => {

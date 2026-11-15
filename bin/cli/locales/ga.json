@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Seol sprioc CLI a thacaítear trí OmniRoute"
   },
-  "setupClaude": {
-    "description": "Gineadh próifílí ~/.claude/profiles Claude Code ó chatalóg samhlacha OmniRoute"
-  },
   "connect": {
     "description": "Ceangail le freastalaí cianda OmniRoute agus téigh isteach i mód cianda"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Seol Codex CLI dírithe ar OmniRoute (áitiúil nó VPS cianda)"
-  },
-  "setupCodex": {
-    "description": "Gineadh comhaid próifíle ~/.codex ó chatalóg beo samhlacha OmniRoute"
   },
   "packs": {
     "description": "Bainistigh paicéid rithaithe roghnach (ML / uathoibriú brabhsálaí)",

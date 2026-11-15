@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Palaidiet atbalstītu CLI mērķi caur OmniRoute"
   },
-  "setupClaude": {
-    "description": "Ģenerēt ~/.claude/profiles Claude Code profilus no OmniRoute modeļu kataloga"
-  },
   "connect": {
     "description": "Savienoties ar attālinātu OmniRoute serveri un ievadīt attālināto režīmu"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Palaidiet Codex CLI vērstu uz OmniRoute (vietējā vai attālinātā VPS)"
-  },
-  "setupCodex": {
-    "description": "Ģenerēt ~/.codex profila failus no OmniRoute dzīvā modeļu kataloga"
   },
   "packs": {
     "description": "Pārvaldīt izvēles runtime pakotnes (ML / pārlūkprogrammu automatizācija)",

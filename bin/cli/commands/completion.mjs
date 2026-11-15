@@ -173,7 +173,7 @@ _omniroute() {
             '--system[System prompt]:' \\
             '--max-tokens[Max tokens]:' ;;
         open)
-          _arguments '1:resource:(combos providers api-manager cli-tools agents settings logs evals audit cost resilience)' ;;
+          _arguments '1:resource:(combos providers api-manager agents settings logs evals audit cost resilience)' ;;
         completion) _arguments '1:subcommand:(zsh bash fish install refresh)' ;;
         config) _arguments '1:subcommand:(list get set validate contexts)' ;;
         models) _arguments '1:subcommand:(${modelCommands})' ;;
@@ -235,7 +235,7 @@ _omniroute() {
     config)      COMPREPLY=($(compgen -W "list get set validate contexts" -- "\${cur}")); return 0 ;;
     models)      COMPREPLY=($(compgen -W "${modelCommands}" -- "\${cur}")); return 0 ;;
     completion)  COMPREPLY=($(compgen -W "zsh bash fish install refresh" -- "\${cur}")); return 0 ;;
-    open)        COMPREPLY=($(compgen -W "combos providers api-manager cli-tools agents settings logs evals audit cost resilience" -- "\${cur}")); return 0 ;;
+    open)        COMPREPLY=($(compgen -W "combos providers api-manager agents settings logs evals audit cost resilience" -- "\${cur}")); return 0 ;;
     contexts)    COMPREPLY=($(compgen -W "list add use current show remove rename export import migrate" -- "\${cur}")); return 0 ;;
     configure)   COMPREPLY=($(compgen -W "${CONFIGURE_TARGET_WORDS}" -- "\${cur}")); return 0 ;;
     run)         COMPREPLY=($(compgen -W "${RUN_TARGET_WORDS}" -- "\${cur}")); return 0 ;;
@@ -278,7 +278,7 @@ complete -c omniroute -n '__fish_seen_subcommand_from providers' -a 'available l
 complete -c omniroute -n '__fish_seen_subcommand_from config' -a 'list get set validate contexts'
 complete -c omniroute -n '__fish_seen_subcommand_from models' -a '${modelCommands}'
 complete -c omniroute -n '__fish_seen_subcommand_from completion' -a 'zsh bash fish install refresh'
-complete -c omniroute -n '__fish_seen_subcommand_from open' -a 'combos providers api-manager cli-tools agents settings logs evals audit cost resilience'
+complete -c omniroute -n '__fish_seen_subcommand_from open' -a 'combos providers api-manager agents settings logs evals audit cost resilience'
 complete -c omniroute -n '__fish_seen_subcommand_from contexts' -a 'list add use current show remove rename export import migrate'
 complete -c omniroute -n '__fish_seen_subcommand_from configure' -a '${CONFIGURE_TARGET_WORDS}'
 complete -c omniroute -n '__fish_seen_subcommand_from run' -a '${RUN_TARGET_WORDS}'

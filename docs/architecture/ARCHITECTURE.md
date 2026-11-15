@@ -123,7 +123,6 @@ Main pages under `src/app/(dashboard)/dashboard/`:
 - `/dashboard/costs` — cost aggregation and pricing visibility
 - `/dashboard/analytics` — usage analytics, evaluations, combo target health
 - `/dashboard/limits` — quota/rate controls
-- `/dashboard/cli-code` — CLI onboarding, runtime detection, config generation
 - `/dashboard/cache` — read-through and reasoning cache statistics, eviction controls
 - `/dashboard/onboarding` — first-run setup wizard for new installations
 - `/dashboard/search-tools` — search provider testing and history
@@ -229,7 +228,6 @@ Management domains:
 - Keys/aliases/combos/pricing: `src/app/api/keys*`, `src/app/api/models/alias`, `src/app/api/combos*`, `src/app/api/pricing`
 - Usage: `src/app/api/usage/*`
 - Sync/cloud: `src/app/api/sync/*`, `src/app/api/cloud/*`
-- CLI tooling helpers: `src/app/api/cli-tools/*`
 - IP filter: `src/app/api/settings/ip-filter` (GET/PUT)
 - Thinking budget: `src/app/api/settings/thinking-budget` (GET/PUT)
 - Compression: `src/app/api/settings/compression`, `src/app/api/compression/*`, and
@@ -829,7 +827,6 @@ flowchart LR
 - `src/app/api/settings/proxy/test`: outbound proxy connectivity test (POST)
 - `src/app/api/usage/*`: usage and logs APIs
 - `src/app/api/sync/*` + `src/app/api/cloud/*`: cloud sync and cloud-facing helpers
-- `src/app/api/cli-tools/*`: local CLI config writers/checkers
 - `src/app/api/settings/ip-filter`: IP allowlist/blocklist (GET/PUT)
 - `src/app/api/settings/thinking-budget`: thinking token budget config (GET/PUT)
 - `src/app/api/settings/compression`: global compression settings (GET/PUT)

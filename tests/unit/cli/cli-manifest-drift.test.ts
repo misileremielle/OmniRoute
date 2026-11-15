@@ -117,9 +117,9 @@ test("manifest aliases never conflict with runtime aliases", () => {
   }
 });
 
-test("kilocode variants stay a single canonical target in both worlds", () => {
+test("kilocode variants normalize to kilo and have no configure target", () => {
   for (const legacy of ["kilocode", "kilo-code", "kilo_cli"]) {
-    assert.equal(resolveManifestTarget(legacy, "configure"), "kilo");
+    assert.equal(resolveManifestTarget(legacy, "configure"), undefined);
     assert.equal(normalizeCliToolId(legacy), "kilo");
   }
 });

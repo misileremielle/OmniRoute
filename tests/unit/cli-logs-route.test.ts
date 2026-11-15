@@ -1,11 +1,11 @@
 /**
- * Tests for /api/cli-tools/logs route (fix #2756).
+ * Tests for /api/logs/tail route (fix #2756).
  *
  * Verifies:
  *   - GET returns 200 with valid JSON array body.
  *   - `filter` param filters log lines by text.
  *   - Error responses do NOT leak stack traces (hard rule #12).
- *   - log-streamer.ts points to the correct URL (/api/cli-tools/logs).
+ *   - log-streamer.ts points to the correct URL (/api/logs/tail).
  *   - Non-numeric `limit` param does NOT bypass the 2000-entry cap.
  */
 
@@ -35,7 +35,7 @@ const lines = [
 ];
 fs.writeFileSync(logPath, lines.join("\n") + "\n", "utf-8");
 
-const { GET } = await import("../../src/app/api/cli-tools/logs/route.ts");
+const { GET } = await import("../../src/app/api/logs/tail/route.ts");
 
 test.before(async () => {
   await updateSettings({ requireLogin: false });
@@ -53,11 +53,11 @@ test.after(async () => {
 
 // Helper — make a request; auth passes because requireLogin is set to false in test.before
 function makeReq(queryString = "") {
-  const url = `http://localhost/api/cli-tools/logs${queryString ? `?${queryString}` : ""}`;
+  const url = `http://localhost/api/logs/tail${queryString ? `?${queryString}` : ""}`;
   return new Request(url);
 }
 
-test("GET /api/cli-tools/logs returns 200 with JSON array when log file exists", async () => {
+test("GET /api/logs/tail returns 200 with JSON array when log file exists", async () => {
   const res = await GET(makeReq());
   assert.equal(res.status, 200);
 
@@ -66,7 +66,7 @@ test("GET /api/cli-tools/logs returns 200 with JSON array when log file exists",
   assert.ok(body.length >= 3, `expected at least 3 entries, got ${body.length}`);
 });
 
-test("GET /api/cli-tools/logs respects filter param", async () => {
+test("GET /api/logs/tail respects filter param", async () => {
   const res = await GET(makeReq("filter=rateLimit"));
   assert.equal(res.status, 200);
 
@@ -83,7 +83,7 @@ test("GET /api/cli-tools/logs respects filter param", async () => {
   );
 });
 
-test("GET /api/cli-tools/logs returns empty array when log file does not exist", async () => {
+test("GET /api/logs/tail returns empty array when log file does not exist", async () => {
   const origPath = process.env.APP_LOG_FILE_PATH;
   process.env.APP_LOG_FILE_PATH = "/tmp/omniroute-nonexistent-cli-logs-test.log";
 
@@ -96,7 +96,7 @@ test("GET /api/cli-tools/logs returns empty array when log file does not exist",
   process.env.APP_LOG_FILE_PATH = origPath;
 });
 
-test("GET /api/cli-tools/logs error response does not leak stack traces (hard rule #12)", async () => {
+test("GET /api/logs/tail error response does not leak stack traces (hard rule #12)", async () => {
   // Simulate an internal error path by temporarily breaking the log path to a dir
   const origPath = process.env.APP_LOG_FILE_PATH;
   // Point to a directory so readFileSync throws
@@ -110,7 +110,7 @@ test("GET /api/cli-tools/logs error response does not leak stack traces (hard ru
   process.env.APP_LOG_FILE_PATH = origPath;
 });
 
-test("GET /api/cli-tools/logs limit=abc does not bypass the 2000-entry cap", async () => {
+test("GET /api/logs/tail limit=abc does not bypass the 2000-entry cap", async () => {
   // Write more than 2000 entries so we can verify the cap is applied
   const manyLines: string[] = [];
   for (let i = 0; i < 2100; i++) {
@@ -137,7 +137,7 @@ test("GET /api/cli-tools/logs limit=abc does not bypass the 2000-entry cap", asy
   }
 });
 
-test("log-streamer.ts calls /api/cli-tools/logs (correct URL, not the missing route)", async () => {
+test("log-streamer.ts calls /api/logs/tail (correct URL, not the missing route)", async () => {
   const { createLogStream } = await import("../../src/lib/cli-helper/log-streamer.ts");
   // Inspect the source to verify the URL used; we mock fetch to capture it
   const captured: string[] = [];
@@ -168,8 +168,8 @@ test("log-streamer.ts calls /api/cli-tools/logs (correct URL, not the missing ro
 
   assert.ok(captured.length > 0, "fetch should have been called");
   assert.ok(
-    captured.some((u) => u.includes("/api/cli-tools/logs")),
-    `Expected /api/cli-tools/logs in fetched URL, got: ${captured[0]}`
+    captured.some((u) => u.includes("/api/logs/tail")),
+    `Expected /api/logs/tail in fetched URL, got: ${captured[0]}`
   );
   assert.ok(
     !captured.some((u) => u.includes("/api/logs/console")),

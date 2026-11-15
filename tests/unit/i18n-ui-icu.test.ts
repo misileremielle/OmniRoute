@@ -13,7 +13,7 @@ import { findInvalidMessages, flattenLeaves } from "../../scripts/i18n/check-ui-
 // name instead of the translated copy.
 //
 // Before this gate, that class shipped 6 times: #12302 (ccOnboardingKeyPlaceholder),
-// #12505 (OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES.description), plus 4 more
+// #12505 (a removed CLI profile auto-sync flag description), plus 4 more
 // (featureFlagExposeFunctionalGatewayMirrorsDescription, three paste-hint
 // JSON/regex examples, two `{" "}` artifacts) — 381 literal values across
 // the 42 locale catalogs, all fixed by scripts/ad-hoc/fix-invalid-icu.mjs with a

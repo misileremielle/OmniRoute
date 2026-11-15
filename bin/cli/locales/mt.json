@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Nniedi target tal-CLI appoġġat permezz ta' OmniRoute"
   },
-  "setupClaude": {
-    "description": "Ġġenera profili tal-Claude Code ~/.claude/profiles mill-katalog tal-mudelli tal-OmniRoute"
-  },
   "connect": {
     "description": "Connettiti għal server tal-OmniRoute remote u daħħal fil-modalità remote"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Nniedi Codex CLI mmirat lejn OmniRoute (lokali jew VPS remote)"
-  },
-  "setupCodex": {
-    "description": "Ġġenera fajls tal-profil ~/.codex mill-katalog tal-mudelli ħaj tal-OmniRoute"
   },
   "packs": {
     "description": "Immaniġġja packs tal-ħin tax-xogħol opzjonali (ML / awtomazzjoni tal-browser)",

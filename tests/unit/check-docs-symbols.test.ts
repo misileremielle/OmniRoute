@@ -101,8 +101,8 @@ test("ignores file references ending in .ts even when URL-shaped", () => {
 });
 
 test("drops a trailing markdown-emphasis underscore (table italics)", () => {
-  const md = "| _500 no POST /api/cli-tools/config_ | _Zod faltando_ |";
-  assert.deepEqual(extract(md), ["/api/cli-tools/config"]);
+  const md = "| _500 no POST /api/logs/tail_ | _Zod faltando_ |";
+  assert.deepEqual(extract(md), ["/api/logs/tail"]);
 });
 
 test("discards a segment with an unbalanced bracket (regex truncation in prose)", () => {

@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Start et understøttet CLI-mål via OmniRoute"
   },
-  "setupClaude": {
-    "description": "Generér Claude Code-profiler i ~/.claude/profiles ud fra OmniRoutes modelkatalog"
-  },
   "connect": {
     "description": "Opret forbindelse til en ekstern OmniRoute-server, og skift til ekstern tilstand"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Start Codex CLI med forbindelse til OmniRoute (lokalt eller på en ekstern VPS)"
-  },
-  "setupCodex": {
-    "description": "Generér profilfiler i ~/.codex ud fra OmniRoutes aktive modelkatalog"
   },
   "packs": {
     "description": "Administrer valgfrie runtime-pakker (ML/browserautomatisering)",

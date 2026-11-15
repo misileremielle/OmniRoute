@@ -97,8 +97,7 @@ OmniRoute ships Compose profiles for the main deployment shapes. Pick the one th
 
 ## Configuring host CLI tools when OmniRoute runs in Docker
 
-`omniroute setup-codex`, `setup-claude`, `config set <tool>` and the dashboard's
-**Save config** button all write files like `~/.codex/*.config.toml`. Those paths
+`omniroute config set <tool>` and `omniroute configure codex` write files like `~/.codex/*.config.toml`. Those paths
 only mean something on the machine where the CLI actually runs. Run them inside
 the container and the write lands in the container's own home (`/home/node` —
 the image runs `USER node`), where no host CLI will ever read it and where it is
@@ -117,7 +116,7 @@ docker compose --profile base up -d
 
 npm install -g omniroute
 omniroute connect http://localhost:20128   # point the CLI at the container
-omniroute setup-codex                      # writes the real ~/.codex on your host
+omniroute configure codex                  # writes the real ~/.codex on your host
 ```
 
 This is the right choice when Codex, Claude Code, Cursor or similar run on your
@@ -146,7 +145,7 @@ still refusing unmounted ones.
 ### Escape hatch: configure the container's own CLIs (use sparingly)
 
 When the CLIs genuinely live inside the container (the `cli` profile), the write
-is intentional. Pass `--allow-container-write` to any `setup-*` command, or set
+is intentional. Pass `--allow-container-write` to `config set` / `configure`, or set
 `OMNIROUTE_ALLOW_CONTAINER_CONFIG_WRITE=true` for the server. The write proceeds
 with a warning that it will not survive the container.
 

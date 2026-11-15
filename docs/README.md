@@ -82,7 +82,6 @@ Lookup material — API surface, environment variables, CLI flags, provider cata
 - [openapi.yaml](openapi.yaml) — OpenAPI spec for the public API.
 - [ENVIRONMENT.md](reference/ENVIRONMENT.md) — environment variables reference.
 - [FEATURE_FLAGS.md](reference/FEATURE_FLAGS.md) — feature flags and their defaults.
-- [CLI-TOOLS.md](reference/CLI-TOOLS.md) — bundled CLI commands.
 - [FREE_TIERS.md](reference/FREE_TIERS.md) — free-tier LLM provider directory.
 - [FREE_PROXIES_API.md](reference/FREE_PROXIES_API.md) — free proxies API.
 - [RELAY_BACKEND_STRATEGY.md](reference/RELAY_BACKEND_STRATEGY.md) — relay backend strategy.

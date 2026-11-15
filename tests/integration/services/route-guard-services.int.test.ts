@@ -154,13 +154,6 @@ describe("LOCAL_ONLY_API_PREFIXES constant integrity", () => {
     );
   });
 
-  it("includes /api/cli-tools/runtime/ (pre-existing hard rule)", () => {
-    assert.ok(
-      LOCAL_ONLY_API_PREFIXES.includes("/api/cli-tools/runtime/"),
-      "Expected /api/cli-tools/runtime/ in LOCAL_ONLY_API_PREFIXES"
-    );
-  });
-
   it("has exactly 5 entries (no silent regressions adding or removing prefixes)", () => {
     // 4 baseline entries (/api/mcp/, /api/cli-tools/runtime/, /api/services/,
     // /dashboard/providers/services/) + /api/copilot/ added in the v3.8.4
@@ -178,13 +171,6 @@ describe("SPAWN_CAPABLE_PREFIXES constant integrity", () => {
     assert.ok(
       SPAWN_CAPABLE_PREFIXES.includes("/api/services/"),
       `Expected /api/services/ in SPAWN_CAPABLE_PREFIXES, got: ${JSON.stringify(SPAWN_CAPABLE_PREFIXES)}`
-    );
-  });
-
-  it("includes /api/cli-tools/runtime/ (pre-existing spawn-capable)", () => {
-    assert.ok(
-      SPAWN_CAPABLE_PREFIXES.includes("/api/cli-tools/runtime/"),
-      "Expected /api/cli-tools/runtime/ in SPAWN_CAPABLE_PREFIXES"
     );
   });
 

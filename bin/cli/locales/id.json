@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Luncurkan target CLI yang didukung melalui OmniRoute"
   },
-  "setupClaude": {
-    "description": "Buat profil Claude Code di ~/.claude/profiles dari katalog model OmniRoute"
-  },
   "connect": {
     "description": "Hubungkan ke server OmniRoute jarak jauh dan masuk ke mode jarak jauh"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Luncurkan Codex CLI yang diarahkan ke OmniRoute (VPS lokal atau jarak jauh)"
-  },
-  "setupCodex": {
-    "description": "Buat file profil ~/.codex dari katalog model langsung OmniRoute"
   },
   "packs": {
     "description": "Kelola paket runtime opsional (ML / otomatisasi browser)",

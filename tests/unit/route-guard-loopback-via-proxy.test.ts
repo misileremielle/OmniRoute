@@ -6,7 +6,7 @@
  * Previously, the custom server stamped the loopback socket as the trusted
  * peer IP, so `classifyHostLocality()` returned "loopback" for every remote
  * caller arriving via the proxy → the LOCAL_ONLY route guard (which gates
- * spawn-capable routes like `/api/cli-tools/runtime/*`, `/api/services/*`,
+ * spawn-capable routes like `/api/services/*`,
  * `/api/plugins/*`, `/api/system/version`) was effectively bypassed. A leaked
  * JWT over the public tunnel could trigger child-process spawning.
  *

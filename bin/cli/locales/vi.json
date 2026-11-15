@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Khởi chạy một CLI được hỗ trợ thông qua OmniRoute"
   },
-  "setupClaude": {
-    "description": "Tạo các hồ sơ Claude Code trong ~/.claude/profiles từ danh mục mô hình OmniRoute"
-  },
   "connect": {
     "description": "Kết nối với máy chủ OmniRoute từ xa và vào chế độ từ xa"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Khởi chạy Codex CLI trỏ đến OmniRoute (cục bộ hoặc VPS từ xa)"
-  },
-  "setupCodex": {
-    "description": "Tạo các tệp hồ sơ ~/.codex từ danh mục mô hình trực tiếp của OmniRoute"
   },
   "packs": {
     "description": "Quản lý các gói runtime tùy chọn (ML / tự động hóa trình duyệt)",

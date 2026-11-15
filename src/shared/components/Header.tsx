@@ -81,8 +81,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   cache: "cacheDescription",
   quota: "limitsDescription",
   runtime: "runtimeDescription",
-  "cli-code": "cliToolsDescription",
-  "cli-agents": "agentsDescription",
   "context-caveman": "contextCavemanDescription",
   "context-rtk": "contextRtkDescription",
   "context-combos": "contextCombosDescription",

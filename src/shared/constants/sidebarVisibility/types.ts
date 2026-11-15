@@ -25,8 +25,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "compression-studio",
   "compression-exclusions",
   // OmniProxy > Tools
-  "cli-code",
-  "cli-agents",
   "discovery",
   // OmniProxy > Integrations
   "api-endpoints",

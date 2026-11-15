@@ -7,7 +7,7 @@ lastUpdated: 2026-09-21
 # Shared CLI launch and configuration contracts
 
 The neutral `config/cli-tools-manifest.json` contract declares canonical IDs,
-aliases, binary candidates, setup recipes, model arguments and capabilities.
+aliases, binary candidates, model arguments and capabilities.
 The plain Node adapter in `bin/cli/cli-manifest.mjs` and the TypeScript adapter
 in `src/shared/constants/cliIntegrationManifest.ts` read the same file.
 Runtime, catalog, configure, completion, generators and backend registration
@@ -33,15 +33,11 @@ termination (default 5000 milliseconds).
 ## Gemini persistent setup
 
 ```bash
-omniroute setup-gemini --remote https://omni.example --model provider/model --yes
-omniroute configure gemini --model provider/model --yes
 omniroute run gemini --model provider/model --dry-run --json
 ```
 
-The first two commands configure this machine for the selected local or remote
-server. Setup preserves unrelated JSON settings, selects Gemini API-key auth,
-and writes the endpoint and credential to a private `.gemini/.env` file.
-It refuses invalid JSON rather than overwriting it. Endpoint URLs must be
+`run gemini` launches against the selected local or remote server with a
+temporary isolated home. Endpoint URLs must be
 HTTP(S), without embedded credentials, query parameters or fragments.
 Dry-run prints paths, not credential values.
 
@@ -123,7 +119,7 @@ The CLI pairs a context's stored token (access token or legacy API key) only
 with that context's own origin: scheme, host and port, compared as
 `URL.origin`. This applies to requests made through the CLI's HTTP client
 (`--base-url`, `OMNIROUTE_BASE_URL`, `omniroute connect <new-url>`) and to the
-`launch`, `launch codex`, `configure` and `setup-*` commands that write a base
+`launch`, `launch codex` and `configure` commands that write a base
 URL and key into another tool's config. Pointed at another server with
 `--remote`, they use an explicit `--api-key` or `OMNIROUTE_API_KEY` if one is
 set, and no context token. The comparison is exact, so `localhost` and

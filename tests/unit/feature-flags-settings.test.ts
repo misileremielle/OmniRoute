@@ -77,7 +77,9 @@ const {
 // Removing the PII masker and the prompt-injection guard drops INPUT_SANITIZER_ENABLED,
 // INJECTION_GUARD_MODE, PII_REDACTION_ENABLED, PII_RESPONSE_SANITIZATION and
 // PII_RESPONSE_SANITIZATION_MODE (-5): 108.
-const EXPECTED_FEATURE_FLAG_COUNT = 108;
+// Removing the CLI tool configurators drops OMNIROUTE_AUTO_SYNC_CODEX_PROFILES and
+// OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES (-2): 106.
+const EXPECTED_FEATURE_FLAG_COUNT = 106;
 // tool_call wrapper repair, default on) to 86; OPENCODE_V2_CLIENT_FINGERPRINT_ENABLED
 // (#16571, OpenCode v2 client fingerprint, default off) to 87.
 // tool_call wrapper repair, default on) to 86; CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED
@@ -426,21 +428,6 @@ describe("featureFlagDefinitions", () => {
     assert.strictEqual(def.type, "boolean");
     assert.strictEqual(def.defaultValue, "true");
     assert.strictEqual(def.requiresRestart, false);
-  });
-
-  it("defines CLI profile auto-sync flags as CLI booleans disabled by default", () => {
-    for (const key of [
-      "OMNIROUTE_AUTO_SYNC_CODEX_PROFILES",
-      "OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES",
-    ]) {
-      const def = FEATURE_FLAG_DEFINITIONS.find((d) => d.key === key);
-      assert.ok(def, `${key} should exist`);
-      assert.strictEqual(def.category, "cli");
-      assert.strictEqual(def.type, "boolean");
-      assert.strictEqual(def.defaultValue, "false");
-      assert.strictEqual(def.requiresRestart, false);
-      assert.strictEqual(def.warningLevel, "caution");
-    }
   });
 
   it("defines context-window check bypass as a dangerous opt-in policy flag", () => {

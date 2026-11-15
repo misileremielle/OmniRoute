@@ -1,7 +1,5 @@
 {
   "open-sse/services/usage/qoder.ts": 1,
   "src/app/api/system/env/repair/route.ts": 1,
-  "src/lib/cli-helper/claudeProfileAutoSync.ts": 1,
-  "src/lib/cli-helper/codexProfileAutoSync.ts": 1,
   "src/lib/services/reverseProxy.ts": 1
 }

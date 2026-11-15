@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute வழியாக ஆதரிக்கப்படும் CLI இலக்கைத் தொடங்கவும்"
   },
-  "setupClaude": {
-    "description": "OmniRoute மாதிரிப் பட்டியலிலிருந்து ~/.claude/profiles Claude Code சுயவிவரங்களை உருவாக்கவும்"
-  },
   "connect": {
     "description": "தொலைநிலை OmniRoute சேவையகத்துடன் இணைந்து தொலைநிலைப் பயன்முறைக்குச் செல்லவும்"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute-ஐ நோக்கி Codex CLI-ஐத் தொடங்கவும் (உள்ளூர் அல்லது தொலைநிலை VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute-இன் நேரடி மாதிரிப் பட்டியலிலிருந்து ~/.codex சுயவிவரக் கோப்புகளை உருவாக்கவும்"
   },
   "packs": {
     "description": "விருப்ப இயக்கநேரத் தொகுப்புகளை நிர்வகிக்கவும் (ML / உலாவித் தானியக்கம்)",

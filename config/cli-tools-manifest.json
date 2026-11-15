@@ -59,13 +59,8 @@
         "catalog": true,
         "detect": true,
         "run": true,
-        "configure": true,
+        "configure": false,
         "generate": false
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-aider.mjs",
-        "exportName": "runSetupAiderCommand"
       },
       "runModel": {
         "flag": "--model",
@@ -119,13 +114,8 @@
         "catalog": true,
         "detect": true,
         "run": true,
-        "configure": true,
+        "configure": false,
         "generate": true
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-claude.mjs",
-        "exportName": "runSetupClaudeCommand"
       },
       "agentBackend": {
         "mode": "stdio-adapter",
@@ -143,13 +133,8 @@
         "catalog": true,
         "detect": true,
         "run": false,
-        "configure": true,
+        "configure": false,
         "generate": true
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-cline.mjs",
-        "exportName": "runSetupClineCommand"
       },
       "agentBackend": {
         "mode": "stdio-adapter",
@@ -201,13 +186,8 @@
         "catalog": true,
         "detect": true,
         "run": false,
-        "configure": true,
+        "configure": false,
         "generate": true
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-continue.mjs",
-        "exportName": "runSetupContinueCommand"
       }
     },
     "copilot": {
@@ -340,13 +320,8 @@
         "catalog": false,
         "detect": true,
         "run": true,
-        "configure": true,
+        "configure": false,
         "generate": false
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-gemini.mjs",
-        "exportName": "runSetupGeminiCommand"
       },
       "runModel": {
         "flag": "--model",
@@ -369,13 +344,8 @@
         "catalog": true,
         "detect": true,
         "run": true,
-        "configure": true,
+        "configure": false,
         "generate": false
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-goose.mjs",
-        "exportName": "runSetupGooseCommand"
       },
       "agentBackend": {
         "mode": "stdio-adapter",
@@ -460,13 +430,8 @@
         "catalog": true,
         "detect": true,
         "run": false,
-        "configure": true,
+        "configure": false,
         "generate": true
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-kilo.mjs",
-        "exportName": "runSetupKiloCommand"
       }
     },
     "letta": {
@@ -532,13 +497,8 @@
         "catalog": true,
         "detect": true,
         "run": true,
-        "configure": true,
+        "configure": false,
         "generate": true
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-opencode.mjs",
-        "exportName": "runSetupOpencodeCommand"
       },
       "runModel": {
         "flag": "--model",
@@ -597,13 +557,8 @@
         "catalog": true,
         "detect": true,
         "run": true,
-        "configure": true,
+        "configure": false,
         "generate": false
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-qwen.mjs",
-        "exportName": "runSetupQwenCommand"
       },
       "runModel": {
         "flag": "--model",
@@ -705,13 +660,8 @@
         "catalog": true,
         "detect": true,
         "run": false,
-        "configure": true,
+        "configure": false,
         "generate": false
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-5dive.mjs",
-        "exportName": "runSetup5diveCommand"
       }
     },
     "whycodes": {
@@ -722,13 +672,8 @@
         "catalog": true,
         "detect": true,
         "run": true,
-        "configure": true,
+        "configure": false,
         "generate": true
-      },
-      "configureRecipe": {
-        "mode": "module",
-        "module": "./setup-whycodes.mjs",
-        "exportName": "runSetupWhyCodesCommand"
       },
       "runModel": {
         "flag": "-m",

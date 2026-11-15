@@ -405,26 +405,6 @@ export const updateCliVersionSchema = z
     }
   });
 
-export const guideSettingsSaveSchema = z
-  .object({
-    baseUrl: z.string().trim().min(1).optional(),
-    // #3552: the CLI tool cards post `apiKey: null` in cloud mode (the real key is resolved
-    // server-side from keyId), and `z.string().optional()` rejected null → 400. Normalize
-    // null → undefined so validation passes and the keyId/default path is used.
-    apiKey: z.preprocess((v) => (v === null ? undefined : v), z.string().optional()),
-    model: z.string().trim().min(1, "Model is required").optional(),
-    models: z.array(z.string().trim().min(1, "Models must be non-empty")).min(1).optional(),
-    modelLabels: z.record(z.string(), z.string().trim().min(1)).optional(),
-    // OpenCode dashboard save forwards the /v1/models catalog the page already
-    // loaded. Unknown keys stay so context_length / capabilities are not stripped.
-    // Absent catalog keeps the writer's 128K/8K fallback.
-    catalog: z.array(z.object({ id: z.string().trim().min(1) }).passthrough()).optional(),
-  })
-  .refine((data) => !!data.model || !!data.models?.length, {
-    message: "Model is required",
-    path: ["model"],
-  });
-
 // ─── Auto-disable banned/error accounts ───────────────────────────────────
 export const updateAutoDisableAccountsSchema = z
   .object({

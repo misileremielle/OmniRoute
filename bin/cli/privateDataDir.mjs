@@ -4,7 +4,7 @@
 // storage.sqlite) and the database itself. Creating them without an explicit mode lets the
 // process umask decide; under the common umask 002 that is 0775 / 0664, i.e. readable by
 // every local user. These helpers make the private mode explicit, the same convention the
-// CLI already follows elsewhere (contexts.mjs, model-preferences.mjs, setup-qwen.mjs).
+// CLI already follows elsewhere (contexts.mjs, model-preferences.mjs).
 //
 // chmod is best-effort on purpose: on Windows it is a no-op, and a DATA_DIR owned by another
 // user (a bind mount, a shared volume) must not stop the server from starting.

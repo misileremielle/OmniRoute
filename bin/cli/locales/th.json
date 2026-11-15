@@ -1177,9 +1177,6 @@
   "run": {
     "description": "เปิดเป้าหมาย CLI ที่รองรับผ่าน OmniRoute"
   },
-  "setupClaude": {
-    "description": "สร้างโปรไฟล์ Claude Code ใน ~/.claude/profiles จากแค็ตตาล็อกโมเดล OmniRoute"
-  },
   "connect": {
     "description": "เชื่อมต่อกับเซิร์ฟเวอร์ OmniRoute ระยะไกลและเข้าสู่โหมดระยะไกล"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "เปิด Codex CLI ที่เชื่อมต่อกับ OmniRoute (ภายในเครื่องหรือ VPS ระยะไกล)"
-  },
-  "setupCodex": {
-    "description": "สร้างไฟล์โปรไฟล์ใน ~/.codex จากแค็ตตาล็อกโมเดลแบบสดของ OmniRoute"
   },
   "packs": {
     "description": "จัดการแพ็กรันไทม์เสริม (ML / ระบบอัตโนมัติของเบราว์เซอร์)",

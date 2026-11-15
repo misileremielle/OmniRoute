@@ -53,7 +53,7 @@ test("isLocalOnlyBypassableByManageScope: /api/local/ is NOT bypassable (defence
   //
   // The predicate reads from runtime settings; here we exercise the
   // defence-in-depth clause directly by checking the relevant invariant:
-  // /api/local/ must be in the same spawn-capable set as /api/cli-tools/runtime/.
+  // /api/local/ must be in the same spawn-capable set as /api/services/.
   assert.equal(isLocalOnlyPath("/api/local/redis/start"), true);
   // Same-origin false-positive guard: ensure /api/local is treated like every
   // other spawn-capable prefix (no whitelist carve-out).

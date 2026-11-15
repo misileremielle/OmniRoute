@@ -30,7 +30,6 @@ test("RESOURCES inclui todos os recursos principais", async () => {
     "combos",
     "providers",
     "api-manager",
-    "cli-tools",
     "agents",
     "settings",
     "logs",

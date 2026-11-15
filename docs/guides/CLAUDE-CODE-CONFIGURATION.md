@@ -20,8 +20,7 @@ omniroute launch
 # Against a remote OmniRoute (after `omniroute connect <host>`, this is automatic)
 omniroute launch --remote http://192.168.0.15:20128 --api-key oma_live_xxx
 
-# Generate per-model profiles, then launch one
-omniroute setup-claude            # writes ~/.claude/profiles/<name>/settings.json
+# Profiles are hand-written settings.json files (see Profiles below), then launch one
 omniroute launch --profile glm52  # Claude Code using glm/glm-5.2 via OmniRoute
 ```
 
@@ -165,43 +164,16 @@ only Kimi's models.
 > window for any id it doesn't recognize (it can't read a real window from
 > `/v1/models`). For a model with a larger window (e.g. Kimi K2's 256K), set
 > `CLAUDE_CODE_AUTO_COMPACT_WINDOW` to a value below the model's real window so
-> auto-compaction doesn't fire prematurely. The generated profiles above already
-> do this per model.
+> auto-compaction doesn't fire prematurely. Set it per model in each profile's
+> `env` block (see Profiles below).
 
 ---
 
-## Onboarding block on the dashboard
-
-The Claude tool card (**Dashboard → CLI Code**) renders the exact `settings.json` fragment
-for this instance, next to the discovery-alias info button, with a copy button:
-
-```jsonc
-{
-  "env": {
-    "ANTHROPIC_BASE_URL": "http://<your OmniRoute>:20128",
-    "ANTHROPIC_AUTH_TOKEN": "<your OmniRoute API key>",
-    "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
-  },
-}
-```
-
-The base URL is the one resolved by the card (including a custom override you typed), already
-normalized — no `/v1` suffix, no trailing slash. **The key is never rendered**: the block ships a
-placeholder, so a screenshot or a pasted snippet cannot leak one. Paste your key over it.
-
-Add `CLAUDE_CODE_AUTO_COMPACT_WINDOW` under the same `env` block for any model whose real
-context window is not 200K — Claude Code assumes 200K for every id it does not recognize, so
-auto-compaction otherwise fires at the wrong point (see the warning in the previous section).
-The snippet builder accepts that value too, so a caller that knows the target model's window
-can emit it directly.
-
-Source: `src/shared/services/claudeCliConfig.ts::buildClaudeDiscoverySettingsSnippet` (pure
-builder, unit-tested) rendered by `ClaudeGatewayOnboardingBlock`.
-
-### Pin one account (optional)
+## Pin one account (optional)
 
 To send every Claude Code request through one specific provider account, add the
-`x-omniroute-connection` header through `ANTHROPIC_CUSTOM_HEADERS` in the same `env` block:
+`x-omniroute-connection` header through `ANTHROPIC_CUSTOM_HEADERS` in the `env` block of
+Claude Code's `settings.json`:
 
 ```jsonc
 "ANTHROPIC_CUSTOM_HEADERS": "x-omniroute-connection: <connection id>"
@@ -220,9 +192,8 @@ Claude Code has **no native profile files** (unlike Codex's `~/.codex/<name>.con
 The idiomatic mechanism is `CLAUDE_CONFIG_DIR` — a separate config directory per
 profile, each with its own `settings.json`, credentials, history and cache.
 
-`omniroute setup-claude` fetches the live `/v1/models` catalog and writes one
-profile per model at `~/.claude/profiles/<name>/settings.json`, reusing the
-**same names as `setup-codex`** (`glm52`, `kimi-k27`, `deepseek-pro`, …):
+Write one profile per model at `~/.claude/profiles/<name>/settings.json`, reusing the
+**same names as the Codex profiles** (`glm52`, `kimi-k27`, `deepseek-pro`, …):
 
 ```jsonc
 // ~/.claude/profiles/glm52/settings.json
@@ -244,34 +215,11 @@ profile per model at `~/.claude/profiles/<name>/settings.json`, reusing the
 > active context), or export `ANTHROPIC_AUTH_TOKEN` yourself and run
 > `CLAUDE_CONFIG_DIR=~/.claude/profiles/<name> claude`.
 
-**Auto-sync after model discovery (opt-in).** OmniRoute can regenerate these same
-`~/.claude/profiles/<name>/settings.json` files automatically whenever a provider model
-sync changes the live catalog — so new/renamed models get profiles without re-running the
-command. It is **off by default**: toggle it from the **CLI Code dashboard** ("CLI profile
-auto-sync" → Claude Code), or set `OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES=true` (it also honors
-`CLI_ALLOW_CONFIG_WRITES`, on by default). When enabled it only writes profile files; it never
-changes your active/default Claude config, auth, or the `~/.claude/settings.json`.
-
-### Generating + using profiles
+### Using profiles
 
 ```bash
-# Local OmniRoute
-omniroute setup-claude
-
-# Remote VPS (bakes the VPS URL into every profile)
-omniroute setup-claude --remote http://192.168.0.15:20128 --api-key oma_live_xxx
-
-# Only some providers
-omniroute setup-claude --only glm,kimi
-
-# Also write profiles for local-CLI providers (zcode, auggie, devin-cli-agentic,
-# codex-app-server) not detected on this host (skipped by default for a local target)
-omniroute setup-claude --include-local
-
-# Preview without writing
-omniroute setup-claude --dry-run
-
-# Launch a profile
+# Write ~/.claude/profiles/<name>/settings.json per model (see above), then
+# launch one
 omniroute launch --profile kimi-k27
 ```
 
@@ -295,8 +243,8 @@ Otherwise a single `ANTHROPIC_MODEL` (what profiles set) is used for everything.
 ## Remote mode
 
 Once you've run `omniroute connect <host>` (see
-[Remote Mode](./REMOTE-MODE.md)), `omniroute launch` and `omniroute setup-claude`
-automatically target that remote server and use its scoped access token — no
+[Remote Mode](./REMOTE-MODE.md)), `omniroute launch`
+automatically targets that remote server and use its scoped access token — no
 extra flags needed. Override per-invocation with `--remote` / `--api-key`.
 
 ---

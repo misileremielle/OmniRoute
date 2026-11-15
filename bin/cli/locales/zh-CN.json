@@ -1177,9 +1177,6 @@
   "run": {
     "description": "通过 OmniRoute 启动受支持的 CLI 目标"
   },
-  "setupClaude": {
-    "description": "从 OmniRoute 模型目录生成 ~/.claude/profiles 的 Claude Code 配置文件"
-  },
   "connect": {
     "description": "连接到远程 OmniRoute 服务器并进入远程模式"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "启动指向 OmniRoute 的 Codex CLI（本地或远程 VPS）"
-  },
-  "setupCodex": {
-    "description": "从 OmniRoute 实时模型目录生成 ~/.codex 配置文件"
   },
   "packs": {
     "description": "管理可选的运行时包（ML / 浏览器自动化）",

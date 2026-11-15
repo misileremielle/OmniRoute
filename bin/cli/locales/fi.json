@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Käynnistä tuettu CLI-kohde OmniRouten kautta"
   },
-  "setupClaude": {
-    "description": "Luo ~/.claude/profiles Claude Code -profiilit OmniRouten malliluettelosta"
-  },
   "connect": {
     "description": "Yhdistä OmniRoute-etäpalvelimeen ja siirry etätilaan"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Käynnistä Codex CLI OmniRouteen yhdistettynä (paikallinen tai VPS-etäpalvelin)"
-  },
-  "setupCodex": {
-    "description": "Luo ~/.codex-profiilitiedostot OmniRouten reaaliaikaisesta malliluettelosta"
   },
   "packs": {
     "description": "Hallitse valinnaisia ajonaikaisen ympäristön paketteja (ML / selainautomaatio)",

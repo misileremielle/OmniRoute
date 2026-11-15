@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Ṣe ìfilọ́lẹ̀ ibi-àfojúsùn CLI tí a ṣe àtìlẹ́yìn fún nípasẹ̀ OmniRoute"
   },
-  "setupClaude": {
-    "description": "Ṣẹ̀dá àwọn prófáìlì Claude Code ~/.claude/profiles láti inú àkójọ awoṣe OmniRoute"
-  },
   "connect": {
     "description": "Sopọ̀ mọ́ olupin OmniRoute jíjìn kí o sì wọ ipò jíjìn"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Ṣe ìfilọ́lẹ̀ Codex CLI tí a tọ́ka sí OmniRoute (VPS agbègbè tàbí jíjìn)"
-  },
-  "setupCodex": {
-    "description": "Ṣẹ̀dá àwọn fáìlì prófáìlì ~/.codex láti inú àkójọ awoṣe alààyè OmniRoute"
   },
   "packs": {
     "description": "Ṣàkóso àwọn àpò runtime àṣàyàn (ML / aládàáṣiṣẹ́ aṣàwákiri)",

@@ -14,7 +14,7 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 
 - **Runtime:** Node.js `>=22.22.2 <23 || >=24.0.0 <27`, ES Modules (`"type": "module"`)
 - **Framework:** Next.js 16 (App Router) with TypeScript 6
-- **Database:** SQLite via better-sqlite3 (local, zero-config, 244 migrations)
+- **Database:** SQLite via better-sqlite3 (local, zero-config, 245 migrations)
 - **State management:** Zustand (client), SQLite (server persistence)
 - **UI:** React 19, Tailwind CSS 4, Recharts for analytics, @lobehub/icons for 130+ provider SVG icons
 - **Auth:** OAuth 2.0 (PKCE) for providers, bcrypt for local user auth
@@ -39,7 +39,6 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 │   │   │       ├── audit/        # Audit logs
 │   │   │       ├── auto-combo/   # Auto-combo engine dashboard
 │   │   │       ├── cache/        # Cache dashboard (semantic cache stats)
-│   │   │       ├── cli-tools/    # CLI tool configuration (Claude Code, Codex, etc.)
 │   │   │       ├── combos/       # Model combo management (21 strategies + 4 templates)
 │   │   │       ├── costs/        # Cost tracking per provider/model
 │   │   │       ├── endpoint/     # Unified: Endpoint Proxy, MCP, API Endpoints tabs
@@ -89,7 +88,7 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 │   │   │   ├── taskManager.ts    # Task lifecycle with TTL cleanup
 │   │   │   └── streaming.ts      # SSE streaming for A2A
 │   │   ├── compliance/           # Compliance policy engine
-│   │   ├── db/                   # SQLite database layer (147 modules + migrations)
+│   │   ├── db/                   # SQLite database layer (146 modules + migrations)
 │   │   │   ├── core.ts           # Database initialization, connection, schema
 │   │   │   ├── providers.ts      # Provider connection CRUD
 │   │   │   ├── models.ts         # Model catalog management
@@ -105,13 +104,12 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 │   │   │   ├── registeredKeys.ts # Registered API keys with quotas
 │   │   │   ├── quotaSnapshots.ts # Quota snapshot history
 │   │   │   ├── modelComboMappings.ts # Model-to-combo mappings
-│   │   │   ├── cliToolState.ts   # CLI tool state tracking
 │   │   │   ├── encryption.ts     # Data encryption
 │   │   │   ├── readCache.ts      # Read-through cache layer
 │   │   │   ├── secrets.ts        # Secrets management
 │   │   │   ├── stateReset.ts     # State reset utilities
 │   │   │   ├── migrationRunner.ts # Schema migration runner
-│   │   │   └── migrations/       # 244 versioned SQL migration files
+│   │   │   └── migrations/       # 245 versioned SQL migration files
 │   │   ├── evals/                # Eval runner and scheduler
 │   │   │   ├── extraction.ts     # Memory extraction from conversations
 │   │   │   ├── injection.ts      # Memory injection into context
@@ -242,7 +240,7 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 │   └── load/                     # Load tests
 ├── docs/                         # Documentation
 │   ├── architecture/             # ARCHITECTURE.md, CODEBASE_DOCUMENTATION.md, REPOSITORY_MAP.md, AUTHZ_GUIDE.md, RESILIENCE_GUIDE.md, QUALITY_GATES.md
-│   ├── reference/                # API_REFERENCE.md, PROVIDER_REFERENCE.md, CLI-TOOLS.md
+│   ├── reference/                # API_REFERENCE.md, PROVIDER_REFERENCE.md
 │   ├── frameworks/               # MCP-SERVER.md (80 tools), A2A-SERVER.md, SKILLS.md, MEMORY.md, EVALS.md, WEBHOOKS.md
 │   ├── routing/                  # AUTO-COMBO.md (16-factor scoring), REASONING_REPLAY.md
 │   ├── security/                 # GUARDRAILS.md, COMPLIANCE.md, STEALTH_GUIDE.md, PUBLIC_CREDS.md, ERROR_SANITIZATION.md
@@ -298,8 +296,6 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 - **Costs** — Cost tracking per provider/model
 - **Limits** — Rate limit monitoring
 - **Cache** — Semantic cache statistics and management
-- **CLI Tools** — One-click configuration for 10+ AI CLI tools
-- **CLI Agents** — Grid of 14+ built-in agents with ProviderIcon and install detection + custom agent registration
 - **Media** — Image/video/music generation (GPT-Image, FLUX, etc.) + audio transcription (up to 2GB files)
 - **Search Tools** — Search provider configuration and testing
 - **Memory** — Memory system management and visualization
@@ -344,13 +340,13 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 
 5. **SSE proxy pipeline:** The proxy pipeline is middleware-based: request → auth resolution → rate limiting → circuit breaker → format translation → upstream call → response translation → SSE streaming back to client.
 
-6. **SQLite for persistence:** All state (providers, combos, logs, settings, API keys, memory, skills) stored in a single SQLite database via 147 domain-specific modules. All DB operations go through `src/lib/db/` modules, never raw SQL in routes.
+6. **SQLite for persistence:** All state (providers, combos, logs, settings, API keys, memory, skills) stored in a single SQLite database via 146 domain-specific modules. All DB operations go through `src/lib/db/` modules, never raw SQL in routes.
 
 7. **OAuth with PKCE:** OAuth flows use PKCE for security. Token refresh handled by background job (`tokenHealthCheck.ts`).
 
 8. **ProviderIcon component:** Unified icon system using `@lobehub/icons` (130+ SVG) with PNG fallback and generic icon fallback chain. Used on providers, dashboard, and agents pages.
 
-9. **DB architecture:** `localDb.ts` is a re-export layer only — real logic lives in 147 `src/lib/db/` modules with 244 SQL migrations.
+9. **DB architecture:** `localDb.ts` is a re-export layer only — real logic lives in 146 `src/lib/db/` modules with 245 SQL migrations.
 
 10. **Upstream headers:** Custom headers merged in executors after default auth; same header name replaces executor value. Forbidden header names in `src/shared/constants/upstreamHeaders.ts`.
 
@@ -394,7 +390,7 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 
 4. **Environment variables:** All configuration is in `.env` (from `.env.example`). Key vars: `PORT`, `NEXT_PUBLIC_BASE_URL`, `API_KEY`, `ADMIN_PASSWORD`.
 
-5. **Database layer:** Operations go through `src/lib/db/` modules (147 domain-specific files, 244 migrations). `localDb.ts` is re-exports only — add new functions to the proper `db/*.ts` module.
+5. **Database layer:** Operations go through `src/lib/db/` modules (146 domain-specific files, 245 migrations). `localDb.ts` is re-exports only — add new functions to the proper `db/*.ts` module.
 
 6. **Tests** use Node.js built-in test runner + Vitest. Run `npm test`. Vitest for MCP/autoCombo (`npm run test:vitest`). Playwright for E2E (`npm run test:e2e`). Coverage gate: ratchet vs `quality-baseline.json`, absolute floor 60% statements/lines/functions/branches.
 
@@ -451,7 +447,7 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 ### Documentation Index
 
 - **Architecture & Reference**: `docs/architecture/ARCHITECTURE.md`, `docs/architecture/CODEBASE_DOCUMENTATION.md`, `docs/architecture/REPOSITORY_MAP.md`, `docs/reference/API_REFERENCE.md`, `docs/reference/PROVIDER_REFERENCE.md`, `docs/reference/openapi.yaml`
-- **Operator guides**: `docs/guides/USER_GUIDE.md`, `docs/reference/CLI-TOOLS.md`, `docs/guides/TROUBLESHOOTING.md`, `docs/ops/COVERAGE_PLAN.md`
+- **Operator guides**: `docs/guides/USER_GUIDE.md`, `docs/guides/TROUBLESHOOTING.md`, `docs/ops/COVERAGE_PLAN.md`
 - **Routing & resilience**: `docs/routing/AUTO-COMBO.md`, `docs/architecture/RESILIENCE_GUIDE.md`
 - **Security**: `docs/architecture/AUTHZ_GUIDE.md`, `docs/security/GUARDRAILS.md`, `docs/security/COMPLIANCE.md`, `docs/security/STEALTH_GUIDE.md`
 - **Extensibility**: `docs/frameworks/SKILLS.md`, `docs/frameworks/MEMORY.md`, `docs/frameworks/EVALS.md`, `docs/frameworks/WEBHOOKS.md`, `docs/routing/REASONING_REPLAY.md`

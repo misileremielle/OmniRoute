@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Käivita toetatud CLI sihtmärk OmniRoute'i kaudu"
   },
-  "setupClaude": {
-    "description": "Genereeri ~/.claude/profiles Claude Code profiilid OmniRoute'i mudelikataloogist"
-  },
   "connect": {
     "description": "Ühendu kaugserveriga OmniRoute ja lülitu kaugrežiimi"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Käivita Codex CLI, mis on suunatud OmniRoute'ile (kohalik või kaug-VPS)"
-  },
-  "setupCodex": {
-    "description": "Genereeri ~/.codex profiilifailid OmniRoute'i reaalajas mudelikataloogist"
   },
   "packs": {
     "description": "Halda valikulisi käitusaja pakke (ML / brauseri automatiseerimine)",

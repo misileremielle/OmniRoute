@@ -89,18 +89,18 @@ The CLI validates it via `GET /api/cli/whoami` and saves it as the active contex
 
 Three levels, hierarchical (`admin ⊃ write ⊃ read`):
 
-| Scope   | Can do                                                                       |
-| ------- | ---------------------------------------------------------------------------- |
-| `read`  | list/inspect — `models list`, `providers status`, `logs`, `usage`, `cost`    |
-| `write` | read **+** configure/apply — `setup-codex`, `keys add`, `config set`, combos |
-| `admin` | write **+** manage — `tokens` CRUD, add providers, services, policy, oauth   |
+| Scope   | Can do                                                                     |
+| ------- | -------------------------------------------------------------------------- |
+| `read`  | list/inspect — `models list`, `providers status`, `logs`, `usage`, `cost`  |
+| `write` | read **+** configure/apply — `config set`, `keys add`, combos              |
+| `admin` | write **+** manage — `tokens` CRUD, add providers, services, policy, oauth |
 
 The server infers the scope each route requires from the HTTP method
 (`GET`→read, mutations→write) plus an admin allowlist for sensitive surfaces
 (`/api/cli/tokens`, `/api/providers` mutations, `/api/oauth`, `/api/services`, …).
 A token with insufficient scope gets `403` with a clear message.
 
-> Routes that spawn processes (`/api/services/*`, `/api/cli-tools/runtime/*`, …) stay
+> Routes that spawn processes (`/api/services/*`, …) stay
 > **loopback-only** — a remote token can never reach them, regardless of scope.
 
 ---
@@ -320,45 +320,12 @@ Targets: `claude`, `codex`, `aider`, `goose`, `opencode`, `qwen`, `gemini`
 temporary isolated home that is removed on exit, so the launch never touches —
 or leaks into — your personal tool configuration.
 
-### Per-CLI setup commands
+### Per-tool configuration
 
-Each supported CLI has a remote-aware setup command (all honour the active
-context, or `--remote <url> --api-key <key>`):
-
-| CLI         | Command                    | What it writes                                                                                                                                                       |
-| ----------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Codex       | `omniroute setup-codex`    | `~/.codex/<name>.config.toml` profiles (per model)                                                                                                                   |
-| Claude Code | `omniroute setup-claude`   | `~/.claude/profiles/<name>/settings.json` (per model)                                                                                                                |
-| OpenCode    | `omniroute setup-opencode` | `~/.config/opencode/opencode.json` — the `omniroute` openai-compatible provider with every catalog model (run `opencode -m omniroute/<model>`)                       |
-| Cline       | `omniroute setup-cline`    | `~/.cline/data/{globalState,secrets}.json` (CLI mode) + prints the VS Code extension settings to paste (OpenAI-compatible, Base URL **without** `/v1`)               |
-| Kilo Code   | `omniroute setup-kilo`     | `~/.local/share/kilo/auth.json` (CLI) + VS Code `kilocode.*` settings — OpenAI-compatible, Base URL **with** `/v1`                                                   |
-| Continue    | `omniroute setup-continue` | `~/.continue/config.yaml` (VS Code/JetBrains + `cn` CLI) — `provider: openai`, `apiBase` **with** `/v1`, key via `${{ secrets.OMNIROUTE_API_KEY }}`                  |
-| Cursor      | `omniroute setup-cursor`   | prints the in-app steps (Settings → Models → Override OpenAI Base URL **with** `/v1` + key + model). Cursor config is opaque SQLite — chat panel only                |
-| Roo Code    | `omniroute setup-roo`      | writes a Roo import JSON (`~/.omniroute/roo-settings.json`) + sets `roo-cline.autoImportSettingsPath` + prints UI steps (OpenAI-compatible, Base URL **with** `/v1`) |
-| Crush       | `omniroute setup-crush`    | `~/.config/crush/crush.json` — `openai-compat` provider, `base_url` **with** `/v1`, key via `$OMNIROUTE_API_KEY`                                                     |
-| Zed         | `omniroute setup-zed`      | `~/.config/zed/settings.json` — `language_models.openai_compatible.omniroute`, `api_url` **with** `/v1`, key read by Zed from `$OMNIROUTE_API_KEY` (never written)   |
-| Goose       | `omniroute setup-goose`    | `~/.config/goose/config.yaml` (`GOOSE_PROVIDER=openai` + `OPENAI_HOST` **without** `/v1` + `GOOSE_MODEL`) + env recipe                                               |
-| Aider       | `omniroute setup-aider`    | `~/.aider.conf.yml` (`openai-api-base` **without** `/v1` + `model: openai/<id>`) + env recipe (`aider --message --yes`)                                              |
-| Qwen Code   | `omniroute setup-qwen`     | `~/.qwen/settings.json` V4 `modelProviders.openai` entry + `OMNIROUTE_API_KEY` in `~/.qwen/.env`                                                                     |
-
-```bash
-# OpenCode (openai-compatible provider, all catalog models, remote VPS)
-omniroute setup-opencode --remote http://192.168.0.15:20128 --api-key oma_live_xxx
-omniroute setup-opencode --only glm,kimi        # keep only matching models
-opencode -m omniroute/glm/glm-5.2 "..."          # export OMNIROUTE_API_KEY first
-```
-
-> OpenCode also has a richer **plugin** integration: `omniroute setup opencode`
-> (now remote-aware via `--remote`) installs `@omniroute/opencode-plugin`.
-> `setup-opencode` is the lightweight openai-compatible alternative. The API key
-> is referenced via `{env:OMNIROUTE_API_KEY}` — never written to disk.
->
-> On OpenCode v2, use `@omniroute/opencode-plugin-v2` instead: same catalog,
-> different loader contract. It reads the key from OpenCode's own credential
-> store when the integration is connected, so a remote gateway needs no key in
-> `opencode.json` at all.
-
----
+`omniroute configure codex` writes a `~/.codex/<name>.config.toml` profile from
+the active context's live model catalog. `omniroute config set <tool>` writes
+other tools' configs the same way. Both honour the active context, or
+`--remote <url> --api-key <key>`.
 
 ## Managing contexts (switch between servers)
 

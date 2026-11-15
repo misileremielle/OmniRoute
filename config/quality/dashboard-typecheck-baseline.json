@@ -11,15 +11,6 @@
   "src/app/(dashboard)/dashboard/cache/components/CachePerformance.tsx": {
     "TS2339": 1
   },
-  "src/app/(dashboard)/dashboard/cli-code/components/ClaudeToolCard.tsx": {
-    "TS2339": 2
-  },
-  "src/app/(dashboard)/dashboard/cli-code/components/CodexToolCard.tsx": {
-    "TS2345": 3
-  },
-  "src/app/(dashboard)/dashboard/cli-code/components/CustomCliCard.tsx": {
-    "TS2345": 1
-  },
   "src/app/(dashboard)/dashboard/compression/studio/EncoderComparisonTable.tsx": {
     "TS2322": 1
   },

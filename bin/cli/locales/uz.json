@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute orqali qoʻllab-quvvatlanadigan CLI nishonini ishga tushirish"
   },
-  "setupClaude": {
-    "description": "OmniRoute modellar katalogidan ~/.claude/profiles uchun Claude Code profillarini yaratish"
-  },
   "connect": {
     "description": "Masofaviy OmniRoute serveriga ulanish va masofaviy rejimga oʻtish"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute manziliga yoʻnaltirilgan Codex CLI vositasini ishga tushirish (mahalliy yoki masofaviy VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute jonli modellar katalogidan ~/.codex profil fayllarini yaratish"
   },
   "packs": {
     "description": "Ixtiyoriy bajarilish paketlarini boshqarish (ML / brauzerni avtomatlashtirish)",

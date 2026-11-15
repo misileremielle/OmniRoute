@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Desteklenen bir CLI hedefini OmniRoute üzerinden başlat"
   },
-  "setupClaude": {
-    "description": "OmniRoute model kataloğundan ~/.claude/profiles Claude Code profilleri oluştur"
-  },
   "connect": {
     "description": "Uzak bir OmniRoute sunucusuna bağlan ve uzak moda geç"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute'u hedefleyen Codex CLI'ı başlat (yerel veya uzak VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute canlı model kataloğundan ~/.codex profil dosyaları oluştur"
   },
   "packs": {
     "description": "İsteğe bağlı çalışma zamanı paketlerini yönet (ML / tarayıcı otomasyonu)",

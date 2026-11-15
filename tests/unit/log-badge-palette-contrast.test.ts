@@ -207,10 +207,10 @@ test("the kit's ink and border hold on the tint for every provider and CLI tool 
 
 test("brand chips use the kit tint, and the app's own tint helper is gone", () => {
   assert.equal(fs.existsSync(path.join(root, "src/shared/utils/brandTint.ts")), false);
-  const chips: Array<[string, number]> = [
-    ["src/app/(dashboard)/dashboard/cli-code/components/CopilotToolCard.tsx", 3],
-    ["src/app/(dashboard)/dashboard/cli-code/components/DefaultToolCard.tsx", 1],
-  ];
+  // The only brand-chip consumers were the removed cli-code tool cards
+  // (CopilotToolCard x3, DefaultToolCard x1); no kept dashboard file may
+  // reintroduce the app-level tint helper or solid brand fills.
+  const chips: Array<[string, number]> = [];
   for (const [file, count] of chips) {
     const source = read(file);
     assert.doesNotMatch(source, /brandTintStyle/, `${file}: no app tint helper`);
@@ -255,8 +255,6 @@ test("token text stays AA on every step of the saliency ramp, in all four looks"
 
 test("white text on a brand fill and brand-coloured text are gone from the audited screens", () => {
   const files = [
-    "src/app/(dashboard)/dashboard/cli-code/components/CopilotToolCard.tsx",
-    "src/app/(dashboard)/dashboard/cli-code/components/DefaultToolCard.tsx",
     "src/app/(dashboard)/dashboard/providers/components/onboarding/ProviderOnboardingWizard.tsx",
     "src/app/(dashboard)/dashboard/providers/[id]/components/ProviderPageHeader.tsx",
     "src/app/(dashboard)/dashboard/settings/components/SecurityTab.tsx",

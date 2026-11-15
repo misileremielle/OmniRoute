@@ -1431,18 +1431,6 @@ a manual backup (`PUT`) keep ordinary management auth.
 | `/api/sync/initialize` | POST    | Initialize sync       |
 | `/api/cloud/*`         | Various | Cloud management      |
 
-### CLI Tools
-
-| Endpoint                           | Method | Description         |
-| ---------------------------------- | ------ | ------------------- |
-| `/api/cli-tools/claude-settings`   | GET    | Claude CLI status   |
-| `/api/cli-tools/codex-settings`    | GET    | Codex CLI status    |
-| `/api/cli-tools/droid-settings`    | GET    | Droid CLI status    |
-| `/api/cli-tools/openclaw-settings` | GET    | OpenClaw CLI status |
-| `/api/cli-tools/runtime/[toolId]`  | GET    | Generic CLI runtime |
-
-CLI responses include: `installed`, `runnable`, `command`, `commandPath`, `runtimeMode`, `reason`.
-
 ### Resilience & Rate Limits
 
 | Endpoint                          | Method    | Description                                                                                                                                                                                                                                                                                                                                                                                     |
@@ -1894,26 +1882,6 @@ Admin-only endpoints for operational management.
 | POST   | `/api/admin/concurrency` | Update concurrency limits — body: `{global?: number, perProvider?: Record<string, number>}` |
 
 **Auth:** Requires management session with admin scope.
-
----
-
-## CLI Tools Management
-
-Manage CLI tools that integrate with OmniRoute (antigravity, commandCode,
-devin-cli, etc.). See [Provider Reference](./PROVIDER_REFERENCE.md) for the full list.
-
-| Method | Path                          | Description                                                                                                                                       |
-| ------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/cli-tools/all-statuses` | Status of all CLI tools (installed, version, last seen)                                                                                           |
-| GET    | `/api/cli-tools/status`       | Status detail for one CLI tool (`?tool=` query)                                                                                                   |
-| POST   | `/api/cli-tools/apply`        | Write a tool's generated config (`dryRun` previews; `422` + `containerEphemeralTarget` when containerized; `migration` notes a legacy Codex YAML) |
-| GET    | `/api/cli-tools/backups`      | List CLI tool configuration backups                                                                                                               |
-| POST   | `/api/cli-tools/backups`      | Create a backup of all CLI tool configurations                                                                                                    |
-| POST   | `/api/cli-tools/backups`      | Restore: same endpoint with `{tool, backupId}` in the body restores that backup                                                                   |
-
-**Auth:** Requires management session.
-
----
 
 ## Agent Skills
 

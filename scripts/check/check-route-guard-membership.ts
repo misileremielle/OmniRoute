@@ -50,29 +50,8 @@ function assertNoStaleEntries(
 // Hard Rules #15/#16 for the dirs that physically exist under src/app/api/.
 export const SPAWN_CAPABLE_ROUTE_ROOTS: ReadonlyArray<string> = [
   "src/app/api/services",
-  "src/app/api/cli-tools/runtime",
   "src/app/api/local", // T-12: 1-click local service launchers (Redis today) — every child here spawns podman/docker (Hard Rules #15 + #16)
   "src/app/api/skills/collect", // Chaos Mode dispatch route, kept loopback-only apart from its exact public entry
-  "src/app/api/cli-tools/forge-settings", // GET calls getCliRuntimeStatus() to detect the `forge` CLI install (Hard Rules #15 + #16, #7263)
-  "src/app/api/cli-tools/jcode-settings", // GET calls getCliRuntimeStatus() to detect the `jcode` CLI install (Hard Rules #15 + #16, #7263)
-  "src/app/api/cli-tools/qwen-settings", // GET calls getCliRuntimeStatus("qwen") and writes local ~/.qwen config files (Hard Rules #15 + #16)
-  // GHSA-35fw-cv32-2373: the 14 cli-tools routes that reach the same spawn as the siblings
-  // above via getCliRuntimeStatus() (13) or detectAllTools() -> execFile (detect).
-  "src/app/api/cli-tools/all-statuses", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/claude-settings", // GET calls getCliRuntimeStatus() to detect the `claude` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/cline-settings", // GET calls getCliRuntimeStatus() to detect the `cline` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/codewhale-settings", // GET calls getCliRuntimeStatus() to detect the `codewhale` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/codex-settings", // GET calls getCliRuntimeStatus() to detect the `codex` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/crush-settings", // GET calls getCliRuntimeStatus() to detect the `crush` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/deepseek-tui-settings", // GET calls getCliRuntimeStatus() to detect the `deepseek-tui` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/detect", // GET calls detectAllTools() -> execFile(binary, --version) + execFile("which") per tool via src/lib/cli-helper/tool-detector.ts (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/droid-settings", // GET calls getCliRuntimeStatus() to detect the `droid` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/kilo-settings", // GET calls getCliRuntimeStatus() to detect the `kilo` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/openclaw-settings", // GET calls getCliRuntimeStatus() to detect the `openclaw` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/pi-settings", // GET calls getCliRuntimeStatus() to detect the `pi` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/smelt-settings", // GET calls getCliRuntimeStatus() to detect the `smelt` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "src/app/api/cli-tools/whycodes-settings", // GET calls getCliRuntimeStatus() to detect the `whycodes` CLI install (Hard Rules #15 + #16, #14107)
   // (executor.ts -> builtins.ts -> sandbox.ts) — invisible to the source-scan subcheck.
   // install / start / restart / stop reach the CLIProxyAPI download + ServiceSupervisor spawn
   // transitively, which the source-scan subcheck cannot see.

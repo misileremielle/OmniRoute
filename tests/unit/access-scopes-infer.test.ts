@@ -29,8 +29,6 @@ test("admin-mutation prefixes: GET stays read, mutations become admin", () => {
   assert.equal(inferRequiredScope("GET", "/api/providers"), "read");
   assert.equal(inferRequiredScope("POST", "/api/providers"), "admin");
   assert.equal(inferRequiredScope("DELETE", "/api/providers/openai"), "admin");
-  // cli-tools/apply writes to the host fs
-  assert.equal(inferRequiredScope("POST", "/api/cli-tools/apply"), "admin");
 });
 
 test("resilience inspection is read-only but mutations require operator admin", () => {

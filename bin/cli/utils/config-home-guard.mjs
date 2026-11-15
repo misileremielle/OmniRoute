@@ -3,7 +3,7 @@ import { printError, printInfo } from "../io.mjs";
 /**
  * Container guard for CLI-tool config writes.
  *
- * `omniroute setup-*` writes to `~/.codex`, `~/.claude`, ... — paths that only
+ * `omniroute config set` writes to `~/.codex`, `~/.claude`, ... — paths that only
  * mean something on the operator's host. Run the same command inside the
  * OmniRoute container and the write "succeeds" into an ephemeral layer that no
  * host CLI ever reads and that disappears with the container. This guard turns
@@ -97,7 +97,7 @@ export async function assertHostConfigTarget(targetPath, options = {}) {
 
 /**
  * Container check for commands that write nothing but still print host-oriented
- * instructions (setup-cursor). Fails closed to `false` so a broken import never
+ * instructions). Fails closed to `false` so a broken import never
  * turns into a spurious warning.
  */
 export async function isContainerRuntime(deps) {

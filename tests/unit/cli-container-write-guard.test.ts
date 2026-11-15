@@ -37,14 +37,14 @@ test("guard allows any write on a host machine", async () => {
 test("guard refuses an ephemeral container home and explains both escape routes", async () => {
   const result = await assertHostConfigTarget("/home/node/.codex", {
     toolLabel: "Codex",
-    hostCommand: "omniroute setup-codex",
+    hostCommand: "omniroute config set codex",
     deps: containerDeps,
     env: {},
   });
 
   assert.equal(result.ok, false);
   assert.match(result.message!, /Refusing to write Codex config to \/home\/node\/\.codex/);
-  assert.match(result.message!, /omniroute setup-codex/);
+  assert.match(result.message!, /omniroute config set codex/);
   assert.match(result.message!, /CLI_CONFIG_HOME=\/host-home/);
   assert.match(result.message!, /--allow-container-write/);
 });

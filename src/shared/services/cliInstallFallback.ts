@@ -11,9 +11,7 @@ import fsSync from "fs";
  * report `installed:false`, even when the tool's own settings/config file on
  * disk proves it was installed and used before.
  *
- * Upstream 9router's equivalent route
- * (`src/app/api/cli-tools/claude-settings/route.js::checkClaudeInstalled()`)
- * has a second-chance fallback: when `where`/`which` fails, it still reports
+ * Upstream had a second-chance fallback: when `where`/`which` fails, it still reports
  * `installed:true` if the settings file exists. This restores that fallback
  * for any CLI tool that declares a `settings` config path (currently
  * `claude` and `droid` — see `CLI_TOOLS` in `cliRuntime.ts`).

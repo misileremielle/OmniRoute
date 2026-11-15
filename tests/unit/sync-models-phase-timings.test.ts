@@ -7,8 +7,6 @@ import test from "node:test";
 const isolatedHome = mkdtempSync(join(tmpdir(), "sync-phase-18335-"));
 process.env.HOME = isolatedHome;
 process.env.DATA_DIR = join(isolatedHome, "data");
-process.env.OMNIROUTE_AUTO_SYNC_CODEX_PROFILES = "false";
-process.env.OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES = "false";
 process.env.OMNIROUTE_INTERNAL_SCHEME = "http";
 const core = await import("../../src/lib/db/core.ts");
 const { createProviderConnection } = await import("../../src/lib/db/providers.ts");

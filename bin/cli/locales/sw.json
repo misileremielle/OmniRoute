@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Zindua lengwa la CLI linalotumika kupitia OmniRoute"
   },
-  "setupClaude": {
-    "description": "Zalisha wasifu wa Claude Code katika ~/.claude/profiles kutoka kwenye katalogi ya modeli za OmniRoute"
-  },
   "connect": {
     "description": "Unganisha kwenye seva ya mbali ya OmniRoute na uingie katika hali ya mbali"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Zindua Codex CLI ikielekezwa kwenye OmniRoute (ya ndani au VPS ya mbali)"
-  },
-  "setupCodex": {
-    "description": "Zalisha faili za wasifu za ~/.codex kutoka kwenye katalogi hai ya modeli za OmniRoute"
   },
   "packs": {
     "description": "Dhibiti vifurushi vya hiari vya wakati wa utekelezaji (ML / uendeshaji otomatiki wa kivinjari)",

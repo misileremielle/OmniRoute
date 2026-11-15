@@ -141,28 +141,17 @@ Model:    if/qwen3.8-max-preview (or any provider/model prefix)
 
 Works with Claude Code, Codex CLI, Cursor, Cline, OpenClaw, OpenCode, and OpenAI-compatible SDKs.
 
-#### Auto-configure with `setup-*`
+#### Auto-configure with `omniroute configure` / `config set`
 
-Instead of pasting the base URL and key by hand, let OmniRoute write each tool's
-own config from the live model catalog. One command per tool:
+Instead of pasting the base URL and key by hand, let OmniRoute write the tool's
+own config from the live model catalog:
 
 ```bash
-omniroute setup-codex        # ~/.codex/<name>.config.toml profiles
-omniroute setup-claude       # ~/.claude/profiles/<name>/settings.json
-omniroute setup-opencode     # ~/.config/opencode/opencode.json (openai-compatible)
-omniroute setup-cline        # Cline CLI + VS Code extension settings
-omniroute setup-kilo         # Kilo Code
-omniroute setup-continue     # ~/.continue/config.yaml (Continue / cn)
-omniroute setup-cursor       # prints Cursor's in-app steps
-omniroute setup-roo          # Roo Code import + autoImport pointer
-omniroute setup-crush        # ~/.config/crush/crush.json
-omniroute setup-zed          # ~/.config/zed/settings.json (openai_compatible)
-omniroute setup-goose        # ~/.config/goose/config.yaml
-omniroute setup-aider        # ~/.aider.conf.yml
-omniroute setup-qwen         # ~/.qwen/settings.json + ~/.qwen/.env
+omniroute configure codex    # ~/.codex/<name>.config.toml profiles
+omniroute config set <tool>  # other supported tools
 ```
 
-Each accepts `--remote <url> --api-key <key>` to configure a local tool against a
+Both accept `--remote <url> --api-key <key>` to configure a local tool against a
 **remote** OmniRoute, plus `--dry-run` to preview. To launch a CLI with the right
 env injected and no config written at all, use the generic launcher
 `omniroute run <target>` (claude, codex, aider, goose, opencode, qwen, gemini);
@@ -171,8 +160,6 @@ the legacy per-tool launchers `omniroute launch` (Claude Code) and
 
 For the full table (what each command writes, every flag, local vs remote, base-URL
 `/v1` conventions), see **[CLI Integrations](./CLI-INTEGRATIONS.md)**.
-
-For detailed per-tool configuration (Claude Code, Codex CLI, Cursor, Cline, OpenClaw, Kilo Code, Copilot, and more), see the dedicated **[CLI Tools Guide](../reference/CLI-TOOLS.md)**.
 
 ---
 

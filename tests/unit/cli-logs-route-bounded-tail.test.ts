@@ -1,5 +1,5 @@
 /**
- * Bounded tail read for /api/cli-tools/logs (perf: large log files must not
+ * Bounded tail read for /api/logs/tail (perf: large log files must not
  * stall served requests).
  *
  * Proves:
@@ -30,10 +30,10 @@ const tailLogPath = path.join(tailLogDir, "tail-app.log");
 const origAppLogPath = process.env.APP_LOG_FILE_PATH;
 process.env.APP_LOG_FILE_PATH = tailLogPath;
 
-const { GET } = await import("../../src/app/api/cli-tools/logs/route.ts");
+const { GET } = await import("../../src/app/api/logs/tail/route.ts");
 
 function makeReq(queryString = "") {
-  const url = `http://localhost/api/cli-tools/logs${queryString ? `?${queryString}` : ""}`;
+  const url = `http://localhost/api/logs/tail${queryString ? `?${queryString}` : ""}`;
   return new Request(url);
 }
 

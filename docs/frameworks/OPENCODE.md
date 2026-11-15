@@ -8,7 +8,7 @@ lastUpdated: 2027-07-27
 
 > **Status:** Generally available.
 > **Audience:** Operators wiring OpenCode to an OmniRoute deployment.
-> **Source of truth (config schema):** `src/shared/services/opencodeConfig.ts`
+> **Source of truth (config schema):** `src/lib/cli-helper/config-generator/opencode.ts`
 > **Source of truth (npm package):** `@omniroute/opencode-provider/` (publishable workspace)
 
 [OpenCode](https://opencode.ai) is an agentic CLI/desktop AI client. It reads its provider catalog from `~/.config/opencode/opencode.json` (or `opencode.jsonc`) and follows the schema at `https://opencode.ai/config.json`. OmniRoute exposes itself to OpenCode as one of those providers — every request flows through OmniRoute's standard OpenAI-compatible `/v1` surface, so OpenCode automatically benefits from Auto-Combo routing, circuit breakers, key policies, observability, etc.
@@ -28,7 +28,7 @@ omniroute config opencode \
   --api-key "$OMNIROUTE_API_KEY"
 ```
 
-Behind the scenes the CLI calls `mergeOpenCodeConfigText()` (`src/shared/services/opencodeConfig.ts:104`), so an existing `opencode.json` keeps its other providers and comments. The OmniRoute entry is added/replaced atomically.
+Behind the scenes the CLI calls `generateOpencodeConfig()` (`src/lib/cli-helper/config-generator/opencode.ts`), which edits the file in place with `jsonc-parser`, so an existing `opencode.json` keeps its other providers and comments. The OmniRoute entry is added/replaced atomically.
 
 Resulting file (default model catalog):
 
@@ -79,7 +79,7 @@ const config = buildOmniRouteOpenCodeConfig({
 writeFileSync("opencode.json", JSON.stringify(config, null, 2));
 ```
 
-For a non-destructive merge against an existing file, replicate `mergeOpenCodeConfigText()` from `opencodeConfig.ts` or call the CLI generator.
+For a non-destructive merge against an existing file, call the CLI generator.
 
 See the [package README](../../@omniroute/opencode-provider/README.md) for the full API.
 
@@ -162,4 +162,4 @@ For Anthropic-style clients that send `x-api-key` + `anthropic-version`, OmniRou
 - [API reference](../reference/API_REFERENCE.md) — full OmniRoute REST surface
 - [Auto-Combo](../routing/AUTO-COMBO.md) — what `model: "auto"` means
 - [`@omniroute/opencode-provider` README](../../@omniroute/opencode-provider/README.md)
-- Source: `src/shared/services/opencodeConfig.ts`, `src/lib/cli-helper/config-generator/opencode.ts`, `@omniroute/opencode-provider/src/index.ts`
+- Source: `src/lib/cli-helper/config-generator/opencode.ts`, `@omniroute/opencode-provider/src/index.ts`

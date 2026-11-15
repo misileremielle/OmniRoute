@@ -37,8 +37,8 @@ import {
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
-/** Hard Rule #15 (`/api/cli-tools/runtime/`) + `/api/services/` API roots. */
-const API_ROOTS = ["src/app/api/cli-tools/runtime", "src/app/api/services"];
+/** Hard Rule #15 (`/api/services/`) + Hard Rule #16 embed API roots. */
+const API_ROOTS = ["src/app/api/services"];
 /** Hard Rule #16 dashboard root; only its `<name>/embed/**` subtree is in scope. */
 const EMBED_PARENT = "src/app/(dashboard)/dashboard/providers/services";
 
@@ -138,7 +138,7 @@ test("every in-scope root contributes route files (the sweep is not vacuous)", (
   assert.ok(embed.length > 0, "no dashboard embed route found under " + EMBED_PARENT);
 });
 
-test("every cli-tools runtime / services / embed route is LOCAL_ONLY for every write method", () => {
+test("every services / embed route is LOCAL_ONLY for every write method", () => {
   const misses: string[] = [];
   for (const { file, paths } of IN_SCOPE) {
     for (const p of paths) {
@@ -201,11 +201,11 @@ test("every in-scope route is classified MANAGEMENT, the route class whose polic
 });
 
 test("the manage-scope carve-out can never cover the subprocess-spawning roots", () => {
-  // No prefix is bypassable by default; /api/services/ and /api/cli-tools/runtime/
+  // No prefix is bypassable by default; /api/services/
   // are in the compile-time spawn-capable deny-list, which the settings schema and
   // isLocalOnlyBypassableByManageScope() both enforce.
   assert.deepEqual([...LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES], []);
-  for (const prefix of ["/api/services/", "/api/cli-tools/runtime/"]) {
+  for (const prefix of ["/api/services/"]) {
     assert.ok(SPAWN_CAPABLE_PREFIXES.includes(prefix), `${prefix} missing from deny-list`);
   }
 });

@@ -45,8 +45,6 @@ const PATH_LABELS = {
   edit: "edit",
   keys: "apiKeys",
   models: "models",
-  "cli-code": "cliCode",
-  "cli-agents": "cliAgents",
   endpoint: "endpoint",
   "api-manager": "apiManager",
   context: "context",

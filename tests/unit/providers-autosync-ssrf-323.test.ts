@@ -32,19 +32,6 @@ const syncModelsRouteSrc = readFileSync(
   join(import.meta.dirname, "../../src/app/api/providers/[id]/sync-models/route.ts"),
   "utf8"
 );
-const codexProfileSyncSrc = readFileSync(
-  join(import.meta.dirname, "../../src/lib/cli-helper/codexProfileAutoSync.ts"),
-  "utf8"
-);
-const claudeProfileSyncSrc = readFileSync(
-  join(import.meta.dirname, "../../src/lib/cli-helper/claudeProfileAutoSync.ts"),
-  "utf8"
-);
-const profileCatalogSrc = readFileSync(
-  join(import.meta.dirname, "../../src/lib/cli-helper/profileCatalog.ts"),
-  "utf8"
-);
-
 test("POST /api/providers auto-sync uses the trusted internal origin (not request.url) — #323", () => {
   assert.ok(
     routeSrc.includes("getModelSyncInternalBaseUrl()"),
@@ -76,16 +63,6 @@ test("POST /api/sync/initialize never forwards the client Origin to model sync",
     /startModelSyncScheduler\(origin\)/,
     "model-sync scheduler must resolve its own trusted loopback origin"
   );
-});
-
-test("credential-forwarding CLI profile self-fetches reject redirects", () => {
-  // The credential-forwarding catalog fetch lives in one shared helper...
-  assert.match(profileCatalogSrc, /redirect:\s*["']error["']/);
-  // ...and both profile auto-syncs must go through it instead of fetching directly.
-  for (const source of [codexProfileSyncSrc, claudeProfileSyncSrc]) {
-    assert.match(source, /loadProfileCatalog\(/);
-    assert.doesNotMatch(source, /\bfetch\w*\(/);
-  }
 });
 
 test("nested model-sync self-fetches use the shared dashboard resolver and reject redirects", () => {

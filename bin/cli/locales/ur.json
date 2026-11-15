@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute کے ذریعے ایک معاونت یافتہ CLI ہدف چلائیں"
   },
-  "setupClaude": {
-    "description": "OmniRoute ماڈل کیٹلاگ سے ~/.claude/profiles میں Claude Code پروفائلز بنائیں"
-  },
   "connect": {
     "description": "ریموٹ OmniRoute سرور سے منسلک ہوں اور ریموٹ موڈ میں داخل ہوں"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute کی جانب اشارہ کرتے ہوئے Codex CLI چلائیں (مقامی یا ریموٹ VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute کے براہِ راست ماڈل کیٹلاگ سے ~/.codex پروفائل فائلیں بنائیں"
   },
   "packs": {
     "description": "اختیاری رَن ٹائم پیکس (ML / براؤزر آٹومیشن) کا نظم کریں",

@@ -1177,9 +1177,6 @@
   "run": {
     "description": "تشغيل هدف CLI مدعوم عبر OmniRoute"
   },
-  "setupClaude": {
-    "description": "إنشاء ملفات تعريف Claude Code في ~/.claude/profiles من كتالوج نماذج OmniRoute"
-  },
   "connect": {
     "description": "الاتصال بخادم OmniRoute بعيد والدخول إلى الوضع البعيد"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "تشغيل Codex CLI موجّهًا إلى OmniRoute (محليًا أو على VPS بعيد)"
-  },
-  "setupCodex": {
-    "description": "إنشاء ملفات تعريف في ~/.codex من كتالوج نماذج OmniRoute المباشر"
   },
   "packs": {
     "description": "إدارة حزم وقت التشغيل الاختيارية (ML / أتمتة المتصفح)",

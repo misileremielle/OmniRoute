@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute വഴി പിന്തുണയ്ക്കുന്ന ഒരു CLI ലക്ഷ്യം സമാരംഭിക്കുക"
   },
-  "setupClaude": {
-    "description": "OmniRoute മോഡൽ കാറ്റലോഗിൽ നിന്ന് ~/.claude/profiles-ൽ Claude Code പ്രൊഫൈലുകൾ സൃഷ്ടിക്കുക"
-  },
   "connect": {
     "description": "ഒരു വിദൂര OmniRoute സെർവറുമായി ബന്ധിപ്പിച്ച് വിദൂര മോഡിലേക്ക് പ്രവേശിക്കുക"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute-ലേക്ക് ചൂണ്ടുന്ന Codex CLI സമാരംഭിക്കുക (പ്രാദേശികം അല്ലെങ്കിൽ വിദൂര VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute-ന്റെ തത്സമയ മോഡൽ കാറ്റലോഗിൽ നിന്ന് ~/.codex പ്രൊഫൈൽ ഫയലുകൾ സൃഷ്ടിക്കുക"
   },
   "packs": {
     "description": "ഐച്ഛിക റൺടൈം പാക്കുകൾ നിയന്ത്രിക്കുക (ML / ബ്രൗസർ ഓട്ടോമേഷൻ)",

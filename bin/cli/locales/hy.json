@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Գործարկել աջակցվող CLI թիրախը OmniRoute-ի միջոցով"
   },
-  "setupClaude": {
-    "description": "OmniRoute-ի մոդելների կատալոգից ստեղծել ~/.claude/profiles Claude Code պրոֆիլներ"
-  },
   "connect": {
     "description": "Միանալ հեռակա OmniRoute սերվերին և անցնել հեռակա ռեժիմի"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Գործարկել Codex CLI՝ ուղղված OmniRoute-ին (տեղային կամ հեռակա VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute-ի գործող մոդելների կատալոգից ստեղծել ~/.codex պրոֆիլի ֆայլեր"
   },
   "packs": {
     "description": "Կառավարել գործարկման միջավայրի ընտրովի փաթեթները (ML / դիտարկչի ավտոմատացում)",

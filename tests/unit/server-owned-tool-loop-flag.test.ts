@@ -81,8 +81,9 @@ describe("feature-flags-settings count update", () => {
     // MCP flags, taking the count from 117 to 114; removing the Batch API drops
     // BATCH_AND_FILE_AUTO_CLEANUP_ENABLED, taking it to 113; removing the PII
     // masker and the prompt-injection guard drops a further five flags, taking
-    // it to 108.
-    assert.equal(FEATURE_FLAG_DEFINITIONS.length, 108);
+    // it to 108; removing the CLI configurators drops the two profile auto-sync
+    // flags, taking it to 106.
+    assert.equal(FEATURE_FLAG_DEFINITIONS.length, 106);
     // COMPRESSION_CACHE_AUTOMATIC_PREFIX_ESTIMATE (#17114, default off) to 114.
     // CURSOR_GROK_47_DROP_MAX_EFFORT (#17386, default off) to 112.
     // UNPRICED_USAGE_BUDGET_POLICY (#14604, default fail_closed) to 113.

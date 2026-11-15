@@ -238,7 +238,7 @@ describe("EndpointPageClient", () => {
       if (path === "/api/search/providers") {
         return Promise.resolve(jsonResponse({ providers: [] }));
       }
-      if (path === "/api/cli-tools/keys") return Promise.resolve(jsonResponse({ keys: [] }));
+      if (path === "/api/keys?limit=100") return Promise.resolve(jsonResponse({ keys: [] }));
       throw new Error(`Unexpected request: ${path}`);
     });
 
@@ -329,7 +329,7 @@ describe("EndpointPageClient", () => {
       if (path === "/api/search/providers") {
         return Promise.resolve(jsonResponse({ providers: [] }));
       }
-      if (path === "/api/cli-tools/keys") {
+      if (path === "/api/keys?limit=100") {
         return Promise.resolve(
           jsonResponse({
             keys: [
@@ -453,7 +453,7 @@ describe("EndpointPageClient", () => {
         return Promise.resolve(jsonResponse({ status: "ok", tasks: { activeStreams: 0 } }));
       }
       if (path === "/api/search/providers") return Promise.resolve(jsonResponse({ providers: [] }));
-      if (path === "/api/cli-tools/keys") return Promise.resolve(jsonResponse({ keys: [] }));
+      if (path === "/api/keys?limit=100") return Promise.resolve(jsonResponse({ keys: [] }));
       throw new Error(`Unexpected request: ${path}`);
     });
   }
@@ -564,7 +564,7 @@ describe("EndpointPageClient", () => {
       if (path === "/api/search/providers") {
         return Promise.resolve(jsonResponse({ providers: [] }));
       }
-      if (path === "/api/cli-tools/keys") {
+      if (path === "/api/keys?limit=100") {
         return Promise.resolve(jsonResponse({ keys: [] }));
       }
       throw new Error(`Unexpected request: ${path}`);

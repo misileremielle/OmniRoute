@@ -71,8 +71,7 @@ test("AC-1: GET returns 5 tiers with prefixes + bypass state envelope", async ()
 
   const localOnly = body.tiers.find((t) => t.name === "LOCAL_ONLY");
   assert.ok(localOnly);
-  assert.ok(localOnly!.prefixes.includes("/api/cli-tools/runtime/"));
-  assert.ok(localOnly!.prefixes.includes("/api/cli-tools/runtime/"));
+  assert.ok(localOnly!.prefixes.includes("/api/services/"));
   assert.equal(localOnly!.bypassable, true);
 
   const alwaysProtected = body.tiers.find((t) => t.name === "ALWAYS_PROTECTED");
@@ -92,7 +91,7 @@ test("AC-1: GET returns 5 tiers with prefixes + bypass state envelope", async ()
     assert.ok(tier.description.length > 0, `tier ${tier.name} missing description`);
   }
 
-  assert.ok(body.spawnCapablePrefixes.includes("/api/cli-tools/runtime/"));
+  assert.ok(body.spawnCapablePrefixes.includes("/api/services/"));
 });
 
 // ─── AC-2 — flags match getSettings() pre- and post-mutation ──────────────

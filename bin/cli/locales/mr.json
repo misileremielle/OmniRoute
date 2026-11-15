@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute द्वारे समर्थित CLI लक्ष्य सुरू करा"
   },
-  "setupClaude": {
-    "description": "OmniRoute मॉडेल कॅटलॉगमधून ~/.claude/profiles Claude Code प्रोफाइल तयार करा"
-  },
   "connect": {
     "description": "दूरस्थ OmniRoute सर्व्हरशी कनेक्ट करा आणि दूरस्थ मोडमध्ये प्रवेश करा"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute कडे निर्देशित केलेले Codex CLI सुरू करा (स्थानिक किंवा दूरस्थ VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute च्या थेट मॉडेल कॅटलॉगमधून ~/.codex प्रोफाइल फाइल्स तयार करा"
   },
   "packs": {
     "description": "पर्यायी रनटाइम पॅक व्यवस्थापित करा (ML / ब्राउझर स्वयंचलन)",

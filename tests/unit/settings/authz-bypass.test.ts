@@ -7,7 +7,7 @@
  *   - AC-5 wrong currentPassword → 401 PASSWORD_MISMATCH
  *   - AC-6 toggle list reflects DB after PATCH
  *   - AC-7 add a new prefix → persists + applyRuntimeSettings fires + snapshot reflects
- *   - AC-8 add /api/cli-tools/runtime/ → 400 BYPASS_PREFIX_NOT_ALLOWED, snapshot unchanged
+ *   - AC-8 add /api/services/cliproxy/ → 400 BYPASS_PREFIX_NOT_ALLOWED, snapshot unchanged
  *
  * Goes through the production `updateSettings → applyRuntimeSettings` and
  * the real PATCH route handler — no direct `getAuthzBypassSnapshot` mocks.
@@ -238,7 +238,7 @@ test("AC-7: PATCH adds prefix → applyRuntimeSettings fires + getAuthzBypassSna
 
 // ─── AC-8 — spawn-capable prefix → 400 BYPASS_PREFIX_NOT_ALLOWED ─────────
 
-test("AC-8: PATCH with /api/cli-tools/runtime/ in bypass list → 400 BYPASS_PREFIX_NOT_ALLOWED + snapshot unchanged", async () => {
+test("AC-8: PATCH with /api/services/cliproxy/ in bypass list → 400 BYPASS_PREFIX_NOT_ALLOWED + snapshot unchanged", async () => {
   process.env.JWT_SECRET = "test-jwt-secret-authz-bypass";
   process.env.INITIAL_PASSWORD = "initial-pass-ac8";
   await settingsDb.updateSettings({ requireLogin: true });
@@ -254,7 +254,7 @@ test("AC-8: PATCH with /api/cli-tools/runtime/ in bypass list → 400 BYPASS_PRE
     await makeManagementSessionRequest("http://localhost/api/settings", {
       method: "PATCH",
       body: {
-        localOnlyManageScopeBypassPrefixes: [BYPASS, "/api/cli-tools/runtime/"],
+        localOnlyManageScopeBypassPrefixes: [BYPASS, "/api/services/cliproxy/"],
         currentPassword: "initial-pass-ac8",
       },
     })
@@ -350,16 +350,19 @@ test("PATCH with ONLY the unrelated the bypass prefix prefix still succeeds (no 
 
 // ─── Defence-in-depth: snapshot mutation alone cannot grant spawn bypass ─
 
-test("Defence-in-depth: even if a malformed snapshot lists /api/cli-tools/runtime/, the runtime predicate rejects it", async () => {
+test("Defence-in-depth: even if a malformed snapshot lists /api/services/cliproxy/, the runtime predicate rejects it", async () => {
   // applyRuntimeSettings wires the snapshot through normalizeAuthzBypass,
   // which now drops spawn-capable entries itself; the routeGuard predicate
   // must refuse them at runtime regardless.
   await runtime.applyRuntimeSettings({
     localOnlyManageScopeBypassEnabled: true,
-    localOnlyManageScopeBypassPrefixes: ["/api/cli-tools/runtime/"],
+    localOnlyManageScopeBypassPrefixes: ["/api/services/cliproxy/"],
   });
 
-  assert.equal(routeGuard.isLocalOnlyBypassableByManageScope("/api/cli-tools/runtime/foo"), false);
+  assert.equal(
+    routeGuard.isLocalOnlyBypassableByManageScope("/api/services/cliproxy/install"),
+    false
+  );
 });
 
 // ─── Host-credential read: /api/oauth/kiro/auto-import is never bypassable ─

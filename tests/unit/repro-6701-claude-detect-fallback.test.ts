@@ -12,7 +12,7 @@
  * installed:false — even when `~/.claude/settings.json` proves the tool was
  * installed and used before.
  *
- * Upstream 9router's equivalent route (src/app/api/cli-tools/claude-settings/route.js)
+ * Upstream 9router's equivalent probe (9router's claude-settings check)
  * has a second-chance fallback: if `where`/`which` fails, it still reports
  * installed:true when the settings file exists on disk. OmniRoute's rewrite
  * into cliRuntime.ts dropped that fallback, which is the concrete regression

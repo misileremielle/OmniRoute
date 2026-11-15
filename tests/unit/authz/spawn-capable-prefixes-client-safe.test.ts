@@ -71,29 +71,11 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
   assert.ok(Array.isArray(SPAWN_CAPABLE_PREFIXES));
   // The full deny-list survived the extraction out of routeGuard.ts (Hard Rules #15/#16).
   for (const prefix of [
-    "/api/cli-tools/runtime/",
     "/api/services/",
     "/api/local/",
     "/api/headroom/start",
     "/api/headroom/stop",
     "/api/vnc-session",
-    // GHSA-35fw-cv32-2373: the 14 cli-tools routes that reach the same
-    // getCliRuntimeStatus() / detectAllTools() spawn as their gated siblings.
-    "/api/cli-tools/all-statuses",
-    "/api/cli-tools/claude-settings",
-    "/api/cli-tools/cline-settings",
-    "/api/cli-tools/codewhale-settings",
-    "/api/cli-tools/codex-settings",
-    "/api/cli-tools/crush-settings",
-    "/api/cli-tools/deepseek-tui-settings",
-    "/api/cli-tools/detect",
-    "/api/cli-tools/droid-settings",
-    "/api/cli-tools/kilo-settings",
-    "/api/cli-tools/openclaw-settings",
-    "/api/cli-tools/pi-settings",
-    "/api/cli-tools/smelt-settings",
-    "/api/cli-tools/status",
-    "/api/cli-tools/whycodes-settings",
     // GHSA-jx89-f37j-pq89: skills handler registration + execution reach the
     // sandbox container spawn transitively.
     // The CLIProxyAPI binary lifecycle under /api/version-manager/, same work as /api/services/.
@@ -105,11 +87,6 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
     "/api/db-backups/exportAll",
     "/api/db/health",
     "/api/oauth/cursor/auto-import",
-    "/api/cli-tools/omp-settings",
-    "/api/cli-tools/letta-settings",
-    "/api/cli-tools/grok-build-settings",
-    "/api/cli-tools/forge-settings",
-    "/api/cli-tools/jcode-settings",
     "/dashboard/providers/services/",
     "/api/discovery/",
     "/api/issue-agent/",
@@ -120,12 +97,8 @@ test("SPAWN_CAPABLE_PREFIXES is defined in the server-free constants leaf with t
       `SPAWN_CAPABLE_PREFIXES lost the spawn-capable prefix "${prefix}" during extraction`
     );
   }
-  // 20 at extraction time + 14 (GHSA-35fw-cv32-2373) + 2 (GHSA-jx89-f37j-pq89) + 1 (version-manager)
-  // + 14 LOCAL_ONLY spawn / code-exec routes that had never been mirrored here.
-  // + 1 host-credential read (/api/oauth/kiro/auto-import) that must never be bypassable.
-  // + 1 (whycodes-settings, #14107).
-  // qwen-settings is the one pre-existing entry not enumerated above.
-  // - 6 tunnel routes (Cloudflare/Tailscale tunnel feature removed).
-  // - 4 MITM / Agent Bridge / Traffic Inspector routes (feature removed).
-  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 38);
+  // 38 entries until the CLI tool configurators were removed with their 22
+  // /api/cli-tools/* routes. Earlier removals already dropped 6 tunnel routes and
+  // 4 MITM / Agent Bridge / Traffic Inspector routes.
+  assert.equal(SPAWN_CAPABLE_PREFIXES.length, 16);
 });

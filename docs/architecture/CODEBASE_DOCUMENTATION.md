@@ -113,11 +113,12 @@ Top-level segments under `src/app/`:
 
 #### 3.1.1 `src/app/(dashboard)/dashboard/` — UI pages
 
-`agents`, `analytics`, `api-manager`, `audit`, `auto-combo`, `cache`,
-`changelog`, `cli-tools`, `combos`, `compression`, `context`,
-`costs`, `endpoint`, `health`, `limits`, `logs`, `memory`, `onboarding`,
-`providers`, `search-tools`, `settings`, `skills`, `system`,
-`translator`, `usage`, `webhooks`, plus root `page.tsx`, `HomePageClient.tsx`,
+`activity`, `analytics`, `api-endpoints`, `api-manager`, `audit`, `auto-combo`,
+`cache`, `combos`, `compression`, `context`, `conversations`, `costs`,
+`discovery`, `endpoint`, `free-tiers`, `health`, `limits`, `logs`,
+`media-providers`, `models`, `onboarding`, `providers`, `provider-stats`,
+`quota`, `relay`, `resilience`, `runtime`, `search-tools`, `settings`,
+`system`, `usage`, plus root `page.tsx`, `HomePageClient.tsx`,
 `BootstrapBanner.tsx`.
 
 #### 3.1.2 `src/app/api/` — Top-level API groups
@@ -131,7 +132,7 @@ src/app/api/
 ├── assess/
 ├── auth/
 ├── cache/
-├── cli-tools/
+├── cli/
 ├── cloud/{codex-responses-ws}
 ├── combos/
 ├── compliance/
@@ -317,7 +318,7 @@ Singleton SQLite database (`getDbInstance()` in `core.ts`, WAL journaling).
 > Source: [diagrams/db-schema-overview.mmd](../diagrams/db-schema-overview.mmd)
 
 Domain modules (each owns one or more tables): `apiKeys.ts`, `backup.ts`,
-`cleanup.ts`, `cliToolState.ts`, `combos.ts`,
+`cleanup.ts`, `combos.ts`,
 `commandCodeAuth.ts`, `compression.ts`, `compressionAnalytics.ts`,
 `compressionCacheStats.ts`, `compressionCombos.ts`, `compressionScheduler.ts`,
 `contextHandoffs.ts`, `core.ts`, `creditBalance.ts`, `databaseSettings.ts`,
@@ -790,7 +791,6 @@ See [RESILIENCE_GUIDE.md](./RESILIENCE_GUIDE.md) and the dedicated section in
   lockout deep dive.
 - [AUTO-COMBO.md](../routing/AUTO-COMBO.md) — Auto Combo scoring and strategies.
 - [COMPRESSION_GUIDE.md](../compression/COMPRESSION_GUIDE.md) — RTK + Caveman compression.
-- [CLI-TOOLS.md](../reference/CLI-TOOLS.md) — CLI integrations.
 - [DOCKER_GUIDE.md](../guides/DOCKER_GUIDE.md), [FLY_IO_DEPLOYMENT_GUIDE.md](../ops/FLY_IO_DEPLOYMENT_GUIDE.md), [VM_DEPLOYMENT_GUIDE.md](../ops/VM_DEPLOYMENT_GUIDE.md), [TERMUX_GUIDE.md](../guides/TERMUX_GUIDE.md), [PWA_GUIDE.md](../guides/PWA_GUIDE.md) — deployment targets.
 - [TROUBLESHOOTING.md](../guides/TROUBLESHOOTING.md) — common operational issues.
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) — contributor workflow.

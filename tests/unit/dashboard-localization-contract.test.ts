@@ -20,13 +20,6 @@ test("shared provider playground uses localized visible copy", () => {
   }
 });
 
-test("CLI guide fallback checks key existence before translating", () => {
-  const source = readSource(
-    "src/app/(dashboard)/dashboard/cli-code/components/DefaultToolCard.tsx"
-  );
-  assert.match(source, /if \(!t\.has\(key\)\) return fallback;/);
-});
-
 test("known provider PNGs resolve locally before the external CDN", () => {
   const source = readSource("src/shared/components/ProviderIcon.tsx");
   assert.match(source, /"opencode-go": "opencode"/);
@@ -78,11 +71,6 @@ test("feature-flag descriptions are localized without changing flag values", () 
   const messages = JSON.parse(readSource("src/i18n/messages/vi.json"));
   assert.match(card, /enumValues\.\$\{val\}/);
   assert.ok(messages.featureFlags.definitions.REQUIRE_API_KEY.description.includes("khóa API"));
-  assert.ok(
-    messages.featureFlags.definitions.OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES.description.includes(
-      "Claude Code"
-    )
-  );
 });
 
 test("analytics charts localize calendar, account, and diversity labels", () => {
@@ -117,7 +105,6 @@ test("Vietnamese navigation preserves engine and product names", () => {
   assert.equal(messages.sidebar.contextHeadroom, "Headroom");
   assert.equal(messages.sidebar.contextSessionDedup, "Session Dedup");
   assert.equal(messages.sidebar.compressionStudio, "Compression Studio");
-  assert.equal(messages.sidebar.cliCode, "CLI Code");
   assert.equal(messages.sidebar.trafficInspector, "Traffic Inspector");
 });
 
@@ -134,10 +121,6 @@ test("CLI cards use packaged brand icons whenever an asset exists", () => {
   ]) {
     assert.ok(catalog.includes(`image: "${image}"`), `missing CLI icon mapping: ${image}`);
   }
-
-  const card = readSource("src/shared/components/cli/CliToolCard.tsx");
-  assert.match(card, /tool\.imageDark \|\| tool\.imageLight/);
-  assert.match(card, /tool\.imageLight \|\| tool\.imageDark/);
 });
 
 test("settings breadcrumbs use localized labels", () => {

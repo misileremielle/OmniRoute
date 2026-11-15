@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Starta ett CLI-mål som stöds via OmniRoute"
   },
-  "setupClaude": {
-    "description": "Generera Claude Code-profiler i ~/.claude/profiles från OmniRoutes modellkatalog"
-  },
   "connect": {
     "description": "Anslut till en fjärrserver för OmniRoute och aktivera fjärrläge"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Starta Codex CLI anslutet till OmniRoute (lokalt eller på en fjärr-VPS)"
-  },
-  "setupCodex": {
-    "description": "Generera profilfiler i ~/.codex från OmniRoutes aktuella modellkatalog"
   },
   "packs": {
     "description": "Hantera valfria körningspaket (ML/webbläsarautomatisering)",

@@ -50,7 +50,7 @@ function inventoryPayload(cors: { allowAll: boolean; allowedOrigins: string[] })
     ],
     bypassEnabled: true,
     bypassPrefixes: ["/api/mcp/"],
-    spawnCapablePrefixes: ["/api/cli-tools/runtime/"],
+    spawnCapablePrefixes: ["/api/services/"],
     cors,
   };
 }

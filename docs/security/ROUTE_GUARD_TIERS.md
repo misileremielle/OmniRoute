@@ -39,29 +39,25 @@ spawn-capable route: a leaked token over a tunnel still can't reach the spawn.
 `check-route-guard-membership` gate enumerates every `route.ts` under the
 spawn-capable prefixes and fails CI if any is not classified local-only.
 
-| Prefix / pattern                                                                                         | Why it's local-only                                                                             |
-| -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `/api/cli-tools/runtime/`                                                                                | CLI tool runtime — executes arbitrary plugin code                                               |
-| `/api/cli-tools/{omp,letta,grok-build,forge,jcode,qwen}-settings`                                        | Per-tool settings writers that can touch tool binaries/config on the host                       |
-| `/api/cli-tools/{claude,cline,codewhale,codex,crush,deepseek-tui,droid,kilo,openclaw,pi,smelt}-settings` | Same `getCliRuntimeStatus()` spawn as the six siblings above (GHSA-35fw-cv32-2373)              |
-| `/api/cli-tools/{all-statuses,status,detect}`                                                            | CLI inventory probes — spawn `command -v` / `--version` per tool (GHSA-35fw-cv32-2373)          |
-| `/api/services/`                                                                                         | Embedded services (9Router / CLIProxy / Bifrost / Mux / Dario) — `npm install` + spawn          |
-| `/dashboard/providers/services/`                                                                         | Reverse proxy to embedded-service UIs                                                           |
-| `/api/copilot/`                                                                                          | Unauthenticated LLM driver — CLI-only by default                                                |
-| `/api/issue-agent/`                                                                                      | Issue agent — spawns local tooling against the repo                                             |
-| `/api/middleware/`                                                                                       | User middleware — loads/executes operator code in-process                                       |
-| `/api/system/version`                                                                                    | Auto-update (POST only; GET/HEAD/OPTIONS exempt) — spawns `git checkout` + `npm install`        |
-| `/api/db-backups/exportAll`                                                                              | Spawns `tar` for the export archive                                                             |
-| `/api/local/`                                                                                            | 1-click local launchers (Redis today) — spawns podman/docker                                    |
-| `/api/headroom/start`, `/api/headroom/stop`                                                              | Headroom proxy lifecycle — spawns python CLI / signals PID                                      |
-| `/api/jobs`, `/api/jobs/`                                                                                | Job runner control — executes scheduled host-side work                                          |
-| `/api/oauth/cursor/auto-import`                                                                          | `execFile("which", ["cursor"])` before importing creds                                          |
-| `/api/oauth/kiro/auto-import`                                                                            | Reads Kiro CLI credential files from the host                                                   |
-| `/api/discovery/`                                                                                        | Local network/provider discovery probes                                                         |
-| `/api/resilience/connections`                                                                            | Per-account resilience JSON (cooldown, breaker, lockout). The dashboard HTML is not local-only. |
-| `/api/providers/cursor/agent-availability`                                                               | Dashboard install-nudge check — spawns `cursor-agent status --format json`                      |
-| `/api/providers/volcengine-plan/connect` (regex)                                                         | Manual headful flow + session-based phone/SMS auto-login (spawns Playwright)                    |
-| `/api/providers/{id}/refresh-cursor` (regex)                                                             | Manual Cursor session renewal — nudges `cursor-agent`                                           |
+| Prefix / pattern                                 | Why it's local-only                                                                             |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `/api/services/`                                 | Embedded services (9Router / CLIProxy / Bifrost / Mux / Dario) — `npm install` + spawn          |
+| `/dashboard/providers/services/`                 | Reverse proxy to embedded-service UIs                                                           |
+| `/api/copilot/`                                  | Unauthenticated LLM driver — CLI-only by default                                                |
+| `/api/issue-agent/`                              | Issue agent — spawns local tooling against the repo                                             |
+| `/api/middleware/`                               | User middleware — loads/executes operator code in-process                                       |
+| `/api/system/version`                            | Auto-update (POST only; GET/HEAD/OPTIONS exempt) — spawns `git checkout` + `npm install`        |
+| `/api/db-backups/exportAll`                      | Spawns `tar` for the export archive                                                             |
+| `/api/local/`                                    | 1-click local launchers (Redis today) — spawns podman/docker                                    |
+| `/api/headroom/start`, `/api/headroom/stop`      | Headroom proxy lifecycle — spawns python CLI / signals PID                                      |
+| `/api/jobs`, `/api/jobs/`                        | Job runner control — executes scheduled host-side work                                          |
+| `/api/oauth/cursor/auto-import`                  | `execFile("which", ["cursor"])` before importing creds                                          |
+| `/api/oauth/kiro/auto-import`                    | Reads Kiro CLI credential files from the host                                                   |
+| `/api/discovery/`                                | Local network/provider discovery probes                                                         |
+| `/api/resilience/connections`                    | Per-account resilience JSON (cooldown, breaker, lockout). The dashboard HTML is not local-only. |
+| `/api/providers/cursor/agent-availability`       | Dashboard install-nudge check — spawns `cursor-agent status --format json`                      |
+| `/api/providers/volcengine-plan/connect` (regex) | Manual headful flow + session-based phone/SMS auto-login (spawns Playwright)                    |
+| `/api/providers/{id}/refresh-cursor` (regex)     | Manual Cursor session renewal — nudges `cursor-agent`                                           |
 
 **Response on violation:** `403 LOCAL_ONLY`
 
@@ -77,7 +73,7 @@ requests and requests with non-manage keys are still rejected with
 
 No prefix is bypassable by default (the MCP routes it was added for were
 removed with the MCP server); an operator can add a non-spawning LOCAL_ONLY prefix
-in Settings. `/api/cli-tools/runtime/` and `/api/services/` can never be added
+in Settings. `/api/services/` can never be added
 because they can spawn arbitrary subprocesses (`npm install`, `node`), which is the
 exact CVE class the LOCAL_ONLY tier exists to prevent.
 
@@ -86,7 +82,7 @@ exact CVE class the LOCAL_ONLY tier exists to prevent.
 | Non-loopback, no Bearer                  | operator-configured bypass prefix | 403 LOCAL_ONLY      |
 | Non-loopback, Bearer with `manage` scope | operator-configured bypass prefix | Allow               |
 | Non-loopback, Bearer without `manage`    | operator-configured bypass prefix | 403 LOCAL_ONLY      |
-| Non-loopback, Bearer with `manage` scope | `/api/cli-tools/runtime/*`        | 403 LOCAL_ONLY      |
+| Non-loopback, Bearer with `manage` scope | `/api/services/*`                 | 403 LOCAL_ONLY      |
 | Loopback, any/no Bearer                  | any LOCAL_ONLY                    | Allow (gate passes) |
 
 #### Operator guidance & auditing
@@ -167,10 +163,6 @@ server process.
 | `/api/settings/import-json`               | Replaces the full settings blob                |
 | `/api/providers/health-autopilot/actions` | Executes autopilot remediation actions         |
 | `/api/relay/tokens`                       | Mints, lists, edits and revokes relay tokens   |
-| `/api/cli-tools/apply`                    | Rewrites the operator's host CLI config        |
-| `/api/cli-tools/guide-settings`           | Writes guide-driven CLI config files           |
-| `/api/cli-tools/hermes-agent-settings`    | Writes the Hermes agent config                 |
-| `/api/cli-tools/backups`                  | Restores and deletes CLI config backups        |
 | `/api/restart`                            | Restarts the server process                    |
 
 **Response on violation:** `401 Authentication required`
@@ -260,7 +252,7 @@ expired DB doesn't silently downgrade to "deny".
    `src/server/authz/routeGuard.ts`
 3. Add coverage in `tests/unit/authz/management-policy.test.ts` for all four
    request shapes: no Bearer (403), manage Bearer (allow), non-manage Bearer
-   (403), and the per-prefix regression that `/api/cli-tools/runtime/*` stays
+   (403), and the per-prefix regression that `/api/services/*` stays
    strict-loopback even with a manage Bearer.
 
 ## Files

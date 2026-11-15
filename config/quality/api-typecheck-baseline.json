@@ -14,21 +14,6 @@
   "src/app/api/cache/route.ts": {
     "TS2339": 1
   },
-  "src/app/api/cli-tools/all-statuses/route.ts": {
-    "TS2339": 1
-  },
-  "src/app/api/cli-tools/claude-settings/route.ts": {
-    "TS2339": 1
-  },
-  "src/app/api/cli-tools/codex-settings/route.ts": {
-    "TS2345": 2
-  },
-  "src/app/api/cli-tools/grok-build-settings/route.ts": {
-    "TS2304": 1
-  },
-  "src/app/api/cli-tools/qwen-settings/route.ts": {
-    "TS2322": 1
-  },
   "src/app/api/combos/auto/route.ts": {
     "TS2322": 1
   },
@@ -329,8 +314,6 @@
   ],
   "_suppressions": {
     "open-sse/services/usage/qoder.ts": 1,
-    "src/app/api/system/env/repair/route.ts": 1,
-    "src/lib/cli-helper/claudeProfileAutoSync.ts": 1,
-    "src/lib/cli-helper/codexProfileAutoSync.ts": 1
+    "src/app/api/system/env/repair/route.ts": 1
   }
 }

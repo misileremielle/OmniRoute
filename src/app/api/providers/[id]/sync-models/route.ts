@@ -23,8 +23,6 @@ import {
   isModelSyncInternalRequest,
   isModelSyncLocalSpawnDenied,
 } from "@/shared/services/modelSyncScheduler";
-import { autoSyncCodexProfilesFromLiveCatalog } from "@/lib/cli-helper/codexProfileAutoSync";
-import { autoSyncClaudeProfilesFromLiveCatalog } from "@/lib/cli-helper/claudeProfileAutoSync";
 import { getSearchProvider } from "@omniroute/open-sse/config/searchRegistry.ts";
 import { providerUsesCuratedModelsOnly } from "@/lib/providers/modelListingCapability";
 import {
@@ -725,54 +723,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const importedCount = importedChanges.added;
     const updatedCount = importedChanges.updated;
     const shouldLog = modelChanges.total > 0 || customModelChanges.total > 0;
-
-    if (shouldLog && !quiet) {
-      void autoSyncCodexProfilesFromLiveCatalog(request, `model-sync:${logProvider}`)
-        .then((syncResult) => {
-          if (syncResult.ok) {
-            console.log(
-              `[ModelSync] Codex profile auto-sync wrote ${syncResult.written} profile(s), skipped ${syncResult.skipped} (${logProvider})`
-            );
-          } else {
-            console.log(
-              `[ModelSync] Codex profile auto-sync skipped for ${logProvider}: ${syncResult.reason}`
-            );
-          }
-        })
-        .catch((err) => {
-          console.log(
-            `[ModelSync] Codex profile auto-sync failed for ${logProvider}:`,
-            err?.message || err
-          );
-        });
-
-      void autoSyncClaudeProfilesFromLiveCatalog(request, `model-sync:${logProvider}`)
-        .then((syncResult) => {
-          if (syncResult.ok) {
-            console.log(
-              `[ModelSync] Claude profile auto-sync wrote ${syncResult.written} profile(s), skipped ${syncResult.skipped} (${logProvider})`
-            );
-          } else {
-            console.log(
-              `[ModelSync] Claude profile auto-sync skipped for ${logProvider}: ${syncResult.reason}`
-            );
-          }
-        })
-        .catch((err) => {
-          console.log(
-            `[ModelSync] Claude profile auto-sync failed for ${logProvider}:`,
-            err?.message || err
-          );
-        });
-    } else if (shouldLog && quiet) {
-      // Still update profiles; suppress console noise from boot revalidation.
-      void autoSyncCodexProfilesFromLiveCatalog(request, `model-sync:${logProvider}`).catch(
-        () => undefined
-      );
-      void autoSyncClaudeProfilesFromLiveCatalog(request, `model-sync:${logProvider}`).catch(
-        () => undefined
-      );
-    }
 
     // #13505: flag combo steps pinned to models this sync dropped. Failed and
     // degraded syncs returned above; a free-only import is a deliberate subset,

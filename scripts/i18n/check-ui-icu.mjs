@@ -14,10 +14,9 @@
  *   - #12302: `ccOnboardingKeyPlaceholder` = `<your OmniRoute API key>`
  *     in every locale catalog — INVALID_TAG crashed the Claude Code onboarding
  *     block.
- *   - #12505: `featureFlags.definitions.OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES
- *     .description` = `~/.claude/profiles/<name>/settings.json` in every
- *     locale catalog
- *     locales — UNCLOSED_TAG made the Feature Flags page show the raw key.
+ *   - #12505 (since removed with the CLI configurators): a CLI profile auto-sync
+ *     `featureFlags.definitions.*.description` = `~/.claude/profiles/<name>/settings.json`
+ *     in every locale catalog — UNCLOSED_TAG made the Feature Flags page show the raw key.
  *   - The same class had already shipped 4 more times: `<gateway-alias>/
  *     <model>` (feature flag description), literal JSON/regex paste-hint
  *     examples (`[{ json, name?, email? }...]`), and `{" "}` artifacts in

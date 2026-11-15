@@ -17,8 +17,8 @@ test("isLocalOnlyPath: the removed /api/mcp/ surface is no longer local-only", (
   assert.equal(isLocalOnlyPath("/api/mcp/sse"), false);
 });
 
-test("isLocalOnlyPath: /api/cli-tools/runtime/ is local-only", () => {
-  assert.equal(isLocalOnlyPath("/api/cli-tools/runtime/claude"), true);
+test("isLocalOnlyPath: /api/services/ is local-only", () => {
+  assert.equal(isLocalOnlyPath("/api/services/cliproxy/install"), true);
 });
 
 test("isLocalOnlyPath: regular management routes are not local-only", () => {
@@ -46,8 +46,8 @@ test("isLocalOnlyBypassableByManageScope: no prefix is bypassable by default", (
   assert.equal(isLocalOnlyBypassableByManageScope("/api/resilience/connections"), false);
 });
 
-test("isLocalOnlyBypassableByManageScope: /api/cli-tools/runtime/* is NOT bypassable", () => {
-  assert.equal(isLocalOnlyBypassableByManageScope("/api/cli-tools/runtime/foo"), false);
+test("isLocalOnlyBypassableByManageScope: /api/services/cliproxy/* is NOT bypassable", () => {
+  assert.equal(isLocalOnlyBypassableByManageScope("/api/services/cliproxy/foo"), false);
 });
 
 test("isLocalOnlyBypassableByManageScope: non-local-only routes are not bypassable", () => {
@@ -145,16 +145,16 @@ function makeCtx(
   };
 }
 
-test("management policy rejects /api/cli-tools/runtime/ from non-localhost (status 403)", async () => {
-  const ctx = makeCtx("/api/cli-tools/runtime/status", { host: "evil.tunnel.io" });
+test("management policy rejects /api/services/cliproxy/ from non-localhost (status 403)", async () => {
+  const ctx = makeCtx("/api/services/cliproxy/install", { host: "evil.tunnel.io" });
   const outcome = await managementPolicy.evaluate(ctx);
   assert.equal(outcome.allow, false);
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy rejects /api/cli-tools/runtime/ when forwarded peer is remote", async () => {
+test("management policy rejects /api/services/cliproxy/ when forwarded peer is remote", async () => {
   const token = getMachineTokenSync();
-  const ctx = makeCtx("/api/cli-tools/runtime/status", {
+  const ctx = makeCtx("/api/services/cliproxy/install", {
     host: "localhost",
     "x-forwarded-for": "203.0.113.10",
     [CLI_TOKEN_HEADER]: token,
@@ -164,10 +164,10 @@ test("management policy rejects /api/cli-tools/runtime/ when forwarded peer is r
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy rejects /api/cli-tools/runtime/ when host is spoofed from a remote socket", async () => {
+test("management policy rejects /api/services/cliproxy/ when host is spoofed from a remote socket", async () => {
   const token = getMachineTokenSync();
   const ctx = makeCtx(
-    "/api/cli-tools/runtime/status",
+    "/api/services/cliproxy/install",
     {
       host: "localhost",
       "x-forwarded-for": "127.0.0.1",
@@ -180,9 +180,9 @@ test("management policy rejects /api/cli-tools/runtime/ when host is spoofed fro
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy rejects /api/cli-tools/runtime/ when loopback x-forwarded-for is untrusted", async () => {
+test("management policy rejects /api/services/cliproxy/ when loopback x-forwarded-for is untrusted", async () => {
   const token = getMachineTokenSync();
-  const ctx = makeCtx("/api/cli-tools/runtime/status", {
+  const ctx = makeCtx("/api/services/cliproxy/install", {
     host: "localhost",
     "x-forwarded-for": "127.0.0.1",
     [CLI_TOKEN_HEADER]: token,
@@ -192,9 +192,9 @@ test("management policy rejects /api/cli-tools/runtime/ when loopback x-forwarde
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy rejects /api/cli-tools/runtime/ when loopback x-real-ip is untrusted", async () => {
+test("management policy rejects /api/services/cliproxy/ when loopback x-real-ip is untrusted", async () => {
   const token = getMachineTokenSync();
-  const ctx = makeCtx("/api/cli-tools/runtime/status", {
+  const ctx = makeCtx("/api/services/cliproxy/install", {
     host: "localhost",
     "x-real-ip": "127.0.0.1",
     [CLI_TOKEN_HEADER]: token,
@@ -204,10 +204,10 @@ test("management policy rejects /api/cli-tools/runtime/ when loopback x-real-ip 
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy allows /api/cli-tools/runtime/ from localhost with valid CLI token", async () => {
+test("management policy allows /api/services/cliproxy/ from localhost with valid CLI token", async () => {
   const token = getMachineTokenSync();
   const ctx = makeCtx(
-    "/api/cli-tools/runtime/status",
+    "/api/services/cliproxy/install",
     {
       host: "localhost",
       [CLI_TOKEN_HEADER]: token,
@@ -261,7 +261,7 @@ test("management policy rejects /api/services/ from non-localhost (status 403)",
 test("management policy allows /api/services/ from localhost with valid CLI token", async () => {
   const token = getMachineTokenSync();
   // Locality comes from the real peer (socket), never from the spoofable Host
-  // header — same setup as the /api/cli-tools/runtime/ sibling test above (peer-stamp model).
+  // header — same setup as the /api/services/cliproxy/ sibling test above (peer-stamp model).
   const ctx = makeCtx(
     "/api/services/9router/status",
     {
@@ -312,8 +312,8 @@ test("isLocalOnlyPath: /api/copilot/ prefix is local-only", () => {
 
 test("isLocalOnlyBypassableByManageScope: /api/copilot/ is bypassable when admin opts in", () => {
   // Copilot is local-only by default but not spawn-capable, so admins MAY
-  // add it to the manage-scope bypass list (unlike /api/services/* and
-  // /api/cli-tools/runtime/*, which are statically denied). Whether the
+  // add it to the manage-scope bypass list (unlike /api/services/*,
+  // which is statically denied). Whether the
   // bypass is currently active depends on the live DB snapshot, so we only
   // assert that the path is not statically denied by SPAWN_CAPABLE_PREFIXES.
   // (Snapshot-dependent positive case is covered by the management policy

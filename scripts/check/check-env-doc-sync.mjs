@@ -101,10 +101,10 @@ const IGNORE_FROM_CODE = new Set([
   "VITEST",
   // Instruction snippet shown to users (Traffic Inspector HttpProxySnippetCard) — not OmniRoute config.
   "NODE_TLS_REJECT_UNAUTHORIZED",
-  // Claude Code's own auth env var — read from the CLI environment to detect
-  // existing auth and written into the generated Claude Code settings (so the CLI
-  // points at OmniRoute). A downstream client-tool var, not an OmniRoute server
-  // input (src/shared/services/claudeCliConfig.ts, api/cli-tools/claude-settings).
+  // Claude Code's own auth env var — set for the launched Claude Code and written
+  // into the generated Claude Code settings (so the CLI points at OmniRoute). A
+  // downstream client-tool var, not an OmniRoute server input
+  // (bin/cli/commands/launch.mjs, src/lib/cli-helper/config-generator/claude.ts).
   "ANTHROPIC_AUTH_TOKEN",
   // CI providers (set by the runner).
   "GITHUB_BASE_REF",

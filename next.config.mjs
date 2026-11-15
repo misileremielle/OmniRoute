@@ -335,11 +335,7 @@ const nextConfig = {
     "util",
     "process",
   ],
-  transpilePackages: [
-    "@omniroute/open-sse",
-    "@lobehub/icons",
-    "@omniroute/ui-kit",
-  ],
+  transpilePackages: ["@omniroute/open-sse", "@lobehub/icons", "@omniroute/ui-kit"],
   allowedDevOrigins: ["localhost", "127.0.0.1", "192.168.0.250"],
   typescript: {
     // TODO: Re-enable after fixing all sub-component useTranslations scope issues
@@ -488,13 +484,6 @@ const nextConfig = {
       {
         source: "/dashboard/providers/freepik",
         destination: "/dashboard/providers/magnific",
-        permanent: true,
-      },
-      // CLI Pages — Plano 14 (F9)
-      { source: "/dashboard/cli-tools", destination: "/dashboard/cli-code", permanent: true },
-      {
-        source: "/dashboard/cli-tools/:path*",
-        destination: "/dashboard/cli-code/:path*",
         permanent: true,
       },
     ];

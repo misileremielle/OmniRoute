@@ -347,7 +347,7 @@ test("managementPolicy: rejects invalid API keys with 403 when bearer is present
 //
 // BYPASS_PREFIX is LOCAL_ONLY and, once configured, in the manage-scope bypass
 // list (so a manage-scoped API key presented from non-loopback may reach it).
-// `/api/cli-tools/runtime/*` is LOCAL_ONLY but NOT bypassable — the carve-out
+// `/api/services/*` is LOCAL_ONLY but NOT bypassable — the carve-out
 // is path-scoped.
 //
 // `ctx()` uses `new Headers()` without an explicit `host`, so
@@ -412,12 +412,12 @@ test("LOCAL_ONLY manage-scope bypass: manage-scope key + non-loopback → allow"
   }
 });
 
-test("LOCAL_ONLY manage-scope bypass: carve-out does not extend to /api/cli-tools/runtime/*", async () => {
+test("LOCAL_ONLY manage-scope bypass: carve-out does not extend to /api/services/*", async () => {
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
   await enableBypassPrefix();
-  const created = await apiKeysDb.createApiKey("cli-runtime-denied", "machine-cli-runtime-denied", [
+  const created = await apiKeysDb.createApiKey("services-denied", "machine-services-denied", [
     "manage",
   ]);
 
@@ -426,7 +426,7 @@ test("LOCAL_ONLY manage-scope bypass: carve-out does not extend to /api/cli-tool
     ctx(
       new Headers({ authorization: `Bearer ${created.key}` }),
       "GET",
-      "/api/cli-tools/runtime/foo"
+      "/api/services/cliproxy/install"
     )
   );
 
@@ -463,7 +463,7 @@ test("LOCAL_ONLY manage-scope bypass: loopback + no Bearer → allow (local CLI 
 // cookie + admin label + error log"). The dashboard-session bypass mirrors the
 // manage-scope bypass: an authenticated `auth_token` cookie reaching a
 // bypassable LOCAL_ONLY path (e.g. BYPASS_PREFIX) from a public hostname is
-// allowed, but the cli-tools-runtime carve-out is NOT extended to it.
+// allowed, but the services carve-out is NOT extended to it.
 
 test("LOCAL_ONLY dashboard-session bypass: authenticated dashboard cookie + non-loopback → allow", async () => {
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
@@ -483,7 +483,7 @@ test("LOCAL_ONLY dashboard-session bypass: authenticated dashboard cookie + non-
   }
 });
 
-test("LOCAL_ONLY dashboard-session bypass: authenticated dashboard cookie + /api/cli-tools/runtime/ → 403 LOCAL_ONLY", async () => {
+test("LOCAL_ONLY dashboard-session bypass: authenticated dashboard cookie + /api/services/ → 403 LOCAL_ONLY", async () => {
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
@@ -492,7 +492,7 @@ test("LOCAL_ONLY dashboard-session bypass: authenticated dashboard cookie + /api
   const cookie = await dashboardCookieHeader();
   const policy = await loadPolicy();
   const out = await policy.evaluate(
-    ctx(new Headers({ cookie }), "GET", "/api/cli-tools/runtime/foo")
+    ctx(new Headers({ cookie }), "GET", "/api/services/cliproxy/install")
   );
 
   assert.equal(out.allow, false);

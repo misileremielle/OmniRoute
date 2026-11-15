@@ -92,12 +92,6 @@ export const KNOWN_MISSING_ERROR_HELPER = new Set([
   "src/app/api/providers/[id]/claude-auth/export/route.ts",
   "src/app/api/providers/[id]/codex-auth/apply-local/route.ts",
   "src/app/api/providers/[id]/codex-auth/export/route.ts",
-
-  // --- API routes returning a caught error message directly. Note
-  // grok-build-settings:230 forwards a TYPED `GrokBuildConfigConflictError` (an
-  // app-defined message, not upstream text) and is latent for the same reason as the
-  // provider-auth block above; the sibling branch one line down already sanitizes.
-  "src/app/api/cli-tools/grok-build-settings/route.ts",
 ]);
 
 // G-03 (#15159): a line that actually routes an error value through a sanitizer

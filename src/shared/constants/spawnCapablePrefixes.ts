@@ -24,26 +24,6 @@
  * Hard Rules #15 + #16.
  */
 export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
-  "/api/cli-tools/runtime/",
-  "/api/cli-tools/qwen-settings", // GET probes the Qwen Code binary; the route also mutates local ~/.qwen files
-  // GHSA-35fw-cv32-2373: 14 cli-tools routes that reach the same getCliRuntimeStatus() /
-  // detectAllTools() spawn as their gated siblings — must never be whitelistable via
-  // manage-scope bypass (Hard Rules #15 + #16). Exact entries; NOT a "/api/cli-tools/" blanket.
-  "/api/cli-tools/all-statuses", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry
-  "/api/cli-tools/claude-settings", // GET probes the `claude` binary via getCliRuntimeStatus()
-  "/api/cli-tools/cline-settings", // GET probes the `cline` binary via getCliRuntimeStatus()
-  "/api/cli-tools/codewhale-settings", // GET probes the `codewhale` binary via getCliRuntimeStatus()
-  "/api/cli-tools/codex-settings", // GET probes the `codex` binary via getCliRuntimeStatus()
-  "/api/cli-tools/crush-settings", // GET probes the `crush` binary via getCliRuntimeStatus()
-  "/api/cli-tools/deepseek-tui-settings", // GET probes the `deepseek-tui` binary via getCliRuntimeStatus()
-  "/api/cli-tools/detect", // GET calls detectAllTools() -> execFile(binary, --version) + execFile("which") per tool
-  "/api/cli-tools/droid-settings", // GET probes the `droid` binary via getCliRuntimeStatus()
-  "/api/cli-tools/kilo-settings", // GET probes the `kilo` binary via getCliRuntimeStatus()
-  "/api/cli-tools/openclaw-settings", // GET probes the `openclaw` binary via getCliRuntimeStatus()
-  "/api/cli-tools/pi-settings", // GET probes the `pi` binary via getCliRuntimeStatus()
-  "/api/cli-tools/smelt-settings", // GET probes the `smelt` binary via getCliRuntimeStatus()
-  "/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry
-  "/api/cli-tools/whycodes-settings", // GET probes the `whycodes` binary via getCliRuntimeStatus()
   "/api/services/", // T-10: can run npm install + spawn node processes
   "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary (Hard Rules #15 + #16)
   "/api/local/", // T-12: 1-click local service launchers (Redis today) — must never be whitelistable via manage-scope bypass (Hard Rules #15 + #16)
@@ -60,11 +40,6 @@ export const SPAWN_CAPABLE_PREFIXES: ReadonlyArray<string> = [
   "/api/db-backups/exportAll", // spawns tar for the export archive
   "/api/db/health", // runManagedDbHealthCheck() forks native diagnostics (healthCheckRunner.ts)
   "/api/oauth/cursor/auto-import", // execFile("which", ["cursor"]) before importing creds
-  "/api/cli-tools/omp-settings", // spawns `which omp`
-  "/api/cli-tools/letta-settings", // spawns `which letta`
-  "/api/cli-tools/grok-build-settings", // GET probes the `grok` binary via getCliRuntimeStatus()
-  "/api/cli-tools/forge-settings", // GET probes the `forge` binary via getCliRuntimeStatus()
-  "/api/cli-tools/jcode-settings", // GET probes the `jcode` binary via getCliRuntimeStatus()
   "/dashboard/providers/services/", // reverse proxy into embedded service UIs — Hard Rule #16 pairs it with /api/services/
   "/api/discovery/", // not a spawn, but declared strict-loopback with no manage-scope bypass (outbound provider probes, SSRF-adjacent)
   "/api/issue-agent/", // local triage executor surface, held loopback/LAN "until sandbox + audit hardening is complete" — not opt-in remote until then
@@ -112,7 +87,7 @@ export const SPAWN_CAPABLE_PATTERN_ANCESTORS: ReadonlyArray<string> = ["/api/pro
  * (Covers the few non-spawn entries above too, e.g. the Kiro host-credential import.)
  * Returns true when `prefix` overlaps a spawn-capable route in EITHER direction:
  *   - it equals or sits under a spawn-capable prefix (`/api/middleware/hooks`), or
- *   - it is a parent that would cover one (`/api/`, `/api/cli-tools/`, `/api/middleware`),
+ *   - it is a parent that would cover one (`/api/`, `/api/middleware`),
  * or it overlaps a `SPAWN_CAPABLE_PATTERN_ANCESTORS` entry the same way.
  *
  * Consumed by all three enforcement points so they cannot drift apart:

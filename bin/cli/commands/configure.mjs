@@ -27,10 +27,7 @@ import {
  * are in remote mode (`omniroute connect ...`) you pick from the remote server's
  * live models and the profile is written on THIS machine.
  *
- * Codex keeps its profile-specific TOML files. Other targets delegate to their
- * existing setup-* recipe after the same provider/model selection, so the
- * picker remains a read-only orchestration layer and does not duplicate config
- * merge logic.
+ * Codex keeps its profile-specific TOML files.
  */
 
 const SUPPORTED = listManifestTargets("configure");

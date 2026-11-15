@@ -93,7 +93,7 @@ export async function runLogsCommand(opts = {}) {
   // Pass only level filters to the stream (server-side); other filters are client-side
   const levelFilters = opts.filter ? opts.filter.split(",").map((f) => f.trim()) : [];
 
-  // Authenticate the log stream. The /api/cli-tools/logs endpoint requires the
+  // Authenticate the log stream. The /api/logs/tail endpoint requires the
   // management token; build the same headers (scoped context token + CLI token)
   // that apiFetch uses, so `logs` works against authenticated/remote servers.
   // NOTE: --api-key here is a client-side log *filter* (see buildLogFilter), not

@@ -5,8 +5,7 @@
  * HTTP body (`(error as Error).message` / `String(error)`), violating the
  * project's error-sanitization policy (CLAUDE.md hard rule 12,
  * docs/security/ERROR_SANITIZATION.md). These guards pin the fix in source so
- * the anti-pattern cannot silently return. (Static-source assertions mirror the
- * established style of cli-tools-auth-hardening.test.ts.)
+ * the anti-pattern cannot silently return. (Static-source assertions pin the fix in source.)
  */
 
 import test from "node:test";
@@ -22,7 +21,6 @@ function readRoute(rel: string): string {
 }
 
 const CACHE_STATS = "src/app/api/cache/stats/route.ts";
-const HERMES = "src/app/api/cli-tools/hermes-agent-settings/route.ts";
 const COPILOT_CHAT = "src/app/api/copilot/chat/route.ts";
 
 test("cache/stats route routes errors through sanitizeErrorMessage", () => {
@@ -33,34 +31,6 @@ test("cache/stats route routes errors through sanitizeErrorMessage", () => {
     !/\(error as Error\)\.message/.test(src),
     "must not put raw (error as Error).message in the response body"
   );
-});
-
-test("hermes-agent-settings GET sanitizes its error response (no raw String(error))", () => {
-  const src = readRoute(HERMES);
-  assert.match(src, /import \{ sanitizeErrorMessage \}/, "must import sanitizeErrorMessage");
-  assert.match(src, /sanitizeErrorMessage\(error\)/, "GET catch must sanitize the error");
-  assert.ok(
-    !/error: String\(error\)/.test(src),
-    "must not return raw String(error) in the response body"
-  );
-});
-
-test("hermes-agent-settings POST validates baseUrl as an http(s) URL", () => {
-  const src = readRoute(HERMES);
-  assert.match(
-    src,
-    /import \{ validateBaseUrl \}/,
-    "must import the shared validateBaseUrl helper"
-  );
-  assert.match(src, /validateBaseUrl\(baseUrl\)/, "POST must validate the supplied baseUrl");
-});
-
-test("hermes-agent-settings POST validates preview mode before use", () => {
-  const src = readRoute(HERMES);
-  assert.match(src, /preview: z\.boolean\(\)\.optional\(\)/, "preview must be schema-bound");
-  assert.match(src, /const \{ baseUrl, keyId, apiKey, selections, preview \} = parsed\.data;/);
-  assert.match(src, /if \(preview === true\)/);
-  assert.ok(!/body\.preview/.test(src), "must not reference an undefined body variable");
 });
 
 test("copilot chat route requires management auth and sanitizes thrown errors", () => {

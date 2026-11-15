@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Támogatott CLI-cél indítása az OmniRoute-on keresztül"
   },
-  "setupClaude": {
-    "description": "Claude Code-profilok létrehozása a ~/.claude/profiles könyvtárban az OmniRoute modellkatalógusából"
-  },
   "connect": {
     "description": "Kapcsolódás távoli OmniRoute-kiszolgálóhoz és belépés távoli módba"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "A Codex CLI indítása az OmniRoute használatával (helyi vagy távoli VPS)"
-  },
-  "setupCodex": {
-    "description": "~/.codex-profilfájlok létrehozása az OmniRoute élő modellkatalógusából"
   },
   "packs": {
     "description": "Opcionális futtatókörnyezeti csomagok kezelése (ML / böngészőautomatizálás)",

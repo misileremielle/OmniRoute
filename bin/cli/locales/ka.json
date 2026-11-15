@@ -1177,9 +1177,6 @@
   "run": {
     "description": "მხარდაჭერილი CLI სამიზნის გაშვება OmniRoute-ის მეშვეობით"
   },
-  "setupClaude": {
-    "description": "OmniRoute-ის მოდელების კატალოგიდან ~/.claude/profiles Claude Code პროფილების გენერირება"
-  },
   "connect": {
     "description": "დისტანციურ OmniRoute სერვერთან დაკავშირება და დისტანციურ რეჟიმში გადასვლა"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute-ზე მიმართული Codex CLI-ის გაშვება (ლოკალურად ან დისტანციურ VPS-ზე)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute-ის ცოცხალი მოდელების კატალოგიდან ~/.codex პროფილის ფაილების გენერირება"
   },
   "packs": {
     "description": "არასავალდებულო გაშვების პაკეტების მართვა (ML / ბრაუზერის ავტომატიზაცია)",

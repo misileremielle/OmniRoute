@@ -1177,9 +1177,6 @@
   "run": {
     "description": "በOmniRoute በኩል የሚደገፍ CLI ዒላማ ያስጀምሩ"
   },
-  "setupClaude": {
-    "description": "ከOmniRoute ሞዴል ካታሎግ የ~/.claude/profiles Claude Code መገለጫዎችን ይፍጠሩ"
-  },
   "connect": {
     "description": "ከርቀት OmniRoute አገልጋይ ጋር ይገናኙ እና ወደ የርቀት ሁነታ ይግቡ"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "ወደ OmniRoute (አካባቢያዊ ወይም የርቀት VPS) የሚያመለክተውን Codex CLI ያስጀምሩ"
-  },
-  "setupCodex": {
-    "description": "ከOmniRoute የቀጥታ ሞዴል ካታሎግ የ~/.codex መገለጫ ፋይሎችን ይፍጠሩ"
   },
   "packs": {
     "description": "አማራጭ የአሂድ ጊዜ ጥቅሎችን ያስተዳድሩ (ML / የአሳሽ አውቶሜሽን)",

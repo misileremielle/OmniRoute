@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute를 통해 지원되는 CLI 대상 실행"
   },
-  "setupClaude": {
-    "description": "OmniRoute 모델 카탈로그에서 ~/.claude/profiles Claude Code 프로필 생성"
-  },
   "connect": {
     "description": "원격 OmniRoute 서버에 연결하고 원격 모드로 전환"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute를 가리키도록 Codex CLI 실행(로컬 또는 원격 VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute 실시간 모델 카탈로그에서 ~/.codex 프로필 파일 생성"
   },
   "packs": {
     "description": "선택적 런타임 팩 관리(ML / 브라우저 자동화)",

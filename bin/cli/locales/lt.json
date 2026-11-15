@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Paleisti palaikomą CLI taikinį per OmniRoute"
   },
-  "setupClaude": {
-    "description": "Sugeneruoti ~/.claude/profiles Claude Code profilius iš OmniRoute modelių katalogo"
-  },
   "connect": {
     "description": "Prisijungti prie nuotolinio OmniRoute serverio ir įjungti nuotolinį režimą"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Paleisti Codex CLI, nukreiptą į OmniRoute (vietiniame arba nuotoliniame VPS)"
-  },
-  "setupCodex": {
-    "description": "Sugeneruoti ~/.codex profilio failus iš tiesioginio OmniRoute modelių katalogo"
   },
   "packs": {
     "description": "Tvarkyti pasirinktinius vykdymo aplinkos paketus (ML / naršyklės automatizavimas)",

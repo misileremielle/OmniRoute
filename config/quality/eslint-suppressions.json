@@ -396,31 +396,6 @@
       "count": 2
     }
   },
-  "src/app/(dashboard)/dashboard/cli-agents/CliAgentsPageClient.tsx": {
-    "no-restricted-syntax": {
-      "count": 4
-    }
-  },
-  "src/app/(dashboard)/dashboard/cli-code/components/ClineToolCard.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/app/(dashboard)/dashboard/cli-code/components/CopilotToolCard.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
-    }
-  },
-  "src/app/(dashboard)/dashboard/cli-code/components/HermesAgentToolCard.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "src/app/(dashboard)/dashboard/cli-code/components/KiloToolCard.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "src/app/(dashboard)/dashboard/costs/costExplorerUtils.ts": {
     "no-restricted-syntax": {
       "count": 1
@@ -577,16 +552,6 @@
     }
   },
   "src/app/api/assess/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/app/api/cli-tools/cline-settings/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/app/api/cli-tools/kilo-settings/route.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -1201,7 +1166,7 @@
   },
   "tests/e2e/ecosystem.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 13
+      "count": 12
     }
   },
   "tests/e2e/group-b-redirect-logs-activity.spec.ts": {
@@ -1262,11 +1227,6 @@
       "count": 1
     }
   },
-  "tests/integration/all-statuses-route.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/integration/api-keys.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 23
@@ -1291,11 +1251,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 4
-    }
-  },
-  "tests/integration/cli-settings-forge.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "tests/integration/combo-live/_liveHarness.ts": {
@@ -1517,11 +1472,6 @@
   "tests/unit/antigravity-model-aliases.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 3
-    }
-  },
-  "tests/unit/api-key-mask-fix.test.mjs": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 4
     }
   },
   "tests/unit/api-key-reveal-route.test.ts": {
@@ -1991,11 +1941,6 @@
     }
   },
   "tests/unit/cli/alias-resolver-7791.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/cli/setup-continue.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -3567,11 +3512,6 @@
       "count": 1
     }
   },
-  "tests/unit/ui/cli-code-detail-page.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/ui/combo-defaults-fusion-5598.test.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -3613,11 +3553,6 @@
     }
   },
   "tests/unit/ui/search-tools-search-tab.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/ui/useToolBatchStatuses.test.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }

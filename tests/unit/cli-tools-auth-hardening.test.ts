@@ -7,64 +7,38 @@ import { fileURLToPath } from "node:url";
 const THIS_FILE = fileURLToPath(import.meta.url);
 const TESTS_DIR = path.dirname(THIS_FILE);
 const REPO_ROOT = path.resolve(TESTS_DIR, "../..");
-const CLI_TOOLS_DIR = path.join(REPO_ROOT, "src", "app", "api", "cli-tools");
 
-function listCliToolRouteFiles(dir: string): string[] {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  const files: string[] = [];
+test("the logs tail route (the remaining requireCliToolsAuth consumer) guards its handler", () => {
+  const relPath = "src/app/api/logs/tail/route.ts";
+  const content = fs.readFileSync(path.join(REPO_ROOT, relPath), "utf8");
+  const handlerCount = (content.match(/export async function (GET|POST|PUT|DELETE)\(/g) || [])
+    .length;
+  const authCount = (
+    content.match(
+      /const authError = await requireCliToolsAuth\(request(?:, \{ alwaysRequireAuth: true \})?\);/g
+    ) || []
+  ).length;
+  const returnCount = (
+    content.match(
+      /if \(authError\) (?:return authError;|\{\s*authError\.headers\.set\("cache-control", "no-store"\);\s*return authError;\s*\})/g
+    ) || []
+  ).length;
 
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...listCliToolRouteFiles(fullPath));
-      continue;
-    }
-    if (entry.isFile() && entry.name === "route.ts") {
-      files.push(fullPath);
-    }
-  }
-
-  return files;
-}
-test("all cli-tools route handlers require the shared management auth guard", () => {
-  const routeFiles = listCliToolRouteFiles(CLI_TOOLS_DIR)
-    .map((fullPath) => path.relative(REPO_ROOT, fullPath).replace(/\\/g, "/"))
-    .sort();
-
-  assert.ok(routeFiles.length > 0, "expected at least one cli-tools route");
-
-  for (const relPath of routeFiles) {
-    const fullPath = path.join(REPO_ROOT, relPath);
-    const content = fs.readFileSync(fullPath, "utf8");
-    const handlerCount = (content.match(/export async function (GET|POST|PUT|DELETE)\(/g) || [])
-      .length;
-    const authCount = (
-      content.match(
-        /const authError = await requireCliToolsAuth\(request(?:, \{ alwaysRequireAuth: true \})?\);/g
-      ) || []
-    ).length;
-    const returnCount = (
-      content.match(
-        /if \(authError\) (?:return authError;|\{\s*authError\.headers\.set\("cache-control", "no-store"\);\s*return authError;\s*\})/g
-      ) || []
-    ).length;
-
-    assert.ok(handlerCount > 0, `${relPath} should export at least one route handler`);
-    assert.ok(
-      content.includes('from "@/lib/api/requireCliToolsAuth"'),
-      `${relPath} should import requireCliToolsAuth`
-    );
-    assert.equal(
-      authCount,
-      handlerCount,
-      `${relPath} should guard every exported handler before host access`
-    );
-    assert.equal(
-      returnCount,
-      handlerCount,
-      `${relPath} should return the auth error from every exported handler`
-    );
-  }
+  assert.ok(handlerCount > 0, `${relPath} should export at least one route handler`);
+  assert.ok(
+    content.includes('from "@/lib/api/requireCliToolsAuth"'),
+    `${relPath} should import requireCliToolsAuth`
+  );
+  assert.equal(
+    authCount,
+    handlerCount,
+    `${relPath} should guard every exported handler before host access`
+  );
+  assert.equal(
+    returnCount,
+    handlerCount,
+    `${relPath} should return the auth error from every exported handler`
+  );
 });
 
 test("cli-tools auth helper delegates to management auth", () => {

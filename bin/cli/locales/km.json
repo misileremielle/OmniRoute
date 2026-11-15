@@ -1177,9 +1177,6 @@
   "run": {
     "description": "ដំណើរការគោលដៅ CLI ដែលគាំទ្រតាមរយៈ OmniRoute"
   },
-  "setupClaude": {
-    "description": "បង្កើតប្រូហ្វាល Claude Code ក្នុង ~/.claude/profiles ពីកាតាឡុកម៉ូដែល OmniRoute"
-  },
   "connect": {
     "description": "ភ្ជាប់ទៅម៉ាស៊ីនមេ OmniRoute ពីចម្ងាយ ហើយចូលរបៀបពីចម្ងាយ"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "ដំណើរការ Codex CLI ដោយចង្អុលទៅ OmniRoute (VPS មូលដ្ឋាន ឬពីចម្ងាយ)"
-  },
-  "setupCodex": {
-    "description": "បង្កើតឯកសារប្រូហ្វាល ~/.codex ពីកាតាឡុកម៉ូដែលបន្តផ្ទាល់របស់ OmniRoute"
   },
   "packs": {
     "description": "គ្រប់គ្រងកញ្ចប់ពេលដំណើរការជាជម្រើស (ML / ស្វ័យប្រវត្តិកម្មកម្មវិធីរុករក)",

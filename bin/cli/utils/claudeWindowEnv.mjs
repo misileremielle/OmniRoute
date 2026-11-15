@@ -1,4 +1,4 @@
-// Claude Code window env for a routed model. Pure and spawn-free on purpose: setup-claude.mjs
+// Claude Code window env for a routed model. Pure and spawn-free on purpose: it
 // is reached from an API route (sync-models), so it must not import launch.mjs (spawn-capable).
 
 /**

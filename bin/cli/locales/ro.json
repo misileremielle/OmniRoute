@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Lansează o țintă CLI acceptată prin OmniRoute"
   },
-  "setupClaude": {
-    "description": "Generează profiluri Claude Code în ~/.claude/profiles din catalogul de modele OmniRoute"
-  },
   "connect": {
     "description": "Conectează-te la un server OmniRoute la distanță și intră în modul la distanță"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Lansează Codex CLI configurat pentru OmniRoute (local sau pe un VPS la distanță)"
-  },
-  "setupCodex": {
-    "description": "Generează fișiere de profil în ~/.codex din catalogul live de modele OmniRoute"
   },
   "packs": {
     "description": "Gestionează pachetele opționale de execuție (ML / automatizarea browserului)",

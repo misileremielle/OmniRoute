@@ -239,15 +239,6 @@ test("T06 route payload validation uses validateBody in critical endpoints", () 
     "src/app/api/providers/test-batch/route.ts",
     "src/app/api/providers/validate/route.ts",
     "src/app/api/v1beta/models/[...path]/route.ts",
-    "src/app/api/cli-tools/backups/route.ts",
-    "src/app/api/cli-tools/claude-settings/route.ts",
-    "src/app/api/cli-tools/cline-settings/route.ts",
-    "src/app/api/cli-tools/codex-profiles/route.ts",
-    "src/app/api/cli-tools/codex-settings/route.ts",
-    "src/app/api/cli-tools/droid-settings/route.ts",
-    "src/app/api/cli-tools/guide-settings/[toolId]/route.ts",
-    "src/app/api/cli-tools/kilo-settings/route.ts",
-    "src/app/api/cli-tools/openclaw-settings/route.ts",
   ];
   for (const relPath of targets) {
     const content = readIfExists(relPath);

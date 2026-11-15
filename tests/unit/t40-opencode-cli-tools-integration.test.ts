@@ -5,8 +5,6 @@ import path from "node:path";
 
 const { CLI_TOOLS } = await import("../../src/shared/constants/cliTools.ts");
 const { resolveOpencodeConfigPath } = await import("../../src/shared/services/cliRuntime.ts");
-const { buildOpenCodeProviderConfig, buildOpenCodeConfigDocument, mergeOpenCodeConfig } =
-  await import("../../src/shared/services/opencodeConfig.ts");
 
 test("T40: OpenCode card documents config paths and --variant usage", () => {
   const opencode = CLI_TOOLS.opencode;
@@ -57,119 +55,6 @@ test("T40: OpenCode config path resolves per-platform", () => {
     "C:\\Users\\dev"
   );
   assert.equal(windowsXdg, path.join("D:\\xdg", "opencode", "opencode.json"));
-});
-
-test("T40: OpenCode config generator includes endpoint and selected API key", () => {
-  const providerConfig = buildOpenCodeProviderConfig({
-    baseUrl: "http://localhost:20128/v1/",
-    apiKey: "sk_test_opencode",
-    model: "claude-sonnet-4-5-thinking",
-  });
-  assert.equal(providerConfig.options.baseURL, "http://localhost:20128/v1");
-  assert.equal(providerConfig.options.apiKey, "sk_test_opencode");
-  assert.ok(providerConfig.models["claude-sonnet-4-5-thinking"]);
-
-  const mergedConfig = mergeOpenCodeConfig(
-    { provider: { custom: { name: "Custom Provider" } } },
-    {
-      baseUrl: "http://localhost:20128/v1",
-      apiKey: "sk_test_opencode",
-      model: "claude-sonnet-4-5-thinking",
-    }
-  );
-  assert.ok(mergedConfig.provider.custom);
-  assert.equal(mergedConfig.provider.omniroute.options.baseURL, "http://localhost:20128/v1");
-  assert.equal(mergedConfig.provider.omniroute.options.apiKey, "sk_test_opencode");
-});
-
-test("T40: OpenCode config document uses current provider schema", () => {
-  const configDocument = buildOpenCodeConfigDocument({
-    baseUrl: "http://localhost:20128/v1/",
-    apiKey: "sk_test_opencode",
-    models: ["cc/claude-sonnet-4-20250514", "gg/gemini-2.5-pro"],
-    modelLabels: {
-      "cc/claude-sonnet-4-20250514": "Claude Sonnet 4.5",
-      "gg/gemini-2.5-pro": "Gemini 2.5 Pro",
-    },
-  });
-
-  assert.equal(configDocument.$schema, "https://opencode.ai/config.json");
-  assert.ok(configDocument.provider.omniroute);
-  assert.equal(configDocument.provider.omniroute.npm, "@ai-sdk/openai-compatible");
-  assert.equal(configDocument.provider.omniroute.options.baseURL, "http://localhost:20128/v1");
-  assert.equal(configDocument.provider.omniroute.options.apiKey, "sk_test_opencode");
-  assert.deepEqual(Object.keys(configDocument.provider.omniroute.models), [
-    "cc/claude-sonnet-4-20250514",
-    "gg/gemini-2.5-pro",
-  ]);
-  assert.equal(
-    configDocument.provider.omniroute.models["cc/claude-sonnet-4-20250514"].name,
-    "Claude Sonnet 4.5"
-  );
-  assert.equal(
-    configDocument.provider.omniroute.models["gg/gemini-2.5-pro"].name,
-    "Gemini 2.5 Pro"
-  );
-  // v2 provider schema is dual-written alongside the v1 block.
-  assert.equal(
-    configDocument.providers.omniroute.package,
-    "@opencode-ai/ai/providers/openai-compatible"
-  );
-});
-
-test("T40: OpenCode explicit multi-model selection overrides fallback defaults", () => {
-  const providerConfig = buildOpenCodeProviderConfig({
-    baseUrl: "http://localhost:20128/v1/",
-    apiKey: "sk_test_opencode",
-    models: ["custom/provider-a", "custom/provider-b"],
-    modelLabels: {
-      "custom/provider-a": "Provider A",
-      "custom/provider-b": "Provider B",
-    },
-  });
-
-  assert.deepEqual(Object.keys(providerConfig.models), ["custom/provider-a", "custom/provider-b"]);
-  assert.equal(providerConfig.models["claude-sonnet-4-5-thinking"], undefined);
-  assert.equal(providerConfig.models["custom/provider-a"].name, "Provider A");
-  assert.equal(providerConfig.models["custom/provider-b"].name, "Provider B");
-});
-
-test("T40: OpenCode merge preserves unrelated config and updates only provider.omniroute", () => {
-  const mergedConfig = mergeOpenCodeConfig(
-    {
-      $schema: "https://opencode.ai/config.json",
-      provider: {
-        custom: { name: "Custom Provider" },
-        omniroute: {
-          name: "Old OmniRoute",
-          options: { baseURL: "http://old-host/v1", apiKey: "old-key" },
-        },
-      },
-      mcpServers: {
-        github: { command: "npx", args: ["-y", "@modelcontextprotocol/server-github"] },
-      },
-    },
-    {
-      baseUrl: "http://localhost:20128/v1",
-      apiKey: "sk_test_opencode",
-      models: ["cx/gpt-5.6-sol"],
-      modelLabels: { "cx/gpt-5.6-sol": "GPT-5.6 Sol" },
-    }
-  );
-
-  assert.deepEqual(mergedConfig.provider.custom, { name: "Custom Provider" });
-  assert.deepEqual(mergedConfig.mcpServers, {
-    github: { command: "npx", args: ["-y", "@modelcontextprotocol/server-github"] },
-  });
-  assert.deepEqual(mergedConfig.provider.omniroute.models, {
-    "cx/gpt-5.6-sol": {
-      name: "GPT-5.6 Sol",
-      limit: {
-        context: 128_000,
-        output: 8_192,
-      },
-    },
-  });
 });
 
 test("T40: OpenCode tool card uses the internal generic asset", () => {

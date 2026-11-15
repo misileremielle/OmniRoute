@@ -18,7 +18,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../
 // Synthetic isLocalOnlyPath: classifies anything under the three spawn-capable
 // prefixes via startsWith. Mirrors the real predicate's prefix semantics without
 // importing routeGuard.ts (keeps this test DB-free / pure).
-const SYNTHETIC_PREFIXES = ["/api/mcp/", "/api/cli-tools/runtime/", "/api/services/"];
+const SYNTHETIC_PREFIXES = ["/api/mcp/", "/api/services/"];
 const isLocalOnly = (path: string): boolean =>
   SYNTHETIC_PREFIXES.some((p) => path === p || path.startsWith(p));
 
@@ -34,10 +34,7 @@ test("routeFileToApiPath resolves dynamic [param] segments to a concrete placeho
     routeFileToApiPath("src/app/api/services/[name]/logs/route.ts"),
     "/api/services/_name_/logs"
   );
-  assert.equal(
-    routeFileToApiPath("src/app/api/cli-tools/runtime/[toolId]/route.ts"),
-    "/api/cli-tools/runtime/_toolId_"
-  );
+  assert.equal(routeFileToApiPath("src/app/api/providers/[id]/route.ts"), "/api/providers/_id_");
 });
 
 test("routeFileToApiPath normalizes Windows backslash separators before stripping prefixes", () => {
@@ -52,11 +49,7 @@ test("routeFileToApiPath normalizes Windows backslash separators before strippin
 });
 
 test("no unclassified routes when every spawn-capable route is local-only", () => {
-  const routes = [
-    "/api/mcp/tools",
-    "/api/services/9router/start",
-    "/api/cli-tools/runtime/_toolId_",
-  ];
+  const routes = ["/api/mcp/tools", "/api/services/9router/start"];
   assert.deepEqual(findUnclassifiedSpawnRoutes(routes, isLocalOnly, {}), []);
 });
 
@@ -162,39 +155,6 @@ test("every KNOWN_UNCLASSIFIED_SOURCE_SPAWN entry carries a non-empty justificat
   }
 });
 
-test("GHSA-35fw-cv32-2373: every cli-tools route that reaches getCliRuntimeStatus()/detectAllTools() is classified local-only", () => {
-  // Same transitive-spawn class as #7948: the spawn lives in
-  // src/shared/services/cliRuntime.ts (runProcess -> spawn) and
-  // src/lib/cli-helper/tool-detector.ts (execFile), never in the route file, so
-  // the source-scan subcheck is blind to it. Six siblings were already gated;
-  // these 14 called the same helper and were not. Each is now a
-  // SPAWN_CAPABLE_ROUTE_ROOT so subcheck 1 enforces membership going forward.
-  const routes = [
-    "/api/cli-tools/all-statuses",
-    "/api/cli-tools/claude-settings",
-    "/api/cli-tools/cline-settings",
-    "/api/cli-tools/codewhale-settings",
-    "/api/cli-tools/codex-settings",
-    "/api/cli-tools/crush-settings",
-    "/api/cli-tools/deepseek-tui-settings",
-    "/api/cli-tools/detect",
-    "/api/cli-tools/droid-settings",
-    "/api/cli-tools/kilo-settings",
-    "/api/cli-tools/openclaw-settings",
-    "/api/cli-tools/pi-settings",
-    "/api/cli-tools/smelt-settings",
-    "/api/cli-tools/status",
-    "/api/cli-tools/whycodes-settings",
-  ];
-  for (const r of routes) {
-    assert.equal(isLocalOnlyPath(r), true, `${r} must be local-only`);
-    assert.ok(
-      SPAWN_CAPABLE_ROUTE_ROOTS.includes(`src/app${r}`),
-      `src/app${r} must be a SPAWN_CAPABLE_ROUTE_ROOT`
-    );
-  }
-});
-
 test("/api/version-manager/* (CLIProxyAPI download + supervisor spawn) is classified local-only", () => {
   assert.ok(
     SPAWN_CAPABLE_ROUTE_ROOTS.includes("src/app/api/version-manager"),
@@ -209,7 +169,7 @@ test("6A.8: spawn-capable routes in SPAWN_CAPABLE_ROUTE_ROOTS are still all clas
   // The original subcheck (SPAWN_CAPABLE_ROUTE_ROOTS) must still pass.
   // This test is a regression guard — the new source-scan does not break the old check.
   const { isLocalOnlyPath } = await import("../../src/server/authz/routeGuard.ts");
-  const rootPrefixes = ["/api/services/", "/api/cli-tools/runtime/"];
+  const rootPrefixes = ["/api/services/"];
   for (const prefix of rootPrefixes) {
     assert.ok(isLocalOnlyPath(prefix + "test"), `expected ${prefix} to be local-only`);
   }

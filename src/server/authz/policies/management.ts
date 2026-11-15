@@ -73,7 +73,7 @@ export const managementPolicy: RoutePolicy = {
     // default; operators can extend it in settings.
     //
     // The strict-loopback default still applies to everything else (notably
-    // the subprocess-spawning /api/cli-tools/runtime/* surface, which is NOT
+    // the subprocess-spawning /api/services/* surface, which is NOT
     // in the bypass list).
     //
     // Anonymous (no Bearer / invalid key / wrong scope / no session) requests

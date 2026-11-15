@@ -33,11 +33,9 @@ test("appearance widget visibility settings reject non-boolean values", () => {
 });
 
 test("localOnlyManageScopeBypass settings are accepted by the settings PATCH schema", () => {
-  // Only NON-spawn-capable prefixes are acceptable. This test previously asserted
-  // that "/api/cli-tools/runtime/" was accepted — it was written against the buggy
-  // schema (the BYPASS_PREFIX_NOT_ALLOWED layer-1 refine documented in routeGuard.ts
-  // was missing) and consecrated the bug. The real contract (Hard Rules #15/#16 +
-  // authz-bypass AC-8) is covered by the rejection test below.
+  // Only NON-spawn-capable prefixes are acceptable. The real contract
+  // (Hard Rules #15/#16 + authz-bypass AC-8) is covered by the rejection
+  // test below.
   const validation = updateSettingsSchema.safeParse({
     localOnlyManageScopeBypassEnabled: true,
     localOnlyManageScopeBypassPrefixes: ["/api/mcp/"],
@@ -52,7 +50,7 @@ test("localOnlyManageScopeBypass settings are accepted by the settings PATCH sch
 test("localOnlyManageScopeBypassPrefixes rejects spawn-capable prefixes (BYPASS_PREFIX_NOT_ALLOWED)", () => {
   const validation = updateSettingsSchema.safeParse({
     localOnlyManageScopeBypassEnabled: true,
-    localOnlyManageScopeBypassPrefixes: ["/api/mcp/", "/api/cli-tools/runtime/"],
+    localOnlyManageScopeBypassPrefixes: ["/api/mcp/", "/api/services/cliproxy/"],
   });
 
   assert.equal(validation.success, false);

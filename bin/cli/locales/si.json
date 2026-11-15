@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute හරහා සහාය දක්වන CLI ඉලක්කයක් දියත් කරන්න"
   },
-  "setupClaude": {
-    "description": "OmniRoute ආදර්ශ නාමාවලියෙන් ~/.claude/profiles Claude Code පැතිකඩ ජනනය කරන්න"
-  },
   "connect": {
     "description": "දුරස්ථ OmniRoute සේවාදායකයකට සම්බන්ධ වී දුරස්ථ ප්රකාරයට ඇතුළු වන්න"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute වෙත යොමු කළ Codex CLI දියත් කරන්න (දේශීය හෝ දුරස්ථ VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute සජීවී ආදර්ශ නාමාවලියෙන් ~/.codex පැතිකඩ ගොනු ජනනය කරන්න"
   },
   "packs": {
     "description": "විකල්ප ධාවනකාල පැකේජ කළමනාකරණය කරන්න (ML / බ්රවුසර ස්වයංක්රීයකරණය)",

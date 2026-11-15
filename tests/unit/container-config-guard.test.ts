@@ -32,10 +32,10 @@ test("a missing or non-string message is not a refusal", () => {
 test("the message names the tool, the target path and the host command", () => {
   const message = buildContainerWriteRefusal("/root/.codex/config.toml", {
     toolLabel: "Codex",
-    hostCommand: "omniroute setup-codex",
+    hostCommand: "omniroute config set codex",
   });
   assert.ok(message.startsWith("Refusing to write Codex config to /root/.codex/config.toml"));
-  assert.match(message, /\n {2}omniroute setup-codex\n/);
+  assert.match(message, /\n {2}omniroute config set codex\n/);
 });
 
 test("without options it uses the generic subject, the placeholder command and the server hint", () => {

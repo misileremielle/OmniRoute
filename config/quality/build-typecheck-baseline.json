@@ -25,15 +25,6 @@
   "src/app/(dashboard)/dashboard/cache/components/CachePerformance.tsx": {
     "TS2339": 1
   },
-  "src/app/(dashboard)/dashboard/cli-code/components/ClaudeToolCard.tsx": {
-    "TS2339": 2
-  },
-  "src/app/(dashboard)/dashboard/cli-code/components/CodexToolCard.tsx": {
-    "TS2345": 3
-  },
-  "src/app/(dashboard)/dashboard/cli-code/components/CustomCliCard.tsx": {
-    "TS2345": 1
-  },
   "src/app/(dashboard)/dashboard/compression/studio/EncoderComparisonTable.tsx": {
     "TS2322": 1
   },
@@ -74,21 +65,6 @@
   },
   "src/app/api/cache/route.ts": {
     "TS2339": 1
-  },
-  "src/app/api/cli-tools/all-statuses/route.ts": {
-    "TS2339": 1
-  },
-  "src/app/api/cli-tools/claude-settings/route.ts": {
-    "TS2339": 1
-  },
-  "src/app/api/cli-tools/codex-settings/route.ts": {
-    "TS2345": 2
-  },
-  "src/app/api/cli-tools/grok-build-settings/route.ts": {
-    "TS2304": 1
-  },
-  "src/app/api/cli-tools/qwen-settings/route.ts": {
-    "TS2322": 1
   },
   "src/app/api/combos/auto/route.ts": {
     "TS2322": 1

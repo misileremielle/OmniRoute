@@ -1,7 +1,7 @@
 /**
  * E2E Test Suite — OmniRoute Ecosystem
  *
- * Scenarios covering MCP, quota, Auto-Combo, OpenClaw, Stress, and Security.
+ * Scenarios covering quota, Auto-Combo, Stress, and Security.
  * Run with: npm run test:ecosystem
  */
 
@@ -155,20 +155,6 @@ describe("E2E: Auto-Combo (routing + self-healing)", () => {
     expect(Array.isArray(data?.combos)).toBe(true);
     const autoCombos = data.combos.filter((c: any) => c.strategy === "auto");
     expect(autoCombos.length).toBeGreaterThanOrEqual(0);
-  });
-});
-
-// ─── Scenario 4: OpenClaw Integration ────────────────────────────
-describe("E2E: OpenClaw Integration", () => {
-  itCase("should return dynamic provider.order", async () => {
-    const res = await apiFetch("/api/cli-tools/openclaw/auto-order");
-    expect(res.ok).toBe(true);
-    const data = (await res.json()) as any;
-    expect(data).toHaveProperty("provider");
-    expect(data.provider).toHaveProperty("order");
-    expect(Array.isArray(data.provider.order)).toBe(true);
-    expect(data.provider).toHaveProperty("allow_fallbacks");
-    expect(data).toHaveProperty("source");
   });
 });
 

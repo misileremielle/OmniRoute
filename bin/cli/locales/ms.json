@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Lancarkan sasaran CLI yang disokong melalui OmniRoute"
   },
-  "setupClaude": {
-    "description": "Jana profil Claude Code ~/.claude/profiles daripada katalog model OmniRoute"
-  },
   "connect": {
     "description": "Sambung ke pelayan OmniRoute jauh dan masuk ke mod jauh"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Lancarkan Codex CLI yang diarahkan ke OmniRoute (VPS setempat atau jauh)"
-  },
-  "setupCodex": {
-    "description": "Jana fail profil ~/.codex daripada katalog model langsung OmniRoute"
   },
   "packs": {
     "description": "Urus pek masa jalan pilihan (ML / automasi pelayar)",

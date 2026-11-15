@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Iniciar un destino de CLI compatible a través de OmniRoute"
   },
-  "setupClaude": {
-    "description": "Generar perfiles de Claude Code en ~/.claude/profiles a partir del catálogo de modelos de OmniRoute"
-  },
   "connect": {
     "description": "Conectarse a un servidor remoto de OmniRoute y entrar en modo remoto"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Iniciar Codex CLI conectado a OmniRoute (local o VPS remoto)"
-  },
-  "setupCodex": {
-    "description": "Generar archivos de perfil en ~/.codex a partir del catálogo de modelos activo de OmniRoute"
   },
   "packs": {
     "description": "Gestionar paquetes opcionales del entorno de ejecución (ML / automatización del navegador)",

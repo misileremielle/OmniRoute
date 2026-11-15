@@ -110,7 +110,6 @@ OmniRoute has **110 top-level TypeScript files** in `src/lib/db/`. Below is a sa
 | `registeredKeys.ts`     | `registered_keys`, `account_key_limits`, `provider_key_limits` | Whitelisted API keys for MCP/A2A                                          |
 | `quotaSnapshots.ts`     | `quota_snapshots`                                              | Historical quota usage                                                    |
 | `modelComboMappings.ts` | `model_combo_mappings`                                         | Map models to combo defaults                                              |
-| `cliToolState.ts`       | `cli_tool_state`                                               | CLI-specific persistent state                                             |
 | `encryption.ts`         | —                                                              | Helpers for encrypting/decrypting fields                                  |
 | `readCache.ts`          | —                                                              | In-memory cache for read-heavy ops                                        |
 | `secrets.ts`            | `key_value` (encrypted entries)                                | Encrypted secret storage                                                  |

@@ -80,12 +80,7 @@ test("the capability scan finds the routes it is meant to police", () => {
   const routes = new Set(capableRoutes().map((r) => r.route));
   // Known members of each class; if a refactor renames the markers these disappear and
   // the scan would silently pass everything.
-  for (const known of [
-    "/api/shutdown",
-    "/api/cli-tools/codex-profiles",
-    "/api/cli-tools/letta-settings",
-    "/api/db-backups/exportAll",
-  ]) {
+  for (const known of ["/api/shutdown", "/api/db-backups/exportAll"]) {
     assert.ok(routes.has(known), `capability scan no longer detects ${known}`);
   }
 });

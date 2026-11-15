@@ -1177,9 +1177,6 @@
   "run": {
     "description": "اجرای یک مقصد CLI پشتیبانیشده از طریق OmniRoute"
   },
-  "setupClaude": {
-    "description": "ایجاد پروفایلهای Claude Code در ~/.claude/profiles از کاتالوگ مدل OmniRoute"
-  },
   "connect": {
     "description": "اتصال به یک سرور راه دور OmniRoute و ورود به حالت راه دور"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "اجرای Codex CLI با اتصال به OmniRoute (محلی یا VPS راه دور)"
-  },
-  "setupCodex": {
-    "description": "ایجاد فایلهای پروفایل ~/.codex از کاتالوگ زنده مدل OmniRoute"
   },
   "packs": {
     "description": "مدیریت بستههای اختیاری زمان اجرا (ML / خودکارسازی مرورگر)",

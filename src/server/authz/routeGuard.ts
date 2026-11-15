@@ -31,36 +31,7 @@ import {
 const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
 export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
-  "/api/cli-tools/runtime/",
-  "/api/cli-tools/omp-settings", // spawns `which omp` to detect the CLI install (Hard Rules #15 + #16, #6318)
-  "/api/cli-tools/letta-settings", // spawns `which letta` to detect the CLI install (Hard Rules #15 + #16, #6318)
-  "/api/cli-tools/grok-build-settings", // GET calls getCliRuntimeStatus("grok-build"), which spawns a child process to locate + healthcheck the `grok` binary — same transitive-spawn surface that classified /api/skills/collect/ (Hard Rules #15 + #16). Writing ~/.grok/config.toml is inherently a local-machine operation, so loopback-only costs no real capability.
-  "/api/cli-tools/forge-settings", // spawns via getCliRuntimeStatus() to detect the `forge` CLI install (Hard Rules #15 + #16, #7263)
-  "/api/cli-tools/jcode-settings", // spawns via getCliRuntimeStatus() to detect the `jcode` CLI install (Hard Rules #15 + #16, #7263)
-  "/api/cli-tools/qwen-settings", // GET probes the local `qwen` binary; writes target ~/.qwen config files (Hard Rules #15 + #16)
-  // GHSA-35fw-cv32-2373: the 14 cli-tools routes below reach the SAME spawn as their six
-  // gated siblings above — getCliRuntimeStatus() -> locateCommand() -> runProcess("sh", -c
-  // 'command -v -- "$1"') -> spawn() — but sat on Tier 3 MANAGEMENT only, which
-  // requireManagementAuth() waives under requireLogin=false (incl. the fresh-install window).
-  // Exact entries on purpose: a blanket "/api/cli-tools/" prefix would also lock the
-  // non-spawning apply/backups/config/guide-settings/hermes-agent-settings/keys/logs/
-  // openclaw/auto-order routes that tunnel-served dashboards legitimately use.
-  "/api/cli-tools/all-statuses", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/claude-settings", // spawns via getCliRuntimeStatus() to detect the `claude` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/cline-settings", // spawns via getCliRuntimeStatus() to detect the `cline` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/codewhale-settings", // spawns via getCliRuntimeStatus() to detect the `codewhale` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/codex-settings", // spawns via getCliRuntimeStatus() to detect the `codex` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/crush-settings", // spawns via getCliRuntimeStatus() to detect the `crush` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/deepseek-tui-settings", // spawns via getCliRuntimeStatus() to detect the `deepseek-tui` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/detect", // GET calls detectAllTools() -> execFile(binary, --version) + execFile("which") per tool (src/lib/cli-helper/tool-detector.ts) (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/droid-settings", // spawns via getCliRuntimeStatus() to detect the `droid` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/kilo-settings", // spawns via getCliRuntimeStatus() to detect the `kilo` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/openclaw-settings", // spawns via getCliRuntimeStatus() to detect the `openclaw` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373). Does NOT cover the non-spawning sibling /api/cli-tools/openclaw/auto-order (different segment).
   "/api/providers/devin-cli-agentic/auth-status", // GET spawns `devin auth status` via getDevinAgenticAuthStatus() (src/lib/providers/devinAgenticAuthStatus.ts) — RCE-via-tunnel surface (Hard Rules #15 + #16, #15446). Narrow-scoped like /api/providers/cursor/agent-availability.
-  "/api/cli-tools/pi-settings", // spawns via getCliRuntimeStatus() to detect the `pi` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/smelt-settings", // spawns via getCliRuntimeStatus() to detect the `smelt` CLI install (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/status", // GET calls getCliRuntimeStatus() per CLI_TOOL_IDS entry (Hard Rules #15 + #16, GHSA-35fw-cv32-2373)
-  "/api/cli-tools/whycodes-settings", // spawns via getCliRuntimeStatus() to detect the `whycodes` CLI install (Hard Rules #15 + #16, #14107)
   "/api/services/", // T-10: embedded service lifecycle (spawn child processes)
   "/api/version-manager/", // downloads, unpacks and runs the CLIProxyAPI binary, the same work as /api/services/cliproxy/ (Hard Rules #15 + #16); read-only GETs exempted below
   "/dashboard/providers/services/", // T-07: reverse proxy to embedded service UIs
@@ -167,12 +138,6 @@ export const ALWAYS_PROTECTED_API_PATHS: ReadonlyArray<string> = [
   // client/public IPs, and the handler only calls requireManagementAuth() with no
   // alwaysRequireAuth. Found sweeping the GHSA-5926-2w35-7h4q class.
   "/api/logs/export",
-  // Codex CLI profile store. GET leaks the operator's account label; PUT writes
-  // attacker-supplied auth.json + config.toml straight into the operator's Codex
-  // CLI config (ensureCliConfigWriteAllowed() only checks CLI_ALLOW_CONFIG_WRITES,
-  // which defaults to true), so a POST+PUT pair repoints the CLI at attacker
-  // credentials or an attacker base URL. Found sweeping the same class.
-  "/api/cli-tools/codex-profiles",
   // Imports the host's local Antigravity login (token files, Linux keyring through
   // `secret-tool`). Same family as the {claude,codex}-auth/apply-local pattern below;
   // a plain path because it carries no dynamic segment. Also LOCAL_ONLY above, for
@@ -201,17 +166,6 @@ export const ALWAYS_PROTECTED_API_PATHS: ReadonlyArray<string> = [
   // or the local CLI when login is on; in open mode it fell back to "anyone".
   // The bundle itself stays a public route: it authenticates with the token.
   "/api/sync/tokens",
-  // Host CLI config writers. /apply overwrites the operator's CLI config (for Claude the
-  // whole ~/.claude/settings.json) with a caller-supplied base URL and token, repointing
-  // the operator's CLI at that endpoint; guide-settings and hermes-agent-settings write
-  // the same kind of config and backups restores one. The handlers only call
-  // requireCliToolsAuth() and guardCliConfigWrite() (CLI_ALLOW_CONFIG_WRITES defaults to
-  // true), so with login disabled they were anonymous while their sibling
-  // /api/cli-tools/codex-profiles above was not. Read-only CLI tool routes stay as is.
-  "/api/cli-tools/apply",
-  "/api/cli-tools/guide-settings",
-  "/api/cli-tools/hermes-agent-settings",
-  "/api/cli-tools/backups",
   // Log export destinations: a destination is a caller-chosen BigQuery project with its
   // own service account, and /[id]/run ships call_logs (prompts, responses, key names)
   // into it. Same data as /api/logs/export above; the prefix covers destinations, their
@@ -350,7 +304,7 @@ const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
  * Returns true when `path` is a local-only route that must be blocked from
  * non-loopback / non-LAN callers.
  *
- * @param path    Normalized request path (e.g. "/api/cli-tools/runtime/status").
+ * @param path    Normalized request path (e.g. "/api/services/cliproxy/status").
  * @param method  Optional HTTP method. When provided and the method is a safe
  *                read-only method (GET/HEAD/OPTIONS) AND the path exactly
  *                matches an entry in `LOCAL_ONLY_API_GET_EXEMPTIONS`, this
@@ -399,8 +353,8 @@ export function isLocalOnlyBypassableByManageScope(path: string): boolean {
   return snapshot.prefixes.some((p) => {
     // Defence-in-depth: reject a bypass prefix that is the same as, child of,
     // OR PARENT of any spawn-capable prefix (or pattern ancestor). The parent
-    // case catches e.g. `/api/cli-tools/` (parent of `/api/cli-tools/runtime/`)
-    // — a request to `/api/cli-tools/runtime/foo` would otherwise satisfy
+    // case catches e.g. `/api/services/` (parent of `/api/services/cliproxy/`)
+    // — a request to `/api/services/cliproxy/foo` would otherwise satisfy
     // `path.startsWith(p)` and reach the spawn-capable surface without a
     // loopback check. `normalizeAuthzBypass` already drops these entries when
     // the snapshot is built; this re-check covers any other snapshot writer.

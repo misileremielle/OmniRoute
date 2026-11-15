@@ -28,7 +28,7 @@ export function createLogStream(options: LogStreamOptions = {}): LogStream {
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
-      let url = `${baseUrl}/api/cli-tools/logs?follow=${follow}`;
+      let url = `${baseUrl}/api/logs/tail?follow=${follow}`;
       if (filters.length > 0) {
         url += `&filter=${encodeURIComponent(filters.join(","))}`;
       }

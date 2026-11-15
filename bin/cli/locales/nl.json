@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Start een ondersteund CLI-doel via OmniRoute"
   },
-  "setupClaude": {
-    "description": "Genereer Claude Code-profielen in ~/.claude/profiles vanuit de OmniRoute-modelcatalogus"
-  },
   "connect": {
     "description": "Maak verbinding met een externe OmniRoute-server en activeer de externe modus"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Start Codex CLI, gericht op OmniRoute (lokale of externe VPS)"
-  },
-  "setupCodex": {
-    "description": "Genereer profielbestanden in ~/.codex vanuit de actuele OmniRoute-modelcatalogus"
   },
   "packs": {
     "description": "Beheer optionele runtimepakketten (ML / browserautomatisering)",

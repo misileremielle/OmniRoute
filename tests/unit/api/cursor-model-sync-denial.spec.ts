@@ -17,12 +17,6 @@ vi.mock("@/shared/network/safeOutboundFetch", async (importOriginal) => ({
   safeOutboundFetch: boundaries.provider,
 }));
 vi.mock("@/lib/usage/callLogs", () => ({ saveCallLog: vi.fn(async () => undefined) }));
-vi.mock("@/lib/cli-helper/codexProfileAutoSync", () => ({
-  autoSyncCodexProfilesFromLiveCatalog: vi.fn(async () => ({ ok: false, reason: "fixture" })),
-}));
-vi.mock("@/lib/cli-helper/claudeProfileAutoSync", () => ({
-  autoSyncClaudeProfilesFromLiveCatalog: vi.fn(async () => ({ ok: false, reason: "fixture" })),
-}));
 
 const dataDir = mkdtempSync(join(tmpdir(), "cursor-sync-denial-"));
 const originalEnv = {

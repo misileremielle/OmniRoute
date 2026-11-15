@@ -199,7 +199,7 @@ test("AC-10c: BYPASS_PREFIX_NOT_ALLOWED failure writes settings.update_failed", 
     await makeManagementSessionRequest("http://localhost/api/settings", {
       method: "PATCH",
       body: {
-        localOnlyManageScopeBypassPrefixes: ["/api/jobs/", "/api/cli-tools/runtime/"],
+        localOnlyManageScopeBypassPrefixes: ["/api/jobs/", "/api/services/cliproxy/"],
         currentPassword: "initial-pass-ac10c",
       },
     })

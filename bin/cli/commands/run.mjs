@@ -15,7 +15,7 @@ import { t } from "../i18n.mjs";
 import os from "node:os";
 import { join } from "node:path";
 import { spawn, execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { contextCredentialFor, resolveActiveContext } from "../contexts.mjs";
 import { buildSafeCliLaunchEnv } from "../launch-env.mjs";
 import { quoteShellArgsForSpawn } from "../utils/winShellArgs.mjs";
@@ -371,14 +371,43 @@ async function healthCheckForRun(baseUrl) {
 }
 
 // WhyCodes reads a custom provider's base URL only from config.toml, so `-P omniroute`
-// needs the entry `omniroute setup-whycodes` writes. Fail early with that hint instead of
-// letting WhyCodes reject an unknown provider, and flag a base URL that is not this target.
+// needs the `[providers.omniroute]` entry `omniroute config set whycodes` writes. Fail
+// early with that hint instead of letting WhyCodes reject an unknown provider, and
+// flag a base URL that is not this target.
+function whyCodesConfigPath() {
+  const homeOverride = String(process.env.WHYCODES_HOME || "").trim();
+  if (homeOverride) return join(homeOverride, "config.toml");
+  const userHome =
+    String(process.env.HOME || "").trim() ||
+    String(process.env.USERPROFILE || "").trim() ||
+    os.homedir();
+  return join(userHome, ".whycodes", "config.toml");
+}
+
+/**
+ * `base_url` of `[providers.omniroute]` in the WhyCodes config.toml, `""` when the
+ * provider exists without one, or `null` when the file, its TOML or the provider is
+ * missing.
+ */
+export async function readWhyCodesProviderBaseUrl(configPath = whyCodesConfigPath()) {
+  if (!existsSync(configPath)) return null;
+  const { parse } = await import("smol-toml");
+  let config;
+  try {
+    config = parse(readFileSync(configPath, "utf8"));
+  } catch {
+    return null;
+  }
+  const provider = config?.providers?.omniroute;
+  if (!provider || typeof provider !== "object") return null;
+  return String(provider.base_url || provider.api_base || "");
+}
+
 async function checkWhyCodesProvider(baseUrl) {
-  const { readWhyCodesProviderBaseUrl } = await import("./setup-whycodes.mjs");
   const configured = await readWhyCodesProviderBaseUrl();
   if (configured === null) {
     console.error(
-      "WhyCodes has no [providers.omniroute] entry yet. Run `omniroute setup-whycodes` first."
+      "WhyCodes has no [providers.omniroute] entry yet. Run `omniroute config set whycodes` first."
     );
     return false;
   }
@@ -386,7 +415,7 @@ async function checkWhyCodesProvider(baseUrl) {
   if (configured && trim(configured) !== trim(baseUrl)) {
     console.error(
       `WhyCodes will use its configured base_url ${configured}, not ${baseUrl}. ` +
-        "Re-run `omniroute setup-whycodes` (with --remote) to point it here."
+        "Re-run `omniroute --base-url <this target> config set whycodes` to point it here."
     );
   }
   return true;

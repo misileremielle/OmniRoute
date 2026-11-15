@@ -36,10 +36,6 @@ const HARD_GATED_INVENTORY: ReadonlyArray<{ path: string; why: string }> = [
     path: "/api/logs/export",
     why: "dumps call_logs (prompts and responses) and proxy_logs for up to 168h",
   },
-  {
-    path: "/api/cli-tools/codex-profiles",
-    why: "PUT writes attacker-supplied auth.json and config.toml into the operator's Codex CLI config",
-  },
   // ── Same family: WRITE the operator's credentials into host CLI files ───
   // These do not hand the credential to the caller, so they are a step below
   // the export routes — but anonymous is still the wrong audience for "write
@@ -120,7 +116,6 @@ test("the trailing-slash spelling is gated too", () => {
     "/api/providers/abc/claude-auth/export/",
     "/api/providers/abc/codex-auth/export/",
     "/api/logs/export/",
-    "/api/cli-tools/codex-profiles/",
     "/api/providers/client/",
     "/api/relay/tokens/",
     "/api/sync/tokens/",
@@ -141,7 +136,6 @@ test("the new patterns do not over-protect their neighbours", () => {
     "/api/providers/abc/claude-auth/apply",
     "/api/providers/agy-auth",
     "/api/logs",
-    "/api/cli-tools",
   ]) {
     assert.equal(
       isAlwaysProtectedPath(path),

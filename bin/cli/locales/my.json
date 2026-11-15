@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute မှတစ်ဆင့် ပံ့ပိုးထားသော CLI ပစ်မှတ်တစ်ခုကို စတင်ပါ"
   },
-  "setupClaude": {
-    "description": "OmniRoute မော်ဒယ်ကတ်တလောက်မှ ~/.claude/profiles Claude Code ပရိုဖိုင်များကို ဖန်တီးပါ"
-  },
   "connect": {
     "description": "အဝေးရှိ OmniRoute ဆာဗာသို့ ချိတ်ဆက်ပြီး အဝေးထိန်းမုဒ်သို့ ဝင်ပါ"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRoute သို့ ညွှန်ထားသော Codex CLI ကို စတင်ပါ (စက်တွင်း သို့မဟုတ် အဝေးရှိ VPS)"
-  },
-  "setupCodex": {
-    "description": "OmniRoute တိုက်ရိုက်မော်ဒယ်ကတ်တလောက်မှ ~/.codex ပရိုဖိုင်ဖိုင်များကို ဖန်တီးပါ"
   },
   "packs": {
     "description": "ထည့်သွင်းရွေးချယ်နိုင်သော runtime pack များကို စီမံပါ (ML / ဘရောက်ဇာ အလိုအလျောက်လုပ်ဆောင်မှု)",

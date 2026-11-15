@@ -155,7 +155,7 @@ OmniRoute itself is **free and open-source**. You only pay for the providers you
 
 ### "Can I use it with Claude Code / Cursor / Copilot?"
 
-**Yes!** OmniRoute works with any tool that supports OpenAI format. Just set the base URL to `http://localhost:20128/v1`. See the [CLI Tools Guide](../reference/CLI-TOOLS.md) for specific setup instructions.
+**Yes!** OmniRoute works with any tool that supports OpenAI format. Just set the base URL to `http://localhost:20128/v1`. See [CLI Integrations](../guides/CLI-INTEGRATIONS.md) for specific setup instructions.
 
 ### "What if a provider goes down?"
 

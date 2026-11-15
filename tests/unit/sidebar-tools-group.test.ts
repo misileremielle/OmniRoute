@@ -27,30 +27,14 @@ function getToolsGroup() {
   };
 }
 
-test("TOOLS_GROUP items follow order: cli-code → cli-agents → discovery", () => {
+test("TOOLS_GROUP items follow order: discovery first", () => {
   const toolsGroup = getToolsGroup();
   const itemIds = toolsGroup.items.map((item) => item.id);
   assert.deepEqual(
     itemIds,
-    ["cli-code", "cli-agents", "discovery"],
-    "TOOLS_GROUP items order must be cli-code, cli-agents, discovery"
+    ["discovery"],
+    "TOOLS_GROUP items order must be discovery only after cli-code/cli-agents removal"
   );
-});
-
-test("TOOLS_GROUP cli-code item has correct href and i18nKey", () => {
-  const toolsGroup = getToolsGroup();
-  const cliCode = toolsGroup.items.find((item) => item.id === "cli-code");
-  assert.ok(cliCode, "expected cli-code in TOOLS_GROUP");
-  assert.equal(cliCode.href, "/dashboard/cli-code");
-  assert.equal(cliCode.i18nKey, "cliCode");
-});
-
-test("TOOLS_GROUP cli-agents item has correct href and i18nKey", () => {
-  const toolsGroup = getToolsGroup();
-  const cliAgents = toolsGroup.items.find((item) => item.id === "cli-agents");
-  assert.ok(cliAgents, "expected cli-agents in TOOLS_GROUP");
-  assert.equal(cliAgents.href, "/dashboard/cli-agents");
-  assert.equal(cliAgents.i18nKey, "cliAgents");
 });
 
 test("TOOLS_GROUP does NOT contain legacy cli-tools or agents entries", () => {

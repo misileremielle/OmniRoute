@@ -14,21 +14,8 @@ const {
   runConfigureCommand,
 } = await import("../../../bin/cli/commands/configure.mjs");
 
-test("configure picker exposes setup-backed CLI targets (manifest declaration order)", () => {
-  assert.deepEqual(listConfigureTargets(), [
-    "aider",
-    "claude",
-    "cline",
-    "codex",
-    "continue",
-    "gemini",
-    "goose",
-    "kilo",
-    "opencode",
-    "qwen",
-    "5dive",
-    "whycodes",
-  ]);
+test("configure picker exposes the manifest configure targets", () => {
+  assert.deepEqual(listConfigureTargets(), ["codex"]);
 });
 
 test("configure picker derives stable profile names from provider/model ids", () => {

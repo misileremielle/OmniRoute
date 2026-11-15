@@ -255,7 +255,7 @@ describe("aliasResolver end-to-end (#7791 regression)", () => {
   }
 
   it("resolves @/shared/network/outboundUrlGuard from a child process", () => {
-    // Reproduces the exact import chain that setup-opencode triggers.
+    // Reproduces the import chain that the removed setup-opencode triggered.
     // Before #7791 fix: `Cannot find package '@/shared'`.
     // After fix: imports succeed and the module exports are reachable.
     //

@@ -5,7 +5,6 @@ const RESOURCES = {
   combos: "/dashboard/combos",
   providers: "/dashboard/providers",
   "api-manager": "/dashboard/api-manager",
-  "cli-tools": "/dashboard/cli-tools",
   agents: "/dashboard/agents",
   settings: "/dashboard/settings",
   logs: "/dashboard/logs",

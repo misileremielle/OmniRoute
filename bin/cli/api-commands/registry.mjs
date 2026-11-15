@@ -14,7 +14,6 @@ import { register_settings } from "./settings.mjs";
 import { register_compression } from "./compression.mjs";
 import { register_usage } from "./usage.mjs";
 import { register_pricing } from "./pricing.mjs";
-import { register_cli_tools } from "./cli-tools.mjs";
 import { register_embedded_services } from "./embedded-services.mjs";
 import { register_oauth } from "./oauth.mjs";
 import { register_cloud } from "./cloud.mjs";
@@ -38,7 +37,6 @@ export const API_TAGS = [
   "compression",
   "usage",
   "pricing",
-  "cli-tools",
   "embedded-services",
   "oauth",
   "cloud",
@@ -72,7 +70,6 @@ export function registerApiCommands(program) {
   register_compression(api);
   register_usage(api);
   register_pricing(api);
-  register_cli_tools(api);
   register_embedded_services(api);
   register_oauth(api);
   register_cloud(api);

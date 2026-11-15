@@ -317,15 +317,12 @@ const CLI_TOOLS: Record<string, any> = {
     paths: {
       // Pi (>= 1.0) loads custom providers from `<agent-dir>/models.json`, not
       // the pre-1.0 ~/.pi/config.json. The agent dir defaults to ~/.pi/agent and
-      // moves with PI_CODING_AGENT_DIR; getPiModelsPath() resolves both, this
-      // entry keeps the batch status + config-path surfaces pointed at the same
-      // file the pi-settings route writes.
+      // moves with PI_CODING_AGENT_DIR; getPiModelsPath() resolves both, and this
+      // entry points the status + config-path surfaces at that same file.
       config: ".pi/agent/models.json",
     },
   },
-  // Config path reconciled with bin/cli/commands/setup-crush.mjs::resolveCrushTarget's
-  // default (~/.config/crush/crush.json) so the dashboard and `omniroute setup-crush`
-  // agree on one canonical config location.
+  // Crush's canonical config location is ~/.config/crush/crush.json.
   crush: {
     defaultCommand: "crush",
     envBinKey: "CLI_CRUSH_BIN",

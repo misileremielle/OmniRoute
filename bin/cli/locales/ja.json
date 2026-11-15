@@ -1177,9 +1177,6 @@
   "run": {
     "description": "OmniRoute経由でサポート対象のCLIを起動"
   },
-  "setupClaude": {
-    "description": "OmniRouteモデルカタログから~/.claude/profiles用のClaude Codeプロファイルを生成"
-  },
   "connect": {
     "description": "リモートOmniRouteサーバーに接続してリモートモードに移行"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "OmniRouteを参照するCodex CLIを起動（ローカルまたはリモートVPS）"
-  },
-  "setupCodex": {
-    "description": "OmniRouteのライブモデルカタログから~/.codexプロファイルファイルを生成"
   },
   "packs": {
     "description": "オプションのランタイムパック（ML／ブラウザー自動化）を管理",

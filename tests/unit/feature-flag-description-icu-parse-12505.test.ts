@@ -51,18 +51,3 @@ test("every featureFlags.definitions message compiles as ICU in every locale", (
 
   assert.deepEqual(failures, [], `ICU-invalid feature-flag messages:\n${failures.join("\n")}`);
 });
-
-test("the OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES path placeholder renders literally", () => {
-  for (const file of localeFiles) {
-    const parsed = JSON.parse(readFileSync(join(messagesDir, file), "utf8"));
-    const value = parsed?.featureFlags?.definitions?.OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES
-      ?.description as string | undefined;
-    if (typeof value !== "string" || !value.includes("settings.json")) continue;
-
-    const rendered = new IntlMessageFormat(value, "en").format() as string;
-    assert.ok(
-      rendered.includes("<name>"),
-      `${file}: the escaped placeholder must render as a literal <name>, got: ${rendered}`
-    );
-  }
-});

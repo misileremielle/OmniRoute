@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Ƙaddamar da manufa ta CLI mai goyan baya ta hanyar OmniRoute"
   },
-  "setupClaude": {
-    "description": "Samar da bayanan martabar Claude Code na ~/.claude/profiles daga kundin samfuran OmniRoute"
-  },
   "connect": {
     "description": "Haɗa zuwa sabar OmniRoute ta nesa kuma shiga yanayin nesa"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Ƙaddamar da Codex CLI da aka nuna masa OmniRoute (na gida ko VPS na nesa)"
-  },
-  "setupCodex": {
-    "description": "Samar da fayilolin bayanan martabar ~/.codex daga kundin samfuran OmniRoute kai tsaye"
   },
   "packs": {
     "description": "Sarrafa fakitin runtime na zaɓi (ML / sarrafa burauza ta atomatik)",

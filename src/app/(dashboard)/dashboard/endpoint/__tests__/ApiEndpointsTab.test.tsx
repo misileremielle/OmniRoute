@@ -119,7 +119,7 @@ describe("ApiEndpointsTab", () => {
 
   it("shows an API catalog error state instead of a blank page", async () => {
     fetchMock.mockImplementation(async (input) => {
-      if (input === "/api/cli-tools/keys") {
+      if (input === "/api/keys?limit=100") {
         return jsonResponse({ keys: [] });
       }
 
@@ -135,7 +135,7 @@ describe("ApiEndpointsTab", () => {
 
   it("renders catalog content when the OpenAPI catalog loads", async () => {
     fetchMock.mockImplementation(async (input) => {
-      if (input === "/api/cli-tools/keys") {
+      if (input === "/api/keys?limit=100") {
         return jsonResponse({
           keys: [{ id: "copilot", key: "sk-***", rawKey: "sk-live-123", isActive: true }],
         });
@@ -173,7 +173,7 @@ describe("ApiEndpointsTab", () => {
   it("renders curl example using window.location.origin when NEXT_PUBLIC_BASE_URL is unset", async () => {
     vi.stubEnv("NEXT_PUBLIC_BASE_URL", "");
     fetchMock.mockImplementation(async (input) => {
-      if (input === "/api/cli-tools/keys") {
+      if (input === "/api/keys?limit=100") {
         return jsonResponse({ keys: [] });
       }
 

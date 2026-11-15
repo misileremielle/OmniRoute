@@ -1177,9 +1177,6 @@
   "run": {
     "description": "Покрените подржани CLI циљ преко OmniRoute"
   },
-  "setupClaude": {
-    "description": "Генерише Claude Code профиле у ~/.claude/profiles на основу OmniRoute каталога модела"
-  },
   "connect": {
     "description": "Повежите се на удаљени OmniRoute сервер и уђите у удаљени режим"
   },
@@ -1191,9 +1188,6 @@
   },
   "launchCodex": {
     "description": "Покрените Codex CLI усмерен на OmniRoute (локални или удаљени VPS)"
-  },
-  "setupCodex": {
-    "description": "Генерише датотеке профила у ~/.codex на основу живог каталога модела OmniRoute"
   },
   "packs": {
     "description": "Управљајте опционим runtime пакетима (ML / аутоматизација прегледача)",

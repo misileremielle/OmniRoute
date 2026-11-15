@@ -25,15 +25,11 @@ export default function UpstreamProxyCard({ t }: UpstreamProxyCardProps) {
             {providerText(
               t,
               "upstreamProxyManagedDescription",
-              "CLIProxyAPI is configured as an upstream proxy layer, not as a direct provider connection. Manage the binary/runtime in CLI Tools and enable proxy routing on each provider via the provider proxy controls."
+              "CLIProxyAPI is configured as an upstream proxy layer, not as a direct provider connection. Enable proxy routing on each provider via the provider proxy controls."
             )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/dashboard/cli-code" className={buttonVariants({ variant: "outline" })}>
-            <Icon name="terminal" size={16} />
-            {t("openCliTools")}
-          </Link>
           <Link href="/dashboard/settings" className={buttonVariants({ variant: "outline" })}>
             <Icon name="settings" size={16} />
             {t("openSettings")}
