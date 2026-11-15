@@ -10,9 +10,7 @@
  *   2. The host callLogs.ts still exposes the FULL public API (10 functions).
  *   3. The format leaf exports its helpers directly.
  *
- * NOTE: helpers that call sanitizePII are exercised with non-PII text, since PII
- * redaction is opt-in / off by default (Hard Rule #19), so sanitizePII is a
- * pass-through here — the test pins the formatting logic, not PII behaviour.
+ * NOTE: the test pins the formatting logic; error text is plain and non-sensitive.
  */
 
 import { describe, it } from "node:test";
@@ -86,7 +84,7 @@ describe("callLogs/format — toStoredErrorSummary", () => {
     assert.equal(toStoredErrorSummary(null), null);
     assert.equal(toStoredErrorSummary(undefined), null);
   });
-  it("stringifies a plain-text error (PII pass-through by default)", () => {
+  it("stringifies a plain-text error (passes through by default)", () => {
     assert.equal(toStoredErrorSummary("boom"), "boom");
   });
   it("JSON-stringifies an Error object's sanitized shape", () => {

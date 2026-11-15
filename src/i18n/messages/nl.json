@@ -1496,7 +1496,6 @@
     "showing": "Toont {count} van {total} evenementen",
     "policyViolation": "Beleidsschending",
     "accessDenied": "Toegang geweigerd",
-    "injectionBlocked": "Injectie geblokkeerd",
     "noEvents": "Er zijn geen nalevingsgebeurtenissen geregistreerd.",
     "failedFetch": "Kan het compliance-auditlogboek niet ophalen.",
     "viewDetails": "Bekijk details",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Resterende herstelcodes: {count}",
     "mfaDisableDesc": "Voer je wachtwoord en een actuele code (of een herstelcode) in om tweestapsverificatie uit te schakelen.",
     "mfaRecoveryHint": "Herstel bij verloren apparaat: start de server met OMNIROUTE_DISABLE_MFA=true en log in vanaf de host zelf.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA is ingesteld: aanmeldingen vanaf deze host slaan de tweede factor over. Verwijder het zodra je weer toegang hebt.",
-    "piiMasking": {
-      "title": "PII-maskering",
-      "description": "Kies welke soorten persoonsgegevens worden gemaskeerd en voeg je eigen patronen toe. Maskering blijft uit totdat je de hieronder getoonde feature flags inschakelt.",
-      "requestFlag": "Maskering van verzoeken",
-      "responseFlag": "Opschoning van antwoorden",
-      "templates": "Sjablonen",
-      "template": {
-        "minimal": "Minimaal",
-        "standard": "Standaard",
-        "financial": "Financieel",
-        "brazilian": "Braziliaans",
-        "usa": "VS",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Zuid-Afrika)",
-        "full": "Volledig"
-      },
-      "builtinTypes": "Ingebouwde typen",
-      "types": {
-        "email": "E-mailadressen",
-        "phone_us": "Amerikaanse telefoonnummers",
-        "phone_br": "Braziliaanse telefoonnummers",
-        "ssn": "Amerikaanse burgerservicenummers (SSN)",
-        "credit_card": "Creditcardnummers",
-        "cpf": "CPF (Braziliaans fiscaal nummer)",
-        "cnpj": "CNPJ (Braziliaans bedrijfsnummer)",
-        "ip_address": "IPv4-adressen",
-        "ipv6_address": "IPv6-adressen",
-        "aws_key": "AWS-toegangssleutels",
-        "api_key_generic": "API-sleutels en tokens",
-        "iban": "IBAN -bankrekeningnummers",
-        "eu_vat": "EU VAT -nummers",
-        "es_dni_nie": "Spaanse DNI / NIE",
-        "it_codice_fiscale": "Italiaanse Codice Fiscale",
-        "pl_pesel": "Poolse PESEL",
-        "nl_bsn": "Nederlandse BSN",
-        "de_steuer_id": "Duitse Steuer-ID",
-        "se_personnummer": "Zweeds persoonsnummer",
-        "za_id": "Zuid-Afrikaanse ID nummers",
-        "za_phone": "Zuid-Afrikaanse telefoonnummers",
-        "za_vat": "Zuid-Afrikaanse VAT nummers",
-        "za_tax_ref": "Zuid-Afrikaanse belastingreferenties"
-      },
-      "customPatterns": "Aangepaste patronen",
-      "customPatternsDesc": "Overeenkomsten worden vervangen door [CUSTOM_REDACTED]. Maximaal {max} patronen. Patronen met risico op catastrofale backtracking worden geweigerd.",
-      "typeRegex": "Reguliere expressie",
-      "typeWildcard": "Jokerteken (* en ?)",
-      "pattern": "Patroon",
-      "flags": "Vlaggen (i, m, s, u)",
-      "sampleText": "Voorbeeldtekst om het patroon op te testen",
-      "test": "Testen",
-      "testMatches": "{count} overeenkomsten",
-      "testFailed": "Patroon geweigerd: {message}",
-      "add": "Patroon toevoegen",
-      "saved": "Opgeslagen",
-      "saveFailed": "Opslaan mislukt: {message}",
-      "statsTitle": "Detecties sinds herstart",
-      "statsEmpty": "Nog geen detecties.",
-      "statsRequest": "Verzoeken"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA is ingesteld: aanmeldingen vanaf deze host slaan de tweede factor over. Verwijder het zodra je weer toegang hebt."
   },
   "contextRtk": {
     "title": "RTK Engine",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Een API-sleutel vereisen voor alle inkomende verzoeken."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Invoeropschoning inschakelen voor alle verzoeken."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "De prompt-injection-beveiligingsmodus instellen."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Persoonlijk identificeerbare informatie uit verzoeken maskeren."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Persoonlijk identificeerbare informatie in provider-responsen opschonen."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Kies hoe er met PII in responsen wordt omgegaan: maskeren vervangt dit, waarschuwen logt dit alleen, blokkeren weigert de respons en uit schakelt opschoning uit."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Uitgaande verzoeken naar privé- of interne IP-bereiken blokkeren."

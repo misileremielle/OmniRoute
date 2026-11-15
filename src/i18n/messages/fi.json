@@ -1496,7 +1496,6 @@
     "showing": "Näytetään {count} / {total} tapahtumaa",
     "policyViolation": "Käytännön rikkominen",
     "accessDenied": "Pääsy kielletty",
-    "injectionBlocked": "Injektio estetty",
     "noEvents": "Ei tallennettuja vaatimustenmukaisuustapahtumia.",
     "failedFetch": "Vaatimustenmukaisuuden tarkastuslokin nouto epäonnistui.",
     "viewDetails": "Näytä tiedot",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Palautuskoodeja jäljellä: {count}",
     "mfaDisableDesc": "Poista kaksivaiheinen tunnistautuminen käytöstä antamalla salasanasi ja voimassa oleva koodi (tai palautuskoodi).",
     "mfaRecoveryHint": "Kadonneen laitteen palautus: käynnistä palvelin asetuksella OMNIROUTE_DISABLE_MFA=true ja kirjaudu sisään suoraan isäntäkoneelta.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA on asetettu: tältä isäntäkoneelta kirjautuminen ohittaa toisen vaiheen. Poista se, kun pääsy on palautunut.",
-    "piiMasking": {
-      "title": "Henkilötietojen peittäminen",
-      "description": "Valitse, minkä tyyppiset henkilötiedot peitetään, ja lisää omia malleja. Peittäminen on pois päältä, kunnes otat käyttöön alla näkyvät ominaisuusliput.",
-      "requestFlag": "Pyyntöjen peittäminen",
-      "responseFlag": "Vastausten puhdistus",
-      "templates": "Pohjat",
-      "template": {
-        "minimal": "Suppea",
-        "standard": "Vakio",
-        "financial": "Talous",
-        "brazilian": "Brasilia",
-        "usa": "Yhdysvallat",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Etelä-Afrikka)",
-        "full": "Täysi"
-      },
-      "builtinTypes": "Sisäänrakennetut tyypit",
-      "types": {
-        "email": "Sähköpostiosoitteet",
-        "phone_us": "Yhdysvaltalaiset puhelinnumerot",
-        "phone_br": "Brasilialaiset puhelinnumerot",
-        "ssn": "Yhdysvaltain sosiaaliturvatunnukset",
-        "credit_card": "Luottokorttien numerot",
-        "cpf": "CPF (Brasilian verotunniste)",
-        "cnpj": "CNPJ (Brasilian yritystunniste)",
-        "ip_address": "IPv4-osoitteet",
-        "ipv6_address": "IPv6-osoitteet",
-        "aws_key": "AWS-käyttöavaimet",
-        "api_key_generic": "API-avaimet ja tunnisteet",
-        "iban": "IBAN pankkitilinumerot",
-        "eu_vat": "EU VAT numerot",
-        "es_dni_nie": "espanja DNI / NIE",
-        "it_codice_fiscale": "Italialainen Codice Fiscale",
-        "pl_pesel": "Puolan PESEL",
-        "nl_bsn": "hollantilainen BSN",
-        "de_steuer_id": "Saksalainen Steuer-ID",
-        "se_personnummer": "ruotsalainen henkilömäärä",
-        "za_id": "Etelä-Afrikan ID -numerot",
-        "za_phone": "Etelä-Afrikan puhelinnumerot",
-        "za_vat": "Etelä-Afrikan VAT -numerot",
-        "za_tax_ref": "Etelä-Afrikan veroviitteet"
-      },
-      "customPatterns": "Omat mallit",
-      "customPatternsDesc": "Osumat korvataan merkinnällä [CUSTOM_REDACTED]. Enintään {max} mallia. Mallit, joissa on katastrofaalisen takaisinjäljityksen riski, hylätään.",
-      "typeRegex": "Säännöllinen lauseke",
-      "typeWildcard": "Jokerimerkki (* ja ?)",
-      "pattern": "Malli",
-      "flags": "Liput (i, m, s, u)",
-      "sampleText": "Esimerkkiteksti mallin testaamiseen",
-      "test": "Testaa",
-      "testMatches": "Osumia: {count}",
-      "testFailed": "Malli hylättiin: {message}",
-      "add": "Lisää malli",
-      "saved": "Tallennettu",
-      "saveFailed": "Tallennus epäonnistui: {message}",
-      "statsTitle": "Havainnot uudelleenkäynnistyksen jälkeen",
-      "statsEmpty": "Ei vielä havaintoja.",
-      "statsRequest": "Pyynnöt"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA on asetettu: tältä isäntäkoneelta kirjautuminen ohittaa toisen vaiheen. Poista se, kun pääsy on palautunut."
   },
   "contextRtk": {
     "title": "RTK Engine",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Vaadi API-avain kaikille saapuville pyynnöille."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Ota käyttöön syötteen puhdistus kaikille pyynnöille."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Aseta kehoteinjektioiden suojaustila."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Sensuroi henkilötiedot pyynnöistä."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Puhdista henkilötiedot tarjoajan vastauksista."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Valitse, miten vastauksen henkilötietoja (PII) käsitellään: redact korvaa ne, warn vain lokittaa ne, block hylkää vastauksen ja off poistaa puhdistuksen käytöstä."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Estä ulosmenevät pyynnöt yksityisiin tai sisäisiin IP-alueisiin."

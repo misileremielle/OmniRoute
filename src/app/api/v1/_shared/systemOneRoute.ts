@@ -12,7 +12,6 @@ import {
   getProviderCredentialsWithQuotaPreflight,
   clearRecoveredProviderState,
 } from "@/sse/services/auth";
-import { createInjectionGuard, withInjectionGuard } from "@/middleware/promptInjectionGuard";
 import { getCachedProviderNodes } from "@/lib/db/readCache";
 import { CORS_HEADERS } from "@omniroute/open-sse/utils/cors.ts";
 import { decodeSystemOneRequest, isSystemOneDecodeFailure } from "./systemOneRequest";
@@ -50,8 +49,6 @@ export function systemOneModelsGet(pathname: string) {
       return Array.isArray(endpoints) && endpoints.includes("decisions");
     });
 }
-
-const injectionGuard = createInjectionGuard();
 
 /** Operator-added System One-compatible endpoints (custom `<prefix>/<model>` routing). */
 async function loadSystemOneCompatibleNodes() {
@@ -98,35 +95,11 @@ export async function typeSafeSdkModelsResponse(request: Request): Promise<Respo
   });
 }
 
-async function postHandler(
-  request: Request,
-  _context?: unknown,
-  preParsedBody?: unknown
-): Promise<Response> {
+async function postHandler(request: Request, _context?: unknown): Promise<Response> {
   // TypeSafe SDK bodies may be zstd-compressed and/or multipart (image assets).
   const decoded = await decodeSystemOneRequest(request);
   if (isSystemOneDecodeFailure(decoded)) return errorResponse(decoded.status, decoded.message);
   const rawBody = decoded.payload;
-
-  // withInjectionGuard only scans bodies it can read as plain JSON; run the same
-  // guard on the decoded payload when it could not (compressed / multipart).
-  if (preParsedBody == null && rawBody && typeof rawBody === "object") {
-    const { blocked, result }: { blocked: boolean; result: { detections: unknown[] } } =
-      injectionGuard(rawBody as Record<string, unknown>);
-    if (blocked) {
-      return new Response(
-        JSON.stringify({
-          error: {
-            message: "Request blocked: potential prompt injection detected",
-            type: "injection_detected",
-            code: "SECURITY_001",
-            detections: result.detections.length,
-          },
-        }),
-        { status: 400, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
-      );
-    }
-  }
 
   const validation = validateBody(v1SystemOneSchema, rawBody);
   if (isValidationFailure(validation)) {
@@ -193,6 +166,6 @@ export function createSystemOneRouteHandlers(pathname: string) {
   return {
     OPTIONS: optionsResponse,
     GET: systemOneModelsGet(pathname),
-    POST: withInjectionGuard(postHandler),
+    POST: postHandler,
   };
 }

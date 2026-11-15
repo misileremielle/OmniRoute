@@ -1,9 +1,9 @@
 // Characterization of assembleStreamingPipeline — the streaming transform-chain assembly extracted
 // from handleChatCore's streaming success path (chatCore god-file decomposition, #3501). All
 // transform factories are injected; a fake "stream" records each pipeThrough so the exact chain
-// order and the branch conditions (PII explicit vs feature-flag, progress, echo) are observable
-// without real ReadableStreams. Locks: transform order, the progress header side-effect, and the
-// PII branch precedence (explicit createPiiTransform wins over the feature flag).
+// order and the branch conditions (credential gate, progress, echo) are observable
+// without real ReadableStreams. Locks: transform order, the progress header side-effect,
+// and the credential gate + opt-out precedence.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -40,9 +40,8 @@ function makeDeps(over: Record<string, unknown> = {}) {
   const log: string[] = [];
   const deps = {
     wantsProgress: () => false,
-    pipeWithDisconnect: (..._a: unknown[]) => fakeStream("pii-base", log),
+    pipeWithDisconnect: (..._a: unknown[]) => fakeStream("cred-base", log),
     isFeatureFlagEnabled: () => false,
-    createPiiSseTransform: () => ({ __tag: "pii-flag" }),
     createCredentialSseTransform: () => ({ __tag: "credential-flag" }),
     createProgressTransform: () => ({ __tag: "progress" }),
     createSseHeartbeatTransform: () => ({ __tag: "heartbeat" }),
@@ -58,7 +57,6 @@ function baseArgs(over: Record<string, unknown> = {}) {
     providerResponse: {},
     transformStream: {},
     streamController: { signal: {} as AbortSignal },
-    createPiiTransform: undefined,
     clientRawRequestHeaders: null,
     clientResponseFormat: "openai",
     echoModel: null,
@@ -91,23 +89,10 @@ test("pipeline arguments preserve the dependency parameter contracts", () => {
   assert.equal(contracts.clientResponseFormat, "openai");
 });
 
-test("baseline (no pii, no progress, no echo) → only heartbeat in the chain", () => {
+test("baseline (no credential, no progress, no echo) → only heartbeat in the chain", () => {
   const { deps, log } = makeDeps();
   assembleStreamingPipeline(baseArgs(), deps);
   assert.deepEqual(log, ["heartbeat"]);
-});
-
-test("feature-flag PII → pii-flag transform applied before heartbeat", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
-  assembleStreamingPipeline(baseArgs(), deps);
-  assert.deepEqual(log, ["pii-flag", "heartbeat"]);
-});
-
-test("explicit createPiiTransform wins over the feature flag", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
-  const explicit = () => ({ __tag: "pii-explicit" });
-  assembleStreamingPipeline(baseArgs({ createPiiTransform: explicit }), deps);
-  assert.deepEqual(log, ["pii-explicit", "heartbeat"]);
 });
 
 test("progress enabled → progress transform + progress header set", () => {
@@ -131,32 +116,34 @@ test("echoModel set → echo transform applied last", () => {
   assert.deepEqual(log, ["heartbeat", "echo"]);
 });
 
-test("full chain order: pii → progress → heartbeat → echo", () => {
+test("full chain order: credential → progress → heartbeat → echo", () => {
   const { deps, log } = makeDeps({
-    isFeatureFlagEnabled: () => true,
     wantsProgress: () => true,
   });
-  assembleStreamingPipeline(baseArgs({ echoModel: "alias-x" }), deps);
-  assert.deepEqual(log, ["pii-flag", "progress", "heartbeat", "echo"]);
+  assembleStreamingPipeline(
+    baseArgs({ echoModel: "alias-x", credentialRedactionEnabled: true }),
+    deps
+  );
+  assert.deepEqual(log, ["credential-flag", "progress", "heartbeat", "echo"]);
 });
 
 test("credential gate off by default → chain unchanged", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
+  const { deps, log } = makeDeps();
   assembleStreamingPipeline(baseArgs(), deps);
-  assert.deepEqual(log, ["pii-flag", "heartbeat"]);
+  assert.deepEqual(log, ["heartbeat"]);
 });
 
-test("credential gate on → credential transform runs before pii, before heartbeat", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
+test("credential gate on → credential transform applied before heartbeat", () => {
+  const { deps, log } = makeDeps();
   assembleStreamingPipeline(
     baseArgs({ credentialRedactionEnabled: true, credentialDisabledGuardrails: [] }),
     deps
   );
-  assert.deepEqual(log, ["credential-flag", "pii-flag", "heartbeat"]);
+  assert.deepEqual(log, ["credential-flag", "heartbeat"]);
 });
 
 test("credential opt-out → credential transform skipped", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
+  const { deps, log } = makeDeps();
   assembleStreamingPipeline(
     baseArgs({
       credentialRedactionEnabled: true,
@@ -164,46 +151,16 @@ test("credential opt-out → credential transform skipped", () => {
     }),
     deps
   );
-  assert.deepEqual(log, ["pii-flag", "heartbeat"]);
+  assert.deepEqual(log, ["heartbeat"]);
 });
 
 test("credential gate off → credential transform skipped", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
+  const { deps, log } = makeDeps();
   assembleStreamingPipeline(
     baseArgs({ credentialRedactionEnabled: false, credentialDisabledGuardrails: [] }),
     deps
   );
-  assert.deepEqual(log, ["pii-flag", "heartbeat"]);
-});
-
-test("explicit pii transform plus credential gate → credential then explicit pii", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
-  const explicit = () => ({ __tag: "pii-explicit" });
-  assembleStreamingPipeline(
-    baseArgs({
-      createPiiTransform: explicit,
-      credentialRedactionEnabled: true,
-      credentialDisabledGuardrails: [],
-    }),
-    deps
-  );
-  assert.deepEqual(log, ["credential-flag", "pii-explicit", "heartbeat"]);
-});
-
-test("full chain order with credential: credential → pii → progress → heartbeat → echo", () => {
-  const { deps, log } = makeDeps({
-    isFeatureFlagEnabled: () => true,
-    wantsProgress: () => true,
-  });
-  assembleStreamingPipeline(
-    baseArgs({
-      echoModel: "alias-x",
-      credentialRedactionEnabled: true,
-      credentialDisabledGuardrails: [],
-    }),
-    deps
-  );
-  assert.deepEqual(log, ["credential-flag", "pii-flag", "progress", "heartbeat", "echo"]);
+  assert.deepEqual(log, ["heartbeat"]);
 });
 
 test("pipeline assembly creates performance mark and measure entries", () => {
@@ -238,51 +195,4 @@ test("performance measure has positive duration", () => {
   assert.ok(entry, "measure exists");
   assert.equal(entry.entryType, "measure");
   assert.ok(entry.duration >= 0, `duration ${entry.duration} >= 0`);
-});
-
-test("opt-out skips the flag-based PII transform, bytes pass through", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
-  assembleStreamingPipeline(baseArgs({ piiDisabledGuardrails: ["pii-masker"] }), deps);
-  assert.deepEqual(log, ["heartbeat"]);
-});
-
-test("absent opt-out keeps the flag-based PII transform", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
-  assembleStreamingPipeline(baseArgs({ piiDisabledGuardrails: undefined }), deps);
-  assert.deepEqual(log, ["pii-flag", "heartbeat"]);
-});
-
-test("flag off with opt-out stays without PII transform", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => false });
-  assembleStreamingPipeline(baseArgs({ piiDisabledGuardrails: ["pii-masker"] }), deps);
-  assert.deepEqual(log, ["heartbeat"]);
-});
-
-test("opt-out skips the explicit PII transform", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
-  const explicit = () => ({ __tag: "pii-explicit" });
-  assembleStreamingPipeline(
-    baseArgs({ createPiiTransform: explicit, piiDisabledGuardrails: ["pii-masker"] }),
-    deps
-  );
-  assert.deepEqual(log, ["heartbeat"]);
-});
-
-test("unrelated entry alone keeps the PII transform", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
-  assembleStreamingPipeline(baseArgs({ piiDisabledGuardrails: ["vision-bridge"] }), deps);
-  assert.deepEqual(log, ["pii-flag", "heartbeat"]);
-});
-
-test("opt-out skips PII but keeps the credential transform order", () => {
-  const { deps, log } = makeDeps({ isFeatureFlagEnabled: () => true });
-  assembleStreamingPipeline(
-    baseArgs({
-      piiDisabledGuardrails: ["pii-masker"],
-      credentialRedactionEnabled: true,
-      credentialDisabledGuardrails: [],
-    }),
-    deps
-  );
-  assert.deepEqual(log, ["credential-flag", "heartbeat"]);
 });

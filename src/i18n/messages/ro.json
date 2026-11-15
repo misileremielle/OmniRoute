@@ -1496,7 +1496,6 @@
     "showing": "Se afișează {count} din {total} evenimente",
     "policyViolation": "Încălcarea politicii",
     "accessDenied": "Acces refuzat",
-    "injectionBlocked": "Injecție blocată",
     "noEvents": "Nu au fost înregistrate evenimente de conformitate.",
     "failedFetch": "Nu s-a putut prelua jurnalul de audit de conformitate.",
     "viewDetails": "Vezi detalii",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Coduri de recuperare rămase: {count}",
     "mfaDisableDesc": "Introduceți parola și un cod curent (sau un cod de recuperare) pentru a dezactiva autentificarea în doi pași.",
     "mfaRecoveryHint": "Recuperare dispozitiv pierdut: porniți serverul cu OMNIROUTE_DISABLE_MFA=true și conectați-vă direct de pe gazdă.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA este setat: conectările de pe această gazdă omit al doilea factor. Eliminați-l după ce vă recăpătați accesul.",
-    "piiMasking": {
-      "title": "Mascarea datelor personale",
-      "description": "Alegeți ce tipuri de date personale sunt mascate și adăugați propriile modele. Mascarea rămâne dezactivată până când activați feature flag-urile afișate mai jos.",
-      "requestFlag": "Mascarea cererilor",
-      "responseFlag": "Igienizarea răspunsurilor",
-      "templates": "Șabloane",
-      "template": {
-        "minimal": "Minim",
-        "standard": "Standard",
-        "financial": "Financiar",
-        "brazilian": "Brazilian",
-        "usa": "SUA",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Africa de Sud)",
-        "full": "Complet"
-      },
-      "builtinTypes": "Tipuri încorporate",
-      "types": {
-        "email": "Adrese de e-mail",
-        "phone_us": "Numere de telefon din SUA",
-        "phone_br": "Numere de telefon braziliene",
-        "ssn": "Numere de asigurare socială din SUA",
-        "credit_card": "Numere de card de credit",
-        "cpf": "CPF (cod fiscal brazilian)",
-        "cnpj": "CNPJ (cod de firmă brazilian)",
-        "ip_address": "Adrese IPv4",
-        "ipv6_address": "Adrese IPv6",
-        "aws_key": "Chei de acces AWS",
-        "api_key_generic": "Chei API și tokenuri",
-        "iban": "IBAN numere de cont bancar",
-        "eu_vat": "EU VAT numere",
-        "es_dni_nie": "Spaniolă DNI / NIE",
-        "it_codice_fiscale": "Codice Fiscale italian",
-        "pl_pesel": "PESEL polonez",
-        "nl_bsn": "BSN olandez",
-        "de_steuer_id": "German Steuer-ID",
-        "se_personnummer": "personnummer suedez",
-        "za_id": "Numerele ID din Africa de Sud",
-        "za_phone": "numere de telefon din Africa de Sud",
-        "za_vat": "Numerele VAT din Africa de Sud",
-        "za_tax_ref": "Referințe fiscale din Africa de Sud"
-      },
-      "customPatterns": "Modele personalizate",
-      "customPatternsDesc": "Potrivirile sunt înlocuite cu [CUSTOM_REDACTED]. Până la {max} modele. Modelele cu risc de backtracking catastrofal sunt refuzate.",
-      "typeRegex": "Expresie regulată",
-      "typeWildcard": "Caracter wildcard (* și ?)",
-      "pattern": "Model",
-      "flags": "Indicatori (i, m, s, u)",
-      "sampleText": "Text de exemplu pentru testarea modelului",
-      "test": "Testează",
-      "testMatches": "{count} potriviri",
-      "testFailed": "Model refuzat: {message}",
-      "add": "Adaugă model",
-      "saved": "Salvat",
-      "saveFailed": "Salvarea a eșuat: {message}",
-      "statsTitle": "Detecții de la repornire",
-      "statsEmpty": "Nicio detecție încă.",
-      "statsRequest": "Cereri"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA este setat: conectările de pe această gazdă omit al doilea factor. Eliminați-l după ce vă recăpătați accesul."
   },
   "contextRtk": {
     "title": "Motor RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Solicită o cheie API pentru toate cererile primite."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Activează igienizarea intrărilor pentru toate cererile."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Setează modul de protecție împotriva injectării de prompturi."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Redactează informațiile de identificare personală din cereri."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Igienizează informațiile de identificare personală din răspunsurile furnizorilor."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Alegeți modul în care sunt gestionate informațiile PII din răspuns: redactare le înlocuiește, avertizare doar le înregistrează în jurnal, blocare respinge răspunsul, iar dezactivat dezactivează igienizarea."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Blochează cererile de ieșire către intervale de adrese IP private sau interne."

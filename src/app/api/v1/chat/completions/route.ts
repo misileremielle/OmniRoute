@@ -10,7 +10,6 @@ import {
   isSelfHostedEntryConfigured,
 } from "@omniroute/open-sse/services/selfHostedEntry.ts";
 import { initTranslators } from "@omniroute/open-sse/translator/index.ts";
-import { createInjectionGuard } from "@/middleware/promptInjectionGuard";
 import { acceptHeaderForcesStream } from "@omniroute/open-sse/utils/aiSdkCompat.ts";
 import {
   OPENAI_CHAT_ERROR_FRAME,
@@ -59,10 +58,6 @@ import { dispatchToBifrost } from "@/shared/services/bifrost/bifrostClient";
 import { gateBifrostFastPath } from "@/shared/services/bifrost/bifrostFastPathGate";
 
 let initPromise = null;
-
-// Singleton injection guard instance. `logger: null` — the guardrail registry
-// re-evaluates this request inside handleChat with the pino logger (#11936 dedupe).
-const injectionGuard = createInjectionGuard({ logger: null });
 
 /**
  * Initialize translators once (Promise-based singleton — no race condition)
@@ -286,26 +281,9 @@ export async function POST(request) {
             /* swallow — fall through with original model */
           });
         }
-
-        const { blocked, result } = injectionGuard(parsedBody);
-        if (blocked) {
-          return finishAdmission(
-            new Response(
-              JSON.stringify({
-                error: {
-                  message: "Request blocked: potential prompt injection detected",
-                  type: "injection_detected",
-                  code: "SECURITY_001",
-                  detections: result.detections.length,
-                },
-              }),
-              { status: 400, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
-            )
-          );
-        }
       }
     } catch (error) {
-      console.error("[SECURITY] Prompt injection guard failed:", error);
+      console.error("[SECURITY] Request admission failed:", error);
     }
 
     // Gate the early SSE keepalive wrapper: only wrap when the client explicitly

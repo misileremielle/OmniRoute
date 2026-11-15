@@ -58,7 +58,7 @@ Core capabilities:
 - A2A Server (JSON-RPC 2.0 + SSE) with skills and task lifecycle
 - Memory system (extraction, injection, retrieval, summarization)
 - Skills system (registry, executor, sandbox, built-in skills)
-- Prompt injection guard middleware
+- Credential-masking guardrail
 - Prompt compression pipeline with Caveman, RTK, stacked pipelines, compression combos, language packs, and analytics
 - ACP (Agent Communication Protocol) registry
 - Modular OAuth providers (22 individual modules under `src/lib/oauth/providers/`)
@@ -374,11 +374,11 @@ For full algorithmic detail (factor formulas, weight tuning), see
 ### C. Guardrails
 
 The guardrails module is a hot-reloadable middleware layer that inspects requests
-and responses for PII, prompt injection, and unsafe vision content. Violations
+and responses for leaked credentials and unsafe vision content. Violations
 short-circuit the request with HTTP **503** plus a structured error code, allowing
 downstream callers to retry or branch.
 
-- Module root: `src/lib/guardrails/` (`base.ts`, `registry.ts`, `piiMasker.ts`,
+- Module root: `src/lib/guardrails/` (`base.ts`, `registry.ts`,
   `promptInjection.ts`, `visionBridge.ts`, `visionBridgeHelpers.ts`)
 - Hot reload: registry watches for config changes and rebuilds the chain in place
 - Wire-in points: chat handler entry, image generation handler, response sanitizer

@@ -249,7 +249,7 @@ export const updateSettingsSchema = z.object({
   // "provider/model" (or bare "model") ids, or a glob pattern via the shared
   // globToRegex matcher (src/shared/utils/modelExposureList.ts). Independent of
   // hidePaidModels — this is operator curation, not a cost signal. Default
-  // empty arrays = no-op (Hard Rule #19 spirit).
+  // empty arrays = no-op (opt-in, off by default).
   modelVisibilityAllowlist: z.array(z.string().max(200)).max(500).optional(),
   modelVisibilityDenylist: z.array(z.string().max(200)).max(500).optional(),
   // Subscription-first routing tuning (`auto/subscription`, `auto/thrifty`).

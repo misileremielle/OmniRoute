@@ -52,22 +52,6 @@ other sessions' worktrees untouched, and end on the branch you started on (the a
 `release/vX.Y.Z`, never `main`). Full protocol, commands, and incidents:
 [docs/ops/WORKTREE_ISOLATION.md](../ops/WORKTREE_ISOLATION.md).
 
-## Rule 19 — PII redaction/sanitization is opt-in
-
-PII redaction/sanitization is **opt-in — never on by default**. OmniRoute proxies for
-self-hosted/local LLMs where the operator owns the data, so mutating request/response payloads
-by default would silently corrupt legitimate traffic. The two data-mutating PII feature flags
-**MUST** keep `defaultValue: "false"` in `src/shared/constants/featureFlagDefinitions.ts`:
-`PII_REDACTION_ENABLED` (request-side) and `PII_RESPONSE_SANITIZATION` (response + streaming).
-All three application points — `src/lib/guardrails/piiMasker.ts` (request guardrail),
-`src/lib/piiSanitizer.ts` (response), `src/lib/streamingPiiTransform.ts` (SSE) — are gated on
-these flags; with both off the `pii-masker` guardrail still runs but never mutates payloads
-(data passes through untouched). Flipping either default to `"true"` requires explicit operator
-approval. The regression guard is `tests/unit/pii-opt-in-default.test.ts` (asserts both
-definition defaults + behavioral pass-through). Opt-in is per-operator via env or the
-settings/DB override (`src/lib/db/featureFlags.ts`), never a silent default. See
-`docs/security/GUARDRAILS.md`.
-
 ## Rule 20 — Release-freeze (parallel-cycle model)
 
 **The FROZEN release branch belongs to the release captain; development does NOT stop

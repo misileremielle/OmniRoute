@@ -7,11 +7,7 @@ import path from "node:path";
 const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-t07-"));
 process.env.DATA_DIR = TEST_DATA_DIR;
 
-const originalPiiEnabled = process.env.PII_RESPONSE_SANITIZATION;
-const originalPiiMode = process.env.PII_RESPONSE_SANITIZATION_MODE;
 const originalApiKeySecret = process.env.API_KEY_SECRET;
-process.env.PII_RESPONSE_SANITIZATION = "true";
-process.env.PII_RESPONSE_SANITIZATION_MODE = "redact";
 process.env.API_KEY_SECRET = process.env.API_KEY_SECRET || "t07-test-secret-key";
 
 const core = await import("../../src/lib/db/core.ts");
@@ -35,18 +31,6 @@ test.after(async () => {
   core.resetDbInstance();
   apiKeysDb.resetApiKeyState();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-
-  if (originalPiiEnabled === undefined) {
-    delete process.env.PII_RESPONSE_SANITIZATION;
-  } else {
-    process.env.PII_RESPONSE_SANITIZATION = originalPiiEnabled;
-  }
-
-  if (originalPiiMode === undefined) {
-    delete process.env.PII_RESPONSE_SANITIZATION_MODE;
-  } else {
-    process.env.PII_RESPONSE_SANITIZATION_MODE = originalPiiMode;
-  }
 
   if (originalApiKeySecret === undefined) {
     delete process.env.API_KEY_SECRET;
@@ -95,7 +79,7 @@ test("API key no_log persists and updates compliance state", async () => {
   assert.equal(compliance.isNoLog(created.id), false);
 });
 
-test("call logs omit payloads when key no_log is enabled and redact PII otherwise", async () => {
+test("call logs omit payloads when key no_log is enabled and redact secrets otherwise", async () => {
   const created = await apiKeysDb.createApiKey("privacy-log-key", "machine-test");
 
   const baseEntry = {
@@ -141,8 +125,8 @@ test("call logs omit payloads when key no_log is enabled and redact PII otherwis
   assert.ok(withPayloadEntry, "Expected a log entry with payload persisted");
 
   const payloadDetails = await callLogs.getCallLogById(withPayloadEntry.id);
-  assert.equal(payloadDetails?.requestBody?.email, "[EMAIL_REDACTED]");
+  assert.equal(payloadDetails?.requestBody?.email, "john@example.com");
   assert.equal(payloadDetails?.requestBody?.token, "[REDACTED]");
-  assert.equal(payloadDetails?.requestBody?.nested?.contact, "[EMAIL_REDACTED]");
-  assert.equal(payloadDetails?.responseBody?.summary, "Contact [EMAIL_REDACTED] for details");
+  assert.equal(payloadDetails?.requestBody?.nested?.contact, "john@example.com");
+  assert.equal(payloadDetails?.responseBody?.summary, "Contact john@example.com for details");
 });

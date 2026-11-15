@@ -1496,7 +1496,6 @@
     "showing": "ከ{total} ክስተቶች {count} እየታዩ ነው",
     "policyViolation": "የፖሊሲ ጥሰት",
     "accessDenied": "መዳረሻ ተከልክሏል",
-    "injectionBlocked": "ኢንጀክሽን ታግዷል",
     "noEvents": "ምንም የተገዢነት ክስተቶች አልተመዘገቡም።",
     "failedFetch": "የተገዢነት ኦዲት መዝገብን ማምጣት አልተሳካም።",
     "viewDetails": "ዝርዝሮችን ይመልከቱ",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "የቀሩ የመልሶ ማግኛ ኮዶች፦ {count}",
     "mfaDisableDesc": "ባለሁለት ደረጃ ማረጋገጫን ለማጥፋት የይለፍ ቃልዎን እና የአሁኑን ኮድ (ወይም የመልሶ ማግኛ ኮድ) ያስገቡ።",
     "mfaRecoveryHint": "የጠፋ መሣሪያ መልሶ ማግኛ፦ አገልጋዩን በ OMNIROUTE_DISABLE_MFA=true ያስጀምሩ እና ከራሱ አስተናጋጅ ይግቡ።",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ተቀናብሯል፦ ከዚህ አስተናጋጅ የሚደረጉ መግቢያዎች ሁለተኛውን ደረጃ ይዘላሉ። ተመልሰው ከገቡ በኋላ ያስወግዱት።",
-    "piiMasking": {
-      "title": "የግል መረጃ መደበቅ",
-      "description": "የትኞቹ የግል መረጃ ዓይነቶች እንደሚደበቁ ይምረጡ እና የራስዎን ቅጦች ያክሉ። ከታች የሚታዩትን የባህሪ ባንዲራዎች እስኪያበሩ ድረስ መደበቁ ጠፍቶ ይቆያል።",
-      "requestFlag": "የጥያቄ መደበቅ",
-      "responseFlag": "የምላሽ ማጽዳት",
-      "templates": "አብነቶች",
-      "template": {
-        "minimal": "ዝቅተኛ",
-        "standard": "መደበኛ",
-        "financial": "ፋይናንስ",
-        "brazilian": "ብራዚላዊ",
-        "usa": "አሜሪካ",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (ደቡብ አፍሪካ)",
-        "full": "ሙሉ"
-      },
-      "builtinTypes": "አብሮ የተሰሩ ዓይነቶች",
-      "types": {
-        "email": "የኢሜይል አድራሻዎች",
-        "phone_us": "የአሜሪካ ስልክ ቁጥሮች",
-        "phone_br": "የብራዚል ስልክ ቁጥሮች",
-        "ssn": "የአሜሪካ ማኅበራዊ ዋስትና ቁጥሮች",
-        "credit_card": "የክሬዲት ካርድ ቁጥሮች",
-        "cpf": "CPF (የብራዚል ግብር ከፋይ መታወቂያ)",
-        "cnpj": "CNPJ (የብራዚል ኩባንያ መታወቂያ)",
-        "ip_address": "IPv4 አድራሻዎች",
-        "ipv6_address": "IPv6 አድራሻዎች",
-        "aws_key": "የAWS መዳረሻ ቁልፎች",
-        "api_key_generic": "የAPI ቁልፎች እና ቶከኖች",
-        "iban": "IBAN የባንክ ሂሳብ ቁጥሮች",
-        "eu_vat": "EU VAT ቁጥሮች",
-        "es_dni_nie": "ስፓኒሽ DNI / NIE",
-        "it_codice_fiscale": "የጣሊያን Codece Fiscale",
-        "pl_pesel": "የፖላንድ PESEL",
-        "nl_bsn": "የደች BSN",
-        "de_steuer_id": "የጀርመን Steuer-መታወቂያ",
-        "se_personnummer": "የስዊድን personnummer",
-        "za_id": "የደቡብ አፍሪካ ID ቁጥሮች",
-        "za_phone": "የደቡብ አፍሪካ ስልክ ቁጥሮች",
-        "za_vat": "የደቡብ አፍሪካ VAT ቁጥሮች",
-        "za_tax_ref": "የደቡብ አፍሪካ የግብር ማጣቀሻዎች"
-      },
-      "customPatterns": "ብጁ ቅጦች",
-      "customPatternsDesc": "ተዛማጆች በ[CUSTOM_REDACTED] ይተካሉ። እስከ {max} ቅጦች። አስከፊ የኋሊት ፍለጋ አደጋ ያላቸው ቅጦች ውድቅ ይደረጋሉ።",
-      "typeRegex": "መደበኛ አገላለጽ",
-      "typeWildcard": "ምትክ ቁምፊ (* እና ?)",
-      "pattern": "ቅጥ",
-      "flags": "ባንዲራዎች (i, m, s, u)",
-      "sampleText": "ቅጡን ለመሞከር ናሙና ጽሑፍ",
-      "test": "ሞክር",
-      "testMatches": "ተዛማጆች፦ {count}",
-      "testFailed": "ቅጡ ውድቅ ተደርጓል፦ {message}",
-      "add": "ቅጥ አክል",
-      "saved": "ተቀምጧል",
-      "saveFailed": "ማስቀመጥ አልተቻለም፦ {message}",
-      "statsTitle": "ዳግም ከተጀመረ ወዲህ የተገኙ",
-      "statsEmpty": "እስካሁን የተገኘ የለም።",
-      "statsRequest": "ጥያቄዎች"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ተቀናብሯል፦ ከዚህ አስተናጋጅ የሚደረጉ መግቢያዎች ሁለተኛውን ደረጃ ይዘላሉ። ተመልሰው ከገቡ በኋላ ያስወግዱት።"
   },
   "contextRtk": {
     "title": "RTK ሞተር",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "ለሁሉም ገቢ ጥያቄዎች API ቁልፍ እንዲኖር አስገድድ።"
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "ለሁሉም ጥያቄዎች የግቤት ማጽዳትን አንቃ።"
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "የprompt-injection መከላከያ ሁነታን ያዘጋጁ።"
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "ከጥያቄዎች ውስጥ ግለሰብን ሊለይ የሚችል መረጃን ደብቅ።"
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "በአቅራቢ ምላሾች ውስጥ ያለውን ግለሰብን ሊለይ የሚችል መረጃ አጽዳ።"
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "በምላሾች ውስጥ ያለው PII እንዴት እንደሚስተናገድ ይምረጡ፦ redact መረጃውን ይተካል፣ warn በመዝገብ ብቻ ያስቀምጠዋል፣ block ምላሹን ውድቅ ያደርጋል፣ off ደግሞ ማጽዳቱን ያሰናክላል።"
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "ወደ ግል ወይም ውስጣዊ IP ክልሎች የሚላኩ ጥያቄዎችን አግድ።"

@@ -7,8 +7,6 @@ import path from "node:path";
 const isolated = fs.mkdtempSync(path.join(os.tmpdir(), "redaction-chain-17291-"));
 process.env.HOME = isolated;
 process.env.DATA_DIR = path.join(isolated, "data");
-process.env.PII_RESPONSE_SANITIZATION = "true";
-process.env.PII_RESPONSE_SANITIZATION_MODE = "redact";
 const originalFetch = globalThis.fetch;
 globalThis.fetch = async () => {
   throw new Error("Offline pipeline test forbids fetch");
@@ -44,7 +42,6 @@ async function exerciseChain(tag: string) {
   const a = `request ${tag} key ${key} end`;
   const b = `request ${tag} email fixture@example.com end`;
   const keyCut = a.indexOf(key) + 25;
-  const emailCut = b.indexOf("fixture@") + "fixture@".length;
   const args = JSON.stringify({ command: "echo safe 🦜 ".repeat(400), credential: key });
   const argsCut = args.indexOf(key) + 25;
   const expectedArgs = args.replace(key, "[REDACTED:openai]");
@@ -57,7 +54,7 @@ async function exerciseChain(tag: string) {
             role: "assistant",
             content: "ready",
             reasoning: a.slice(0, keyCut),
-            reasoning_content: b.slice(0, emailCut),
+            reasoning_content: b,
             tool_calls: [
               {
                 index: 0,
@@ -75,7 +72,7 @@ async function exerciseChain(tag: string) {
           index: 0,
           delta: {
             reasoning: a.slice(keyCut),
-            reasoning_content: b.slice(emailCut),
+            reasoning_content: " second part of B",
             tool_calls: [{ index: 0, function: { arguments: args.slice(argsCut) } }],
           },
         },
@@ -111,19 +108,16 @@ async function exerciseChain(tag: string) {
       abort: () => abort.abort(),
       clientResponseFormat: "openai",
     },
-    createPiiTransform: undefined,
     clientRawRequestHeaders: null,
     clientResponseFormat: "openai",
     echoModel: null,
     responseHeaders: {},
     credentialRedactionEnabled: true,
     credentialDisabledGuardrails: [],
-    piiDisabledGuardrails: [],
   });
   const output = await new Response(stream).text();
   assert.deepEqual(errors, []);
   assert.equal(output.includes(key), false);
-  assert.equal(output.includes("fixture@example.com"), false);
   const events = output
     .split("\n")
     .filter((line) => line.startsWith("data: ") && line !== "data: [DONE]")
@@ -131,12 +125,11 @@ async function exerciseChain(tag: string) {
   const deltas = events.flatMap((e) => e.choices ?? []).map((c) => c.delta ?? {});
   assert.equal(
     deltas.map((d) => d.reasoning ?? "").join(""),
-    // The credential transform runs before PII and owns this API-key match.
     `request ${tag} key [REDACTED:openai] end`
   );
   assert.equal(
     deltas.map((d) => d.reasoning_content ?? "").join(""),
-    `request ${tag} email [EMAIL_REDACTED] end`
+    `request ${tag} email fixture@example.com end second part of B`
   );
   assert.equal(deltas.map((d) => d.content ?? "").join(""), "ready");
   const calls = deltas.flatMap((d) => d.tool_calls ?? []);
@@ -153,7 +146,7 @@ async function exerciseChain(tag: string) {
   assert.equal(output.split("data: [DONE]").length - 1, 1);
 }
 
-test("real pipeline with both redaction flags retains reasoning aliases and multi-KB tool arguments", async () => {
+test("real pipeline with credential redaction retains reasoning aliases and multi-KB tool arguments", async () => {
   await exerciseChain("sequential");
 });
 test("eight concurrent real redaction chains keep their reasoning streams independent", async () => {

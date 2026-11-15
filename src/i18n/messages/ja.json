@@ -1496,7 +1496,6 @@
     "showing": "{total} イベント中 {count} を表示しています",
     "policyViolation": "ポリシー違反",
     "accessDenied": "アクセスが拒否されました",
-    "injectionBlocked": "注入がブロックされました",
     "noEvents": "コンプライアンス イベントは記録されません。",
     "failedFetch": "コンプライアンス監査ログの取得に失敗しました。",
     "viewDetails": "詳細を見る",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "残りのリカバリーコード: {count}",
     "mfaDisableDesc": "二要素認証をオフにするには、パスワードと現在のコード(またはリカバリーコード)を入力してください。",
     "mfaRecoveryHint": "デバイス紛失時の復旧: OMNIROUTE_DISABLE_MFA=true でサーバーを起動し、ホスト自体からサインインしてください。",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA が設定されています: このホストからのサインインでは第 2 要素が省略されます。アクセスを回復したら解除してください。",
-    "piiMasking": {
-      "title": "個人情報のマスキング",
-      "description": "マスクする個人データの種類を選び、独自のパターンを追加します。下に表示されている機能フラグを有効にするまで、マスキングはオフのままです。",
-      "requestFlag": "リクエストのマスキング",
-      "responseFlag": "レスポンスのサニタイズ",
-      "templates": "テンプレート",
-      "template": {
-        "minimal": "最小",
-        "standard": "標準",
-        "financial": "金融",
-        "brazilian": "ブラジル",
-        "usa": "米国",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (南アフリカ)",
-        "full": "すべて"
-      },
-      "builtinTypes": "組み込みタイプ",
-      "types": {
-        "email": "メールアドレス",
-        "phone_us": "米国の電話番号",
-        "phone_br": "ブラジルの電話番号",
-        "ssn": "米国の社会保障番号",
-        "credit_card": "クレジットカード番号",
-        "cpf": "CPF（ブラジルの個人納税者番号）",
-        "cnpj": "CNPJ（ブラジルの法人番号）",
-        "ip_address": "IPv4 アドレス",
-        "ipv6_address": "IPv6 アドレス",
-        "aws_key": "AWS アクセスキー",
-        "api_key_generic": "API キーとトークン",
-        "iban": "IBAN 銀行口座番号",
-        "eu_vat": "EU VAT 番号",
-        "es_dni_nie": "スペインの DNI / NIE",
-        "it_codice_fiscale": "イタリアの Codice Fiscale",
-        "pl_pesel": "ポーランドの PESEL",
-        "nl_bsn": "オランダの BSN",
-        "de_steuer_id": "ドイツの Steuer-ID",
-        "se_personnummer": "スウェーデンの personnummer",
-        "za_id": "南アフリカの ID 番号",
-        "za_phone": "南アフリカの電話番号",
-        "za_vat": "南アフリカの VAT 番号",
-        "za_tax_ref": "南アフリカの税務参照番号"
-      },
-      "customPatterns": "カスタムパターン",
-      "customPatternsDesc": "一致した部分は [CUSTOM_REDACTED] に置き換えられます。パターンは最大 {max} 件です。壊滅的なバックトラックの恐れがあるパターンは拒否されます。",
-      "typeRegex": "正規表現",
-      "typeWildcard": "ワイルドカード（* と ?）",
-      "pattern": "パターン",
-      "flags": "フラグ（i, m, s, u）",
-      "sampleText": "パターンをテストするサンプルテキスト",
-      "test": "テスト",
-      "testMatches": "{count} 件一致",
-      "testFailed": "パターンが拒否されました: {message}",
-      "add": "パターンを追加",
-      "saved": "保存しました",
-      "saveFailed": "保存できませんでした: {message}",
-      "statsTitle": "再起動以降の検出",
-      "statsEmpty": "まだ検出はありません。",
-      "statsRequest": "リクエスト"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA が設定されています: このホストからのサインインでは第 2 要素が省略されます。アクセスを回復したら解除してください。"
   },
   "contextRtk": {
     "title": "RTKエンジン",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "すべての受信リクエストにAPIキーを要求します。"
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "すべてのリクエストに対して入力サニタイズを有効にします。"
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "プロンプトインジェクションのガードモードを設定します。"
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "リクエストから個人特定可能情報（PII）をマスクします。"
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "プロバイダーのレスポンスに含まれる個人特定可能情報（PII）をサニタイズします。"
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "レスポンスのPIIの処理方法を選択します。「マスク」はそれを置き換え、「警告」はログ記録のみを行い、「ブロック」はレスポンスを拒否し、「オフ」はサニタイズを無効にします。"
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "プライベートまたは内部IP範囲への送信リクエストをブロックします。"

@@ -1496,7 +1496,6 @@
     "showing": "Es werden {count} von {total} Ereignissen angezeigt",
     "policyViolation": "Richtlinienverstoß",
     "accessDenied": "Zugriff verweigert",
-    "injectionBlocked": "Injektion blockiert",
     "noEvents": "Es wurden keine Compliance-Ereignisse aufgezeichnet.",
     "failedFetch": "Das Compliance-Audit-Protokoll konnte nicht abgerufen werden.",
     "viewDetails": "Details anzeigen",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Verbleibende Wiederherstellungscodes: {count}",
     "mfaDisableDesc": "Geben Sie Ihr Passwort und einen aktuellen Code (oder einen Wiederherstellungscode) ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren.",
     "mfaRecoveryHint": "Wiederherstellung bei verlorenem Gerät: Starten Sie den Server mit OMNIROUTE_DISABLE_MFA=true und melden Sie sich direkt am Host an.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ist gesetzt: Anmeldungen von diesem Host überspringen den zweiten Faktor. Entfernen Sie die Variable, sobald Sie wieder Zugriff haben.",
-    "piiMasking": {
-      "title": "PII-Maskierung",
-      "description": "Wählen Sie, welche Arten personenbezogener Daten maskiert werden, und fügen Sie eigene Muster hinzu. Die Maskierung bleibt aus, bis Sie die unten angezeigten Feature-Flags aktivieren.",
-      "requestFlag": "Anfrage-Maskierung",
-      "responseFlag": "Antwort-Bereinigung",
-      "templates": "Vorlagen",
-      "template": {
-        "minimal": "Minimal",
-        "standard": "Standard",
-        "financial": "Finanzen",
-        "brazilian": "Brasilien",
-        "usa": "USA",
-        "gdpr": "DSGVO (EU)",
-        "popia": "POPIA (Südafrika)",
-        "full": "Vollständig"
-      },
-      "builtinTypes": "Integrierte Typen",
-      "types": {
-        "email": "E-Mail-Adressen",
-        "phone_us": "US-Telefonnummern",
-        "phone_br": "Brasilianische Telefonnummern",
-        "ssn": "US-Sozialversicherungsnummern",
-        "credit_card": "Kreditkartennummern",
-        "cpf": "CPF (brasilianische Steuer-ID)",
-        "cnpj": "CNPJ (brasilianische Firmen-ID)",
-        "ip_address": "IPv4-Adressen",
-        "ipv6_address": "IPv6-Adressen",
-        "aws_key": "AWS-Zugriffsschlüssel",
-        "api_key_generic": "API-Schlüssel und Tokens",
-        "iban": "IBAN-Kontonummern",
-        "eu_vat": "EU-USt-IdNr.",
-        "es_dni_nie": "Spanische DNI / NIE",
-        "it_codice_fiscale": "Italienischer Codice Fiscale",
-        "pl_pesel": "Polnische PESEL",
-        "nl_bsn": "Niederländische BSN",
-        "de_steuer_id": "Deutsche Steuer-ID",
-        "se_personnummer": "Schwedische Personnummer",
-        "za_id": "Südafrikanische ID-Nummern",
-        "za_phone": "Südafrikanische Telefonnummern",
-        "za_vat": "Südafrikanische USt-Nummern",
-        "za_tax_ref": "Südafrikanische Steuernummern"
-      },
-      "customPatterns": "Eigene Muster",
-      "customPatternsDesc": "Treffer werden durch [CUSTOM_REDACTED] ersetzt. Bis zu {max} Muster. Muster mit Risiko für katastrophales Backtracking werden abgelehnt.",
-      "typeRegex": "Regulärer Ausdruck",
-      "typeWildcard": "Platzhalter (* und ?)",
-      "pattern": "Muster",
-      "flags": "Flags (i, m, s, u)",
-      "sampleText": "Beispieltext zum Testen des Musters",
-      "test": "Testen",
-      "testMatches": "{count} Treffer",
-      "testFailed": "Muster abgelehnt: {message}",
-      "add": "Muster hinzufügen",
-      "saved": "Gespeichert",
-      "saveFailed": "Speichern fehlgeschlagen: {message}",
-      "statsTitle": "Erkennungen seit dem Neustart",
-      "statsEmpty": "Noch keine Erkennungen.",
-      "statsRequest": "Anfragen"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ist gesetzt: Anmeldungen von diesem Host überspringen den zweiten Faktor. Entfernen Sie die Variable, sobald Sie wieder Zugriff haben."
   },
   "contextRtk": {
     "title": "RTK-Engine",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "API-Schlüssel für alle eingehenden Anfragen erfordern."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Eingabebereinigung für alle Anfragen aktivieren."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Den Schutzmodus gegen Prompt-Injection festlegen."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Personenbezogene Daten in Anfragen schwärzen."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Personenbezogene Daten in Antworten von Anbietern bereinigen."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Wählen Sie, wie mit personenbezogenen Daten (PII) in Antworten verfahren wird: „redact“ (Schwärzen) ersetzt sie, „warn“ (Warnen) protokolliert sie nur, „block“ (Blockieren) weist die Antwort ab und „off“ (Aus) deaktiviert die Bereinigung."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Ausgehende Anfragen an private oder interne IP-Bereiche blockieren."

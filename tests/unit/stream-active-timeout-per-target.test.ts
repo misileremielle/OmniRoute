@@ -207,7 +207,6 @@ test("the resolved active budget reaches pipeWithDisconnect", () => {
       return stream;
     },
     isFeatureFlagEnabled: () => false,
-    createPiiSseTransform: () => ({ pipeThrough: () => stream }),
     createCredentialSseTransform: () => ({ pipeThrough: () => stream }),
     createProgressTransform: () => ({ pipeThrough: () => stream }),
     createSseHeartbeatTransform: () => ({ pipeThrough: () => stream }),
@@ -220,7 +219,6 @@ test("the resolved active budget reaches pipeWithDisconnect", () => {
       providerResponse: {},
       transformStream: {},
       streamController: { signal: {} as AbortSignal },
-      createPiiTransform: undefined,
       clientRawRequestHeaders: {},
       clientResponseFormat: "openai",
       echoModel: null,

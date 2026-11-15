@@ -1067,7 +1067,7 @@ The settings page is organized into **7 tabs** for easy navigation:
 | **General**    | System storage tools, default behavior, Endpoint tunnel visibility                                                                                       |
 | **Appearance** | Theme controls (light/dark/system), sidebar visibility                                                                                                   |
 | **AI**         | Thinking budget (passthrough / auto-strip / custom / adaptive — see [THINKING_BUDGET.md](./THINKING_BUDGET.md)), prompt cache stats                      |
-| **Security**   | Login/Password settings, IP Access Control, API auth for `/models`, Provider Blocking, prompt-injection guard                                            |
+| **Security**   | Login/Password settings, IP Access Control, API auth for `/models`, Provider Blocking                                                                    |
 | **Routing**    | Global routing strategy (Fill First / Round Robin / P2C / Random / Least Used / Cost Optimized), wildcard model aliases, fallback chains, combo defaults |
 | **Resilience** | Request queue, connection cooldown, provider breaker config, and wait-for-cooldown behavior                                                              |
 | **Advanced**   | Global proxy configuration (HTTP/SOCKS5), per-provider proxy overrides                                                                                   |

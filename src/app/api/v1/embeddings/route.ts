@@ -13,7 +13,6 @@ import { isValidationFailure, validateBody } from "@/shared/validation/helpers";
 
 import { createEmbeddingResponse, type EmbeddingHandlerOptions } from "@/lib/embeddings/service";
 import { resolveClientApiKey } from "@/sse/services/clientApiKeyResolver";
-import { withInjectionGuard } from "@/middleware/promptInjectionGuard";
 import { getSpecialtyModelsResponse } from "@/app/api/v1/_shared/specialtyCatalog";
 
 export const dynamic = "force-dynamic";
@@ -100,4 +99,4 @@ async function postHandler(request, context) {
   });
 }
 
-export const POST = withInjectionGuard(postHandler);
+export const POST = postHandler;

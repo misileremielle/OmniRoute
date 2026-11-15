@@ -1496,7 +1496,6 @@
     "showing": "מציג {count} מתוך {total} אירועים",
     "policyViolation": "הפרת מדיניות",
     "accessDenied": "הגישה נדחתה",
-    "injectionBlocked": "הזרקה חסומה",
     "noEvents": "לא נרשמו אירועי ציות.",
     "failedFetch": "אחזור יומן ביקורת התאימות נכשל.",
     "viewDetails": "הצג פרטים",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "קודי שחזור שנותרו: {count}",
     "mfaDisableDesc": "הזן את הסיסמה וקוד נוכחי (או קוד שחזור) כדי לכבות את האימות הדו-שלבי.",
     "mfaRecoveryHint": "שחזור מכשיר שאבד: הפעל את השרת עם OMNIROUTE_DISABLE_MFA=true והתחבר מהמארח עצמו.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA מוגדר: כניסות מהמארח הזה מדלגות על הגורם השני. הסר אותו לאחר שתחזור לחשבון.",
-    "piiMasking": {
-      "title": "הסתרת מידע אישי",
-      "description": "בחרו אילו סוגי מידע אישי יוסתרו והוסיפו תבניות משלכם. ההסתרה נשארת כבויה עד שתפעילו את דגלי התכונות המוצגים למטה.",
-      "requestFlag": "הסתרה בבקשות",
-      "responseFlag": "ניקוי תגובות",
-      "templates": "תבניות מוכנות",
-      "template": {
-        "minimal": "מינימלי",
-        "standard": "רגיל",
-        "financial": "פיננסי",
-        "brazilian": "ברזילאי",
-        "usa": "ארה״ב",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (דרום אפריקה)",
-        "full": "מלא"
-      },
-      "builtinTypes": "סוגים מובנים",
-      "types": {
-        "email": "כתובות אימייל",
-        "phone_us": "מספרי טלפון בארה״ב",
-        "phone_br": "מספרי טלפון בברזיל",
-        "ssn": "מספרי ביטוח לאומי בארה״ב",
-        "credit_card": "מספרי כרטיסי אשראי",
-        "cpf": "CPF (מספר מזהה מס ברזילאי)",
-        "cnpj": "CNPJ (מספר חברה ברזילאי)",
-        "ip_address": "כתובות IPv4",
-        "ipv6_address": "כתובות IPv6",
-        "aws_key": "מפתחות גישה של AWS",
-        "api_key_generic": "מפתחות API ואסימונים",
-        "iban": "מספרי חשבון בנק IBAN",
-        "eu_vat": "מספרי EU VAT",
-        "es_dni_nie": "DNI / NIE ספרדית",
-        "it_codice_fiscale": "Codice Fiscale האיטלקי",
-        "pl_pesel": "PESEL פולנית",
-        "nl_bsn": "BSN הולנדי",
-        "de_steuer_id": "גרמנית Steuer-ID",
-        "se_personnummer": "מספר אישי שוודי",
-        "za_id": "מספרי ID דרום אפריקאים",
-        "za_phone": "מספרי טלפון בדרום אפריקה",
-        "za_vat": "מספרי VAT דרום אפריקאים",
-        "za_tax_ref": "אסמכתאות מס בדרום אפריקה"
-      },
-      "customPatterns": "תבניות מותאמות אישית",
-      "customPatternsDesc": "התאמות מוחלפות ב-[CUSTOM_REDACTED]. עד {max} תבניות. תבניות בסיכון לחזרה לאחור קטסטרופלית נדחות.",
-      "typeRegex": "ביטוי רגולרי",
-      "typeWildcard": "תו כללי (* ו-?)",
-      "pattern": "תבנית",
-      "flags": "דגלים (i, m, s, u)",
-      "sampleText": "טקסט לדוגמה לבדיקת התבנית",
-      "test": "בדיקה",
-      "testMatches": "התאמות: {count}",
-      "testFailed": "התבנית נדחתה: {message}",
-      "add": "הוספת תבנית",
-      "saved": "נשמר",
-      "saveFailed": "השמירה נכשלה: {message}",
-      "statsTitle": "זיהויים מאז ההפעלה מחדש",
-      "statsEmpty": "אין זיהויים עדיין.",
-      "statsRequest": "בקשות"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA מוגדר: כניסות מהמארח הזה מדלגות על הגורם השני. הסר אותו לאחר שתחזור לחשבון."
   },
   "contextRtk": {
     "title": "מנוע RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "דרוש מפתח API עבור כל הבקשות הנכנסות."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "הפעל חיטוי קלט עבור כל הבקשות."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "הגדרת מצב ההגנה מפני הזרקת הנחיות."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "הסתרת מידע מזהה אישי (PII) מבקשות."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "ניקוי מידע מזהה אישי (PII) בתגובות של ספקי שירות."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "בחירת אופן הטיפול במידע מזהה אישי (PII) בתגובות: redact מחליף אותו, warn רק מתעד אותו ביומן, block דוחה את התגובה, ו-off משבית את הניקוי."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "חסימת בקשות יוצאות לטווחי כתובות IP פרטיים או פנימיים."

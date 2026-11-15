@@ -1496,7 +1496,6 @@
     "showing": "Showing {count} of {total} events",
     "policyViolation": "Policy Violation",
     "accessDenied": "Access Denied",
-    "injectionBlocked": "Injection Blocked",
     "noEvents": "No compliance events recorded.",
     "failedFetch": "Failed to fetch compliance audit log.",
     "viewDetails": "View details",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Recovery codes left: {count}",
     "mfaDisableDesc": "Enter your password and a current code (or a recovery code) to turn two-factor authentication off.",
     "mfaRecoveryHint": "Lost-device recovery: start the server with OMNIROUTE_DISABLE_MFA=true and sign in from the host itself.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA is set: sign-ins from this host skip the second factor. Unset it once you are back in.",
-    "piiMasking": {
-      "title": "PII masking",
-      "description": "Choose which kinds of personal data are masked and add your own patterns. Masking stays off until you turn on the feature flags shown below.",
-      "requestFlag": "Request masking",
-      "responseFlag": "Response sanitization",
-      "templates": "Templates",
-      "template": {
-        "minimal": "Minimal",
-        "standard": "Standard",
-        "financial": "Financial",
-        "brazilian": "Brazilian",
-        "usa": "USA",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (South Africa)",
-        "full": "Full"
-      },
-      "builtinTypes": "Built-in types",
-      "types": {
-        "email": "Email addresses",
-        "phone_us": "US phone numbers",
-        "phone_br": "Brazilian phone numbers",
-        "ssn": "US Social Security numbers",
-        "credit_card": "Credit card numbers",
-        "cpf": "CPF (Brazilian taxpayer ID)",
-        "cnpj": "CNPJ (Brazilian company ID)",
-        "ip_address": "IPv4 addresses",
-        "ipv6_address": "IPv6 addresses",
-        "aws_key": "AWS access keys",
-        "api_key_generic": "API keys and tokens",
-        "iban": "IBAN bank account numbers",
-        "eu_vat": "EU VAT numbers",
-        "es_dni_nie": "Spanish DNI / NIE",
-        "it_codice_fiscale": "Italian Codice Fiscale",
-        "pl_pesel": "Polish PESEL",
-        "nl_bsn": "Dutch BSN",
-        "de_steuer_id": "German Steuer-ID",
-        "se_personnummer": "Swedish personnummer",
-        "za_id": "South African ID numbers",
-        "za_phone": "South African phone numbers",
-        "za_vat": "South African VAT numbers",
-        "za_tax_ref": "South African tax references"
-      },
-      "customPatterns": "Custom patterns",
-      "customPatternsDesc": "Matches are replaced with [CUSTOM_REDACTED]. Up to {max} patterns. Patterns that risk catastrophic backtracking are refused.",
-      "typeRegex": "Regular expression",
-      "typeWildcard": "Wildcard (* and ?)",
-      "pattern": "Pattern",
-      "flags": "Flags (i, m, s, u)",
-      "sampleText": "Sample text to test the pattern against",
-      "test": "Test",
-      "testMatches": "{count} matches",
-      "testFailed": "Pattern rejected: {message}",
-      "add": "Add pattern",
-      "saved": "Saved",
-      "saveFailed": "Could not save: {message}",
-      "statsTitle": "Detections since restart",
-      "statsEmpty": "No detections yet.",
-      "statsRequest": "Requests"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA is set: sign-ins from this host skip the second factor. Unset it once you are back in."
   },
   "contextRtk": {
     "title": "RTK Engine",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Require an API key for all incoming requests."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Enable input sanitization for all requests."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Set the prompt-injection guard mode."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Redact personally identifiable information from requests."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sanitize personally identifiable information in provider responses."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Choose how response PII is handled: redact replaces it, warn only logs it, block rejects the response, and off disables sanitization."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Block outbound requests to private or internal IP ranges."

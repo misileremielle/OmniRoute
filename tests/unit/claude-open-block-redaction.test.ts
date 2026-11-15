@@ -1,10 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createCredentialSseTransform } from "../../src/lib/streamingCredentialTransform.ts";
-import { createPiiSseTransform } from "../../src/lib/streamingPiiTransform.ts";
-
-const originalPii = process.env.PII_RESPONSE_SANITIZATION;
-process.env.PII_RESPONSE_SANITIZATION = "true";
 
 type Event = {
   type: string;
@@ -81,37 +77,31 @@ for (const bodyLength of [100, 1500]) {
   });
 }
 
-for (const [field, deltaType] of [
-  ["text", "text_delta"],
-  ["thinking", "thinking_delta"],
-]) {
-  for (const empty of [false, true]) {
-    test(`PII retains open ${field} across an ${empty ? "empty" : "occupied"} block stop`, async () => {
-      const output = await transform(createPiiSseTransform(), [
-        {
-          type: "content_block_delta",
-          index: 0,
-          delta: { type: deltaType, [field]: "contact alice@example.co" },
-        },
-        ...(empty
-          ? []
-          : [
-              {
-                type: "content_block_delta",
-                index: 1,
-                delta: { type: "text_delta", text: "second block" },
-              },
-            ]),
-        { type: "content_block_stop", index: 1 },
-        { type: "content_block_delta", index: 0, delta: { type: deltaType, [field]: "m done" } },
-        { type: "content_block_stop", index: 0 },
-        { type: "message_stop" },
-      ]);
-      assert.equal(blockText(output, 0, field, deltaType), "contact [EMAIL_REDACTED] done");
-      assert.equal(blockText(output, 1), empty ? "" : "second block");
-      assert.ok(!JSON.stringify(output).includes("alice@example"));
-    });
-  }
+for (const empty of [false, true]) {
+  test(`credential retains open text across an ${empty ? "empty" : "occupied"} block stop`, async () => {
+    const output = await transform(createCredentialSseTransform(), [
+      {
+        type: "content_block_delta",
+        index: 0,
+        delta: { type: "text_delta", text: "contact block-zero" },
+      },
+      ...(empty
+        ? []
+        : [
+            {
+              type: "content_block_delta",
+              index: 1,
+              delta: { type: "text_delta", text: "second block" },
+            },
+          ]),
+      { type: "content_block_stop", index: 1 },
+      { type: "content_block_delta", index: 0, delta: { type: "text_delta", text: "m done" } },
+      { type: "content_block_stop", index: 0 },
+      { type: "message_stop" },
+    ]);
+    assert.equal(blockText(output, 0), "contact block-zerom done");
+    assert.equal(blockText(output, 1), empty ? "" : "second block");
+  });
 }
 
 test("retained credential buffers still count toward the limit after another block stops", async () => {
@@ -154,8 +144,6 @@ test("closing a credential block releases its own buffer budget", async () => {
 });
 
 test.after(async () => {
-  if (originalPii === undefined) delete process.env.PII_RESPONSE_SANITIZATION;
-  else process.env.PII_RESPONSE_SANITIZATION = originalPii;
   const { resetDbInstance } = await import("../../src/lib/db/core.ts");
   resetDbInstance();
 });

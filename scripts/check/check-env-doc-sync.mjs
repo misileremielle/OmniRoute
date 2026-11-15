@@ -325,8 +325,6 @@ const ENV_ONLY_ALLOWLIST = new Set([
   "DEBUG",
   "HEAP_PRESSURE_THRESHOLD_MB",
   "OMNIROUTE_TRACE",
-  "PII_TEST_BYPASS_MIN_WINDOW",
-  "PII_WINDOW_SIZE",
   "TRAE_STREAM_TIMEOUT_MS",
   "TRAE_TOKEN",
   // #12190: Trae host/Origin override. ENVIRONMENT.md documents no Trae variable at

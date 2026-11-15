@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 // The open-sse → src boundary ratchet (quality-baseline.json) counts one edge per importing file.
 // These seams keep engine code off src/: the numeric helpers live in open-sse and src re-exports
-// them; streamingTail reaches the PII gate through streamingPipeline, the existing PII seam.
+// them; the credential gate is resolved through the streaming credential transform module.
 
 test("src/shared/utils/numeric re-exports the engine helpers (same function objects)", async () => {
   const engine = await import("../../open-sse/utils/numeric.ts");
@@ -19,25 +19,13 @@ test("src/shared/utils/numeric re-exports the engine helpers (same function obje
   assert.equal(engine.toNumberOrNull(""), null);
 });
 
-test("streamingPipeline exposes the PII gate resolver from the PII stream module", async () => {
-  const pipeline = await import("../../open-sse/handlers/chatCore/streamingPipeline.ts");
-  const pii = await import("../../src/lib/streamingPiiTransform.ts");
-  assert.equal(pipeline.resolvePiiGate, pii.resolvePiiGate);
-  const gate = await pipeline.resolvePiiGate({ resolveDisabledGuardrails: () => ["pii-masker"] });
-  assert.deepEqual(gate, { piiDisabledGuardrails: ["pii-masker"] });
-});
-
 test("engine files touched by the seams do not import src/ directly", () => {
   for (const f of [
     "open-sse/handlers/responseTranslator.ts",
     "open-sse/handlers/chatCore/streamingTail.ts",
   ]) {
     const s = readFileSync(f, "utf8");
-    assert.doesNotMatch(
-      s,
-      /from ["'](?:@\/|(?:\.\.\/)+src\/)(?:shared\/utils\/numeric|lib\/streamingPiiTransform)/,
-      f
-    );
+    assert.doesNotMatch(s, /from ["'](?:@\/|(?:\.\.\/)+src\/)shared\/utils\/numeric/, f);
   }
 });
 

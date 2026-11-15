@@ -7,11 +7,7 @@ import path from "node:path";
 const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-db-detailed-logs-"));
 process.env.DATA_DIR = TEST_DATA_DIR;
 
-const ORIGINAL_PII_ENABLED = process.env.PII_RESPONSE_SANITIZATION;
-const ORIGINAL_PII_MODE = process.env.PII_RESPONSE_SANITIZATION_MODE;
 const ORIGINAL_ENABLE_REQUEST_LOGS = process.env.ENABLE_REQUEST_LOGS;
-process.env.PII_RESPONSE_SANITIZATION = "true";
-process.env.PII_RESPONSE_SANITIZATION_MODE = "redact";
 process.env.API_KEY_SECRET = process.env.API_KEY_SECRET || "task-303-detailed-secret";
 
 const core = await import("../../src/lib/db/core.ts");
@@ -53,18 +49,6 @@ test.after(async () => {
   core.resetDbInstance();
   apiKeysDb.resetApiKeyState();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-
-  if (ORIGINAL_PII_ENABLED === undefined) {
-    delete process.env.PII_RESPONSE_SANITIZATION;
-  } else {
-    process.env.PII_RESPONSE_SANITIZATION = ORIGINAL_PII_ENABLED;
-  }
-
-  if (ORIGINAL_PII_MODE === undefined) {
-    delete process.env.PII_RESPONSE_SANITIZATION_MODE;
-  } else {
-    process.env.PII_RESPONSE_SANITIZATION_MODE = ORIGINAL_PII_MODE;
-  }
 
   if (ORIGINAL_ENABLE_REQUEST_LOGS === undefined) {
     delete process.env.ENABLE_REQUEST_LOGS;
@@ -144,7 +128,7 @@ test("saveRequestDetailLog persists protected payloads and compacted stream summ
 
   assert.equal(row.call_log_id, "call-1");
   assert.deepEqual(row.client_request, {
-    email: "[EMAIL_REDACTED]",
+    email: "john@example.com",
     token: "[REDACTED]",
   });
   assert.deepEqual(row.translated_request, { message: "hello" });

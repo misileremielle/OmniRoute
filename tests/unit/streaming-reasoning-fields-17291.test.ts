@@ -7,14 +7,10 @@ import path from "node:path";
 const isolated = fs.mkdtempSync(path.join(os.tmpdir(), "reasoning-fields-17291-"));
 process.env.HOME = isolated;
 process.env.DATA_DIR = path.join(isolated, "data");
-process.env.PII_RESPONSE_SANITIZATION = "true";
-process.env.PII_RESPONSE_SANITIZATION_MODE = "redact";
-process.env.PII_TEST_BYPASS_MIN_WINDOW = "true";
 const originalFetch = globalThis.fetch;
 globalThis.fetch = async () => {
   throw new Error("Offline streaming test forbids fetch");
 };
-const { createPiiSseTransform } = await import("../../src/lib/streamingPiiTransform.ts");
 const { createCredentialSseTransform } =
   await import("../../src/lib/streamingCredentialTransform.ts");
 const { resetDbInstance } = await import("../../src/lib/db/core.ts");
@@ -74,10 +70,7 @@ function field(events: Event[], name: TextField, index = 0): string {
     .map((c) => c.delta?.[name] ?? "")
     .join("");
 }
-for (const [name, factory] of [
-  ["PII", createPiiSseTransform],
-  ["credential", createCredentialSseTransform],
-] as const) {
+for (const [name, factory] of [["credential", createCredentialSseTransform]] as const) {
   test(`${name}: simultaneous reasoning fields retain their own bytes (#17291)`, async () => {
     const reasoning = "reason-A ".repeat(100);
     const reasoningContent = "reason-B ".repeat(100);
@@ -90,10 +83,7 @@ for (const [name, factory] of [
   });
 }
 
-const factories = [
-  ["PII", createPiiSseTransform],
-  ["credential", createCredentialSseTransform],
-] as const;
+const factories = [["credential", createCredentialSseTransform]] as const;
 const done = "data: [DONE]\n\n";
 const jsonEvent = (value: Event) => `data: ${JSON.stringify(value)}\n\n`;
 for (const [name, factory] of factories) {
@@ -207,11 +197,11 @@ for (const [name, factory] of factories) {
     assert.equal(out.filter((e) => e.choices?.some((c) => c.finish_reason)).length, 1);
   });
   test(`${name}: fragmented sensitive text is masked independently in both reasoning fields`, async () => {
-    const secret = name === "PII" ? "fixture@example.com" : "sk-" + "ABCD".repeat(12);
-    const marker = name === "PII" ? "[EMAIL_REDACTED]" : "[REDACTED:openai]";
+    const secret = "sk-" + "ABCD".repeat(12);
+    const marker = "[REDACTED:openai]";
     // Split the credential prefix before it can match on its own. A longer partial
     // prefix is a separate pre-existing masker defect; #17291 preserves its policy.
-    const cut = name === "PII" ? Math.floor(secret.length / 2) : 2;
+    const cut = 2;
     const out = await run(factory(), [
       event({
         reasoning: "A " + secret.slice(0, cut),

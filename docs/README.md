@@ -110,7 +110,7 @@ Combo routing, scoring, and replay.
 
 Guardrails, compliance, stealth, and the mandatory patterns for handling public credentials and error messages.
 
-- [GUARDRAILS.md](security/GUARDRAILS.md) — PII, prompt injection, vision guardrails.
+- [GUARDRAILS.md](security/GUARDRAILS.md) — credential masking, vision guardrails.
 - [COMPLIANCE.md](security/COMPLIANCE.md) — audit trails and compliance.
 - [STEALTH_GUIDE.md](security/STEALTH_GUIDE.md) — TLS / fingerprint stealth.
 - [PUBLIC_CREDS.md](security/PUBLIC_CREDS.md) — **mandatory** pattern for embedding public upstream OAuth client_id/secret + Firebase Web keys without tripping secret scanners.

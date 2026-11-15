@@ -1496,7 +1496,6 @@
     "showing": "Kuvatakse {count} sündmust {total}-st",
     "policyViolation": "Poliitika rikkumine",
     "accessDenied": "Juurdepääs keelatud",
-    "injectionBlocked": "Sisestusrünne blokeeritud",
     "noEvents": "Vastavussündmusi pole salvestatud.",
     "failedFetch": "Vastavuse auditilogi toomine ebaõnnestus.",
     "viewDetails": "Kuva üksikasjad",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Järelejäänud taastekoodid: {count}",
     "mfaDisableDesc": "Kaheastmelise autentimise väljalülitamiseks sisestage oma parool ja kehtiv kood (või taastekood).",
     "mfaRecoveryHint": "Kaotatud seadme taastamine: käivitage server sättega OMNIROUTE_DISABLE_MFA=true ja logige sisse otse hostist.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA on määratud: sellest hostist sisselogimised jätavad teise teguri vahele. Eemaldage see, kui olete taas sees.",
-    "piiMasking": {
-      "title": "Isikuandmete maskeerimine",
-      "description": "Valige, milliseid isikuandmeid maskeeritakse, ja lisage oma mustrid. Maskeerimine on välja lülitatud, kuni lülitate sisse allpool näidatud funktsioonilipud.",
-      "requestFlag": "Päringute maskeerimine",
-      "responseFlag": "Vastuste puhastamine",
-      "templates": "Mallid",
-      "template": {
-        "minimal": "Minimaalne",
-        "standard": "Tavaline",
-        "financial": "Finants",
-        "brazilian": "Brasiilia",
-        "usa": "USA",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Lõuna-Aafrika)",
-        "full": "Täielik"
-      },
-      "builtinTypes": "Sisseehitatud tüübid",
-      "types": {
-        "email": "E-posti aadressid",
-        "phone_us": "USA telefoninumbrid",
-        "phone_br": "Brasiilia telefoninumbrid",
-        "ssn": "USA sotsiaalkindlustusnumbrid",
-        "credit_card": "Krediitkaardi numbrid",
-        "cpf": "CPF (Brasiilia maksukohustuslase number)",
-        "cnpj": "CNPJ (Brasiilia ettevõtte number)",
-        "ip_address": "IPv4-aadressid",
-        "ipv6_address": "IPv6-aadressid",
-        "aws_key": "AWS-i juurdepääsuvõtmed",
-        "api_key_generic": "API-võtmed ja tokenid",
-        "iban": "IBAN pangakonto numbrid",
-        "eu_vat": "EU VAT numbrid",
-        "es_dni_nie": "hispaania DNI / NIE",
-        "it_codice_fiscale": "Itaalia Codice Fiscale",
-        "pl_pesel": "Poola PESEL",
-        "nl_bsn": "Hollandi BSN",
-        "de_steuer_id": "Saksa Steuer-ID",
-        "se_personnummer": "Rootsi personalinumber",
-        "za_id": "Lõuna-Aafrika ID numbrid",
-        "za_phone": "Lõuna-Aafrika telefoninumbrid",
-        "za_vat": "Lõuna-Aafrika VAT numbrid",
-        "za_tax_ref": "Lõuna-Aafrika maksuviited"
-      },
-      "customPatterns": "Kohandatud mustrid",
-      "customPatternsDesc": "Vasted asendatakse tekstiga [CUSTOM_REDACTED]. Kuni {max} mustrit. Katastroofilise tagasiotsingu ohuga mustrid lükatakse tagasi.",
-      "typeRegex": "Regulaaravaldis",
-      "typeWildcard": "Metamärk (* ja ?)",
-      "pattern": "Muster",
-      "flags": "Lipud (i, m, s, u)",
-      "sampleText": "Näidistekst mustri testimiseks",
-      "test": "Testi",
-      "testMatches": "Vasteid: {count}",
-      "testFailed": "Muster lükati tagasi: {message}",
-      "add": "Lisa muster",
-      "saved": "Salvestatud",
-      "saveFailed": "Salvestamine ebaõnnestus: {message}",
-      "statsTitle": "Tuvastused alates taaskäivitusest",
-      "statsEmpty": "Tuvastusi veel pole.",
-      "statsRequest": "Päringud"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA on määratud: sellest hostist sisselogimised jätavad teise teguri vahele. Eemaldage see, kui olete taas sees."
   },
   "contextRtk": {
     "title": "RTK Engine",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Nõua kõigi sissetulevate päringute jaoks API-võtit."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Luba kõigi päringute sisendi puhastamine."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Määra viibasüsti vastase kaitse režiim."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Varja päringutes sisalduv isikut tuvastav teave."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Puhasta teenusepakkuja vastused isikut tuvastavast teabest."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Vali, kuidas vastustes sisalduvat isikut tuvastavat teavet käsitletakse: varjamine asendab selle, hoiatamine ainult logib selle, blokeerimine lükkab vastuse tagasi ja väljalülitamine keelab puhastamise."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Blokeeri väljaminevad päringud privaatsetesse või sisemistesse IP-vahemikesse."

@@ -11,14 +11,14 @@ const { FEATURE_FLAG_DEFINITIONS } =
 
 const _model = "grok-imagine-image-2.0";
 
-test("GROK_SUBSCRIPTION_IMAGES_ENABLED defaults to false and does not flip PII defaults", () => {
+test("GROK_SUBSCRIPTION_IMAGES_ENABLED defaults to false and does not flip credential defaults", () => {
   const flag = FEATURE_FLAG_DEFINITIONS.find(
     (entry) => entry.key === "GROK_SUBSCRIPTION_IMAGES_ENABLED"
   );
   assert.ok(flag);
   assert.equal(flag.defaultValue, "false");
   assert.equal(flag.type, "boolean");
-  for (const key of ["PII_REDACTION_ENABLED", "PII_RESPONSE_SANITIZATION"]) {
+  for (const key of ["ALLOW_API_KEY_REVEAL"]) {
     assert.equal(
       FEATURE_FLAG_DEFINITIONS.find((entry) => entry.key === key)?.defaultValue,
       "false"

@@ -891,11 +891,6 @@
       "count": 1
     }
   },
-  "src/lib/guardrails/promptInjection.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "src/lib/guardrails/visionBridgeHelpers.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -937,11 +932,6 @@
     }
   },
   "src/lib/oauth/utils/claudeAuthImport.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/lib/piiSanitizer.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -1499,14 +1489,6 @@
       "count": 1
     }
   },
-  "tests/unit/adversarialPii.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
-    }
-  },
   "tests/unit/agy-usage-quota.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 4
@@ -1725,7 +1707,7 @@
   },
   "tests/unit/chat-route-coverage.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 15
+      "count": 13
     }
   },
   "tests/unit/chat-route-edge-cases.test.ts": {
@@ -2626,11 +2608,6 @@
       "count": 4
     }
   },
-  "tests/unit/injection-guard-nonchat-route-logging.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
   "tests/unit/json-size-exactness.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -2857,11 +2834,6 @@
   "tests/unit/probe-9575-tool-name-case.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 4
-    }
-  },
-  "tests/unit/prompt-injection-guard.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
     }
   },
   "tests/unit/provider-connection-apikey-dedup.test.ts": {
@@ -3392,11 +3364,6 @@
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    }
-  },
-  "tests/unit/streamingPiiTransform.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 18
     }
   },
   "tests/unit/sync-bundle.test.ts": {

@@ -37,7 +37,7 @@ Running tests: see [Testing](#testing) below (run the most focused test for chan
 - Translators — `open-sse/translator/` (format conversion OpenAI↔Claude↔Gemini)
 - Transformer — `open-sse/transformer/` (Responses API ↔ Chat Completions)
 - Services — `open-sse/services/` (combo routing, rate limits, caching, etc)
-- Database — `src/lib/db/` (SQLite domain modules, 243 migrations)
+- Database — `src/lib/db/` (SQLite domain modules, 244 migrations)
 - Domain/Policy — `src/domain/` (policy engine, cost rules, fallback logic)
 
 Monorepo: `src/` (Next.js 16 app), `open-sse/` (streaming engine workspace), `tests/`, `bin/` (CLI entry point).
@@ -48,7 +48,7 @@ Monorepo: `src/` (Next.js 16 app), `open-sse/` (streaming engine workspace), `te
 
 ```
 Client → /v1/chat/completions (Next.js route)
-  → CORS → Zod validation → auth? → policy check → prompt injection guard
+  → CORS → Zod validation → auth? → policy check
   → handleChatCore() [open-sse/handlers/chatCore.ts]
     → cache check → rate limit → combo routing?
       → resolveComboTargets() → handleSingleModel() per target
@@ -361,6 +361,7 @@ Rule numbers are stable and cited across scripts and docs — never renumber. Wh
 is a short form, its complete binding text, rationale and incident history are in
 [`docs/ops/HARD_RULES_DETAIL.md`](docs/ops/HARD_RULES_DETAIL.md) under the same number.
 
+<!-- prettier-ignore -->
 1. Never commit secrets or credentials
 2. Never barrel-import from `localDb.ts` — import specific `src/lib/db/*` modules
 3. Never use `eval()` / `new Function()` / implied eval
@@ -379,7 +380,6 @@ is a short form, its complete binding text, rationale and incident history are i
 16. Never expose routes under `/api/services/` or `/dashboard/providers/services/*/embed/` without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. These routes can spawn child processes (`npm install`, `node`). Loopback enforcement happens unconditionally before any auth check — a leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
 17. Every bug fix must be validated before shipping: a failing-then-passing unit/integration test (TDD) OR a documented live test on the production VPS (192.168.0.15). A fix without either is not merged. See Testing → "Bug fix / issue triage protocol" and `docs/ops/HARD_RULES_DETAIL.md` → Rule 17 for the full decision tree.
 18. Never develop on the shared main checkout. Every development task runs in its own git worktree on its own dedicated branch, and you MUST confirm the base branch with the operator before creating the worktree/branch — never assume `main` or the currently checked-out branch. A `git checkout` in the shared checkout silently destroys other sessions' uncommitted work. Tear down only the worktrees/branches you created (by name, never `fix/*`/`feat/*` wildcards), leave other sessions' worktrees untouched, and end on the branch you started on (the active `release/vX.Y.Z`, never `main`). See Git Workflow → "Worktree isolation" and `docs/ops/WORKTREE_ISOLATION.md`.
-19. PII redaction/sanitization is **opt-in — never on by default**. The two data-mutating PII feature flags **MUST** keep `defaultValue: "false"` in `src/shared/constants/featureFlagDefinitions.ts`: `PII_REDACTION_ENABLED` (request-side) and `PII_RESPONSE_SANITIZATION` (response + streaming). Flipping either default to `"true"` requires explicit operator approval; opt-in is per-operator, never a silent default. Regression guard: `tests/unit/pii-opt-in-default.test.ts`. Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 19.
 20. **Release-freeze — the FROZEN release branch belongs to the release captain; development does NOT stop (parallel-cycle model, 2026-07-04).** Before merging **any** PR, every campaign workflow **MUST** check `gh issue list --repo cheaper-inference/OmniRoute --label release-freeze --state open`. If active: **NEVER merge into the frozen `release/vX.Y.Z`** — retarget the PR to the **highest** `release/v*` (`gh pr edit <N> --base release/vX+1`, then VERIFY with `gh pr view <N> --json baseRefName` — the edit fails silently) and merge normally; **HOLD only when the highest release/v\* branch IS the frozen one**. **⛔ ONLY `/generate-release` may raise a release-freeze (Phase 0a; lifted at Phase 12c)** — never open, extend, re-open or close one autonomously (any other freeze needs the operator's explicit yes). Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 20.
 21. **Cross-session safety — this repo is worked by MANY parallel sessions/agents at once; never step on another's in-flight work.** Two absolute bans (both recurring incidents):
     - **(a) Never `git stash` / `git stash pop` — ANYWHERE in this repo, including inside an isolated worktree, and including inside any subagent you dispatch.** `git stash` operates on the **shared repository object store**, not the per-worktree working tree — a stash in one session can silently clobber or resurrect another parallel session's uncommitted changes. Compare against a base ref with `git show <ref>:<path>` or `git diff <ref> -- <path>` instead — never stash your tree away to "get it clean". **Put this ban verbatim in the prompt of every subagent that touches git.**
@@ -398,22 +398,6 @@ is a short form, its complete binding text, rationale and incident history are i
     (e) se `_tasks` aparecer como symlink quebrado, NÃO commitar nada — restaurar do remote e
     avisar o operador. O gate `check:tracked-artifacts` (pre-commit + CI) bloqueia `_tasks`
     rastreado em qualquer forma. Texto completo: `docs/ops/HARD_RULES_DETAIL.md` → Rule 22.
-
----
-
-## PII & Stream Sanitization Learnings
-
-### 1. Regex Security (ReDoS)
-
-All regex patterns matching variable-length strings (e.g. IPv6 address, credit cards) must use strictly bounded, non-overlapping sequences (e.g., limit occurrences with bounded ranges `{1,7}`) to prevent catastrophic backtracking when processing untrusted inputs.
-
-### 2. SSE Snapshot Handling
-
-When parsing streaming LLM responses (e.g. Responses API), check if a chunk represents a final snapshot (`done` or `completed` events). Snapshot text must be sanitized directly as a standalone string (bypassing rolling delta buffers) to prevent text duplication at the end of the stream.
-
-### 3. Database Handles in Tests
-
-Ensure that any unit tests that trigger database migrations or establish SQLite connections call `resetDbInstance()` and properly clean up/close all DB handles in a `test.after(...)` hook. Failure to release database connection handles will cause Node's native test runner to hang indefinitely.
 
 ---
 

@@ -1496,7 +1496,6 @@
     "showing": "نمایش {count} از {total} رویدادها",
     "policyViolation": "نقض خط مشی",
     "accessDenied": "دسترسی ممنوع شد",
-    "injectionBlocked": "تزریق مسدود شده است",
     "noEvents": "هیچ رویداد انطباق ثبت نشده است.",
     "failedFetch": "گزارش حسابرسی انطباق واکشی نشد.",
     "viewDetails": "مشاهده جزئیات",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "کدهای بازیابی باقی‌مانده: {count}",
     "mfaDisableDesc": "برای خاموش کردن احراز هویت دومرحله‌ای، گذرواژه و یک کد فعلی (یا کد بازیابی) را وارد کنید.",
     "mfaRecoveryHint": "بازیابی دستگاه گم‌شده: سرور را با OMNIROUTE_DISABLE_MFA=true اجرا کنید و از خود میزبان وارد شوید.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA تنظیم شده است: ورودها از این میزبان مرحلهٔ دوم را رد می‌کنند. پس از بازگشت دسترسی آن را حذف کنید.",
-    "piiMasking": {
-      "title": "پنهان‌سازی داده‌های شخصی",
-      "description": "انتخاب کنید کدام نوع داده‌های شخصی پنهان شوند و الگوهای خود را اضافه کنید. پنهان‌سازی تا زمانی که پرچم‌های ویژگی نمایش‌داده‌شده در زیر را روشن نکنید خاموش می‌ماند.",
-      "requestFlag": "پنهان‌سازی درخواست‌ها",
-      "responseFlag": "پاک‌سازی پاسخ‌ها",
-      "templates": "قالب‌ها",
-      "template": {
-        "minimal": "حداقلی",
-        "standard": "استاندارد",
-        "financial": "مالی",
-        "brazilian": "برزیلی",
-        "usa": "آمریکا",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (آفریقای جنوبی)",
-        "full": "کامل"
-      },
-      "builtinTypes": "انواع داخلی",
-      "types": {
-        "email": "نشانی‌های ایمیل",
-        "phone_us": "شماره تلفن‌های آمریکا",
-        "phone_br": "شماره تلفن‌های برزیل",
-        "ssn": "شماره‌های تأمین اجتماعی آمریکا",
-        "credit_card": "شماره‌های کارت اعتباری",
-        "cpf": "CPF (شناسه مالیاتی اشخاص در برزیل)",
-        "cnpj": "CNPJ (شناسه شرکت در برزیل)",
-        "ip_address": "نشانی‌های IPv4",
-        "ipv6_address": "نشانی‌های IPv6",
-        "aws_key": "کلیدهای دسترسی AWS",
-        "api_key_generic": "کلیدهای API و توکن‌ها",
-        "iban": "شماره حساب های بانکی IBAN",
-        "eu_vat": "EU VAT",
-        "es_dni_nie": "اسپانیایی DNI / NIE",
-        "it_codice_fiscale": "کدیس ایتالیایی Fiscale",
-        "pl_pesel": "PESEL لهستانی",
-        "nl_bsn": "هلندی BSN",
-        "de_steuer_id": "Steuer-ID آلمانی",
-        "se_personnummer": "شماره پرسنل سوئدی",
-        "za_id": "اعداد ID آفریقای جنوبی",
-        "za_phone": "شماره تلفن های آفریقای جنوبی",
-        "za_vat": "اعداد VAT آفریقای جنوبی",
-        "za_tax_ref": "مراجع مالیاتی آفریقای جنوبی"
-      },
-      "customPatterns": "الگوهای سفارشی",
-      "customPatternsDesc": "موارد منطبق با [CUSTOM_REDACTED] جایگزین می‌شوند. حداکثر {max} الگو. الگوهایی که خطر عقبگرد فاجعه‌بار دارند رد می‌شوند.",
-      "typeRegex": "عبارت باقاعده",
-      "typeWildcard": "نویسه عام (* و ?)",
-      "pattern": "الگو",
-      "flags": "پرچم‌ها (i, m, s, u)",
-      "sampleText": "متن نمونه برای آزمایش الگو",
-      "test": "آزمایش",
-      "testMatches": "تعداد تطابق: {count}",
-      "testFailed": "الگو رد شد: {message}",
-      "add": "افزودن الگو",
-      "saved": "ذخیره شد",
-      "saveFailed": "ذخیره ناموفق بود: {message}",
-      "statsTitle": "شناسایی‌ها از زمان راه‌اندازی مجدد",
-      "statsEmpty": "هنوز موردی شناسایی نشده است.",
-      "statsRequest": "درخواست‌ها"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA تنظیم شده است: ورودها از این میزبان مرحلهٔ دوم را رد می‌کنند. پس از بازگشت دسترسی آن را حذف کنید."
   },
   "contextRtk": {
     "title": "موتور RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "نیاز به کلید API برای تمام درخواست‌های ورودی."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "فعال‌سازی پاک‌سازی ورودی برای تمام درخواست‌ها."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "تنظیم حالت محافظت در برابر تزریق پرامپت."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "پوشاندن اطلاعات شناسایی شخصی در درخواست‌ها."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "پاک‌سازی اطلاعات شناسایی شخصی در پاسخ‌های ارائه‌دهنده."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "نحوه مدیریت PII پاسخ را انتخاب کنید: redact آن را جایگزین می‌کند، warn فقط آن را ثبت می‌کند، block پاسخ را رد می‌کند، و off پاک‌سازی را غیرفعال می‌کند."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "مسدود کردن درخواست‌های خروجی به محدوده‌های IP خصوصی یا داخلی."

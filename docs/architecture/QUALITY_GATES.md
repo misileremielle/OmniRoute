@@ -318,7 +318,7 @@ These run on a cron schedule (and `workflow_dispatch`), never on PRs. All are ad
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
 | `nightly-property`     | fast-check property tests with a random seed + high run count                                                                                       | **Advisory** |
 | `nightly-resilience`   | heap-growth gate, chaos fault-injection, k6 load/soak                                                                                               | **Advisory** |
-| `nightly-llm-security` | promptfoo injection guard (block mode) + garak probes (skipped without a provider secret)                                                           | **Advisory** |
+| `nightly-llm-security` | promptfoo adversarial-prompt suite (block-mode contracts) + garak probes (skipped without a provider secret)                                        | **Advisory** |
 | `nightly-schemathesis` | OpenAPI contract fuzzing (schemathesis) against a live OmniRoute using `docs/openapi.yaml` — surfaces spec violations / unhandled 500s (Fase 8 B.4) | **Advisory** |
 | `nightly-mutation`     | Stryker mutation-testing score over the fast unit lane — surviving mutants surface weak asserts                                                     | **Advisory** |
 | `nightly-compat`       | Node engine compatibility matrix across the supported `engines.node` ranges                                                                         | **Advisory** |
@@ -511,7 +511,7 @@ decomposition into a growth allowance for whoever edits the file next.
 |          |                                                                                                        |
 | -------- | ------------------------------------------------------------------------------------------------------ |
 | Runs on  | `schedule` (3×/day) + `workflow_dispatch` — deliberately **not** `push`                                |
-| Measures | the highest `release/vX.Y.Z`, same resolution + injection guard as `release-green`                     |
+| Measures | the highest `release/vX.Y.Z`, same resolution as `release-green`                                       |
 | Writes   | `check:file-size --update` and `check:complexity-ratchets --update` (both shrink-only by construction) |
 | Verifies | `npm run check:ratchet-bank` (`scripts/quality/verify-ratchet-bank.mjs`)                               |
 | Ships    | one always-current PR against the release branch — force-updated, never spammed                        |

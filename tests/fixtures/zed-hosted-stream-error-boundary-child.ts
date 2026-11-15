@@ -274,7 +274,6 @@ test("zed-hosted partial failure reaches stream finalization and persistence as 
     providerResponse: readiness.response,
     transformStream,
     streamController,
-    createPiiTransform: null,
     clientRawRequestHeaders: null,
     clientResponseFormat: FORMATS.OPENAI,
     echoModel: null,

@@ -74,7 +74,10 @@ const {
 // Removing the MCP server drops OMNIROUTE_MCP_ENFORCE_SCOPES and
 // OMNIROUTE_MCP_COMPRESS_DESCRIPTIONS (-2): 114.
 // Removing the Batch API drops BATCH_AND_FILE_AUTO_CLEANUP_ENABLED (-1): 113.
-const EXPECTED_FEATURE_FLAG_COUNT = 113;
+// Removing the PII masker and the prompt-injection guard drops INPUT_SANITIZER_ENABLED,
+// INJECTION_GUARD_MODE, PII_REDACTION_ENABLED, PII_RESPONSE_SANITIZATION and
+// PII_RESPONSE_SANITIZATION_MODE (-5): 108.
+const EXPECTED_FEATURE_FLAG_COUNT = 108;
 // tool_call wrapper repair, default on) to 86; OPENCODE_V2_CLIENT_FINGERPRINT_ENABLED
 // (#16571, OpenCode v2 client fingerprint, default off) to 87.
 // tool_call wrapper repair, default on) to 86; CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED
@@ -498,7 +501,7 @@ describe("featureFlags DB module", () => {
 
   it("clearAllFeatureFlagOverrides removes all overrides", () => {
     setFeatureFlagOverride("REQUIRE_API_KEY", "true");
-    setFeatureFlagOverride("INPUT_SANITIZER_ENABLED", "true");
+    setFeatureFlagOverride("REQUIRE_API_KEY", "true");
     clearAllFeatureFlagOverrides();
     assert.deepStrictEqual(getFeatureFlagOverrides(), {});
   });
@@ -711,10 +714,10 @@ describe("featureFlagUpdateSchema validation", () => {
     assert.ok(!knownKeys.has("UNKNOWN_FLAG_XYZ"), "UNKNOWN_FLAG_XYZ should not be a known key");
   });
 
-  it("validates that INJECTION_GUARD_MODE has known enum values", () => {
-    const def = FEATURE_FLAG_DEFINITIONS.find((d) => d.key === "INJECTION_GUARD_MODE");
-    assert.ok(def, "INJECTION_GUARD_MODE should exist");
-    assert.deepStrictEqual(def.enumValues, ["off", "warn", "block", "redact"]);
+  it("validates that TOOL_POLICY_MODE has known enum values", () => {
+    const def = FEATURE_FLAG_DEFINITIONS.find((d) => d.key === "TOOL_POLICY_MODE");
+    assert.ok(def, "TOOL_POLICY_MODE should exist");
+    assert.deepStrictEqual(def.enumValues, ["disabled", "warn", "block"]);
   });
 
   it("validates that TOOL_POLICY_MODE has known enum values", () => {
@@ -732,7 +735,7 @@ describe("featureFlagUpdateSchema validation", () => {
 
   it("setFeatureFlagOverride throws for invalid enum value", () => {
     assert.throws(
-      () => setFeatureFlagOverride("INJECTION_GUARD_MODE", "invalid_mode"),
+      () => setFeatureFlagOverride("TOOL_POLICY_MODE", "invalid_mode"),
       /Invalid value/
     );
   });

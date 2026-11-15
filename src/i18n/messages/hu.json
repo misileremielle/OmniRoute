@@ -1496,7 +1496,6 @@
     "showing": "{count}/{total} esemény megjelenítése",
     "policyViolation": "Szabályzat megsértése",
     "accessDenied": "Hozzáférés megtagadva",
-    "injectionBlocked": "Befecskendezés blokkolva",
     "noEvents": "Nem rögzítettek megfelelőségi eseményeket.",
     "failedFetch": "Nem sikerült lekérni a megfelelőségi ellenőrzési naplót.",
     "viewDetails": "Részletek megtekintése",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Hátralévő helyreállító kódok: {count}",
     "mfaDisableDesc": "A kétlépcsős azonosítás kikapcsolásához adja meg a jelszavát és egy aktuális kódot (vagy egy helyreállító kódot).",
     "mfaRecoveryHint": "Elveszett eszköz helyreállítása: indítsa a szervert OMNIROUTE_DISABLE_MFA=true beállítással, és jelentkezzen be magáról a gazdagépről.",
-    "mfaRecoverySwitchActive": "Az OMNIROUTE_DISABLE_MFA be van állítva: az erről a gazdagépről történő bejelentkezések kihagyják a második lépést. Törölje, miután újra hozzáfér.",
-    "piiMasking": {
-      "title": "Személyes adatok maszkolása",
-      "description": "Válassza ki, mely személyesadat-típusokat maszkolja a rendszer, és adjon hozzá saját mintákat. A maszkolás kikapcsolva marad, amíg be nem kapcsolja az alább látható funkciójelzőket.",
-      "requestFlag": "Kérések maszkolása",
-      "responseFlag": "Válaszok tisztítása",
-      "templates": "Sablonok",
-      "template": {
-        "minimal": "Minimális",
-        "standard": "Alapértelmezett",
-        "financial": "Pénzügyi",
-        "brazilian": "Brazil",
-        "usa": "USA",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Dél-Afrika)",
-        "full": "Teljes"
-      },
-      "builtinTypes": "Beépített típusok",
-      "types": {
-        "email": "E-mail-címek",
-        "phone_us": "Egyesült államokbeli telefonszámok",
-        "phone_br": "Brazil telefonszámok",
-        "ssn": "Egyesült államokbeli társadalombiztosítási számok",
-        "credit_card": "Bankkártyaszámok",
-        "cpf": "CPF (brazil adóazonosító)",
-        "cnpj": "CNPJ (brazil cégazonosító)",
-        "ip_address": "IPv4-címek",
-        "ipv6_address": "IPv6-címek",
-        "aws_key": "AWS hozzáférési kulcsok",
-        "api_key_generic": "API-kulcsok és tokenek",
-        "iban": "IBAN bankszámlaszámok",
-        "eu_vat": "EU VAT számok",
-        "es_dni_nie": "spanyol DNI / NIE",
-        "it_codice_fiscale": "Olasz Codice Fiscale",
-        "pl_pesel": "lengyel PESEL",
-        "nl_bsn": "holland BSN",
-        "de_steuer_id": "Német Steuer-ID",
-        "se_personnummer": "svéd személyi szám",
-        "za_id": "Dél-afrikai ID számok",
-        "za_phone": "Dél-afrikai telefonszámok",
-        "za_vat": "Dél-afrikai VAT számok",
-        "za_tax_ref": "Dél-afrikai adóhivatkozások"
-      },
-      "customPatterns": "Egyéni minták",
-      "customPatternsDesc": "A találatokat a rendszer [CUSTOM_REDACTED] értékre cseréli. Legfeljebb {max} minta. A katasztrofális visszalépés kockázatával járó mintákat elutasítja.",
-      "typeRegex": "Reguláris kifejezés",
-      "typeWildcard": "Helyettesítő karakter (* és ?)",
-      "pattern": "Minta",
-      "flags": "Jelzők (i, m, s, u)",
-      "sampleText": "Mintaszöveg a minta teszteléséhez",
-      "test": "Tesztelés",
-      "testMatches": "Találatok: {count}",
-      "testFailed": "Minta elutasítva: {message}",
-      "add": "Minta hozzáadása",
-      "saved": "Mentve",
-      "saveFailed": "A mentés nem sikerült: {message}",
-      "statsTitle": "Észlelések az újraindítás óta",
-      "statsEmpty": "Még nincs észlelés.",
-      "statsRequest": "Kérések"
-    }
+    "mfaRecoverySwitchActive": "Az OMNIROUTE_DISABLE_MFA be van állítva: az erről a gazdagépről történő bejelentkezések kihagyják a második lépést. Törölje, miután újra hozzáfér."
   },
   "contextRtk": {
     "title": "RTK-motor",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "API-kulcs megkövetelése minden bejövő kéréshez."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Bemenet-tisztítás engedélyezése minden kéréshez."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Állítsa be a prompt-injection védelmi módot."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Személyazonosításra alkalmas adatok kitakarása a kérésekből."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Személyazonosításra alkalmas adatok tisztítása a szolgáltatói válaszokban."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Válassza ki a válaszban szereplő PII kezelésének módját: a redact helyettesíti, a warn csak naplózza, a block elutasítja a választ, az off pedig kikapcsolja a tisztítást."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "A privát vagy belső IP-tartományokba irányuló kimenő kérések blokkolása."

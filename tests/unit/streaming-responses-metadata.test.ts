@@ -6,11 +6,8 @@ import test from "node:test";
 
 const isolated = fs.mkdtempSync(path.join(os.tmpdir(), "responses-metadata-"));
 process.env.DATA_DIR = isolated;
-process.env.PII_RESPONSE_SANITIZATION = "true";
-process.env.PII_RESPONSE_SANITIZATION_MODE = "redact";
 const { createCredentialSseTransform } =
   await import("../../src/lib/streamingCredentialTransform.ts");
-const { createPiiSseTransform } = await import("../../src/lib/streamingPiiTransform.ts");
 const { createSseTextTransform } = await import("../../src/lib/sseTextTransform.ts");
 const { resetDbInstance } = await import("../../src/lib/db/core.ts");
 test.after(() => {
@@ -95,11 +92,7 @@ const delta = (value: string, index = 0): Event => ({
   delta: value,
 });
 
-for (const [name, factories] of [
-  ["credential", [createCredentialSseTransform]],
-  ["PII", [createPiiSseTransform]],
-  ["PII + credential", [createPiiSseTransform, createCredentialSseTransform]],
-] as const) {
+for (const [name, factories] of [["credential", [createCredentialSseTransform]]] as const) {
   test(`${name}: Responses metadata never becomes text and snapshots do not replay`, async () => {
     const events: Event[] = [
       { type: "response.created", response: { ...metadata, output: [] } },
@@ -152,10 +145,7 @@ test("credential: split secrets remain masked in Responses deltas and snapshot t
   );
 });
 
-for (const [name, factory] of [
-  ["credential", createCredentialSseTransform],
-  ["PII", createPiiSseTransform],
-] as const) {
+for (const [name, factory] of [["credential", createCredentialSseTransform]] as const) {
   for (const ending of ["done", "eof", "completed"] as const) {
     test(`${name}: interleaved output indexes drain separately at ${ending}`, async () => {
       const events = [delta("first 🦜", 0), delta("second 🌞", 1), delta(" tail", 0)];
@@ -385,24 +375,6 @@ for (const terminal of [
     assert.equal(text(out.slice(terminalIndex + 1)), "");
   });
 }
-
-test("PII: split email is redacted in deltas and lifecycle snapshots", async () => {
-  const out = await run(
-    [createPiiSseTransform()],
-    [
-      delta("contact alice@"),
-      delta("example.com end"),
-      { type: "response.output_text.done", output_index: 0, text: "contact alice@example.com end" },
-      {
-        type: "response.output_item.done",
-        output_index: 0,
-        item: message("contact alice@example.com end"),
-      },
-    ]
-  );
-  assert.ok(!JSON.stringify(out).includes("alice@example.com"));
-  assert.match(text(out), /REDACTED/);
-});
 
 test("credential: Responses lane budget still fails closed", async () => {
   await assert.rejects(

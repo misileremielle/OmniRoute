@@ -76,7 +76,6 @@ test("persistAttemptLogs redacts request.failed delivery/replay but keeps its in
       // so importing the real pipeline cannot start an npm registry refresh.
       GITHUB_COPILOT_CLI_VERSION: "1.0.91",
       CODEX_CLIENT_VERSION: DEFAULT_CODEX_CLIENT_VERSION,
-      PII_RESPONSE_SANITIZATION: "false",
       OMNIROUTE_ENABLE_LIVE_WS: "0",
     });
 

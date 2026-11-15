@@ -10,7 +10,7 @@ export type { CredentialPattern } from "@omniroute/open-sse/utils/credentialPatt
  * from the upstream payload (message content, tool-call arguments, tool results)
  * AND the provider response, so secrets are not leaked to providers or clients.
  *
- * Opt-in: enabled when CREDENTIAL_REDACTION_ENABLED=true (mirrors PII_REDACTION_ENABLED).
+ * Opt-in: enabled when CREDENTIAL_REDACTION_ENABLED=true (off by default).
  * Patterns are provider-specific + conservative to avoid false positives.
  * Future: per-pipeline / per-provider scoping via GuardrailContext.
  */
@@ -132,8 +132,7 @@ function redactResponse(
 }
 export class CredentialMaskerGuardrail extends BaseGuardrail {
   constructor(options: { enabled?: boolean; priority?: number } = {}) {
-    // Below the PII masker (10): its broad phone/card rules rewrite the digit middle of a
-    // token and leave the prefix and tail in clear. Above the media bridges (5-7).
+    // Above the media bridges (5-7).
     super("credential-masker", { enabled: options.enabled, priority: options.priority ?? 9 });
   }
 

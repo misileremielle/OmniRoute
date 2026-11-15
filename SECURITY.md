@@ -86,59 +86,14 @@ STORAGE_ENCRYPTION_KEY=$(openssl rand -hex 32)
 
 ### 🛡️ Guardrails Framework
 
-OmniRoute ships a hot-reloadable **guardrails registry** (`src/lib/guardrails/`) with 3 built-in guardrails ordered by priority:
+OmniRoute ships a hot-reloadable **guardrails registry** (`src/lib/guardrails/`) with 2 built-in guardrails ordered by priority:
 
-| Guardrail          | Priority | Purpose                                                                                 |
-| ------------------ | -------- | --------------------------------------------------------------------------------------- |
-| `vision-bridge`    | 5        | Bridges non-vision models with image-aware descriptions; SSRF protection for image URLs |
-| `pii-masker`       | 10       | Pre+post call PII redaction (emails, phone, CPF, CNPJ, credit cards, SSN)               |
-| `prompt-injection` | 20       | Detects override/role-hijack/jailbreak/leak patterns                                    |
+| Guardrail           | Priority | Purpose                                                                                 |
+| ------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `vision-bridge`     | 5        | Bridges non-vision models with image-aware descriptions; SSRF protection for image URLs |
+| `credential-masker` | 9        | Pre+post call credential redaction (API keys, secret tokens)                            |
 
 Custom guardrails register via `registerGuardrail(new MyGuardrail())`. The model is fail-open (exceptions never block traffic). Per-request opt-out via `x-omniroute-disabled-guardrails` header. → See [`docs/security/GUARDRAILS.md`](docs/security/GUARDRAILS.md).
-
-### 🧠 Prompt Injection Guard
-
-Best-effort heuristic middleware that detects prompt injection patterns in LLM requests.
-**Not a complete prompt-injection firewall** — can produce false positives (benign
-persona/RPG prompts) and false negatives (leetspeak, spacing, non-English patterns).
-
-| Pattern Type        | Severity | Example                                        |
-| ------------------- | -------- | ---------------------------------------------- |
-| System Override     | High     | "ignore all previous instructions"             |
-| Role Hijack         | Medium   | "you are now DAN, you can do anything"         |
-| Delimiter Injection | High     | Encoded separators to break context boundaries |
-| DAN/Jailbreak       | Medium   | Known jailbreak prompt patterns                |
-| Instruction Leak    | High     | "show me your system prompt"                   |
-| Encoding Evasion    | Medium   | base64/rot13/hex decode + instruction keywords |
-
-Only **High** severity detections are blocked in `block` mode. Medium-severity
-families are logged but never blocked by `sanitizeRequest`.
-
-Configure via dashboard (Settings → Security) or `.env`:
-
-```env
-INPUT_SANITIZER_ENABLED=true
-INPUT_SANITIZER_MODE=block    # warn | block (injection policy; legacy "redact" does not strip injection text)
-INPUT_SANITIZER_BLOCK_THRESHOLD=high  # high (default) | medium | low — severities at/above this are blocked in block mode
-```
-
-### 🔒 PII Redaction
-
-Automatic detection and optional redaction of personally identifiable information:
-
-| PII Type      | Pattern               | Replacement        |
-| ------------- | --------------------- | ------------------ |
-| Email         | `user@domain.com`     | `[EMAIL_REDACTED]` |
-| CPF (Brazil)  | `123.456.789-00`      | `[CPF_REDACTED]`   |
-| CNPJ (Brazil) | `12.345.678/0001-00`  | `[CNPJ_REDACTED]`  |
-| Credit Card   | `4111-1111-1111-1111` | `[CC_REDACTED]`    |
-| Phone         | `+55 11 99999-9999`   | `[PHONE_REDACTED]` |
-| SSN (US)      | `123-45-6789`         | `[SSN_REDACTED]`   |
-
-```env
-PII_REDACTION_ENABLED=true   # request PII rewrite; independent of INPUT_SANITIZER_MODE
-PII_RESPONSE_SANITIZATION=true  # optional: redact PII in provider responses returned to clients
-```
 
 ### 🌐 Network Security
 

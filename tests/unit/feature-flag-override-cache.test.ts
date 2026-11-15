@@ -20,7 +20,7 @@ const {
   clearFeatureFlagOverrideCache,
 } = await import("../../src/lib/db/featureFlags.ts");
 
-const FLAG = "PII_RESPONSE_SANITIZATION";
+const FLAG = "REQUIRE_API_KEY";
 const NAMESPACE = "feature_flags";
 
 function writeRaw(value: string) {

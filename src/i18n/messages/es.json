@@ -1496,7 +1496,6 @@
     "showing": "Mostrando {count} de {total} eventos",
     "policyViolation": "Violación de política",
     "accessDenied": "Acceso denegado",
-    "injectionBlocked": "Inyección bloqueada",
     "noEvents": "No se registraron eventos de cumplimiento.",
     "failedFetch": "No se pudo recuperar el registro de auditoría de cumplimiento.",
     "viewDetails": "Ver detalles",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Códigos de recuperación restantes: {count}",
     "mfaDisableDesc": "Introduce tu contraseña y un código actual (o un código de recuperación) para desactivar la autenticación de dos factores.",
     "mfaRecoveryHint": "Recuperación por dispositivo perdido: inicia el servidor con OMNIROUTE_DISABLE_MFA=true e inicia sesión desde el propio host.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA está definido: los inicios de sesión desde este host omiten el segundo factor. Quítalo cuando recuperes el acceso.",
-    "piiMasking": {
-      "title": "Enmascaramiento de PII",
-      "description": "Elige qué tipos de datos personales se enmascaran y añade tus propios patrones. El enmascaramiento permanece desactivado hasta que actives las feature flags que se muestran abajo.",
-      "requestFlag": "Enmascaramiento de solicitudes",
-      "responseFlag": "Saneamiento de respuestas",
-      "templates": "Plantillas",
-      "template": {
-        "minimal": "Mínima",
-        "standard": "Estándar",
-        "financial": "Financiera",
-        "brazilian": "Brasileña",
-        "usa": "EE. UU.",
-        "gdpr": "RGPD (UE)",
-        "popia": "POPIA (Sudáfrica)",
-        "full": "Completa"
-      },
-      "builtinTypes": "Tipos integrados",
-      "types": {
-        "email": "Direcciones de correo electrónico",
-        "phone_us": "Teléfonos de EE. UU.",
-        "phone_br": "Teléfonos brasileños",
-        "ssn": "Números de Seguro Social de EE. UU.",
-        "credit_card": "Números de tarjeta de crédito",
-        "cpf": "CPF (identificación fiscal brasileña)",
-        "cnpj": "CNPJ (identificación de empresa brasileña)",
-        "ip_address": "Direcciones IPv4",
-        "ipv6_address": "Direcciones IPv6",
-        "aws_key": "Claves de acceso de AWS",
-        "api_key_generic": "Claves de API y tokens",
-        "iban": "Números de cuenta bancaria IBAN",
-        "eu_vat": "Números de IVA de la UE",
-        "es_dni_nie": "DNI / NIE español",
-        "it_codice_fiscale": "Codice Fiscale italiano",
-        "pl_pesel": "PESEL polaco",
-        "nl_bsn": "BSN neerlandés",
-        "de_steuer_id": "Steuer-ID alemán",
-        "se_personnummer": "Personnummer sueco",
-        "za_id": "Números de identidad sudafricanos",
-        "za_phone": "Números de teléfono sudafricanos",
-        "za_vat": "Números de IVA sudafricanos",
-        "za_tax_ref": "Referencias fiscales sudafricanas"
-      },
-      "customPatterns": "Patrones personalizados",
-      "customPatternsDesc": "Las coincidencias se reemplazan por [CUSTOM_REDACTED]. Hasta {max} patrones. Se rechazan los patrones con riesgo de backtracking catastrófico.",
-      "typeRegex": "Expresión regular",
-      "typeWildcard": "Comodín (* y ?)",
-      "pattern": "Patrón",
-      "flags": "Indicadores (i, m, s, u)",
-      "sampleText": "Texto de ejemplo para probar el patrón",
-      "test": "Probar",
-      "testMatches": "{count} coincidencias",
-      "testFailed": "Patrón rechazado: {message}",
-      "add": "Añadir patrón",
-      "saved": "Guardado",
-      "saveFailed": "No se pudo guardar: {message}",
-      "statsTitle": "Detecciones desde el reinicio",
-      "statsEmpty": "Aún no hay detecciones.",
-      "statsRequest": "Solicitudes"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA está definido: los inicios de sesión desde este host omiten el segundo factor. Quítalo cuando recuperes el acceso."
   },
   "contextRtk": {
     "title": "Motor RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Exigir una clave de API para todas las solicitudes entrantes."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Habilitar el saneamiento de entradas para todas las solicitudes."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Establecer el modo de protección contra la inyección de prompts."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Censurar la información de identificación personal de las solicitudes."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sanear la información de identificación personal en las respuestas de los proveedores."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Elige cómo se gestiona la información de identificación personal en las respuestas: censurar la reemplaza, advertir solo la registra, bloquear rechaza la respuesta y desactivado deshabilita el saneamiento."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Bloquear las solicitudes salientes a rangos de IP privados o internos."

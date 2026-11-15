@@ -3,8 +3,8 @@
  * decomposition, #3501).
  *
  * Extracted from handleChatCore's streaming success path: chain the response transforms onto the
- * provider stream — disconnect-aware pipe → PII sanitization (explicit transform or feature-flagged
- * SSE transform) → optional progress tracking (Phase 9.3) → SSE heartbeat → optional model-echo
+ * provider stream — disconnect-aware pipe → optional credential redaction → optional progress
+ * tracking (Phase 9.3) → SSE heartbeat → optional model-echo
  * (#1311). Returns the assembled `finalStream`; mutates the passed `responseHeaders` to add the
  * progress marker when progress is enabled. Behaviour is byte-identical to the previous inline
  * block, including the exact transform order and branch conditions.
@@ -19,12 +19,6 @@ import {
   createProgressTransform as defaultProgress,
   wantsProgress as defaultWantsProgress,
 } from "../../utils/progressTracker.ts";
-import { createPiiSseTransform as defaultPiiSse } from "@/lib/streamingPiiTransform";
-import { isPiiTransformEnabled, resolvePiiGate } from "@/lib/streamingPiiTransform";
-
-// Single seam to the PII stream module: streamingTail resolves the per-request gate through this
-// file instead of importing src/ itself (boundary ratchet, quality-baseline.json).
-export { resolvePiiGate };
 import {
   createCredentialSseTransform as defaultCredentialSse,
   isCredentialTransformEnabled,
@@ -50,7 +44,6 @@ export interface StreamingPipelineDeps {
   wantsProgress: typeof defaultWantsProgress;
   pipeWithDisconnect: typeof defaultPipeWithDisconnect;
   isFeatureFlagEnabled: typeof defaultFeatureFlag;
-  createPiiSseTransform: typeof defaultPiiSse;
   createCredentialSseTransform: typeof defaultCredentialSse;
   createProgressTransform: typeof defaultProgress;
   createSseHeartbeatTransform: typeof defaultHeartbeat;
@@ -62,7 +55,6 @@ const DEFAULT_DEPS: StreamingPipelineDeps = {
   wantsProgress: defaultWantsProgress,
   pipeWithDisconnect: defaultPipeWithDisconnect,
   isFeatureFlagEnabled: defaultFeatureFlag,
-  createPiiSseTransform: defaultPiiSse,
   createCredentialSseTransform: defaultCredentialSse,
   createProgressTransform: defaultProgress,
   createSseHeartbeatTransform: defaultHeartbeat,
@@ -75,17 +67,12 @@ export function assembleStreamingPipeline(
     providerResponse: Parameters<typeof defaultPipeWithDisconnect>[0];
     transformStream: Parameters<typeof defaultPipeWithDisconnect>[1];
     streamController: Parameters<typeof defaultPipeWithDisconnect>[2];
-    createPiiTransform: unknown;
     clientRawRequestHeaders: HeadersLike;
     clientResponseFormat: Parameters<typeof defaultShape>[0];
     echoModel: string | null | undefined;
     responseHeaders: Record<string, string>;
     credentialRedactionEnabled?: boolean;
     credentialDisabledGuardrails?: string[];
-    /** Names the caller asked to skip. Absent means no opt-out: when the
-     * request carries `pii-masker`, both PII insertions are skipped so the
-     * bytes pass through untouched, matching the non-streaming guardrail. */
-    piiDisabledGuardrails?: string[];
     /** See pipeWithDisconnect's own doc comment — the post-handoff "stream is
      * open but never produced real output" watchdog. Threaded from the same
      * adaptive streamReadinessPolicy.timeoutMs already computed for this
@@ -106,7 +93,7 @@ export function assembleStreamingPipeline(
   const progressEnabled = deps.wantsProgress(args.clientRawRequestHeaders);
   let finalStream;
 
-  let piiStream = deps.pipeWithDisconnect(
+  let redactedStream = deps.pipeWithDisconnect(
     args.providerResponse,
     args.transformStream,
     args.streamController,
@@ -115,25 +102,16 @@ export function assembleStreamingPipeline(
       activeTimeoutMs: args.activeTimeoutMs,
     }
   );
-  // Credential redaction runs before the PII transform, as the guardrails do: the broad phone
-  // rule would otherwise rewrite the digit middle of a token. Opt-in, gated per request by
-  // the same flag and opt-out name as the non-streaming post-call guardrail. Off or opted
-  // out enqueues no transform, so bytes pass through untouched.
+  // Credential redaction is opt-in, gated per request by the same flag and
+  // opt-out name as the non-streaming post-call guardrail. Off or opted out
+  // enqueues no transform, so bytes pass through untouched.
   if (
     isCredentialTransformEnabled({
       credentialRedactionEnabled: args.credentialRedactionEnabled ?? false,
       credentialDisabledGuardrails: args.credentialDisabledGuardrails ?? [],
     })
   ) {
-    piiStream = piiStream.pipeThrough(deps.createCredentialSseTransform());
-  }
-
-  if (isPiiTransformEnabled({ piiDisabledGuardrails: args.piiDisabledGuardrails ?? [] })) {
-    if (typeof args.createPiiTransform === "function") {
-      piiStream = piiStream.pipeThrough((args.createPiiTransform as () => TransformStream)());
-    } else if (deps.isFeatureFlagEnabled("PII_RESPONSE_SANITIZATION")) {
-      piiStream = piiStream.pipeThrough(deps.createPiiSseTransform());
-    }
+    redactedStream = redactedStream.pipeThrough(deps.createCredentialSseTransform());
   }
 
   if (progressEnabled) {
@@ -141,10 +119,10 @@ export function assembleStreamingPipeline(
       signal: args.streamController.signal,
     });
     // Chain: provider → transform → progress → client
-    finalStream = piiStream.pipeThrough(progressTransform);
+    finalStream = redactedStream.pipeThrough(progressTransform);
     args.responseHeaders[OMNIROUTE_RESPONSE_HEADERS.progress] = "enabled";
   } else {
-    finalStream = piiStream;
+    finalStream = redactedStream;
   }
   finalStream = finalStream.pipeThrough(
     deps.createSseHeartbeatTransform({

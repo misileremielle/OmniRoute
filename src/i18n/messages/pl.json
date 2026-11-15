@@ -1496,7 +1496,6 @@
     "showing": "Wyświetlanie {count} z {total} zdarzeń",
     "policyViolation": "Naruszenie zasad",
     "accessDenied": "Brak dostępu",
-    "injectionBlocked": "Zablokowano próby wstrzyknięcia (injection)",
     "noEvents": "Brak zarejestrowanych zdarzeń Compliance.",
     "failedFetch": "Nie udało się pobrać logu audytu Compliance.",
     "viewDetails": "Pokaż szczegóły",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Pozostałe kody odzyskiwania: {count}",
     "mfaDisableDesc": "Wprowadź hasło i bieżący kod (lub kod odzyskiwania), aby wyłączyć uwierzytelnianie dwuskładnikowe.",
     "mfaRecoveryHint": "Odzyskiwanie po utracie urządzenia: uruchom serwer z OMNIROUTE_DISABLE_MFA=true i zaloguj się bezpośrednio z hosta.",
-    "mfaRecoverySwitchActive": "Ustawiono OMNIROUTE_DISABLE_MFA: logowania z tego hosta pomijają drugi składnik. Usuń tę zmienną po odzyskaniu dostępu.",
-    "piiMasking": {
-      "title": "Maskowanie danych osobowych",
-      "description": "Wybierz, które rodzaje danych osobowych mają być maskowane, i dodaj własne wzorce. Maskowanie pozostaje wyłączone, dopóki nie włączysz flag funkcji pokazanych poniżej.",
-      "requestFlag": "Maskowanie żądań",
-      "responseFlag": "Oczyszczanie odpowiedzi",
-      "templates": "Szablony",
-      "template": {
-        "minimal": "Minimalny",
-        "standard": "Standardowy",
-        "financial": "Finansowy",
-        "brazilian": "Brazylijski",
-        "usa": "USA",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Afryka Południowa)",
-        "full": "Pełny"
-      },
-      "builtinTypes": "Typy wbudowane",
-      "types": {
-        "email": "Adresy e-mail",
-        "phone_us": "Numery telefonów w USA",
-        "phone_br": "Brazylijskie numery telefonów",
-        "ssn": "Numery ubezpieczenia społecznego USA",
-        "credit_card": "Numery kart kredytowych",
-        "cpf": "CPF (brazylijski numer podatnika)",
-        "cnpj": "CNPJ (brazylijski numer firmy)",
-        "ip_address": "Adresy IPv4",
-        "ipv6_address": "Adresy IPv6",
-        "aws_key": "Klucze dostępu AWS",
-        "api_key_generic": "Klucze API i tokeny",
-        "iban": "numery kont bankowych IBAN",
-        "eu_vat": "EU VAT numery",
-        "es_dni_nie": "Hiszpański DNI / NIE",
-        "it_codice_fiscale": "Włoski kodeks fiskalny",
-        "pl_pesel": "polski PESEL",
-        "nl_bsn": "holenderski BSN",
-        "de_steuer_id": "Niemiecki Steuer-ID",
-        "se_personnummer": "Szwedzki numer personalny",
-        "za_id": "Numery ID Republiki Południowej Afryki",
-        "za_phone": "Numery telefonów w Republice Południowej Afryki",
-        "za_vat": "Numery VAT Republiki Południowej Afryki",
-        "za_tax_ref": "Referencje podatkowe z Republiki Południowej Afryki"
-      },
-      "customPatterns": "Własne wzorce",
-      "customPatternsDesc": "Dopasowania są zastępowane przez [CUSTOM_REDACTED]. Maksymalnie {max} wzorców. Wzorce grożące katastrofalnym backtrackingiem są odrzucane.",
-      "typeRegex": "Wyrażenie regularne",
-      "typeWildcard": "Symbol wieloznaczny (* i ?)",
-      "pattern": "Wzorzec",
-      "flags": "Flagi (i, m, s, u)",
-      "sampleText": "Przykładowy tekst do przetestowania wzorca",
-      "test": "Testuj",
-      "testMatches": "Dopasowania: {count}",
-      "testFailed": "Wzorzec odrzucony: {message}",
-      "add": "Dodaj wzorzec",
-      "saved": "Zapisano",
-      "saveFailed": "Nie udało się zapisać: {message}",
-      "statsTitle": "Wykrycia od ponownego uruchomienia",
-      "statsEmpty": "Brak wykryć.",
-      "statsRequest": "Żądania"
-    }
+    "mfaRecoverySwitchActive": "Ustawiono OMNIROUTE_DISABLE_MFA: logowania z tego hosta pomijają drugi składnik. Usuń tę zmienną po odzyskaniu dostępu."
   },
   "contextRtk": {
     "title": "Silnik RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Wymagaj klucza API dla wszystkich żądań przychodzących."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Włącz oczyszczanie danych wejściowych dla wszystkich żądań."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Ustaw tryb ochrony przed wstrzykiwaniem poleceń (prompt injection)."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Anonimizuj dane osobowe (PII) w żądaniach."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Oczyszczaj dane osobowe (PII) w odpowiedziach dostawców."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Wybierz, jak traktowane są dane osobowe (PII) w odpowiedziach: anonimizuj zastępuje je, ostrzegaj tylko je loguje, blokuj odrzuca odpowiedź, a wyłączone wyłącza oczyszczanie."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Blokuj żądania wychodzące do prywatnych lub wewnętrznych zakresów IP."

@@ -12,8 +12,7 @@ import { finishModelCatalogWriteWithoutBackup } from "./models/modelCatalogWrite
 
 const NAMESPACE = "feature_flags";
 
-// Flag reads sit on hot paths that call them once per string leaf of a request
-// body (sanitizePII, the PII masker guardrail), so a synchronous SELECT per
+// Flag reads sit on hot request paths, so a synchronous SELECT per
 // read turned a 2 MB agentic request into a thousand SQLite round trips. The
 // cache is invalidated by every writer in this module; the short TTL only
 // covers edits made to the store from outside this process. It is keyed by the

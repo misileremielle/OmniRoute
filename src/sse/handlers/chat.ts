@@ -797,7 +797,7 @@ async function handleChatImplementation(
     ).input;
   }
 
-  // Guardrail pre-call pipeline — prompt injection, PII masking, and future custom rules.
+  // Guardrail pre-call pipeline — vision bridge, credential masking, and future custom rules.
   telemetry.startPhase("validate");
   const preCallGuardrails = await guardrailRegistry.runPreCallHooks(body, {
     apiKeyInfo: apiKeyInfo as any,

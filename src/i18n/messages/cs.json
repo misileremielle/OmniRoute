@@ -1496,7 +1496,6 @@
     "showing": "Zobrazuje se {count} z {total} událostí",
     "policyViolation": "Porušení zásad",
     "accessDenied": "Přístup odepřen",
-    "injectionBlocked": "Vstřikování zablokováno",
     "noEvents": "Nebyly zaznamenány žádné události shody.",
     "failedFetch": "Nepodařilo se načíst protokol auditu souladu.",
     "viewDetails": "Zobrazit podrobnosti",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Zbývající kódy pro obnovení: {count}",
     "mfaDisableDesc": "Zadejte heslo a aktuální kód (nebo kód pro obnovení) pro vypnutí dvoufázového ověření.",
     "mfaRecoveryHint": "Obnovení ztraceného zařízení: spusťte server s OMNIROUTE_DISABLE_MFA=true a přihlaste se přímo z hostitele.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA je nastaveno: přihlášení z tohoto hostitele přeskakují druhý faktor. Po obnovení přístupu jej zrušte.",
-    "piiMasking": {
-      "title": "Maskování osobních údajů",
-      "description": "Vyberte, které druhy osobních údajů se maskují, a přidejte vlastní vzory. Maskování zůstává vypnuté, dokud nezapnete níže zobrazené příznaky funkcí.",
-      "requestFlag": "Maskování požadavků",
-      "responseFlag": "Čištění odpovědí",
-      "templates": "Šablony",
-      "template": {
-        "minimal": "Minimální",
-        "standard": "Standardní",
-        "financial": "Finanční",
-        "brazilian": "Brazilská",
-        "usa": "USA",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Jihoafrická republika)",
-        "full": "Úplná"
-      },
-      "builtinTypes": "Vestavěné typy",
-      "types": {
-        "email": "E-mailové adresy",
-        "phone_us": "Telefonní čísla v USA",
-        "phone_br": "Brazilská telefonní čísla",
-        "ssn": "Čísla sociálního zabezpečení USA",
-        "credit_card": "Čísla platebních karet",
-        "cpf": "CPF (brazilské daňové číslo)",
-        "cnpj": "CNPJ (brazilské číslo firmy)",
-        "ip_address": "Adresy IPv4",
-        "ipv6_address": "Adresy IPv6",
-        "aws_key": "Přístupové klíče AWS",
-        "api_key_generic": "Klíče API a tokeny",
-        "iban": "čísla bankovních účtů IBAN",
-        "eu_vat": "EU VAT čísla",
-        "es_dni_nie": "Španělské DNI / NIE",
-        "it_codice_fiscale": "Italský Codice Fiscale",
-        "pl_pesel": "polská PESEL",
-        "nl_bsn": "holandská BSN",
-        "de_steuer_id": "Německý Steuer-ID",
-        "se_personnummer": "švédské personnummer",
-        "za_id": "Jihoafrická čísla ID",
-        "za_phone": "Jihoafrická telefonní čísla",
-        "za_vat": "Jihoafrická čísla VAT",
-        "za_tax_ref": "Jihoafrické daňové odkazy"
-      },
-      "customPatterns": "Vlastní vzory",
-      "customPatternsDesc": "Shody se nahrazují za [CUSTOM_REDACTED]. Nejvýše {max} vzorů. Vzory s rizikem katastrofického backtrackingu se odmítají.",
-      "typeRegex": "Regulární výraz",
-      "typeWildcard": "Zástupný znak (* a ?)",
-      "pattern": "Vzor",
-      "flags": "Příznaky (i, m, s, u)",
-      "sampleText": "Ukázkový text pro otestování vzoru",
-      "test": "Otestovat",
-      "testMatches": "Počet shod: {count}",
-      "testFailed": "Vzor odmítnut: {message}",
-      "add": "Přidat vzor",
-      "saved": "Uloženo",
-      "saveFailed": "Uložení se nezdařilo: {message}",
-      "statsTitle": "Detekce od restartu",
-      "statsEmpty": "Zatím žádné detekce.",
-      "statsRequest": "Požadavky"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA je nastaveno: přihlášení z tohoto hostitele přeskakují druhý faktor. Po obnovení přístupu jej zrušte."
   },
   "contextRtk": {
     "title": "Modul RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Vyžadovat klíč API pro všechny příchozí požadavky."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Povolit sanitizaci vstupů pro všechny požadavky."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Nastavit režim ochrany před prompt-injection."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Anonymizovat osobně identifikovatelné údaje z požadavků."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sanitizovat osobně identifikovatelné údaje v odpovědích poskytovatele."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Vyberte, jak se má nakládat s PII v odpovědích: redact je nahradí, warn je pouze zaznamená do protokolu, block odpověď odmítne a off sanitizaci zakáže."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Blokovat odchozí požadavky do soukromých nebo interních rozsahů IP adres."

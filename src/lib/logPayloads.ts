@@ -3,7 +3,6 @@ import {
   sanitizeUpstreamDetails,
 } from "@omniroute/open-sse/utils/errorSanitization.ts";
 import { projectResponsesFailureOutput } from "@omniroute/open-sse/utils/responsesFailureOutput.ts";
-import { isPiiSanitizationEnabled, sanitizePII } from "./piiSanitizer";
 
 const SENSITIVE_KEYS = new Set([
   "api_key",
@@ -504,44 +503,12 @@ export function redactPayload(payload: unknown): unknown {
   return redacted;
 }
 
-function sanitizePayloadPIIWalk(payload: unknown): unknown {
-  if (typeof payload === "string") {
-    return sanitizePII(payload).text;
-  }
-  if (!payload || typeof payload !== "object") {
-    return payload;
-  }
-  if (isOpaqueBinary(payload)) {
-    return describeOpaqueBinary(payload);
-  }
-  if (Array.isArray(payload)) {
-    return payload.map(sanitizePayloadPIIWalk);
-  }
-
-  const sanitized: JsonRecord = {};
-  for (const [key, value] of Object.entries(payload)) {
-    sanitized[key] = sanitizePayloadPIIWalk(value);
-  }
-  return sanitized;
-}
-
-export function sanitizePayloadPII(payload: unknown): unknown {
-  // Sanitization is opt-in and off by default. With it off, sanitizePII returns
-  // every string untouched, so the walk below was a full rebuild of the payload
-  // that changed nothing: on a multi-megabyte agentic request body, run several
-  // times per request by the pending-request tracker and the call log, it was
-  // the single largest CPU cost on the event loop under concurrent load.
-  if (!isPiiSanitizationEnabled()) return payload;
-  return sanitizePayloadPIIWalk(payload);
-}
-
 export function protectPayloadForLog(payload: unknown): unknown {
   if (payload === null || payload === undefined) return null;
   const normalized = normalizePayloadForLog(payload);
   const errorProjected = projectErrorSubtreesForLog(normalized).value;
   const reasoningOmitted = omitEncryptedReasoningForLog(errorProjected);
-  const piiSanitized = sanitizePayloadPII(reasoningOmitted);
-  return redactPayload(piiSanitized);
+  return redactPayload(reasoningOmitted);
 }
 
 /** Project every string leaf because the payload is known to represent a failed response. */
@@ -551,8 +518,7 @@ export function protectErrorPayloadForLog(payload: unknown): unknown {
   if (isOpaqueBinary(normalized)) return describeOpaqueBinary(normalized);
   const errorProjected = sanitizeErrorSubtreeValue(normalized);
   const reasoningOmitted = omitEncryptedReasoningForLog(errorProjected);
-  const piiSanitized = sanitizePayloadPII(reasoningOmitted);
-  return redactPayload(piiSanitized);
+  return redactPayload(reasoningOmitted);
 }
 
 export function serializePayloadForStorage(payload: unknown, maxLength = 65536): string | null {

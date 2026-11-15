@@ -40,7 +40,7 @@ import { convertJsonBodyWithinCap } from "./jsonBodyToSse.ts";
 import { mergeResponseToolNameMap } from "./passthroughToolNames.ts";
 import { wrapReadableStreamWithFinalize } from "./streamFinalize.ts";
 import { buildStreamLedgerDetails, recordStreamingCost } from "./streamingCost.ts";
-import { assembleStreamingPipeline, resolvePiiGate } from "./streamingPipeline.ts";
+import { assembleStreamingPipeline } from "./streamingPipeline.ts";
 import { scheduleStreamingQuotaShareConsumption } from "./streamingQuotaShare.ts";
 import { assembleStreamingResponseHeaders } from "./streamingResponseHeaders.ts";
 import { storeStreamingSemanticCacheResponse } from "./streamingSemanticCacheStore.ts";
@@ -100,7 +100,6 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     contextEditingEnabled,
     copilotCompatibleReasoning,
     correlationId,
-    createPiiTransform,
     credentials,
     currentModel,
     customToolNames,
@@ -791,28 +790,16 @@ export async function runStreamingTail(deps: StreamingTailDeps) {
     body: deps.body,
     headers: deps.clientRawRequest?.headers,
   });
-  // Per-request PII opt-out: same names as the non-streaming guardrail.
-  // Only data keys chatCore.ts already passes (apiKeyInfo, body,
-  // clientRawRequest) are read here; the reader defaults to the production
-  // module inside resolvePiiGate, and unit tests inject fakes by calling
-  // that helper directly.
-  const piiGate = await resolvePiiGate({
-    apiKeyInfo: deps.apiKeyInfo,
-    body: deps.body,
-    headers: deps.clientRawRequest?.headers,
-  });
   const finalStream = assembleStreamingPipeline({
     providerResponse,
     transformStream,
     streamController,
-    createPiiTransform,
     clientRawRequestHeaders: clientRawRequest?.headers,
     clientResponseFormat,
     echoModel: echoModel || (currentModel !== effectiveModel ? responseModel : null),
     responseHeaders,
     credentialRedactionEnabled: credentialGate.credentialRedactionEnabled,
     credentialDisabledGuardrails: credentialGate.credentialDisabledGuardrails,
-    piiDisabledGuardrails: piiGate.piiDisabledGuardrails,
     // Same adaptive budget the pre-handoff readiness gate above just used —
     // reasoning models that legitimately take a while to say anything keep
     // that same patience for their first REAL content, not just their first

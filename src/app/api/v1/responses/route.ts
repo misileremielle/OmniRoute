@@ -2,8 +2,6 @@ import { z } from "zod";
 import { handleChat } from "@/sse/handlers/chat";
 import { maybeQueueQuotaSessionRecovery } from "@/lib/quota/quotaSessionRecovery";
 import { logAdmissionRejection } from "@/sse/handlers/admissionRejectionLog";
-import { CORS_HEADERS } from "@/shared/utils/cors";
-import { createInjectionGuard } from "@/middleware/promptInjectionGuard";
 import { resolveResponsesApiModel } from "@/app/api/internal/codex-responses-ws/modelResolution";
 import { getModelInfo, getComboForModel } from "@/sse/services/model";
 import { generateRequestId } from "@/shared/utils/requestId";
@@ -43,10 +41,6 @@ import {
 // certain Node APIs used by the translator bootstrap are not available.
 // The translators are always initialized via the open-sse side (chatCore),
 // so /v1/responses just delegates to handleChat which handles everything.
-
-// `logger: null` — the guardrail registry re-evaluates this request inside
-// handleChat with the pino logger (#11936 dedupe).
-const injectionGuard = createInjectionGuard({ logger: null });
 
 export async function OPTIONS() {
   return new Response(null, {
@@ -181,44 +175,6 @@ async function postHandler(request: any) {
       return finishAdmission(structuralAdmission.response);
     }
     admission.lease = structuralAdmission.lease;
-
-    let guardResult;
-    try {
-      guardResult = injectionGuard(parsedBody);
-    } catch (error) {
-      console.error("[SECURITY] Injection guard error:", error);
-      return finishAdmission(
-        new Response(JSON.stringify({ error: "Security check failed" }), {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        })
-      );
-    }
-
-    const { blocked, result } = guardResult;
-    if (blocked) {
-      return finishAdmission(
-        new Response(
-          JSON.stringify({
-            error: {
-              message: "Request blocked: potential prompt injection detected",
-              type: "injection_detected",
-              code: "SECURITY_001",
-              detections: result.detections.length,
-            },
-          }),
-          { status: 400, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
-        )
-      );
-    }
-    if (result.flagged) {
-      try {
-        request.headers.set("X-Injection-Flagged", "true");
-        request.headers.set("X-Injection-Detections", String(result.detections.length));
-      } catch {
-        // Detection already ran; metadata propagation is best-effort.
-      }
-    }
 
     // Codex CLI (wire_api="responses") consumes this endpoint over SSE and its reqwest
     // client drops the connection if no bytes arrive within ~5s. Keep the connection

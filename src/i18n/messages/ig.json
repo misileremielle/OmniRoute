@@ -1496,7 +1496,6 @@
     "showing": "Na-egosi ihe omume {count} n'ime {total}",
     "policyViolation": "Mmebi Amụma",
     "accessDenied": "Ajụrụ Nnweta",
-    "injectionBlocked": "Egbochiri Ntinye",
     "noEvents": "Ọ dịghị ihe omume nrubeisi e dekọrọ.",
     "failedFetch": "Enweghị ike iweta ndekọ nyocha nrubeisi.",
     "viewDetails": "Lelee nkọwa",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Koodu mgbake fọdụrụ: {count}",
     "mfaDisableDesc": "Tinye okwuntughe gị na koodu dị ugbu a (ma ọ bụ koodu mgbake) iji gbanyụọ nkwenye nzọụkwụ abụọ.",
     "mfaRecoveryHint": "Mgbake ngwaọrụ furu efu: malite sava ahụ na OMNIROUTE_DISABLE_MFA=true wee banye site na onye nnabata n'onwe ya.",
-    "mfaRecoverySwitchActive": "Edobere OMNIROUTE_DISABLE_MFA: mbanye site na onye nnabata a na-awụfe nzọụkwụ nke abụọ. Wepụ ya ozugbo ị laghachiri.",
-    "piiMasking": {
-      "title": "Nzuzo data onwe",
-      "description": "Họrọ ụdị data onwe a ga-ezo ma tinye usoro nke gị. Nzuzo na-anọgide na-agbanyụ ruo mgbe ị gbanwụrụ ọkọlọtọ atụmatụ e gosiri n'okpuru.",
-      "requestFlag": "Nzuzo arịrịọ",
-      "responseFlag": "Ihicha nzaghachi",
-      "templates": "Ndebiri",
-      "template": {
-        "minimal": "Obere",
-        "standard": "Ọkọlọtọ",
-        "financial": "Ego",
-        "brazilian": "Brazil",
-        "usa": "Amerịka",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (South Africa)",
-        "full": "Zuru oke"
-      },
-      "builtinTypes": "Ụdị arụnyere",
-      "types": {
-        "email": "Adreesị email",
-        "phone_us": "Nọmba ekwentị Amerịka",
-        "phone_br": "Nọmba ekwentị Brazil",
-        "ssn": "Nọmba Nchekwa Ọha Amerịka",
-        "credit_card": "Nọmba kaadị kredit",
-        "cpf": "CPF (ID onye na-akwụ ụtụ isi na Brazil)",
-        "cnpj": "CNPJ (ID ụlọ ọrụ na Brazil)",
-        "ip_address": "Adreesị IPv4",
-        "ipv6_address": "Adreesị IPv6",
-        "aws_key": "Igodo nnweta AWS",
-        "api_key_generic": "Igodo API na tokin",
-        "iban": "IBAN nọmba akaụntụ akụ",
-        "eu_vat": "VAT EU",
-        "es_dni_nie": "Spanish DNI / NIE",
-        "it_codice_fiscale": "Ịtali Codece Fiscale",
-        "pl_pesel": "Polish PESEL",
-        "nl_bsn": "Dutch BSN",
-        "de_steuer_id": "German Steuer-ID",
-        "se_personnummer": "Onye ọrụ Swedish",
-        "za_id": "South African ID nọmba",
-        "za_phone": "Nọmba ekwentị South Africa",
-        "za_vat": "South African VAT nọmba",
-        "za_tax_ref": "Ntuziaka ụtụ isi South Africa"
-      },
-      "customPatterns": "Usoro ahaziri",
-      "customPatternsDesc": "A na-eji [CUSTOM_REDACTED] dochie ihe dabara. Ruo usoro {max}. A na-ajụ usoro nwere ihe ize ndụ nke ịlaghachi azụ ọdachi.",
-      "typeRegex": "Okwu usoro oge niile",
-      "typeWildcard": "Mkpụrụedemede nnọchi (* na ?)",
-      "pattern": "Usoro",
-      "flags": "Ọkọlọtọ (i, m, s, u)",
-      "sampleText": "Ederede atụ iji nwalee usoro",
-      "test": "Nwalee",
-      "testMatches": "Ndakọrịta: {count}",
-      "testFailed": "Ajụrụ usoro: {message}",
-      "add": "Tinye usoro",
-      "saved": "Echekwara",
-      "saveFailed": "Enweghị ike ichekwa: {message}",
-      "statsTitle": "Nchọpụta kemgbe mmalitegharị",
-      "statsEmpty": "Enweghị nchọpụta ka ọ dị ugbu a.",
-      "statsRequest": "Arịrịọ"
-    }
+    "mfaRecoverySwitchActive": "Edobere OMNIROUTE_DISABLE_MFA: mbanye site na onye nnabata a na-awụfe nzọụkwụ nke abụọ. Wepụ ya ozugbo ị laghachiri."
   },
   "contextRtk": {
     "title": "Injin RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Mee ka igodo API bụrụ ihe achọrọ maka arịrịọ niile na-abata."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Kwado nhicha ntinye maka arịrịọ niile."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Tọọ ọnọdụ nchedo megide prompt-injection."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Zoo ozi na-achọpụta mmadụ n’arịrịọ."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Hichaa ozi na-achọpụta mmadụ na nzaghachi ndị provider."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Họrọ otu a ga-esi jikwaa PII dị na nzaghachi: redact na-eji ihe ọzọ dochie ya, warn na-edekọ ya naanị, block na-ajụ nzaghachi ahụ, ebe off na-akwụsị nhicha."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Gbochie arịrịọ na-apụ apụ ịga na mpaghara IP nkeonwe ma ọ bụ nke ime."

@@ -96,10 +96,9 @@ test("embeddings routes never reach the guardrail registry", () => {
     assert.ok(!/sse\/handlers\/chat["']/.test(source), `${route} imports the chat handler`);
     assert.ok(!/lib\/guardrails/.test(source), `${route} imports the guardrail registry`);
   }
-  // The only injection check those routes get is the legacy middleware facade (prompt
-  // injection only; see the disable-channel characterization in the behavioral file).
+  // Embeddings routes reach neither the guardrail registry nor any injection middleware.
   for (const route of ["src/app/api/v1/embeddings/route.ts"]) {
-    assert.ok(/(?:withInjectionGuard|createInjectionGuard)\(/.test(read(route)), route);
+    assert.doesNotMatch(read(route), /(?:withInjectionGuard|createInjectionGuard)/, route);
   }
 });
 

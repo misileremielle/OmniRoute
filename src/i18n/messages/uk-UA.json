@@ -1496,7 +1496,6 @@
     "showing": "Показано {count} з {total} подій",
     "policyViolation": "Порушення політики",
     "accessDenied": "Доступ заборонено",
-    "injectionBlocked": "Ін'єкція заблокована",
     "noEvents": "Подій відповідності не зареєстровано.",
     "failedFetch": "Не вдалося отримати журнал аудиту відповідності.",
     "viewDetails": "Переглянути деталі",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Залишилося кодів відновлення: {count}",
     "mfaDisableDesc": "Введіть пароль і поточний код (або код відновлення), щоб вимкнути двофакторну автентифікацію.",
     "mfaRecoveryHint": "Відновлення в разі втрати пристрою: запустіть сервер з OMNIROUTE_DISABLE_MFA=true і увійдіть безпосередньо з хоста.",
-    "mfaRecoverySwitchActive": "Задано OMNIROUTE_DISABLE_MFA: вхід із цього хоста пропускає другий фактор. Видаліть змінну після відновлення доступу.",
-    "piiMasking": {
-      "title": "Маскування ПД",
-      "description": "Виберіть, які типи персональних даних маскувати, і додайте власні шаблони. Маскування вимкнене, доки ви не ввімкнете прапорці функцій, показані нижче.",
-      "requestFlag": "Маскування запитів",
-      "responseFlag": "Очищення відповідей",
-      "templates": "Шаблони",
-      "template": {
-        "minimal": "Мінімальний",
-        "standard": "Стандартний",
-        "financial": "Фінансовий",
-        "brazilian": "Бразильський",
-        "usa": "США",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Південна Африка)",
-        "full": "Повний"
-      },
-      "builtinTypes": "Вбудовані типи",
-      "types": {
-        "email": "Адреси електронної пошти",
-        "phone_us": "Телефонні номери США",
-        "phone_br": "Бразильські телефонні номери",
-        "ssn": "Номери соціального страхування США",
-        "credit_card": "Номери банківських карток",
-        "cpf": "CPF (податковий номер фізособи в Бразилії)",
-        "cnpj": "CNPJ (номер компанії в Бразилії)",
-        "ip_address": "IPv4-адреси",
-        "ipv6_address": "IPv6-адреси",
-        "aws_key": "Ключі доступу AWS",
-        "api_key_generic": "API-ключі та токени",
-        "iban": "IBAN номери банківських рахунків",
-        "eu_vat": "EU VAT числа",
-        "es_dni_nie": "Іспанська DNI / NIE",
-        "it_codice_fiscale": "Італійський Codice Fiscale",
-        "pl_pesel": "Польська PESEL",
-        "nl_bsn": "голландська BSN",
-        "de_steuer_id": "Німецький Steuer-ID",
-        "se_personnummer": "Шведський personnummer",
-        "za_id": "Південноафриканські номери ID",
-        "za_phone": "Номери телефонів Південної Африки",
-        "za_vat": "Південноафриканські номери VAT",
-        "za_tax_ref": "Податкові довідки Південної Африки"
-      },
-      "customPatterns": "Власні шаблони",
-      "customPatternsDesc": "Збіги замінюються на [CUSTOM_REDACTED]. До {max} шаблонів. Шаблони з ризиком катастрофічного бектрекінгу відхиляються.",
-      "typeRegex": "Регулярний вираз",
-      "typeWildcard": "Символ підстановки (* і ?)",
-      "pattern": "Шаблон",
-      "flags": "Прапорці (i, m, s, u)",
-      "sampleText": "Приклад тексту для перевірки шаблону",
-      "test": "Перевірити",
-      "testMatches": "Збігів: {count}",
-      "testFailed": "Шаблон відхилено: {message}",
-      "add": "Додати шаблон",
-      "saved": "Збережено",
-      "saveFailed": "Не вдалося зберегти: {message}",
-      "statsTitle": "Виявлення від перезапуску",
-      "statsEmpty": "Виявлень поки немає.",
-      "statsRequest": "Запити"
-    }
+    "mfaRecoverySwitchActive": "Задано OMNIROUTE_DISABLE_MFA: вхід із цього хоста пропускає другий фактор. Видаліть змінну після відновлення доступу."
   },
   "contextRtk": {
     "title": "Двигун RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Вимагати ключ API для всіх вхідних запитів."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Увімкнути очищення вхідних даних для всіх запитів."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Встановити режим захисту від prompt-ін'єкцій."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Маскувати персональні дані в запитах."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Очищати персональні дані у відповідях провайдера."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Виберіть спосіб обробки персональних даних у відповідях: redact замінює їх, warn лише записує в журнал, block відхиляє відповідь, а off вимикає очищення."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Блокувати вихідні запити до приватних або внутрішніх діапазонів IP-адрес."

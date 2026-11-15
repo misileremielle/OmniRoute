@@ -14,12 +14,8 @@ import { cleanupTempDataDir } from "../_setup/tempDataDir.ts";
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-test-claude-stream-"));
 const savedEnv = {
   DATA_DIR: process.env.DATA_DIR,
-  PII_RESPONSE_SANITIZATION: process.env.PII_RESPONSE_SANITIZATION,
-  PII_TEST_BYPASS_MIN_WINDOW: process.env.PII_TEST_BYPASS_MIN_WINDOW,
 };
 process.env.DATA_DIR = tmpDir;
-process.env.PII_RESPONSE_SANITIZATION = "true";
-process.env.PII_TEST_BYPASS_MIN_WINDOW = "true";
 
 test.after(async () => {
   await cleanupTempDataDir(tmpDir);
@@ -31,13 +27,11 @@ test.after(async () => {
 
 const { createCredentialSseTransform } =
   await import("../../src/lib/streamingCredentialTransform.ts");
-const { createPiiSseTransform } = await import("../../src/lib/streamingPiiTransform.ts");
 
-for (const [name, make] of [
-  ["credential", () => createCredentialSseTransform()],
-  ["PII", () => createPiiSseTransform({ windowSize: 8 })],
-] as const) {
-  for (const terminal of ["EOF", "[DONE]"]) {
+for (const terminal of ["EOF", "[DONE]"]) {
+  {
+    const name = "credential";
+    const make = () => createCredentialSseTransform();
     test(`${name} transform: generic JSON array stays one payload at ${terminal}`, async () => {
       const input = ['data: [{"text":"hello"}]\n\n'];
       if (terminal === "[DONE]") input.push("data: [DONE]\n\n");
@@ -290,17 +284,6 @@ test("a block without its own content_block_stop is still drained at message_del
   );
 });
 
-test("PII transform: Claude thinking tail comes back as thinking_delta, text as text_delta", async () => {
-  const output = await runTransform(createPiiSseTransform({ windowSize: 8 }), thinkingThenText());
-  const acc = accumulate(parseFrames(output));
-  assert.equal(acc.signature.get(0), SIGNATURE);
-  assert.equal(acc.thinking.get(0), summary.join(""));
-  assert.equal(acc.text.get(1), reply.join(""));
-  assert.deepEqual(acc.wrongType, []);
-  assert.deepEqual(acc.wrongEvent, []);
-  assert.deepEqual(acc.lateDeltas, []);
-});
-
 // A `ping` right before message_delta must not hide the Claude shape from the flush: the
 // tails of blocks that never got their own content_block_stop still come back typed, each
 // on its own block, instead of one generic clone of the last content frame.
@@ -321,10 +304,9 @@ function pingBeforeMessageDelta(): string[] {
   ];
 }
 
-for (const [name, make] of [
-  ["credential", () => createCredentialSseTransform()],
-  ["PII", () => createPiiSseTransform({ windowSize: 8 })],
-] as const) {
+{
+  const name = "credential";
+  const make = () => createCredentialSseTransform();
   test(`${name} transform: ping right before message_delta still flushes typed deltas`, async () => {
     const output = await runTransform(make(), pingBeforeMessageDelta());
     const frames = parseFrames(output);
@@ -348,7 +330,7 @@ for (const [name, make] of [
 
 // Strings outside the three streamed paths never enter the rolling window, but they are not
 // exempt from redaction: they are cleaned where they sit, so a search result, a citation or
-// a pre-filled tool input cannot carry a credential or PII past the transform, and none of
+// a pre-filled tool input cannot carry a credential past the transform, and none of
 // them is spliced into the text of the block. Opaque protocol tokens stay byte-identical.
 const SECRET = "sk-proj-" + "A1b2C3d4".repeat(6);
 const EMAIL = "jane.doe@example.com";
@@ -433,7 +415,6 @@ function serverToolFrames(): string[] {
 
 for (const [name, make, needle, kept] of [
   ["credential", () => createCredentialSseTransform(), SECRET, EMAIL],
-  ["PII", () => createPiiSseTransform({ windowSize: 8 }), EMAIL, SECRET],
 ] as const) {
   test(`${name} transform: non-streamed strings of Claude frames are redacted in place`, async () => {
     const output = await runTransform(make(), serverToolFrames());

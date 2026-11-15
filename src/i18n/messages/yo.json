@@ -1496,7 +1496,6 @@
     "showing": "Ń ṣàfihàn ìṣẹ̀lẹ̀ {count} nínú {total}",
     "policyViolation": "Ìrúfin Ìlànà",
     "accessDenied": "A Kọ̀ Ìwọlé",
-    "injectionBlocked": "A Dínà Ìfisí",
     "noEvents": "Kò sí ìṣẹ̀lẹ̀ ìbámu tí a gbasilẹ.",
     "failedFetch": "Kò ṣeé ṣe láti gba àkọsílẹ̀ àyẹ̀wò ìbámu.",
     "viewDetails": "Wo àwọn àlàyé",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Àwọn koodu ìmúpadà tó kù: {count}",
     "mfaDisableDesc": "Tẹ ọ̀rọ̀ aṣínà rẹ àti koodu lọ́wọ́lọ́wọ́ (tàbí koodu ìmúpadà) láti pa ìfìdímúlẹ̀ oní-ìpele méjì.",
     "mfaRecoveryHint": "Ìmúpadà ẹ̀rọ tó sọnù: bẹ̀rẹ̀ olùpèsè pẹ̀lú OMNIROUTE_DISABLE_MFA=true kí o sì wọlé láti orí agbàlejò fúnra rẹ̀.",
-    "mfaRecoverySwitchActive": "A ti ṣètò OMNIROUTE_DISABLE_MFA: ìwọlé láti orí agbàlejò yìí ń fo ìpele kejì. Yọ ọ́ kúrò ní kété tí o bá tún wọlé.",
-    "piiMasking": {
-      "title": "Bíbo dátà ti ara ẹni",
-      "description": "Yan irú dátà ti ara ẹni tí a ó bò, kí o sì ṣàfikún àwọn àpẹẹrẹ tìrẹ. Bíbò yóò wà ní pípa títí tí o fi tan àwọn àsíá ẹ̀yà tí a fihàn ní ìsàlẹ̀.",
-      "requestFlag": "Bíbo ìbéèrè",
-      "responseFlag": "Ìmọ́tótó ìdáhùn",
-      "templates": "Àwọn àwòṣe",
-      "template": {
-        "minimal": "Kéré jù",
-        "standard": "Ìpìlẹ̀",
-        "financial": "Ti ìnáwó",
-        "brazilian": "Ti Brazil",
-        "usa": "Amẹ́ríkà",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Súúsù Áfíríkà)",
-        "full": "Kíkún"
-      },
-      "builtinTypes": "Àwọn irú tí a kọ́ sínú",
-      "types": {
-        "email": "Àwọn àdírẹ́sì ímeèlì",
-        "phone_us": "Àwọn nọ́mbà fóònù Amẹ́ríkà",
-        "phone_br": "Àwọn nọ́mbà fóònù Brazil",
-        "ssn": "Àwọn nọ́mbà Ààbò Àwùjọ Amẹ́ríkà",
-        "credit_card": "Àwọn nọ́mbà káàdì kírẹ́dítì",
-        "cpf": "CPF (ID olùsan-owó-orí Brazil)",
-        "cnpj": "CNPJ (ID ilé-iṣẹ́ Brazil)",
-        "ip_address": "Àwọn àdírẹ́sì IPv4",
-        "ipv6_address": "Àwọn àdírẹ́sì IPv6",
-        "aws_key": "Àwọn kọ́kọ́rọ́ ìwọlé AWS",
-        "api_key_generic": "Àwọn kọ́kọ́rọ́ API àti tókìnì",
-        "iban": "IBAN ifowo iroyin awọn nọmba",
-        "eu_vat": "EU VAT awọn nọmba",
-        "es_dni_nie": "Spani DNI / NIE",
-        "it_codice_fiscale": "Italian Codece Fiscale",
-        "pl_pesel": "Polish PESEL",
-        "nl_bsn": "Dutch BSN",
-        "de_steuer_id": "German Steuer-ID",
-        "se_personnummer": "Swedish personnummer",
-        "za_id": "South African ID awọn nọmba",
-        "za_phone": "Awọn nọmba foonu South Africa",
-        "za_vat": "South African VAT awọn nọmba",
-        "za_tax_ref": "South African-ori to jo"
-      },
-      "customPatterns": "Àwọn àpẹẹrẹ àdáni",
-      "customPatternsDesc": "A ó fi [CUSTOM_REDACTED] rọ́pò àwọn tí ó bá mu. Títí dé àpẹẹrẹ {max}. A ó kọ àwọn àpẹẹrẹ tí ó ní ewu ìpadàsẹ́yìn burúkú.",
-      "typeRegex": "Ìgbékalẹ̀ déédéé",
-      "typeWildcard": "Ìwé àrọ́pò (* àti ?)",
-      "pattern": "Àpẹẹrẹ",
-      "flags": "Àwọn àsíá (i, m, s, u)",
-      "sampleText": "Ọ̀rọ̀ àpẹẹrẹ láti dán àpẹẹrẹ wò",
-      "test": "Dán wò",
-      "testMatches": "Àwọn tí ó mu: {count}",
-      "testFailed": "A kọ àpẹẹrẹ náà: {message}",
-      "add": "Ṣàfikún àpẹẹrẹ",
-      "saved": "Ti fipamọ́",
-      "saveFailed": "Kò ṣeé fipamọ́: {message}",
-      "statsTitle": "Àwọn àwárí láti ìgbà àtúnbẹ̀rẹ̀",
-      "statsEmpty": "Kò sí àwárí kankan síbẹ̀.",
-      "statsRequest": "Àwọn ìbéèrè"
-    }
+    "mfaRecoverySwitchActive": "A ti ṣètò OMNIROUTE_DISABLE_MFA: ìwọlé láti orí agbàlejò yìí ń fo ìpele kejì. Yọ ọ́ kúrò ní kété tí o bá tún wọlé."
   },
   "contextRtk": {
     "title": "Ẹ́ńjìnnì RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Béèrè fún kọ́kọ́rọ́ API fún gbogbo ìbéèrè tó ń wọlé."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Mú ìwẹ̀numọ́ ohun tí a fi wọlé ṣiṣẹ́ fún gbogbo ìbéèrè."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Ṣètò ipò ààbò lódì sí prompt-injection."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Bo ìwífún tó lè dá ènìyàn mọ̀ mọ́lẹ̀ nínú àwọn ìbéèrè."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Wẹ ìwífún tó lè dá ènìyàn mọ̀ mọ́ nínú àwọn ìdáhùn olùpèsè."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Yan bí a ṣe máa bójú tó PII inú ìdáhùn: redact máa ń fi ohun mìíràn rọ́pò rẹ̀, warn máa ń ṣàkọsílẹ̀ rẹ̀ nìkan, block máa ń kọ ìdáhùn náà, off sì máa ń pa ìwẹ̀numọ́."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Dènà àwọn ìbéèrè tó ń jáde lọ sí àwọn àgbègbè IP aládani tàbí ti inú nẹ́tíwọ́ọ̀kì."

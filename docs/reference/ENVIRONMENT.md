@@ -23,7 +23,7 @@ lastUpdated: 2026-10-11
 - [2. Storage & Database](#2-storage--database)
 - [3. Network & Ports](#3-network--ports)
 - [4. Security & Authentication](#4-security--authentication)
-- [5. Input Sanitization & PII Protection](#5-input-sanitization--pii-protection)
+- [5. Credential Redaction](#5-credential-redaction)
 - [6. Tool & Routing Policies](#6-tool--routing-policies)
 - [7. URLs & Cloud Sync](#7-urls--cloud-sync)
 - [8. Outbound Proxy](#8-outbound-proxy)
@@ -263,38 +263,20 @@ MAX_BODY_SIZE_BYTES=5242880    # 5 MB limit
 
 ---
 
-## 5. Input Sanitization & PII Protection
+## 5. Credential Redaction
 
-OmniRoute provides a two-layer defense: request-side injection scanning and response-side PII stripping.
+The credential masker redacts well-known API-key / secret-token patterns from
+request/response payloads. Opt-in, off by default.
 
-> **⚠️ Limitations:** These guardrails are _best-effort heuristic_ detections, not a complete prompt-injection firewall or PII DLP system. They can produce false positives (benign persona/RPG prompts flagged) and false negatives (leetspeak, spacing, non-English patterns). They are not sufficient alone for compliance. Tune modes and test against your traffic before relying on them.
-
-### Request-Side: Prompt Injection Guard
-
-| Variable                          | Default   | Source File                              | Description                                                                                                                                                                     |
-| --------------------------------- | --------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `INPUT_SANITIZER_ENABLED`         | `true`    | `src/middleware/promptInjectionGuard.ts` | Enable scanning of incoming messages for prompt injection patterns.                                                                                                             |
-| `INPUT_SANITIZER_MODE`            | `warn`    | `src/middleware/promptInjectionGuard.ts` | Injection policy: `warn` = log only, `block` = reject request with 400. Legacy `redact` does **not** strip injection text; use `PII_REDACTION_ENABLED` for request PII rewrite. |
-| `INJECTION_GUARD_MODE`            | _(unset)_ | `src/middleware/promptInjectionGuard.ts` | Legacy alias for `INPUT_SANITIZER_MODE` — same behavior.                                                                                                                        |
-| `INPUT_SANITIZER_BLOCK_THRESHOLD` | `high`    | `src/shared/utils/injectionSeverity.ts`  | Minimum severity that `MODE=block` rejects: `high` (default), `medium`, or `low`. Medium patterns are observe-only unless lowered.                                              |
-| `INJECTION_GUARD_BLOCK_THRESHOLD` | _(unset)_ | `src/shared/utils/injectionSeverity.ts`  | Legacy alias for `INPUT_SANITIZER_BLOCK_THRESHOLD` — same behavior.                                                                                                             |
-| `PII_REDACTION_ENABLED`           | `false`   | `src/lib/guardrails/piiMasker.ts`        | When `true`, redact PII in incoming requests (independent of injection mode).                                                                                                   |
-| `CREDENTIAL_REDACTION_ENABLED`    | `false`   | `src/lib/guardrails/credentialMasker.ts` | Redact well-known API-key / secret-token patterns from request/response payloads. Opt-in; mirrors `PII_REDACTION_ENABLED`.                                                      |
-
-### Response-Side: PII Sanitizer
-
-| Variable                         | Default  | Source File               | Description                                                             |
-| -------------------------------- | -------- | ------------------------- | ----------------------------------------------------------------------- |
-| `PII_RESPONSE_SANITIZATION`      | `false`  | `src/lib/piiSanitizer.ts` | Scan LLM responses for leaked PII before returning to client.           |
-| `PII_RESPONSE_SANITIZATION_MODE` | `redact` | `src/lib/piiSanitizer.ts` | `redact` = mask PII, `warn` = log only, `block` = drop entire response. |
+| Variable                       | Default | Source File                              | Description                                                                          |
+| ------------------------------ | ------- | ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| `CREDENTIAL_REDACTION_ENABLED` | `false` | `src/lib/guardrails/credentialMasker.ts` | Redact well-known API-key / secret-token patterns from request/response payloads. Opt-in, off by default. |
 
 ### Scenarios
 
-| Scenario                  | Configuration                                                                                                                                                                                           |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Enterprise compliance** | `INPUT_SANITIZER_ENABLED=true`, `INPUT_SANITIZER_MODE=block`, `PII_REDACTION_ENABLED=true`, `PII_RESPONSE_SANITIZATION=true` (injection blocks + request/response PII redaction; modes are independent) |
-| **Monitoring only**       | `INPUT_SANITIZER_ENABLED=true`, `INPUT_SANITIZER_MODE=warn` — logs but never blocks                                                                                                                     |
-| **Personal use**          | Leave all disabled — zero overhead                                                                                                                                                                      |
+| Scenario         | Configuration                                    |
+| ---------------- | ------------------------------------------------ |
+| **Personal use** | Leave all disabled — zero overhead               |
 
 ---
 

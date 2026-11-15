@@ -1496,7 +1496,6 @@
     "showing": "دکھا رہا ہے {count} میں سے {total} ایونٹس",
     "policyViolation": "پالیسی کی خلاف ورزی",
     "accessDenied": "رسائی سے انکار کر دیا گیا۔",
-    "injectionBlocked": "انجکشن مسدود",
     "noEvents": "تعمیل کے کوئی واقعات ریکارڈ نہیں کیے گئے۔",
     "failedFetch": "تعمیل آڈٹ لاگ لانے میں ناکام۔",
     "viewDetails": "تفصیلات دیکھیں",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "باقی ریکوری کوڈز: {count}",
     "mfaDisableDesc": "دو مرحلہ تصدیق بند کرنے کے لیے اپنا پاس ورڈ اور موجودہ کوڈ (یا ریکوری کوڈ) درج کریں۔",
     "mfaRecoveryHint": "کھوئے ہوئے آلے کی بحالی: سرور کو OMNIROUTE_DISABLE_MFA=true کے ساتھ شروع کریں اور خود ہوسٹ سے سائن ان کریں۔",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA سیٹ ہے: اس ہوسٹ سے سائن ان دوسرا مرحلہ چھوڑ دیتے ہیں۔ دوبارہ رسائی ملنے کے بعد اسے ہٹا دیں۔",
-    "piiMasking": {
-      "title": "ذاتی ڈیٹا کی پردہ پوشی",
-      "description": "منتخب کریں کہ کس قسم کا ذاتی ڈیٹا چھپایا جائے اور اپنے پیٹرن شامل کریں۔ پردہ پوشی تب تک بند رہتی ہے جب تک آپ نیچے دکھائے گئے فیچر فلیگز آن نہ کریں۔",
-      "requestFlag": "درخواستوں کی پردہ پوشی",
-      "responseFlag": "جوابات کی صفائی",
-      "templates": "سانچے",
-      "template": {
-        "minimal": "کم سے کم",
-        "standard": "معیاری",
-        "financial": "مالیاتی",
-        "brazilian": "برازیلی",
-        "usa": "امریکہ",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (جنوبی افریقہ)",
-        "full": "مکمل"
-      },
-      "builtinTypes": "بلٹ اِن اقسام",
-      "types": {
-        "email": "ای میل پتے",
-        "phone_us": "امریکی فون نمبر",
-        "phone_br": "برازیلی فون نمبر",
-        "ssn": "امریکی سوشل سیکیورٹی نمبر",
-        "credit_card": "کریڈٹ کارڈ نمبر",
-        "cpf": "CPF (برازیلی ٹیکس دہندہ شناخت)",
-        "cnpj": "CNPJ (برازیلی کمپنی شناخت)",
-        "ip_address": "IPv4 پتے",
-        "ipv6_address": "IPv6 پتے",
-        "aws_key": "AWS رسائی کیز",
-        "api_key_generic": "API کیز اور ٹوکنز",
-        "iban": "IBAN بینک اکاؤنٹ نمبر",
-        "eu_vat": "EU VAT نمبرز",
-        "es_dni_nie": "ہسپانوی DNI / NIE",
-        "it_codice_fiscale": "اطالوی کوڈیس مالیاتی",
-        "pl_pesel": "پولش PESEL",
-        "nl_bsn": "ڈچ BSN",
-        "de_steuer_id": "جرمن Steuer-ID",
-        "se_personnummer": "سویڈش شخصی نمبر",
-        "za_id": "جنوبی افریقی ID نمبر",
-        "za_phone": "جنوبی افریقہ کے فون نمبر",
-        "za_vat": "جنوبی افریقی VAT نمبر",
-        "za_tax_ref": "جنوبی افریقہ کے ٹیکس حوالہ جات"
-      },
-      "customPatterns": "حسب ضرورت پیٹرن",
-      "customPatternsDesc": "مماثلتیں [CUSTOM_REDACTED] سے بدل دی جاتی ہیں۔ زیادہ سے زیادہ {max} پیٹرن۔ تباہ کن بیک ٹریکنگ کے خطرے والے پیٹرن مسترد کیے جاتے ہیں۔",
-      "typeRegex": "ریگولر ایکسپریشن",
-      "typeWildcard": "وائلڈ کارڈ (* اور ?)",
-      "pattern": "پیٹرن",
-      "flags": "فلیگز (i, m, s, u)",
-      "sampleText": "پیٹرن جانچنے کے لیے نمونہ متن",
-      "test": "جانچیں",
-      "testMatches": "مماثلتیں: {count}",
-      "testFailed": "پیٹرن مسترد: {message}",
-      "add": "پیٹرن شامل کریں",
-      "saved": "محفوظ ہو گیا",
-      "saveFailed": "محفوظ نہیں ہو سکا: {message}",
-      "statsTitle": "دوبارہ شروع ہونے کے بعد سے نشاندہیاں",
-      "statsEmpty": "ابھی تک کوئی نشاندہی نہیں۔",
-      "statsRequest": "درخواستیں"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA سیٹ ہے: اس ہوسٹ سے سائن ان دوسرا مرحلہ چھوڑ دیتے ہیں۔ دوبارہ رسائی ملنے کے بعد اسے ہٹا دیں۔"
   },
   "contextRtk": {
     "title": "RTK انجن",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "تمام آنے والی درخواستوں کے لیے API کلید درکار ہے۔"
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "تمام درخواستوں کے لیے ان پٹ سینیٹائزیشن کو فعال کریں۔"
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "پرامپٹ انجیکشن گارڈ موڈ سیٹ کریں۔"
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "درخواستوں سے ذاتی طور پر قابل شناخت معلومات کو پوشیدہ کریں۔"
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "فراہم کنندہ کے جوابات میں ذاتی طور پر قابل شناخت معلومات کو صاف کریں۔"
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "منتخب کریں کہ جواب کی PII کو کیسے ہینڈل کیا جائے: redact اسے تبدیل کرتا ہے، warn صرف اسے لاگ کرتا ہے، block جواب کو مسترد کرتا ہے، اور off صفائی کو غیر فعال کرتا ہے۔"
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "نجی یا اندرونی IP حدود میں جانے والی آؤٹ باؤنڈ درخواستوں کو بلاک کریں۔"

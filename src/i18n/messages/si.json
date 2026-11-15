@@ -1496,7 +1496,6 @@
     "showing": "සිදුවීම් {total} න් {count} ක් පෙන්වයි",
     "policyViolation": "ප්රතිපත්ති උල්ලංඝනය",
     "accessDenied": "ප්රවේශය ප්රතික්ෂේප කරන ලදී",
-    "injectionBlocked": "ඉන්ජෙක්ෂන් ප්රහාරය අවහිර කරන ලදී",
     "noEvents": "අනුකූලතා සිදුවීම් කිසිවක් වාර්තා කර නැත.",
     "failedFetch": "අනුකූලතා විගණන ලොගය ලබාගැනීමට අසමත් විය.",
     "viewDetails": "විස්තර බලන්න",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "ඉතිරි ප්‍රතිසාධන කේත: {count}",
     "mfaDisableDesc": "ද්වි-සාධක සත්‍යාපනය අක්‍රිය කිරීමට ඔබේ මුරපදය සහ වත්මන් කේතයක් (හෝ ප්‍රතිසාධන කේතයක්) ඇතුළත් කරන්න.",
     "mfaRecoveryHint": "නැති වූ උපාංග ප්‍රතිසාධනය: සේවාදායකය OMNIROUTE_DISABLE_MFA=true සමඟ ආරම්භ කර ධාරකයෙන්ම පුරනය වන්න.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA සකසා ඇත: මෙම ධාරකයෙන් පුරනය වීම් දෙවන සාධකය මඟ හරියි. නැවත ප්‍රවේශ වූ පසු එය ඉවත් කරන්න.",
-    "piiMasking": {
-      "title": "පුද්ගලික දත්ත සැඟවීම",
-      "description": "සැඟවිය යුතු පුද්ගලික දත්ත වර්ග තෝරා ඔබේම රටා එක් කරන්න. පහත පෙන්වා ඇති විශේෂාංග ධජ සක්‍රිය කරන තුරු සැඟවීම අක්‍රියව පවතී.",
-      "requestFlag": "ඉල්ලීම් සැඟවීම",
-      "responseFlag": "ප්‍රතිචාර පිරිසිදු කිරීම",
-      "templates": "සැකිලි",
-      "template": {
-        "minimal": "අවම",
-        "standard": "සම්මත",
-        "financial": "මූල්‍ය",
-        "brazilian": "බ්‍රසීල",
-        "usa": "ඇමරිකාව",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (දකුණු අප්‍රිකාව)",
-        "full": "සම්පූර්ණ"
-      },
-      "builtinTypes": "ගොඩනඟන ලද වර්ග",
-      "types": {
-        "email": "ඊමේල් ලිපින",
-        "phone_us": "එක්සත් ජනපද දුරකථන අංක",
-        "phone_br": "බ්‍රසීල දුරකථන අංක",
-        "ssn": "එක්සත් ජනපද සමාජ ආරක්ෂණ අංක",
-        "credit_card": "ක්‍රෙඩිට් කාඩ් අංක",
-        "cpf": "CPF (බ්‍රසීල බදු ගෙවන්නාගේ ID)",
-        "cnpj": "CNPJ (බ්‍රසීල සමාගම් ID)",
-        "ip_address": "IPv4 ලිපින",
-        "ipv6_address": "IPv6 ලිපින",
-        "aws_key": "AWS ප්‍රවේශ යතුරු",
-        "api_key_generic": "API යතුරු සහ ටෝකන",
-        "iban": "IBAN බැංකු ගිණුම් අංක",
-        "eu_vat": "EU VAT අංක",
-        "es_dni_nie": "ස්පාඤ්ඤ DNI / NIE",
-        "it_codice_fiscale": "ඉතාලි කෝඩිස් ෆිස්කේල්",
-        "pl_pesel": "පෝලන්ත PESEL",
-        "nl_bsn": "ලන්දේසි BSN",
-        "de_steuer_id": "ජර්මානු ස්ටීවර්-ID",
-        "se_personnummer": "ස්වීඩන් පුද්ගල අංකය",
-        "za_id": "දකුණු අප්‍රිකානු ID අංක",
-        "za_phone": "දකුණු අප්‍රිකානු දුරකථන අංක",
-        "za_vat": "දකුණු අප්‍රිකානු VAT අංක",
-        "za_tax_ref": "දකුණු අප්‍රිකානු බදු යොමු කිරීම්"
-      },
-      "customPatterns": "අභිරුචි රටා",
-      "customPatternsDesc": "ගැළපීම් [CUSTOM_REDACTED] මගින් ප්‍රතිස්ථාපනය වේ. උපරිම රටා {max}. විනාශකාරී පසුගමන අවදානමක් ඇති රටා ප්‍රතික්ෂේප වේ.",
-      "typeRegex": "නිත්‍ය ප්‍රකාශනය",
-      "typeWildcard": "වයිල්ඩ්කාඩ් (* සහ ?)",
-      "pattern": "රටාව",
-      "flags": "ධජ (i, m, s, u)",
-      "sampleText": "රටාව පරීක්ෂා කිරීමට නියැදි පෙළ",
-      "test": "පරීක්ෂා කරන්න",
-      "testMatches": "ගැළපීම් {count}",
-      "testFailed": "රටාව ප්‍රතික්ෂේප විය: {message}",
-      "add": "රටාවක් එක් කරන්න",
-      "saved": "සුරැකිණි",
-      "saveFailed": "සුරැකීමට නොහැකි විය: {message}",
-      "statsTitle": "නැවත ආරම්භයෙන් පසු අනාවරණ",
-      "statsEmpty": "තවම අනාවරණ නැත.",
-      "statsRequest": "ඉල්ලීම්"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA සකසා ඇත: මෙම ධාරකයෙන් පුරනය වීම් දෙවන සාධකය මඟ හරියි. නැවත ප්‍රවේශ වූ පසු එය ඉවත් කරන්න."
   },
   "contextRtk": {
     "title": "RTK එන්ජිම",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "පැමිණෙන සියලු ඉල්ලීම් සඳහා API යතුරක් අවශ්ය කරන්න."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "සියලු ඉල්ලීම් සඳහා ආදාන පිරිසිදු කිරීම සක්රිය කරන්න."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "ප්රොම්ප්ට් එන්නත් කිරීම්වලින් ආරක්ෂා වන ප්රකාරය සකසන්න."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "ඉල්ලීම්වලින් පුද්ගලයා හඳුනාගත හැකි තොරතුරු සඟවන්න."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "සපයන්නාගේ ප්රතිචාරවල ඇති පුද්ගලයා හඳුනාගත හැකි තොරතුරු පිරිසිදු කරන්න."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "ප්රතිචාරවල PII හසුරුවන ආකාරය තෝරන්න: සඟවන්න යන්න එය ප්රතිස්ථාපනය කරයි, අනතුරු අඟවන්න යන්න එය ලොග් කිරීම පමණක් කරයි, අවහිර කරන්න යන්න ප්රතිචාරය ප්රතික්ෂේප කරයි, සහ අක්රියයි යන්න පිරිසිදු කිරීම අබල කරයි."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "පෞද්ගලික හෝ අභ්යන්තර IP පරාස වෙත යැවෙන ඉල්ලීම් අවහිර කරන්න."

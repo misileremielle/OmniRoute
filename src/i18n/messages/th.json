@@ -1496,7 +1496,6 @@
     "showing": "กำลังแสดง {count} จาก {total} กิจกรรม",
     "policyViolation": "การละเมิดนโยบาย",
     "accessDenied": "การเข้าถึงถูกปฏิเสธ",
-    "injectionBlocked": "การฉีดถูกบล็อก",
     "noEvents": "ไม่มีการบันทึกเหตุการณ์การปฏิบัติตามข้อกำหนด",
     "failedFetch": "ดึงบันทึกการตรวจสอบการปฏิบัติตามข้อกำหนดไม่สำเร็จ",
     "viewDetails": "ดูรายละเอียด",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "รหัสกู้คืนที่เหลือ: {count}",
     "mfaDisableDesc": "ป้อนรหัสผ่านและรหัสปัจจุบัน (หรือรหัสกู้คืน) เพื่อปิดการยืนยันตัวตนแบบสองปัจจัย",
     "mfaRecoveryHint": "การกู้คืนเมื่ออุปกรณ์หาย: เริ่มเซิร์ฟเวอร์ด้วย OMNIROUTE_DISABLE_MFA=true แล้วลงชื่อเข้าใช้จากโฮสต์โดยตรง",
-    "mfaRecoverySwitchActive": "ตั้งค่า OMNIROUTE_DISABLE_MFA ไว้: การลงชื่อเข้าใช้จากโฮสต์นี้จะข้ามปัจจัยที่สอง ให้ยกเลิกเมื่อคุณเข้าถึงได้อีกครั้ง",
-    "piiMasking": {
-      "title": "การปิดบังข้อมูลส่วนบุคคล",
-      "description": "เลือกประเภทข้อมูลส่วนบุคคลที่จะปิดบังและเพิ่มรูปแบบของคุณเอง การปิดบังจะปิดอยู่จนกว่าคุณจะเปิดแฟล็กฟีเจอร์ที่แสดงด้านล่าง",
-      "requestFlag": "ปิดบังคำขอ",
-      "responseFlag": "ทำความสะอาดการตอบกลับ",
-      "templates": "เทมเพลต",
-      "template": {
-        "minimal": "ขั้นต่ำ",
-        "standard": "มาตรฐาน",
-        "financial": "การเงิน",
-        "brazilian": "บราซิล",
-        "usa": "สหรัฐฯ",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (แอฟริกาใต้)",
-        "full": "ทั้งหมด"
-      },
-      "builtinTypes": "ประเภทในตัว",
-      "types": {
-        "email": "ที่อยู่อีเมล",
-        "phone_us": "หมายเลขโทรศัพท์สหรัฐฯ",
-        "phone_br": "หมายเลขโทรศัพท์บราซิล",
-        "ssn": "หมายเลขประกันสังคมสหรัฐฯ",
-        "credit_card": "หมายเลขบัตรเครดิต",
-        "cpf": "CPF (เลขประจำตัวผู้เสียภาษีบราซิล)",
-        "cnpj": "CNPJ (เลขทะเบียนบริษัทบราซิล)",
-        "ip_address": "ที่อยู่ IPv4",
-        "ipv6_address": "ที่อยู่ IPv6",
-        "aws_key": "คีย์การเข้าถึง AWS",
-        "api_key_generic": "คีย์ API และโทเค็น",
-        "iban": "หมายเลขบัญชีธนาคาร IBAN",
-        "eu_vat": "ตัวเลข EU VAT",
-        "es_dni_nie": "ภาษาสเปน DNI / NIE",
-        "it_codice_fiscale": "รหัส Fiscale ของอิตาลี",
-        "pl_pesel": "โปแลนด์ PESEL",
-        "nl_bsn": "ภาษาดัตช์ BSN",
-        "de_steuer_id": "เยอรมัน Steuer-ID",
-        "se_personnummer": "บุคคลชาวสวีเดน",
-        "za_id": "หมายเลข ID ของแอฟริกาใต้",
-        "za_phone": "หมายเลขโทรศัพท์ของแอฟริกาใต้",
-        "za_vat": "หมายเลข VAT ของแอฟริกาใต้",
-        "za_tax_ref": "การอ้างอิงภาษีของแอฟริกาใต้"
-      },
-      "customPatterns": "รูปแบบที่กำหนดเอง",
-      "customPatternsDesc": "ส่วนที่ตรงกันจะถูกแทนที่ด้วย [CUSTOM_REDACTED] ได้สูงสุด {max} รูปแบบ รูปแบบที่เสี่ยงต่อการย้อนรอยแบบหายนะจะถูกปฏิเสธ",
-      "typeRegex": "นิพจน์ทั่วไป",
-      "typeWildcard": "ไวลด์การ์ด (* และ ?)",
-      "pattern": "รูปแบบ",
-      "flags": "แฟล็ก (i, m, s, u)",
-      "sampleText": "ข้อความตัวอย่างสำหรับทดสอบรูปแบบ",
-      "test": "ทดสอบ",
-      "testMatches": "ตรงกัน {count} รายการ",
-      "testFailed": "รูปแบบถูกปฏิเสธ: {message}",
-      "add": "เพิ่มรูปแบบ",
-      "saved": "บันทึกแล้ว",
-      "saveFailed": "บันทึกไม่ได้: {message}",
-      "statsTitle": "การตรวจพบตั้งแต่รีสตาร์ต",
-      "statsEmpty": "ยังไม่มีการตรวจพบ",
-      "statsRequest": "คำขอ"
-    }
+    "mfaRecoverySwitchActive": "ตั้งค่า OMNIROUTE_DISABLE_MFA ไว้: การลงชื่อเข้าใช้จากโฮสต์นี้จะข้ามปัจจัยที่สอง ให้ยกเลิกเมื่อคุณเข้าถึงได้อีกครั้ง"
   },
   "contextRtk": {
     "title": "RTK Engine",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "กำหนดให้ต้องใช้คีย์ API สำหรับคำขอขาเข้าทั้งหมด"
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "เปิดใช้งานการล้างข้อมูลนำเข้าสำหรับคำขอทั้งหมด"
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "กำหนดโหมดการป้องกัน prompt-injection"
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "ปกปิดข้อมูลระบุตัวบุคคลจากคำขอ"
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "กรองข้อมูลระบุตัวบุคคลในการตอบกลับของผู้ให้บริการ"
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "เลือกวิธีจัดการ PII ในการตอบกลับ: redact จะแทนที่ข้อมูล, warn จะบันทึกเท่านั้น, block จะปฏิเสธการตอบกลับ และ off จะปิดใช้งานการกรองข้อมูล"
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "บล็อกคำขอขาออกไปยังช่วง IP ส่วนตัวหรือภายใน"

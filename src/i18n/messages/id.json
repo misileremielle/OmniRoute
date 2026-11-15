@@ -1496,7 +1496,6 @@
     "showing": "Menampilkan {count} dari {total} acara",
     "policyViolation": "Pelanggaran Kebijakan",
     "accessDenied": "Akses Ditolak",
-    "injectionBlocked": "Injeksi Diblokir",
     "noEvents": "Tidak ada peristiwa kepatuhan yang tercatat.",
     "failedFetch": "Gagal mengambil log audit kepatuhan.",
     "viewDetails": "Lihat detailnya",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Sisa kode pemulihan: {count}",
     "mfaDisableDesc": "Masukkan kata sandi dan kode saat ini (atau kode pemulihan) untuk menonaktifkan autentikasi dua faktor.",
     "mfaRecoveryHint": "Pemulihan perangkat hilang: jalankan server dengan OMNIROUTE_DISABLE_MFA=true dan masuk langsung dari host.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA diatur: proses masuk dari host ini melewati faktor kedua. Hapus setelah Anda kembali masuk.",
-    "piiMasking": {
-      "title": "Penyamaran data pribadi",
-      "description": "Pilih jenis data pribadi yang disamarkan dan tambahkan pola Anda sendiri. Penyamaran tetap nonaktif sampai Anda mengaktifkan feature flag yang ditampilkan di bawah.",
-      "requestFlag": "Penyamaran permintaan",
-      "responseFlag": "Sanitasi respons",
-      "templates": "Templat",
-      "template": {
-        "minimal": "Minimal",
-        "standard": "Standar",
-        "financial": "Keuangan",
-        "brazilian": "Brasil",
-        "usa": "AS",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Afrika Selatan)",
-        "full": "Lengkap"
-      },
-      "builtinTypes": "Jenis bawaan",
-      "types": {
-        "email": "Alamat email",
-        "phone_us": "Nomor telepon AS",
-        "phone_br": "Nomor telepon Brasil",
-        "ssn": "Nomor Jaminan Sosial AS",
-        "credit_card": "Nomor kartu kredit",
-        "cpf": "CPF (ID wajib pajak Brasil)",
-        "cnpj": "CNPJ (ID perusahaan Brasil)",
-        "ip_address": "Alamat IPv4",
-        "ipv6_address": "Alamat IPv6",
-        "aws_key": "Kunci akses AWS",
-        "api_key_generic": "Kunci API dan token",
-        "iban": "nomor rekening bank IBAN",
-        "eu_vat": "nomor EU VAT",
-        "es_dni_nie": "DNI Spanyol / NIE",
-        "it_codice_fiscale": "Skala Fiskal Kodeks Italia",
-        "pl_pesel": "PESEL Polandia",
-        "nl_bsn": "BSN belanda",
-        "de_steuer_id": "Steuer-ID Jerman",
-        "se_personnummer": "Nomor orang Swedia",
-        "za_id": "Nomor ID Afrika Selatan",
-        "za_phone": "Nomor telepon Afrika Selatan",
-        "za_vat": "Nomor VAT Afrika Selatan",
-        "za_tax_ref": "Referensi pajak Afrika Selatan"
-      },
-      "customPatterns": "Pola kustom",
-      "customPatternsDesc": "Kecocokan diganti dengan [CUSTOM_REDACTED]. Hingga {max} pola. Pola yang berisiko backtracking katastrofik akan ditolak.",
-      "typeRegex": "Ekspresi reguler",
-      "typeWildcard": "Karakter pengganti (* dan ?)",
-      "pattern": "Pola",
-      "flags": "Flag (i, m, s, u)",
-      "sampleText": "Teks contoh untuk menguji pola",
-      "test": "Uji",
-      "testMatches": "{count} kecocokan",
-      "testFailed": "Pola ditolak: {message}",
-      "add": "Tambah pola",
-      "saved": "Tersimpan",
-      "saveFailed": "Gagal menyimpan: {message}",
-      "statsTitle": "Deteksi sejak dimulai ulang",
-      "statsEmpty": "Belum ada deteksi.",
-      "statsRequest": "Permintaan"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA diatur: proses masuk dari host ini melewati faktor kedua. Hapus setelah Anda kembali masuk."
   },
   "contextRtk": {
     "title": "Mesin RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Wajibkan kunci API untuk semua permintaan masuk."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Aktifkan sanitasi input untuk semua permintaan."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Atur mode perlindungan prompt-injection."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Sensor informasi identitas pribadi dari permintaan."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sanitasi informasi identitas pribadi dalam respons penyedia."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Pilih cara penanganan PII respons: redact menggantikannya, warn hanya mencatatnya, block menolak respons, dan off menonaktifkan sanitasi."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Blokir permintaan keluar ke rentang IP privat atau internal."

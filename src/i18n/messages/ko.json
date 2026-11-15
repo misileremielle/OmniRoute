@@ -1496,7 +1496,6 @@
     "showing": "{total} 이벤트 중 {count} 표시 중",
     "policyViolation": "정책 위반",
     "accessDenied": "액세스가 거부되었습니다.",
-    "injectionBlocked": "주입이 차단됨",
     "noEvents": "기록된 규정 준수 이벤트가 없습니다.",
     "failedFetch": "규정 준수 감사 로그를 가져오지 못했습니다.",
     "viewDetails": "세부정보 보기",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "남은 복구 코드: {count}",
     "mfaDisableDesc": "2단계 인증을 끄려면 비밀번호와 현재 코드(또는 복구 코드)를 입력하세요.",
     "mfaRecoveryHint": "기기 분실 시 복구: OMNIROUTE_DISABLE_MFA=true로 서버를 시작하고 호스트에서 직접 로그인하세요.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA가 설정되어 있습니다: 이 호스트에서의 로그인은 두 번째 단계를 건너뜁니다. 다시 접근한 뒤에는 해제하세요.",
-    "piiMasking": {
-      "title": "개인정보 마스킹",
-      "description": "마스킹할 개인 데이터 유형을 선택하고 직접 패턴을 추가하세요. 아래 표시된 기능 플래그를 켜기 전까지 마스킹은 꺼져 있습니다.",
-      "requestFlag": "요청 마스킹",
-      "responseFlag": "응답 정제",
-      "templates": "템플릿",
-      "template": {
-        "minimal": "최소",
-        "standard": "표준",
-        "financial": "금융",
-        "brazilian": "브라질",
-        "usa": "미국",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (남아프리카공화국)",
-        "full": "전체"
-      },
-      "builtinTypes": "기본 제공 유형",
-      "types": {
-        "email": "이메일 주소",
-        "phone_us": "미국 전화번호",
-        "phone_br": "브라질 전화번호",
-        "ssn": "미국 사회보장번호",
-        "credit_card": "신용카드 번호",
-        "cpf": "CPF(브라질 개인 납세자 번호)",
-        "cnpj": "CNPJ(브라질 법인 번호)",
-        "ip_address": "IPv4 주소",
-        "ipv6_address": "IPv6 주소",
-        "aws_key": "AWS 액세스 키",
-        "api_key_generic": "API 키 및 토큰",
-        "iban": "IBAN 은행 계좌 번호",
-        "eu_vat": "EU VAT 번호",
-        "es_dni_nie": "스페인어 DNI / NIE",
-        "it_codice_fiscale": "이탈리아 코디스 피스케일(Codice Fiscale)",
-        "pl_pesel": "폴란드어 PESEL",
-        "nl_bsn": "네덜란드 BSN",
-        "de_steuer_id": "독일 Steuer-ID",
-        "se_personnummer": "스웨덴 사람번호",
-        "za_id": "남아프리카 ID 번호",
-        "za_phone": "남아프리카 전화번호",
-        "za_vat": "남아프리카 VAT 번호",
-        "za_tax_ref": "남아프리카 공화국 세금 참조"
-      },
-      "customPatterns": "사용자 지정 패턴",
-      "customPatternsDesc": "일치 항목은 [CUSTOM_REDACTED](으)로 바뀝니다. 최대 {max}개 패턴. 치명적인 백트래킹 위험이 있는 패턴은 거부됩니다.",
-      "typeRegex": "정규식",
-      "typeWildcard": "와일드카드(* 및 ?)",
-      "pattern": "패턴",
-      "flags": "플래그(i, m, s, u)",
-      "sampleText": "패턴을 테스트할 샘플 텍스트",
-      "test": "테스트",
-      "testMatches": "{count}개 일치",
-      "testFailed": "패턴 거부됨: {message}",
-      "add": "패턴 추가",
-      "saved": "저장됨",
-      "saveFailed": "저장할 수 없음: {message}",
-      "statsTitle": "재시작 이후 감지",
-      "statsEmpty": "아직 감지된 항목이 없습니다.",
-      "statsRequest": "요청"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA가 설정되어 있습니다: 이 호스트에서의 로그인은 두 번째 단계를 건너뜁니다. 다시 접근한 뒤에는 해제하세요."
   },
   "contextRtk": {
     "title": "RTK 엔진",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "모든 수신 요청에 API 키를 요구합니다."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "모든 요청에 대해 입력 정화를 활성화합니다."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "프롬프트 인젝션 방어 모드를 설정합니다."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "요청에서 개인 식별 정보(PII)를 마스킹합니다."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "제공자 응답에서 개인 식별 정보(PII)를 정화합니다."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "응답 PII 처리 방법을 선택합니다: 마스킹(redact)은 이를 대체하고, 경고(warn)는 로그만 기록하며, 차단(block)은 응답을 거부하고, 꺼짐(off)은 정화를 비활성화합니다."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "사설 또는 내부 IP 대역으로의 아웃바운드 요청을 차단합니다."

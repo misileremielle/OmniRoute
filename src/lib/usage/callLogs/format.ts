@@ -9,7 +9,6 @@ import {
   sanitizeErrorMessage,
   sanitizeUpstreamDetails,
 } from "@omniroute/open-sse/utils/errorSanitization.ts";
-import { sanitizePII } from "../../piiSanitizer";
 import {
   omitEncryptedReasoningFromLogChunks,
   protectErrorPayloadForLog,
@@ -60,12 +59,12 @@ export function normalizeDetailState(value: unknown): CallLogDetailState {
 export function sanitizeErrorForLog(error: unknown): unknown {
   if (error === null || error === undefined) return null;
   if (typeof error === "string") {
-    return sanitizePII(sanitizeErrorMessage(error)).text;
+    return sanitizeErrorMessage(error);
   }
   try {
     if (error instanceof Error) {
-      const message = sanitizePII(sanitizeErrorMessage(error.message)).text;
-      const stack = sanitizePII(sanitizeErrorMessage(error.stack || "")).text;
+      const message = sanitizeErrorMessage(error.message);
+      const stack = sanitizeErrorMessage(error.stack || "");
       const name = sanitizeErrorMessage(error.name) || "Error";
       return {
         message,
@@ -169,7 +168,7 @@ export function buildRequestSummary(
 
   const summary: JsonRecord = {};
   if (typeof body.query === "string" && body.query.trim().length > 0) {
-    summary.query = sanitizePII(body.query).text;
+    summary.query = body.query;
   }
 
   const filters = Object.fromEntries(

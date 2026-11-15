@@ -2,7 +2,6 @@ import { handleChat } from "@/sse/handlers/chat";
 import { generateRequestId } from "@/shared/utils/requestId";
 import { resolveIncomingCorrelationId } from "@/shared/utils/correlationPreserve.ts";
 import { initTranslators } from "@omniroute/open-sse/translator/index.ts";
-import { withInjectionGuard } from "@/middleware/promptInjectionGuard";
 import { withChatAdmission } from "@/shared/middleware/withChatAdmission";
 import { requireJsonContentType } from "@/shared/middleware/requireJsonContentType";
 import { enforceClientApiRouteAuth } from "@/shared/utils/clientApiRouteAuth";
@@ -148,8 +147,8 @@ function applyBifrostHeaders(
 /**
  * POST /v1/messages - Claude format (auto convert via handleChat)
  *
- * `preParsedBody` is threaded from withInjectionGuard (#4041) so the body is
- * parsed at most once per request.
+ * `preParsedBody` lets a caller that already parsed the body pass it in; the
+ * exported POST passes none, so the handler parses the body itself.
  */
 async function postHandler(request: any, context: any, preParsedBody: any = null) {
   // Defense-in-depth: the authz proxy (src/proxy.ts) is the primary gate, but
@@ -228,4 +227,4 @@ async function postHandler(request: any, context: any, preParsedBody: any = null
 // The outer admission wrapper still owns the route-level lease. On a stream deadline,
 // the synthetic SSE body closes, so its response lifecycle releases that lease while
 // handleChat receives the explicit streamSignal and tears provider work down directly.
-export const POST = withChatAdmission(withInjectionGuard(postHandler, { logger: null }));
+export const POST = withChatAdmission(postHandler);

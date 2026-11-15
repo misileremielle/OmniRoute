@@ -1496,7 +1496,6 @@
     "showing": "Prikazano {count} od {total} događaja",
     "policyViolation": "Kršenje polise",
     "accessDenied": "Pristup odbijen",
-    "injectionBlocked": "Injekcija blokirana",
     "noEvents": "Nema zabilježenih događaja usklađenosti.",
     "failedFetch": "Neuspjelo preuzimanje dnevnika revizije usklađenosti.",
     "viewDetails": "Pogledaj detalje",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Preostali kodovi za oporavak: {count}",
     "mfaDisableDesc": "Unesite lozinku i trenutni kod (ili kod za oporavak) da isključite dvofaktorsku autentifikaciju.",
     "mfaRecoveryHint": "Oporavak izgubljenog uređaja: pokrenite server sa OMNIROUTE_DISABLE_MFA=true i prijavite se sa samog hosta.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA je postavljen: prijave s ovog hosta preskaču drugi faktor. Uklonite ga kada ponovo dobijete pristup.",
-    "piiMasking": {
-      "title": "Maskiranje ličnih podataka",
-      "description": "Odaberite koje se vrste ličnih podataka maskiraju i dodajte vlastite uzorke. Maskiranje ostaje isključeno dok ne uključite zastavice funkcija prikazane ispod.",
-      "requestFlag": "Maskiranje zahtjeva",
-      "responseFlag": "Čišćenje odgovora",
-      "templates": "Šabloni",
-      "template": {
-        "minimal": "Minimalni",
-        "standard": "Standardni",
-        "financial": "Finansijski",
-        "brazilian": "Brazilski",
-        "usa": "SAD",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (južna Afrika)",
-        "full": "Potpuni"
-      },
-      "builtinTypes": "Ugrađeni tipovi",
-      "types": {
-        "email": "Adrese e-pošte",
-        "phone_us": "Brojevi telefona u SAD-u",
-        "phone_br": "Brazilski brojevi telefona",
-        "ssn": "Brojevi socijalnog osiguranja SAD-a",
-        "credit_card": "Brojevi kreditnih kartica",
-        "cpf": "CPF (brazilski poreski broj)",
-        "cnpj": "CNPJ (brazilski broj firme)",
-        "ip_address": "IPv4 adrese",
-        "ipv6_address": "IPv6 adrese",
-        "aws_key": "AWS pristupni ključevi",
-        "api_key_generic": "API ključevi i tokeni",
-        "iban": "IBAN brojevi bankovnih računa",
-        "eu_vat": "EU VAT brojevi",
-        "es_dni_nie": "španjolski DNI / NIE",
-        "it_codice_fiscale": "Italijanski kodeks Fiscale",
-        "pl_pesel": "Poljski PESEL",
-        "nl_bsn": "holandski BSN",
-        "de_steuer_id": "njemački Steuer-ID",
-        "se_personnummer": "Swedish personnummer",
-        "za_id": "Južnoafrički ID brojevi",
-        "za_phone": "Južnoafrički brojevi telefona",
-        "za_vat": "Južnoafrički VAT brojevi",
-        "za_tax_ref": "Južnoafričke porezne reference"
-      },
-      "customPatterns": "Prilagođeni uzorci",
-      "customPatternsDesc": "Podudaranja se zamjenjuju sa [CUSTOM_REDACTED]. Najviše {max} uzoraka. Uzorci s rizikom od katastrofalnog vraćanja se odbijaju.",
-      "typeRegex": "Regularni izraz",
-      "typeWildcard": "Džoker znak (* i ?)",
-      "pattern": "Uzorak",
-      "flags": "Zastavice (i, m, s, u)",
-      "sampleText": "Primjer teksta za testiranje uzorka",
-      "test": "Testiraj",
-      "testMatches": "Podudaranja: {count}",
-      "testFailed": "Uzorak je odbijen: {message}",
-      "add": "Dodaj uzorak",
-      "saved": "Sačuvano",
-      "saveFailed": "Čuvanje nije uspjelo: {message}",
-      "statsTitle": "Otkrivanja od ponovnog pokretanja",
-      "statsEmpty": "Još nema otkrivanja.",
-      "statsRequest": "Zahtjevi"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA je postavljen: prijave s ovog hosta preskaču drugi faktor. Uklonite ga kada ponovo dobijete pristup."
   },
   "contextRtk": {
     "title": "RTK pogon",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Zahtijevaj API ključ za sve dolazne zahtjeve."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Omogući sanitizaciju ulaza za sve zahtjeve."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Postavi režim zaštite od prompt-injection-a."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Redaktuj lično identifikabilne informacije iz zahtjeva."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sanitizuj lično identifikabilne informacije u odgovorima provajdera."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Odaberite kako se rukuje s PII odgovorima: 'redact' ga zamjenjuje, 'warn' ga samo zapisuje u logove, 'block' odbija odgovor, a 'off' onemogućava sanitizaciju."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Blokiraj odlazne zahtjeve prema privatnim ili internim IP opsezima."

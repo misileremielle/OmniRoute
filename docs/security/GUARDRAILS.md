@@ -28,15 +28,13 @@ security control.
 
 ## Built-in Guardrails
 
-The registry auto-loads four guardrails in priority order on import
+The registry auto-loads two guardrails in priority order on import
 (see `registry.ts` → `registerDefaultGuardrails()`):
 
 | Priority | Name                | Stage(s)       | File                  |
 | -------- | ------------------- | -------------- | --------------------- |
 | `5`      | `vision-bridge`     | `preCall`      | `visionBridge.ts`     |
-| `10`     | `pii-masker`        | `pre` + `post` | `piiMasker.ts`        |
-| `20`     | `prompt-injection`  | `preCall`      | `promptInjection.ts`  |
-| `95`     | `credential-masker` | `pre` + `post` | `credentialMasker.ts` |
+| `9`      | `credential-masker` | `pre` + `post` | `credentialMasker.ts` |
 
 Lower priority numbers run **first**.
 
@@ -197,7 +195,7 @@ path always keeps working. Non-image bytes (a fetch that did not return a
 decodable image) are also passed through untouched. This normalization is
 scoped to images the bridge fetches for its own self-call — it is never
 applied to the caller's raw passthrough payload, consistent with the
-opt-in-only mutation principle (Hard Rule #19).
+opt-in-only mutation principle (opt-in, off by default).
 
 #### Settings schema + migration
 
@@ -259,152 +257,15 @@ new mode/task-aware/cache defaults and the settings resolver live in
 `deps` constructor option so tests can inject fake `getSettings` and
 `callVisionModel` implementations.
 
-### PII Masker (`piiMasker.ts`)
-
-Runs on **both** stages.
-
-- **`preCall`** clones the payload, walks `system`, `messages`, `input`, and
-  `prompt` (including plain string items), and applies `processPII()` (from
-  `@/shared/utils/inputSanitizer`) to string `content`/`text` fields. When
-  `PII_REDACTION_ENABLED=true`, detected PII is redacted in the outbound
-  payload. This is independent of `INPUT_SANITIZER_MODE` (which only controls
-  prompt-injection policy). When redaction is off, the call records detection
-  counts without rewriting content.
-- **`postCall`** deep-clones the response, runs `sanitizePIIResponse()` plus
-  the Responses-API-shape masker (`maskResponsesOutput` — covers
-  `output_text` and `output[].content[].text`). If any redaction occurs, the
-  modified response replaces the original.
-
-The guardrail never blocks; it only annotates (`meta.detections`,
-`meta.redacted`) or rewrites.
-
-#### Per-type selection, custom patterns and detection counters
-
-**Dashboard → Settings → Security → PII masking** chooses _what_ is masked. It
-does not switch masking on: that is still `PII_REDACTION_ENABLED` (request) and
-`PII_RESPONSE_SANITIZATION` (response + SSE), both off by default.
-
-- **Per-type selection** — the built-in ids are listed in
-  `src/shared/constants/piiTypes.ts` (`PII_BUILTIN_TYPES`). Unset means every
-  type (the behaviour before this setting existed). The request engine's
-  `ssn_us` pattern maps to `ssn`. Templates (Minimal, Standard, Financial,
-  Brazilian, USA, GDPR, POPIA, Full) only fill the checkboxes in the UI.
-- **GDPR and POPIA identifiers** — twelve built-in ids covering EU and South
-  African personal identifiers (table below). Their regexes, validators and
-  jurisdiction tags live in one table, `src/shared/utils/piiPatterns.ts`, which
-  both the response sanitizer (`src/lib/piiSanitizer.ts`) and the request
-  masker (`src/shared/utils/inputSanitizer.ts`) consume. A match is redacted
-  only when its validator accepts it; a bare run of digits is never enough. An
-  operator who saved a narrowed selection before these ids existed keeps the
-  behaviour it had until the new ids are ticked.
-- **Custom patterns** — up to 20 regex or wildcard patterns (`*` = up to 64
-  non-whitespace characters, `?` = one). Matches become `[CUSTOM_REDACTED]`.
-  Every pattern goes through `compilePiiCustomPattern()`
-  (`src/shared/utils/piiCustomPatterns.ts`): at most 500 characters, flags limited
-  to `g i m s u`, must compile, must pass `safe-regex` (catastrophic
-  backtracking), and must not match an empty string or a redaction placeholder.
-  A pattern that fails is refused when saved and when tested, and a stored row
-  that fails is skipped at runtime instead of being compiled. Custom patterns only
-  run while masking is on.
-- **Detection counters** — per-type counts (never matched values), held in
-  memory and reset on restart (`src/lib/pii/piiDetectionStats.ts`). They only
-  increase while masking is on.
-
-The settings live in the `key_value` table (namespace `pii_settings`,
-`src/lib/db/piiSettings.ts`) and are read through a 1 s cache. API:
-
-| Method | Path                     | Purpose                                                                 |
-| ------ | ------------------------ | ----------------------------------------------------------------------- |
-| `GET`  | `/api/settings/pii`      | Flag state, `enabledTypes`, `customPatterns`, detection counters        |
-| `PUT`  | `/api/settings/pii`      | Replace `enabledTypes` (`null` = all) and/or `customPatterns`           |
-| `POST` | `/api/settings/pii/test` | Dry-run one pattern against a sample of at most 8 KB; nothing is stored |
-
-All three require management auth and validate the body with Zod
-(`src/shared/validation/schemas/piiSettings.ts`). With login disabled
-(`requireLogin=false`) `GET` and the test endpoint are open, but `PUT` still
-needs a dashboard session, a `manage`-scope API key, an `oma_` access token
-with write scope or higher, or the CLI token or internal-service token sent
-from loopback.
-
-#### GDPR (EU) and POPIA (South Africa) identifiers
-
-| Id                  | Identifier               | Validation                                                                           |
-| ------------------- | ------------------------ | ------------------------------------------------------------------------------------ |
-| `iban`              | IBAN                     | Known country, exact length for that country, ISO 13616 MOD-97-10                    |
-| `eu_vat`            | EU VAT number            | Known member-state prefix and that state's number format (no VIES lookup)            |
-| `es_dni_nie`        | Spanish DNI / NIE        | Control letter (value mod 23); NIE is `X/Y/Z` + 7 digits                             |
-| `it_codice_fiscale` | Italian Codice Fiscale   | Control letter from the odd/even position tables                                     |
-| `pl_pesel`          | Polish PESEL             | Weighted checksum and an encoded birth date that exists                              |
-| `nl_bsn`            | Dutch BSN                | 11-proof (weights 9..2, -1)                                                          |
-| `de_steuer_id`      | German Steuer-ID         | ISO 7064 Mod 11,10 plus the digit-structure rules (no leading 0)                     |
-| `se_personnummer`   | Swedish personnummer     | Luhn over the last ten digits and a plausible birth date (10 or 12 digits)           |
-| `za_id`             | South African ID number  | Luhn over all 13 digits, valid birth month/day, citizenship digit 0 or 1             |
-| `za_phone`          | South African phone      | `+27` / `27` prefix, or the national `0..` form written with a space or hyphen       |
-| `za_vat`            | South African VAT number | 10 digits starting with `4` **and** "VAT" / "BTW" in the 48 characters before        |
-| `za_tax_ref`        | South African tax ref.   | 10 digits starting `0`-`3`, Luhn, **and** "tax" / "SARS" in the 48 characters before |
-
-Because the digit-only formats collide with order numbers, build numbers and
-timestamps, the weakest ones (`za_vat`, `za_tax_ref`) need the keyword cue, and
-a bare ten-digit `0..` number is not treated as a South African phone number.
-Spaced IBANs (`GB29 NWBK ...`) are not matched. On the streaming path the cue is
-looked up inside the current chunk only. The ids sit ahead of the generic phone
-patterns, so a validated identifier keeps its own placeholder
-(`[IBAN_REDACTED]`, `[NL_BSN_REDACTED]`, ...). The `gdpr` and `popia` templates
-select the EU and South African ids respectively. Masking itself stays opt-in
-(Hard Rule #19): nothing here changes a feature-flag default.
-
-### Prompt Injection (`promptInjection.ts`)
-
-Detects adversarial structures in user-supplied content and enforces the
-configured policy. Behavior is driven by environment variables and constructor
-options:
-
-| Setting         | Env var                                                                                               | Default | Effect                                                                                                                                                                                   |
-| --------------- | ----------------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Enabled         | `INPUT_SANITIZER_ENABLED`                                                                             | `true`  | When `false`, guardrail short-circuits.                                                                                                                                                  |
-| Mode            | `INJECTION_GUARD_MODE` / `INPUT_SANITIZER_MODE`                                                       | `warn`  | Injection policy: `block`, `warn`, or `log`. (`redact` is accepted for back-compat but does **not** strip injection text; request PII rewrite is controlled by `PII_REDACTION_ENABLED`.) |
-| Block threshold | `blockThreshold` option / `INPUT_SANITIZER_BLOCK_THRESHOLD` (alias `INJECTION_GUARD_BLOCK_THRESHOLD`) | `high`  | Minimum severity required to block. Medium is observe-only at default.                                                                                                                   |
-
-**Mode precedence** (`getMode`): caller `options.mode` →
-`INJECTION_GUARD_MODE` **DB feature-flag override** (Dashboard → Settings →
-Feature Flags) → `INJECTION_GUARD_MODE` env → `INPUT_SANITIZER_MODE` env →
-`warn`. A dashboard override therefore wins over the env vars, so the Feature
-Flags UI controls the running guard live (no restart). The DB read is fail-safe:
-if it errors, the guard falls back to the env-based behavior, and when no
-override is set behavior is identical to env-only resolution.
-
-Detection sources:
-
-1. `sanitizeRequest()` from `@/shared/utils/inputSanitizer` (shared detector
-   set used elsewhere in the pipeline).
-2. Built-in `DEFAULT_GUARD_PATTERNS` (currently `system_override_inline` and
-   `markdown_system_block`, both `high` severity).
-3. Optional `customPatterns` passed via constructor options (strings, regex,
-   or `{ name, pattern, severity }` records).
-
-When `mode === "block"` **and** at least one detection meets the severity
-threshold, `preCall` returns `{ block: true, message: "Request rejected:
-suspicious content detected" }`. In `warn`/`log` modes the guardrail logs but
-allows the call. The shared helper `evaluatePromptInjection()` is also exported
-for callers that need to evaluate prompts without going through the registry.
-
-**Scan bound (v3.8.20):** the detector only inspects the **first 16 KB** of
-joined prompt text — `MAX_INJECTION_SCAN_BYTES = 16 * 1024` (16 384 bytes) in
-`src/shared/utils/inputSanitizer.ts`. Both `detectInjection()` and
-`evaluatePromptInjection()` `slice(0, MAX_INJECTION_SCAN_BYTES)` before running
-the pattern loop. Injection directives sit near the top of an input, so this
-caps regex CPU/GC on multi-hundred-KB payloads without weakening detection (cf.
-#3932, #4041).
-
 ### Credential Masker (`credentialMasker.ts`)
 
-Runs on **both** stages, last in the default chain (priority `95`). Redacts
+Runs on **both** stages, last in the default chain (priority `9`). Redacts
 well-known API-key / secret-token patterns from the outbound payload (message
 content, tool-call arguments, tool results) **and** the provider response, so a
 credential pasted into a prompt (or echoed back by a tool result) is not leaked
 to the upstream provider or back to the client.
 
-- **Opt-in only**, same convention as PII redaction (Hard Rule #19-adjacent):
+- **Opt-in only, off by default**:
   disabled unless `settings.credentialRedactionEnabled === true` **or**
   `CREDENTIAL_REDACTION_ENABLED=true`. With it off, the guardrail is a no-op —
   it never blocks and never rewrites.
@@ -508,25 +369,14 @@ their lists, and an empty modern header no longer hides the legacy one
 [#16805](https://github.com/diegosouzapw/OmniRoute/pull/16805)).
 
 Values may be arrays of strings or a comma-separated string; names are trimmed
-and normalized to lowercase kebab-case (`pii_masker` → `pii-masker`), and empty
+and normalized to lowercase kebab-case (`my_guardrail` → `my-guardrail`), and empty
 entries are dropped. The result is passed through `context.disabledGuardrails`
 to the registry, which skips matching guardrails (`skipped: true` in `results`).
 
-The disable list only affects the **registry**. Prompt-injection `block` mode is
-a mandatory boundary: the injection-guard middleware
-(`src/middleware/promptInjectionGuard.ts`) calls `evaluatePromptInjection()`
-without any caller-controlled disable list (the dead
-`resolveDisabledGuardrails({ body })` call it used to make was removed in
-[#16934](https://github.com/diegosouzapw/OmniRoute/pull/16934)), so a request
-that disables `prompt-injection` is still rejected in `block` mode. This is by
-design. The disable channels are caller-controlled (request body,
-metadata, headers), and a caller must not be able to switch off a security
-control the operator set
-([#16413](https://github.com/diegosouzapw/OmniRoute/issues/16413)). The header
-union from [#16412](https://github.com/diegosouzapw/OmniRoute/issues/16412)
-changes only which registry guardrails are skipped; it does not let a client
-bypass the middleware. Mandatory per-key and per-group guardrail policies are
-tracked in the v4 RFC [#16417](https://github.com/diegosouzapw/OmniRoute/issues/16417).
+The disable list only affects the **registry** (currently the vision bridge
+and the credential masker). The disable channels are caller-controlled (request
+body, metadata, headers). Mandatory per-key and per-group guardrail policies
+are tracked in the v4 RFC [#16417](https://github.com/diegosouzapw/OmniRoute/issues/16417).
 See [Coverage and limits](#coverage-and-limits).
 
 ## Execution Order
@@ -561,30 +411,22 @@ deliberately when the behavior changes.
 
 ### Where the hooks run
 
-| Hook / control                      | Runs on                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runPreCallHooks`                   | Requests handled by `handleChat` (`src/sse/handlers/chat.ts`): `/v1/chat/completions`, `/v1/messages`, `/v1/responses` (and `/v1/responses/*`), `/v1/relay/chat/completions`, `/v1/providers/{provider}/chat/completions`, `/v1/api/chat`, `/v1/antigravity`, `/v1beta/models/*`, and the Telegram chat proxy. Also the dashboard test endpoint `/api/guardrails/test`. A pre-call block returns HTTP 400. |
-| `runPostCallHooks`                  | **Non-streaming** chat responses only (`open-sse/handlers/chatCore/nonStreamingResponse.ts`). Streamed responses never reach it.                                                                                                                                                                                                                                                                           |
-| Streaming PII                       | `createPiiSseTransform` (`src/lib/streamingPiiTransform.ts`), piped in `streamingPipeline.ts` when `PII_RESPONSE_SANITIZATION` is on. It is not a guardrail, so the disable channels don't affect it.                                                                                                                                                                                                      |
-| Injection-guard middleware (legacy) | Every prompt-bearing `/v1` route, chat-family included (see [route coverage](#injection-guard-route-coverage--red-team-phase-8--block-d)). Prompt injection only.                                                                                                                                                                                                                                          |
+| Hook / control     | Runs on                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runPreCallHooks`  | Requests handled by `handleChat` (`src/sse/handlers/chat.ts`): `/v1/chat/completions`, `/v1/messages`, `/v1/responses` (and `/v1/responses/*`), `/v1/relay/chat/completions`, `/v1/providers/{provider}/chat/completions`, `/v1/api/chat`, `/v1/antigravity`, `/v1beta/models/*`, and the Telegram chat proxy. Also the dashboard test endpoint `/api/guardrails/test`. A pre-call block returns HTTP 400. |
+| `runPostCallHooks` | **Non-streaming** chat responses only (`open-sse/handlers/chatCore/nonStreamingResponse.ts`). Streamed responses never reach it.                                                                                                                                                                                                                                                                           |
 
 ### What is not covered
 
 - **Media, embeddings and data routes** (`/v1/images/*`, `/v1/embeddings`,
   `/v1/audio/*`, `/v1/videos/generations`, `/v1/music/generations`,
   `/v1/rerank`, `/v1/search`) never reach the registry. No
-  PII masking, credential masking or vision bridge runs there. Their only
-  check is the legacy injection-guard middleware.
-- **Streamed responses** get no post-call guardrails: no `pii-masker` or
-  `credential-masker` post-call, and no post-call block. Only the streaming PII
-  transform applies (when `PII_RESPONSE_SANITIZATION` is on). A credential
-  echoed back in a streamed response is not redacted.
-- **Disable channels vs. the middleware (by design):** the middleware evaluates
-  prompt injection with its own call to `evaluatePromptInjection()`, without
-  passing any caller-controlled disable list. `block` mode is a mandatory
-  boundary that caller-controlled disables cannot bypass, including on chat-family routes
-  ([#16413](https://github.com/diegosouzapw/OmniRoute/issues/16413)). Disabling
-  `prompt-injection` only skips the registry guardrail.
+  credential masking or vision bridge runs there.
+- **Streamed responses** get no post-call guardrails: no
+  `credential-masker` post-call, and no post-call block. Only the credential
+  streaming transform applies (when `CREDENTIAL_REDACTION_ENABLED` is on). A
+  credential echoed back in a streamed response with redaction off is not
+  redacted.
 
 ### What sees a response before post-call
 
@@ -592,29 +434,17 @@ On the non-streaming path the order is: memory extraction → built-in tool
 execution → post-call guardrails → post-call block exit → semantic-cache store.
 
 - **Memory extraction** and **tool execution** see the response before post-call
-  guardrails can rewrite or block it. Since
-  [#16401](https://github.com/diegosouzapw/OmniRoute/pull/16401), memory
-  extraction runs the extracted text through `sanitizePII` when
-  `PII_RESPONSE_SANITIZATION` is on (both streaming and non-streaming), but a
-  response that post-call later blocks has still been offered to memory and
-  tools.
+  guardrails can rewrite or block it. A response that post-call later blocks
+  has still been offered to memory and tools.
 - **The semantic cache** stores the response after post-call, so it stores the
   rewritten response, and a blocked response is never cached. Cache entries are
   keyed per API key.
 
 ## Configuration
 
-Environment variables read by the built-in guardrails:
-
-| Variable                              | Used by                   | Effect                                                                                              |
-| ------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------- |
-| `INPUT_SANITIZER_ENABLED`             | `prompt-injection`        | Set `false` to disable detection entirely.                                                          |
-| `INPUT_SANITIZER_MODE`                | `prompt-injection`        | Injection policy: `warn`, `block`, or `log`. Legacy value `redact` does not rewrite injection text. |
-| `INJECTION_GUARD_MODE`                | `prompt-injection`        | Mode for the injection guard; also a DB feature flag that **overrides** the env vars (DB > ENV).    |
-| `INPUT_SANITIZER_BLOCK_THRESHOLD`     | `prompt-injection`        | Minimum severity that `MODE=block` rejects: `high` (default), `medium`, or `low`.                   |
-| `INJECTION_GUARD_BLOCK_THRESHOLD`     | `prompt-injection`        | Legacy alias for `INPUT_SANITIZER_BLOCK_THRESHOLD`.                                                 |
-| `PII_REDACTION_ENABLED`               | `pii-masker`              | When `true`, request PII is redacted (independent of injection mode).                               |
-| `PII_RESPONSE_SANITIZATION` / `_MODE` | `pii-masker` (downstream) | Controls response-side masker behavior.                                                             |
+The credential-masker guardrail is opt-in, off by default: it runs only when
+`settings.credentialRedactionEnabled === true` **or**
+`CREDENTIAL_REDACTION_ENABLED=true`.
 
 The Vision Bridge guardrail reads runtime config from the DB-backed settings
 store (`getSettings()`), not env vars. Vision's primary keys are
@@ -659,7 +489,6 @@ Steps:
    any prior guardrail with the same normalized name.
 4. Add tests under `tests/unit/` (existing examples:
    `tests/unit/guardrails-registry.test.ts`,
-   `tests/unit/prompt-injection-guard.test.ts`,
    `tests/unit/guardrails/visionBridge.test.ts`).
 
 ## Testing
@@ -673,47 +502,8 @@ without DB or network access.
 ## See Also
 
 - `src/lib/guardrails/` — implementation
-- `src/shared/utils/inputSanitizer.ts` — shared detector that powers
-  prompt-injection and PII masking
 - `src/shared/constants/visionBridgeDefaults.ts` — Vision Bridge defaults and
   forced-bridge model list
 - `src/shared/constants/modalityBridgeDefaults.ts` — shared Vision/Audio runtime defaults
 - `docs/architecture/RESILIENCE_GUIDE.md` — orthogonal layer (circuit breaker, cooldowns)
 - `docs/reference/ENVIRONMENT.md` — full env var reference
-
-## Injection-guard route coverage & red-team (Phase 8 · Block D)
-
-The injection-guard (`createInjectionGuard` / `withInjectionGuard`) covers all routes
-that accept user prompts. It respects `INJECTION_GUARD_MODE` (default `warn` = log only;
-`block` = returns HTTP 400 `SECURITY_001`).
-
-| Type            | Routes                                                                                                                                               | Default mode |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| Text (existing) | `/v1/chat/completions`, `/v1/relay/chat/completions`                                                                                                 | warn         |
-| Generative      | `/v1/messages`, `/v1/responses`, `/v1/images/generations`, `/v1/images/edits`, `/v1/videos/generations`, `/v1/music/generations`, `/v1/audio/speech` | warn         |
-| Data            | `/v1/embeddings`, `/v1/rerank`, `/v1/search`                                                                                                         | warn         |
-
-Text extraction (`extractMessageContents`) covers `messages`/`input`/`prompt`/`query`+`documents`/`instructions`/`system`.
-
-**Red-team (nightly, `nightly-llm-security.yml`):** promptfoo validates that each route blocks
-the OWASP-LLM corpus in `INJECTION_GUARD_MODE=block`; garak runs probes (skips without secret).
-Block mode is a mandatory boundary: `evaluatePromptInjection()`
-ignores the per-request disable list the middleware passes it, so `disabledGuardrails` does
-**not** exempt a route from it ([#16413](https://github.com/diegosouzapw/OmniRoute/issues/16413)).
-
-The nightly workflow (`.github/workflows/nightly-llm-security.yml`, cron + manual
-dispatch) has two jobs:
-
-- **`promptfoo-guard` (blocking)** — runs `promptfoo eval -c promptfooconfig.yaml`
-  with `INJECTION_GUARD_MODE=block`. Each adversarial case (e.g. "ignore all
-  previous instructions…", DAN-style jailbreaks) asserts the response carries
-  `error.code === "SECURITY_001"`, i.e. the guard actually rejected the request.
-- **`garak` (advisory)** — runs garak `--probes promptinject,dan,leakreplay`
-  against a local OmniRoute instance (`http://localhost:20128/v1`). Gated on a
-  provider secret (`PROMPTFOO_PROVIDER_KEY`); skips gracefully and is suffixed
-  `|| true`, so it reports without failing CI.
-
-Coverage of the guard helper (`createInjectionGuard` / `withInjectionGuard`)
-spans every prompt-bearing `/v1` route; prompt text is pulled from
-`messages`/`input`/`prompt`/`query`+`documents`/`instructions`/`system` by
-`extractMessageContents()` in `src/shared/utils/inputSanitizer.ts`.

@@ -15,7 +15,6 @@ import { getDbInstance, isCloud, isBuildPhase, DATA_DIR } from "../db/core";
 import { getLegacyDotDataDir, isSamePath } from "../dataPaths";
 import { getAppLogFilePath } from "../logEnv";
 import { protectPayloadForLog } from "../logPayloads";
-import { sanitizePII } from "../piiSanitizer";
 import { resolveProviderId } from "@/shared/constants/providers";
 import { writeCallArtifact, getCallLogsDir, type CallLogArtifact } from "./callLogArtifacts";
 import {
@@ -57,7 +56,7 @@ function buildLegacyRequestSummary(requestType: unknown, requestBody: unknown) {
   const record = requestBody as Record<string, unknown>;
   const summary: Record<string, unknown> = {};
   if (typeof record.query === "string" && record.query.trim().length > 0) {
-    summary.query = sanitizePII(record.query).text;
+    summary.query = record.query;
   }
 
   const filters = Object.fromEntries(

@@ -45,7 +45,6 @@ import {
 } from "@/app/api/v1/_shared/rateLimit";
 import { getSettings } from "@/lib/db/settings";
 import { isProviderBlockedByIdOrAlias } from "@/shared/utils/noAuthProviders";
-import { withInjectionGuard } from "@/middleware/promptInjectionGuard";
 import { saveCallLog } from "@/lib/usageDb";
 import { isModelLocked } from "@omniroute/open-sse/services/accountFallback.ts";
 import { orderAutoSearchFallbacks } from "@/lib/search/codexSearchAutoFallback";
@@ -528,4 +527,4 @@ class SearchError extends Error {
   }
 }
 
-export const POST = withInjectionGuard(postHandler);
+export const POST = postHandler;

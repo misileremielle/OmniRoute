@@ -1496,7 +1496,6 @@
     "showing": "Tiek rādīti {count} no {total} notikumiem",
     "policyViolation": "Politikas pārkāpums",
     "accessDenied": "Piekļuve liegta",
-    "injectionBlocked": "Injekcija bloķēta",
     "noEvents": "Nav reģistrēts neviens atbilstības notikums.",
     "failedFetch": "Neizdevās ielādēt atbilstības revīzijas žurnālu.",
     "viewDetails": "Skatīt informāciju",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Atlikušie atkopšanas kodi: {count}",
     "mfaDisableDesc": "Lai izslēgtu divu faktoru autentifikāciju, ievadiet paroli un pašreizējo kodu (vai atkopšanas kodu).",
     "mfaRecoveryHint": "Pazaudētas ierīces atkopšana: palaidiet serveri ar OMNIROUTE_DISABLE_MFA=true un piesakieties tieši no resursdatora.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ir iestatīts: pieteikšanās no šī resursdatora izlaiž otro faktoru. Noņemiet to, kad atkal esat iekšā.",
-    "piiMasking": {
-      "title": "Personas datu maskēšana",
-      "description": "Izvēlieties, kurus personas datu veidus maskēt, un pievienojiet savus šablonus. Maskēšana ir izslēgta, līdz ieslēdzat zemāk redzamos funkciju karogus.",
-      "requestFlag": "Pieprasījumu maskēšana",
-      "responseFlag": "Atbilžu attīrīšana",
-      "templates": "Veidnes",
-      "template": {
-        "minimal": "Minimālā",
-        "standard": "Standarta",
-        "financial": "Finanšu",
-        "brazilian": "Brazīlijas",
-        "usa": "ASV",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Dienvidāfrika)",
-        "full": "Pilnā"
-      },
-      "builtinTypes": "Iebūvētie veidi",
-      "types": {
-        "email": "E-pasta adreses",
-        "phone_us": "ASV tālruņa numuri",
-        "phone_br": "Brazīlijas tālruņa numuri",
-        "ssn": "ASV sociālās apdrošināšanas numuri",
-        "credit_card": "Kredītkaršu numuri",
-        "cpf": "CPF (Brazīlijas nodokļu maksātāja ID)",
-        "cnpj": "CNPJ (Brazīlijas uzņēmuma ID)",
-        "ip_address": "IPv4 adreses",
-        "ipv6_address": "IPv6 adreses",
-        "aws_key": "AWS piekļuves atslēgas",
-        "api_key_generic": "API atslēgas un žetoni",
-        "iban": "IBAN bankas kontu numuri",
-        "eu_vat": "EU VAT cipari",
-        "es_dni_nie": "spāņu DNI / NIE",
-        "it_codice_fiscale": "Itāļu Codice Fiscale",
-        "pl_pesel": "poļu PESEL",
-        "nl_bsn": "Holandiešu BSN",
-        "de_steuer_id": "Vācu Steuer-ID",
-        "se_personnummer": "Zviedru personnummer",
-        "za_id": "Dienvidāfrikas ID skaitļi",
-        "za_phone": "Dienvidāfrikas tālruņu numuri",
-        "za_vat": "Dienvidāfrikas VAT skaitļi",
-        "za_tax_ref": "Dienvidāfrikas nodokļu atsauces"
-      },
-      "customPatterns": "Pielāgoti šabloni",
-      "customPatternsDesc": "Atbilstības tiek aizstātas ar [CUSTOM_REDACTED]. Līdz {max} šabloniem. Šabloni ar katastrofālas atkāpšanās risku tiek noraidīti.",
-      "typeRegex": "Regulārā izteiksme",
-      "typeWildcard": "Aizstājējzīme (* un ?)",
-      "pattern": "Šablons",
-      "flags": "Karogi (i, m, s, u)",
-      "sampleText": "Parauga teksts šablona pārbaudei",
-      "test": "Pārbaudīt",
-      "testMatches": "Atbilstības: {count}",
-      "testFailed": "Šablons noraidīts: {message}",
-      "add": "Pievienot šablonu",
-      "saved": "Saglabāts",
-      "saveFailed": "Neizdevās saglabāt: {message}",
-      "statsTitle": "Atklājumi kopš restartēšanas",
-      "statsEmpty": "Atklājumu vēl nav.",
-      "statsRequest": "Pieprasījumi"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ir iestatīts: pieteikšanās no šī resursdatora izlaiž otro faktoru. Noņemiet to, kad atkal esat iekšā."
   },
   "contextRtk": {
     "title": "RTK dzinējs",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Pieprasīt API atslēgu visiem ienākošajiem pieprasījumiem."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Iespējot ievades sanitizēšanu visiem pieprasījumiem."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Iestatīt aizsardzības režīmu pret uzvednes injekciju."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Aizklāt personu identificējošu informāciju pieprasījumos."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sanitizēt personu identificējošu informāciju pakalpojumu sniedzēju atbildēs."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Izvēlieties, kā apstrādāt atbilžu PII: “redact” to aizklāj, “warn” tikai reģistrē brīdinājumu, “block” noraida atbildi, bet “off” atspējo sanitizēšanu."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Bloķēt izejošos pieprasījumus uz privāto vai iekšējo IP adrešu diapazoniem."

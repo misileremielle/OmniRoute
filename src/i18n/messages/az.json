@@ -1496,7 +1496,6 @@
     "showing": "{total} hadisədən {count}-i göstərilir",
     "policyViolation": "Siyasət pozuntusu",
     "accessDenied": "Giriş rədd edildi",
-    "injectionBlocked": "İnyeksiya bloklandı",
     "noEvents": "Heç bir uyğunluq hadisəsi qeydə alınmayıb.",
     "failedFetch": "Uyğunluq auditi jurnalını əldə etmək mümkün olmadı.",
     "viewDetails": "Təfərrüatlara bax",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Qalan bərpa kodları: {count}",
     "mfaDisableDesc": "İki faktorlu autentifikasiyanı söndürmək üçün parolunuzu və cari kodu (və ya bərpa kodunu) daxil edin.",
     "mfaRecoveryHint": "İtirilmiş cihazın bərpası: serveri OMNIROUTE_DISABLE_MFA=true ilə başladın və hostun özündən daxil olun.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA təyin edilib: bu hostdan girişlər ikinci faktoru keçir. Geri qayıtdıqdan sonra onu silin.",
-    "piiMasking": {
-      "title": "Şəxsi məlumatların maskalanması",
-      "description": "Hansı növ şəxsi məlumatların maskalanacağını seçin və öz nümunələrinizi əlavə edin. Aşağıda göstərilən funksiya bayraqlarını yandırana qədər maskalama söndürülmüş qalır.",
-      "requestFlag": "Sorğuların maskalanması",
-      "responseFlag": "Cavabların təmizlənməsi",
-      "templates": "Şablonlar",
-      "template": {
-        "minimal": "Minimal",
-        "standard": "Standart",
-        "financial": "Maliyyə",
-        "brazilian": "Braziliya",
-        "usa": "ABŞ",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Cənubi Afrika)",
-        "full": "Tam"
-      },
-      "builtinTypes": "Daxili növlər",
-      "types": {
-        "email": "E-poçt ünvanları",
-        "phone_us": "ABŞ telefon nömrələri",
-        "phone_br": "Braziliya telefon nömrələri",
-        "ssn": "ABŞ sosial təminat nömrələri",
-        "credit_card": "Kredit kartı nömrələri",
-        "cpf": "CPF (Braziliya vergi ödəyicisi ID)",
-        "cnpj": "CNPJ (Braziliya şirkət ID)",
-        "ip_address": "IPv4 ünvanları",
-        "ipv6_address": "IPv6 ünvanları",
-        "aws_key": "AWS giriş açarları",
-        "api_key_generic": "API açarları və tokenlər",
-        "iban": "IBAN bank hesab nömrələri",
-        "eu_vat": "EU VAT nömrələri",
-        "es_dni_nie": "İspan DNI / NIE",
-        "it_codice_fiscale": "İtalyan Kodeksi Fiscale",
-        "pl_pesel": "Polşa PESEL",
-        "nl_bsn": "holland BSN",
-        "de_steuer_id": "Alman Steuer-ID",
-        "se_personnummer": "İsveçli kadr",
-        "za_id": "Cənubi Afrika ID nömrələri",
-        "za_phone": "Cənubi Afrika telefon nömrələri",
-        "za_vat": "Cənubi Afrika VAT nömrələri",
-        "za_tax_ref": "Cənubi Afrika vergi istinadları"
-      },
-      "customPatterns": "Fərdi nümunələr",
-      "customPatternsDesc": "Uyğunluqlar [CUSTOM_REDACTED] ilə əvəz olunur. Ən çox {max} nümunə. Fəlakətli geri izləmə riski olan nümunələr rədd edilir.",
-      "typeRegex": "Müntəzəm ifadə",
-      "typeWildcard": "Əvəzedici simvol (* və ?)",
-      "pattern": "Nümunə",
-      "flags": "Bayraqlar (i, m, s, u)",
-      "sampleText": "Nümunəni sınamaq üçün nümunə mətn",
-      "test": "Sına",
-      "testMatches": "{count} uyğunluq",
-      "testFailed": "Nümunə rədd edildi: {message}",
-      "add": "Nümunə əlavə et",
-      "saved": "Yadda saxlanıldı",
-      "saveFailed": "Yadda saxlamaq mümkün olmadı: {message}",
-      "statsTitle": "Yenidən başladılandan bəri aşkarlamalar",
-      "statsEmpty": "Hələ aşkarlama yoxdur.",
-      "statsRequest": "Sorğular"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA təyin edilib: bu hostdan girişlər ikinci faktoru keçir. Geri qayıtdıqdan sonra onu silin."
   },
   "contextRtk": {
     "title": "RTK Mühərriki",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Bütün daxil olan sorğular üçün API açarı tələb olunsun."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Bütün sorğular üçün daxiletmənin təmizlənməsini aktivləşdirin."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Prompt inyeksiyası qoruma rejimini təyin edin."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Fərdi müəyyənləşdirilə bilən məlumatları sorğulardan gizlədin."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Provayder cavablarında fərdi müəyyənləşdirilə bilən məlumatları təmizləyin."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Cavab PII-nin necə idarə olunacağını seçin: redact onu əvəz edir, warn yalnız qeydə alır, block cavabı rədd edir və off təmizləməni sıradan çıxarır."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Özəl və ya daxili IP diapazonlarına gedən sorğuları bloklayın."

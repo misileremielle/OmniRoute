@@ -214,6 +214,6 @@ provider-management routes when they emit credential events:
 
 ## See Also
 
-- [`docs/security/GUARDRAILS.md`](./GUARDRAILS.md) — PII masking, prompt injection
+- [`docs/security/GUARDRAILS.md`](./GUARDRAILS.md) — credential masking, vision bridge
 - [`docs/reference/ENVIRONMENT.md`](../reference/ENVIRONMENT.md) — full env var reference
 - Source: `src/lib/compliance/`, `src/app/api/compliance/`, `src/lib/logEnv.ts`

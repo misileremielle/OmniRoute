@@ -25,7 +25,6 @@ import {
 import { isAllRateLimitedCredentials } from "@/app/api/v1/_shared/rateLimit";
 import { getSettings } from "@/lib/db/settings";
 import { isProviderBlockedByIdOrAlias } from "@/shared/utils/noAuthProviders";
-import { withInjectionGuard } from "@/middleware/promptInjectionGuard";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -296,4 +295,4 @@ async function postHandler(request: Request) {
   }
 }
 
-export const POST = withInjectionGuard(postHandler);
+export const POST = postHandler;

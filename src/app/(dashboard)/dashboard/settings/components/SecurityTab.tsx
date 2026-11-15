@@ -7,7 +7,6 @@ import Icon from "@/shared/components/Icon";
 import { AI_PROVIDERS } from "@/shared/constants/providers";
 import ProviderIcon from "@/shared/components/ProviderIcon";
 import IPFilterSection from "./IPFilterSection";
-import PiiMaskingCard from "./PiiMaskingCard";
 import SessionInfoCard from "./SessionInfoCard";
 import AuthzSection from "./AuthzSection";
 import MfaSection from "./MfaSection";
@@ -315,8 +314,6 @@ export default function SecurityTab() {
       <MfaSection />
 
       <IPFilterSection />
-
-      <PiiMaskingCard />
 
       {/* API Endpoint Protection */}
       <Card title={t("apiEndpointProtection")} icon="api">

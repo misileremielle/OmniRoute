@@ -1962,7 +1962,7 @@ Shadow / A-B comparison of providers is **not a standalone REST surface** — it
 
 ## Guardrails
 
-Inspect the runtime guardrails (PII detection, prompt injection detection, vision bridging). Guardrails run on every request; per-call opt-out is via the `x-omniroute-disabled-guardrails` request header — there is no persisted enable/disable surface.
+Inspect the runtime guardrails (credential masking, vision bridging). Guardrails run on every request; per-call opt-out is via the `x-omniroute-disabled-guardrails` request header — there is no persisted enable/disable surface.
 
 | Method | Path                   | Description                                                                              |
 | ------ | ---------------------- | ---------------------------------------------------------------------------------------- |

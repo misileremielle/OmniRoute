@@ -1496,7 +1496,6 @@
     "showing": "Visar {count} av {total} händelser",
     "policyViolation": "Policyöverträdelse",
     "accessDenied": "Åtkomst nekad",
-    "injectionBlocked": "Injektion blockerad",
     "noEvents": "Inga efterlevnadshändelser registrerade.",
     "failedFetch": "Det gick inte att hämta granskningsloggen för efterlevnad.",
     "viewDetails": "Visa detaljer",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Återstående återställningskoder: {count}",
     "mfaDisableDesc": "Ange ditt lösenord och en aktuell kod (eller en återställningskod) för att stänga av tvåfaktorsautentisering.",
     "mfaRecoveryHint": "Återställning vid förlorad enhet: starta servern med OMNIROUTE_DISABLE_MFA=true och logga in från själva värden.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA är satt: inloggningar från den här värden hoppar över den andra faktorn. Ta bort den när du är inne igen.",
-    "piiMasking": {
-      "title": "PII-maskering",
-      "description": "Välj vilka typer av personuppgifter som maskeras och lägg till egna mönster. Maskeringen är avstängd tills du aktiverar funktionsflaggorna som visas nedan.",
-      "requestFlag": "Maskering av förfrågningar",
-      "responseFlag": "Sanering av svar",
-      "templates": "Mallar",
-      "template": {
-        "minimal": "Minimal",
-        "standard": "Standard",
-        "financial": "Finansiell",
-        "brazilian": "Brasiliansk",
-        "usa": "USA",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Sydafrika)",
-        "full": "Fullständig"
-      },
-      "builtinTypes": "Inbyggda typer",
-      "types": {
-        "email": "E-postadresser",
-        "phone_us": "Amerikanska telefonnummer",
-        "phone_br": "Brasilianska telefonnummer",
-        "ssn": "Amerikanska personnummer (SSN)",
-        "credit_card": "Kreditkortsnummer",
-        "cpf": "CPF (brasilianskt skatte-ID)",
-        "cnpj": "CNPJ (brasilianskt företags-ID)",
-        "ip_address": "IPv4-adresser",
-        "ipv6_address": "IPv6-adresser",
-        "aws_key": "AWS-åtkomstnycklar",
-        "api_key_generic": "API-nycklar och tokens",
-        "iban": "IBAN bankkontonummer",
-        "eu_vat": "EU VAT -nummer",
-        "es_dni_nie": "Spanska DNI / NIE",
-        "it_codice_fiscale": "Italienska Codice Fiscale",
-        "pl_pesel": "polska PESEL",
-        "nl_bsn": "holländska BSN",
-        "de_steuer_id": "tyska Steuer-ID",
-        "se_personnummer": "Svenskt personnummer",
-        "za_id": "Sydafrikanska ID nummer",
-        "za_phone": "Sydafrikanska telefonnummer",
-        "za_vat": "Sydafrikanska VAT nummer",
-        "za_tax_ref": "Sydafrikanska skattereferenser"
-      },
-      "customPatterns": "Egna mönster",
-      "customPatternsDesc": "Träffar ersätts med [CUSTOM_REDACTED]. Upp till {max} mönster. Mönster som riskerar katastrofal backtracking avvisas.",
-      "typeRegex": "Reguljärt uttryck",
-      "typeWildcard": "Jokertecken (* och ?)",
-      "pattern": "Mönster",
-      "flags": "Flaggor (i, m, s, u)",
-      "sampleText": "Exempeltext att testa mönstret mot",
-      "test": "Testa",
-      "testMatches": "{count} träffar",
-      "testFailed": "Mönstret avvisades: {message}",
-      "add": "Lägg till mönster",
-      "saved": "Sparat",
-      "saveFailed": "Kunde inte spara: {message}",
-      "statsTitle": "Upptäckter sedan omstart",
-      "statsEmpty": "Inga upptäckter än.",
-      "statsRequest": "Förfrågningar"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA är satt: inloggningar från den här värden hoppar över den andra faktorn. Ta bort den när du är inne igen."
   },
   "contextRtk": {
     "title": "RTK-motor",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Kräv en API-nyckel för alla inkommande förfrågningar."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Aktivera indatasanering för alla förfrågningar."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Ställ in skyddsläge för prompt-injektion."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Maskera personligt identifierbar information från förfrågningar."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sanera personligt identifierbar information i leverantörssvar."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Välj hur PII i svar hanteras: redact ersätter det, warn loggar det bara, block avvisar svaret och off inaktiverar sanering."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Blockera utgående förfrågningar till privata eller interna IP-intervall."

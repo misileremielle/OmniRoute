@@ -12,13 +12,11 @@ const FIXED_CATEGORY_MAP: Record<string, FieldCategory> = {
   partial_json: "partialJson",
 };
 
-// System/protocol metadata keys that must never be routed through the PII processor or
-// buffer, no matter which JSON shape they appear in. Shared by the real-time sanitizeObject
-// pass (below) and streamingPiiTransform.ts's onFlush generic-fallback branch — the two
-// copies of this list had drifted (see issue #13488): neither one listed `provider`,
-// `native_finish_reason`, or the `reasoning_details[].format` field, so those OpenRouter
-// metadata strings fell through to the default "content" category and got spliced into the
-// same sliding-window buffer as the actual answer text.
+// System/protocol metadata keys that must never be routed through the content
+// processor or buffer, no matter which JSON shape they appear in. Shared by the
+// real-time sanitizeObject pass (below): OpenRouter metadata strings such as
+// `provider`, `native_finish_reason`, or the `reasoning_details[].format` field
+// must not be spliced into the same sliding-window buffer as the actual answer text.
 export const METADATA_KEYS = new Set([
   "id",
   "model",
@@ -142,7 +140,7 @@ export function isResponsesToolArgsDelta(json: any): boolean {
 }
 
 /**
- * Classify a string field as a PII-processed category, or `null` when it is metadata that
+ * Classify a string field as a content category, or `null` when it is metadata that
  * must pass through untouched. `parentKey` is the key of the object that directly contains
  * `key` (empty string at the JSON root) — it disambiguates `text`, which means the answer
  * everywhere except inside a `reasoning_details[]` item, where it is reasoning text (and
@@ -470,6 +468,8 @@ export function createSseTextTransform(
           }
           controller.enqueue(encoder.encode(prefix + JSON.stringify(json) + "\n"));
         } catch (err: any) {
+          // "[PII]"-prefixed errors are the credential transform failing closed
+          // (buffer/choice limits): never swallow them.
           if (err?.message?.startsWith("[PII]")) {
             throw err;
           }

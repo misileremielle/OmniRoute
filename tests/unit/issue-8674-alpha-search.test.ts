@@ -16,7 +16,8 @@ test("issue-8674: /v1/alpha/search route file exists", () => {
 
 test("issue-8674: route exports POST and OPTIONS, not GET", () => {
   const src = readFileSync(ROUTE_PATH, "utf8");
-  assert.match(src, /export const POST = withInjectionGuard\(postHandler\)/);
+  assert.match(src, /export const POST = postHandler/);
+  assert.doesNotMatch(src, /withInjectionGuard/);
   assert.match(src, /export async function OPTIONS\(\)/);
   assert.doesNotMatch(src, /export async function GET\(/);
 });

@@ -12,8 +12,8 @@
  *   - `providerLimitsSyncScheduler.ts`: `isRunning` reentrancy guard,
  *     elapsed-since-last-run initial delay, `.unref()`'d timers.
  *
- * Config via environment (opt-in, off by default — parallels Hard Rule #19's
- * default-off posture for another data-mutating background feature):
+ * Config via environment (opt-in, off by default, like other data-mutating
+ * background features):
  *   FREE_PROXY_AUTO_SYNC_ENABLED       — set "true" to enable (default: off)
  *   FREE_PROXY_AUTO_SYNC_INTERVAL_MS   — sync interval in ms (default: 1_800_000
  *                                        = 30min; floor-clamped to 300_000 =

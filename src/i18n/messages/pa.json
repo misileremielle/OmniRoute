@@ -1496,7 +1496,6 @@
     "showing": "{total} ਵਿੱਚੋਂ {count} ਇਵੈਂਟ ਦਿਖਾਏ ਜਾ ਰਹੇ ਹਨ",
     "policyViolation": "ਨੀਤੀ ਦੀ ਉਲੰਘਣਾ",
     "accessDenied": "ਪਹੁੰਚ ਅਸਵੀਕਾਰ ਕੀਤੀ ਗਈ",
-    "injectionBlocked": "ਇੰਜੈਕਸ਼ਨ ਬਲੌਕ ਕੀਤਾ ਗਿਆ",
     "noEvents": "ਕੋਈ ਅਨੁਕੂਲਤਾ ਇਵੈਂਟ ਦਰਜ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।",
     "failedFetch": "ਅਨੁਕੂਲਤਾ ਆਡਿਟ ਲੌਗ ਪ੍ਰਾਪਤ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ।",
     "viewDetails": "ਵੇਰਵੇ ਵੇਖੋ",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "ਬਾਕੀ ਰਿਕਵਰੀ ਕੋਡ: {count}",
     "mfaDisableDesc": "ਦੋ-ਪੜਾਅ ਪ੍ਰਮਾਣੀਕਰਨ ਬੰਦ ਕਰਨ ਲਈ ਆਪਣਾ ਪਾਸਵਰਡ ਅਤੇ ਮੌਜੂਦਾ ਕੋਡ (ਜਾਂ ਰਿਕਵਰੀ ਕੋਡ) ਦਰਜ ਕਰੋ।",
     "mfaRecoveryHint": "ਗੁੰਮ ਹੋਏ ਡਿਵਾਈਸ ਦੀ ਰਿਕਵਰੀ: ਸਰਵਰ ਨੂੰ OMNIROUTE_DISABLE_MFA=true ਨਾਲ ਸ਼ੁਰੂ ਕਰੋ ਅਤੇ ਹੋਸਟ ਤੋਂ ਹੀ ਸਾਈਨ ਇਨ ਕਰੋ।",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ਸੈੱਟ ਹੈ: ਇਸ ਹੋਸਟ ਤੋਂ ਸਾਈਨ-ਇਨ ਦੂਜਾ ਪੜਾਅ ਛੱਡ ਦਿੰਦੇ ਹਨ। ਦੁਬਾਰਾ ਪਹੁੰਚ ਮਿਲਣ ਤੋਂ ਬਾਅਦ ਇਸਨੂੰ ਹਟਾ ਦਿਓ।",
-    "piiMasking": {
-      "title": "ਨਿੱਜੀ ਡਾਟਾ ਮਾਸਕਿੰਗ",
-      "description": "ਚੁਣੋ ਕਿ ਕਿਹੜੀ ਕਿਸਮ ਦਾ ਨਿੱਜੀ ਡਾਟਾ ਮਾਸਕ ਕੀਤਾ ਜਾਵੇ ਅਤੇ ਆਪਣੇ ਪੈਟਰਨ ਸ਼ਾਮਲ ਕਰੋ। ਜਦੋਂ ਤੱਕ ਤੁਸੀਂ ਹੇਠਾਂ ਦਿਖਾਏ ਫੀਚਰ ਫਲੈਗ ਚਾਲੂ ਨਹੀਂ ਕਰਦੇ, ਮਾਸਕਿੰਗ ਬੰਦ ਰਹਿੰਦੀ ਹੈ।",
-      "requestFlag": "ਬੇਨਤੀ ਮਾਸਕਿੰਗ",
-      "responseFlag": "ਜਵਾਬ ਸਫ਼ਾਈ",
-      "templates": "ਟੈਮਪਲੇਟ",
-      "template": {
-        "minimal": "ਘੱਟੋ-ਘੱਟ",
-        "standard": "ਮਿਆਰੀ",
-        "financial": "ਵਿੱਤੀ",
-        "brazilian": "ਬ੍ਰਾਜ਼ੀਲੀ",
-        "usa": "ਅਮਰੀਕਾ",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (ਦੱਖਣੀ ਅਫਰੀਕਾ)",
-        "full": "ਪੂਰਾ"
-      },
-      "builtinTypes": "ਬਿਲਟ-ਇਨ ਕਿਸਮਾਂ",
-      "types": {
-        "email": "ਈਮੇਲ ਪਤੇ",
-        "phone_us": "ਅਮਰੀਕੀ ਫ਼ੋਨ ਨੰਬਰ",
-        "phone_br": "ਬ੍ਰਾਜ਼ੀਲੀ ਫ਼ੋਨ ਨੰਬਰ",
-        "ssn": "ਅਮਰੀਕੀ ਸੋਸ਼ਲ ਸਿਕਿਓਰਿਟੀ ਨੰਬਰ",
-        "credit_card": "ਕ੍ਰੈਡਿਟ ਕਾਰਡ ਨੰਬਰ",
-        "cpf": "CPF (ਬ੍ਰਾਜ਼ੀਲੀ ਟੈਕਸਦਾਤਾ ID)",
-        "cnpj": "CNPJ (ਬ੍ਰਾਜ਼ੀਲੀ ਕੰਪਨੀ ID)",
-        "ip_address": "IPv4 ਪਤੇ",
-        "ipv6_address": "IPv6 ਪਤੇ",
-        "aws_key": "AWS ਪਹੁੰਚ ਕੁੰਜੀਆਂ",
-        "api_key_generic": "API ਕੁੰਜੀਆਂ ਅਤੇ ਟੋਕਨ",
-        "iban": "IBAN ਬੈਂਕ ਖਾਤਾ ਨੰਬਰ",
-        "eu_vat": "EU VAT ਨੰਬਰ",
-        "es_dni_nie": "ਸਪੇਨੀ DNI / NIE",
-        "it_codice_fiscale": "ਇਤਾਲਵੀ ਕੋਡਿਸ ਫਿਸਕੇਲ",
-        "pl_pesel": "ਪੋਲਿਸ਼ PESEL",
-        "nl_bsn": "ਡੱਚ BSN",
-        "de_steuer_id": "ਜਰਮਨ Steuer-ID",
-        "se_personnummer": "ਸਵੀਡਿਸ਼ ਵਿਅਕਤੀ ਨੰਬਰ",
-        "za_id": "ਦੱਖਣੀ ਅਫ਼ਰੀਕੀ ID ਨੰਬਰ",
-        "za_phone": "ਦੱਖਣੀ ਅਫ਼ਰੀਕੀ ਫ਼ੋਨ ਨੰਬਰ",
-        "za_vat": "ਦੱਖਣੀ ਅਫ਼ਰੀਕੀ VAT ਨੰਬਰ",
-        "za_tax_ref": "ਦੱਖਣੀ ਅਫ਼ਰੀਕੀ ਟੈਕਸ ਹਵਾਲੇ"
-      },
-      "customPatterns": "ਕਸਟਮ ਪੈਟਰਨ",
-      "customPatternsDesc": "ਮੇਲ [CUSTOM_REDACTED] ਨਾਲ ਬਦਲੇ ਜਾਂਦੇ ਹਨ। ਵੱਧ ਤੋਂ ਵੱਧ {max} ਪੈਟਰਨ। ਤਬਾਹਕੁਨ ਬੈਕਟ੍ਰੈਕਿੰਗ ਦੇ ਖ਼ਤਰੇ ਵਾਲੇ ਪੈਟਰਨ ਰੱਦ ਕੀਤੇ ਜਾਂਦੇ ਹਨ।",
-      "typeRegex": "ਰੈਗੂਲਰ ਐਕਸਪ੍ਰੈਸ਼ਨ",
-      "typeWildcard": "ਵਾਈਲਡਕਾਰਡ (* ਅਤੇ ?)",
-      "pattern": "ਪੈਟਰਨ",
-      "flags": "ਫਲੈਗ (i, m, s, u)",
-      "sampleText": "ਪੈਟਰਨ ਜਾਂਚਣ ਲਈ ਨਮੂਨਾ ਲਿਖਤ",
-      "test": "ਜਾਂਚੋ",
-      "testMatches": "{count} ਮੇਲ",
-      "testFailed": "ਪੈਟਰਨ ਰੱਦ: {message}",
-      "add": "ਪੈਟਰਨ ਸ਼ਾਮਲ ਕਰੋ",
-      "saved": "ਸੁਰੱਖਿਅਤ ਕੀਤਾ",
-      "saveFailed": "ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਹੋ ਸਕਿਆ: {message}",
-      "statsTitle": "ਮੁੜ-ਚਾਲੂ ਹੋਣ ਤੋਂ ਬਾਅਦ ਦੀਆਂ ਪਛਾਣਾਂ",
-      "statsEmpty": "ਅਜੇ ਕੋਈ ਪਛਾਣ ਨਹੀਂ।",
-      "statsRequest": "ਬੇਨਤੀਆਂ"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ਸੈੱਟ ਹੈ: ਇਸ ਹੋਸਟ ਤੋਂ ਸਾਈਨ-ਇਨ ਦੂਜਾ ਪੜਾਅ ਛੱਡ ਦਿੰਦੇ ਹਨ। ਦੁਬਾਰਾ ਪਹੁੰਚ ਮਿਲਣ ਤੋਂ ਬਾਅਦ ਇਸਨੂੰ ਹਟਾ ਦਿਓ।"
   },
   "contextRtk": {
     "title": "RTK ਇੰਜਣ",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "ਸਾਰੀਆਂ ਆਉਣ ਵਾਲੀਆਂ ਬੇਨਤੀਆਂ ਲਈ API ਕੁੰਜੀ ਲਾਜ਼ਮੀ ਕਰੋ।"
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "ਸਾਰੀਆਂ ਬੇਨਤੀਆਂ ਲਈ ਇਨਪੁੱਟ ਸੈਨੀਟਾਈਜ਼ੇਸ਼ਨ ਸਮਰੱਥ ਕਰੋ।"
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "ਪ੍ਰੌਂਪਟ-ਇੰਜੈਕਸ਼ਨ ਗਾਰਡ ਮੋਡ ਸੈੱਟ ਕਰੋ।"
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "ਬੇਨਤੀਆਂ ਵਿੱਚੋਂ ਨਿੱਜੀ ਤੌਰ 'ਤੇ ਪਛਾਣਯੋਗ ਜਾਣਕਾਰੀ ਛੁਪਾਓ।"
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "ਪ੍ਰਦਾਤਾ ਦੇ ਜਵਾਬਾਂ ਵਿੱਚੋਂ ਨਿੱਜੀ ਤੌਰ 'ਤੇ ਪਛਾਣਯੋਗ ਜਾਣਕਾਰੀ ਨੂੰ ਸੈਨੀਟਾਈਜ਼ ਕਰੋ।"
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "ਚੁਣੋ ਕਿ ਜਵਾਬ ਵਿੱਚ ਮੌਜੂਦ PII ਨੂੰ ਕਿਵੇਂ ਸੰਭਾਲਿਆ ਜਾਵੇ: ਛੁਪਾਉਣ ਨਾਲ ਇਹ ਬਦਲ ਦਿੱਤੀ ਜਾਂਦੀ ਹੈ, ਚੇਤਾਵਨੀ ਸਿਰਫ਼ ਇਸ ਨੂੰ ਲੌਗ ਕਰਦੀ ਹੈ, ਬਲੌਕ ਜਵਾਬ ਨੂੰ ਰੱਦ ਕਰਦਾ ਹੈ ਅਤੇ ਬੰਦ ਕਰਨ ਨਾਲ ਸੈਨੀਟਾਈਜ਼ੇਸ਼ਨ ਅਯੋਗ ਹੋ ਜਾਂਦੀ ਹੈ।"
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "ਨਿੱਜੀ ਜਾਂ ਅੰਦਰੂਨੀ IP ਰੇਂਜਾਂ ਵੱਲ ਜਾਣ ਵਾਲੀਆਂ ਬੇਨਤੀਆਂ ਨੂੰ ਬਲੌਕ ਕਰੋ।"

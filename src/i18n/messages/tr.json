@@ -1496,7 +1496,6 @@
     "showing": "{total} olaydan {count} gösteriliyor",
     "policyViolation": "Politika İhlali",
     "accessDenied": "Erişim Reddedildi",
-    "injectionBlocked": "Enjeksiyon Engellendi",
     "noEvents": "Hiçbir uyumluluk olayı kaydedilmedi.",
     "failedFetch": "Uyumluluk denetim günlüğü getirilemedi.",
     "viewDetails": "Ayrıntıları görüntüle",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Kalan kurtarma kodları: {count}",
     "mfaDisableDesc": "İki faktörlü kimlik doğrulamayı kapatmak için parolanızı ve geçerli bir kodu (veya bir kurtarma kodunu) girin.",
     "mfaRecoveryHint": "Kayıp cihaz kurtarma: sunucuyu OMNIROUTE_DISABLE_MFA=true ile başlatın ve doğrudan ana makineden giriş yapın.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ayarlı: bu ana makineden yapılan girişler ikinci faktörü atlar. Erişimi geri kazandığınızda kaldırın.",
-    "piiMasking": {
-      "title": "Kişisel veri maskeleme",
-      "description": "Hangi kişisel veri türlerinin maskeleneceğini seçin ve kendi desenlerinizi ekleyin. Aşağıda gösterilen özellik bayraklarını açana kadar maskeleme kapalı kalır.",
-      "requestFlag": "İstek maskeleme",
-      "responseFlag": "Yanıt temizleme",
-      "templates": "Şablonlar",
-      "template": {
-        "minimal": "Asgari",
-        "standard": "Standart",
-        "financial": "Finansal",
-        "brazilian": "Brezilya",
-        "usa": "ABD",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Güney Afrika)",
-        "full": "Tam"
-      },
-      "builtinTypes": "Yerleşik türler",
-      "types": {
-        "email": "E-posta adresleri",
-        "phone_us": "ABD telefon numaraları",
-        "phone_br": "Brezilya telefon numaraları",
-        "ssn": "ABD Sosyal Güvenlik numaraları",
-        "credit_card": "Kredi kartı numaraları",
-        "cpf": "CPF (Brezilya vergi kimlik no.)",
-        "cnpj": "CNPJ (Brezilya şirket kimlik no.)",
-        "ip_address": "IPv4 adresleri",
-        "ipv6_address": "IPv6 adresleri",
-        "aws_key": "AWS erişim anahtarları",
-        "api_key_generic": "API anahtarları ve belirteçler",
-        "iban": "IBAN banka hesap numaraları",
-        "eu_vat": "EU VAT numaraları",
-        "es_dni_nie": "İspanyolca DNI / NIE",
-        "it_codice_fiscale": "İtalyanca Codice Fiscale",
-        "pl_pesel": "Polonya PESEL",
-        "nl_bsn": "Hollandalı BSN",
-        "de_steuer_id": "Alman Steuer-ID",
-        "se_personnummer": "İsveçli kişi numarası",
-        "za_id": "Güney Afrika ID numaraları",
-        "za_phone": "Güney Afrika telefon numaraları",
-        "za_vat": "Güney Afrika VAT numaraları",
-        "za_tax_ref": "Güney Afrika vergi referansları"
-      },
-      "customPatterns": "Özel desenler",
-      "customPatternsDesc": "Eşleşmeler [CUSTOM_REDACTED] ile değiştirilir. En fazla {max} desen. Felaket düzeyinde geri izleme riski taşıyan desenler reddedilir.",
-      "typeRegex": "Düzenli ifade",
-      "typeWildcard": "Joker karakter (* ve ?)",
-      "pattern": "Desen",
-      "flags": "Bayraklar (i, m, s, u)",
-      "sampleText": "Deseni test etmek için örnek metin",
-      "test": "Test et",
-      "testMatches": "{count} eşleşme",
-      "testFailed": "Desen reddedildi: {message}",
-      "add": "Desen ekle",
-      "saved": "Kaydedildi",
-      "saveFailed": "Kaydedilemedi: {message}",
-      "statsTitle": "Yeniden başlatmadan bu yana tespitler",
-      "statsEmpty": "Henüz tespit yok.",
-      "statsRequest": "İstekler"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA ayarlı: bu ana makineden yapılan girişler ikinci faktörü atlar. Erişimi geri kazandığınızda kaldırın."
   },
   "contextRtk": {
     "title": "RTK Motoru",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Gelen tüm istekler için bir API anahtarı gerektir."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Tüm istekler için girdi temizlemeyi etkinleştir."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Prompt enjeksiyonu koruma modunu ayarlayın."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Kişisel olarak tanımlanabilir bilgileri isteklerden gizleyin."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sağlayıcı yanıtlarındaki kişisel olarak tanımlanabilir bilgileri arındırın."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Yanıttaki PII verilerinin nasıl işleneceğini seçin: \"redact\" bunu değiştirir, \"warn\" yalnızca günlüğe kaydeder, \"block\" yanıtı reddeder ve \"off\" arındırmayı devre dışı bırakır."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Özel veya dahili IP aralıklarına giden istekleri engelleyin."

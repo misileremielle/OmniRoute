@@ -1496,7 +1496,6 @@
     "showing": "Ag taispeáint {count} imeacht as {total}",
     "policyViolation": "Sárú Beartais",
     "accessDenied": "Rochtain Diúltaithe",
-    "injectionBlocked": "Instealladh Bactha",
     "noEvents": "Níl aon imeachtaí comhlíontachta taifeadta.",
     "failedFetch": "Theip ar loga iniúchta comhlíontachta a fháil.",
     "viewDetails": "Féach na sonraí",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Cóid aisghabhála fágtha: {count}",
     "mfaDisableDesc": "Cuir isteach do phasfhocal agus cód reatha (nó cód aisghabhála) chun fíordheimhniú dhá fhachtóir a mhúchadh.",
     "mfaRecoveryHint": "Aisghabháil gléis caillte: tosaigh an freastalaí le OMNIROUTE_DISABLE_MFA=true agus sínigh isteach ón óstach féin.",
-    "mfaRecoverySwitchActive": "Tá OMNIROUTE_DISABLE_MFA socraithe: ní iarrtar an dara fachtóir ar shínithe isteach ón óstach seo. Bain é nuair a bheidh tú istigh arís.",
-    "piiMasking": {
-      "title": "Folú sonraí pearsanta",
-      "description": "Roghnaigh na cineálacha sonraí pearsanta a fholófar agus cuir do phatrúin féin leis. Fanann an folú múchta go dtí go gcasann tú air na bratacha gné a thaispeántar thíos.",
-      "requestFlag": "Folú iarratas",
-      "responseFlag": "Sláintíocht freagraí",
-      "templates": "Teimpléid",
-      "template": {
-        "minimal": "Íosta",
-        "standard": "Caighdeánach",
-        "financial": "Airgeadais",
-        "brazilian": "Brasaíleach",
-        "usa": "SAM",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (An Afraic Theas)",
-        "full": "Iomlán"
-      },
-      "builtinTypes": "Cineálacha ionsuite",
-      "types": {
-        "email": "Seoltaí ríomhphoist",
-        "phone_us": "Uimhreacha gutháin SAM",
-        "phone_br": "Uimhreacha gutháin na Brasaíle",
-        "ssn": "Uimhreacha Slándála Sóisialta SAM",
-        "credit_card": "Uimhreacha cártaí creidmheasa",
-        "cpf": "CPF (aitheantas cáiníocóra na Brasaíle)",
-        "cnpj": "CNPJ (aitheantas cuideachta na Brasaíle)",
-        "ip_address": "Seoltaí IPv4",
-        "ipv6_address": "Seoltaí IPv6",
-        "aws_key": "Eochracha rochtana AWS",
-        "api_key_generic": "Eochracha API agus comharthaí",
-        "iban": "IBAN uimhreacha cuntais bainc",
-        "eu_vat": "EU VAT uimhreacha",
-        "es_dni_nie": "Spáinnis DNI / NIE",
-        "it_codice_fiscale": "Cód Fiscale na hIodáile",
-        "pl_pesel": "Polainnis PESEL",
-        "nl_bsn": "Ollainnis BSN",
-        "de_steuer_id": "Gearmáinis Steuer-ID",
-        "se_personnummer": "pearsanra Sualainnis",
-        "za_id": "Uimhreacha ID Afraic Theas",
-        "za_phone": "Uimhreacha gutháin na hAfraice Theas",
-        "za_vat": "Uimhreacha VAT Afraic Theas",
-        "za_tax_ref": "Tagairtí cánach na hAfraice Theas"
-      },
-      "customPatterns": "Patrúin shaincheaptha",
-      "customPatternsDesc": "Cuirtear [CUSTOM_REDACTED] in ionad na meaitseálacha. Suas le {max} patrún. Diúltaítear do phatrúin a bhfuil baol cúlrianaithe tubaistigh ag baint leo.",
-      "typeRegex": "Slonn ionadaíochta",
-      "typeWildcard": "Saoróg (* agus ?)",
-      "pattern": "Patrún",
-      "flags": "Bratacha (i, m, s, u)",
-      "sampleText": "Téacs samplach chun an patrún a thástáil",
-      "test": "Tástáil",
-      "testMatches": "{count} meaitseáil",
-      "testFailed": "Diúltaíodh don phatrún: {message}",
-      "add": "Cuir patrún leis",
-      "saved": "Sábháilte",
-      "saveFailed": "Níorbh fhéidir sábháil: {message}",
-      "statsTitle": "Brathanna ó atosú",
-      "statsEmpty": "Níl aon bhrath fós.",
-      "statsRequest": "Iarratais"
-    }
+    "mfaRecoverySwitchActive": "Tá OMNIROUTE_DISABLE_MFA socraithe: ní iarrtar an dara fachtóir ar shínithe isteach ón óstach seo. Bain é nuair a bheidh tú istigh arís."
   },
   "contextRtk": {
     "title": "Inneall RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Éiligh eochair API do gach iarratas isteach."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Cumasaigh sláintíocht ionchuir do gach iarratas."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Socraigh mód an gharda in aghaidh instealladh leid."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Ceil faisnéis inaitheanta phearsanta in iarratais."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Sláintigh faisnéis inaitheanta phearsanta i bhfreagraí soláthraithe."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Roghnaigh conas a láimhseáiltear PII i bhfreagraí: cuireann ceilt rud eile ina áit, ní dhéanann rabhadh ach é a logáil, diúltaíonn bac don fhreagra, agus díchumasaíonn as an tsláintíocht."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Cuir bac ar iarratais amach chuig raonta IP príobháideacha nó inmheánacha."

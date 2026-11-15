@@ -1496,7 +1496,6 @@
     "showing": "Показани са {count} от {total} събития",
     "policyViolation": "Нарушение на правилата",
     "accessDenied": "Достъпът е отказан",
-    "injectionBlocked": "Инжектирането е блокирано",
     "noEvents": "Няма регистрирани събития за съответствие.",
     "failedFetch": "Неуспешно извличане на регистрационния файл за проверка на съответствието.",
     "viewDetails": "Вижте подробности",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Оставащи кодове за възстановяване: {count}",
     "mfaDisableDesc": "Въведете паролата си и текущ код (или код за възстановяване), за да изключите двуфакторното удостоверяване.",
     "mfaRecoveryHint": "Възстановяване при загубено устройство: стартирайте сървъра с OMNIROUTE_DISABLE_MFA=true и влезте от самия хост.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA е зададена: входовете от този хост пропускат втория фактор. Премахнете я, след като възстановите достъпа.",
-    "piiMasking": {
-      "title": "Маскиране на лични данни",
-      "description": "Изберете кои видове лични данни да се маскират и добавете свои шаблони. Маскирането остава изключено, докато не включите показаните по-долу флагове за функции.",
-      "requestFlag": "Маскиране на заявки",
-      "responseFlag": "Почистване на отговори",
-      "templates": "Шаблони",
-      "template": {
-        "minimal": "Минимален",
-        "standard": "Стандартен",
-        "financial": "Финансов",
-        "brazilian": "Бразилски",
-        "usa": "САЩ",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Южна Африка)",
-        "full": "Пълен"
-      },
-      "builtinTypes": "Вградени типове",
-      "types": {
-        "email": "Имейл адреси",
-        "phone_us": "Телефонни номера в САЩ",
-        "phone_br": "Бразилски телефонни номера",
-        "ssn": "Номера за социално осигуряване в САЩ",
-        "credit_card": "Номера на кредитни карти",
-        "cpf": "CPF (бразилски данъчен номер)",
-        "cnpj": "CNPJ (бразилски номер на фирма)",
-        "ip_address": "IPv4 адреси",
-        "ipv6_address": "IPv6 адреси",
-        "aws_key": "Ключове за достъп до AWS",
-        "api_key_generic": "API ключове и токени",
-        "iban": "IBAN номера на банкови сметки",
-        "eu_vat": "EU VAT числа",
-        "es_dni_nie": "Испански DNI / NIE",
-        "it_codice_fiscale": "италиански Codice Fiscale",
-        "pl_pesel": "полски PESEL",
-        "nl_bsn": "Холандски BSN",
-        "de_steuer_id": "Немски Steuer-ID",
-        "se_personnummer": "Шведски personnummer",
-        "za_id": "Южноафрикански ID номера",
-        "za_phone": "Южноафрикански телефонни номера",
-        "za_vat": "Южноафрикански VAT номера",
-        "za_tax_ref": "Южноафрикански данъчни справки"
-      },
-      "customPatterns": "Персонализирани шаблони",
-      "customPatternsDesc": "Съвпаденията се заменят с [CUSTOM_REDACTED]. До {max} шаблона. Шаблоните с риск от катастрофално връщане се отхвърлят.",
-      "typeRegex": "Регулярен израз",
-      "typeWildcard": "Заместващ символ (* и ?)",
-      "pattern": "Шаблон",
-      "flags": "Флагове (i, m, s, u)",
-      "sampleText": "Примерен текст за тестване на шаблона",
-      "test": "Тествай",
-      "testMatches": "Съвпадения: {count}",
-      "testFailed": "Шаблонът е отхвърлен: {message}",
-      "add": "Добави шаблон",
-      "saved": "Запазено",
-      "saveFailed": "Неуспешно запазване: {message}",
-      "statsTitle": "Засичания от рестарта",
-      "statsEmpty": "Все още няма засичания.",
-      "statsRequest": "Заявки"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA е зададена: входовете от този хост пропускат втория фактор. Премахнете я, след като възстановите достъпа."
   },
   "contextRtk": {
     "title": "RTK Engine",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Изискване на API ключ за всички входящи заявки."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Активиране на санирането на входните данни за всички заявки."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Задаване на режим за защита от prompt-injection."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Скриване на лична идентифицираща информация от заявките."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Прочистване на лична идентифицираща информация в отговорите от доставчика."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Изберете как да се обработва PII в отговорите: redact я замества, warn само я записва в лога, block отхвърля отговора, а off деактивира прочистването."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Блокиране на изходящи заявки към частни или вътрешни IP диапазони."

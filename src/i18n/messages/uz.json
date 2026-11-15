@@ -1496,7 +1496,6 @@
     "showing": "{total} ta hodisadan {count} tasi ko‘rsatilmoqda",
     "policyViolation": "Siyosat buzilishi",
     "accessDenied": "Kirish rad etildi",
-    "injectionBlocked": "Inyeksiya bloklandi",
     "noEvents": "Muvofiqlik hodisalari qayd etilmagan.",
     "failedFetch": "Muvofiqlik audit jurnalini olishda xatolik yuz berdi.",
     "viewDetails": "Tafsilotlarni ko‘rish",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Qolgan tiklash kodlari: {count}",
     "mfaDisableDesc": "Ikki bosqichli autentifikatsiyani o‘chirish uchun parolingiz va joriy kodni (yoki tiklash kodini) kiriting.",
     "mfaRecoveryHint": "Yo‘qolgan qurilmani tiklash: serverni OMNIROUTE_DISABLE_MFA=true bilan ishga tushiring va to‘g‘ridan-to‘g‘ri xostdan kiring.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA o‘rnatilgan: bu xostdan kirishlar ikkinchi bosqichni o‘tkazib yuboradi. Qayta kirganingizdan so‘ng uni olib tashlang.",
-    "piiMasking": {
-      "title": "Shaxsiy ma'lumotlarni niqoblash",
-      "description": "Qaysi turdagi shaxsiy ma'lumotlar niqoblanishini tanlang va o'z andozalaringizni qo'shing. Quyida ko'rsatilgan funksiya bayroqlarini yoqmaguningizcha niqoblash o'chiq turadi.",
-      "requestFlag": "So'rovlarni niqoblash",
-      "responseFlag": "Javoblarni tozalash",
-      "templates": "Shablonlar",
-      "template": {
-        "minimal": "Minimal",
-        "standard": "Standart",
-        "financial": "Moliyaviy",
-        "brazilian": "Braziliya",
-        "usa": "AQSH",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Janubiy Afrika)",
-        "full": "To'liq"
-      },
-      "builtinTypes": "O'rnatilgan turlar",
-      "types": {
-        "email": "Elektron pochta manzillari",
-        "phone_us": "AQSH telefon raqamlari",
-        "phone_br": "Braziliya telefon raqamlari",
-        "ssn": "AQSH ijtimoiy sug'urta raqamlari",
-        "credit_card": "Kredit karta raqamlari",
-        "cpf": "CPF (Braziliya soliq to'lovchisi ID)",
-        "cnpj": "CNPJ (Braziliya kompaniyasi ID)",
-        "ip_address": "IPv4 manzillari",
-        "ipv6_address": "IPv6 manzillari",
-        "aws_key": "AWS kirish kalitlari",
-        "api_key_generic": "API kalitlari va tokenlar",
-        "iban": "IBAN bank hisob raqamlari",
-        "eu_vat": "EU VAT raqamlari",
-        "es_dni_nie": "Ispan DNI / NIE",
-        "it_codice_fiscale": "Italiya Kodeksi Fiscale",
-        "pl_pesel": "Polsha PESEL",
-        "nl_bsn": "Gollandiyalik BSN",
-        "de_steuer_id": "Germaniya Steuer-ID",
-        "se_personnummer": "Shvetsiya xodimi",
-        "za_id": "Janubiy Afrika ID raqamlari",
-        "za_phone": "Janubiy Afrika telefon raqamlari",
-        "za_vat": "Janubiy Afrika VAT raqamlari",
-        "za_tax_ref": "Janubiy Afrika soliq ma'lumotnomalari"
-      },
-      "customPatterns": "Maxsus andozalar",
-      "customPatternsDesc": "Mosliklar [CUSTOM_REDACTED] bilan almashtiriladi. Ko'pi bilan {max} ta andoza. Halokatli orqaga qaytish xavfi bor andozalar rad etiladi.",
-      "typeRegex": "Muntazam ifoda",
-      "typeWildcard": "Joker belgi (* va ?)",
-      "pattern": "Andoza",
-      "flags": "Bayroqlar (i, m, s, u)",
-      "sampleText": "Andozani sinash uchun namuna matn",
-      "test": "Sinash",
-      "testMatches": "{count} ta moslik",
-      "testFailed": "Andoza rad etildi: {message}",
-      "add": "Andoza qo'shish",
-      "saved": "Saqlandi",
-      "saveFailed": "Saqlab bo'lmadi: {message}",
-      "statsTitle": "Qayta ishga tushirilgandan beri aniqlashlar",
-      "statsEmpty": "Hali aniqlashlar yo'q.",
-      "statsRequest": "So'rovlar"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA o‘rnatilgan: bu xostdan kirishlar ikkinchi bosqichni o‘tkazib yuboradi. Qayta kirganingizdan so‘ng uni olib tashlang."
   },
   "contextRtk": {
     "title": "RTK mexanizmi",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Barcha kiruvchi soʻrovlar uchun API kalitini talab qilish."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Barcha soʻrovlar uchun kiruvchi maʼlumotlarni sanitizatsiya qilishni yoqish."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Prompt-inʼeksiya himoyasi rejimini belgilash."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Soʻrovlardan shaxsni aniqlash imkonini beruvchi maʼlumotlarni olib tashlash."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Provayder javoblaridagi shaxsni aniqlash imkonini beruvchi maʼlumotlarni sanitizatsiya qilish."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Javobdagi PII qanday qayta ishlanishini tanlang: redact uni almashtiradi, warn faqat jurnalga yozadi, block javobni rad etadi, off esa sanitizatsiyani oʻchiradi."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Xususiy yoki ichki IP diapazonlariga chiquvchi soʻrovlarni bloklash."

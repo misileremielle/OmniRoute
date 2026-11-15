@@ -1496,7 +1496,6 @@
     "showing": "Viser {count} af {total} begivenheder",
     "policyViolation": "Overtrædelse af politik",
     "accessDenied": "Adgang nægtet",
-    "injectionBlocked": "Injektion blokeret",
     "noEvents": "Ingen overholdelseshændelser registreret.",
     "failedFetch": "Kunne ikke hente overholdelsesrevisionslog.",
     "viewDetails": "Se detaljer",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Resterende gendannelseskoder: {count}",
     "mfaDisableDesc": "Indtast din adgangskode og en aktuel kode (eller en gendannelseskode) for at slå totrinsgodkendelse fra.",
     "mfaRecoveryHint": "Gendannelse ved mistet enhed: start serveren med OMNIROUTE_DISABLE_MFA=true, og log ind fra selve værten.",
-    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA er sat: logins fra denne vært springer det andet trin over. Fjern den, når du er inde igen.",
-    "piiMasking": {
-      "title": "PII-maskering",
-      "description": "Vælg, hvilke typer personoplysninger der maskeres, og tilføj dine egne mønstre. Maskeringen er slået fra, indtil du aktiverer de funktionsflag, der vises nedenfor.",
-      "requestFlag": "Maskering af anmodninger",
-      "responseFlag": "Rensning af svar",
-      "templates": "Skabeloner",
-      "template": {
-        "minimal": "Minimal",
-        "standard": "Standard",
-        "financial": "Finansiel",
-        "brazilian": "Brasiliansk",
-        "usa": "USA",
-        "gdpr": "GDPR (EU)",
-        "popia": "POPIA (Sydafrika)",
-        "full": "Fuld"
-      },
-      "builtinTypes": "Indbyggede typer",
-      "types": {
-        "email": "E-mailadresser",
-        "phone_us": "Amerikanske telefonnumre",
-        "phone_br": "Brasilianske telefonnumre",
-        "ssn": "Amerikanske personnumre (SSN)",
-        "credit_card": "Kreditkortnumre",
-        "cpf": "CPF (brasiliansk skatte-ID)",
-        "cnpj": "CNPJ (brasiliansk virksomheds-ID)",
-        "ip_address": "IPv4-adresser",
-        "ipv6_address": "IPv6-adresser",
-        "aws_key": "AWS-adgangsnøgler",
-        "api_key_generic": "API-nøgler og tokens",
-        "iban": "IBAN bankkontonumre",
-        "eu_vat": "EU VAT numre",
-        "es_dni_nie": "Spansk DNI / NIE",
-        "it_codice_fiscale": "Italiensk Codice Fiscale",
-        "pl_pesel": "polsk PESEL",
-        "nl_bsn": "hollandsk BSN",
-        "de_steuer_id": "Tysk Steuer-ID",
-        "se_personnummer": "svensk personnummer",
-        "za_id": "Sydafrikanske ID tal",
-        "za_phone": "Sydafrikanske telefonnumre",
-        "za_vat": "Sydafrikanske VAT tal",
-        "za_tax_ref": "Sydafrikanske skattereferencer"
-      },
-      "customPatterns": "Egne mønstre",
-      "customPatternsDesc": "Match erstattes med [CUSTOM_REDACTED]. Op til {max} mønstre. Mønstre med risiko for katastrofal backtracking afvises.",
-      "typeRegex": "Regulært udtryk",
-      "typeWildcard": "Jokertegn (* og ?)",
-      "pattern": "Mønster",
-      "flags": "Flag (i, m, s, u)",
-      "sampleText": "Eksempeltekst at teste mønsteret på",
-      "test": "Test",
-      "testMatches": "{count} match",
-      "testFailed": "Mønsteret blev afvist: {message}",
-      "add": "Tilføj mønster",
-      "saved": "Gemt",
-      "saveFailed": "Kunne ikke gemme: {message}",
-      "statsTitle": "Fund siden genstart",
-      "statsEmpty": "Ingen fund endnu.",
-      "statsRequest": "Anmodninger"
-    }
+    "mfaRecoverySwitchActive": "OMNIROUTE_DISABLE_MFA er sat: logins fra denne vært springer det andet trin over. Fjern den, når du er inde igen."
   },
   "contextRtk": {
     "title": "RTK Engine",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Kræv en API-nøgle for alle indgående anmodninger."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Aktivér input-sanitering for alle anmodninger."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Indstil tilstanden for prompt-injection-beskyttelse."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "Fjern personhenførbare oplysninger fra anmodninger."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "Rens personhenførbare oplysninger i udbydersvar."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Vælg, hvordan PII i svar håndteres: redact erstatter det, warn logger det kun, block afviser svaret, og off deaktiverer rensning."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "Blokér udgående anmodninger til private eller interne IP-områder."

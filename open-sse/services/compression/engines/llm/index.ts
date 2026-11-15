@@ -193,7 +193,7 @@ async function processMessages(
 
 const LLM_COMPRESSOR_SCHEMA: EngineConfigField[] = [
   // Default OFF: this tier costs an extra model call and mutates the payload, so it is
-  // opt-in (Hard Rule #19 spirit) — never on by default.
+  // opt-in — never on by default.
   { key: "enabled", type: "boolean", label: "Enabled", defaultValue: false },
   { key: "model", type: "string", label: "Compression model", defaultValue: "" },
   {

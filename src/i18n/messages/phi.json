@@ -1496,7 +1496,6 @@
     "showing": "Ipinapakita ang {count} ng {total} na mga kaganapan",
     "policyViolation": "Paglabag sa Patakaran",
     "accessDenied": "Tinanggihan ang Access",
-    "injectionBlocked": "Na-block ang Injection",
     "noEvents": "Walang naitala na mga kaganapan sa pagsunod.",
     "failedFetch": "Nabigong makuha ang log ng audit ng pagsunod.",
     "viewDetails": "Tingnan ang mga detalye",
@@ -9232,66 +9231,7 @@
     "mfaBackupCodesRemaining": "Natitirang recovery code: {count}",
     "mfaDisableDesc": "Ilagay ang iyong password at kasalukuyang code (o recovery code) para i-off ang two-factor na pagpapatotoo.",
     "mfaRecoveryHint": "Pagbawi kapag nawala ang device: simulan ang server gamit ang OMNIROUTE_DISABLE_MFA=true at mag-sign in mula mismo sa host.",
-    "mfaRecoverySwitchActive": "Naka-set ang OMNIROUTE_DISABLE_MFA: nilalaktawan ng mga sign-in mula sa host na ito ang pangalawang factor. Alisin ito kapag nakapasok ka na ulit.",
-    "piiMasking": {
-      "title": "Pagtatakip ng personal na datos",
-      "description": "Piliin kung aling uri ng personal na datos ang tatakpan at magdagdag ng sarili mong mga pattern. Mananatiling naka-off ang pagtatakip hangga't hindi mo ini-on ang mga feature flag na nakikita sa ibaba.",
-      "requestFlag": "Pagtatakip ng request",
-      "responseFlag": "Paglilinis ng tugon",
-      "templates": "Mga template",
-      "template": {
-        "minimal": "Pinakamaliit",
-        "standard": "Karaniwan",
-        "financial": "Pampinansiyal",
-        "brazilian": "Pang-Brazil",
-        "usa": "Estados Unidos",
-        "gdpr": "GDPR (Unyong Europeo)",
-        "popia": "POPIA (Timog Aprika)",
-        "full": "Kumpleto"
-      },
-      "builtinTypes": "Mga built-in na uri",
-      "types": {
-        "email": "Mga email address",
-        "phone_us": "Mga numero ng telepono sa US",
-        "phone_br": "Mga numero ng telepono sa Brazil",
-        "ssn": "Mga numero ng Social Security sa US",
-        "credit_card": "Mga numero ng credit card",
-        "cpf": "CPF (tax ID ng indibidwal sa Brazil)",
-        "cnpj": "CNPJ (ID ng kumpanya sa Brazil)",
-        "ip_address": "Mga IPv4 address",
-        "ipv6_address": "Mga IPv6 address",
-        "aws_key": "Mga access key ng AWS",
-        "api_key_generic": "Mga API key at token",
-        "iban": "Mga numero ng bank account (IBAN)",
-        "eu_vat": "Mga numero ng VAT ng EU",
-        "es_dni_nie": "DNI / NIE ng Espanya",
-        "it_codice_fiscale": "Codice Fiscale ng Italya",
-        "pl_pesel": "PESEL ng Poland",
-        "nl_bsn": "BSN ng Netherlands",
-        "de_steuer_id": "Steuer-ID ng Alemanya",
-        "se_personnummer": "Personnummer ng Sweden",
-        "za_id": "Mga numero ng ID sa Timog Aprika",
-        "za_phone": "Mga numero ng telepono sa Timog Aprika",
-        "za_vat": "Mga numero ng VAT sa Timog Aprika",
-        "za_tax_ref": "Mga reperensya sa buwis sa Timog Aprika"
-      },
-      "customPatterns": "Mga custom na pattern",
-      "customPatternsDesc": "Ang mga tugma ay papalitan ng [CUSTOM_REDACTED]. Hanggang {max} pattern. Tinatanggihan ang mga pattern na may panganib ng sakunang backtracking.",
-      "typeRegex": "Regular expression",
-      "typeWildcard": "Wildcard (* at ?)",
-      "pattern": "Pattern",
-      "flags": "Mga flag (i, m, s, u)",
-      "sampleText": "Halimbawang teksto para subukan ang pattern",
-      "test": "Subukan",
-      "testMatches": "{count} tugma",
-      "testFailed": "Tinanggihan ang pattern: {message}",
-      "add": "Magdagdag ng pattern",
-      "saved": "Na-save",
-      "saveFailed": "Hindi ma-save: {message}",
-      "statsTitle": "Mga natukoy mula nang mag-restart",
-      "statsEmpty": "Wala pang natukoy.",
-      "statsRequest": "Mga request"
-    }
+    "mfaRecoverySwitchActive": "Naka-set ang OMNIROUTE_DISABLE_MFA: nilalaktawan ng mga sign-in mula sa host na ito ang pangalawang factor. Alisin ito kapag nakapasok ka na ulit."
   },
   "contextRtk": {
     "title": "Engine ng RTK",
@@ -13418,21 +13358,6 @@
     "definitions": {
       "REQUIRE_API_KEY": {
         "description": "Kailanganin ang isang API key para sa lahat ng papasok na request."
-      },
-      "INPUT_SANITIZER_ENABLED": {
-        "description": "Paganahin ang input sanitization para sa lahat ng request."
-      },
-      "INJECTION_GUARD_MODE": {
-        "description": "Itakda ang prompt-injection guard mode."
-      },
-      "PII_REDACTION_ENABLED": {
-        "description": "I-redact ang personally identifiable information mula sa mga request."
-      },
-      "PII_RESPONSE_SANITIZATION": {
-        "description": "I-sanitize ang personally identifiable information sa mga response ng provider."
-      },
-      "PII_RESPONSE_SANITIZATION_MODE": {
-        "description": "Piliin kung paano pinangangasiwaan ang PII ng response: pinapalitan ito ng redact, itinatala lamang ito ng warn, tinatanggihan ng block ang response, at hindi pinapagana ng off ang sanitization."
       },
       "OUTBOUND_SSRF_GUARD_ENABLED": {
         "description": "I-block ang mga papalabas na request sa mga pribado o panloob na IP range."

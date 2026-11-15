@@ -4,7 +4,7 @@ import { CODE_ASSIST_LEGACY_TIER_FLAG } from "./featureFlagDefinitionsCodeAssist
 export type { FeatureFlagDefinition };
 
 export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
-  // ──────────────── Security (10) ────────────────
+  // ──────────────── Security (5) ────────────────
   {
     key: "REQUIRE_API_KEY",
     label: "Require API Key",
@@ -17,29 +17,6 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     warningLevel: "caution",
   },
   {
-    key: "INPUT_SANITIZER_ENABLED",
-    label: "Input Sanitizer",
-    description: "Enable input sanitization for all requests",
-    descriptionI18nKey: "featureFlagInputSanitizerEnabledDescription",
-    category: "security",
-    defaultValue: "true",
-    type: "boolean",
-    requiresRestart: false,
-    warningLevel: "info",
-  },
-  {
-    key: "INJECTION_GUARD_MODE",
-    label: "Injection Guard Mode",
-    description: "Set the prompt injection guard mode",
-    descriptionI18nKey: "featureFlagInjectionGuardModeDescription",
-    category: "security",
-    defaultValue: "off",
-    type: "enum",
-    enumValues: ["off", "warn", "block", "redact"],
-    requiresRestart: false,
-    warningLevel: "info",
-  },
-  {
     key: "API_KEY_AUDIT_CLIENT_DETAILS_ENABLED",
     label: "API Key Audit: Record Client IP and User-Agent",
     description:
@@ -50,41 +27,6 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     type: "boolean",
     requiresRestart: false,
     warningLevel: "caution",
-  },
-  {
-    key: "PII_REDACTION_ENABLED",
-    label: "PII Redaction",
-    description: "Redact personally identifiable information from requests",
-    descriptionI18nKey: "featureFlagPiiRedactionEnabledDescription",
-    category: "security",
-    defaultValue: "false",
-    type: "boolean",
-    requiresRestart: false,
-    warningLevel: "info",
-  },
-  {
-    key: "PII_RESPONSE_SANITIZATION",
-    label: "PII Response Sanitization",
-    description: "Sanitize PII from provider responses",
-    descriptionI18nKey: "featureFlagPiiResponseSanitizationDescription",
-    category: "security",
-    defaultValue: "false",
-    type: "boolean",
-    requiresRestart: false,
-    warningLevel: "info",
-  },
-  {
-    key: "PII_RESPONSE_SANITIZATION_MODE",
-    label: "PII Response Sanitization Mode",
-    description:
-      "Mode for PII response sanitization: redact (replace PII), warn (log only), block (reject), off (disable)",
-    descriptionI18nKey: "featureFlagPiiResponseSanitizationModeDescription",
-    category: "security",
-    defaultValue: "redact",
-    type: "enum",
-    enumValues: ["redact", "warn", "block", "off"],
-    requiresRestart: false,
-    warningLevel: "info",
   },
   {
     key: "OUTBOUND_SSRF_GUARD_ENABLED",
