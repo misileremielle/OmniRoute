@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurasikan tetapan pemampatan",
-      "engine": "Enjin pemampatan (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Keagresifan Caveman 0.0–1.0",
-      "rtk_budget": "Belanjawan token RTK",
-      "language_pack": "Pek bahasa untuk diaktifkan"
+      "engine": "Enjin pemampatan (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Dapatkan atau tetapkan enjin pemampatan aktif"
@@ -1107,33 +1104,17 @@
     "created": "Gabungan dicipta: {name}",
     "deleted": "Gabungan dipadamkan: {name}",
     "noCombos": "Tiada gabungan dikonfigurasikan.",
-    "confirmDelete": "Padamkan gabungan {name}?",
-    "suggest": {
-      "description": "Cadangkan gabungan terbaik untuk sesuatu tugas menggunakan pemarkahan AI",
-      "task": "Penerangan tugas",
-      "maxCost": "Kos maksimum bagi setiap permintaan dalam USD",
-      "maxLatencyMs": "Kependaman maksimum dalam milisaat",
-      "weights": "Pemberat pemarkahan JSON, cth. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Bilangan calon teratas untuk dipaparkan (lalai: 5)",
-      "explain": "Cetak rasional ke stderr",
-      "switch": "Aktifkan gabungan dengan kedudukan tertinggi"
-    }
+    "confirmDelete": "Padamkan gabungan {name}?"
   },
   "oneproxy": {
     "description": "Urus kumpulan huluan OneProxy",
-    "stats": {
-      "provider": "Tapis mengikut penyedia",
-      "period": "Tempoh masa (lalai: 24h)"
-    },
     "fetch": {
       "description": "Dapatkan proksi daripada kumpulan",
       "count": "Bilangan proksi untuk didapatkan (lalai: 1)",
       "type": "Jenis proksi: http|socks5 (lalai: http)"
     },
     "rotate": {
-      "description": "Paksa penggiliran proksi",
-      "provider": "Penyedia untuk digilirkan",
-      "connectionId": "ID sambungan khusus untuk digilirkan"
+      "description": "Paksa penggiliran proksi"
     },
     "config": {
       "description": "Tunjukkan atau kemas kini konfigurasi OneProxy",

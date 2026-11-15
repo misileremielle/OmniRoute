@@ -7,7 +7,6 @@ import { pathToFileURL } from "node:url";
 const VITEST_ONLY_DIRS = [
   "tests/unit/autoCombo",
   "open-sse/services/autoCombo",
-  "open-sse/mcp-server",
   "open-sse/services/__tests__",
   "open-sse/translator/helpers/__tests__",
 ];

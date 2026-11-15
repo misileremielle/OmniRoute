@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Configurar los ajustes de compresión",
-      "engine": "Motor de compresión (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agresividad de Caveman de 0.0 a 1.0",
-      "rtk_budget": "Presupuesto de tokens RTK",
-      "language_pack": "Paquete de idioma que se activará"
+      "engine": "Motor de compresión (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Obtener o establecer el motor de compresión activo"
@@ -1107,33 +1104,17 @@
     "created": "Combinación creada: {name}",
     "deleted": "Combinación eliminada: {name}",
     "noCombos": "No hay combinaciones configuradas.",
-    "confirmDelete": "¿Eliminar la combinación {name}?",
-    "suggest": {
-      "description": "Sugerir la mejor combinación para una tarea mediante puntuación con IA",
-      "task": "Descripción de la tarea",
-      "maxCost": "Coste máximo por solicitud en USD",
-      "maxLatencyMs": "Latencia máxima en milisegundos",
-      "weights": "Pesos de puntuación JSON, p. ej., {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Número de candidatos principales que se mostrarán (predeterminado: 5)",
-      "explain": "Imprimir la justificación en stderr",
-      "switch": "Activar la combinación mejor clasificada"
-    }
+    "confirmDelete": "¿Eliminar la combinación {name}?"
   },
   "oneproxy": {
     "description": "Gestionar el grupo de servidores upstream de OneProxy",
-    "stats": {
-      "provider": "Filtrar por proveedor",
-      "period": "Periodo de tiempo (predeterminado: 24h)"
-    },
     "fetch": {
       "description": "Obtener proxies del grupo",
       "count": "Número de proxies que se obtendrán (predeterminado: 1)",
       "type": "Tipo de proxy: http|socks5 (predeterminado: http)"
     },
     "rotate": {
-      "description": "Forzar la rotación del proxy",
-      "provider": "Proveedor para el que se realizará la rotación",
-      "connectionId": "ID de conexión específica que se va a rotar"
+      "description": "Forzar la rotación del proxy"
     },
     "config": {
       "description": "Mostrar o actualizar la configuración de OneProxy",

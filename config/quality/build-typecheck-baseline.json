@@ -229,9 +229,6 @@
   "src/app/api/settings/models-dev/route.ts": {
     "TS2339": 1
   },
-  "src/app/api/settings/obsidian/webdav/route.ts": {
-    "TS2339": 1
-  },
   "src/app/api/settings/proxies/bulk-import/route.ts": {
     "TS2345": 1
   },

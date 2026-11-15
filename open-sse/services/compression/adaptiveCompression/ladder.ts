@@ -2,9 +2,9 @@ import type { LadderStage } from "./types.ts";
 
 /**
  * Default escalation ladder (design D-C2): cheapest/most-lossless → most aggressive.
- * Ordered by the engine catalog's stackPriority. `ccr` and `llmlingua` are intentionally
- * excluded from the AUTOMATIC ladder (ccr = retrieval markers, llmlingua = optional ONNX
- * SLM tier wired through `ultra`); an operator can still add them via ladderOverride.
+ * Ordered by the engine catalog's stackPriority. `llmlingua` is intentionally excluded from
+ * the AUTOMATIC ladder (an optional ONNX SLM tier wired through `ultra`); an operator can
+ * still add it via ladderOverride.
  */
 export const DEFAULT_LADDER: LadderStage[] = [
   { engine: "session-dedup" }, // lossless cross-turn dedup (catalog pri 3)
@@ -23,9 +23,9 @@ export const DEFAULT_LADDER: LadderStage[] = [
  *
  * Rescaled ×10 vs the original 7-entry scale (#6533) to make room for the novel catalog
  * engines that ship in `open-sse/services/compression/engines/index.ts` but are not part
- * of DEFAULT_LADDER: `ccr` and `llmlingua` are intentionally excluded from the AUTOMATIC
- * ladder (see DEFAULT_LADDER doc comment) yet must still rank correctly when an operator
- * adds them via `ladderOverride` — same for `ionizer`, `relevance`, `llm`, `read-lifecycle`,
+ * of DEFAULT_LADDER: `llmlingua` is intentionally excluded from the AUTOMATIC ladder (see
+ * DEFAULT_LADDER doc comment) yet must still rank correctly when an operator adds it via
+ * `ladderOverride` — same for `ionizer`, `relevance`, `llm`, `read-lifecycle`,
  * and `codex-responses`. Placement follows each engine's documented `stackPriority` in
  * `engineCatalog.ts` / its own module header, interpolated onto the existing 7-tier scale
  * (the `lite` exception — ranked after `headroom` despite a lower stackPriority — is a
@@ -34,7 +34,6 @@ export const DEFAULT_LADDER: LadderStage[] = [
 const AGGRESSIVENESS: Record<string, number> = {
   off: 0,
   "session-dedup": 10, // stackPriority 3 — lossless cross-turn dedup
-  ccr: 15, // stackPriority 4 — reversible retrieval marker, only if it shrinks
   rtk: 20, // stackPriority 10 — command-output filtering
   "codex-responses": 22, // stackPriority 12 (#8010) — conservative Responses tool-output compression
   ionizer: 25, // stackPriority 13 — tabular row sampling (lighter than headroom)
@@ -63,7 +62,6 @@ export function aggressivenessOf(engineOrMode: string): number {
  */
 const REDUCTION_FACTOR: Record<string, number> = {
   "session-dedup": 0.95,
-  ccr: 0.9, // conservative: only replaces a block when the marker is shorter than it
   rtk: 0.85,
   "codex-responses": 0.84, // stackPriority 12 (#8010) — lossless-first, bounded diagnostic trims
   ionizer: 0.83, // row sampling, lighter than headroom's full tabular compaction

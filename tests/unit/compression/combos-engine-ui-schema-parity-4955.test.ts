@@ -11,7 +11,7 @@ import { ENGINE_IDS } from "../../../open-sse/services/compression/engineCatalog
 // Regression guard for #4955 / #6747:
 // - #4955: UI and API schema must stay in lockstep (no engines the UI offers that PUT rejects).
 // - #6747: PUT must accept every ENGINE_CATALOG / GET stackedPipeline engine so GET→PUT
-//   round-trips of compression settings succeed (session-dedup, ccr, headroom, relevance,
+//   round-trips of compression settings succeed (session-dedup, headroom, relevance,
 //   llmlingua were previously rejected by a 5-engine discriminator).
 describe("Engine Combos UI ↔ stackedPipelineStepSchema parity (#4955 / #6747)", () => {
   const unionEngines = stackedPipelineStepSchema.options
@@ -47,7 +47,7 @@ describe("Engine Combos UI ↔ stackedPipelineStepSchema parity (#4955 / #6747)"
   });
 
   it("accepts structural catalog engines that #4955 had temporarily dropped from the UI (#6747)", () => {
-    for (const engine of ["headroom", "session-dedup", "ccr", "llmlingua", "relevance"]) {
+    for (const engine of ["headroom", "session-dedup", "llmlingua", "relevance"]) {
       assert.equal(
         stackedPipelineStepSchema.safeParse({ engine }).success,
         true,
@@ -64,7 +64,6 @@ describe("Engine Combos UI ↔ stackedPipelineStepSchema parity (#4955 / #6747)"
     const result = compressionSettingsUpdateSchema.safeParse({
       stackedPipeline: [
         { engine: "session-dedup" },
-        { engine: "ccr" },
         { engine: "lite", intensity: "lite" },
         { engine: "rtk", intensity: "standard" },
         { engine: "headroom" },

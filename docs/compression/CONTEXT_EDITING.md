@@ -190,7 +190,6 @@ Claude prune the running context across turns. They can be enabled together.
 - [COMPRESSION_ENGINES.md](./COMPRESSION_ENGINES.md) — engine registry and the local compression
   engines
 - [RTK_COMPRESSION.md](./RTK_COMPRESSION.md) — command/tool-output compression
-- [../frameworks/MCP-SERVER.md](../frameworks/MCP-SERVER.md) — MCP description compression and
   tool-cardinality reduction
 - Source: `open-sse/config/contextEditing.ts`, `open-sse/executors/base.ts`,
   `open-sse/services/compression/types.ts`, `src/lib/db/compressionAnalytics.ts`

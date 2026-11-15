@@ -36,7 +36,7 @@
  * present and falls back to `apply` otherwise.
  *
  * ### stackPriority
- * 35 — runs after structural engines (CCR=4, session-dedup=3, headroom=15,
+ * 35 — runs after structural engines (session-dedup=3, headroom=15,
  * caveman=20) but before ultra (40). Semantic pruning is most effective after
  * simpler structural compression has already reduced noise.
  *
@@ -435,7 +435,7 @@ export const llmlinguaEngine: CompressionEngine = {
   icon: "brain",
   targets: ["messages"],
   stackable: true,
-  // stackPriority 35: runs after structural engines (CCR=4, session-dedup=3,
+  // stackPriority 35: runs after structural engines (session-dedup=3,
   // headroom=15, caveman=20) but before ultra (40). Semantic pruning is more
   // effective on already-structurally-compressed text.
   stackPriority: 35,

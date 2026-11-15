@@ -673,7 +673,7 @@ export function applyRtkCompression(
     };
   });
 
-  // Mirror the sibling stacked engines (headroom, session-dedup, ccr, relevance,
+  // Mirror the sibling stacked engines (headroom, session-dedup, relevance,
   // ionizer, readLifecycle): skip the expensive createCompressionStats() pass
   // (full JSON.stringify + tokenizer over the whole body, twice) when nothing
   // actually changed. Untouched messages keep their original reference above,

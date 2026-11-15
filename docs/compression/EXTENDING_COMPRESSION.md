@@ -407,7 +407,7 @@ The available modes are defined in `open-sse/services/compression/types.ts` (typ
 | `stacked`    | Custom pipeline      | Compose engines in any order (see below)                                                                                                                                                            |
 
 > Beyond the mode engines above, the registry also ships specialized stackable engines —
-> **CCR**, **headroom**, **ionizer**, and **session-dedup** — documented in
+> **headroom**, **ionizer**, and **session-dedup** — documented in
 > [COMPRESSION_ENGINES.md](./COMPRESSION_ENGINES.md#additional-built-in-engines).
 
 Mode selection is determined by `getEffectiveMode()` in `open-sse/services/compression/strategySelector.ts`:

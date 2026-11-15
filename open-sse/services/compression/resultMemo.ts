@@ -49,9 +49,8 @@ function windowStats(windowMs: number): { hits: number; misses: number; hitRate:
 }
 
 // Opt-IN whitelist (NOT opt-out): cache only engines proven pure + STATELESS across
-// requests. Excluded on purpose: `ccr` and `session-dedup` write to the cross-request
-// CCR store (`ccr/index.ts` ccrStore; session-dedup imports storeBlock), so their output
-// depends on prior state → not safe to memoize; `ultra`/`aggressive`/`llmlingua` are
+// requests. Excluded on purpose: `session-dedup` output depends on earlier turns of the
+// same session → not safe to memoize; `ultra`/`aggressive`/`llmlingua` are
 // model-backed/non-deterministic. Any NEW engine is excluded until explicitly vetted.
 // "omniglyph" is intentionally excluded too (P2 registry-consistency pass): it renders
 // context as an image via a model-backed pipeline, so it is not yet proven deterministic

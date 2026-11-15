@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Sanidi mipangilio ya ubanaji",
-      "engine": "Injini ya ubanaji (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Kiwango cha ubanaji cha Caveman 0.0–1.0",
-      "rtk_budget": "Bajeti ya tokeni za RTK",
-      "language_pack": "Kifurushi cha lugha cha kuwezesha"
+      "engine": "Injini ya ubanaji (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Pata au weka injini ya ubanaji inayotumika"
@@ -1107,33 +1104,17 @@
     "created": "Mseto umeundwa: {name}",
     "deleted": "Mseto umefutwa: {name}",
     "noCombos": "Hakuna miseto iliyosanidiwa.",
-    "confirmDelete": "Ufute mseto {name}?",
-    "suggest": {
-      "description": "Pendekeza mseto bora kwa kazi kwa kutumia ukadiriaji wa AI",
-      "task": "Maelezo ya kazi",
-      "maxCost": "Gharama ya juu zaidi kwa kila ombi katika USD",
-      "maxLatencyMs": "Muda wa juu zaidi wa kusubiri katika milisekunde",
-      "weights": "Uzani wa ukadiriaji wa JSON, k.m. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Idadi ya wagombea bora wa kuonyesha (chaguo-msingi: 5)",
-      "explain": "Chapisha sababu kwenye stderr",
-      "switch": "Washa mseto ulioorodheshwa wa kwanza"
-    }
+    "confirmDelete": "Ufute mseto {name}?"
   },
   "oneproxy": {
     "description": "Dhibiti hifadhi ya seva za juu za OneProxy",
-    "stats": {
-      "provider": "Chuja kulingana na mtoa huduma",
-      "period": "Kipindi cha muda (chaguo-msingi: 24h)"
-    },
     "fetch": {
       "description": "Leta proksi kutoka kwenye hifadhi",
       "count": "Idadi ya proksi za kuleta (chaguo-msingi: 1)",
       "type": "Aina ya proksi: http|socks5 (chaguo-msingi: http)"
     },
     "rotate": {
-      "description": "Lazimisha ubadilishaji wa proksi",
-      "provider": "Mtoa huduma wa kufanyiwa ubadilishaji",
-      "connectionId": "Kitambulisho mahususi cha muunganisho cha kubadilisha"
+      "description": "Lazimisha ubadilishaji wa proksi"
     },
     "config": {
       "description": "Onyesha au sasisha usanidi wa OneProxy",

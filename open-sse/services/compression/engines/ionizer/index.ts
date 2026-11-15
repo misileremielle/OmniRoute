@@ -56,8 +56,8 @@ export const ionizerEngine: CompressionEngine = {
   name: "Ionizer",
   description:
     "Lossy statistical sampling of oversized homogeneous JSON arrays. Keeps schema + error rows " +
-    "+ first/last rows + a seeded uniform middle sample inline; stores the whole array in CCR " +
-    "for recovery. Complements headroom (lossless) as the fallback when columnar still overflows.",
+    "+ first/last rows + a seeded uniform middle sample inline; the omitted rows are not kept. " +
+    "Complements headroom (lossless) as the fallback when columnar still overflows.",
   icon: "filter_alt",
   targets: ["messages"],
   stackable: true,
@@ -68,8 +68,7 @@ export const ionizerEngine: CompressionEngine = {
   metadata: {
     id: ENGINE_ID,
     name: "Ionizer",
-    description:
-      "Lossy statistical sampling of oversized homogeneous JSON arrays, reversible via CCR.",
+    description: "Lossy statistical sampling of oversized homogeneous JSON arrays.",
     inputScope: "messages",
     targetLatencyMs: 2,
     supportsPreview: true,
@@ -89,8 +88,7 @@ export const ionizerEngine: CompressionEngine = {
     const start = performance.now();
     const { messages: finalMessages, ionizedCount } = runIonizerPass(
       messages as MessageLike[],
-      stepConfig,
-      options?.principalId
+      stepConfig
     );
 
     if (ionizedCount === 0) {

@@ -145,49 +145,6 @@
       "count": 1
     }
   },
-  "open-sse/mcp-server/__tests__/dbHealthTool.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "open-sse/mcp-server/__tests__/toolSearch.tool.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
-  "open-sse/mcp-server/audit.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "open-sse/mcp-server/httpTransport.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "open-sse/mcp-server/server.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
-  "open-sse/mcp-server/tools/advancedTools.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
-  "open-sse/mcp-server/tools/compressionTools.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
-  "open-sse/mcp-server/tools/pickFastestModel.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    },
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  },
   "open-sse/services/__tests__/tierResolver.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -269,11 +226,6 @@
   "open-sse/services/compression/aggressive.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 5
-    }
-  },
-  "open-sse/services/compression/engines/ccr/index.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "open-sse/services/compression/engines/headroom/gcf/decode_generic.ts": {
@@ -737,11 +689,6 @@
       "count": 1
     }
   },
-  "src/app/api/settings/obsidian/route.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "src/app/api/settings/route.ts": {
     "no-restricted-imports": {
       "count": 1
@@ -1007,11 +954,6 @@
       "count": 1
     }
   },
-  "src/lib/notion/api.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
-    }
-  },
   "src/lib/oauth/providers.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1035,11 +977,6 @@
   "src/lib/oauth/utils/claudeAuthImport.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "src/lib/obsidian/api.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 2
     }
   },
   "src/lib/piiSanitizer.ts": {
@@ -1335,11 +1272,6 @@
       "count": 1
     }
   },
-  "tests/e2e/protocol-clients.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
-    }
-  },
   "tests/e2e/responsiveSpecs.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1515,14 +1447,6 @@
   "tests/integration/modelsDevSync.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
-    }
-  },
-  "tests/integration/obsidian-plugin-e2e.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 12
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
     }
   },
   "tests/integration/pipeline-combo.test.ts": {
@@ -1948,7 +1872,7 @@
   },
   "tests/unit/cli-audit-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 15
+      "count": 13
     }
   },
   "tests/unit/cli-batches-commands.test.ts": {
@@ -1967,14 +1891,6 @@
       "count": 3
     }
   },
-  "tests/unit/cli-combo-suggest-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 14
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/cli-completion-dynamic.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 11
@@ -1982,7 +1898,7 @@
   },
   "tests/unit/cli-compression-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 20
+      "count": 15
     }
   },
   "tests/unit/cli-context-eng-commands.test.ts": {
@@ -2037,11 +1953,6 @@
       "count": 1
     }
   },
-  "tests/unit/cli-mcp-call-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 5
-    }
-  },
   "tests/unit/cli-nodes-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 15
@@ -2050,14 +1961,6 @@
   "tests/unit/cli-oauth-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 20
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/cli-oneproxy-commands.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 13
     },
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -2124,7 +2027,7 @@
   },
   "tests/unit/cli-resilience-commands.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 16
+      "count": 13
     }
   },
   "tests/unit/cli-runtime-extended.test.ts": {
@@ -2133,11 +2036,6 @@
     }
   },
   "tests/unit/cli-serve-stop-command.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/cli-server-commands.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -2384,11 +2282,6 @@
     }
   },
   "tests/unit/compression/compression-header-dispatch.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/compression/compressionMcpTools.test.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
@@ -3002,11 +2895,6 @@
   "tests/unit/observability-fase04.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
-    }
-  },
-  "tests/unit/obsidian-plugin-sync.test.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 3
     }
   },
   "tests/unit/ocr-route.test.ts": {

@@ -22,7 +22,7 @@
 // Fix by running `pnpm run gen:provider-reference`. Additional STRICT coverage added in
 // the 2026-08-12 hardening: llm.txt + package.json description (providers), migration
 // count (README/AGENTS/llm.txt), and canonical numbers inside the README SVG diagrams
-// (providers / MCP tools / routing strategies / free-tier pools).
+// (providers / routing strategies / free-tier pools).
 
 import fs from "node:fs";
 import { spawnSync as _spawnSync } from "node:child_process";
@@ -232,13 +232,6 @@ function readCodeFacts() {
     'import {MODE_PACKS} from "./open-sse/services/autoCombo/modePacks.ts";',
     'import {ENGINE_IDS} from "./open-sse/services/compression/engineCatalog.ts";',
     'import {CLI_TOOLS} from "./src/shared/constants/cliTools.ts";',
-    'import {countUniqueMcpTools} from "./open-sse/mcp-server/toolCount.ts";',
-    'import {MCP_TOOLS} from "./open-sse/mcp-server/schemas/tools.ts";',
-    'import {poolTools} from "./open-sse/mcp-server/tools/poolTools.ts";',
-    'import {notionTools} from "./open-sse/mcp-server/tools/notionTools.ts";',
-    'import {obsidianTools} from "./open-sse/mcp-server/tools/obsidianTools.ts";',
-    'import {localCorpusTools} from "./open-sse/mcp-server/tools/localCorpusTools.ts";',
-    'import {compressionTools} from "./open-sse/mcp-server/tools/compressionTools.ts";',
     // Live provider total — the SAME collections gen-provider-reference.ts unions, so the
     // doc-vs-live check below cannot drift from the generator's definition of "provider".
     'import * as PROV from "./src/shared/constants/providers.ts";',
@@ -248,11 +241,6 @@ function readCodeFacts() {
     "PROV.SYSTEM_PROVIDERS];",
     "const pids=new Set();",
     "for(const c of provCols)for(const p of Object.values(c||{}))if(p&&p.id)pids.add(p.id);",
-    "const cols={MCP_TOOLS,poolTools,",
-    "notionTools,obsidianTools,localCorpusTools,compressionTools};",
-    "const sc=new Set();",
-    "for(const col of Object.values(cols))for(const t of Object.values(col))",
-    "for(const x of (t?.scopes||[]))sc.add(x);",
     "const t=computeFreeModelTotals();const cli=Object.values(CLI_TOOLS);",
     "const by=(c)=>cli.filter(x=>x.category===c).length;",
     // "Free forever" = every provider whose free access renews or needs no key at all.
@@ -267,7 +255,7 @@ function readCodeFacts() {
     "freeFirst:t.firstMonthRealisticTokens,freeGated:t.gatedRecurringTokens,",
     "freePools:t.poolCount,engines:ENGINE_IDS.length,",
     "cliTotal:cli.length,cliCode:by('code'),cliAgent:by('agent'),",
-    "mcpTools:countUniqueMcpTools(cols),mcpScopes:sc.size,providers:pids.size,freeForever:ff.size,",
+    "providers:pids.size,freeForever:ff.size,",
     "modePacks:Object.keys(MODE_PACKS),catalogDate:__cat,sortBy:__sb,intelligentKeys:__ik,",
     "hardStop:FREE_MODEL_BUDGETS.filter(e=>e.hardStopGuaranteed===true).length,",
     "trainsOnPrompts:FREE_MODEL_BUDGETS.filter(e=>e.trainsOnPrompts===true).length,",
@@ -677,7 +665,6 @@ export function makePackageDescriptionValidator(expected) {
 // same reason.
 const SVG_CANONICAL_PATTERNS = [
   { key: "providers", what: "providers", pattern: /(\d{3,4}) (?:AI )?providers\b/g },
-  { key: "mcpTools", what: "MCP tools", pattern: /MCP (?:server with |with |\()(\d+)/g },
   { key: "strategies", what: "routing strategies", pattern: /(\d+) routing strategies\b/g },
   { key: "pools", what: "free-tier pools", pattern: /(\d+) provider pools\b/g },
 ];
@@ -916,7 +903,7 @@ export function buildChecks() {
         {
           label: "SVG canonical numbers (live code)",
           actual:
-            `${f.providers} providers / ${f.mcpTools} MCP tools / ` +
+            `${f.providers} providers / ` +
             `${countRoutingStrategies()} strategies / ${f.freePools} pools`,
           docKey: "SVG canonical numbers",
           strict: true,
@@ -924,7 +911,6 @@ export function buildChecks() {
           validate: (content) =>
             checkSvgCanonicalNumbers(content, {
               providers: f.providers,
-              mcpTools: f.mcpTools,
               strategies: countRoutingStrategies(),
               pools: f.freePools,
             }),
@@ -944,33 +930,6 @@ export function buildChecks() {
           { pattern: /(\d+)[-\s](?:engine stack|composable engines|stacked engines)/gi },
           ["README.md"]
         ),
-        claim(
-          f.mcpTools,
-          "MCP tools",
-          {
-            pattern: /(\d+)[- ]tools?\b/gi,
-            // per-module rows ("Memory tool definitions (3 tools)") and the CLI catalog
-            // total ("33 tools (25 CLI Code's …)") are not the MCP aggregate
-            // per-module rows read "… tool definitions (N tools" / "… management tools
-            // (N tools" — the word tool(s)/definitions sits right before the paren. The
-            // aggregate ("MCP Server (109 tools", "all 109 tools") never does.
-            // "Phase 2 tool handlers" is a phase number, not a tool count
-            skipBefore: /(tools?|definitions?)\s*\(\s*$|phase\s+$/i,
-            skipAfter: /^\s*\(\d+ CLI/,
-          },
-          [
-            "README.md",
-            "AGENTS.md",
-            "docs/frameworks/MCP-SERVER.md",
-            "llm.txt",
-            "open-sse/mcp-server/README.md",
-          ]
-        ),
-        claim(f.mcpScopes, "MCP scopes", { pattern: /(\d+) scopes/gi }, [
-          "README.md",
-          "AGENTS.md",
-          "llm.txt",
-        ]),
         claim(f.cliTotal, "CLI tools", { pattern: /(\d+) tools(?=\s*\(\d+ CLI)/gi }, ["README.md"]),
         claim(
           f.freeForever,

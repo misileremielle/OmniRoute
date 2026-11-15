@@ -1,6 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { makeMcpResp, makeMcpStreamFetch, type McpFetchCall } from "./helpers/mcpStreamMock.ts";
 
 function makeResp(data: unknown, status = 200) {
   const obj = {
@@ -34,75 +33,58 @@ function makeCmd(output = "json") {
   return { optsWithGlobals: () => ({ output, quiet: output !== "table" }) };
 }
 
-test("compression status chama omniroute_compression_status via mcp", async () => {
-  const calls: unknown[] = [];
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = makeMcpStreamFetch({ toolResult: { engine: "caveman", enabled: true } });
-  const inner = globalThis.fetch;
-  globalThis.fetch = ((url: unknown, init: unknown) => {
-    calls.push({ url: String(url), init });
-    return inner(url, init);
-  }) as any;
+type RestCall = { url: string; method: string; body: any };
 
+function recordFetch(data: unknown = {}) {
+  const calls: RestCall[] = [];
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: unknown, init?: any) => {
+    calls.push({
+      url: String(url),
+      method: String(init?.method ?? "GET"),
+      body: typeof init?.body === "string" ? JSON.parse(init.body) : undefined,
+    });
+    return makeResp(data);
+  }) as any;
+  return { calls, restore: () => (globalThis.fetch = origFetch) };
+}
+
+const pathOf = (u: string) => new URL(u, "http://localhost").pathname;
+
+test("compression status reads settings, combos and analytics over REST", async () => {
+  const rec = recordFetch({ defaultMode: "rtk", combos: [] });
   const { runCompressionStatus } = await import("../../bin/cli/commands/compression.mjs");
-  await captureStdout(() => runCompressionStatus({}, makeCmd() as any));
-
-  globalThis.fetch = origFetch;
-  const body = JSON.parse(
-    calls.find((x) => String(x.init?.body || "").includes("tools/call"))?.init?.body || "{}"
-  );
-  assert.equal(body.method, "tools/call");
-  assert.equal(body.params.name, "omniroute_compression_status");
+  const out = await captureStdout(() => runCompressionStatus({}, makeCmd() as any));
+  rec.restore();
+  assert.deepEqual(rec.calls.map((c) => pathOf(c.url)).sort(), [
+    "/api/context/analytics",
+    "/api/context/combos",
+    "/api/settings/compression",
+  ]);
+  assert.match(out, /"strategy": "rtk"/);
 });
 
-test("compression configure envia configuração via mcp", async () => {
-  const calls: unknown[] = [];
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = makeMcpStreamFetch({ toolResult: { success: true } });
-  const inner = globalThis.fetch;
-  globalThis.fetch = ((url: unknown, init: unknown) => {
-    calls.push({ url: String(url), init });
-    return inner(url, init);
-  }) as any;
-
+test("compression configure PUTs only schema-valid keys to /api/settings/compression", async () => {
+  const rec = recordFetch({ success: true });
   const { runCompressionConfigure } = await import("../../bin/cli/commands/compression.mjs");
-  await captureStdout(() =>
-    runCompressionConfigure({ engine: "caveman", cavemanAggressiveness: 0.8 }, makeCmd() as any)
-  );
-
-  globalThis.fetch = origFetch;
-  const body = JSON.parse(
-    calls.find((x) => String(x.init?.body || "").includes("tools/call"))?.init?.body || "{}"
-  );
-  assert.equal(body.method, "tools/call");
-  assert.equal(body.params.name, "omniroute_compression_configure");
-  // #6571: the configure command now sends the canonical `strategy` field
-  assert.equal(body.params.arguments.strategy, "caveman");
-  assert.ok(body.params.arguments.caveman?.aggressiveness === 0.8);
+  await captureStdout(() => runCompressionConfigure({ engine: "caveman" }, makeCmd() as any));
+  rec.restore();
+  assert.equal(rec.calls.length, 1);
+  assert.equal(pathOf(rec.calls[0].url), "/api/settings/compression");
+  assert.equal(rec.calls[0].method, "PUT");
+  // #6571: caveman is stored as the server's "standard" mode.
+  assert.deepEqual(rec.calls[0].body, { defaultMode: "standard" });
 });
 
-test("compression engine set chama omniroute_set_compression_engine", async () => {
-  const calls: unknown[] = [];
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = makeMcpStreamFetch({ toolResult: {} });
-  const inner = globalThis.fetch;
-  globalThis.fetch = ((url: unknown, init: unknown) => {
-    calls.push({ url: String(url), init });
-    return inner(url, init);
-  }) as any;
-
+test("compression engine set PUTs the engine as defaultMode", async () => {
+  const rec = recordFetch({});
   const out = await captureStdout(async () => {
     const { runCompressionEngineSet } = await import("../../bin/cli/commands/compression.mjs");
     await runCompressionEngineSet("rtk", {}, makeCmd() as any);
   });
-
-  globalThis.fetch = origFetch;
-  const body = JSON.parse(
-    calls.find((x) => String(x.init?.body || "").includes("tools/call"))?.init?.body || "{}"
-  );
-  assert.equal(body.method, "tools/call");
-  assert.equal(body.params.name, "omniroute_set_compression_engine");
-  assert.equal(body.params.arguments.engine, "rtk");
+  rec.restore();
+  assert.equal(rec.calls[0].method, "PUT");
+  assert.equal(rec.calls[0].body.defaultMode, "rtk");
   assert.ok(out.includes("rtk"));
 });
 
@@ -126,25 +108,13 @@ test("compression engine set rejeita engine inválido", async () => {
 });
 
 test("compression engine set normaliza hybrid → stacked alias", async () => {
-  const calls: unknown[] = [];
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = makeMcpStreamFetch({ toolResult: {} });
-  const inner = globalThis.fetch;
-  globalThis.fetch = ((url: unknown, init: unknown) => {
-    calls.push({ url: String(url), init });
-    return inner(url, init);
-  }) as any;
-
+  const rec = recordFetch({});
   await captureStdout(async () => {
     const { runCompressionEngineSet } = await import("../../bin/cli/commands/compression.mjs");
     await runCompressionEngineSet("hybrid", {}, makeCmd() as any);
   });
-
-  globalThis.fetch = origFetch;
-  const body = JSON.parse(
-    calls.find((x) => String(x.init?.body || "").includes("tools/call"))?.init?.body || "{}"
-  );
-  assert.equal(body.params.arguments.engine, "stacked");
+  rec.restore();
+  assert.equal(rec.calls[0].body.defaultMode, "stacked");
 });
 
 test("compression rules list busca /api/compression/rules", async () => {
@@ -204,107 +174,4 @@ test("compression.mjs pode ser importado sem erro", async () => {
   assert.equal(typeof mod.runCompressionStatus, "function");
   assert.equal(typeof mod.runCompressionEngineSet, "function");
   assert.equal(typeof mod.runCompressionPreview, "function");
-});
-
-// #2688 — when the MCP tool surface returns 404, the CLI must fall back to
-// direct REST endpoints (no MCP tool surface required on minimal builds).
-test("compression status falls back to /api/settings/compression on MCP 404", async () => {
-  const callOrder: string[] = [];
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = ((url: string, opts: unknown) => {
-    callOrder.push(url);
-    if (url.includes("/api/mcp/stream")) {
-      const body = opts?.body ? JSON.parse(opts.body) : {};
-      if (body.method === "initialize") {
-        return Promise.resolve(
-          makeMcpResp({ jsonrpc: "2.0", id: body.id, result: {} }, 200, { "mcp-session-id": "s" })
-        );
-      }
-      return Promise.resolve(makeMcpResp({ error: "not mounted" }, 404));
-    }
-    if (url.includes("/api/settings/compression")) {
-      return Promise.resolve(makeResp({ engine: "caveman", enabled: true }));
-    }
-    if (url.includes("/api/context/combos")) {
-      return Promise.resolve(makeResp({ combos: [{ id: "c1", name: "x" }] }));
-    }
-    if (url.includes("/api/context/analytics")) {
-      return Promise.resolve(makeResp({ savings: 12 }));
-    }
-    return Promise.resolve(makeResp({}, 404));
-  }) as any;
-
-  const { runCompressionStatus } = await import("../../bin/cli/commands/compression.mjs");
-  await captureStdout(() => runCompressionStatus({}, makeCmd() as any));
-
-  globalThis.fetch = origFetch;
-  const first = callOrder[0] ?? "";
-  assert.ok(first.includes("/api/mcp/stream"), "should attempt MCP first");
-  assert.ok(
-    callOrder.some((u) => u.includes("/api/settings/compression")),
-    "should fall back to REST"
-  );
-  assert.ok(
-    callOrder.some((u) => u.includes("/api/context/combos")),
-    "should fetch combos"
-  );
-  assert.ok(
-    callOrder.some((u) => u.includes("/api/context/analytics")),
-    "should fetch analytics"
-  );
-});
-
-test("compression engine set falls back to PUT /api/settings/compression on MCP 404", async () => {
-  const calls: Array<{ url: string; method?: string; body?: unknown }> = [];
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = ((url: string, opts: unknown) => {
-    calls.push({
-      url,
-      method: opts?.method,
-      body: opts?.body ? JSON.parse(opts.body) : undefined,
-    });
-    if (url.includes("/api/mcp/stream")) {
-      const body = opts?.body ? JSON.parse(opts.body) : {};
-      if (body.method === "initialize") {
-        return Promise.resolve(
-          makeMcpResp({ jsonrpc: "2.0", id: body.id, result: {} }, 200, { "mcp-session-id": "s" })
-        );
-      }
-      return Promise.resolve(makeMcpResp({ error: "not mounted" }, 404));
-    }
-    return Promise.resolve(makeResp({ ok: true }));
-  }) as any;
-
-  await captureStdout(async () => {
-    const { runCompressionEngineSet } = await import("../../bin/cli/commands/compression.mjs");
-    await runCompressionEngineSet("rtk", {}, makeCmd() as any);
-  });
-
-  globalThis.fetch = origFetch;
-  const restCall = calls.find((c) => c.url.includes("/api/settings/compression"));
-  assert.ok(restCall, "should fall back to PUT /api/settings/compression");
-  assert.equal(restCall?.method, "PUT");
-  // #6571: the REST fallback now PUTs the canonical `defaultMode` field
-  assert.equal(restCall?.body?.defaultMode, "rtk");
-});
-
-test("compression status works against a sessionless MCP stream", async () => {
-  const calls: McpFetchCall[] = [];
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = makeMcpStreamFetch({
-    toolResult: { engine: "caveman", enabled: true },
-    sessionMode: "stateless",
-    calls,
-  });
-
-  try {
-    const { runCompressionStatus } = await import("../../bin/cli/commands/compression.mjs");
-    await captureStdout(() => runCompressionStatus({}, makeCmd()));
-    const toolCall = calls.find((c) => c.body?.method === "tools/call");
-    assert.equal(toolCall?.body?.params?.name, "omniroute_compression_status");
-    assert.equal(toolCall?.headers.get("mcp-session-id"), null);
-    assert.ok(!calls.some((c) => c.method === "DELETE"), "no session → no DELETE");
-  } finally {
-    globalThis.fetch = origFetch;
-  }
 });

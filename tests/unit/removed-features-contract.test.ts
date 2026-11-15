@@ -6,7 +6,6 @@ import test from "node:test";
 import { createProviderNodeSchema } from "../../src/shared/validation/schemas/provider.ts";
 import { ENDPOINT_CATEGORIES } from "../../src/shared/constants/endpointCategories.ts";
 import { SERVICE_KIND_VALUES } from "../../src/shared/constants/serviceKinds.ts";
-import { getAllToolDefinitions } from "../../open-sse/mcp-server/toolSearch/catalog.ts";
 
 import { parseAutoPrefix } from "../../open-sse/services/autoCombo/autoPrefix.ts";
 import { getModePackNames } from "../../open-sse/services/autoCombo/modePacks.ts";
@@ -84,16 +83,6 @@ test("compatible nodes reject deleted media APIs while retaining chat and embedd
   for (const kind of ["image", "video", "music", "tts", "stt"]) {
     assert.equal((SERVICE_KIND_VALUES as readonly string[]).includes(kind), false, kind);
   }
-});
-
-test("MCP discovery retains routing tools and omits removed feature tools", () => {
-  const names = getAllToolDefinitions().map((tool) => tool.name);
-  assert.ok(names.includes("omniroute_get_health"));
-  assert.ok(names.includes("omniroute_list_combos"));
-  assert.equal(
-    names.some((name) => /(?:memory_|skills_|gamification_|plugin_|radar_)/.test(name)),
-    false
-  );
 });
 
 test("startup and build no longer launch removed background jobs", () => {

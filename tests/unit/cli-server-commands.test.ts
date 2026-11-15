@@ -95,25 +95,6 @@ test("quota returns 1 when server is offline", async () => {
   );
 });
 
-// ── mcp ───────────────────────────────────────────────────────────────────────
-
-test("mcp status --json returns 0 when server responds", async () => {
-  const mcpStatus = { running: true, toolsCount: 37, transport: "stdio" };
-  const mockFetch = (async (url: string) => makeResponse(mcpStatus)) as typeof fetch;
-
-  await withServerFetch(mockFetch, async () => {
-    const { runMcpStatusCommand } = await import("../../bin/cli/commands/mcp.mjs");
-    const lines: string[] = [];
-    const originalLog = console.log;
-    console.log = (msg: string) => lines.push(msg);
-    const result = await runMcpStatusCommand({ json: true });
-    console.log = originalLog;
-    assert.equal(result, 0);
-    const parsed = JSON.parse(lines.join("\n"));
-    assert.equal(parsed.running, true);
-  });
-});
-
 // ── completion ────────────────────────────────────────────────────────────────
 
 test("completion bash outputs bash script", async () => {

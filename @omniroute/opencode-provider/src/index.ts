@@ -380,93 +380,6 @@ export function mergeIntoExistingConfig(
   return merged;
 }
 
-/**
- * The 7 read-only MCP scopes that allow inspection without any write access.
- * Suitable for shared / public environments.
- */
-export const OMNIROUTE_MCP_DEFAULT_SCOPES = [
-  "read:health",
-  "read:combos",
-  "read:quota",
-  "read:usage",
-  "read:models",
-  "read:cache",
-  "read:compression",
-] as const;
-
-export type OmniRouteMCPScope = (typeof OMNIROUTE_MCP_DEFAULT_SCOPES)[number] | string;
-
-export interface OmniRouteMCPOptions {
-  /** Absolute path to the MCP server entry point (TypeScript or compiled JS). */
-  serverPath: string;
-  /** OmniRoute API key forwarded to the MCP server as `OMNIROUTE_API_KEY`. */
-  apiKey: string;
-  /**
-   * Management API key used for management-scoped operations.
-   * When supplied it is forwarded as `OMNIROUTE_MANAGEMENT_API_KEY`.
-   */
-  managementApiKey?: string;
-  /**
-   * Comma-separated scope list passed as `OMNIROUTE_MCP_SCOPES`.
-   * When omitted `OMNIROUTE_MCP_ENFORCE_SCOPES` is not set and all scopes are
-   * available (development default). Pass an explicit list to restrict access.
-   */
-  scopes?: OmniRouteMCPScope[];
-  /**
-   * Runtime used to execute the MCP server.
-   *
-   * - `"tsx"` (default) — runs via `npx tsx` for TypeScript source files.
-   * - `"node"` — runs via `node` for compiled JS outputs.
-   */
-  runtime?: "tsx" | "node";
-}
-
-export interface OpenCodeMCPServerEntry {
-  command: string;
-  args: string[];
-  env: Record<string, string>;
-}
-
-/**
- * Build the `mcp.servers.omniroute` entry for an OpenCode config document.
- *
- * @example
- * ```ts
- * const mcpEntry = createOmniRouteMCPEntry({
- *   serverPath: "/home/user/.local/share/omniroute/open-sse/mcp-server/server.ts",
- *   apiKey: "sk_omniroute",
- *   managementApiKey: "sk_manage_...",
- *   scopes: ["read:health", "read:combos", "execute:completions"],
- * });
- * // Place at config.mcp.servers.omniroute
- * ```
- */
-export function createOmniRouteMCPEntry(options: OmniRouteMCPOptions): OpenCodeMCPServerEntry {
-  const serverPath = requireNonEmpty(options.serverPath, "serverPath");
-  const apiKey = requireNonEmpty(options.apiKey, "apiKey");
-
-  const runtime = options.runtime ?? "tsx";
-
-  const command = runtime === "tsx" ? "npx" : "node";
-  const args = runtime === "tsx" ? ["tsx", serverPath] : [serverPath];
-
-  const env: Record<string, string> = {
-    OMNIROUTE_API_KEY: apiKey,
-  };
-
-  if (options.managementApiKey !== undefined) {
-    const mgmtKey = options.managementApiKey.trim();
-    if (mgmtKey) env.OMNIROUTE_MANAGEMENT_API_KEY = mgmtKey;
-  }
-
-  if (options.scopes !== undefined && options.scopes.length > 0) {
-    env.OMNIROUTE_MCP_ENFORCE_SCOPES = "true";
-    env.OMNIROUTE_MCP_SCOPES = options.scopes.join(",");
-  }
-
-  return { command, args, env };
-}
-
 async function fetchJSON<T>(url: string, apiKey: string, timeoutMs: number): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -595,14 +508,7 @@ export async function fetchLiveModels(
  * An empty string clears any existing override (inherits global setting).
  */
 export type OmniRouteCompressionOverride =
-  | ""
-  | "off"
-  | "lite"
-  | "standard"
-  | "aggressive"
-  | "ultra"
-  | "rtk"
-  | "stacked";
+  "" | "off" | "lite" | "standard" | "aggressive" | "ultra" | "rtk" | "stacked";
 
 const VALID_COMPRESSION_OVERRIDES = new Set<string>([
   "",

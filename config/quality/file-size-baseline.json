@@ -552,7 +552,6 @@
     "open-sse/handlers/imageGeneration.ts": 4068,
     "open-sse/handlers/responseSanitizer.ts": 1457,
     "open-sse/handlers/search.ts": 2166,
-    "open-sse/mcp-server/schemas/tools.ts": 1907,
     "open-sse/services/accountFallback.ts": 3005,
     "open-sse/services/autoCombo/virtualFactory.ts": 1510,
     "open-sse/services/claudeCodeCompatible.ts": 1494,

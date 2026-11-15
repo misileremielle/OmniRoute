@@ -163,27 +163,19 @@ export const headroomConfigSchema = z
   })
   .strict();
 
-// Session Dedup / CCR detail settings (#8388 — sibling gap to headroom/#8056: the
+// Session Dedup detail settings (#8388 — sibling gap to headroom/#8056: the
 // EngineConfigPage detail form was renderable but PUT bodies had no slot to persist
-// into). Ranges mirror SESSION_DEDUP_SCHEMA / CCR_SCHEMA (engines/session-dedup,
-// engines/ccr) so the validation layer stays in lockstep with the engine's own bounds.
+// into). Range mirrors SESSION_DEDUP_SCHEMA (engines/session-dedup) so the validation
+// layer stays in lockstep with the engine's own bounds.
 export const sessionDedupConfigSchema = z
   .object({
     minBlockChars: z.number().int().min(1).max(100000).optional(),
-    fuzzy: z.boolean().optional(),
-  })
-  .strict();
-
-export const ccrConfigSchema = z
-  .object({
-    minChars: z.number().int().min(100).max(1_000_000).optional(),
-    retrievalRampFactor: z.number().min(1).max(100).optional(),
   })
   .strict();
 
 const noConfigSchema = z.object({}).strict();
 
-// Structural engines (session-dedup / ccr / headroom / relevance / llmlingua) do not
+// Structural engines (session-dedup / headroom / relevance / llmlingua) do not
 // expose a fixed intensity enum in ENGINE_CATALOG — accept optional free-form intensity
 // and a loose config bag so GET→PUT round-trips of stackedPipeline succeed (#6747).
 const structuralStepConfigSchema = z.record(z.string(), z.unknown()).optional();
@@ -193,7 +185,7 @@ const structuralStepConfigSchema = z.record(z.string(), z.unknown()).optional();
  * PUT /api/context/combos/[id]. MUST accept every engine id in ENGINE_CATALOG /
  * GET /api/compression/engines and every engine the DB normalizer keeps
  * (src/lib/db/compression.ts STACKED_PIPELINE_ENGINE_IDS). Issue #6747: a 5-engine
- * discriminator rejected session-dedup/ccr/headroom/relevance/llmlingua on write even
+ * discriminator rejected session-dedup/headroom/relevance/llmlingua on write even
  * though GET returned them.
  */
 export const stackedPipelineStepSchema = z.discriminatedUnion("engine", [
@@ -249,13 +241,6 @@ export const stackedPipelineStepSchema = z.discriminatedUnion("engine", [
     .strict(),
   z
     .object({
-      engine: z.literal("ccr"),
-      intensity: z.string().optional(),
-      config: structuralStepConfigSchema,
-    })
-    .strict(),
-  z
-    .object({
       engine: z.literal("headroom"),
       intensity: z.string().optional(),
       config: structuralStepConfigSchema,
@@ -298,7 +283,6 @@ export const stackedPipelineStepSchema = z.discriminatedUnion("engine", [
 export const STACKED_PIPELINE_ENGINE_INTENSITIES: Record<string, readonly string[]> = {
   // Order matches ENGINE_CATALOG stackPriority for readability
   "session-dedup": [],
-  ccr: [],
   lite: ["lite"],
   rtk: ["minimal", "standard", "aggressive"],
   "codex-responses": [],
@@ -372,7 +356,6 @@ export const compressionSettingsUpdateSchema = z
     cacheMinutes: z.number().int().min(1).max(60).optional(),
     preserveSystemPrompt: z.boolean().optional(),
     preserveSystemPromptMode: z.enum(["always", "whenNoCache", "never"]).optional(),
-    mcpDescriptionCompressionEnabled: z.boolean().optional(),
     comboOverrides: z.record(z.string(), compressionModeSchema).optional(),
     compressionComboId: z.string().trim().min(1).nullable().optional(),
     stackedPipeline: z.array(stackedPipelineStepSchema).optional(),
@@ -387,7 +370,6 @@ export const compressionSettingsUpdateSchema = z
     lite: liteConfigSchema.optional(),
     headroom: headroomConfigSchema.optional(),
     sessionDedup: sessionDedupConfigSchema.optional(),
-    ccr: ccrConfigSchema.optional(),
     contextBudget: contextBudgetConfigSchema.optional(),
     contextEditing: contextEditingConfigSchema.optional(),
     omniglyph: omniglyphConfigSchema.optional(),

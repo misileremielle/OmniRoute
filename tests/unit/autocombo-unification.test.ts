@@ -56,7 +56,6 @@ test("combo strategies stay aligned between UI metadata and schema validation", 
   const { comboStrategySchema, createComboSchema } =
     await import("../../src/shared/validation/schemas.ts");
   const { comboSchema } = await import("../../src/shared/schemas/validation.ts");
-  const { setRoutingStrategyInput } = await import("../../open-sse/mcp-server/schemas/tools.ts");
   const strategyValues = ROUTING_STRATEGIES.map((strategy) => strategy.value);
 
   assert.deepEqual(strategyValues, [...ROUTING_STRATEGY_VALUES]);
@@ -81,11 +80,6 @@ test("combo strategies stay aligned between UI metadata and schema validation", 
       }).success,
       true,
       `legacy combo schema should accept strategy ${strategy}`
-    );
-    assert.equal(
-      setRoutingStrategyInput.safeParse({ comboId: "combo", strategy }).success,
-      true,
-      `MCP set strategy schema should accept ${strategy}`
     );
   });
 

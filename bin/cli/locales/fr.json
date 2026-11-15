@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Configurer les paramètres de compression",
-      "engine": "Moteur de compression (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agressivité de Caveman de 0.0 à 1.0",
-      "rtk_budget": "Budget de jetons RTK",
-      "language_pack": "Pack linguistique à activer"
+      "engine": "Moteur de compression (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Obtenir ou définir le moteur de compression actif"
@@ -1107,33 +1104,17 @@
     "created": "Combinaison créée : {name}",
     "deleted": "Combinaison supprimée : {name}",
     "noCombos": "Aucune combinaison configurée.",
-    "confirmDelete": "Supprimer la combinaison {name} ?",
-    "suggest": {
-      "description": "Suggérer la meilleure combinaison pour une tâche à l’aide d’une évaluation par IA",
-      "task": "Description de la tâche",
-      "maxCost": "Coût maximal par requête en USD",
-      "maxLatencyMs": "Latence maximale en millisecondes",
-      "weights": "Pondérations d’évaluation JSON, p. ex. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Nombre de meilleurs candidats à afficher (par défaut : 5)",
-      "explain": "Afficher la justification dans stderr",
-      "switch": "Activer la combinaison la mieux classée"
-    }
+    "confirmDelete": "Supprimer la combinaison {name} ?"
   },
   "oneproxy": {
     "description": "Gérer le pool en amont de OneProxy",
-    "stats": {
-      "provider": "Filtrer par fournisseur",
-      "period": "Période (par défaut : 24h)"
-    },
     "fetch": {
       "description": "Récupérer des proxys depuis le pool",
       "count": "Nombre de proxys à récupérer (par défaut : 1)",
       "type": "Type de proxy : http|socks5 (par défaut : http)"
     },
     "rotate": {
-      "description": "Forcer la rotation du proxy",
-      "provider": "Fournisseur pour lequel effectuer la rotation",
-      "connectionId": "ID de connexion spécifique à renouveler"
+      "description": "Forcer la rotation du proxy"
     },
     "config": {
       "description": "Afficher ou mettre à jour la configuration de OneProxy",

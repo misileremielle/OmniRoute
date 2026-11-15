@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "የመጭመቂያ ቅንብሮችን ያዋቅሩ",
-      "engine": "የመጭመቂያ ሞተር (caveman|rtk|hybrid|none)",
-      "caveman_agg": "የCaveman ጥብቅነት 0.0–1.0",
-      "rtk_budget": "የRTK ቶከን በጀት",
-      "language_pack": "የሚነቃው የቋንቋ ጥቅል"
+      "engine": "የመጭመቂያ ሞተር (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "ንቁውን የመጭመቂያ ሞተር ያግኙ ወይም ያዘጋጁ"
@@ -1107,33 +1104,17 @@
     "created": "ጥምረት ተፈጥሯል፦ {name}",
     "deleted": "ጥምረት ተሰርዟል፦ {name}",
     "noCombos": "ምንም ጥምረት አልተዋቀረም።",
-    "confirmDelete": "ጥምረቱ {name} ይሰረዝ?",
-    "suggest": {
-      "description": "የAI ውጤት አሰጣጥን በመጠቀም ለአንድ ተግባር ምርጡን ጥምረት ጠቁም",
-      "task": "የተግባር መግለጫ",
-      "maxCost": "ለእያንዳንዱ ጥያቄ በUSD የሚፈቀደው ከፍተኛ ወጪ",
-      "maxLatencyMs": "ከፍተኛው የመዘግየት ጊዜ በሚሊሰከንድ",
-      "weights": "የJSON የውጤት አሰጣጥ ክብደቶች፣ ለምሳሌ {\"latency\":0.7,\"cost\":0.3}",
-      "top": "የሚታዩ ከፍተኛ እጩዎች ብዛት (ነባሪ፦ 5)",
-      "explain": "ምክንያቱን ወደ stderr አትም",
-      "switch": "ከፍተኛ ደረጃ ያገኘውን ጥምረት አግብር"
-    }
+    "confirmDelete": "ጥምረቱ {name} ይሰረዝ?"
   },
   "oneproxy": {
     "description": "የOneProxy የወራጅ አገልጋዮች ስብስብን አስተዳድር",
-    "stats": {
-      "provider": "በአቅራቢ አጣራ",
-      "period": "የጊዜ ክልል (ነባሪ፦ 24h)"
-    },
     "fetch": {
       "description": "ከስብስቡ ፕሮክሲዎችን አምጣ",
       "count": "የሚመጡ ፕሮክሲዎች ብዛት (ነባሪ፦ 1)",
       "type": "የፕሮክሲ አይነት፦ http|socks5 (ነባሪ፦ http)"
     },
     "rotate": {
-      "description": "የፕሮክሲ ማዞርን አስገድድ",
-      "provider": "የሚዞርለት አቅራቢ",
-      "connectionId": "የሚዞር የተወሰነ የግንኙነት ID"
+      "description": "የፕሮክሲ ማዞርን አስገድድ"
     },
     "config": {
       "description": "የOneProxy ውቅርን አሳይ ወይም አዘምን",

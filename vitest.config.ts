@@ -37,7 +37,6 @@ export default defineConfig({
       // Live-server E2E — these drive a real running server, so they must never run
       // in this jsdom job. They have their own runners + vitest.e2e-live.config.ts.
       "tests/e2e/ecosystem.test.ts",
-      "tests/e2e/protocol-clients.test.ts",
     ],
 
     coverage: {

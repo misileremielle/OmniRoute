@@ -31,7 +31,6 @@ const SIBLINGS: Array<[string, string]> = [
   ["scripts/dev/h2c-upgrade-guard.cjs", "h2c-upgrade-guard.cjs"],
   ["scripts/dev/responses-ws-proxy.mjs", "responses-ws-proxy.mjs"],
   ["src/shared/utils/httpClientAbortGuard.mjs", "httpClientAbortGuard.mjs"],
-  ["scripts/dev/webdav-handler.mjs", "webdav-handler.mjs"],
   ["scripts/dev/tls-options.mjs", "tls-options.mjs"],
 ];
 

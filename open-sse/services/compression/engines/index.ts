@@ -3,7 +3,6 @@ import { aggressiveEngine, cavemanEngine, liteEngine, ultraEngine } from "./cave
 import { rtkEngine } from "./rtk/index.ts";
 import { sessionDedupEngine } from "./session-dedup/index.ts";
 import { headroomEngine } from "./headroom/index.ts";
-import { ccrEngine } from "./ccr/index.ts";
 import { llmlinguaEngine } from "./llmlingua/index.ts";
 import { ionizerEngine } from "./ionizer/index.ts";
 import { relevanceEngine } from "./relevance/index.ts";
@@ -31,7 +30,6 @@ export function registerBuiltinCompressionEngines(): void {
     { id: "codex-responses", engine: codexResponsesEngine },
     { id: "session-dedup", engine: sessionDedupEngine },
     { id: "headroom", engine: headroomEngine },
-    { id: "ccr", engine: ccrEngine },
     { id: "llmlingua", engine: llmlinguaEngine },
     { id: "ionizer", engine: ionizerEngine },
     { id: "relevance", engine: relevanceEngine },

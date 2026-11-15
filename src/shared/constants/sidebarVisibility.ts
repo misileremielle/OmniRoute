@@ -122,7 +122,6 @@ export const ESSENTIALS_ADVANCED_TOOL_IDS: ReadonlySet<HideableSidebarItemId> = 
   "cache",
   "runtime",
   "resilience-connections",
-  "mcp",
 ]);
 
 const MINIMAL_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
@@ -162,7 +161,6 @@ const DEVELOPER_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
   "resilience-connections",
   "translator",
   "playground",
-  "mcp",
   "settings-general",
   "settings-modality-bridge",
   "settings-routing",
@@ -191,7 +189,6 @@ const ADMIN_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
   "health",
   "runtime",
   "audit",
-  "audit-mcp",
   "settings-general",
   "settings-modality-bridge",
   "settings-routing",

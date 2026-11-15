@@ -26,10 +26,6 @@
 //       se um par registrado some, falha (regressão de cobertura de formato). Pares
 //       novos não falham — apenas são reportados — para não bloquear adições legítimas.
 //
-//   (4) MCP TOOLS — todos os tools registrados em createMcpServer() (base MCP_TOOLS +
-//       notionTools + obsidianTools) must each have an assigned scope.
-//       nomes são congelados em KNOWN_MCP_TOOL_NAMES. Catraca: tool removido = fail.
-//       Tool novo = report (não bloqueia adições legítimas).
 //
 // Catraca: cada divergência pré-existente fica numa allowlist documentada e sai 0 hoje.
 // Padrão herdado de scripts/check/check-provider-consistency.ts (gate .ts via
@@ -40,8 +36,8 @@
 // (estratégia canônica sem branch de despacho). Uma entrada que não suprime mais
 // nenhuma violação real (porque a estratégia ganhou um branch `strategy === "..."`)
 // é obsoleta → o gate falha com instrução de remoção, fechando o furo de regressão
-// silenciosa. As demais listas (KNOWN_TRANSLATOR_PAIRS, KNOWN_MCP_TOOL_NAMES) NÃO são
-// allowlists de supressão e sim snapshots-catraca (falham na REMOÇÃO, não na presença):
+// silenciosa. A lista KNOWN_TRANSLATOR_PAIRS NÃO é
+// allowlist de supressão e sim snapshot-catraca (falham na REMOÇÃO, não na presença):
 // uma entrada nelas exige que o par/tool continue VIVO no registry — o oposto de
 // supressão — então a semântica de stale-enforcement não se aplica a elas.
 
@@ -233,118 +229,6 @@ export function findNewTranslatorPairs(frozen: readonly string[], live: Set<stri
 }
 
 // ───────────────────────────────────────────────────────────────────────────
-// (4) MCP TOOLS — scope check + snapshot catraca
-// ───────────────────────────────────────────────────────────────────────────
-
-export type McpToolLike = {
-  name: string;
-  scopes?: string[] | readonly string[];
-};
-
-/**
- * Returns the names of tools that have no scopes assigned (empty array or
- * undefined). Every registered MCP tool must declare at least one scope so
- * that scope-enforcement can filter callers correctly.
- */
-export function checkMcpToolsHaveScopes(tools: McpToolLike[]): string[] {
-  return tools.filter((t) => !t.scopes || t.scopes.length === 0).map((t) => t.name);
-}
-
-/**
- * Returns tools in the frozen snapshot that are no longer in the live
- * registry (removals are regressions).
- */
-export function findMissingMcpTools(frozen: readonly string[], live: Set<string>): string[] {
-  return frozen.filter((name) => !live.has(name));
-}
-
-/**
- * Returns live tools not present in the frozen snapshot (additions are
- * informative, not failures).
- */
-export function findNewMcpTools(frozen: readonly string[], live: Set<string>): string[] {
-  const frozenSet = new Set(frozen);
-  return [...live].filter((name) => !frozenSet.has(name)).sort();
-}
-
-/**
- * Snapshot of all MCP tool names registered by createMcpServer() as of
- * 2026-06-13. Catraca: tool removed = fail; tool added = informative report.
- * To update after an intentional removal/rename: edit this list and document
- * the reason in the commit message.
- *
- * Sources:
- *   - MCP_TOOLS (base tools: omniroute_* + compression)
- *   - notionTools (6): notion_*
- *   - obsidianTools (22): obsidian_*
- * compressionTools are included in MCP_TOOLS.
- */
-export const KNOWN_MCP_TOOL_NAMES: readonly string[] = [
-  // MCP_TOOLS base (31)
-  "omniroute_get_health",
-  "omniroute_list_combos",
-  "omniroute_get_combo_metrics",
-  "omniroute_switch_combo",
-  "omniroute_check_quota",
-  "omniroute_route_request",
-  "omniroute_cost_report",
-  "omniroute_list_models_catalog",
-  "omniroute_web_search",
-  "omniroute_x_search",
-  "omniroute_simulate_route",
-  "omniroute_set_budget_guard",
-  "omniroute_set_routing_strategy",
-  "omniroute_set_resilience_profile",
-  "omniroute_test_combo",
-  "omniroute_get_provider_metrics",
-  "omniroute_best_combo_for_task",
-  "omniroute_explain_route",
-  "omniroute_get_session_snapshot",
-  "omniroute_db_health_check",
-  "omniroute_sync_pricing",
-  "omniroute_cache_stats",
-  "omniroute_cache_flush",
-  "omniroute_compression_status",
-  "omniroute_compression_configure",
-  "omniroute_set_compression_engine",
-  "omniroute_list_compression_combos",
-  "omniroute_compression_combo_stats",
-  "omniroute_oneproxy_fetch",
-  "omniroute_oneproxy_rotate",
-  "omniroute_oneproxy_stats",
-  // notionTools (6)
-  "notion_search",
-  "notion_get_page",
-  "notion_list_block_children",
-  "notion_query_database",
-  "notion_get_database",
-  "notion_append_blocks",
-  // obsidianTools (22)
-  "obsidian_check_status",
-  "obsidian_search_simple",
-  "obsidian_search_structured",
-  "obsidian_read_note",
-  "obsidian_list_vault",
-  "obsidian_get_document_map",
-  "obsidian_get_note_metadata",
-  "obsidian_get_active_file",
-  "obsidian_get_periodic_note",
-  "obsidian_get_tags",
-  "obsidian_list_commands",
-  "obsidian_write_note",
-  "obsidian_append_note",
-  "obsidian_patch_note",
-  "obsidian_delete_note",
-  "obsidian_move_note",
-  "obsidian_execute_command",
-  "obsidian_open_file",
-  "obsidian_sync_status",
-  "obsidian_sync_trigger",
-  "obsidian_sync_conflicts",
-  "obsidian_sync_resolve_conflict",
-];
-
-// ───────────────────────────────────────────────────────────────────────────
 // main() — importa módulos reais, lê fontes, roda as seis sub-checagens
 // ───────────────────────────────────────────────────────────────────────────
 
@@ -463,40 +347,6 @@ async function main(): Promise<void> {
   }
   const newPairs = findNewTranslatorPairs(KNOWN_TRANSLATOR_PAIRS, livePairs);
 
-  // ── (4) MCP tools scope + snapshot ───────────────────────────────────────
-  const { MCP_TOOLS } = await import("@omniroute/open-sse/mcp-server/schemas/tools.ts");
-  const { notionTools } = await import("@omniroute/open-sse/mcp-server/tools/notionTools.ts");
-  const { obsidianTools } = await import("@omniroute/open-sse/mcp-server/tools/obsidianTools.ts");
-
-  // Build the full live set of registered tools (compressionTools are already in MCP_TOOLS).
-  const liveMcpTools: McpToolLike[] = [
-    ...(MCP_TOOLS as unknown as McpToolLike[]),
-    ...(notionTools as unknown as McpToolLike[]),
-    ...(obsidianTools as unknown as McpToolLike[]),
-  ];
-  const liveMcpToolNames = new Set(liveMcpTools.map((t) => t.name));
-
-  // 4a. Every registered tool must have at least one scope.
-  const toolsWithoutScopes = checkMcpToolsHaveScopes(liveMcpTools);
-  if (toolsWithoutScopes.length) {
-    failures.push(
-      `[mcp-tools] ${toolsWithoutScopes.length} tool(s) sem scope(s) atribuído(s) — todo tool registrado deve ter ao menos 1 scope para scope-enforcement:\n` +
-        toolsWithoutScopes.map((n) => `    ✗ ${n}`).join("\n") +
-        `\n    → adicione o campo scopes: [...] na definição do tool.`
-    );
-  }
-
-  // 4b. Snapshot catraca: tools removed are regressions.
-  const missingMcpTools = findMissingMcpTools(KNOWN_MCP_TOOL_NAMES, liveMcpToolNames);
-  if (missingMcpTools.length) {
-    failures.push(
-      `[mcp-tools] ${missingMcpTools.length} tool(s) congelado(s) sumiram do registry vivo (regressão):\n` +
-        missingMcpTools.map((n) => `    ✗ ${n}`).join("\n") +
-        `\n    → restaure o tool ou, se a remoção foi intencional, atualize KNOWN_MCP_TOOL_NAMES.`
-    );
-  }
-  const newMcpTools = findNewMcpTools(KNOWN_MCP_TOOL_NAMES, liveMcpToolNames);
-
   // ── Resultado ─────────────────────────────────────────────────────────────
   if (failures.length) {
     console.error(
@@ -511,15 +361,11 @@ async function main(): Promise<void> {
   const newPairsNote = newPairs.length
     ? ` (${newPairs.length} par(es) novo(s) não-congelado(s): ${newPairs.join(", ")} — atualize KNOWN_TRANSLATOR_PAIRS se intencional)`
     : "";
-  const newMcpNote = newMcpTools.length
-    ? ` (${newMcpTools.length} tool(s) novo(s) não-congelado(s): ${newMcpTools.join(", ")} — atualize KNOWN_MCP_TOOL_NAMES se intencional)`
-    : "";
   console.log(
     `[known-symbols] OK — ` +
       `${aliases.length} executores conformes; ` +
       `${canonical.length} estratégias canônicas (${handled.size} via despacho + ${Object.keys(IMPLICIT_DEFAULT_STRATEGIES).length} default(s) implícito(s)); ` +
-      `${livePairs.size} pares de tradutor vivos vs ${KNOWN_TRANSLATOR_PAIRS.length} congelados${newPairsNote}; ` +
-      `${liveMcpToolNames.size} tools MCP (${toolsWithoutScopes.length === 0 ? "todos com scope" : `${toolsWithoutScopes.length} sem scope`}) vs ${KNOWN_MCP_TOOL_NAMES.length} congelados${newMcpNote}`
+      `${livePairs.size} pares de tradutor vivos vs ${KNOWN_TRANSLATOR_PAIRS.length} congelados${newPairsNote}`
   );
 }
 

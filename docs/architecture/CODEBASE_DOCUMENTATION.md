@@ -447,7 +447,6 @@ open-sse/
 ├── transformer/            Responses API ↔ Chat Completions stream transformer
 ├── services/               80+ service modules (combos, fallback, quotas, identity, …)
 ├── utils/                  Streaming helpers, TLS client, AWS SigV4, proxy fetch, …
-└── mcp-server/             MCP server (3 transports, 22 scopes, 80 tools)
 ```
 
 ### 4.1 `open-sse/handlers/`
@@ -530,19 +529,6 @@ Highlights (full list under `open-sse/services/`):
 | Batches              | `batchProcessor.ts`                                                                                                                                                                                                                                      |
 | Usage                | `usage.ts`                                                                                                                                                                                                                                               |
 
-### 4.6 `open-sse/mcp-server/`
-
-- **80 unique tools** wired in `server.ts` (45 canonical in `schemas/tools.ts` +
-  memory, skills, GitHub-skills, pool, plugin, Notion, Obsidian,
-  local-corpus and compression modules — union counted by `countUniqueMcpTools`).
-- **3 transports**: stdio, HTTP Streamable, SSE.
-- **22 scopes** enforced at runtime — base list in `src/shared/constants/mcpScopes.ts`, full set is the union of the scopes declared by each tool module.
-- Audit table: `mcp_tool_audit` (populated by `audit.ts`).
-- Files: `server.ts`, `index.ts`, `httpTransport.ts`, `audit.ts`, `scopeEnforcement.ts`,
-  `tools/{advancedTools, compressionTools, memoryTools, skillTools}.ts`,
-  plus tests under `__tests__/`.
-- See [MCP-SERVER.md](../frameworks/MCP-SERVER.md) for the full tool catalog.
-
 ### 4.7 `open-sse/config/`
 
 Provider registries (`providerRegistry.ts`, `providerModels.ts`,
@@ -577,7 +563,6 @@ Streaming primitives and provider helpers: `stream.ts`, `streamHandler.ts`,
 bin/
 ├── omniroute.mjs           Main CLI entry (Node ESM)
 ├── reset-password.mjs      Reset the management password from CLI
-├── mcp-server.mjs          MCP server launcher (stdio)
 ├── nodeRuntimeSupport.mjs  Node version guard
 └── cli/
     ├── program.mjs         Commander program builder
@@ -621,9 +606,8 @@ Common commands:
 | Command                                                  | What it runs                                                     |
 | -------------------------------------------------------- | ---------------------------------------------------------------- |
 | `npm run test:unit`                                      | All `tests/unit/*.test.ts` via Node test runner (concurrency 10) |
-| `npm run test:vitest`                                    | Vitest suite (MCP, autoCombo, cache)                             |
+| `npm run test:vitest`                                    | Vitest suite (autoCombo, combo, cache)                           |
 | `npm run test:e2e`                                       | Playwright UI suite                                              |
-| `npm run test:protocols:e2e`                             | MCP + A2A protocol e2e                                           |
 | `npm run test:coverage`                                  | Coverage gate (≥60% lines/statements/functions/branches)         |
 | `node --import tsx/esm --test tests/unit/<file>.test.ts` | Single file run                                                  |
 
@@ -738,15 +722,6 @@ See [RESILIENCE_GUIDE.md](./RESILIENCE_GUIDE.md) and the dedicated section in
 4. Importers use direct imports from `@/lib/db/yourModule` (no barrel — the old `localDb.ts` re-export layer was removed).
 5. Add tests under `tests/unit/`.
 
-### Add a new MCP tool
-
-1. Add the tool definition under `open-sse/mcp-server/tools/` (or extend
-   `open-sse/mcp-server/schemas/tools.ts`).
-2. Assign the appropriate scope(s) in `src/shared/constants/mcpScopes.ts`.
-3. Register the tool in `open-sse/mcp-server/server.ts`.
-4. Add tests under `open-sse/mcp-server/__tests__/`.
-5. Update [MCP-SERVER.md](../frameworks/MCP-SERVER.md).
-
 ### Add a new A2A skill
 
 `src/lib/a2a/skills/` and are registered through the A2A task manager.
@@ -819,7 +794,6 @@ See [RESILIENCE_GUIDE.md](./RESILIENCE_GUIDE.md) and the dedicated section in
 - [RESILIENCE_GUIDE.md](./RESILIENCE_GUIDE.md) — circuit breaker, cooldown,
   lockout deep dive.
 - [AUTO-COMBO.md](../routing/AUTO-COMBO.md) — Auto Combo scoring and strategies.
-- [MCP-SERVER.md](../frameworks/MCP-SERVER.md) — full MCP tool catalog + transports.
 - [COMPRESSION_GUIDE.md](../compression/COMPRESSION_GUIDE.md) — RTK + Caveman compression.
 - [CLI-TOOLS.md](../reference/CLI-TOOLS.md) — CLI integrations.
 - [DOCKER_GUIDE.md](../guides/DOCKER_GUIDE.md), [FLY_IO_DEPLOYMENT_GUIDE.md](../ops/FLY_IO_DEPLOYMENT_GUIDE.md), [VM_DEPLOYMENT_GUIDE.md](../ops/VM_DEPLOYMENT_GUIDE.md), [TERMUX_GUIDE.md](../guides/TERMUX_GUIDE.md), [PWA_GUIDE.md](../guides/PWA_GUIDE.md) — deployment targets.

@@ -66,10 +66,9 @@ for (const [key, value] of Object.entries(mergedEnv)) {
   }
 }
 
-// E2E open-mode bootstrap (#11535). Test harnesses that boot THIS server (protocol
-// clients E2E) rely on an auth-disabled "open" bootstrap so management endpoints such
-// as /api/mcp/audit are genuinely exercised unauthenticated (200), not short-circuited
-// by a stray credential. bootstrap-env.mjs deliberately drops empty strings from
+// E2E open-mode bootstrap (#11535). Test harnesses that boot THIS server rely on an
+// auth-disabled "open" bootstrap so management endpoints are genuinely exercised
+// unauthenticated (200), not short-circuited by a stray credential. bootstrap-env.mjs deliberately drops empty strings from
 // process.env/.env/server.env, so an INITIAL_PASSWORD="" injected by a harness cannot
 // survive the merge above and any INITIAL_PASSWORD persisted in .env or server.env
 // would leak back in (401 → green-shallow suite).

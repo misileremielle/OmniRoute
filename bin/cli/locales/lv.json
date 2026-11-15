@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurēt saspiešanas iestatījumus",
-      "engine": "Saspiešanas dzinējs (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman agresivitāte 0.0–1.0",
-      "rtk_budget": "RTK žetonu budžets",
-      "language_pack": "Valodas paka, ko aktivizēt"
+      "engine": "Saspiešanas dzinējs (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Iegūt vai iestatīt aktīvo saspiešanas dzinēju"
@@ -1107,33 +1104,17 @@
     "created": "Kombinācija izveidota: {name}",
     "deleted": "Kombinācija izdzēsta: {name}",
     "noCombos": "Nav konfigurētu kombināciju.",
-    "confirmDelete": "Izdzēst kombināciju {name}?",
-    "suggest": {
-      "description": "Ieteikt labāko kombināciju uzdevumam, izmantojot AI vērtēšanu",
-      "task": "Uzdevuma apraksts",
-      "maxCost": "Maksimālā izmaksas par pieprasījumu ASV dolāros",
-      "maxLatencyMs": "Maksimālā latentuma laiks milisekundēs",
-      "weights": "JSON vērtēšanas svari, piem., {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Rādāmo augstāko kandidātu skaits (noklusējums: 5)",
-      "explain": "Izdrukāt pamatojumu uz stderr",
-      "switch": "Aktivizēt visaugstāk novērtēto kombināciju"
-    }
+    "confirmDelete": "Izdzēst kombināciju {name}?"
   },
   "oneproxy": {
     "description": "Pārvaldīt OneProxy augšējā līmeņa baseinu",
-    "stats": {
-      "provider": "Filtrēt pēc pakalpojuma sniedzēja",
-      "period": "Laika periods (noklusējums: 24h)"
-    },
     "fetch": {
       "description": "Iegūt starpniekserverus no baseina",
       "count": "Iegūstamo starpniekserveru skaits (noklusējums: 1)",
       "type": "Starpniekservera tips: http|socks5 (noklusējums: http)"
     },
     "rotate": {
-      "description": "Piespiest starpniekservera maiņu",
-      "provider": "Pakalpojuma sniedzējs, kam veikt maiņu",
-      "connectionId": "Konkrētais savienojuma ID, kam veikt maiņu"
+      "description": "Piespiest starpniekservera maiņu"
     },
     "config": {
       "description": "Rādīt vai atjaunināt OneProxy konfigurāciju",

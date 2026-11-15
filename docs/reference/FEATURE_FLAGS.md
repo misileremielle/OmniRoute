@@ -46,7 +46,7 @@ A boolean flag is considered **enabled** when its effective value is `"true"`,
 
 ## Flag Catalog
 
-116 flags across 6 categories. **Default** is the definition default — the value
+114 flags across 6 categories. **Default** is the definition default — the value
 used when neither a DB override nor an environment variable is present.
 
 ### Security (11)
@@ -120,15 +120,13 @@ Invalid enum values and unreadable feature-flag storage fail closed. Neither opt
 priced spend or a failed pricing lookup. Enforcement and the administrator report resolve the
 same effective policy.
 
-### Runtime (57)
+### Runtime (55)
 
 | Key                                            | Type    | Default | Restart | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------------------------------------------- | ------- | ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `UNIVERSAL_CONTEXT_HANDOFF_ENABLED`            | boolean | `true`  |         | Generate and inject conversation summaries when combo routing switches models. Disable to treat model switches independently and prevent background handoff requests for all existing and future combos.                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `REASONING_REPLAY_ENABLED`                     | boolean | `true`  |         | Cache and replay model reasoning across multi-turn conversations. Disable to stop storing and re-injecting reasoning.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `RESPONSES_PASSTHROUGH_DROP_COMMENTARY`        | boolean | `true`  |         | Drop internal commentary-phase output items from Responses API passthrough streams before forwarding to clients. Disable to receive raw upstream commentary.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `OMNIROUTE_MCP_ENFORCE_SCOPES`                 | boolean | `false` |         | Enforce scope restrictions on MCP tool access.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `OMNIROUTE_MCP_COMPRESS_DESCRIPTIONS`          | boolean | `false` |         | Compress MCP tool descriptions to reduce token usage.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `OMNIROUTE_ENABLE_RUNTIME_BACKGROUND_TASKS`    | boolean | `false` |         | Enable background task processing at runtime.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `OMNIROUTE_DISABLE_BACKGROUND_SERVICES`        | boolean | `false` | ✓       | Disable all background services: quota refresh, provider-limits sync, connection recovery, credential health, cloud/model/free-proxy/proxy-health sync, retention cleanup, scheduled VACUUM, settings hot-reload poll. On a long-running install, connections do not auto-recover and the database keeps growing.                                                                                                                                                                                                                                                                                                                               |
 | `OMNIROUTE_RTK_TRUST_PROJECT_FILTERS`          | boolean | `false` |         | Trust project-level RTK filters without validation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -249,8 +247,8 @@ Every method requires an authenticated dashboard session (`401` otherwise).
 
 With login disabled (`requireLogin=false`) the route is open, except for the
 protected flags: every flag in the Security category plus
-`OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS`, `OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS` and
-`OMNIROUTE_MCP_ENFORCE_SCOPES` (`isProtectedFeatureFlag()` in
+`OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS` and `OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS`
+(`isProtectedFeatureFlag()` in
 `protectedFeatureFlags.ts`). A `PUT` on one of them, and a `DELETE` while
 one of them has a DB override, still needs a dashboard session, a
 `manage`-scope API key, an `oma_` access token with write scope or higher, or
@@ -278,10 +276,10 @@ Returns every flag with its effective value, source, and a summary.
       "requiresRestart": false,
       "warningLevel": "caution",
     },
-    // ... all 116 flags
+    // ... all 114 flags
   ],
   "summary": {
-    "total": 116,
+    "total": 114,
     "active": 0,
     "inactive": 0,
     "overriddenByDb": 0,

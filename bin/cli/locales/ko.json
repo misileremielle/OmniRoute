@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "압축 설정 구성",
-      "engine": "압축 엔진(caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman 적극성 0.0~1.0",
-      "rtk_budget": "RTK 토큰 예산",
-      "language_pack": "활성화할 언어 팩"
+      "engine": "압축 엔진(caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "활성 압축 엔진 가져오기 또는 설정"
@@ -1107,33 +1104,17 @@
     "created": "콤보가 생성되었습니다: {name}",
     "deleted": "콤보가 삭제되었습니다: {name}",
     "noCombos": "설정된 콤보가 없습니다.",
-    "confirmDelete": "콤보 {name}을(를) 삭제하시겠습니까?",
-    "suggest": {
-      "description": "AI 점수를 사용하여 작업에 가장 적합한 콤보 추천",
-      "task": "작업 설명",
-      "maxCost": "요청당 최대 비용(USD)",
-      "maxLatencyMs": "최대 지연 시간(밀리초)",
-      "weights": "JSON 점수 가중치(예: {\"latency\":0.7,\"cost\":0.3})",
-      "top": "표시할 상위 후보 수(기본값: 5)",
-      "explain": "근거를 stderr에 출력",
-      "switch": "가장 높은 순위의 콤보 활성화"
-    }
+    "confirmDelete": "콤보 {name}을(를) 삭제하시겠습니까?"
   },
   "oneproxy": {
     "description": "OneProxy 업스트림 풀 관리",
-    "stats": {
-      "provider": "제공업체별 필터링",
-      "period": "기간(기본값: 24h)"
-    },
     "fetch": {
       "description": "풀에서 프록시 가져오기",
       "count": "가져올 프록시 수(기본값: 1)",
       "type": "프록시 유형: http|socks5 (기본값: http)"
     },
     "rotate": {
-      "description": "프록시 강제 교체",
-      "provider": "교체할 제공업체",
-      "connectionId": "교체할 특정 연결 ID"
+      "description": "프록시 강제 교체"
     },
     "config": {
       "description": "OneProxy 설정 표시 또는 업데이트",

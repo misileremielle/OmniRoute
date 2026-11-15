@@ -8271,14 +8271,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/compression/retrieve:
-    post:
-      tags:
-        - Compression
-      summary: "POST compression › retrieve"
-      responses:
-        "200":
-          description: OK
   /api/context/analytics:
     get:
       tags:
@@ -9004,84 +8996,6 @@ paths:
         LIMIT/OFFSET pages may repeat or omit rows when inserts/deletes shift pages.
         Neither the export nor totalAvailable represents a transactional snapshot.
       x-always-protected: true
-      responses:
-        "200":
-          description: OK
-  /api/mcp/audit:
-    get:
-      tags:
-        - Mcp
-      summary: "GET mcp › audit"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/mcp/audit/stats:
-    get:
-      tags:
-        - Mcp
-      summary: "GET mcp › audit › stats"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/mcp/sse:
-    get:
-      tags:
-        - Mcp
-      summary: "GET mcp › sse"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Mcp
-      summary: "POST mcp › sse"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/mcp/status:
-    get:
-      tags:
-        - Mcp
-      summary: "GET mcp › status"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/mcp/stream:
-    delete:
-      tags:
-        - Mcp
-      summary: "DELETE mcp › stream"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - Mcp
-      summary: "GET mcp › stream"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Mcp
-      summary: "POST mcp › stream"
-      x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/mcp/tools:
-    get:
-      tags:
-        - Mcp
-      summary: "GET mcp › tools"
-      x-loopback-only: true
       responses:
         "200":
           description: OK
@@ -10310,28 +10224,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/settings/local-corpus:
-    delete:
-      tags:
-        - Settings
-      summary: "DELETE settings › local corpus"
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - Settings
-      summary: "GET settings › local corpus"
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Settings
-      summary: "POST settings › local corpus"
-      responses:
-        "200":
-          description: OK
   /api/settings/model-aliases:
     delete:
       tags:
@@ -10373,78 +10265,6 @@ paths:
       tags:
         - Settings
       summary: "POST settings › models dev"
-      responses:
-        "200":
-          description: OK
-  /api/settings/notion:
-    delete:
-      tags:
-        - Settings
-      summary: "DELETE settings › notion"
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - Settings
-      summary: "GET settings › notion"
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Settings
-      summary: "POST settings › notion"
-      responses:
-        "200":
-          description: OK
-  /api/settings/obsidian:
-    delete:
-      tags:
-        - Settings
-      summary: "DELETE settings › obsidian"
-      x-always-protected: true
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - Settings
-      summary: "GET settings › obsidian"
-      x-always-protected: true
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Settings
-      summary: "POST settings › obsidian"
-      x-always-protected: true
-      responses:
-        "200":
-          description: OK
-  /api/settings/obsidian/webdav:
-    delete:
-      tags:
-        - Settings
-      summary: "DELETE settings › obsidian › webdav"
-      x-always-protected: true
-      responses:
-        "200":
-          description: OK
-    get:
-      tags:
-        - Settings
-      summary: "GET settings › obsidian › webdav"
-      x-always-protected: true
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - Settings
-      summary: "POST settings › obsidian › webdav"
-      x-always-protected: true
       responses:
         "200":
           description: OK

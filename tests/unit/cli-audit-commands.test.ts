@@ -83,7 +83,7 @@ function makeCmd(output = "json") {
   return { optsWithGlobals: () => ({ output, quiet: output !== "table" }) };
 }
 
-test("runAuditTail --source all mescla compliance e mcp", async () => {
+test("runAuditTail --source all lê somente a fonte compliance", async () => {
   const origFetch = globalThis.fetch;
   globalThis.fetch = mockFetch() as any;
 
@@ -96,7 +96,7 @@ test("runAuditTail --source all mescla compliance e mcp", async () => {
   const parsed = JSON.parse(out);
   assert.ok(Array.isArray(parsed));
   assert.ok(parsed.some((e: any) => e.source === "compliance"));
-  assert.ok(parsed.some((e: any) => e.source === "mcp"));
+  assert.ok(parsed.every((e: any) => e.source === "compliance"));
 });
 
 test("runAuditTail --source compliance retorna apenas compliance", async () => {
@@ -138,26 +138,6 @@ test("runAuditSearch envia q e filtros na query", async () => {
   globalThis.fetch = origFetch;
   assert.ok(capturedUrl.includes("q=scope_denied"));
   assert.ok(capturedUrl.includes("actor=admin"));
-});
-
-test("runAuditStats consulta endpoint stats do mcp", async () => {
-  let capturedUrl = "";
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = ((url: string) => {
-    capturedUrl = url;
-    return Promise.resolve(makeResp(MCP_STATS));
-  }) as any;
-
-  const { runAuditStats } = await import("../../bin/cli/commands/audit.mjs");
-  const out = await captureStdout(() =>
-    runAuditStats({ source: "mcp", period: "7d" }, makeCmd() as any)
-  );
-
-  globalThis.fetch = origFetch;
-  assert.ok(capturedUrl.includes("/api/mcp/audit/stats"));
-  assert.ok(capturedUrl.includes("period=7d"));
-  const parsed = JSON.parse(out);
-  assert.equal(parsed.totalCalls, 150);
 });
 
 test("runAuditGet busca entrada por id", async () => {

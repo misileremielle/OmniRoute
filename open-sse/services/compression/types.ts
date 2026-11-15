@@ -46,7 +46,6 @@ export type CompressionEngineId =
   | "rtk"
   | "session-dedup"
   | "headroom"
-  | "ccr"
   | "llmlingua"
   | "relevance"
   | "omniglyph"
@@ -225,7 +224,6 @@ export interface CompressionConfig {
    * (`false → whenNoCache`, otherwise `always`).
    */
   preserveSystemPromptMode?: PreserveSystemPromptMode;
-  mcpDescriptionCompressionEnabled?: boolean;
   comboOverrides: Record<string, CompressionMode>;
   compressionComboId?: string | null;
   stackedPipeline?: CompressionPipelineStep[];
@@ -253,10 +251,8 @@ export interface CompressionConfig {
   lite?: LiteConfig;
   /** Headroom SmartCrusher detail settings (minRows gate). */
   headroom?: HeadroomConfig;
-  /** Session Dedup detail settings (minBlockChars / fuzzy, #8388). */
+  /** Session Dedup detail settings (minBlockChars, #8388). */
   sessionDedup?: SessionDedupConfig;
-  /** CCR (context-cache-retrieval) detail settings (minChars / retrievalRampFactor, #8388). */
-  ccr?: CcrConfig;
   /** Provider-delegated context editing (Claude/Anthropic only). */
   contextEditing?: ContextEditingConfig;
   /** Opt-in cache-aligned live-zone compression (default disabled). */
@@ -426,7 +422,6 @@ export const DEFAULT_COMPRESSION_CONFIG: CompressionConfig = {
   cacheMinutes: 5,
   preserveSystemPrompt: true,
   preserveSystemPromptMode: "always",
-  mcpDescriptionCompressionEnabled: true,
   comboOverrides: {},
   compressionComboId: null,
   stackedPipeline: [
@@ -631,29 +626,10 @@ export const DEFAULT_HEADROOM_CONFIG: HeadroomConfig = {
 export interface SessionDedupConfig {
   /** Minimum character count for a suffix block to be a dedup candidate. Matches DEFAULT_MIN_BLOCK_CHARS=80. */
   minBlockChars: number;
-  /** Opt-in fuzzy near-duplicate dedup (replaces ~85%+ similar messages with a CCR marker). */
-  fuzzy: boolean;
 }
 
 export const DEFAULT_SESSION_DEDUP_CONFIG: SessionDedupConfig = {
   minBlockChars: 80,
-  fuzzy: false,
-};
-
-// ─── CCR (context-cache-retrieval) detail settings ───────────────────────────
-// Persisted under compression settings key `ccr` (#8388 — same gap as session-dedup).
-
-/** Configuration for the CCR engine detail page. */
-export interface CcrConfig {
-  /** Minimum character count for a block to be a CCR candidate. Matches DEFAULT_MIN_CHARS=600. */
-  minChars: number;
-  /** How steeply frequently-retrieved blocks resist compression; 1 disables the ramp. */
-  retrievalRampFactor: number;
-}
-
-export const DEFAULT_CCR_CONFIG: CcrConfig = {
-  minChars: 600,
-  retrievalRampFactor: 2,
 };
 
 export type { McpAccessibilityConfig } from "./engines/mcpAccessibility/constants.ts";

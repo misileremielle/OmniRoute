@@ -67,12 +67,12 @@ interface RuntimeSettingsSnapshot {
   cliVersionOverrides: CliVersionOverrides;
 }
 
-// Default bypass policy: kill-switch on, `/api/mcp/` bypassable. Mirrors the
-// pre-T-011 compile-time constant so the route guard works identically before
-// the first `applyRuntimeSettings` call (e.g. cold-boot requests).
+// Default bypass policy: kill-switch on, no bypassable prefixes. Mirrors the
+// compile-time constant so the route guard works identically before the first
+// `applyRuntimeSettings` call (e.g. cold-boot requests).
 const DEFAULT_AUTHZ_BYPASS_SNAPSHOT: AuthzBypassSnapshot = {
   enabled: true,
-  prefixes: ["/api/mcp/"],
+  prefixes: [],
 };
 
 const DEFAULT_RUNTIME_SETTINGS_SNAPSHOT: RuntimeSettingsSnapshot = {
@@ -298,9 +298,8 @@ function normalizeAuthzBypass(settings: Record<string, unknown>): AuthzBypassSna
  * O(1) accessor for the current LOCAL_ONLY manage-scope bypass policy.
  *
  * Consumed by the route-guard hot path (`isLocalOnlyBypassableByManageScope`).
- * Returns the default snapshot (`{ enabled: true, prefixes: ["/api/mcp/"] }`)
- * before the first `applyRuntimeSettings` call so cold-boot requests behave
- * identically to PR #2473. Mutated only by `applyAuthzBypassSection`.
+ * Returns the default snapshot (`{ enabled: true, prefixes: [] }`) before the
+ * first `applyRuntimeSettings` call. Mutated only by `applyAuthzBypassSection`.
  *
  * Hot-reload latency: <50 ms (no I/O, no async, pure read of the shared
  * globalThis-backed store). Spec §Non-Functional Requirements / Performance.

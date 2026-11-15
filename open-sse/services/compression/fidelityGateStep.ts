@@ -25,7 +25,7 @@ export function gateAdvance(
   engineId?: string
 ): boolean {
   if (!fidelityGate?.enabled) return true;
-  if (engineId && getCompressionEngine(engineId)?.sampling) return true; // lossy-by-design, CCR-recoverable
+  if (engineId && getCompressionEngine(engineId)?.sampling) return true; // lossy-by-design
   const verdict = checkFidelity(bodyToText(inputBody), bodyToText(result.body), fidelityGate);
   if (verdict.passed) return true;
   // mergeStackStep only pushed a breakdown entry when result.stats exists; only then is

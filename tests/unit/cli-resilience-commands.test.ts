@@ -1,6 +1,11 @@
 import test from "node:test";
-import { makeMcpStreamFetch, type McpFetchCall } from "./helpers/mcpStreamMock.ts";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { Command } from "commander";
+
+process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-cli-resilience-"));
 
 function makeResp(data: unknown, status = 200) {
   const obj = {
@@ -93,47 +98,70 @@ test("resilience reset envia provider e body correto", async () => {
   assert.equal(capturedBody.connectionId, "conn-1");
 });
 
-test("resilience profile set usa JSON-RPC tools/call", async () => {
-  let capturedCall: any = null;
+async function runProfileSet(name: string, status = 200) {
+  const { registerResilience } = await import("../../bin/cli/commands/resilience.mjs");
+  const program = new Command();
+  program.name("omniroute").option("--output <fmt>", "output", "json").exitOverride();
+  registerResilience(program);
+  const calls: Array<{ url: string; method: string; body: any }> = [];
+  let exitCode: number | null = null;
   const origFetch = globalThis.fetch;
-  globalThis.fetch = makeMcpStreamFetch({ toolResult: {} });
-  const inner = globalThis.fetch;
-  globalThis.fetch = ((url: any, init: any) => {
-    if (
-      String(url).includes("/api/mcp/stream") &&
-      String(init?.body || "").includes("tools/call")
-    ) {
-      capturedCall = JSON.parse(init.body);
-    }
-    return inner(url, init);
-  }) as any;
+  const origWrite = process.stdout.write;
+  const origErr = process.stderr.write;
+  const origExit = process.exit;
+  globalThis.fetch = (async (url: string | URL, init?: RequestInit) => {
+    calls.push({
+      url: String(url),
+      method: String(init?.method ?? "GET"),
+      body: typeof init?.body === "string" ? JSON.parse(init.body) : undefined,
+    });
+    return new Response(JSON.stringify({ ok: true }), { status });
+  }) as typeof fetch;
+  process.stdout.write = (() => true) as typeof process.stdout.write;
+  process.stderr.write = (() => true) as typeof process.stderr.write;
+  process.exit = ((code: number) => {
+    exitCode = code;
+    throw new Error(`EXIT_${code}`);
+  }) as typeof process.exit;
+  try {
+    await program.parseAsync(["node", "omniroute", "resilience", "profile", "set", name]);
+  } catch (err) {
+    if (!(err instanceof Error) || !err.message.startsWith("EXIT_")) throw err;
+  } finally {
+    globalThis.fetch = origFetch;
+    process.stdout.write = origWrite;
+    process.stderr.write = origErr;
+    process.exit = origExit;
+  }
+  return { calls, exitCode };
+}
 
-  const { mcpCallTool } = await import("../../bin/cli/mcpClient.mjs");
-  await mcpCallTool("omniroute_set_resilience_profile", { profile: "balanced" });
+test("resilience profile set PATCHes /api/resilience with the preset", async () => {
+  const { RESILIENCE_PROFILES } = await import("../../bin/cli/commands/resilience.mjs");
+  const { calls, exitCode } = await runProfileSet("balanced");
+  assert.equal(exitCode, null);
+  assert.equal(calls.length, 1);
+  assert.equal(new URL(calls[0].url).pathname, "/api/resilience");
+  assert.equal(calls[0].method, "PATCH");
+  assert.deepEqual(calls[0].body, RESILIENCE_PROFILES.balanced);
+});
 
-  globalThis.fetch = origFetch;
-  assert.equal(capturedCall.method, "tools/call");
-  assert.equal(capturedCall.params.name, "omniroute_set_resilience_profile");
-  assert.equal(capturedCall.params.arguments.profile, "balanced");
+test("resilience profile set exits 1 when the PATCH fails", async () => {
+  const { exitCode } = await runProfileSet("aggressive", 400);
+  assert.equal(exitCode, 1);
+});
+
+test("every resilience preset passes the server's PATCH schema", async () => {
+  const { RESILIENCE_PROFILES } = await import("../../bin/cli/commands/resilience.mjs");
+  const { updateResilienceSchema } =
+    await import("../../src/shared/validation/schemas/settings.ts");
+  for (const [name, body] of Object.entries(RESILIENCE_PROFILES)) {
+    const r = updateResilienceSchema.safeParse(body);
+    assert.ok(r.success, `${name}: ${r.success ? "" : r.error.message}`);
+  }
 });
 
 test("resilience.mjs pode ser importado sem erro", async () => {
   const mod = await import("../../bin/cli/commands/resilience.mjs");
   assert.equal(typeof mod.registerResilience, "function");
-});
-
-test("resilience profile set works against a sessionless MCP stream", async () => {
-  const calls: McpFetchCall[] = [];
-  const origFetch = globalThis.fetch;
-  globalThis.fetch = makeMcpStreamFetch({ toolResult: {}, sessionMode: "stateless", calls });
-
-  try {
-    const { mcpCallTool } = await import("../../bin/cli/mcpClient.mjs");
-    await mcpCallTool("omniroute_set_resilience_profile", { profile: "balanced" });
-    const toolCall = calls.find((c) => c.body?.method === "tools/call");
-    assert.equal(toolCall?.body?.params?.name, "omniroute_set_resilience_profile");
-    assert.deepEqual(toolCall?.body?.params?.arguments, { profile: "balanced" });
-  } finally {
-    globalThis.fetch = origFetch;
-  }
 });

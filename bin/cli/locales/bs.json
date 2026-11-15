@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurišite postavke kompresije",
-      "engine": "Engine kompresije (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agresivnost pećinjaka 0.0–1.0",
-      "rtk_budget": "RTK budžet tokena",
-      "language_pack": "Jezički paket za aktivaciju"
+      "engine": "Engine kompresije (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Preuzmi ili postavi aktivni mehanizam kompresije"
@@ -1107,33 +1104,17 @@
     "created": "Kombinacija kreirana: {name}",
     "deleted": "Kombinacija obrisana: {name}",
     "noCombos": "Nema konfigurisanih kombinacija.",
-    "confirmDelete": "Obriši combo {name}?",
-    "suggest": {
-      "description": "Predložite najbolju kombinaciju za zadatak koristeći AI bodovanje",
-      "task": "Opis zadatka",
-      "maxCost": "Maksimalni trošak po zahtjevu u USD-u",
-      "maxLatencyMs": "Maksimalna latencija u milisekundama",
-      "weights": "JSON težine bodovanja npr. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Broj najboljih kandidata za prikaz (podrazumijevano: 5)",
-      "explain": "Ispiši obrazloženje u stderr",
-      "switch": "Aktiviraj najbolje rangiranu kombinaciju"
-    }
+    "confirmDelete": "Obriši combo {name}?"
   },
   "oneproxy": {
     "description": "Upravljajte OneProxy upstream pool-om",
-    "stats": {
-      "provider": "Filtriraj po dobavljaču",
-      "period": "Vremenski period (podrazumijevano: 24h)"
-    },
     "fetch": {
       "description": "Preuzmi proksije iz pool-a",
       "count": "Broj proxyja za preuzimanje (podrazumijevano: 1)",
       "type": "Tip proxyja: http|socks5 (podrazumijevano: http)"
     },
     "rotate": {
-      "description": "Prisili rotaciju proxyja",
-      "provider": "Provajder za rotaciju za",
-      "connectionId": "Specifični ID veze za rotaciju"
+      "description": "Prisili rotaciju proxyja"
     },
     "config": {
       "description": "Prikaži ili ažuriraj OneProxy konfiguraciju",

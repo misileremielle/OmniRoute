@@ -31,7 +31,6 @@ import {
 const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
 export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
-  "/api/mcp/",
   "/api/cli-tools/runtime/",
   "/api/cli-tools/omp-settings", // spawns `which omp` to detect the CLI install (Hard Rules #15 + #16, #6318)
   "/api/cli-tools/letta-settings", // spawns `which letta` to detect the CLI install (Hard Rules #15 + #16, #6318)
@@ -143,7 +142,7 @@ export { SPAWN_CAPABLE_PREFIXES, SPAWN_CAPABLE_PATTERNS };
  * consult this constant — it reads `getAuthzBypassSnapshot().prefixes`,
  * which is hot-reloaded on every settings PATCH.
  */
-export const LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES: ReadonlyArray<string> = ["/api/mcp/"];
+export const LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES: ReadonlyArray<string> = [];
 
 export const ALWAYS_PROTECTED_API_PATHS: ReadonlyArray<string> = [
   "/api/shutdown",
@@ -180,17 +179,6 @@ export const ALWAYS_PROTECTED_API_PATHS: ReadonlyArray<string> = [
   // the spawn; this entry keeps auth mandatory for loopback callers under
   // requireLogin=false.
   "/api/providers/agy-auth/apply-local",
-  // Obsidian integration. POST /webdav points the WebDAV file service — served by
-  // the custom Node layer BEFORE Next.js, outside this pipeline — at a
-  // caller-chosen root and echoes freshly minted, reusable Basic credentials;
-  // DELETE /webdav rotates/clears them; the parent POST stores the Obsidian REST
-  // API token. GHSA-62vw only masked the GET password reveal, leaving credential
-  // *issuance* on the fail-open tier: with requireLogin flipped off during the
-  // bootstrap window, an anonymous caller stood up a file server over DATA_DIR
-  // and read JWT_SECRET out of server.env (GHSA-7pq4-8pvv-rx7r). Prefix covers
-  // the /webdav child. ALWAYS_PROTECTED rather than LOCAL_ONLY so an operator
-  // driving the dashboard through a tunnel keeps the feature.
-  "/api/settings/obsidian",
   // GET spreads every provider_connections row verbatim, so the lazy-decrypt
   // proxy returns each connection's apiKey / accessToken / refreshToken /
   // idToken in plaintext, and the route has no auth call of its own. Left on the
@@ -201,8 +189,8 @@ export const ALWAYS_PROTECTED_API_PATHS: ReadonlyArray<string> = [
   // Relay token management. POST mints a reusable inference credential and
   // returns it in clear once, GET lists every token's id/prefix/limits, and the
   // [id] child edits, toggles or revokes one. Credential issuance stays
-  // authenticated in open mode (requireLogin=false), like the WebDAV credentials
-  // above: "anonymous" is never the right audience for "mint me a token". The
+  // authenticated in open mode (requireLogin=false): "anonymous" is never the
+  // right audience for "mint me a token". The
   // dashboard sends the session cookie and automation a manage-scoped key, so
   // both keep working; the plain prefix covers the /{id} child routes.
   "/api/relay/tokens",
@@ -352,12 +340,6 @@ export const LOCAL_ONLY_API_GET_EXEMPTIONS: ReadonlySet<string> = new Set([
   // /api/version-manager/ installs or spawns the CLIProxyAPI binary.
   "/api/version-manager/status",
   "/api/version-manager/check-update",
-  // GET /api/mcp/audit and /stats are read-only SQLite queries behind
-  // requireManagementAuth. The rest of /api/mcp/* stays local-only because
-  // SSE/stream can spawn. Without this exemption a tunnel-served dashboard
-  // 403s the timeline MCP poll forever (#13941).
-  "/api/mcp/audit",
-  "/api/mcp/audit/stats",
   "/api/services/cliproxy/status",
 ]);
 
@@ -368,7 +350,7 @@ const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
  * Returns true when `path` is a local-only route that must be blocked from
  * non-loopback / non-LAN callers.
  *
- * @param path    Normalized request path (e.g. "/api/mcp/sse").
+ * @param path    Normalized request path (e.g. "/api/cli-tools/runtime/status").
  * @param method  Optional HTTP method. When provided and the method is a safe
  *                read-only method (GET/HEAD/OPTIONS) AND the path exactly
  *                matches an entry in `LOCAL_ONLY_API_GET_EXEMPTIONS`, this

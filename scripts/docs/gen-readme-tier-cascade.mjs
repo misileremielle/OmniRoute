@@ -32,7 +32,7 @@ export const TIER_CASCADE_COPY = {
     "RTK + Caveman compression",
     " · ",
     "21 routing strategies",
-    "Circuit breakers · TLS stealth · MCP · A2A · Guardrails",
+    "Circuit breakers · TLS stealth · A2A · Guardrails",
   ],
   tiers: TIERS.map((t) => t.kicker),
   models: TIERS.flatMap((t) => t.models),

@@ -92,12 +92,8 @@ Lookup material — API surface, environment variables, CLI flags, provider cata
 
 Pluggable subsystems exposed to clients, agents, and operators.
 
-- [MCP-SERVER.md](frameworks/MCP-SERVER.md) — Model Context Protocol server.
 - [EVALS.md](frameworks/EVALS.md) — eval suites.
 - [EMBEDDED-SERVICES.md](frameworks/EMBEDDED-SERVICES.md) — embedded sidecar services (9Router, CLIProxyAPI).
-- [NOTION_CONTEXT.md](frameworks/NOTION_CONTEXT.md) — Notion context source.
-- [OBSIDIAN_CONTEXT.md](frameworks/OBSIDIAN_CONTEXT.md) — Obsidian context source.
-- [LOCAL_CORPUS_CONTEXT.md](frameworks/LOCAL_CORPUS_CONTEXT.md) — local corpus context source (approved directory exposed to MCP).
 - [OPENCODE.md](frameworks/OPENCODE.md) — OpenCode integration.
 - [OPEN_SSE_ARCHITECTURE.md](frameworks/OPEN_SSE_ARCHITECTURE.md) — open-sse streaming engine internals.
 - [PLAYGROUND_STUDIO.md](frameworks/PLAYGROUND_STUDIO.md) — Playground Studio UI.

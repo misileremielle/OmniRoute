@@ -527,8 +527,6 @@ export const updateSettingsSchema = z.object({
   intentExtraReasoningKeywords: z.array(z.string().max(100)).optional(),
   intentExtraSimpleKeywords: z.array(z.string().max(100)).optional(),
   // Protocol toggles (default: disabled)
-  mcpEnabled: z.boolean().optional(),
-  mcpTransport: z.enum(["stdio", "sse", "streamable-http"]).optional(),
   wsAuth: z.boolean().optional(),
   // CLI Fingerprint compatibility (per-provider)
   cliCompatProviders: z.array(z.string().max(100)).optional(),

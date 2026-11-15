@@ -33,7 +33,7 @@ const INV = KIT.dark;
 // The gate-checked provider total (scripts/check/check-docs-counts-sync.mjs reads
 // "<n> providers" from the title); the health line and the "… N more providers" footer of the
 // providers screen derive from it so the three numbers can never disagree.
-const PROVIDER_TOTAL = 367;
+const PROVIDER_TOTAL = 223;
 
 // The three screens: command, then header + 4 lines + a dim footer line. Segments are plain
 // strings or { t, c } with c ∈ ok | warn | err | dim.
@@ -113,7 +113,7 @@ const SCREENS = [
         { t: "○", c: "err" },
         { t: " 0 open", c: "err" },
       ],
-      [`${nb(2)}Providers: ${PROVIDER_TOTAL} registered${nb(3)}150+ free tiers`],
+      [`${nb(2)}Providers: ${PROVIDER_TOTAL} registered${nb(3)}85+ free tiers`],
     ],
     footer: "… live: /dashboard · omniroute status",
     typing: "0;0.678;0.684;0.690;0.696;0.702;0.708;0.714;0.720;1",
@@ -150,7 +150,6 @@ const TICKER = [
   ["telemetry"],
   ["logs"],
   ["audit"],
-  ["mcp", true],
   ["cloud"],
   ["eval"],
   ["doctor", true],

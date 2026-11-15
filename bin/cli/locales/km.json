@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "កំណត់រចនាសម្ព័ន្ធការកំណត់បង្ហាប់",
-      "engine": "ម៉ាស៊ីនបង្ហាប់ (caveman|rtk|hybrid|none)",
-      "caveman_agg": "កម្រិតខ្លាំងរបស់ Caveman 0.0–1.0",
-      "rtk_budget": "កញ្ចប់ថវិកាថូខឹន RTK",
-      "language_pack": "កញ្ចប់ភាសាដែលត្រូវធ្វើឱ្យសកម្ម"
+      "engine": "ម៉ាស៊ីនបង្ហាប់ (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "ទទួលយក ឬកំណត់ម៉ាស៊ីនបង្ហាប់សកម្ម"
@@ -1107,33 +1104,17 @@
     "created": "បានបង្កើត combo៖ {name}",
     "deleted": "បានលុប combo៖ {name}",
     "noCombos": "មិនមាន combo ដែលបានកំណត់រចនាសម្ព័ន្ធទេ។",
-    "confirmDelete": "លុប combo {name} មែនទេ?",
-    "suggest": {
-      "description": "ណែនាំ combo ល្អបំផុតសម្រាប់កិច្ចការមួយដោយប្រើការដាក់ពិន្ទុពី AI",
-      "task": "ការពិពណ៌នាភារកិច្ច",
-      "maxCost": "តម្លៃអតិបរមាក្នុងមួយសំណើជា USD",
-      "maxLatencyMs": "ភាពយឺតអតិបរមាគិតជាមិល្លីវិនាទី",
-      "weights": "ទម្ងន់ពិន្ទុជា JSON ឧ. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "ចំនួនបេក្ខភាពលំដាប់កំពូលដែលត្រូវបង្ហាញ (លំនាំដើម៖ 5)",
-      "explain": "បោះពុម្ពហេតុផលទៅ stderr",
-      "switch": "ធ្វើឱ្យបន្សំដែលមានចំណាត់ថ្នាក់កំពូលសកម្ម"
-    }
+    "confirmDelete": "លុប combo {name} មែនទេ?"
   },
   "oneproxy": {
     "description": "គ្រប់គ្រងក្រុម upstream របស់ OneProxy",
-    "stats": {
-      "provider": "ត្រងតាមអ្នកផ្តល់សេវា",
-      "period": "រយៈពេល (លំនាំដើម៖ 24h)"
-    },
     "fetch": {
       "description": "ទាញយកប្រូកស៊ីពីក្រុម",
       "count": "ចំនួនប្រូកស៊ីដែលត្រូវទាញយក (លំនាំដើម៖ 1)",
       "type": "ប្រភេទប្រូកស៊ី៖ http|socks5 (លំនាំដើម៖ http)"
     },
     "rotate": {
-      "description": "បង្ខំឱ្យប្តូរប្រូកស៊ី",
-      "provider": "អ្នកផ្តល់សេវាដែលត្រូវប្តូរ",
-      "connectionId": "លេខសម្គាល់ការតភ្ជាប់ជាក់លាក់ដែលត្រូវប្តូរ"
+      "description": "បង្ខំឱ្យប្តូរប្រូកស៊ី"
     },
     "config": {
       "description": "បង្ហាញ ឬធ្វើបច្ចុប្បន្នភាពការកំណត់រចនាសម្ព័ន្ធ OneProxy",

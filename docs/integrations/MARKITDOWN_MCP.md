@@ -310,4 +310,4 @@ For issues with markitdown-mcp:
 - **GitHub Issues**: https://github.com/microsoft/markitdown/issues
 - **PyPI Package**: https://pypi.org/project/markitdown-mcp/
 
-For OmniRoute integration questions, refer to the main OmniRoute documentation at `docs/frameworks/MCP-SERVER.md`.
+For OmniRoute integration questions, refer to the main OmniRoute documentation in `docs/`.

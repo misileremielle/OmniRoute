@@ -7,7 +7,6 @@ import Checkbox from "@/shared/components/Checkbox";
 import Textarea from "@/shared/components/Textarea";
 export const LANE_ENGINES = [
   "session-dedup",
-  "ccr",
   "lite",
   "rtk",
   "ionizer",
@@ -25,8 +24,6 @@ export interface PlaygroundInputProps {
   loading: boolean;
   fidelityGate: boolean;
   onToggleFidelity: () => void;
-  fuzzyDedup: boolean;
-  onToggleFuzzy: () => void;
   riskGate: boolean;
   onToggleRisk: () => void;
   quantumLock: boolean;
@@ -100,8 +97,6 @@ export function PlaygroundInput({
   loading,
   fidelityGate,
   onToggleFidelity,
-  fuzzyDedup,
-  onToggleFuzzy,
   riskGate,
   onToggleRisk,
   quantumLock,
@@ -123,9 +118,6 @@ export function PlaygroundInput({
       <EngineOptions active={active} onToggleActive={onToggleActive} />
       <ToggleOption testId="fidelity-toggle" checked={fidelityGate} onChange={onToggleFidelity}>
         {t("verifyFidelity")}
-      </ToggleOption>
-      <ToggleOption testId="fuzzy-toggle" checked={fuzzyDedup} onChange={onToggleFuzzy}>
-        {t("fuzzyDedup")}
       </ToggleOption>
       <ToggleOption testId="risk-toggle" checked={riskGate} onChange={onToggleRisk}>
         {t("protectSensitive")}

@@ -313,28 +313,6 @@ describe("API Routes — dashboard and tool consumers", () => {
     assert.doesNotMatch(requestLogger, /\/api\/logs\/active/);
   });
 
-  it("keeps usage quota wired through MCP tools", () => {
-    const mcpAdvancedTools = readProjectFile("open-sse/mcp-server/tools/advancedTools.ts");
-    const mcpOpsTools = readProjectFile("open-sse/mcp-server/tools/opsTools.ts");
-    const mcpServer = readProjectFile("open-sse/mcp-server/server.ts");
-
-    assert.ok(mcpAdvancedTools, "advanced MCP tools should exist");
-    assert.ok(mcpOpsTools, "operational MCP tools should exist");
-    assert.ok(mcpServer, "MCP server should exist");
-    assert.match(mcpAdvancedTools, /\/api\/usage\/quota/);
-    // The quota handler moved out of the registration module in #15159.
-    assert.match(mcpOpsTools, /["']\/api\/usage\/quota["']/);
-    assert.match(
-      mcpServer,
-      /^import\s*\{[^}]*\bhandleCheckQuota\b[^}]*\}\s*from\s*"\.\/tools\/opsTools\.ts";/m
-    );
-    assert.match(
-      mcpServer,
-      /^\s+withScopeEnforcement\("omniroute_check_quota",\s*\(args\)\s*=>\s*handleCheckQuota\(checkQuotaInput\.parse\(args\)\)\s*\)/m
-    );
-    assertRouteMethods("src/app/api/usage/quota/route.ts", ["GET"]);
-  });
-
   it("keeps legacy usage history and raw request-log APIs explicitly classified", () => {
     const usageStats = readProjectFile("src/shared/components/UsageStats.tsx");
     const apiReference = readProjectFile("docs/reference/API_REFERENCE.md");

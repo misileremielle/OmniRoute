@@ -151,7 +151,7 @@ When adding a new route or executor, copy the assertion pattern from this file. 
 
 ### The static gate: `npm run check:error-helper`
 
-`scripts/check/check-error-helper.mjs` scans `open-sse/executors/`, `open-sse/handlers/`, `open-sse/mcp-server/` and every `src/app/api/**/route.ts` for a raw caught error (`err.message` / `err.stack`) or a raw upstream `body.error.message` reaching a client-facing body.
+`scripts/check/check-error-helper.mjs` scans `open-sse/executors/`, `open-sse/handlers/` and every `src/app/api/**/route.ts` for a raw caught error (`err.message` / `err.stack`) or a raw upstream `body.error.message` reaching a client-facing body.
 
 **Trust is call-scoped, never file-scoped** (G-03, #15159). The gate used to skip an entire file the moment it saw any import from a `utils/error` path — a file-scoped exemption applied to a call-scoped hazard. One correct `import { sanitizeErrorMessage }` permanently excused every other sink in the file, which is how a live leak shipped green. Now a line is trusted only when it actually routes through a sanctioned builder or sanitizer:
 

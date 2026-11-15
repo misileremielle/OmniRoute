@@ -13,9 +13,8 @@ import { CLI_TOKEN_HEADER } from "../../../src/server/authz/headers.ts";
 
 // ─── routeGuard helpers ────────────────────────────────────────────────────
 
-test("isLocalOnlyPath: /api/mcp/ prefix is local-only", () => {
-  assert.equal(isLocalOnlyPath("/api/mcp/sse"), true);
-  assert.equal(isLocalOnlyPath("/api/mcp/"), true);
+test("isLocalOnlyPath: the removed /api/mcp/ surface is no longer local-only", () => {
+  assert.equal(isLocalOnlyPath("/api/mcp/sse"), false);
 });
 
 test("isLocalOnlyPath: /api/cli-tools/runtime/ is local-only", () => {
@@ -42,9 +41,9 @@ test("isLocalOnlyPath: /api/db/health is local-only (forks native diagnostics, #
   assert.equal(isLocalOnlyPath("/api/db/health"), true);
 });
 
-test("isLocalOnlyBypassableByManageScope: /api/mcp/ prefix is bypassable", () => {
-  assert.equal(isLocalOnlyBypassableByManageScope("/api/mcp/"), true);
-  assert.equal(isLocalOnlyBypassableByManageScope("/api/mcp/stream"), true);
+test("isLocalOnlyBypassableByManageScope: no prefix is bypassable by default", () => {
+  assert.equal(isLocalOnlyBypassableByManageScope("/api/mcp/stream"), false);
+  assert.equal(isLocalOnlyBypassableByManageScope("/api/resilience/connections"), false);
 });
 
 test("isLocalOnlyBypassableByManageScope: /api/cli-tools/runtime/* is NOT bypassable", () => {
@@ -146,16 +145,16 @@ function makeCtx(
   };
 }
 
-test("management policy rejects /api/mcp/ from non-localhost (status 403)", async () => {
-  const ctx = makeCtx("/api/mcp/sse", { host: "evil.tunnel.io" });
+test("management policy rejects /api/cli-tools/runtime/ from non-localhost (status 403)", async () => {
+  const ctx = makeCtx("/api/cli-tools/runtime/status", { host: "evil.tunnel.io" });
   const outcome = await managementPolicy.evaluate(ctx);
   assert.equal(outcome.allow, false);
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy rejects /api/mcp/ when forwarded peer is remote", async () => {
+test("management policy rejects /api/cli-tools/runtime/ when forwarded peer is remote", async () => {
   const token = getMachineTokenSync();
-  const ctx = makeCtx("/api/mcp/sse", {
+  const ctx = makeCtx("/api/cli-tools/runtime/status", {
     host: "localhost",
     "x-forwarded-for": "203.0.113.10",
     [CLI_TOKEN_HEADER]: token,
@@ -165,10 +164,10 @@ test("management policy rejects /api/mcp/ when forwarded peer is remote", async 
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy rejects /api/mcp/ when host is spoofed from a remote socket", async () => {
+test("management policy rejects /api/cli-tools/runtime/ when host is spoofed from a remote socket", async () => {
   const token = getMachineTokenSync();
   const ctx = makeCtx(
-    "/api/mcp/sse",
+    "/api/cli-tools/runtime/status",
     {
       host: "localhost",
       "x-forwarded-for": "127.0.0.1",
@@ -181,9 +180,9 @@ test("management policy rejects /api/mcp/ when host is spoofed from a remote soc
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy rejects /api/mcp/ when loopback x-forwarded-for is untrusted", async () => {
+test("management policy rejects /api/cli-tools/runtime/ when loopback x-forwarded-for is untrusted", async () => {
   const token = getMachineTokenSync();
-  const ctx = makeCtx("/api/mcp/sse", {
+  const ctx = makeCtx("/api/cli-tools/runtime/status", {
     host: "localhost",
     "x-forwarded-for": "127.0.0.1",
     [CLI_TOKEN_HEADER]: token,
@@ -193,9 +192,9 @@ test("management policy rejects /api/mcp/ when loopback x-forwarded-for is untru
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy rejects /api/mcp/ when loopback x-real-ip is untrusted", async () => {
+test("management policy rejects /api/cli-tools/runtime/ when loopback x-real-ip is untrusted", async () => {
   const token = getMachineTokenSync();
-  const ctx = makeCtx("/api/mcp/sse", {
+  const ctx = makeCtx("/api/cli-tools/runtime/status", {
     host: "localhost",
     "x-real-ip": "127.0.0.1",
     [CLI_TOKEN_HEADER]: token,
@@ -205,10 +204,10 @@ test("management policy rejects /api/mcp/ when loopback x-real-ip is untrusted",
   if (!outcome.allow) assert.equal(outcome.status, 403);
 });
 
-test("management policy allows /api/mcp/ from localhost with valid CLI token", async () => {
+test("management policy allows /api/cli-tools/runtime/ from localhost with valid CLI token", async () => {
   const token = getMachineTokenSync();
   const ctx = makeCtx(
-    "/api/mcp/sse",
+    "/api/cli-tools/runtime/status",
     {
       host: "localhost",
       [CLI_TOKEN_HEADER]: token,
@@ -262,7 +261,7 @@ test("management policy rejects /api/services/ from non-localhost (status 403)",
 test("management policy allows /api/services/ from localhost with valid CLI token", async () => {
   const token = getMachineTokenSync();
   // Locality comes from the real peer (socket), never from the spoofable Host
-  // header — same setup as the /api/mcp/ sibling test above (peer-stamp model).
+  // header — same setup as the /api/cli-tools/runtime/ sibling test above (peer-stamp model).
   const ctx = makeCtx(
     "/api/services/9router/status",
     {

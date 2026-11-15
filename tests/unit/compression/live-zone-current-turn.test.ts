@@ -8,10 +8,7 @@ import {
   resetLiveZoneCache,
 } from "../../../open-sse/services/compression/liveZone.ts";
 import { resetDbInstance } from "../../../src/lib/db/core.ts";
-import {
-  applyCompression,
-  applyCompressionAsync,
-} from "../../../open-sse/services/compression/strategySelector.ts";
+import { applyCompression } from "../../../open-sse/services/compression/strategySelector.ts";
 import {
   DEFAULT_COMPRESSION_CONFIG,
   type CompressionResult,
@@ -83,66 +80,6 @@ const outputShapes = [
 
 // LZ-R1-01: count equality is not evidence of source-to-result correspondence.
 describe("live-zone contextual copy-back correspondence", () => {
-  it("retains the current tool when real Lite removal and CCR insertion cancel in cardinality", async () => {
-    const pipelineConfig = {
-      ...DEFAULT_COMPRESSION_CONFIG,
-      enabled: true,
-      stackedPipeline: [
-        { engine: "lite" as const },
-        { engine: "ccr" as const, config: { minChars: 300 } },
-      ],
-    };
-    const run = async (body: Record<string, unknown>) =>
-      applyCompressionAsync(body, "stacked", {
-        config: pipelineConfig,
-        principalId: options.principalId,
-      });
-    const pipelineOptions = { ...options, variant: { mode: "stacked", config: pipelineConfig } };
-    const tools = ["inspect", "omniroute_ccr_retrieve"].map((name) => ({
-      type: "function",
-      function: { name, parameters: { type: "object", properties: {} } },
-    }));
-    const prefix = [
-      { role: "user", content: "Inspect synthetic facts" },
-      { role: "assistant", content: "Ready for inspection" },
-    ];
-    const first = await applyLiveZoneCompression({ tools, messages: prefix }, pipelineOptions, run);
-    const current = {
-      role: "tool",
-      tool_call_id: "current",
-      content: "CURRENT RESULT MUST REMAIN A TOOL",
-    };
-    const body = {
-      tools,
-      messages: [
-        ...prefix,
-        { role: "user", content: observation },
-        assistant("current"),
-        current,
-        { role: "user", content: "duplicate after current tool" },
-        { role: "user", content: "duplicate after current tool" },
-      ],
-    };
-    const original = structuredClone(body);
-    const contextual = body.messages.slice(1);
-    const direct = await run({ tools, messages: contextual });
-    assert.equal(messagesOf(direct).length, contextual.length, "net cardinality is unchanged");
-    assert.deepEqual(
-      contextual.map((item) => item.role),
-      ["assistant", "user", "assistant", "tool", "user", "user"]
-    );
-    assert.deepEqual(
-      messagesOf(direct).map((item) => item.role),
-      ["system", "assistant", "user", "assistant", "tool", "user"]
-    );
-    const warm = await applyLiveZoneCompression(body, pipelineOptions, run);
-    assert.deepEqual(messagesOf(warm)[4], current, "role, tool_call_id and content must survive");
-    assert.deepEqual(messagesOf(warm).slice(0, prefix.length), first.body.messages);
-    assert.deepEqual(messagesOf(warm).slice(prefix.length), body.messages.slice(prefix.length));
-    assert.deepEqual(body, original, "the request must not be mutated");
-    assert.equal(warm.stats?.liveZone?.cacheHit, true);
-  });
-
   for (const { field, item: shape, link } of outputShapes) {
     const label = String("role" in shape ? shape.role : shape.type);
     const firstOutput: Item = shape;

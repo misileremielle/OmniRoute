@@ -1,9 +1,46 @@
 import { createInterface } from "node:readline";
 import { Argument } from "commander";
 import { apiFetch } from "../api.mjs";
-import { mcpCallTool } from "../mcpClient.mjs";
 import { emit } from "../output.mjs";
 import { t } from "../i18n.mjs";
+
+// Profile presets applied with `resilience profile set`. They are sent as one
+// PATCH /api/resilience body; the server keeps no list of named profiles.
+export const RESILIENCE_PROFILES = {
+  aggressive: {
+    requestQueue: { requestsPerMinute: 180, minTimeBetweenRequestsMs: 100, concurrentRequests: 16 },
+    connectionCooldown: {
+      oauth: { baseCooldownMs: 30000, useUpstreamRetryHints: false, maxBackoffSteps: 4 },
+      apikey: { baseCooldownMs: 2000, useUpstreamRetryHints: true, maxBackoffSteps: 3 },
+    },
+    providerBreaker: {
+      oauth: { failureThreshold: 2, resetTimeoutMs: 30000 },
+      apikey: { failureThreshold: 3, resetTimeoutMs: 15000 },
+    },
+  },
+  balanced: {
+    requestQueue: { requestsPerMinute: 100, minTimeBetweenRequestsMs: 200, concurrentRequests: 10 },
+    connectionCooldown: {
+      oauth: { baseCooldownMs: 60000, useUpstreamRetryHints: false, maxBackoffSteps: 8 },
+      apikey: { baseCooldownMs: 3000, useUpstreamRetryHints: true, maxBackoffSteps: 5 },
+    },
+    providerBreaker: {
+      oauth: { failureThreshold: 3, resetTimeoutMs: 60000 },
+      apikey: { failureThreshold: 5, resetTimeoutMs: 30000 },
+    },
+  },
+  conservative: {
+    requestQueue: { requestsPerMinute: 60, minTimeBetweenRequestsMs: 350, concurrentRequests: 6 },
+    connectionCooldown: {
+      oauth: { baseCooldownMs: 120000, useUpstreamRetryHints: false, maxBackoffSteps: 10 },
+      apikey: { baseCooldownMs: 30000, useUpstreamRetryHints: false, maxBackoffSteps: 8 },
+    },
+    providerBreaker: {
+      oauth: { failureThreshold: 8, resetTimeoutMs: 120000 },
+      apikey: { failureThreshold: 8, resetTimeoutMs: 60000 },
+    },
+  },
+};
 
 function fmtTs(v) {
   if (!v) return "-";
@@ -163,11 +200,17 @@ export function registerResilience(program) {
         "aggressive",
         "balanced",
         "conservative",
-        "custom",
       ])
     )
     .action(async (name, opts, cmd) => {
-      await mcpCallTool("omniroute_set_resilience_profile", { profile: name });
+      const res = await apiFetch("/api/resilience", {
+        method: "PATCH",
+        body: RESILIENCE_PROFILES[name],
+      });
+      if (!res.ok) {
+        process.stderr.write(`Error: ${res.status}\n`);
+        process.exit(1);
+      }
       process.stdout.write(`Profile: ${name}\n`);
     });
 

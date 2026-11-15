@@ -500,8 +500,6 @@ The response is the `DbHealthCheckResult` produced by `runDbHealthCheck()`
 | `driver.name`     | SQLite driver serving the checked database.                                                                                                    |
 | `driver.degraded` | `true` when writes are not durably backed by the database file — the `sql.js` WASM fallback (whole-file persistence) or an in-memory database. |
 
-The same payload is returned by the `omniroute_db_health_check` MCP tool.
-
 Run `PRAGMA integrity_check` to detect corruption:
 
 ```bash

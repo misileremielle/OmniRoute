@@ -8,7 +8,7 @@
  * when the path exactly matches LOCAL_ONLY_API_GET_EXEMPTIONS.
  *
  * Security invariant: POST /api/system/version MUST remain local-only.
- * All OTHER local-only prefixes (/api/mcp/, /api/services/, etc.) must
+ * All OTHER local-only prefixes (/api/services/, etc.) must
  * remain local-only for GET too (exemption is exact-match only).
  */
 
@@ -69,30 +69,6 @@ describe("isLocalOnlyPath - GET exemption for /api/system/version (#5083)", () =
 
   // ── OTHER LOCAL-ONLY PREFIXES UNAFFECTED BY GET EXEMPTION ─────────────────
 
-  test("GET /api/mcp/ still local-only - exemption is NOT applied to /api/mcp/", () => {
-    assert.equal(isLocalOnlyPath("/api/mcp/sse", "GET"), true);
-  });
-
-  test("GET /api/mcp/audit is not local-only so a tunnel-served dashboard can poll it (#13941)", () => {
-    assert.equal(isLocalOnlyPath("/api/mcp/audit", "GET"), false);
-    assert.equal(isLocalOnlyPath("/api/mcp/audit", "HEAD"), false);
-    assert.equal(isLocalOnlyPath("/api/mcp/audit", "OPTIONS"), false);
-  });
-
-  test("GET /api/mcp/audit/stats is not local-only (audit tab poll)", () => {
-    assert.equal(isLocalOnlyPath("/api/mcp/audit/stats", "GET"), false);
-  });
-
-  test("POST /api/mcp/audit stays local-only - exemption is GET/HEAD/OPTIONS only", () => {
-    assert.equal(isLocalOnlyPath("/api/mcp/audit", "POST"), true);
-  });
-
-  test("GET /api/mcp/sse stays local-only - exemption is exact-match, not a prefix", () => {
-    assert.equal(isLocalOnlyPath("/api/mcp/sse", "GET"), true);
-    assert.equal(isLocalOnlyPath("/api/mcp/stream", "GET"), true);
-    assert.equal(isLocalOnlyPath("/api/mcp/audit/extra", "GET"), true);
-  });
-
   test("GET /api/services/9router/start still local-only", () => {
     assert.equal(isLocalOnlyPath("/api/services/9router/start", "GET"), true);
   });
@@ -119,9 +95,6 @@ describe("isLocalOnlyPath - GET exemption for /api/system/version (#5083)", () =
   // in the same change, with the reason it is safe for a read-only method.
   //
   //   /api/system/version    - GET only reads package.json + the npm registry (#5083)
-  //   /api/mcp/audit         - GET is a read-only mcp_tool_audit query behind
-  //   /api/mcp/audit/stats     requireManagementAuth (no spawn); the rest of
-  //                              /api/mcp/* (sse/stream) stays local-only (#13941)
   //   /api/services/cliproxy/status - GET reports lifecycle/version metadata; the
   //                              latest-version lookup is an HTTPS release query (no
   //                              spawn). bifrost/dario/mux/openwa status stay local-only:
@@ -130,8 +103,6 @@ describe("isLocalOnlyPath - GET exemption for /api/system/version (#5083)", () =
   //                              install state; install/start/restart/stop stay local-only
   test("LOCAL_ONLY_API_GET_EXEMPTIONS holds exactly the reviewed paths", () => {
     assert.deepEqual([...LOCAL_ONLY_API_GET_EXEMPTIONS].sort(), [
-      "/api/mcp/audit",
-      "/api/mcp/audit/stats",
       "/api/services/cliproxy/status",
       "/api/system/version",
       "/api/version-manager/check-update",

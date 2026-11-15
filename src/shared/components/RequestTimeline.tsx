@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { copyToClipboard } from "@/shared/utils/clipboard";
 import { formatApiKeyLabel } from "@/shared/utils/formatting";
-import { MCP_TOOL_SCOPES } from "@/shared/constants/mcpScopes";
 import RequestLoggerDetail from "@/shared/components/RequestLoggerDetail";
 import Badge from "@/shared/components/Badge";
 import Button from "@/shared/components/Button";
@@ -115,24 +114,21 @@ export default function RequestTimeline({
   useEffect(() => {
     let cancelled = false;
     const refresh = () => {
-      void loadTimelineLogs(
-        fetch,
-        selectedApiKey,
-        (tool) => MCP_TOOL_SCOPES[tool],
-        knownApiKeyIdsRef.current
-      ).then((data) => {
-        if (cancelled) return;
-        const remembered = rememberApiKeysFromPoll(
-          knownApiKeyIdsRef.current,
-          seenApiKeyOptionsRef.current,
-          data,
-          selectedApiKey
-        );
-        knownApiKeyIdsRef.current = remembered.knownIds;
-        seenApiKeyOptionsRef.current = remembered.seenOptions;
-        setSeenApiKeyOptions(remembered.seenOptions);
-        setLogs((current) => nextTimelineLogs(current, data));
-      });
+      void loadTimelineLogs(fetch, selectedApiKey, undefined, knownApiKeyIdsRef.current).then(
+        (data) => {
+          if (cancelled) return;
+          const remembered = rememberApiKeysFromPoll(
+            knownApiKeyIdsRef.current,
+            seenApiKeyOptionsRef.current,
+            data,
+            selectedApiKey
+          );
+          knownApiKeyIdsRef.current = remembered.knownIds;
+          seenApiKeyOptionsRef.current = remembered.seenOptions;
+          setSeenApiKeyOptions(remembered.seenOptions);
+          setLogs((current) => nextTimelineLogs(current, data));
+        }
+      );
     };
     refresh();
     const id = setInterval(() => {

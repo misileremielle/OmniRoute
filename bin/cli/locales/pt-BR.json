@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Configurar as definições de compressão",
-      "engine": "Engine de compressão (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agressividade do Caveman 0.0–1.0",
-      "rtk_budget": "Budget de tokens RTK",
-      "language_pack": "Language pack a ativar"
+      "engine": "Engine de compressão (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Obter ou definir o engine de compressão ativo"
@@ -1107,33 +1104,17 @@
     "created": "Combo criado: {name}",
     "deleted": "Combo removido: {name}",
     "noCombos": "Nenhum combo configurado.",
-    "confirmDelete": "Remover combo {name}?",
-    "suggest": {
-      "description": "Sugerir o melhor combo para uma tarefa usando scoring de IA",
-      "task": "Descrição da tarefa",
-      "maxCost": "Custo máximo por requisição em USD",
-      "maxLatencyMs": "Latência máxima em milissegundos",
-      "weights": "Pesos JSON ex: {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Número de candidatos a exibir (padrão: 5)",
-      "explain": "Imprimir justificativa no stderr",
-      "switch": "Ativar o combo mais bem classificado"
-    }
+    "confirmDelete": "Remover combo {name}?"
   },
   "oneproxy": {
     "description": "Gerenciar o pool de proxies OneProxy",
-    "stats": {
-      "provider": "Filtrar por provider",
-      "period": "Período de tempo (padrão: 24h)"
-    },
     "fetch": {
       "description": "Buscar proxies do pool",
       "count": "Número de proxies a buscar (padrão: 1)",
       "type": "Tipo de proxy: http|socks5 (padrão: http)"
     },
     "rotate": {
-      "description": "Forçar rotação de proxy",
-      "provider": "Provider para rotacionar",
-      "connectionId": "ID de conexão específica para rotacionar"
+      "description": "Forçar rotação de proxy"
     },
     "config": {
       "description": "Exibir ou atualizar configuração do OneProxy",

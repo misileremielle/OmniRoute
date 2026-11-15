@@ -35,7 +35,7 @@ import {
 } from "./stackedStepCore.ts";
 import { resolveStepDetailConfig } from "./stepDetailConfig.ts";
 import { registerBuiltinCompressionEngines } from "./engines/index.ts";
-import { applyCcrProtocolInstruction } from "./engines/ccr/protocolInstruction.ts";
+import { applyDedupProtocolInstruction } from "./engines/session-dedup/markerNote.ts";
 import { getCompressionEngine, getEngineEntry } from "./engines/registry.ts";
 import { codexResponsesEngine } from "./engines/codexResponses/index.ts";
 import { applyOmniglyphSingleMode } from "./engines/omniglyphSingleMode.ts";
@@ -774,7 +774,7 @@ interface StackOptions {
   fidelityGate?: FidelityGateConfig;
   /** Risk-gate mask/restore wrapper (opt-in, default off). Read via resolveRiskGate. */
   riskGate?: RiskGateConfig;
-  /** Authenticated principal id — threaded through to CCR engine for store scoping. */
+  /** Authenticated principal id — threaded through to engines that scope state per caller. */
   principalId?: string;
   /** F3.3: called once per engine as it completes (live per-engine streaming). */
   onEngineStep?: (step: StackedCompressionStep) => void;
@@ -834,7 +834,7 @@ function buildStepOptions(
   step: CompressionPipelineStep,
   options?: StackOptions
 ): CompressionEngineApplyOptions {
-  // Detail sub-objects (headroom.minRows #8056; sessionDedup/ccr #8388) live on
+  // Detail sub-objects (headroom.minRows #8056; sessionDedup #8388) live on
   // settings.<engine>, not only on step.config. Merge them so the stacked runner
   // honors the dashboard value. Explicit step.config still wins so combo pipelines
   // can override per step. See resolveStepDetailConfig (stepDetailConfig.ts).
@@ -925,7 +925,7 @@ function finalizeStackedResult(
 /**
  * Marker-protocol post-pass (#8033), applied by `finalizeStackedResult` for the sync +
  * async stacked runners: after every engine, the hard budget and the inflation guard,
- * one leading system note explains any `[CCR retrieve hash=...]` / `[dedup:ref sha=...]`
+ * one leading system note explains any `[dedup:ref sha=...]`
  * marker left in the final body (idempotent: a replayed prior note carrying the sentinel
  * suppresses a second). The note is a protocol explanation, not a compression, so it runs
  * AFTER the guard: its fixed size must never count against the inflation guard (on a
@@ -934,7 +934,7 @@ function finalizeStackedResult(
  * guard reverted, only markers already in the original body are explained.
  */
 function withMarkerProtocolNote(result: CompressionResult): CompressionResult {
-  const applied = applyCcrProtocolInstruction(result.body);
+  const applied = applyDedupProtocolInstruction(result.body);
   return applied.injected ? { ...result, body: applied.body } : result;
 }
 

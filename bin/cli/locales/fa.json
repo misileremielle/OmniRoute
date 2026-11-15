@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "پیکربندی تنظیمات فشردهسازی",
-      "engine": "موتور فشردهسازی (caveman|rtk|hybrid|none)",
-      "caveman_agg": "میزان تهاجمیبودن Caveman از 0.0 تا 1.0",
-      "rtk_budget": "بودجه توکن RTK",
-      "language_pack": "بسته زبانی برای فعالسازی"
+      "engine": "موتور فشردهسازی (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "دریافت یا تنظیم موتور فشردهسازی فعال"
@@ -1107,33 +1104,17 @@
     "created": "ترکیب ایجاد شد: {name}",
     "deleted": "ترکیب حذف شد: {name}",
     "noCombos": "هیچ ترکیبی پیکربندی نشده است.",
-    "confirmDelete": "ترکیب {name} حذف شود؟",
-    "suggest": {
-      "description": "پیشنهاد بهترین ترکیب برای یک وظیفه با استفاده از امتیازدهی هوش مصنوعی",
-      "task": "شرح وظیفه",
-      "maxCost": "حداکثر هزینه هر درخواست به USD",
-      "maxLatencyMs": "حداکثر تأخیر بر حسب میلیثانیه",
-      "weights": "وزنهای امتیازدهی JSON، مثلاً {\"latency\":0.7,\"cost\":0.3}",
-      "top": "تعداد نامزدهای برتر برای نمایش (پیشفرض: 5)",
-      "explain": "چاپ دلیل انتخاب در stderr",
-      "switch": "فعالکردن ترکیب دارای بالاترین رتبه"
-    }
+    "confirmDelete": "ترکیب {name} حذف شود؟"
   },
   "oneproxy": {
     "description": "مدیریت مخزن بالادستی OneProxy",
-    "stats": {
-      "provider": "فیلتر بر اساس ارائهدهنده",
-      "period": "بازه زمانی (پیشفرض: 24h)"
-    },
     "fetch": {
       "description": "دریافت پروکسیها از مخزن",
       "count": "تعداد پروکسیهای قابل دریافت (پیشفرض: 1)",
       "type": "نوع پروکسی: http|socks5 (پیشفرض: http)"
     },
     "rotate": {
-      "description": "اجبار به چرخش پروکسی",
-      "provider": "ارائهدهندهای که چرخش برای آن انجام میشود",
-      "connectionId": "شناسه اتصال مشخص برای چرخش"
+      "description": "اجبار به چرخش پروکسی"
     },
     "config": {
       "description": "نمایش یا بهروزرسانی پیکربندی OneProxy",

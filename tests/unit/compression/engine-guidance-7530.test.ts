@@ -44,7 +44,7 @@ test("isSafeDefault is derived from guidance.lossy (no duplicated flag)", () => 
 });
 
 test("lossless structural engines are flagged as safe defaults", () => {
-  for (const id of ["session-dedup", "ccr", "lite", "headroom"]) {
+  for (const id of ["session-dedup", "lite", "headroom"]) {
     assert.equal(isSafeDefault(id), true, `${id} should be a safe default (lossless)`);
     assert.equal(engineMeta(id).guidance.lossy, false, `${id} should be marked non-lossy`);
   }

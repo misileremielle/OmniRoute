@@ -6,8 +6,7 @@
  * Write/Edit. This engine collapses those superseded Read tool-results to a short stub, keeping
  * only the current (last, un-superseded) Read intact.
  *
- * Unlike `session-dedup` (content-addressed — collapses *identical* blocks) or `ccr` (reversible
- * markers), this is **semantic + lossy**: it removes stale content the later Read supersedes, so
+ * Unlike `session-dedup` (content-addressed — collapses *identical* blocks), this is **semantic + lossy**: it removes stale content the later Read supersedes, so
  * it is **opt-in / default-off**. It is conservative: it matches only well-known Read/Write tool
  * names, compares exact paths, and collapses a Read only when a strictly-later invocation touches
  * the same path. Fail-open — any unexpected shape is left untouched.

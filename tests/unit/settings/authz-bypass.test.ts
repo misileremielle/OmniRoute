@@ -2,7 +2,7 @@
  * T-011 — DB-stored authz bypass policy + hot-reload.
  *
  * Covers spec AC-3 through AC-8:
- *   - AC-3 kill-switch flip → bypass disabled → /api/mcp/ from non-loopback → 403
+ *   - AC-3 kill-switch flip → bypass disabled → bypass prefix from non-loopback → 403
  *   - AC-4 PATCH missing currentPassword → 400 PASSWORD_REQUIRED
  *   - AC-5 wrong currentPassword → 401 PASSWORD_MISMATCH
  *   - AC-6 toggle list reflects DB after PATCH
@@ -33,12 +33,16 @@ const routeGuard = await import("../../../src/server/authz/routeGuard.ts");
 const settingsRoute = await import("../../../src/app/api/settings/route.ts");
 const apiKeysDb = await import("../../../src/lib/db/apiKeys.ts");
 
+// No prefix is bypassable by default. Each test starts from a seeded policy with one
+// non-spawning LOCAL_ONLY prefix (BYPASS) loaded into the runtime snapshot.
+const BYPASS = "/api/resilience/connections";
+
 test.beforeEach(async () => {
   await fixture.resetStorage();
   apiKeysDb.resetApiKeyState();
-  // Force the route guard to start each test from cold-boot default
-  // (enabled=true, prefixes=["/api/mcp/"]).
   runtime.resetRuntimeSettingsStateForTests();
+  await settingsDb.updateSettings({ localOnlyManageScopeBypassPrefixes: [BYPASS] });
+  await runtime.applyRuntimeSettings(await settingsDb.getSettings());
 });
 
 test.after(() => {
@@ -50,7 +54,7 @@ test.after(() => {
   else process.env.JWT_SECRET = ORIGINAL_JWT_SECRET;
 });
 
-function nonLoopbackCtx(headers: Headers, path = "/api/mcp/stream") {
+function nonLoopbackCtx(headers: Headers, path = BYPASS) {
   return {
     request: {
       method: "GET",
@@ -69,7 +73,7 @@ function nonLoopbackCtx(headers: Headers, path = "/api/mcp/stream") {
 
 // ─── AC-3 — kill-switch flips bypass off → request 403 ───────────────────
 
-test("AC-3: kill-switch off → /api/mcp/* with manage-scope Bearer from non-loopback → 403 LOCAL_ONLY", async () => {
+test("AC-3: kill-switch off → the bypass prefix with manage-scope Bearer from non-loopback → 403 LOCAL_ONLY", async () => {
   process.env.JWT_SECRET = "test-jwt-secret-authz-bypass";
   process.env.INITIAL_PASSWORD = "initial-pass";
   // Seed DB with default snapshot first (kill-switch ON) and confirm the
@@ -86,7 +90,7 @@ test("AC-3: kill-switch off → /api/mcp/* with manage-scope Bearer from non-loo
 
   // Flip the kill-switch off via the production pipeline.
   await mockSettings({ localOnlyManageScopeBypassEnabled: false });
-  assert.equal(routeGuard.isLocalOnlyBypassableByManageScope("/api/mcp/stream"), false);
+  assert.equal(routeGuard.isLocalOnlyBypassableByManageScope(BYPASS), false);
 
   // After the hot-reload, the policy must reject.
   const after = await managePolicy.managementPolicy.evaluate(nonLoopbackCtx(headers));
@@ -167,7 +171,7 @@ test("AC-6: PATCH with correct currentPassword + new prefix list → persists to
     await makeManagementSessionRequest("http://localhost/api/settings", {
       method: "PATCH",
       body: {
-        localOnlyManageScopeBypassPrefixes: ["/api/mcp/"],
+        localOnlyManageScopeBypassPrefixes: [BYPASS],
         currentPassword: "initial-pass-ac6",
       },
     })
@@ -175,7 +179,7 @@ test("AC-6: PATCH with correct currentPassword + new prefix list → persists to
 
   assert.equal(response.status, 200);
   const settings = await settingsDb.getSettings();
-  assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, ["/api/mcp/"]);
+  assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, [BYPASS]);
 });
 
 // ─── AC-7 — add prefix → applyRuntimeSettings fires + snapshot reflects ──
@@ -191,8 +195,9 @@ test("AC-7: PATCH adds prefix → applyRuntimeSettings fires + getAuthzBypassSna
   const seeded = await settingsDb.getSettings();
   await runtime.applyRuntimeSettings(seeded);
 
-  const before = routeGuard.LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES;
-  assert.deepEqual([...before], ["/api/mcp/"]);
+  // The compile-time default list is empty; the seeded policy carries BYPASS.
+  assert.deepEqual([...routeGuard.LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES], []);
+  assert.deepEqual(runtime.getAuthzBypassSnapshot().prefixes, [BYPASS]);
 
   // Measure the snapshot-read latency (spec SLA: <50 ms).
   const t0 = process.hrtime.bigint();
@@ -200,7 +205,7 @@ test("AC-7: PATCH adds prefix → applyRuntimeSettings fires + getAuthzBypassSna
     await makeManagementSessionRequest("http://localhost/api/settings", {
       method: "PATCH",
       body: {
-        localOnlyManageScopeBypassPrefixes: ["/api/mcp/", "/api/mcp/v2/"],
+        localOnlyManageScopeBypassPrefixes: [BYPASS, "/api/resilience/connections-v2/"],
         currentPassword: "initial-pass-ac7",
       },
     })
@@ -209,7 +214,7 @@ test("AC-7: PATCH adds prefix → applyRuntimeSettings fires + getAuthzBypassSna
   const elapsedNs = process.hrtime.bigint() - t0;
 
   assert.equal(response.status, 200);
-  assert.deepEqual(snapshotAfterPatch.prefixes, ["/api/mcp/", "/api/mcp/v2/"]);
+  assert.deepEqual(snapshotAfterPatch.prefixes, [BYPASS, "/api/resilience/connections-v2/"]);
   assert.equal(snapshotAfterPatch.enabled, true);
   // The hot-path accessor itself is O(1) — total PATCH→snapshot covers
   // bcrypt + SQLite write, so we only assert the in-memory accessor is fast.
@@ -225,7 +230,10 @@ test("AC-7: PATCH adds prefix → applyRuntimeSettings fires + getAuthzBypassSna
   assert.ok(elapsedNs < 5_000_000_000n);
 
   // Live route-guard predicate reflects the new prefix.
-  assert.equal(routeGuard.isLocalOnlyBypassableByManageScope("/api/mcp/v2/foo"), true);
+  assert.equal(
+    routeGuard.isLocalOnlyBypassableByManageScope("/api/resilience/connections-v2/foo"),
+    true
+  );
 });
 
 // ─── AC-8 — spawn-capable prefix → 400 BYPASS_PREFIX_NOT_ALLOWED ─────────
@@ -246,7 +254,7 @@ test("AC-8: PATCH with /api/cli-tools/runtime/ in bypass list → 400 BYPASS_PRE
     await makeManagementSessionRequest("http://localhost/api/settings", {
       method: "PATCH",
       body: {
-        localOnlyManageScopeBypassPrefixes: ["/api/mcp/", "/api/cli-tools/runtime/"],
+        localOnlyManageScopeBypassPrefixes: [BYPASS, "/api/cli-tools/runtime/"],
         currentPassword: "initial-pass-ac8",
       },
     })
@@ -264,7 +272,7 @@ test("AC-8: PATCH with /api/cli-tools/runtime/ in bypass list → 400 BYPASS_PRE
 
   // Persisted state untouched.
   const settings = await settingsDb.getSettings();
-  assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, ["/api/mcp/"]);
+  assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, [BYPASS]);
   // Runtime snapshot untouched.
   const snapshotAfter = runtime.getAuthzBypassSnapshot();
   assert.deepEqual(snapshotAfter.prefixes, snapshotBefore.prefixes);
@@ -292,7 +300,7 @@ test("PATCH with /api/providers/ in bypass list → 400 BYPASS_PREFIX_NOT_ALLOWE
     await makeManagementSessionRequest("http://localhost/api/settings", {
       method: "PATCH",
       body: {
-        localOnlyManageScopeBypassPrefixes: ["/api/mcp/", "/api/providers/"],
+        localOnlyManageScopeBypassPrefixes: [BYPASS, "/api/providers/"],
         currentPassword: "initial-pass-cursor-t4",
       },
     })
@@ -307,17 +315,17 @@ test("PATCH with /api/providers/ in bypass list → 400 BYPASS_PREFIX_NOT_ALLOWE
   );
   assert.ok(offending, `expected BYPASS_PREFIX_NOT_ALLOWED in details: ${JSON.stringify(body)}`);
 
-  // The unrelated, already-passing "/api/mcp/" prefix is untouched by this
+  // The unrelated, already-passing BYPASS prefix is untouched by this
   // rejection — no regression to the existing Layer-1 check: persisted state
   // stays at its prior valid value, not silently split-accepted.
   const settings = await settingsDb.getSettings();
-  assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, ["/api/mcp/"]);
+  assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, [BYPASS]);
   const snapshotAfter = runtime.getAuthzBypassSnapshot();
   assert.deepEqual(snapshotAfter.prefixes, snapshotBefore.prefixes);
   assert.equal(snapshotAfter.enabled, snapshotBefore.enabled);
 });
 
-test("PATCH with ONLY the unrelated /api/mcp/ prefix still succeeds (no regression from the /api/providers/ ancestor check)", async () => {
+test("PATCH with ONLY the unrelated the bypass prefix prefix still succeeds (no regression from the /api/providers/ ancestor check)", async () => {
   process.env.JWT_SECRET = "test-jwt-secret-authz-bypass";
   process.env.INITIAL_PASSWORD = "initial-pass-cursor-t4b";
   await settingsDb.updateSettings({ requireLogin: true });
@@ -329,7 +337,7 @@ test("PATCH with ONLY the unrelated /api/mcp/ prefix still succeeds (no regressi
     await makeManagementSessionRequest("http://localhost/api/settings", {
       method: "PATCH",
       body: {
-        localOnlyManageScopeBypassPrefixes: ["/api/mcp/"],
+        localOnlyManageScopeBypassPrefixes: [BYPASS],
         currentPassword: "initial-pass-cursor-t4b",
       },
     })
@@ -337,7 +345,7 @@ test("PATCH with ONLY the unrelated /api/mcp/ prefix still succeeds (no regressi
 
   assert.equal(response.status, 200);
   const settings = await settingsDb.getSettings();
-  assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, ["/api/mcp/"]);
+  assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, [BYPASS]);
 });
 
 // ─── Defence-in-depth: snapshot mutation alone cannot grant spawn bypass ─
@@ -380,7 +388,7 @@ for (const candidate of [KIRO_AUTO_IMPORT, "/api/oauth/kiro/"]) {
       await makeManagementSessionRequest("http://localhost/api/settings", {
         method: "PATCH",
         body: {
-          localOnlyManageScopeBypassPrefixes: ["/api/mcp/", candidate],
+          localOnlyManageScopeBypassPrefixes: [BYPASS, candidate],
           currentPassword: "initial-pass-kiro",
         },
       })
@@ -396,7 +404,7 @@ for (const candidate of [KIRO_AUTO_IMPORT, "/api/oauth/kiro/"]) {
     assert.ok(offending, `expected BYPASS_PREFIX_NOT_ALLOWED in details: ${JSON.stringify(body)}`);
 
     const settings = await settingsDb.getSettings();
-    assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, ["/api/mcp/"]);
+    assert.deepEqual(settings.localOnlyManageScopeBypassPrefixes, [BYPASS]);
     assert.deepEqual(runtime.getAuthzBypassSnapshot().prefixes, snapshotBefore.prefixes);
   });
 }
@@ -404,9 +412,9 @@ for (const candidate of [KIRO_AUTO_IMPORT, "/api/oauth/kiro/"]) {
 test("stored bypass list naming the Kiro auto-import route (or a parent of it) is neutralized by normalization", async () => {
   await runtime.applyRuntimeSettings({
     localOnlyManageScopeBypassEnabled: true,
-    localOnlyManageScopeBypassPrefixes: ["/api/mcp/", KIRO_AUTO_IMPORT, "/api/oauth/kiro/"],
+    localOnlyManageScopeBypassPrefixes: [BYPASS, KIRO_AUTO_IMPORT, "/api/oauth/kiro/"],
   });
-  assert.deepEqual(runtime.getAuthzBypassSnapshot().prefixes, ["/api/mcp/"]);
+  assert.deepEqual(runtime.getAuthzBypassSnapshot().prefixes, [BYPASS]);
   assert.equal(routeGuard.isLocalOnlyBypassableByManageScope(KIRO_AUTO_IMPORT), false);
 });
 
@@ -418,7 +426,7 @@ test("manage-scoped key from non-loopback cannot reach the Kiro auto-import rout
   const created = await apiKeysDb.createApiKey("kiro-mgmt", "machine-kiro", ["manage"]);
   const headers = new Headers({ authorization: `Bearer ${created.key}` });
 
-  // Control: the same key IS granted the default /api/mcp/ bypass, so the
+  // Control: the same key IS granted the default the bypass prefix bypass, so the
   // refusal below is the deny-list's doing, not a broken key/fixture.
   const control = await managePolicy.managementPolicy.evaluate(nonLoopbackCtx(headers));
   assert.equal(control.allow, true);
@@ -427,7 +435,7 @@ test("manage-scoped key from non-loopback cannot reach the Kiro auto-import rout
   await runtime.applyRuntimeSettings(
     {
       localOnlyManageScopeBypassEnabled: true,
-      localOnlyManageScopeBypassPrefixes: ["/api/mcp/", KIRO_AUTO_IMPORT],
+      localOnlyManageScopeBypassPrefixes: [BYPASS, KIRO_AUTO_IMPORT],
     },
     { force: true }
   );
@@ -445,7 +453,7 @@ test("manage-scoped key from non-loopback cannot reach the Kiro auto-import rout
   const store = globalThis as unknown as Record<string, unknown>;
   store.__omniroute_authzBypass_config__ = {
     enabled: true,
-    prefixes: ["/api/mcp/", KIRO_AUTO_IMPORT, "/api/oauth/kiro/"],
+    prefixes: [BYPASS, KIRO_AUTO_IMPORT, "/api/oauth/kiro/"],
   };
   assert.equal(routeGuard.isLocalOnlyBypassableByManageScope(KIRO_AUTO_IMPORT), false);
   const viaRawSnapshot = await managePolicy.managementPolicy.evaluate(

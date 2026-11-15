@@ -10,8 +10,7 @@ lastUpdated: 2026-06-28
 > **Last updated:** 2026-06-28 — v3.8.40
 
 OmniRoute records administrative actions, authentication events, provider
-credential lifecycle changes, and MCP tool invocations to SQLite-backed audit
-tables. This page covers what gets logged, where it lives, how long it is
+and credential lifecycle changes to SQLite-backed audit tables. This page covers what gets logged, where it lives, how long it is
 retained, how API keys can opt out, and how to query the data.
 
 The implementation lives in `src/lib/compliance/index.ts` (T-43 — "Compliance
@@ -57,24 +56,6 @@ normalized path, coalesced and capped at 1,000 rows. Keys with `noLog` and the
 environment key are skipped. The caller's IP address and user-agent are added
 only when the `API_KEY_AUDIT_CLIENT_DETAILS_ENABLED` feature flag is on (off by
 default).
-
-### MCP tool calls (`mcp_tool_audit`)
-
-Every MCP tool invocation writes a row through
-`open-sse/mcp-server/audit.ts`. Schema (from
-`src/lib/db/migrations/002_mcp_a2a_tables.sql`):
-
-| Column           | Notes                               |
-| ---------------- | ----------------------------------- |
-| `id`             | autoincrement                       |
-| `tool_name`      | MCP tool identifier                 |
-| `input_hash`     | sha256 of input (no payload stored) |
-| `output_summary` | short, truncated summary            |
-| `duration_ms`    | wall time                           |
-| `api_key_id`     | caller (nullable)                   |
-| `success`        | `1` / `0`                           |
-| `error_code`     | terminal error code on failure      |
-| `created_at`     | ISO timestamp                       |
 
 ### Request / usage logs
 
@@ -156,7 +137,7 @@ Helpers (`src/lib/compliance/index.ts`):
 - `NO_LOG_API_KEY_IDS` (env, comma-separated) — preloaded into the in-memory
   set on boot; useful when you cannot toggle the column directly
 
-Administrative audit events (login, provider changes, MCP tool calls, etc.)
+Administrative audit events (login, provider changes, etc.)
 are **not** affected by `noLog` — only per-request traffic logging is opted
 out.
 
@@ -165,8 +146,6 @@ out.
 | Endpoint                    | Method | Description                                | Auth       |
 | --------------------------- | ------ | ------------------------------------------ | ---------- |
 | `/api/compliance/audit-log` | `GET`  | Paginated admin audit entries with filters | management |
-| `/api/mcp/audit`            | `GET`  | Paginated MCP tool audit entries           | (open-sse) |
-| `/api/mcp/audit/stats`      | `GET`  | Aggregated MCP audit stats                 | (open-sse) |
 
 No CSV export endpoint is shipped today — export from the dashboard or query
 the SQLite database directly.
@@ -199,7 +178,6 @@ The dashboard exposes audit data at **`/dashboard/audit`**
   `/api/compliance/audit-log`. Filters by event type, severity (info / warning
   / critical, derived from action + status), and date range. Severity is
   computed client-side from the action/status strings.
-- **MCP** (`McpAuditTab.tsx`) — MCP tool audit from `/api/mcp/audit`, with
   filters by tool name and success/failure.
 
 Both tabs paginate with page sizes of `50` (compliance) and `25` (MCP).
@@ -237,7 +215,5 @@ provider-management routes when they emit credential events:
 ## See Also
 
 - [`docs/security/GUARDRAILS.md`](./GUARDRAILS.md) — PII masking, prompt injection
-- [`docs/frameworks/MCP-SERVER.md`](../frameworks/MCP-SERVER.md) — MCP tool catalog and scopes
 - [`docs/reference/ENVIRONMENT.md`](../reference/ENVIRONMENT.md) — full env var reference
-- Source: `src/lib/compliance/`, `src/app/api/compliance/`,
-  `src/app/api/mcp/audit/`, `src/lib/logEnv.ts`
+- Source: `src/lib/compliance/`, `src/app/api/compliance/`, `src/lib/logEnv.ts`

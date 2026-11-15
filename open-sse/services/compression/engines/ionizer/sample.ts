@@ -1,5 +1,4 @@
 // open-sse/services/compression/engines/ionizer/sample.ts
-import { tryStoreBlock } from "../ccr/index.ts";
 
 type MessageLike = { role?: string; content?: unknown; [key: string]: unknown };
 
@@ -122,7 +121,6 @@ export function ionize(rows: Array<Record<string, unknown>>, opts: IonizeOptions
 export interface IonizerPassOptions {
   threshold: number;
   targetRows: number;
-  principalId?: string;
 }
 export interface IonizerPassResult {
   messages: MessageLike[];
@@ -137,8 +135,9 @@ function isPlainObjectArray(v: unknown): v is Array<Record<string, unknown>> {
 
 /**
  * For each non-system string-content message that parses as a homogeneous array of plain
- * objects longer than `threshold`, replace it with a deterministic inline sample + a recoverable
- * CCR marker (the whole original array stored via storeBlock). Only when the marker shrinks it.
+ * objects longer than `threshold`, replace it with a deterministic inline sample + a marker
+ * naming how many rows were kept. Lossy by design: the dropped rows are not stored. Only when
+ * the result is shorter than the original.
  * FAIL-OPEN: any error → no-op.
  */
 export function applyIonizerPass(
@@ -168,12 +167,7 @@ export function applyIonizerPass(
       });
       if (res.keptCount >= res.totalCount) return m;
 
-      const stored = tryStoreBlock(serialized, opts.principalId, {
-        contentType: "application/json",
-        source: "ionizer",
-      });
-      if (!stored.stored) return m;
-      const marker = `[ionizer: kept ${res.keptCount}/${res.totalCount} rows; full → CCR retrieve hash=${stored.hash} chars=${serialized.length}]`;
+      const marker = `[ionizer: kept ${res.keptCount}/${res.totalCount} rows; ${res.totalCount - res.keptCount} omitted]`;
       const newContent = `${JSON.stringify(res.kept)}\n${marker}`;
       if (newContent.length >= serialized.length) return m;
 
@@ -193,13 +187,12 @@ export function applyIonizerPass(
  */
 export function runIonizerPass(
   messages: MessageLike[],
-  stepConfig: Record<string, unknown>,
-  principalId?: string
+  stepConfig: Record<string, unknown>
 ): IonizerPassResult {
   if (stepConfig["enabled"] === false) return { messages, ionizedCount: 0 };
   const threshold =
     typeof stepConfig["threshold"] === "number" ? (stepConfig["threshold"] as number) : 200;
   const targetRows =
     typeof stepConfig["targetRows"] === "number" ? (stepConfig["targetRows"] as number) : 50;
-  return applyIonizerPass(messages, { threshold, targetRows, principalId });
+  return applyIonizerPass(messages, { threshold, targetRows });
 }

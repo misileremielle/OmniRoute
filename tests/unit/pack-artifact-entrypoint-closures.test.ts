@@ -7,7 +7,7 @@ import {
   APP_STAGING_ALLOWED_EXACT_PATHS,
   PACK_ARTIFACT_REQUIRED_PATHS,
 } from "../../scripts/build/pack-artifact-policy.ts";
-import { isCoveredByFiles } from "../../scripts/build/mcpPublishedFilesClosure.ts";
+import { isCoveredByFiles } from "../../scripts/build/packArtifactTestLeaks.ts";
 
 // Generalization of pack-artifact-server-ws-closure.test.ts (#7065 class, 3rd recurrence:
 // tls-options/3.8.41, head-response-guard VPS #7040 + npm #7065). assembleStandalone copies

@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "I-configure ang mga setting ng compression",
-      "engine": "Compression engine (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Antas ng pagiging agresibo ng Caveman 0.0–1.0",
-      "rtk_budget": "Badyet ng token ng RTK",
-      "language_pack": "Language pack na ia-activate"
+      "engine": "Compression engine (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Kunin o itakda ang aktibong compression engine"
@@ -1107,33 +1104,17 @@
     "created": "Nagawa ang combo: {name}",
     "deleted": "Natanggal ang combo: {name}",
     "noCombos": "Walang naka-configure na combo.",
-    "confirmDelete": "Tanggalin ang combo na {name}?",
-    "suggest": {
-      "description": "Magmungkahi ng pinakamahusay na combo para sa isang gawain gamit ang pagmamarka ng AI",
-      "task": "Paglalarawan ng gawain",
-      "maxCost": "Pinakamataas na gastos sa bawat request sa USD",
-      "maxLatencyMs": "Pinakamataas na latency sa millisecond",
-      "weights": "Mga timbang sa pagmamarka na JSON, hal. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Bilang ng mga nangungunang kandidato na ipapakita (default: 5)",
-      "explain": "I-print ang paliwanag sa stderr",
-      "switch": "I-activate ang combo na may pinakamataas na ranggo"
-    }
+    "confirmDelete": "Tanggalin ang combo na {name}?"
   },
   "oneproxy": {
     "description": "Pamahalaan ang upstream pool ng OneProxy",
-    "stats": {
-      "provider": "I-filter ayon sa provider",
-      "period": "Yugto ng panahon (default: 24h)"
-    },
     "fetch": {
       "description": "Kumuha ng mga proxy mula sa pool",
       "count": "Bilang ng mga proxy na kukunin (default: 1)",
       "type": "Uri ng proxy: http|socks5 (default: http)"
     },
     "rotate": {
-      "description": "Pilitin ang pag-rotate ng proxy",
-      "provider": "Provider na pagra-rotate-an",
-      "connectionId": "Partikular na connection ID na ira-rotate"
+      "description": "Pilitin ang pag-rotate ng proxy"
     },
     "config": {
       "description": "Ipakita o i-update ang config ng OneProxy",

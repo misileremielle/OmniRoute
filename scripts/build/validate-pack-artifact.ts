@@ -6,12 +6,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { makeGitAncestryProbe, readBuildSha, resolveBuildProvenance } from "./buildProvenance.ts";
 
-import {
-  MCP_CLOSURE_SPOT_CHECK_PATH,
-  computeMcpClosure,
-  findLeakedTestArtifactPaths,
-  findMissingMcpClosurePaths,
-} from "./mcpPublishedFilesClosure.ts";
+import { findLeakedTestArtifactPaths } from "./packArtifactTestLeaks.ts";
 import { resolveNpmInvocation } from "./resolveNpmEntry.ts";
 import {
   PACK_ARTIFACT_ALLOWED_EXACT_PATHS,
@@ -131,7 +126,7 @@ function formatBytes(bytes: number): string {
 // --policy-only: skip the build (ensureAppStagingReady → build:cli) and the
 // required-runtime-files check (which needs the built dist/). Source-side policy checks
 // still run against the real `npm pack --dry-run` file list: unexpected files (e.g. stray
-// bin/*.sh), test/spec leaks, and missing MCP closure files. This catches source regressions
+// bin/*.sh) and test/spec leaks. This catches source regressions
 // cheaply on the fast-path (PR→release), instead of only on the release PR's full Package
 // Artifact job. See incident v3.8.36 (#5029).
 const POLICY_ONLY = process.argv.includes("--policy-only");
@@ -153,16 +148,11 @@ try {
   // co-located *.test.* / __tests__ leaks; ban them explicitly on the real pack list.
   const leakedTestPaths: string[] = findLeakedTestArtifactPaths(artifactPaths);
 
-  // #3578 — MCP runs from published TypeScript source; every reachable file must pack.
-  const mcpClosure: string[] = computeMcpClosure(ROOT);
-  const missingMcpPaths: string[] = findMissingMcpClosurePaths(artifactPaths, mcpClosure);
-
   console.log("📦 npm pack artifact summary");
   console.log(`   File:          ${packReport.filename}`);
   console.log(`   Entry count:   ${packReport.entryCount}`);
   console.log(`   Packed size:   ${formatBytes(packReport.size)}`);
   console.log(`   Unpacked size: ${formatBytes(packReport.unpackedSize)}`);
-  console.log(`   MCP closure:   ${mcpClosure.length} source files checked`);
 
   if (unexpectedPaths.length > 0) {
     console.error("\n❌ Unexpected files were found in the npm publish artifact:");
@@ -187,24 +177,7 @@ try {
     }
   }
 
-  if (missingMcpPaths.length > 0) {
-    console.error(
-      "\n❌ MCP-reachable source files are missing from the npm publish artifact (would 404 --mcp):"
-    );
-    for (const missingPath of missingMcpPaths) {
-      console.error(`   - ${missingPath}`);
-    }
-    if (missingMcpPaths.includes(MCP_CLOSURE_SPOT_CHECK_PATH)) {
-      console.error(`   (includes the #3578 bug file ${MCP_CLOSURE_SPOT_CHECK_PATH})`);
-    }
-  }
-
-  if (
-    unexpectedPaths.length > 0 ||
-    missingRequiredPaths.length > 0 ||
-    leakedTestPaths.length > 0 ||
-    missingMcpPaths.length > 0
-  ) {
+  if (unexpectedPaths.length > 0 || missingRequiredPaths.length > 0 || leakedTestPaths.length > 0) {
     process.exit(1);
   }
 

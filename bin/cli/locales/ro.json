@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Configurează setările de compresie",
-      "engine": "Motor de compresie (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Nivelul de agresivitate Caveman 0.0–1.0",
-      "rtk_budget": "Bugetul de tokenuri RTK",
-      "language_pack": "Pachetul lingvistic de activat"
+      "engine": "Motor de compresie (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Obține sau setează motorul de compresie activ"
@@ -1107,33 +1104,17 @@
     "created": "Combinație creată: {name}",
     "deleted": "Combinație ștearsă: {name}",
     "noCombos": "Nu există combinații configurate.",
-    "confirmDelete": "Ștergi combinația {name}?",
-    "suggest": {
-      "description": "Sugerează cea mai bună combinație pentru o sarcină folosind evaluarea AI",
-      "task": "Descrierea sarcinii",
-      "maxCost": "Cost maxim per cerere în USD",
-      "maxLatencyMs": "Latență maximă în milisecunde",
-      "weights": "Ponderi de evaluare JSON, de ex. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Numărul de candidați de top de afișat (implicit: 5)",
-      "explain": "Afișează justificarea în stderr",
-      "switch": "Activează combinația clasată pe primul loc"
-    }
+    "confirmDelete": "Ștergi combinația {name}?"
   },
   "oneproxy": {
     "description": "Gestionează grupul de servere upstream OneProxy",
-    "stats": {
-      "provider": "Filtrează după furnizor",
-      "period": "Perioadă de timp (implicit: 24h)"
-    },
     "fetch": {
       "description": "Preia proxy-uri din grup",
       "count": "Numărul de proxy-uri de preluat (implicit: 1)",
       "type": "Tip de proxy: http|socks5 (implicit: http)"
     },
     "rotate": {
-      "description": "Forțează rotația proxy-ului",
-      "provider": "Furnizorul pentru care se efectuează rotația",
-      "connectionId": "ID-ul specific al conexiunii pentru care se efectuează rotația"
+      "description": "Forțează rotația proxy-ului"
     },
     "config": {
       "description": "Afișează sau actualizează configurația OneProxy",

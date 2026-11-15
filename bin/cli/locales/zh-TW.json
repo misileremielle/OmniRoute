@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "配置壓縮設定",
-      "engine": "壓縮引擎（caveman|rtk|hybrid|none）",
-      "caveman_agg": "Caveman 激程序度 0.0–1.0",
-      "rtk_budget": "RTK 權杖預算",
-      "language_pack": "要啟用的語言包"
+      "engine": "壓縮引擎（caveman|rtk|hybrid|none）"
     },
     "engine": {
       "description": "獲取或設定活動壓縮引擎"
@@ -1107,33 +1104,17 @@
     "created": "組合已建立：{name}",
     "deleted": "組合已刪除：{name}",
     "noCombos": "未配置組合。",
-    "confirmDelete": "刪除組合 {name}？",
-    "suggest": {
-      "description": "使用 AI 評分為任務推薦最佳組合",
-      "task": "任務描述",
-      "maxCost": "每次請求的最大成本（美元）",
-      "maxLatencyMs": "最大延遲（毫秒）",
-      "weights": "JSON 評分權重，例如 {\"latency\":0.7,\"cost\":0.3}",
-      "top": "要顯示的候選數（預設：5）",
-      "explain": "將理由列印到 stderr",
-      "switch": "啟用排名最高的組合"
-    }
+    "confirmDelete": "刪除組合 {name}？"
   },
   "oneproxy": {
     "description": "管理 OneProxy 上游代理池",
-    "stats": {
-      "provider": "按提供者篩選",
-      "period": "時間範圍（預設：24h）"
-    },
     "fetch": {
       "description": "從代理池獲取代理",
       "count": "要獲取的代理數（預設：1）",
       "type": "代理型別：http|socks5（預設：http）"
     },
     "rotate": {
-      "description": "強制輪換代理",
-      "provider": "要輪換的提供者",
-      "connectionId": "要輪換的特定連線 ID"
+      "description": "強制輪換代理"
     },
     "config": {
       "description": "顯示或更新 OneProxy 配置",

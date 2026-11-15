@@ -1,11 +1,9 @@
 import { readFileSync } from "node:fs";
 import { apiFetch } from "../api.mjs";
-import { mcpCallTool } from "../mcpClient.mjs";
 import { emit } from "../output.mjs";
 import { t } from "../i18n.mjs";
 
-// #2688 — CLI no longer assumes MCP is enabled. Engine names are normalized
-// to the current core set; legacy aliases continue to work.
+// Engine names are normalized to the current core set; legacy aliases continue to work.
 const VALID_ENGINES = ["off", "caveman", "rtk", "stacked"];
 const ENGINE_ALIASES = { none: "off", hybrid: "stacked" };
 
@@ -13,8 +11,7 @@ function normalizeEngine(name) {
   return ENGINE_ALIASES[name] ?? name;
 }
 
-// Direct REST fallbacks used when the MCP tool surface is not mounted (404).
-// Keeps every subcommand working on minimal builds.
+// Every subcommand talks to the REST API directly.
 async function restCompressionStatus() {
   const [settingsRes, combosRes, analyticsRes] = await Promise.all([
     apiFetch("/api/settings/compression"),
@@ -78,20 +75,6 @@ async function restComboStats(period) {
   return res.json();
 }
 
-async function mcpCall(name, args, restFallback) {
-  try {
-    return await mcpCallTool(name, args);
-  } catch (err) {
-    // Keep the REST fallback behavior for builds where the MCP surface
-    // is unreachable / not mounted. Anything else rethrows as an error.
-    const status = err?.status || err?.cause?.status;
-    if ((status === 404 || status === 501) && typeof restFallback === "function") {
-      return restFallback();
-    }
-    throw err;
-  }
-}
-
 async function confirm(q) {
   return new Promise((resolve) => {
     process.stdout.write(`${q} (yes/no) `);
@@ -101,24 +84,16 @@ async function confirm(q) {
 }
 
 export async function runCompressionStatus(opts, cmd) {
-  const data = await mcpCall("omniroute_compression_status", {}, restCompressionStatus);
+  const data = await restCompressionStatus();
   emit(data, cmd.optsWithGlobals());
 }
 
 export async function runCompressionConfigure(opts, cmd) {
   const config = {};
-  // #6571 — both the MCP tool schema (compressionConfigureInput) and
-  // handleCompressionConfigure expect `strategy`, not `engine`; a non-strict
-  // MCP schema silently strips an unrecognized `engine` key on the primary
-  // (MCP-mounted) path, so this must be `strategy` on both paths.
+  // #6571 — the engine travels as `strategy`; restCompressionConfigure maps it
+  // to the server's `defaultMode`.
   if (opts.engine) config.strategy = normalizeEngine(opts.engine);
-  if (opts.cavemanAggressiveness !== undefined)
-    config.caveman = { aggressiveness: opts.cavemanAggressiveness };
-  if (opts.rtkBudget !== undefined) config.rtk = { tokenBudget: opts.rtkBudget };
-  if (opts.languagePack) config.languagePack = opts.languagePack;
-  const data = await mcpCall("omniroute_compression_configure", config, () =>
-    restCompressionConfigure(config)
-  );
+  const data = await restCompressionConfigure(config);
   emit(data, cmd.optsWithGlobals());
 }
 
@@ -128,9 +103,7 @@ export async function runCompressionEngineSet(name, opts, cmd) {
     process.stderr.write(`Unknown engine: ${name}. Valid: ${VALID_ENGINES.join(", ")}\n`);
     process.exit(2);
   }
-  await mcpCall("omniroute_set_compression_engine", { engine: normalized }, () =>
-    restSetEngine(normalized)
-  );
+  await restSetEngine(normalized);
   process.stdout.write(`Engine: ${normalized}\n`);
 }
 
@@ -162,34 +135,24 @@ export function registerCompression(program) {
     .command("configure")
     .description(t("compression.configure.description"))
     .option("--engine <e>", t("compression.configure.engine"))
-    .option("--caveman-aggressiveness <n>", t("compression.configure.caveman_agg"), parseFloat)
-    .option("--rtk-budget <n>", t("compression.configure.rtk_budget"), parseInt)
-    .option("--language-pack <p>", t("compression.configure.language_pack"))
     .action(runCompressionConfigure);
 
   const engine = cmp.command("engine").description(t("compression.engine.description"));
   engine.command("set <name>").action(runCompressionEngineSet);
   engine.command("get").action(async (opts, cmd) => {
-    const data = await mcpCall("omniroute_compression_status", {}, restCompressionStatus);
+    const data = await restCompressionStatus();
     process.stdout.write(`${data.strategy ?? "(default)"}\n`);
   });
 
   const combos = cmp.command("combos").description(t("compression.combos.description"));
   combos.command("list").action(async (opts, cmd) => {
-    const data = await mcpCall("omniroute_list_compression_combos", {}, async () => ({
-      combos: await restListCombos(),
-    }));
-    emit(data.combos ?? data, cmd.optsWithGlobals());
+    emit(await restListCombos(), cmd.optsWithGlobals());
   });
   combos
     .command("stats")
     .option("--period <p>", null, "7d")
     .action(async (opts, cmd) => {
-      const data = await mcpCall(
-        "omniroute_compression_combo_stats",
-        { period: opts.period ?? "7d" },
-        () => restComboStats(opts.period)
-      );
+      const data = await restComboStats(opts.period);
       emit(data, cmd.optsWithGlobals());
     });
 

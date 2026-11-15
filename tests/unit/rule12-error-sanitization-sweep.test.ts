@@ -4,7 +4,7 @@
  *
  * This covers routes fixed in the fix/rule12-error-sanitization-sweep PR. It drives
  * the real route handlers (fresh temp DATA_DIR, localhost request → auth disabled by
- * default, matching the tests/unit/obsidian-webdav-route.test.ts pattern) and forces
+ * default) and forces
  * the DB layer to throw an Error whose message embeds an absolute source path + a
  * stack tail. The assertion is behavioral: the emitted body must NOT contain the raw
  * path and must NOT match /at \/|[A-Za-z]:\\/ — i.e. it is the sanitized form.

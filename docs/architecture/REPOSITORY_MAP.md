@@ -246,7 +246,6 @@ open-sse/
 ├── translator/          # Format converters (9 request, 9 response, 9 helpers)
 ├── transformer/         # Responses API ↔ Chat Completions (TransformStream)
 ├── services/            # ~80+ service modules (combo, accountFallback, autoCombo, reasoningCache, claude code/chatgpt stealth, modelDeprecation, taskAwareRouter, workflowFSM, etc.)
-├── mcp-server/          # MCP server (80 tools, 3 transports, 22 scopes)
 ├── config/              # Provider/model registries, header config, model aliases
 ├── utils/               # TLS client, proxy fetch/dispatcher, network helpers
 ├── index.ts             # Workspace entry
@@ -254,25 +253,6 @@ open-sse/
 ├── tsconfig.json        # Workspace TS config
 └── types.d.ts           # Workspace type declarations
 ```
-
-### `open-sse/mcp-server/`
-
-| Path                        | Purpose                                                                        |
-| --------------------------- | ------------------------------------------------------------------------------ |
-| `server.ts`                 | MCP server lifecycle (stdio + HTTP transports)                                 |
-| `httpTransport.ts`          | HTTP Streamable + SSE transports (`/api/mcp/sse`, `/api/mcp/stream`)           |
-| `audit.ts`                  | Audit logging to `mcp_tool_audit` table                                        |
-| `scopeEnforcement.ts`       | Per-tool scope validation                                                      |
-| `runtimeHeartbeat.ts`       | Health heartbeat to `DATA_DIR/runtime/mcp-heartbeat.json`                      |
-| `descriptionCompressor.ts`  | Compress tool description metadata to save context                             |
-| `schemas/tools.ts`          | 36 base tool definitions + scopes                                              |
-| `tools/advancedTools.ts`    | Advanced tool implementations                                                  |
-| `tools/memoryTools.ts`      | 3 memory tools (search/add/clear)                                              |
-| `tools/skillTools.ts`       | 4 skill tools (list/enable/execute/executions)                                 |
-| `tools/compressionTools.ts` | 5 compression tools                                                            |
-| `README.md`                 | Internal MCP server README (cross-linked from `docs/frameworks/MCP-SERVER.md`) |
-
----
 
 ## `packages/` — Workspaces
 
@@ -377,7 +357,6 @@ open-sse/
 
 | Doc                                         | Purpose                                                              |
 | ------------------------------------------- | -------------------------------------------------------------------- |
-| `MCP-SERVER.md`                             | MCP server: 80 tools, 3 transports, 22 scopes, REST endpoints        |
 | `A2A-SERVER.md`                             | A2A v0.3: JSON-RPC, 6 skills, REST helpers, agent card               |
 | `AGENT_PROTOCOLS_GUIDE.md`                  | Unified guide: A2A vs ACP vs Cloud Agents                            |
 | `SKILLS.md`                                 | Skills framework (built-in + marketplace + SkillsSH + sandbox)       |
@@ -424,13 +403,12 @@ open-sse/
 
 ## `tests/` — Test Suites
 
-| Subdir                               | Type                                    | Runner                                  |
-| ------------------------------------ | --------------------------------------- | --------------------------------------- |
-| `tests/unit/`                        | Unit tests (~4,800 files, fastest)      | Node native test runner                 |
-| `tests/integration/`                 | Multi-module + DB integration tests     | Node native test runner (concurrency 1) |
-| `tests/e2e/`                         | UI + workflow E2E                       | Playwright                              |
-| `tests/e2e/protocol-clients.test.ts` | MCP + A2A real-client E2E               | Custom protocol clients                 |
-| `tests/e2e/ecosystem.test.ts`        | Provider integration (network-touching) | Node native test runner                 |
+| Subdir                        | Type                                    | Runner                                  |
+| ----------------------------- | --------------------------------------- | --------------------------------------- |
+| `tests/unit/`                 | Unit tests (~4,800 files, fastest)      | Node native test runner                 |
+| `tests/integration/`          | Multi-module + DB integration tests     | Node native test runner (concurrency 1) |
+| `tests/e2e/`                  | UI + workflow E2E                       | Playwright                              |
+| `tests/e2e/ecosystem.test.ts` | Provider integration (network-touching) | Node native test runner                 |
 
 ---
 
@@ -543,7 +521,6 @@ Not included in `npm pack` output. See `.npmignore`.
 - **New contributor?** Read `CONTRIBUTING.md` → `CLAUDE.md` → `docs/architecture/ARCHITECTURE.md` → `docs/architecture/CODEBASE_DOCUMENTATION.md`.
 - **Adding a provider?** Follow `docs/architecture/ARCHITECTURE.md § Adding a New Provider` + cross-check `docs/reference/PROVIDER_REFERENCE.md`.
 - **Adding a route?** `docs/architecture/ARCHITECTURE.md § Adding a New API Route` + `src/shared/validation/schemas.ts`.
-- **Adding an MCP tool?** `docs/frameworks/MCP-SERVER.md § Adding a Tool`.
 - **Adding an A2A skill?** `docs/frameworks/A2A-SERVER.md § Adding a New Skill`.
 - **Running locally?** `docs/guides/SETUP_GUIDE.md`.
 - **Deploying?** `docs/guides/DOCKER_GUIDE.md` / `docs/ops/VM_DEPLOYMENT_GUIDE.md` / `docs/ops/FLY_IO_DEPLOYMENT_GUIDE.md`.

@@ -36,8 +36,10 @@ const auditSchema = [
   { key: "details", header: "Details", formatter: truncate },
 ];
 
-function endpointFor(source) {
-  return source === "mcp" ? "/api/mcp/audit" : "/api/compliance/audit-log";
+// Only the compliance audit log remains (the MCP audit source was removed with the MCP
+// server); `--source` is still accepted so existing scripts keep working.
+function endpointFor(_source) {
+  return "/api/compliance/audit-log";
 }
 
 async function fetchAuditEntries(sources, params) {
@@ -54,9 +56,8 @@ async function fetchAuditEntries(sources, params) {
   return entries;
 }
 
-function resolveSources(source) {
-  if (source === "all") return ["compliance", "mcp"];
-  return [source ?? "compliance"];
+function resolveSources(_source) {
+  return ["compliance"];
 }
 
 export async function runAuditTail(opts, cmd) {
@@ -132,9 +133,8 @@ export async function runAuditExport(file, opts, cmd) {
 
 export async function runAuditStats(opts, cmd) {
   const globalOpts = cmd.optsWithGlobals();
-  const source = opts.source ?? "mcp";
   const params = new URLSearchParams({ period: opts.period ?? "7d" });
-  const endpoint = source === "mcp" ? "/api/mcp/audit/stats" : "/api/compliance/audit-log/stats";
+  const endpoint = "/api/compliance/audit-log/stats";
   const res = await apiFetch(`${endpoint}?${params}`);
   if (!res.ok) {
     process.stderr.write(`Error: ${res.status}\n`);
@@ -191,7 +191,7 @@ export function registerAudit(program) {
   audit
     .command("stats")
     .description(t("audit.stats.description"))
-    .option("--source <s>", t("audit.source"), "mcp")
+    .option("--source <s>", t("audit.source"), "compliance")
     .option("--period <p>", t("audit.stats.period"), "7d")
     .action(runAuditStats);
 

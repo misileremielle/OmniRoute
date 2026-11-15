@@ -125,14 +125,12 @@ async function waitForConnectionFollowUpsBefore(deadline: number): Promise<void>
 async function cleanup(): Promise<void> {
   try {
     const [
-      { closeAuditDb },
       { shutdownDbInstance },
       { flushSpendBatchWriter },
       { closeLogRotation },
       { closeSharedLoggerResource },
       { closeCallLogSaves },
     ] = await Promise.all([
-      import("@omniroute/open-sse/mcp-server/audit.ts"),
       import("@/lib/db/core"),
       import("@/lib/spend/batchWriter"),
       import("@/lib/logRotation"),
@@ -151,9 +149,6 @@ async function cleanup(): Promise<void> {
       flushPayloadTraffic();
     } catch {
       /* proxy traffic metering never blocks shutdown; it reports its own persistence gaps */
-    }
-    if (closeAuditDb()) {
-      console.log("[Shutdown] MCP audit database checkpointed and closed.");
     }
     try {
       if (await shutdownDbInstance()) {

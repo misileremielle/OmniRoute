@@ -2,9 +2,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  schemaUnion, isErrorRow, seededSample, ionize, applyIonizerPass,
+  schemaUnion,
+  isErrorRow,
+  seededSample,
+  ionize,
+  applyIonizerPass,
 } from "../../../open-sse/services/compression/engines/ionizer/sample.ts";
-import { retrieveBlock, resetCcrStore } from "../../../open-sse/services/compression/engines/ccr/index.ts";
 
 test("schemaUnion: union of all keys across rows, stable order", () => {
   const u = schemaUnion([{ a: 1 }, { b: 2 }, { a: 3, c: 4 }]);
@@ -25,7 +28,12 @@ test("seededSample: deterministic, k>=n returns all, in-range", () => {
   assert.deepEqual(a, seededSample(pool, 3, 42)); // deterministic
   assert.equal(a.length, 3);
   assert.ok(a.every((x) => pool.includes(x)));
-  assert.deepEqual(seededSample(pool, 99, 42).slice().sort((x, y) => x - y), pool); // k>=n → all
+  assert.deepEqual(
+    seededSample(pool, 99, 42)
+      .slice()
+      .sort((x, y) => x - y),
+    pool
+  ); // k>=n → all
 });
 
 test("ionize: keeps schema-cover + error rows + first/last K + seeded middle ≤ targetRows, original order", () => {
@@ -39,22 +47,24 @@ test("ionize: keeps schema-cover + error rows + first/last K + seeded middle ≤
   assert.equal(res.kept[res.kept.length - 1].i, 99);
   assert.ok(res.kept.some((r) => r.error === "boom"));
   const idxs = res.kept.map((r) => r.i as number);
-  assert.deepEqual(idxs, idxs.slice().sort((a, b) => a - b));
+  assert.deepEqual(
+    idxs,
+    idxs.slice().sort((a, b) => a - b)
+  );
   const small = [{ a: 1 }, { a: 2 }];
   assert.equal(ionize(small, { targetRows: 20, firstK: 3, lastK: 3, seed: 1 }).keptCount, 2);
 });
 
-test("applyIonizerPass: big homogeneous array → inline sample + recoverable CCR marker; below threshold untouched", () => {
-  resetCcrStore();
+test("applyIonizerPass: big homogeneous array → inline sample + omitted-rows marker; below threshold untouched", () => {
   const arr = Array.from({ length: 300 }, (_, i) => ({ i, v: `r${i}` }));
   const content = JSON.stringify(arr);
   const messages = [{ role: "user", content }];
-  const out = applyIonizerPass(messages, { threshold: 200, targetRows: 50, principalId: "p1" });
+  const out = applyIonizerPass(messages, { threshold: 200, targetRows: 50 });
   assert.equal(out.ionizedCount, 1);
   const newContent = out.messages[0].content as string;
-  assert.match(newContent, /\[ionizer: kept \d+\/300 rows; full → CCR retrieve hash=[0-9a-f]{24} chars=\d+\]$/);
-  const hash = newContent.match(/hash=([0-9a-f]{24})/)![1];
-  assert.equal(retrieveBlock(hash, "p1"), content); // whole original array recoverable verbatim
-  const small = [{ role: "user", content: JSON.stringify(Array.from({ length: 10 }, (_, i) => ({ i }))) }];
-  assert.equal(applyIonizerPass(small, { threshold: 200, targetRows: 50, principalId: "p1" }).ionizedCount, 0);
+  assert.match(newContent, /\[ionizer: kept \d+\/300 rows; \d+ omitted\]$/);
+  const small = [
+    { role: "user", content: JSON.stringify(Array.from({ length: 10 }, (_, i) => ({ i }))) },
+  ];
+  assert.equal(applyIonizerPass(small, { threshold: 200, targetRows: 50 }).ionizedCount, 0);
 });

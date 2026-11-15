@@ -167,20 +167,12 @@ export type TimelineFetchUrls = { llm: string; mcp: string | null };
 
 export function timelineFetchUrls(
   selectedApiKey: string,
-  knownApiKeyIds: readonly string[] = []
+  _knownApiKeyIds: readonly string[] = []
 ): TimelineFetchUrls {
   const llm = new URLSearchParams({ limit: "200" });
   if (selectedApiKey) llm.set("apiKey", selectedApiKey);
   const llmUrl = `/api/usage/call-logs?${llm.toString()}`;
-  if (!selectedApiKey) {
-    const mcp = new URLSearchParams({ limit: "200" });
-    return { llm: llmUrl, mcp: `/api/mcp/audit?${mcp.toString()}` };
-  }
-  if (knownApiKeyIds.includes(selectedApiKey)) {
-    const mcp = new URLSearchParams({ limit: "200" });
-    mcp.set("apiKeyId", selectedApiKey);
-    return { llm: llmUrl, mcp: `/api/mcp/audit?${mcp.toString()}` };
-  }
+  // The MCP audit source was removed with the MCP server; only LLM call logs remain.
   return { llm: llmUrl, mcp: null };
 }
 

@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurovať nastavenia kompresie",
-      "engine": "Kompresný mechanizmus (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agresivita Caveman 0.0–1.0",
-      "rtk_budget": "Rozpočet tokenov RTK",
-      "language_pack": "Jazykový balík, ktorý sa má aktivovať"
+      "engine": "Kompresný mechanizmus (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Získať alebo nastaviť aktívny kompresný mechanizmus"
@@ -1107,33 +1104,17 @@
     "created": "Kombinácia bola vytvorená: {name}",
     "deleted": "Kombinácia bola odstránená: {name}",
     "noCombos": "Nie sú nakonfigurované žiadne kombinácie.",
-    "confirmDelete": "Odstrániť kombináciu {name}?",
-    "suggest": {
-      "description": "Navrhnúť najlepšiu kombináciu pre úlohu pomocou hodnotenia AI",
-      "task": "Opis úlohy",
-      "maxCost": "Maximálne náklady na požiadavku v USD",
-      "maxLatencyMs": "Maximálna latencia v milisekundách",
-      "weights": "Váhy hodnotenia vo formáte JSON, napr. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Počet najlepších kandidátov na zobrazenie (predvolené: 5)",
-      "explain": "Vypísať odôvodnenie na štandardný chybový výstup",
-      "switch": "Aktivovať najvyššie hodnotenú kombináciu"
-    }
+    "confirmDelete": "Odstrániť kombináciu {name}?"
   },
   "oneproxy": {
     "description": "Spravovať nadradený fond OneProxy",
-    "stats": {
-      "provider": "Filtrovať podľa poskytovateľa",
-      "period": "Časové obdobie (predvolené: 24h)"
-    },
     "fetch": {
       "description": "Načítať proxy servery z fondu",
       "count": "Počet proxy serverov na načítanie (predvolené: 1)",
       "type": "Typ proxy servera: http|socks5 (predvolené: http)"
     },
     "rotate": {
-      "description": "Vynútiť rotáciu proxy servera",
-      "provider": "Poskytovateľ, pre ktorého sa má vykonať rotácia",
-      "connectionId": "Konkrétne ID pripojenia na rotáciu"
+      "description": "Vynútiť rotáciu proxy servera"
     },
     "config": {
       "description": "Zobraziť alebo aktualizovať konfiguráciu OneProxy",

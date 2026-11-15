@@ -3,7 +3,6 @@ import net from "node:net";
 import { randomUUID } from "node:crypto";
 import { createResponsesWsProxy } from "./responses-ws-proxy.mjs";
 import { ensurePeerStampToken, wrapRequestListenerWithPeerStamp } from "./peer-stamp.mjs";
-import { maybeHandleWebdav, WEBDAV_PREFIX } from "./webdav-handler.mjs";
 import methodGuard from "./http-method-guard.cjs";
 import headResponseGuard from "./head-response-guard.cjs";
 import h2cUpgradeGuard from "./h2c-upgrade-guard.cjs";
@@ -211,29 +210,6 @@ function wrapUpgradeListener(server, listener) {
   };
 }
 
-/**
- * Wrap a request listener so WebDAV requests at /api/v1/webdav are handled
- * before the peer-stamp/Next.js layer sees them.
- * Returns true if the request was handled; the wrapped listener is never called.
- */
-function wrapRequestListenerWithWebdav(listener) {
-  return function webdavAwareRequestHandler(req, res) {
-    if (!(req.url || "").startsWith(WEBDAV_PREFIX)) {
-      return listener.call(this, req, res);
-    }
-    const self = this;
-    (async () => {
-      try {
-        const handled = await maybeHandleWebdav(req, res);
-        if (handled) return;
-      } catch {
-        // Never block a request on WebDAV errors — fall through to Next
-      }
-      return listener.call(self, req, res);
-    })();
-  };
-}
-
 http.createServer = function createServerWithResponsesWs(...args) {
   // Next's standalone server.js may pass its request listener directly to
   // createServer; wrap it so the real TCP peer IP is stamped before Next runs.
@@ -243,9 +219,7 @@ http.createServer = function createServerWithResponsesWs(...args) {
     // Head-response guard wraps outermost so it sees (and can force-close) every
     // HEAD request regardless of which inner layer ends up handling it (#6400).
     args[lastFnIdx] = wrapRequestListenerWithHeadResponseGuard(
-      wrapRequestListenerWithMethodGuard(
-        wrapRequestListenerWithWebdav(wrapRequestListenerWithPeerStamp(args[lastFnIdx]))
-      )
+      wrapRequestListenerWithMethodGuard(wrapRequestListenerWithPeerStamp(args[lastFnIdx]))
     );
   }
 
@@ -285,9 +259,7 @@ http.createServer = function createServerWithResponsesWs(...args) {
       return originalOn(
         eventName,
         wrapRequestListenerWithHeadResponseGuard(
-          wrapRequestListenerWithMethodGuard(
-            wrapRequestListenerWithWebdav(wrapRequestListenerWithPeerStamp(listener))
-          )
+          wrapRequestListenerWithMethodGuard(wrapRequestListenerWithPeerStamp(listener))
         )
       );
     }
@@ -302,9 +274,7 @@ http.createServer = function createServerWithResponsesWs(...args) {
       return originalAddListener(
         eventName,
         wrapRequestListenerWithHeadResponseGuard(
-          wrapRequestListenerWithMethodGuard(
-            wrapRequestListenerWithWebdav(wrapRequestListenerWithPeerStamp(listener))
-          )
+          wrapRequestListenerWithMethodGuard(wrapRequestListenerWithPeerStamp(listener))
         )
       );
     }

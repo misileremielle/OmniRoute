@@ -209,14 +209,6 @@ test("build-next-isolated sibling imports are allowed in the published package",
   );
 });
 
-test("webdav-handler.mjs is allowed in staging dist/ (server-ws.mjs dependency, missed in 3.8.22 build)", () => {
-  const unexpectedPaths = findUnexpectedArtifactPaths(["webdav-handler.mjs"], {
-    exactPaths: APP_STAGING_ALLOWED_EXACT_PATHS,
-    prefixPaths: APP_STAGING_ALLOWED_PATH_PREFIXES,
-  });
-  assert.deepEqual(unexpectedPaths, []);
-});
-
 test("tls-options.mjs is allowed in staging dist/ (server-ws.mjs dependency, missed in 3.8.41 build — #5452)", () => {
   const unexpectedPaths = findUnexpectedArtifactPaths(["tls-options.mjs"], {
     exactPaths: APP_STAGING_ALLOWED_EXACT_PATHS,
@@ -325,8 +317,6 @@ test("findMissingArtifactPaths flags missing root runtime files in the tarball",
     "bin/cli/utils/untrustedCwdEnv.mjs",
     "bin/cli/utils/versionFastPath.mjs",
     "bin/cli/utils/volatileEnvPath.mjs",
-    "bin/mcp-server.mjs",
-    "bin/mcpStdioConsoleGuard.mjs",
     "bin/nodeRuntimeSupport.mjs",
     "config/cli-tools-manifest.json",
     "config/i18n.json",
@@ -348,7 +338,6 @@ test("findMissingArtifactPaths flags missing root runtime files in the tarball",
     "dist/src/lib/usage/callLogArtifactWorker.js",
     "dist/systemd-notify.mjs",
     "dist/tls-options.mjs",
-    "dist/webdav-handler.mjs",
     "scripts/build/colocateOptionals.mjs",
     "scripts/build/native-binary-compat.mjs",
     "scripts/build/runtime-env.mjs",

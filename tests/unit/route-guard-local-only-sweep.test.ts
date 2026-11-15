@@ -37,8 +37,8 @@ import {
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
-/** Hard Rule #15 (`/api/mcp/`, `/api/cli-tools/runtime/`) + #17 (`/api/services/`) API roots. */
-const API_ROOTS = ["src/app/api/mcp", "src/app/api/cli-tools/runtime", "src/app/api/services"];
+/** Hard Rule #15 (`/api/cli-tools/runtime/`) + `/api/services/` API roots. */
+const API_ROOTS = ["src/app/api/cli-tools/runtime", "src/app/api/services"];
 /** Hard Rule #16 dashboard root; only its `<name>/embed/**` subtree is in scope. */
 const EMBED_PARENT = "src/app/(dashboard)/dashboard/providers/services";
 
@@ -47,11 +47,7 @@ const EMBED_PARENT = "src/app/(dashboard)/dashboard/providers/services";
  * (LOCAL_ONLY_API_GET_EXEMPTIONS, #13941). Pinned so a new exemption under a
  * spawn-capable root is a deliberate, reviewed change.
  */
-const EXPECTED_GET_EXEMPT = [
-  "/api/mcp/audit",
-  "/api/mcp/audit/stats",
-  "/api/services/cliproxy/status",
-];
+const EXPECTED_GET_EXEMPT = ["/api/services/cliproxy/status"];
 
 const WRITE_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
 const READ_METHODS = ["GET", "HEAD"];
@@ -142,7 +138,7 @@ test("every in-scope root contributes route files (the sweep is not vacuous)", (
   assert.ok(embed.length > 0, "no dashboard embed route found under " + EMBED_PARENT);
 });
 
-test("every mcp / cli-tools runtime / services / embed route is LOCAL_ONLY for every write method", () => {
+test("every cli-tools runtime / services / embed route is LOCAL_ONLY for every write method", () => {
   const misses: string[] = [];
   for (const { file, paths } of IN_SCOPE) {
     for (const p of paths) {
@@ -160,7 +156,7 @@ test("every mcp / cli-tools runtime / services / embed route is LOCAL_ONLY for e
   );
 });
 
-test("read-method exemptions inside these roots are only the pinned read-only MCP audit and cliproxy status routes", () => {
+test("read-method exemptions inside these roots are only the pinned read-only cliproxy status route", () => {
   const exempt = IN_SCOPE_PATHS.filter((p) =>
     READ_METHODS.some((method) => !isLocalOnlyPath(p, method))
   ).sort();
@@ -205,10 +201,10 @@ test("every in-scope route is classified MANAGEMENT, the route class whose polic
 });
 
 test("the manage-scope carve-out can never cover the subprocess-spawning roots", () => {
-  // Only /api/mcp/ is bypassable by default; /api/services/ and
-  // /api/cli-tools/runtime/ are in the compile-time spawn-capable deny-list, which
-  // the settings schema and isLocalOnlyBypassableByManageScope() both enforce.
-  assert.deepEqual([...LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES], ["/api/mcp/"]);
+  // No prefix is bypassable by default; /api/services/ and /api/cli-tools/runtime/
+  // are in the compile-time spawn-capable deny-list, which the settings schema and
+  // isLocalOnlyBypassableByManageScope() both enforce.
+  assert.deepEqual([...LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES], []);
   for (const prefix of ["/api/services/", "/api/cli-tools/runtime/"]) {
     assert.ok(SPAWN_CAPABLE_PREFIXES.includes(prefix), `${prefix} missing from deny-list`);
   }

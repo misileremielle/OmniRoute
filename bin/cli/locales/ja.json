@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "圧縮設定を構成",
-      "engine": "圧縮エンジン（caveman|rtk|hybrid|none）",
-      "caveman_agg": "Cavemanの強度 0.0～1.0",
-      "rtk_budget": "RTKトークン予算",
-      "language_pack": "有効化する言語パック"
+      "engine": "圧縮エンジン（caveman|rtk|hybrid|none）"
     },
     "engine": {
       "description": "アクティブな圧縮エンジンを取得または設定"
@@ -1107,33 +1104,17 @@
     "created": "コンボを作成しました: {name}",
     "deleted": "コンボを削除しました: {name}",
     "noCombos": "コンボが設定されていません。",
-    "confirmDelete": "コンボ {name} を削除しますか？",
-    "suggest": {
-      "description": "AI スコアリングを使用してタスクに最適なコンボを提案",
-      "task": "タスクの説明",
-      "maxCost": "リクエストあたりの最大コスト（USD）",
-      "maxLatencyMs": "最大レイテンシー（ミリ秒）",
-      "weights": "JSON 形式のスコアリング重み（例: {\"latency\":0.7,\"cost\":0.3}）",
-      "top": "表示する上位候補数（デフォルト: 5）",
-      "explain": "根拠を stderr に出力",
-      "switch": "最上位のコンボを有効化"
-    }
+    "confirmDelete": "コンボ {name} を削除しますか？"
   },
   "oneproxy": {
     "description": "OneProxy アップストリームプールを管理",
-    "stats": {
-      "provider": "プロバイダーで絞り込み",
-      "period": "期間（デフォルト: 24h）"
-    },
     "fetch": {
       "description": "プールからプロキシを取得",
       "count": "取得するプロキシ数（デフォルト: 1）",
       "type": "プロキシタイプ: http|socks5（デフォルト: http）"
     },
     "rotate": {
-      "description": "プロキシを強制的にローテーション",
-      "provider": "ローテーション対象のプロバイダー",
-      "connectionId": "ローテーション対象の特定の接続 ID"
+      "description": "プロキシを強制的にローテーション"
     },
     "config": {
       "description": "OneProxy の設定を表示または更新",

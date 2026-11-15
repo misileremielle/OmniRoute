@@ -82,7 +82,6 @@ function fixture() {
     created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
   CREATE TABLE quota_allocations (pool_id TEXT, api_key_id TEXT, weight REAL);
   CREATE TABLE quota_allocation_model_caps (pool_id TEXT, api_key_id TEXT, model TEXT);
-  CREATE TABLE api_key_context_sources (api_key_id TEXT, source_type TEXT, token TEXT);
   CREATE TABLE api_key_billing_team_history (id TEXT, api_key_id TEXT, team_id TEXT, valid_to TEXT);
   CREATE TABLE sso_identities (oid TEXT, api_key_id TEXT);
 
@@ -286,7 +285,6 @@ test("lifecycle and excluded settings require acknowledgement and are normalized
   const db = fixture();
   db.exec(`UPDATE api_keys SET is_active=0, is_banned=1, revoked_at='2026-11-02', expires_at='2026-11-03T12:00:00.000Z', source='sso' WHERE id='src';
     INSERT INTO quota_allocations VALUES ('pool-1','src',50);
-    INSERT INTO api_key_context_sources VALUES ('src','vault','CTX-CREDENTIAL');
     INSERT INTO api_key_billing_team_history VALUES ('h','src','team',NULL);`);
   const { policy, warnings } = snapshotToTemplatePolicy(readKeyPolicyRows(db, "src"), NOW);
   const ack = new Set(warnings.filter((w) => w.requiresAcknowledgement).map((w) => w.code));
@@ -297,17 +295,12 @@ test("lifecycle and excluded settings require acknowledgement and are normalized
     "KEY_EXPIRED",
     "SSO_IDENTITY_EXCLUDED",
     "WEIGHTED_ALLOCATION_EXCLUDED",
-    "CONTEXT_SOURCES_EXCLUDED",
     "BILLING_TEAM_EXCLUDED",
   ]) {
     assert.ok(ack.has(code), `${code} requires acknowledgement`);
   }
   assert.equal(policy.key.isActive, true);
   assert.equal(policy.key.isBanned, false);
-  assert.ok(
-    !JSON.stringify(policy).includes("CTX-CREDENTIAL"),
-    "context-source credentials never captured"
-  );
   db.close();
 });
 

@@ -33,15 +33,7 @@ test("sections containing protected items are not hideable", () => {
 });
 
 test("sections without protected items are hideable", () => {
-  for (const id of [
-    "home",
-    "analytics",
-    "costs",
-    "monitoring",
-    "devtools",
-    "agentic-features",
-    "other-features",
-  ]) {
+  for (const id of ["home", "analytics", "costs", "monitoring", "devtools", "other-features"]) {
     assert.ok(HIDEABLE_SIDEBAR_SECTION_IDS.includes(id), `section ${id} must be hideable`);
   }
 });

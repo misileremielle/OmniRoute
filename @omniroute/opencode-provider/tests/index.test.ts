@@ -10,7 +10,6 @@ import {
   buildOmniRouteOpenCodeConfig,
   createOmniRouteAgentBlock,
   createOmniRouteComboConfig,
-  createOmniRouteMCPEntry,
   createOmniRouteModesBlock,
   createOmniRouteProvider,
   fetchLiveModels,
@@ -20,7 +19,6 @@ import {
   OMNIROUTE_DEFAULT_MODEL_CAPABILITIES,
   OMNIROUTE_DEFAULT_MODEL_CONTEXT_LENGTHS,
   OMNIROUTE_DEFAULT_OPENCODE_MODELS,
-  OMNIROUTE_MCP_DEFAULT_SCOPES,
   OMNIROUTE_PROVIDER_NPM,
   OPENCODE_CONFIG_SCHEMA,
 } from "../src/index.ts";
@@ -229,56 +227,6 @@ test("mergeIntoExistingConfig does not add model keys when not supplied", () => 
   assert.ok(!("small_model" in result));
 });
 
-test("OMNIROUTE_MCP_DEFAULT_SCOPES contains 7 read-only scopes", () => {
-  assert.equal(OMNIROUTE_MCP_DEFAULT_SCOPES.length, 7);
-  assert.ok(OMNIROUTE_MCP_DEFAULT_SCOPES.every((s) => s.startsWith("read:")));
-});
-
-test("createOmniRouteMCPEntry defaults to tsx runtime", () => {
-  const entry = createOmniRouteMCPEntry({
-    serverPath: "/path/to/server.ts",
-    apiKey: "sk_omniroute",
-  });
-  assert.equal(entry.command, "npx");
-  assert.deepEqual(entry.args, ["tsx", "/path/to/server.ts"]);
-  assert.equal(entry.env.OMNIROUTE_API_KEY, "sk_omniroute");
-  assert.ok(!("OMNIROUTE_MCP_ENFORCE_SCOPES" in entry.env));
-  assert.ok(!("OMNIROUTE_MANAGEMENT_API_KEY" in entry.env));
-});
-
-test("createOmniRouteMCPEntry uses node runtime when specified", () => {
-  const entry = createOmniRouteMCPEntry({
-    serverPath: "/path/to/server.js",
-    apiKey: "sk_omniroute",
-    runtime: "node",
-  });
-  assert.equal(entry.command, "node");
-  assert.deepEqual(entry.args, ["/path/to/server.js"]);
-});
-
-test("createOmniRouteMCPEntry sets management key and scopes when supplied", () => {
-  const entry = createOmniRouteMCPEntry({
-    serverPath: "/path/to/server.ts",
-    apiKey: "sk_omniroute",
-    managementApiKey: "sk_manage",
-    scopes: ["read:health", "read:combos", "execute:completions"],
-  });
-  assert.equal(entry.env.OMNIROUTE_MANAGEMENT_API_KEY, "sk_manage");
-  assert.equal(entry.env.OMNIROUTE_MCP_ENFORCE_SCOPES, "true");
-  assert.equal(entry.env.OMNIROUTE_MCP_SCOPES, "read:health,read:combos,execute:completions");
-});
-
-test("createOmniRouteMCPEntry rejects missing required fields", () => {
-  assert.throws(
-    () => createOmniRouteMCPEntry({ serverPath: "", apiKey: "x" }),
-    /serverPath is required/
-  );
-  assert.throws(
-    () => createOmniRouteMCPEntry({ serverPath: "/p", apiKey: "" }),
-    /apiKey is required/
-  );
-});
-
 function startMockServer(
   handler: (path: string) => unknown
 ): Promise<{ url: string; close: () => void }> {
@@ -445,7 +393,10 @@ test("createOmniRouteProvider reads contextLength from a live model entry for id
     models: [{ id: "completely-unknown-model", contextLength: 262_144 }],
   });
   const entry = provider.models["completely-unknown-model"];
-  assert.ok(entry.limit, "a live contextLength should produce a limit field even for ids absent from the static map");
+  assert.ok(
+    entry.limit,
+    "a live contextLength should produce a limit field even for ids absent from the static map"
+  );
   assert.equal(entry.limit!.context, 262_144);
 });
 

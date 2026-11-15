@@ -1535,41 +1535,6 @@ jobs:
       - run: pnpm run check:node-runtime
       - run: pnpm run test:ecosystem
 
-  test-protocols-e2e:
-    name: Protocol Clients E2E (live server, advisory)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: changes
-    # Full-matrix lane (2026-10-27): ordinary PRs skip it; push, dispatch, merge_group and the
-    # Mergify queue candidate run it (admission condition full-code). Before a manual merge:
-    # gh workflow run ci.yml --ref <branch>.
-    if: ${{ github.event_name != 'pull_request' || (needs.changes.outputs.code == 'true' && needs.changes.outputs.queueCandidate == 'true') }}
-    # ADVISORY until #10049 is resolved. Restoring this suite immediately surfaced a
-    # real discrepancy that had been invisible while it could not run: GET
-    # /api/mcp/audit answers 403 over loopback where the suite expects 200|401. That
-    # is a pre-existing contract question, not a defect introduced by wiring the job
-    # up, so it must not block every PR in the meantime. Flip to blocking (drop this
-    # continue-on-error) the moment #10049 lands.
-    continue-on-error: true
-    env:
-      JWT_SECRET: ci-test-secret-with-sufficient-length-for-validation
-      API_KEY_SECRET: ci-test-api-key-secret-long
-      DISABLE_SQLITE_AUTO_BACKUP: "true"
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@v7
-        with:
-          package-manager-cache: false
-          node-version: ${{ env.CI_NODE_VERSION }}
-      - uses: ./.github/actions/pnpm-install-retry
-        with:
-          # PR acceleration is not release-candidate provenance.
-          cache: ${{ github.event_name == 'pull_request' }}
-      - run: pnpm run check:node-runtime
-      - run: pnpm run test:protocols:e2e
-
   admission-verdict:
     # A queue-draft edit run must not leave a check named "Gate / CI" on the draft: Mergify
     # read that skipped check as a finished non-success and dequeued the PR (#18961 on
@@ -1601,7 +1566,6 @@ jobs:
       - test-integration
       - test-security
       - test-ecosystem
-      - test-protocols-e2e
       - sonarqube
       - coverage-pr-comment
     steps:
@@ -1648,7 +1612,6 @@ jobs:
       - test-integration
       - test-security
       - test-ecosystem
-      - test-protocols-e2e
     steps:
       - name: Download i18n results
         continue-on-error: true
@@ -1730,7 +1693,6 @@ jobs:
             echo "| Integration | $(status '${{ needs.test-integration.result }}') |"
             echo "| Security Tests | $(status '${{ needs.test-security.result }}') |"
             echo "| Ecosystem E2E | $(status '${{ needs.test-ecosystem.result }}') |"
-            echo "| Protocol Clients E2E (advisory, #10049) | $(status '${{ needs.test-protocols-e2e.result }}') |"
 
             echo ""
             echo "## 🌍 Translations"

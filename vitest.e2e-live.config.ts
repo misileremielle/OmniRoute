@@ -2,13 +2,11 @@ import { defineConfig } from "vitest/config";
 import path from "path";
 
 /**
- * Live-server E2E suites (`tests/e2e/ecosystem.test.ts`,
- * `tests/e2e/protocol-clients.test.ts`).
+ * Live-server E2E suite (`tests/e2e/ecosystem.test.ts`).
  *
- * These are the only two suites that drive a REAL running OmniRoute over HTTP
- * rather than importing modules. Their runners — `scripts/dev/run-ecosystem-tests.mjs`
- * and `scripts/dev/run-protocol-clients-tests.mjs` — boot a dev server, wait for
- * `/api/monitoring/health`, then invoke Vitest with this config.
+ * The only suite that drives a REAL running OmniRoute over HTTP rather than
+ * importing modules. Its runner — `scripts/dev/run-ecosystem-tests.mjs` — boots a
+ * dev server, waits for `/api/monitoring/health`, then invokes Vitest with this config.
  *
  * They need their own config because `vitest.config.ts` deliberately EXCLUDES both
  * files (they must not run in the jsdom UI job, which has no server). Since the
@@ -22,7 +20,7 @@ export default defineConfig({
     // Real HTTP against a running server — never jsdom.
     environment: "node",
     globals: true,
-    include: ["tests/e2e/ecosystem.test.ts", "tests/e2e/protocol-clients.test.ts"],
+    include: ["tests/e2e/ecosystem.test.ts"],
     exclude: ["**/node_modules/**", "**/.git/**"],
     // Both suites share ONE server instance, so files must not run concurrently.
     fileParallelism: false,

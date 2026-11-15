@@ -43,13 +43,6 @@ lastUpdated: 2026-10-18
 3. Add migration in `src/lib/db/migrations/` if new tables needed
 4. Write tests
 
-## Adding a New MCP Tool
-
-1. Add tool definition in `open-sse/mcp-server/tools/` with Zod input schema + async handler
-2. Register in tool set (wired by `createMcpServer()`)
-3. Assign to appropriate scope(s)
-4. Write tests (tool invocation logged to the `mcp_tool_audit` table)
-
 ## Adding a New A2A Skill
 
 1. Create skill in `src/lib/a2a/skills/` (6 already exist: smart-routing, quota-management, provider-discovery, cost-analysis, health-report, list-capabilities)

@@ -132,7 +132,7 @@ test("schema refuses a parent prefix that would cover a spawn-capable route", ()
 });
 
 test("schema still accepts non-spawn bypass prefixes", () => {
-  for (const prefix of ["/api/mcp/", "/api/mcp/v2/", "/api/resilience/connections"]) {
+  for (const prefix of ["/api/jobs/", "/api/resilience/connections"]) {
     assert.equal(schemaRejectsBypassPrefix(prefix), false, prefix);
   }
 });
@@ -141,7 +141,7 @@ test("schema still accepts non-spawn bypass prefixes", () => {
 
 test("runtime snapshot drops spawn-capable prefixes coming from a malformed settings row", async () => {
   await applyBypass([
-    "/api/mcp/",
+    "/api/jobs/",
     "/api/middleware/",
     "/api/cli-tools/runtime/status",
     "/api/cli-tools/runtime/",
@@ -149,7 +149,7 @@ test("runtime snapshot drops spawn-capable prefixes coming from a malformed sett
     "/api/resilience/connections",
   ]);
   assert.deepEqual(runtimeSettings.getAuthzBypassSnapshot().prefixes, [
-    "/api/mcp/",
+    "/api/jobs/",
     "/api/resilience/connections",
   ]);
 });
@@ -212,7 +212,6 @@ test("import-json does not write the password-gated security settings", async ()
  * spawn-capable deny-list fails this test until it is reviewed and listed here.
  */
 const REVIEWED_BYPASS_ELIGIBLE = new Map<string, string>([
-  ["/api/mcp/", "default carve-out (manage or mcp:connect scope)"],
   ["/api/copilot/", "in-process LLM driver; documented opt-in remote access"],
   ["/api/jobs", "JobRegistry admin; runs only built-in job handlers"],
   ["/api/jobs/", "JobRegistry admin children"],

@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Nakonfigurovat nastavení komprese",
-      "engine": "Kompresní modul (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agresivita Caveman 0.0–1.0",
-      "rtk_budget": "Tokenový rozpočet RTK",
-      "language_pack": "Jazykový balíček k aktivaci"
+      "engine": "Kompresní modul (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Získat nebo nastavit aktivní kompresní modul"
@@ -1107,33 +1104,17 @@
     "created": "Kombinace vytvořena: {name}",
     "deleted": "Kombinace odstraněna: {name}",
     "noCombos": "Nejsou nakonfigurovány žádné kombinace.",
-    "confirmDelete": "Odstranit kombinaci {name}?",
-    "suggest": {
-      "description": "Navrhnout pomocí hodnocení AI nejlepší kombinaci pro daný úkol",
-      "task": "Popis úkolu",
-      "maxCost": "Maximální cena za požadavek v USD",
-      "maxLatencyMs": "Maximální latence v milisekundách",
-      "weights": "Váhy hodnocení ve formátu JSON, např. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Počet nejlepších kandidátů k zobrazení (výchozí: 5)",
-      "explain": "Vypsat odůvodnění na standardní chybový výstup",
-      "switch": "Aktivovat nejlépe hodnocenou kombinaci"
-    }
+    "confirmDelete": "Odstranit kombinaci {name}?"
   },
   "oneproxy": {
     "description": "Spravovat fond upstream serverů OneProxy",
-    "stats": {
-      "provider": "Filtrovat podle poskytovatele",
-      "period": "Časové období (výchozí: 24h)"
-    },
     "fetch": {
       "description": "Načíst proxy servery z fondu",
       "count": "Počet proxy serverů k načtení (výchozí: 1)",
       "type": "Typ proxy: http|socks5 (výchozí: http)"
     },
     "rotate": {
-      "description": "Vynutit rotaci proxy",
-      "provider": "Poskytovatel, pro kterého se má provést rotace",
-      "connectionId": "ID konkrétního připojení, které se má rotovat"
+      "description": "Vynutit rotaci proxy"
     },
     "config": {
       "description": "Zobrazit nebo aktualizovat konfiguraci OneProxy",

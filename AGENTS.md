@@ -37,9 +37,8 @@ Running tests: see [Testing](#testing) below (run the most focused test for chan
 - Translators — `open-sse/translator/` (format conversion OpenAI↔Claude↔Gemini)
 - Transformer — `open-sse/transformer/` (Responses API ↔ Chat Completions)
 - Services — `open-sse/services/` (combo routing, rate limits, caching, etc)
-- Database — `src/lib/db/` (SQLite domain modules, 239 migrations)
+- Database — `src/lib/db/` (SQLite domain modules, 241 migrations)
 - Domain/Policy — `src/domain/` (policy engine, cost rules, fallback logic)
-- MCP Server — `open-sse/mcp-server/` (80 tools: 41 canonical + pool/Notion/Obsidian/local-corpus/RTK modules; 3 transports: stdio / SSE / Streamable HTTP; 22 scopes)
 
 Monorepo: `src/` (Next.js 16 app), `open-sse/` (streaming engine workspace), `tests/`, `bin/` (CLI entry point).
 
@@ -91,7 +90,6 @@ Read the nearest `AGENTS.md` and the linked deep-dive before making a non-trivia
 - Routing and resilience — `open-sse/services/` → `open-sse/services/AGENTS.md`, `docs/routing/AUTO-COMBO.md`
 - Database and migrations — `src/lib/db/`, `src/lib/db/migrations/` → `src/lib/db/AGENTS.md`
 - Domain policy — `src/domain/` → `docs/architecture/ARCHITECTURE.md`
-- MCP — `open-sse/mcp-server/` → `docs/frameworks/MCP-SERVER.md`
 - Safety and governance — `src/lib/{guardrails,compliance}/`, `src/server/authz/` → `docs/security/GUARDRAILS.md`, `docs/architecture/AUTHZ_GUIDE.md`
 - UI kit — `packages/ui-kit/` (vendored Keak CI UI Kit; adapters in `src/shared/components/`) → `docs/architecture/DESIGN_SYSTEM.md`
 
@@ -153,7 +151,7 @@ When creating _any_ validation tests or one-off logic scripts, default to `scrip
 - Sanitize user HTML with DOMPurify
 - Upstream header denylist: `src/shared/constants/upstreamHeaders.ts` — keep sanitize, Zod schemas, and unit tests aligned when editing
 - **Public upstream credentials** (for example, OAuth client_id/secret values or Firebase Web keys extracted from public CLIs): **MUST** be embedded via `resolvePublicCred()` from `open-sse/utils/publicCreds.ts` — **never** as string literals. See `docs/security/PUBLIC_CREDS.md` for the mandatory pattern.
-- **Error responses** (HTTP / SSE / executor / MCP handler): **MUST** route through `buildErrorBody()` or `sanitizeErrorMessage()` from `open-sse/utils/error.ts` — **never** put raw `err.stack` or `err.message` in a response body. See `docs/security/ERROR_SANITIZATION.md`.
+- **Error responses** (HTTP / SSE / executor): **MUST** route through `buildErrorBody()` or `sanitizeErrorMessage()` from `open-sse/utils/error.ts` — **never** put raw `err.stack` or `err.message` in a response body. See `docs/security/ERROR_SANITIZATION.md`.
 - **Shell commands built from variables**: when calling `exec()`/`spawn()` with a script that needs runtime values, pass them via the `env` option (shell-escaped automatically) — **never** string-interpolate untrusted/external paths into the script body.
 - **Secure-by-default libraries** ([tldrsec/awesome-secure-defaults](https://github.com/tldrsec/awesome-secure-defaults)): prefer Helmet.js, DOMPurify, ssrf-req-filter, safe-regex, Google Tink over custom implementations whenever adding new security-sensitive surfaces.
 
@@ -183,7 +181,6 @@ Full step-by-step recipes: [`docs/architecture/MODIFICATION_SCENARIOS.md`](docs/
 - **Dual auth (multiple API keys) for a provider**: add its ID to `DUAL_AUTH_PROVIDER_IDS` (`src/shared/constants/providers.ts`) + update its `authHint`; each key becomes its own connection row, rotated by `getProviderCredentials()`.
 - **New API route**: `src/app/api/v1/<route>/route.ts` — CORS → Zod → optional auth → handler in `open-sse/handlers/`; errors via `buildErrorBody()`; tests assert no stack-trace leak.
 - **New DB module**: `src/lib/db/<module>.ts` (`getDbInstance`) → migration if new tables → tests.
-- **New MCP tool**: `open-sse/mcp-server/tools/` (Zod schema) → register → scope → tests.
 - **New embedded service**: installer → `bootstrap.ts` → DB seed → 8 API endpoints + `isLocalOnlyPath()` guard → UI tab → docs + OpenAPI → tests.
 - **Guardrail / eval**: see the detail doc.
 
@@ -200,7 +197,6 @@ For any non-trivial change, read the matching deep-dive first:
 - Guardrails (PII / injection / vision) — `docs/security/GUARDRAILS.md` · Public upstream credentials (Gemini/etc.) — `docs/security/PUBLIC_CREDS.md` · Error message sanitization — `docs/security/ERROR_SANITIZATION.md` · Compliance / audit — `docs/security/COMPLIANCE.md` · Stealth (TLS / fingerprint) — `docs/security/STEALTH_GUIDE.md`
 - Evals — `docs/frameworks/EVALS.md`
 - Authorization pipeline — `docs/architecture/AUTHZ_GUIDE.md`
-- MCP server — `docs/frameworks/MCP-SERVER.md`
 - API reference + OpenAPI — `docs/reference/API_REFERENCE.md` + `docs/openapi.yaml` · Provider catalog (auto-generated) — `docs/reference/PROVIDER_REFERENCE.md`
 - Release flow — `docs/ops/RELEASE_CHECKLIST.md` · Worktree protocol — `docs/ops/WORKTREE_ISOLATION.md` · Hard Rules detail — `docs/ops/HARD_RULES_DETAIL.md` · Build warnings + Bun troubleshooting — `docs/ops/BUILD_WARNINGS.md`
 - Embedded services — `docs/frameworks/EMBEDDED-SERVICES.md` · Quality gates (~90 scripts, allowlist policy) — `docs/architecture/QUALITY_GATES.md`
@@ -210,8 +206,8 @@ For any non-trivial change, read the matching deep-dive first:
 ## Testing
 
 - Unit tests — `pnpm run test:unit`; single file (Node native test runner — most tests) — `node --import tsx/esm --test tests/unit/your-file.test.ts`
-- Vitest (MCP server, autoCombo, cache) — `pnpm run test:vitest`; all suites — `pnpm run test:all`
-- E2E (Playwright) — `pnpm run test:e2e`; Protocol E2E (MCP) — `pnpm run test:protocols:e2e` (CI job `test-protocols-e2e`, advisory — #10049); Ecosystem — `pnpm run test:ecosystem` (CI job `test-ecosystem`, blocking)
+- Vitest (autoCombo, combo, cache) — `pnpm run test:vitest`; all suites — `pnpm run test:all`
+- E2E (Playwright) — `pnpm run test:e2e`; Ecosystem — `pnpm run test:ecosystem` (CI job `test-ecosystem`, blocking)
 - Coverage gate — `pnpm run test:coverage` (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60); report — `pnpm run coverage:report`
 - Full test matrix: `CONTRIBUTING.md` → "Running Tests"
 
@@ -219,7 +215,7 @@ For any non-trivial change, read the matching deep-dive first:
 
 **Test layer preference**: unit first → integration (multi-module or DB state) → e2e (UI/workflow only). Encode bug reproductions as automated tests before or alongside the fix.
 
-**Both test runners must pass**: `pnpm run test:unit` and `pnpm run test:vitest` cover **non-overlapping files**; both are CI jobs (`test-unit`, `test-vitest`) and must be green before merging — one green suite may silently ship broken MCP tools or routing regressions.
+**Both test runners must pass**: `pnpm run test:unit` and `pnpm run test:vitest` cover **non-overlapping files**; both are CI jobs (`test-unit`, `test-vitest`) and must be green before merging — one green suite may silently ship broken combo-routing regressions.
 
 **Bug fix / issue triage protocol (Hard Rule #17)**: failing-then-passing test (TDD, preferred) OR a documented live test on the production VPS (`root@192.168.0.15`) recorded in the PR; touch only what the failing test proves broken. Decision tree: `docs/ops/HARD_RULES_DETAIL.md` → Rule 17.
 
@@ -231,7 +227,6 @@ For any non-trivial change, read the matching deep-dive first:
 
 - Keep database operations in `src/lib/db/`; do not issue raw SQL from routes.
 - Send provider requests through `open-sse/handlers/`.
-- Keep the MCP page as a tab inside `/dashboard/endpoint`.
 - Preserve SSE cleanup, rate-limit header parsing, Zod validation, and provider-schema
   validation.
 - Do not close a contributor pull request after using its code; merge it through GitHub so
@@ -271,7 +266,7 @@ git push -u origin feat/your-feature
 
 **Branch prefixes**: `feat/`, `fix/`, `refactor/`, `docs/`, `test/`, `chore/`
 
-**Commit format** (Conventional Commits): `feat(db): add circuit breaker` — scopes: `db`, `sse`, `oauth`, `dashboard`, `api`, `cli`, `docker`, `ci`, `mcp`, `a2a`, `memory`, `skills`
+**Commit format** (Conventional Commits): `feat(db): add circuit breaker` — scopes: `db`, `sse`, `oauth`, `dashboard`, `api`, `cli`, `docker`, `ci`, `a2a`, `memory`, `skills`
 
 **Husky hooks**:
 
@@ -352,7 +347,7 @@ OmniRoute has **~90 quality-gate scripts** (`scripts/check/` + `scripts/quality/
 - Gates in job `quality-gate`: ratchet — metrics (ESLint warnings, code coverage, duplication,
   complexity) must not regress vs `quality-baseline.json`. Update via
   `pnpm run quality:ratchet --update` when a metric genuinely improves.
-- Job `test-vitest` runs `pnpm run test:vitest` (MCP tools, autoCombo, cache) — blocking.
+- Job `test-vitest` runs `pnpm run test:vitest` (autoCombo, combo, cache) — blocking.
   `test:vitest:ui` has been blocking since PR #7127.
 - **Velocity phase (2026-08-30 → v4.0)**: every numeric baseline is loosened by 20% and `--require-tighten` is advisory (`quality-baseline.json` → `_policy`); the nightly `baseline-headroom` job tracks how much of the budget is left in the issue "📈 Baseline headroom". See `docs/architecture/QUALITY_GATES.md` → "Velocity phase".
 
@@ -380,7 +375,7 @@ is a short form, its complete binding text, rationale and incident history are i
 12. Never return raw `err.stack` / `err.message` in HTTP / SSE / executor responses — always route through `buildErrorBody()` or `sanitizeErrorMessage()` (`open-sse/utils/error.ts`). See `docs/security/ERROR_SANITIZATION.md`.
 13. Never string-interpolate external paths or runtime values into shell scripts passed to `exec()`/`spawn()` — pass via the `env` option instead.
 14. Never dismiss a CodeQL / Secret-Scanning alert without (a) first checking the pattern docs above to see if the helper applies, and (b) recording the technical justification in the dismissal comment. Precedent: `js/stack-trace-exposure` raised on callsites that already route through `sanitizeErrorMessage()` is a known CodeQL limitation (custom sanitizers not recognized) — dismiss as `false positive` referencing `docs/security/ERROR_SANITIZATION.md`.
-15. Never expose routes that spawn child processes (`/api/mcp/`, `/api/cli-tools/runtime/`) without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. Loopback enforcement happens unconditionally before any auth check — leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
+15. Never expose routes that spawn child processes (e.g. `/api/cli-tools/runtime/`) without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. Loopback enforcement happens unconditionally before any auth check — leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
 16. Never expose routes under `/api/services/` or `/dashboard/providers/services/*/embed/` without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. These routes can spawn child processes (`npm install`, `node`). Loopback enforcement happens unconditionally before any auth check — a leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
 17. Every bug fix must be validated before shipping: a failing-then-passing unit/integration test (TDD) OR a documented live test on the production VPS (192.168.0.15). A fix without either is not merged. See Testing → "Bug fix / issue triage protocol" and `docs/ops/HARD_RULES_DETAIL.md` → Rule 17 for the full decision tree.
 18. Never develop on the shared main checkout. Every development task runs in its own git worktree on its own dedicated branch, and you MUST confirm the base branch with the operator before creating the worktree/branch — never assume `main` or the currently checked-out branch. A `git checkout` in the shared checkout silently destroys other sessions' uncommitted work. Tear down only the worktrees/branches you created (by name, never `fix/*`/`feat/*` wildcards), leave other sessions' worktrees untouched, and end on the branch you started on (the active `release/vX.Y.Z`, never `main`). See Git Workflow → "Worktree isolation" and `docs/ops/WORKTREE_ISOLATION.md`.

@@ -12,7 +12,6 @@ lastUpdated: 2026-08-18
 
 - [Install Methods](#install-methods)
 - [CLI Tool Configuration](#cli-tool-configuration)
-- [Protocol Setup (MCP + A2A)](#protocol-setup-mcp--a2a)
 - [Timeout Configuration](#timeout-configuration)
 - [Split-Port Mode](#split-port-mode)
 - [Void Linux (xbps-src)](#void-linux-xbps-src-template)
@@ -91,7 +90,6 @@ Combined with env vars (`INITIAL_PASSWORD`, `OMNIROUTE_WS_BRIDGE_SECRET`, etc.),
 | `omniroute update`      | Check for or apply OmniRoute updates                           |
 | `omniroute provider`    | Manage provider connections — add, list, remove, test, default |
 | `omniroute --port 3000` | Set canonical/API port to 3000                                 |
-| `omniroute --mcp`       | Start MCP server (stdio transport)                             |
 | `omniroute --no-open`   | Don't auto-open browser                                        |
 | `omniroute --help`      | Show help                                                      |
 
@@ -177,59 +175,6 @@ For the full table (what each command writes, every flag, local vs remote, base-
 For detailed per-tool configuration (Claude Code, Codex CLI, Cursor, Cline, OpenClaw, Kilo Code, Copilot, and more), see the dedicated **[CLI Tools Guide](../reference/CLI-TOOLS.md)**.
 
 ---
-
-## Protocol Setup (MCP + A2A)
-
-### MCP Setup (Model Context Protocol)
-
-Start MCP transport in stdio mode:
-
-```bash
-omniroute --mcp
-```
-
-Recommended validation flow:
-
-```bash
-# 1. Start MCP server
-omniroute --mcp
-
-# 2. From your MCP client, call:
-omniroute_get_health        # Should return system health
-omniroute_list_combos       # Should return active combos
-
-# 3. Or run the full E2E suite:
-npm run test:protocols:e2e
-```
-
-#### MCP Client Configuration
-
-**Claude Code:**
-
-```bash
-claude mcp add --transport http omniroute http://localhost:20128/api/mcp/stream
-```
-
-**Cursor / Cline:**
-
-Add to your MCP settings (stdio, with the key so the caller has a principal):
-
-```json
-{
-  "mcpServers": {
-    "omniroute": {
-      "command": "omniroute",
-      "args": ["--mcp"],
-      "env": {
-        "OMNIROUTE_API_KEY": "your-key",
-        "OMNIROUTE_BASE_URL": "http://localhost:20128"
-      }
-    }
-  }
-}
-```
-
-**Full MCP documentation:** [MCP Server README](../../open-sse/mcp-server/README.md) — 80 tools, IDE configs, Python/TS/Go clients.
 
 ## Timeout Configuration
 

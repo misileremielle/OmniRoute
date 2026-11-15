@@ -1,9 +1,4 @@
-import type {
-  SidebarItemDefinition,
-  SidebarItemGroup,
-  SidebarSectionChild,
-  SidebarSectionDefinition,
-} from "./types";
+import type { SidebarItemDefinition, SidebarItemGroup, SidebarSectionDefinition } from "./types";
 
 // ─── Item arrays ────────────────────────────────────────────────────────────
 
@@ -142,15 +137,6 @@ export const COMPRESSION_CONTEXT_GROUP: SidebarItemGroup = {
       subtitleKey: "contextSessionDedupSubtitle",
       subtitleFallback: "Cross-turn dedup",
       icon: "content_copy",
-    },
-    {
-      id: "context-ccr",
-      href: "/dashboard/context/ccr",
-      i18nKey: "contextCcr",
-      labelFallback: "CCR",
-      subtitleKey: "contextCcrSubtitle",
-      subtitleFallback: "Retrieve markers",
-      icon: "archive",
     },
     {
       id: "context-llmlingua",
@@ -473,13 +459,6 @@ const AUDIT_GROUP: SidebarItemGroup = {
       subtitleKey: "auditLogSubtitle",
       icon: "policy",
     },
-    {
-      id: "audit-mcp",
-      href: "/dashboard/audit/mcp",
-      i18nKey: "auditMcp",
-      subtitleKey: "auditMcpSubtitle",
-      icon: "security",
-    },
   ],
 };
 
@@ -506,16 +485,6 @@ const DEVTOOLS_ITEMS: readonly SidebarItemDefinition[] = [
     icon: "manage_search",
   },
 ];
-
-const MCP_ITEM: SidebarItemDefinition = {
-  id: "mcp",
-  href: "/dashboard/mcp",
-  i18nKey: "mcp",
-  subtitleKey: "mcpSubtitle",
-  icon: "hub",
-};
-
-const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [MCP_ITEM];
 
 const BATCH_GROUP: SidebarItemGroup = {
   type: "group",
@@ -673,12 +642,6 @@ export const SIDEBAR_SECTIONS: readonly SidebarSectionDefinition[] = [
     titleKey: "devtoolsSection",
     titleFallback: "Dev Tools",
     children: DEVTOOLS_ITEMS,
-  },
-  {
-    id: "agentic-features",
-    titleKey: "agenticFeaturesSection",
-    titleFallback: "Agentic Features",
-    children: AGENTIC_FEATURES_ITEMS,
   },
   {
     id: "other-features",

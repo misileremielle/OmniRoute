@@ -14,7 +14,7 @@
  *               api_key_token_limits, auto_candidate_overrides, reasoning_routing_rules
  *   excluded (never copied, disclosed when present) — sso_identities,
  *               quota_allocations / quota_allocation_model_caps (weighted pool shares),
- *               api_key_context_sources (credentials), api_key_billing_team_history
+ *               api_key_billing_team_history
  *   runtime state / counters (never copied) — usage/cost history, token/quota counters,
  *               budget reset state, leases, recovery tickets, call logs.
  * Any other api_keys or related-table column holding a non-default value fails closed.
@@ -247,7 +247,6 @@ export interface KeyPolicyRows {
   excluded: {
     ssoIdentity: boolean;
     weightedAllocations: number;
-    contextSources: number;
     billingTeam: boolean;
   };
   unclassified: UnclassifiedField[];
@@ -334,7 +333,6 @@ export function readKeyPolicyRows(db: PolicyDb, keyId: string): KeyPolicyRows | 
       weightedAllocations:
         countRows(db, "quota_allocations", "api_key_id = ?", keyId) +
         countRows(db, "quota_allocation_model_caps", "api_key_id = ?", keyId),
-      contextSources: countRows(db, "api_key_context_sources", "api_key_id = ?", keyId),
       billingTeam:
         countRows(
           db,
@@ -571,15 +569,6 @@ function captureExcludedWarnings(rows: KeyPolicyRows, warnings: TemplateWarning[
       warn(
         "WEIGHTED_ALLOCATION_EXCLUDED",
         `The source key holds ${rows.excluded.weightedAllocations} weighted quota pool allocation or cap row(s). They are shared pool settings and are not captured; pool weights stay unchanged.`,
-        true
-      )
-    );
-  }
-  if (rows.excluded.contextSources > 0) {
-    warnings.push(
-      warn(
-        "CONTEXT_SOURCES_EXCLUDED",
-        `The source key has ${rows.excluded.contextSources} context source(s). They carry credentials and are never captured.`,
         true
       )
     );

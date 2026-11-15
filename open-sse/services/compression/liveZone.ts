@@ -370,7 +370,7 @@ async function compressAndStore(
 }
 
 /**
- * A stacked-pipeline post-pass (e.g. the CCR marker-protocol instruction) may
+ * A stacked-pipeline post-pass (e.g. the session-dedup marker note) may
  * prepend a single leading `system` note. That note is per-request protocol
  * state, not part of the frozen/live history, so it must NOT be carried into
  * the live copy-back (which is spliced into the final body after the frozen

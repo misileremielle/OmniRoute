@@ -315,31 +315,11 @@ Response:
 
 ### Query Usage Analytics
 
-Usage data is accessed via the dashboard or MCP tools, not direct REST export endpoints. Available analytics:
+Usage data is accessed via the dashboard, not direct REST export endpoints. Available analytics:
 
 - **`/api/usage/analytics`** — aggregated usage metrics (group by model, provider, key)
 - **`/api/usage/quota`** — current quota status per API key
 - **`/api/usage/history`** — request history logs
-
----
-
-## MCP Tools
-
-Two MCP tools expose usage data to agents (see `open-sse/mcp-server/tools/`):
-
-| Tool                    | Description                                        |
-| ----------------------- | -------------------------------------------------- |
-| `omniroute_cost_report` | Generates a per-key cost report for a given period |
-| `omniroute_check_quota` | Returns current quota status for an API key        |
-
-Example agent invocation:
-
-```json
-{
-  "tool": "omniroute_cost_report",
-  "args": { "period": "week" }
-}
-```
 
 ---
 

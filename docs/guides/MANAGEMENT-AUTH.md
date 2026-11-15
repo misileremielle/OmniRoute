@@ -34,9 +34,6 @@ Related: [Remote Mode](./REMOTE-MODE.md) (how `oma_live_…` is minted for a rem
 ## Scope matrices
 
 API-key management scopes and access-token scopes are different vocabularies.
-MCP tool scopes are a third vocabulary, checked with `scopeMatches` rather than
-either function in the tables below. Side-by-side:
-[Three scope namespaces](../frameworks/MCP-SERVER.md#three-scope-namespaces).
 
 ### Access Token scopes (`oma_live_…`)
 

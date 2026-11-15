@@ -7,7 +7,7 @@ lastUpdated: 2026-09-22
 # Authorization Guide
 
 > **Source of truth:** `src/server/authz/`, `src/shared/constants/publicApiRoutes.ts`, `src/lib/api/requireManagementAuth.ts`, `src/shared/utils/apiAuth.ts`
-> **Last updated:** 2026-09-22 — scope namespaces point at MCP-SERVER.md
+> **Last updated:** 2026-11-15 — MCP scopes and the MCP route carve-out removed with the MCP server
 
 OmniRoute has a route-aware authorization pipeline that gates every API request. Classification is **deterministic** and **fail-closed** — anything that cannot be classified ends up as `MANAGEMENT` and demands a session or management-grade token. This page explains the model for engineers maintaining routes or designing new endpoints.
 
@@ -201,7 +201,6 @@ Each route class has a policy in `src/server/authz/policies/`:
 - **`publicPolicy`** (`policies/public.ts`) — always returns `allow({ kind: "anonymous", id: "anonymous" })`.
 - **`clientApiPolicy`** (`policies/clientApi.ts`) — extracts Bearer, validates via `validateApiKey()`. Falls through to anonymous only when the effective `REQUIRE_API_KEY` feature flag is disabled. The effective flag is resolved through `isRequireApiKeyEnabled()` (`DB feature flag override > process.env.REQUIRE_API_KEY > default`) so Dashboard Feature Flags and environment variables govern `/api/v1/*`, `/api/v1beta/*`, and aliases consistently; resolver failures fail closed. Allows dashboard-session requests on client API routes (including `/api/v1/models`, used by the dashboard model catalog).
   When Entra ID SSO is enabled, a Bearer that is structurally an Entra token (three base64url segments, `RS*` alg, `kid`) is handled by the SSO branch **before** `validateApiKey()` and its verdict is final — it never falls through to the API-key path or the degrade-to-anonymous branch, so an identity-provider outage cannot become open access. Static API keys are unaffected. See [Entra ID SSO](../security/ENTRA_SSO.md).
-- **`managementPolicy`** (`policies/management.ts`) — accepts dashboard session, internal model-sync requests (matched against `/api/providers/[name]/(sync-models|models)`), or skips entirely if `isAuthRequired()` returns false. Returns 403 (`AUTH_001`) when a Bearer token is present but invalid, 401 otherwise. Also enforces the route-guard tiers (LOCAL_ONLY / ALWAYS_PROTECTED) before any auth branch — see [Route Guard Tiers](../security/ROUTE_GUARD_TIERS.md). LOCAL_ONLY paths in `LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES` (today: `/api/mcp/`) may be accessed from non-loopback when the Bearer key carries the `manage` scope; all other LOCAL_ONLY paths remain strict-loopback regardless of scope.
 
 A successful policy returns `AuthSubject` with `kind ∈ { client_api_key, dashboard_session, management_key, anonymous, sso_user }`. Downstream handlers can read it via `assertAuth(request, "CLIENT_API")` in `src/server/authz/assertAuth.ts` instead of re-running auth logic.
 
@@ -296,30 +295,16 @@ Pick the set by shape, not by convenience. One route goes in `PUBLIC_API_ROUTES_
 
 ## Scopes
 
-Three namespaces. Each checker reads only its own strings. The side-by-side,
-including why `manage` fails `scopeMatches` for `read:compression` and why a
-`read` access token cannot `PATCH /api/keys/{id}`, is
-[Three scope namespaces](../frameworks/MCP-SERVER.md#three-scope-namespaces).
+Two namespaces: API-key management scopes and access-token scopes. Each checker
+reads only its own strings, so a `read` access token cannot `PATCH /api/keys/{id}`.
 
 API keys carry a `scopes` array (stored as JSON in `api_keys.scopes`, see `src/lib/db/apiKeys.ts`).
 
 ### Management scope
 
 - `manage` / `admin` — `hasManageScope`. Bearer access to management API routes.
-- `mcp:connect`, `self:usage`, `self:account-quota`, and
-  `policy:bypass-provider-quota` are additive exact-match scopes. They sit
-  outside `MANAGEMENT_API_KEY_SCOPES`. `mcp:connect` opens only the
-  `/api/mcp/` non-loopback carve-out.
-
-### MCP tool scopes
-
-Catalog and matching rules (identical string, or a granted scope ending in `*`):
-[MCP tool scopes](../frameworks/MCP-SERVER.md#mcp-tool-scopes).
-`MCP_SCOPE_LIST` in `src/shared/constants/mcpScopes.ts` is the original typed
-subset, not that full catalog. Enforcement runs in
-`open-sse/mcp-server/scopeEnforcement.ts` after `resolveCallerScopeContext()`
-resolves scopes from MCP auth info, request metadata, or `OMNIROUTE_MCP_SCOPES`.
-It stays off unless `OMNIROUTE_MCP_ENFORCE_SCOPES=true`.
+- `self:usage`, `self:account-quota`, and `policy:bypass-provider-quota` are
+  additive exact-match scopes. They sit outside `MANAGEMENT_API_KEY_SCOPES`.
 
 ### Access-token scopes
 
@@ -349,10 +334,6 @@ Client API key enforcement uses `isRequireApiKeyEnabled()` in `src/shared/utils/
 ## Breaking Change — v3.8.0
 
 The `/api/v1/agents/tasks/*` and `/api/resilience/model-cooldowns` endpoints **now require management auth** (commit `588a0333`). Clients previously sending a normal API key without the `manage` scope receive `403`. Migration: either issue the key the `manage` scope in the API Keys dashboard, or use a logged-in dashboard session.
-
-## Behaviour Change — v3.8.2
-
-`/api/mcp/*` (the remote MCP server) is still LOCAL_ONLY by default but now accepts non-loopback requests when the `Authorization: Bearer <api-key>` header carries the `manage` scope. The carve-out is gated explicitly per-path via `LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES` in `src/server/authz/routeGuard.ts`; the sibling LOCAL_ONLY prefix `/api/cli-tools/runtime/*` is intentionally NOT bypassable because it can spawn arbitrary subprocesses. Anonymous requests to `/api/mcp/*` from non-loopback continue to return `403 LOCAL_ONLY` — the default for any new LOCAL_ONLY path remains strict-loopback. See [Route Guard Tiers](../security/ROUTE_GUARD_TIERS.md#manage-scope-carve-out).
 
 ## Testing
 
@@ -384,5 +365,4 @@ Use `assertAuth(req, expectedClass)` inside handlers — it throws `AuthzAsserti
 
 - [API_REFERENCE.md](../reference/API_REFERENCE.md) — auth marker per endpoint
 - [COMPLIANCE.md](../security/COMPLIANCE.md) — audit log for auth events
-- [MCP-SERVER.md](../frameworks/MCP-SERVER.md#three-scope-namespaces) — three scope namespaces and MCP tool-scope catalog
 - Source: `src/server/authz/`, `src/lib/api/requireManagementAuth.ts`

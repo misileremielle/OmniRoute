@@ -201,7 +201,7 @@ export function deleteFileOwnedBy(id: string, apiKeyId: string): boolean {
 /**
  * Clears the BLOB content of files past their own `expires_at`, mirroring the
  * deleteFile() soft-delete shape (row kept for metadata/audit, content freed).
- * Like ccr_blocks (see pruneExpiredCcrBlocks), a file carries its own expiry --
+ * A file carries its own expiry --
  * this needs no separate retention-days setting, just an operator-scheduled
  * sweep, since nothing previously enforced expires_at at all. Observed live:
  * 1,874 rows / 5.19 GB of uploaded file content, most long past expiry.

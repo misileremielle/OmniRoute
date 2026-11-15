@@ -50,7 +50,6 @@ function assertNoStaleEntries(
 // Hard Rules #15/#16 for the dirs that physically exist under src/app/api/.
 export const SPAWN_CAPABLE_ROUTE_ROOTS: ReadonlyArray<string> = [
   "src/app/api/services",
-  "src/app/api/mcp",
   "src/app/api/cli-tools/runtime",
   "src/app/api/local", // T-12: 1-click local service launchers (Redis today) — every child here spawns podman/docker (Hard Rules #15 + #16)
   "src/app/api/skills/collect", // Chaos Mode dispatch route, kept loopback-only apart from its exact public entry

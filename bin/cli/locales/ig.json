@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Hazie ntọala mkpakọ",
-      "engine": "Injin mkpakọ (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Ogo ike Caveman 0.0–1.0",
-      "rtk_budget": "Oke token RTK",
-      "language_pack": "Ngwugwu asụsụ a ga-eme ka ọ rụọ ọrụ"
+      "engine": "Injin mkpakọ (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Nweta ma ọ bụ tọọ injin mkpakọ na-arụ ọrụ"
@@ -1107,33 +1104,17 @@
     "created": "Emepụtara combo: {name}",
     "deleted": "Ehichapụla combo: {name}",
     "noCombos": "Enweghị combo ahaziri.",
-    "confirmDelete": "Hichapụ combo {name}?",
-    "suggest": {
-      "description": "Jiri akara AI tụọ aro combo kacha mma maka otu ọrụ",
-      "task": "Nkọwa ọrụ",
-      "maxCost": "Ọnụ ahịa kachasị elu maka arịrịọ ọ bụla na USD",
-      "maxLatencyMs": "Oge nchere kachasị elu na milisekọnd",
-      "weights": "Arọ akara JSON dịka {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Ọnụọgụ ndị ndọrọndọrọ kacha elu a ga-egosi (ndabara: 5)",
-      "explain": "Bipụta ihe kpatara ya na stderr",
-      "switch": "Mee ka combo nke nọ n'ọkwa kachasị elu rụọ ọrụ"
-    }
+    "confirmDelete": "Hichapụ combo {name}?"
   },
   "oneproxy": {
     "description": "Jikwaa ọdọ mmiri upstream nke OneProxy",
-    "stats": {
-      "provider": "Were provider nyochaa",
-      "period": "Ogologo oge (ndabara: 24h)"
-    },
     "fetch": {
       "description": "Weta proxies site n'ọdọ mmiri ahụ",
       "count": "Ọnụọgụ proxies a ga-eweta (ndabara: 1)",
       "type": "Ụdị proxy: http|socks5 (ndabara: http)"
     },
     "rotate": {
-      "description": "Manye ntụgharị proxy",
-      "provider": "Provider a ga-atụgharị maka ya",
-      "connectionId": "NJ njikọ a kapịrị ọnụ a ga-atụgharị"
+      "description": "Manye ntụgharị proxy"
     },
     "config": {
       "description": "Gosi ma ọ bụ melite nhazi OneProxy",

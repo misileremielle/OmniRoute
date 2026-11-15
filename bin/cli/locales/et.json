@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigureeri tihenduse seaded",
-      "engine": "Tihendusmootor (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman agressiivsus 0.0–1.0",
-      "rtk_budget": "RTK tokenite eelarve",
-      "language_pack": "Aktiveeritav keelepakett"
+      "engine": "Tihendusmootor (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Kuva või määra aktiivne tihendusmootor"
@@ -1107,33 +1104,17 @@
     "created": "Kombo loodud: {name}",
     "deleted": "Kombo kustutatud: {name}",
     "noCombos": "Kombosid ei ole seadistatud.",
-    "confirmDelete": "Kustutada kombo {name}?",
-    "suggest": {
-      "description": "Soovita AI-hindamise põhjal ülesande jaoks parim kombo",
-      "task": "Ülesande kirjeldus",
-      "maxCost": "Maksimaalne kulu päringu kohta USD-s",
-      "maxLatencyMs": "Maksimaalne latentsus millisekundites",
-      "weights": "JSON-vormingus skoorimiskaalud, nt {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Kuvatavate parimate kandidaatide arv (vaikimisi: 5)",
-      "explain": "Kuva põhjendus stderr-is",
-      "switch": "Aktiveeri parim komboarvestus"
-    }
+    "confirmDelete": "Kustutada kombo {name}?"
   },
   "oneproxy": {
     "description": "Halda OneProxy ülemvoolu puuli",
-    "stats": {
-      "provider": "Filtreeri teenusepakkuja järgi",
-      "period": "Ajaperiood (vaikimisi: 24h)"
-    },
     "fetch": {
       "description": "Hangi puulist proksisid",
       "count": "Hangitavate proksite arv (vaikimisi: 1)",
       "type": "Proksi tüüp: http|socks5 (vaikimisi: http)"
     },
     "rotate": {
-      "description": "Sunni proksi rotatsiooni",
-      "provider": "Teenusepakkuja, kelle jaoks rotatsiooni läbi viia",
-      "connectionId": "Konkreetne ühenduse ID, mida rotatsiooni viia"
+      "description": "Sunni proksi rotatsiooni"
     },
     "config": {
       "description": "Kuva või uuenda OneProxy seadeid",

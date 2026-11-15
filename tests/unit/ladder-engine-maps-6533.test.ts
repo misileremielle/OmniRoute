@@ -42,10 +42,9 @@ test("every registered catalog engine has a non-default expectedReductionFactor(
 });
 
 test("aggressivenessOf ranks are internally consistent with described engine severity", () => {
-  // Structural/reversible engines (session-dedup, ccr) must rank below the prose-rewriting
-  // tier (caveman/aggressive/ultra).
-  assert.ok(aggressivenessOf("ccr") < aggressivenessOf("caveman"));
-  assert.ok(aggressivenessOf("session-dedup") < aggressivenessOf("ccr") || aggressivenessOf("session-dedup") <= aggressivenessOf("ccr"));
+  // Structural engines (session-dedup) must rank below the prose-rewriting tier
+  // (caveman/aggressive/ultra).
+  assert.ok(aggressivenessOf("session-dedup") < aggressivenessOf("caveman"));
   // Semantic-pruning engines (llmlingua, llm) must rank at/above "aggressive" and below/at "ultra".
   assert.ok(aggressivenessOf("llmlingua") >= aggressivenessOf("aggressive"));
   assert.ok(aggressivenessOf("llmlingua") <= aggressivenessOf("ultra"));

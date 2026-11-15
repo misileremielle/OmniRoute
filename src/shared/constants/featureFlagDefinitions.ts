@@ -608,30 +608,6 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
     warningLevel: "info",
   },
   {
-    key: "OMNIROUTE_MCP_ENFORCE_SCOPES",
-    label: "MCP Enforce Scopes",
-    description: "Enforce scope restrictions on MCP tool access",
-    descriptionI18nKey: "featureFlagOmnirouteMcpEnforceScopesDescription",
-    category: "runtime",
-    // Ships off: the gate rejects a caller that sends no scopes at all, so turning it on
-    // is an operator decision (.env.example has shipped `=false` since the gate landed).
-    defaultValue: "false",
-    type: "boolean",
-    requiresRestart: false,
-    warningLevel: "caution",
-  },
-  {
-    key: "OMNIROUTE_MCP_COMPRESS_DESCRIPTIONS",
-    label: "MCP Compress Descriptions",
-    description: "Compress MCP tool descriptions to reduce token usage",
-    descriptionI18nKey: "featureFlagOmnirouteMcpCompressDescriptionsDescription",
-    category: "runtime",
-    defaultValue: "false",
-    type: "boolean",
-    requiresRestart: false,
-    warningLevel: "info",
-  },
-  {
     key: "OMNIROUTE_ENABLE_RUNTIME_BACKGROUND_TASKS",
     label: "Runtime Background Tasks",
     description: "Enable background task processing at runtime",

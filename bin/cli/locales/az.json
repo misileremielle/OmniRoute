@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Sıxılma parametrlərini konfiqurasiya edin",
-      "engine": "Sıxılma mühərriki (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman aqressivliyi 0.0–1.0",
-      "rtk_budget": "RTK token büdcəsi",
-      "language_pack": "Aktivləşdiriləcək dil paketi"
+      "engine": "Sıxılma mühərriki (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Aktiv sıxılma mühərrikini əldə edin və ya təyin edin"
@@ -1107,33 +1104,17 @@
     "created": "Kombinasiya yaradıldı: {name}",
     "deleted": "Kombinasiya silindi: {name}",
     "noCombos": "Heç bir kombinasiya konfiqurasiya edilməyib.",
-    "confirmDelete": "{name} kombinasiyası silinsin?",
-    "suggest": {
-      "description": "Süni intellekt qiymətləndirməsindən istifadə edərək tapşırıq üçün ən yaxşı kombinasiyanı təklif edin",
-      "task": "Tapşırığın təsviri",
-      "maxCost": "Hər sorğu üçün ABŞ dolları ilə maksimum xərc",
-      "maxLatencyMs": "Millisaniyə ilə maksimum gecikmə",
-      "weights": "JSON qiymətləndirmə çəkiləri, məsələn, {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Göstəriləcək ən yaxşı namizədlərin sayı (standart: 5)",
-      "explain": "Əsaslandırmanı stderr-ə çıxarın",
-      "switch": "Ən yüksək reytinqli kombinasiyanı aktivləşdirin"
-    }
+    "confirmDelete": "{name} kombinasiyası silinsin?"
   },
   "oneproxy": {
     "description": "OneProxy yuxarı axın hovuzunu idarə edin",
-    "stats": {
-      "provider": "Provayderə görə filtrləyin",
-      "period": "Vaxt müddəti (standart: 24h)"
-    },
     "fetch": {
       "description": "Hovuzdan proksiləri əldə edin",
       "count": "Əldə ediləcək proksilərin sayı (standart: 1)",
       "type": "Proksi növü: http|socks5 (standart: http)"
     },
     "rotate": {
-      "description": "Proksinin məcburi rotasiyası",
-      "provider": "Rotasiya ediləcək provayder",
-      "connectionId": "Rotasiya ediləcək konkret bağlantı ID-si"
+      "description": "Proksinin məcburi rotasiyası"
     },
     "config": {
       "description": "OneProxy konfiqurasiyasını göstərin və ya yeniləyin",

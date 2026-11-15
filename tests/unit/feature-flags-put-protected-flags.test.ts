@@ -54,7 +54,6 @@ const UNPROTECTED_FLAG = "MODEL_CATALOG_INCLUDE_NAMES";
 const EXTRA_PROTECTED = [
   "OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS",
   "OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS",
-  "OMNIROUTE_MCP_ENFORCE_SCOPES",
 ];
 
 async function sessionCookie(): Promise<string> {
@@ -183,7 +182,7 @@ describe("PUT/DELETE /api/settings/feature-flags protect security flags with log
     const protectedKeys = defs.FEATURE_FLAG_DEFINITIONS.map((d) => d.key).filter((k) =>
       protectedFlags.isProtectedFeatureFlag(k)
     );
-    assert.ok(protectedKeys.length >= 14, `protected flags: ${protectedKeys.join(",")}`);
+    assert.ok(protectedKeys.length >= 13, `protected flags: ${protectedKeys.join(",")}`);
     for (const key of protectedKeys) {
       assert.equal(await put(key, sampleValue(key)), 401, `${key} anonymous`);
       assert.equal(await put(key, sampleValue(key), { bearer: "sk-junk" }), 403, `${key} junk`);

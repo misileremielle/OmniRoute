@@ -1182,39 +1182,6 @@ The auto-router is fully described in [AUTO-COMBO.md](../routing/AUTO-COMBO.md) 
 
 ---
 
-## 🔌 MCP & A2A Integration
-
-OmniRoute is both an **MCP server** (Model Context Protocol) and an **A2A server** (Agent-to-Agent JSON-RPC 2.0). Any MCP-compatible IDE or agent host can call OmniRoute tools directly — no extra wrapper required.
-
-### MCP transports
-
-- **SSE**: `http://localhost:20128/api/mcp/sse`
-- **Streamable HTTP**: `http://localhost:20128/api/mcp/stream`
-- **stdio**: `omniroute --mcp` (for IDE plugins that prefer stdio)
-
-### Connect Claude Desktop
-
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or the equivalent on Windows/Linux:
-
-```json
-{
-  "mcpServers": {
-    "omniroute": {
-      "command": "omniroute",
-      "args": ["--mcp"]
-    }
-  }
-}
-```
-
-### Connect Cursor / Continue / VS Code MCP
-
-Use the SSE URL `http://localhost:20128/api/mcp/sse` and a Bearer API key generated in **Dashboard → API Keys**.
-
-### Scopes
-
----
-
 ## 🧠 Skills System
 
 OmniRoute exposes an extensible **skill framework** (`src/lib/skills/`) so agents and the A2A endpoint can run domain-specific routines (e.g. `code-review`, `summarize`, `extract-facts`, `web-research`).
@@ -1299,10 +1266,8 @@ omniroute backup                   # Snapshot config + DB
 omniroute restore [<timestamp>]    # Restore from a snapshot
 omniroute health                   # Detailed health (breakers, cache, memory)
 omniroute quota                    # Provider quota usage
-omniroute mcp status               # MCP server status
 omniroute a2a status               # A2A server status
 omniroute reset-password           # Reset the admin password
-omniroute --mcp                    # Start MCP server over stdio
 omniroute --port 3000              # Start the server on a custom port
 ```
 

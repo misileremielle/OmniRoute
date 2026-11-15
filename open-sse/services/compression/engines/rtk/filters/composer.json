@@ -5,7 +5,9 @@
   "category": "package",
   "priority": 65,
   "match": {
-    "outputTypes": ["composer"],
+    "outputTypes": [
+      "composer"
+    ],
     "commands": [
       "^composer\\s+(?:install|update|require|remove|dump-autoload|outdated)\\b",
       "^php\\s+composer(?:\\.phar)?\\s+(?:install|update|require)\\b"
@@ -44,7 +46,9 @@
       "^Downloading \\(\\d+%\\)",
       "^\\s*-\\s+Downloading"
     ],
-    "collapsePatterns": ["^\\s*-\\s+Installing"],
+    "collapsePatterns": [
+      "^\\s*-\\s+Installing"
+    ],
     "deduplicate": true,
     "maxLines": 100,
     "headLines": 20,

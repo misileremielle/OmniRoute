@@ -7,7 +7,6 @@
  *   --version / -V (alone)    Fast-path: print the version and exit, skipping the
  *                             tsx/esm + polyfill imports, env-file loading, and
  *                             Commander's ~70-command registration entirely.
- *   --mcp                     Start MCP server over stdio
  *   reset-encrypted-columns   Recovery tool for broken encrypted credentials
  *   reset-password            Reset the admin/management password
  *
@@ -91,19 +90,13 @@ if (shouldProvisionStorageKey(process.argv)) {
   }
 }
 
-// MCP stdio transport uses stdout exclusively for JSON-RPC messages. Redirect
-// console.log/warn to stderr before anything else runs — including the tsx/esm and
-// polyfill imports below, since those (and their transitive module graphs, e.g. DB
-// init) can themselves log during evaluation. Redirecting after those imports let
-// early output leak straight into the JSON-RPC stream and corrupt it client-side
-// (e.g. Claude Desktop: "Unexpected token 'D', \"[DB] Changi\"... is not valid JSON").
-//
-// `deploy` needs the same treatment for the same reason: it prints Kubernetes
-// YAML (or JSON) on stdout and is meant to be piped —
-// `omniroute deploy k8s | kubectl apply -f -`. Env-loading notices and DB
+// `deploy` prints Kubernetes YAML (or JSON) on stdout and is meant to be piped
+// (`omniroute deploy k8s | kubectl apply -f -`), so console.log/warn are redirected
+// to stderr before anything else runs — including the tsx/esm and polyfill imports
+// below, which can themselves log during evaluation. Env-loading notices and DB
 // warnings on stdout make that YAML unparseable ("control characters are not
 // allowed"), so they belong on stderr where a human still sees them.
-const STDOUT_IS_DATA = process.argv.includes("--mcp") || process.argv[2] === "deploy";
+const STDOUT_IS_DATA = process.argv[2] === "deploy";
 
 if (STDOUT_IS_DATA) {
   const { Console } = await import("node:console");
@@ -415,17 +408,6 @@ process.on("exit", () => {
     });
   }
 });
-
-if (process.argv.includes("--mcp")) {
-  try {
-    const { startMcpCli } = await import(pathToFileURL(join(ROOT, "bin", "mcp-server.mjs")).href);
-    await startMcpCli(ROOT);
-  } catch (err) {
-    console.error("\x1b[31m✖ Failed to start MCP server:\x1b[0m", err.message || err);
-    process.exit(1);
-  }
-  process.exit(0);
-}
 
 if (process.argv.includes("reset-encrypted-columns")) {
   const { runResetEncryptedColumns } = await import(

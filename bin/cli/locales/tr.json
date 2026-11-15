@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Sıkıştırma ayarlarını yapılandır",
-      "engine": "Sıkıştırma motoru (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman agresifliği 0.0–1.0",
-      "rtk_budget": "RTK token bütçesi",
-      "language_pack": "Etkinleştirilecek dil paketi"
+      "engine": "Sıkıştırma motoru (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Etkin sıkıştırma motorunu al veya ayarla"
@@ -1107,33 +1104,17 @@
     "created": "Kombinasyon oluşturuldu: {name}",
     "deleted": "Kombinasyon silindi: {name}",
     "noCombos": "Yapılandırılmış kombinasyon yok.",
-    "confirmDelete": "{name} kombinasyonu silinsin mi?",
-    "suggest": {
-      "description": "Yapay zekâ puanlamasını kullanarak bir görev için en iyi kombinasyonu öner",
-      "task": "Görev açıklaması",
-      "maxCost": "İstek başına USD cinsinden maksimum maliyet",
-      "maxLatencyMs": "Milisaniye cinsinden maksimum gecikme",
-      "weights": "JSON puanlama ağırlıkları, örn. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Gösterilecek en iyi adayların sayısı (varsayılan: 5)",
-      "explain": "Gerekçeyi stderr'e yazdır",
-      "switch": "En yüksek sıralamalı kombinasyonu etkinleştir"
-    }
+    "confirmDelete": "{name} kombinasyonu silinsin mi?"
   },
   "oneproxy": {
     "description": "OneProxy üst sunucu havuzunu yönet",
-    "stats": {
-      "provider": "Sağlayıcıya göre filtrele",
-      "period": "Zaman aralığı (varsayılan: 24h)"
-    },
     "fetch": {
       "description": "Havuzdan proxy'leri getir",
       "count": "Getirilecek proxy sayısı (varsayılan: 1)",
       "type": "Proxy türü: http|socks5 (varsayılan: http)"
     },
     "rotate": {
-      "description": "Proxy rotasyonunu zorla",
-      "provider": "Rotasyon yapılacak sağlayıcı",
-      "connectionId": "Rotasyon yapılacak belirli bağlantı kimliği"
+      "description": "Proxy rotasyonunu zorla"
     },
     "config": {
       "description": "OneProxy yapılandırmasını göster veya güncelle",

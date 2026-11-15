@@ -144,10 +144,6 @@ const ENV_VAR_DENYLIST = new Set([
   "AUTHZ_GUIDE",
   "RESILIENCE_GUIDE",
   "COMPRESSION_GUIDE",
-  "MCP_SERVER",
-  "MCP_AUDIT",
-  "MCP_TOOLS",
-  "MCP_SCOPES",
   "BUILTIN_EVENTS",
   "LIFECYCLE_HOOKS",
   "OBSERVABILITY",
@@ -349,8 +345,6 @@ const ENDPOINT_ALLOWLIST = new Set([
   "/v1/embeddings",
   "/v1/responses",
   "/v1/ws", // WebSocket bridge, not standard route.ts
-  "/api/mcp/stream", // Streamable HTTP MCP transport
-  "/api/mcp/sse", // SSE MCP transport
   "/api/health",
   // Upstream/external provider endpoints documented in provider guides — these are
   // paths on the UPSTREAM service (Claude.ai web, Blackbox), not OmniRoute routes.

@@ -387,29 +387,6 @@ export async function cleanupCompressionRunTelemetry(): Promise<CleanupResult> {
 }
 
 /**
- * Clean up expired CCR blocks (#9061).
- *
- * Unlike the tables above, these rows carry their own expiry: the engine writes
- * `expires_at` from the block's TTL, so this needs no retention-days setting of its own.
- * It is the same sweep the engine does opportunistically, run on the operator's schedule
- * so the table cannot sit on rows nobody will read again.
- */
-export async function cleanupCcrBlocks(): Promise<CleanupResult> {
-  const result: CleanupResult = { deleted: 0, errors: 0 };
-
-  try {
-    const { pruneExpiredCcrBlocks } = await import("./ccrBlocks");
-    result.deleted = pruneExpiredCcrBlocks(Date.now());
-    console.log(`[Cleanup] Deleted ${result.deleted} expired ccr_blocks`);
-  } catch (err: unknown) {
-    console.error("[Cleanup] Error cleaning ccr_blocks:", err);
-    result.errors++;
-  }
-
-  return result;
-}
-
-/**
  * Delete closed quota-share buckets. The sliding window reads only the current and the
  * previous bucket, so a row not updated for two of the longest windows (monthly) is dead
  * for every window. No retention setting: the cutoff follows the window table.
@@ -490,7 +467,7 @@ export async function cleanupOldBatches(): Promise<CleanupResult> {
 /**
  * Clear the content of files past their own `expires_at`.
  *
- * Like ccr_blocks, a file carries its own expiry -- this needs no separate
+ * A file carries its own expiry -- this needs no separate
  * retention-days setting, just an operator-scheduled sweep, since nothing
  * previously enforced expires_at at all. Observed live: 1,874 rows / 5.19 GB
  * of uploaded file content, most long past expiry.
@@ -645,7 +622,6 @@ export async function runAutoCleanup(): Promise<{
     compressionCacheStats: await cleanupCompressionCacheStats(),
     compressionRunTelemetry: await cleanupCompressionRunTelemetry(),
     proxyLogs: await cleanupProxyLogs(),
-    ccrBlocks: await cleanupCcrBlocks(),
     quotaConsumption: await cleanupQuotaConsumption(),
     conversationTurnNodes: await cleanupConversationTurnNodes(),
     agenticConversations: await cleanupAgenticConversations(),

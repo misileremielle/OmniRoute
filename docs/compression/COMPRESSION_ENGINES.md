@@ -67,37 +67,24 @@ Use `unregisterCompressionEngine(id)` to remove an engine at runtime.
 `strategySelector.ts` registers the built-in engines before compression runs. This lets preview,
 runtime compression, stacked mode, tests, and future engines use the same execution path.
 
-### MCP description compression (related)
-
-A separate registry compresses MCP tool description metadata at registry-level — see
-`open-sse/mcp-server/descriptionCompressor.ts` and [MCP-SERVER.md](../frameworks/MCP-SERVER.md). It reuses
-Caveman rules but operates on tool metadata, not request payloads.
-
 ### Additional built-in engines
 
 Beyond Caveman, RTK, and LLMLingua-2, the registry ships several specialized lossless /
 structural engines (used by stacked pipelines, the playground, and tests):
 
-| Engine        | Id              | What it does                                                                                                                                                               |
-| ------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CCR           | `ccr`           | Content-Compress-Retrieve (H4): replaces large contiguous text blocks with content-addressed references, so repeated/large blocks are sent once and referenced thereafter. |
-| headroom      | `headroom`      | SmartCrusher (H3 + N5): lossless tabular compaction of homogeneous JSON-array payloads into a columnar `[N rows]` form.                                                    |
-| ionizer       | `ionizer`       | Head/middle/tail row sampling for very large homogeneous blocks, storing the elided middle as a CCR content-addressed reference.                                           |
-| session-dedup | `session-dedup` | Content-addressed cross-turn deduplication (TokenMizer-inspired): elides text already seen in earlier turns of the same session.                                           |
+| Engine        | Id              | What it does                                                                                                                     |
+| ------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| headroom      | `headroom`      | SmartCrusher (H3 + N5): lossless tabular compaction of homogeneous JSON-array payloads into a columnar `[N rows]` form.          |
+| ionizer       | `ionizer`       | Head/middle/tail row sampling for very large homogeneous blocks; lossy by design — the elided middle rows are not kept.          |
+| session-dedup | `session-dedup` | Content-addressed cross-turn deduplication (TokenMizer-inspired): elides text already seen in earlier turns of the same session. |
 
-**CCR retrieve-protocol instruction (#8033):** the first time CCR replaces ≥1 block in a
-request, the engine prepends a single, idempotent `system` message (leading with the
-`[CCR protocol]` sentinel) teaching the caller the marker → tool contract: what a
-`[CCR retrieve hash=<24hex> chars=N]` marker means, that the hash must be copied verbatim
-(all 24 hex characters — mis-copied hashes are the likely cause of "block not found"
-misses), and that a `[dedup:ref sha=...]` marker means "look back in history", not "call the
-tool". The note is injected **only when the caller's advertised `tools[]` proves it can
-actually reach `omniroute_ccr_retrieve`** (`callerSupportsCcrRetrieve()` in
-`open-sse/services/compression/engines/ccr/protocolInstruction.ts`) — a plain
-OpenAI-compatible caller without that tool never receives an instruction to call something
-it cannot reach. Idempotency is enforced by scanning the message history for the sentinel
-before injecting, so multi-turn requests (which replay prior messages) do not stack the
-note once per turn.
+**Dedup marker note (#8033):** when the final body carries a `[dedup:ref sha=...]` marker,
+the stacked pipeline prepends one idempotent `system` message (leading with the
+`[dedup protocol]` sentinel) explaining that the marker means "this content already appeared
+earlier — look back in the history". No tool is involved. Idempotency is enforced by scanning
+the history for the sentinel (and for the `[CCR protocol]` sentinel older releases wrote), so
+multi-turn requests do not stack the note once per turn. Source:
+`open-sse/services/compression/engines/session-dedup/markerNote.ts`.
 
 ## Caveman
 
@@ -150,7 +137,7 @@ classifier, complementing the rule-based Caveman and RTK engines:
 - runs the `@atjsh/llmlingua-2` backend (ONNX via `@huggingface/transformers`) in a
   worker thread, so model inference never blocks the request event loop
 - is **stackable** (`stackPriority` 35): in a stacked pipeline it runs after the
-  structural engines (CCR, session-dedup, headroom, Caveman) but before `ultra`, since
+  structural engines (session-dedup, headroom, Caveman) but before `ultra`, since
   semantic pruning is most effective on already-structurally-compressed text — e.g.
   `rtk -> caveman -> llmlingua`
 - **fail-opens on any error** (missing optional deps, worker spawn, model load, inference,
@@ -317,94 +304,15 @@ Compression combos are named compression profiles that can be assigned to routin
 
 Dashboard surface: `Dashboard -> Context & Cache -> Compression Combos`.
 
-## Prerequisites / operator guide (CCR & session-dedup)
+## Session-dedup marker
 
-CCR (`ccr`) and `session-dedup` replace or elide text and leave a **marker** behind. This section is the operator reference for wiring a client up, reading the two markers, and retrieving or diagnosing the elided content. Mechanics of each engine are covered above; this is the "how do I run it" layer.
+`session-dedup` elides text and leaves a marker behind:
 
-### Transports & endpoints
-
-The MCP server that exposes the CCR tools can be reached three ways. The default base URL is `http://localhost:20128` (`OMNIROUTE_BASE_URL`):
-
-| Transport                             | URL / command                           | Notes                                                                                                                                |
-| ------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Streamable HTTP (client, recommended) | `http://localhost:20128/api/mcp/stream` | The endpoint current MCP clients talk to.                                                                                            |
-| Legacy SSE singleton                  | `http://localhost:20128/api/mcp/sse`    | Older singleton transport. It **closes** streamable sessions; use `streamable-http` clients against `/api/mcp/stream`, not this one. |
-| stdio                                 | `omniroute --mcp`                       | For IDE MCP config that spawns the process. There is no `--dev` flag; `omniroute --mcp` is the stdio entry point.                    |
-
-### Storage tiers (what survives a restart)
-
-CCR is a **two-tier** store, not in-memory-only:
-
-- **Hot in-memory tier** — per-block cap 2 MiB, per-principal 16 MiB, global 64 MiB. Entries default to a 24 h TTL (maximum 7 days). Full MCP retrieval from memory is capped at 256 KiB; anything larger is still reachable through the ranged / grep modes.
-- **Durable SQLite tier** (`ccr_blocks`, `COMPRESSION_CCR_DURABLE_STORE`, on by default) — backs the in-memory tier so a block survives LRU eviction, a restart, or a retrieve landing on another instance. The row keeps the block's TTL, so a block past its TTL is gone from both tiers.
-
-Three guards keep the durable tier bounded — a block stays memory-only when:
-
-1. the block is over **512 KB** (`MAX_DURABLE_BLOCK_BYTES`);
-2. the runtime is a cloud runtime (no local disk);
-3. `COMPRESSION_CCR_DURABLE_STORE=false`.
-
-So "the block disappeared" is not a blanket restart story: a sub-512 KB block on a local, non-cloud runtime survives a restart via the durable tier until its TTL runs out. See [Environment reference](../reference/ENVIRONMENT.md) for the variable.
-
-### The two markers
-
-| Marker                                | Meaning                                                                                                                                        | What the model should do                                                                                                                                                                     |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[CCR retrieve hash=<24hex> chars=N]` | A large block was stored content-addressed.                                                                                                    | Call `omniroute_ccr_retrieve` with the **24-hex hash copied verbatim** to get the original text back.                                                                                        |
-| `[dedup:ref sha=…]`                   | `session-dedup` elided text already sent in an earlier turn of the same session. This is an **intentional look-back**, not a loss or an error. | Do **not** call any tool and do **not** try to "reconstruct" it. The first occurrence of the text is the canonical copy; the current turn is never rewritten, it is deduped on a later turn. |
+| Marker              | Meaning                                                                                                                                        | What the model should do                                                                                                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[dedup:ref sha=…]` | `session-dedup` elided text already sent in an earlier turn of the same session. This is an **intentional look-back**, not a loss or an error. | Do **not** call any tool and do **not** try to "reconstruct" it. The first occurrence of the text is the canonical copy; the current turn is never rewritten, it is deduped on a later turn. |
 
 The `[dedup:ref]` look-back is a deliberate protocol decision — there is no pre-send reconstruction. Treat it as "this exact text was already on the wire earlier in this session."
-
-### Client prerequisites
-
-- **Key (stdio):** a stdio caller carries no per-request identity, so it authenticates with `OMNIROUTE_API_KEY` (set in the MCP server's `env`). Without it the caller is anonymous and tools that require a principal may degrade.
-- **`tools[]` is the injection precondition.** The CCR retrieve-protocol instruction (#8033) is injected **only** when the request's advertised `tools[]` proves the client can actually reach `omniroute_ccr_retrieve`. The match is a trailing-segment match bounded by a separator (`__`, `.`, `/`, `:`) — never a bare substring — so a namespaced name such as `mcp__gateway__omniroute_ccr_retrieve` still counts. An absent or non-matching `tools[]` means the instruction is _not_ injected, by design.
-- **`codemode:false` (OpenCode clients).** OpenCode defaults to Code Mode, which advertises only its native tools to the model and **does not** put MCP tools on the native `tools[]` list. Set `codemode: false` on the MCP server entry so the `omniroute_ccr_*` tools are advertised. This is a **client** setting, not an OmniRoute one. It does not get the CCR instruction injected yet: OpenCode names a tool `<server>_<tool>`, so a server called `omniroute` exposes `omniroute_omniroute_ccr_retrieve`, and `_` is not one of the matched separators.
-- **Principals.** Storage and retrieval are isolated per authenticated principal (per API key). A key sees its own blocks only.
-
-### Scopes per tool
-
-Scope enforcement is always on for narrow-scoped HTTP/SSE callers. The `omniroute_` CCR tools require:
-
-| Tool                     | Scope               |
-| ------------------------ | ------------------- |
-| `omniroute_ccr_store`    | `write:compression` |
-| `omniroute_ccr_delete`   | `write:compression` |
-| `omniroute_ccr_retrieve` | `read:compression`  |
-| `omniroute_ccr_inspect`  | `read:compression`  |
-| `omniroute_ccr_list`     | `read:compression`  |
-| `omniroute_ccr_stats`    | `read:compression`  |
-
-A missing scope returns an **MCP tool error result** (`isError: true`, not an HTTP 403 — the `403 LOCAL_ONLY` is the separate loopback route-guard auth): `Error: Insufficient MCP scopes for <tool>. Missing: <scope>.` A minimal remote key can hold `mcp:connect` (authorizes the `/api/mcp/` local-only carve-out) plus the specific read/write scope it needs.
-
-### Client matrix
-
-| Client            | Transport                                 | Config to use                                                                                                                                                                                                                           | `tools[]` advertised? (→ CCR instruction injected)                                                                                                                                                  |
-| ----------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Claude Code       | streamable-http                           | `claude mcp add --transport http omniroute http://localhost:20128/api/mcp/stream`                                                                                                                                                       | Yes — MCP-capable; injected.                                                                                                                                                                        |
-| Cursor / Cline    | `stdio` **or** `streamable-http`          | stdio: `omniroute --mcp` with `OMNIROUTE_API_KEY` in `env`; or a remote MCP entry pointing at `http://localhost:20128/api/mcp/stream` (see [Setup Guide → MCP Client Configuration](../guides/SETUP_GUIDE.md#mcp-client-configuration)) | Yes — advertise the `omniroute_ccr_*` tools.                                                                                                                                                        |
-| OpenCode          | streamable-http                           | `opencode mcp add omniroute --url http://localhost:20128/api/mcp/stream`, plus `codemode: false`                                                                                                                                        | Tools advertised only with `codemode: false`; the instruction is still not injected, because `omniroute_omniroute_ccr_retrieve` does not match (see [Client prerequisites](#client-prerequisites)). |
-| OpenAI-compatible | OpenAI-compatible HTTP (chat completions) | standard chat-completions client against the OpenAI-compatible endpoint                                                                                                                                                                 | **Never** — a plain OpenAI-compatible caller is never told to call the tool, and the instruction is not injected.                                                                                   |
-
-### Retrieval limits & pagination
-
-MCP tool text results are clipped around `mcpAccessibility.maxTextChars` (default `50000`). A `full` retrieve of a block is capped at 256 KiB — **there is no unbounded full retrieve**. When a block's `chars=N` is large, page it instead of pulling the whole thing:
-
-- Rule of thumb: **`chars > 40000` → use a `mode`**, never a bare full.
-- `mode:"grep"` — regex `pattern` matched line by line, up to 1,000 matching lines (`unique: true` drops repeats), cheapest for "find the one line I need."
-- `mode:"lines"` — a 1-indexed line range; needs both `start` and `end`.
-- `mode:"head"` / `mode:"tail"` — first/last `n` lines.
-- `mode:"stats"` — line, character, and byte counts without the body.
-
-Use `mode:"lines"` with `start`/`end` to walk a long block in pages rather than requesting the whole thing at once.
-
-### Tool naming
-
-The retrieve tool is currently named `omniroute_ccr_retrieve` (the `omniroute_` prefix is a dated workaround for cross-server name collisions). A cleaner bounded-suffix tool name and a fix for MCP JSON results truncated mid-string are tracked as upstream follow-ups; this page documents the current, shipped behavior only.
-
-### Session lifecycle
-
-Streamable-HTTP sessions idle out and the server reaps them; the idle window is set by `OMNIROUTE_MCP_SESSION_IDLE_MS` (default 5 minutes; referenced by name, not a hardcoded value, so this page does not drift when it changes). The symptom of an idle-reaped session is an HTTP 404 with `Unknown Mcp-Session-Id` — the remedy is to reconnect or restart the session, **not** to rotate a key, change a scope, or rename a tool.
 
 ## API Surface
 
@@ -423,18 +331,6 @@ Streamable-HTTP sessions idle out and the server reaps them; the idle window is 
 | `/api/context/analytics`               | Compression analytics alias                                      |
 
 Management routes require management authentication or API-key policy checks.
-
-## MCP Tools
-
-Compression exposes five MCP tools:
-
-| Tool                                | Scope               | Purpose                          |
-| ----------------------------------- | ------------------- | -------------------------------- |
-| `omniroute_compression_status`      | `read:compression`  | Settings, analytics, cache stats |
-| `omniroute_compression_configure`   | `write:compression` | Update global settings           |
-| `omniroute_set_compression_engine`  | `write:compression` | Set mode and optional pipeline   |
-| `omniroute_list_compression_combos` | `read:compression`  | List compression combos          |
-| `omniroute_compression_combo_stats` | `read:compression`  | Read combo/engine analytics      |
 
 ## Scope & exclusions
 

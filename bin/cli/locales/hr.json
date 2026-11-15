@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfiguriranje postavki komprimiranja",
-      "engine": "Mehanizam komprimiranja (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agresivnost caveman moda 0.0–1.0",
-      "rtk_budget": "RTK budžet tokena",
-      "language_pack": "Jezični paket za aktivaciju"
+      "engine": "Mehanizam komprimiranja (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Dohvati ili postavi aktivni mehanizam komprimiranja"
@@ -1107,33 +1104,17 @@
     "created": "Kombinacija je stvorena: {name}",
     "deleted": "Kombinacija je obrisana: {name}",
     "noCombos": "Nema konfiguriranih kombinacija.",
-    "confirmDelete": "Obrisati kombinaciju {name}?",
-    "suggest": {
-      "description": "Predloži najbolju kombinaciju za zadatak koristeći AI bodovanje",
-      "task": "Opis zadatka",
-      "maxCost": "Maksimalni trošak po zahtjevu u USD",
-      "maxLatencyMs": "Maksimalna latencija u milisekundama",
-      "weights": "JSON ponderi za bodovanje npr. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Broj najboljih kandidata za prikaz (zadano: 5)",
-      "explain": "Ispiši obrazloženje u stderr",
-      "switch": "Aktiviraj najbolje rangiranu kombinaciju"
-    }
+    "confirmDelete": "Obrisati kombinaciju {name}?"
   },
   "oneproxy": {
     "description": "Upravljanje skupom nadređenih proxyja OneProxy",
-    "stats": {
-      "provider": "Filtriraj po pružatelju usluge",
-      "period": "Vremensko razdoblje (zadano: 24h)"
-    },
     "fetch": {
       "description": "Dohvati proxyje iz skupa",
       "count": "Broj proxyja za dohvaćanje (zadano: 1)",
       "type": "Vrsta proxyja: http|socks5 (zadano: http)"
     },
     "rotate": {
-      "description": "Prisilna rotacija proxyja",
-      "provider": "Pružatelj usluge za koji se vrši rotacija",
-      "connectionId": "ID određene veze za rotaciju"
+      "description": "Prisilna rotacija proxyja"
     },
     "config": {
       "description": "Prikaži ili ažuriraj konfiguraciju OneProxy",

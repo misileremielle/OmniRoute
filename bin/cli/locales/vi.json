@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Cấu hình cài đặt nén",
-      "engine": "Công cụ nén (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Mức độ nén mạnh của Caveman từ 0.0–1.0",
-      "rtk_budget": "Ngân sách token RTK",
-      "language_pack": "Gói ngôn ngữ cần kích hoạt"
+      "engine": "Công cụ nén (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Lấy hoặc đặt công cụ nén đang hoạt động"
@@ -1107,33 +1104,17 @@
     "created": "Đã tạo tổ hợp: {name}",
     "deleted": "Đã xóa tổ hợp: {name}",
     "noCombos": "Chưa cấu hình tổ hợp nào.",
-    "confirmDelete": "Xóa tổ hợp {name}?",
-    "suggest": {
-      "description": "Đề xuất tổ hợp tốt nhất cho một tác vụ bằng cách chấm điểm với AI",
-      "task": "Mô tả tác vụ",
-      "maxCost": "Chi phí tối đa cho mỗi yêu cầu, tính bằng USD",
-      "maxLatencyMs": "Độ trễ tối đa tính bằng mili giây",
-      "weights": "Trọng số chấm điểm JSON, ví dụ: {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Số ứng viên hàng đầu cần hiển thị (mặc định: 5)",
-      "explain": "In lý do ra stderr",
-      "switch": "Kích hoạt tổ hợp được xếp hạng cao nhất"
-    }
+    "confirmDelete": "Xóa tổ hợp {name}?"
   },
   "oneproxy": {
     "description": "Quản lý nhóm máy chủ thượng nguồn của OneProxy",
-    "stats": {
-      "provider": "Lọc theo nhà cung cấp",
-      "period": "Khoảng thời gian (mặc định: 24h)"
-    },
     "fetch": {
       "description": "Lấy proxy từ nhóm",
       "count": "Số lượng proxy cần lấy (mặc định: 1)",
       "type": "Loại proxy: http|socks5 (mặc định: http)"
     },
     "rotate": {
-      "description": "Buộc xoay vòng proxy",
-      "provider": "Nhà cung cấp cần xoay vòng",
-      "connectionId": "ID kết nối cụ thể cần xoay vòng"
+      "description": "Buộc xoay vòng proxy"
     },
     "config": {
       "description": "Hiển thị hoặc cập nhật cấu hình OneProxy",

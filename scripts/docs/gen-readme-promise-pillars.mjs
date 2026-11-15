@@ -2,7 +2,7 @@
 // in a 3 × 2 grid with a lime highlight sweeping from tile to tile on a 12 s cycle. Output is
 // committed as docs/diagrams/promise-pillars.svg; tests/unit/docs/readme-promise-pillars-svg.test.ts
 // fails when the committed file no longer matches this generator, and runs the counts gate's own
-// validators on it (provider total, MCP tool count, free-forever providers).
+// validators on it (provider total, free-forever providers).
 //
 //   node scripts/docs/gen-readme-promise-pillars.mjs [--out path.svg]
 //
@@ -20,7 +20,7 @@ const NB = " ";
 export const PROMISE_PILLARS_COPY = {
   kicker: ["THE PROMISE"],
   headline: ["One endpoint. ", " Never stop building — OmniRoute picks ", "."],
-  headlineMarks: ["367 providers.", "the cheapest one that works"],
+  headlineMarks: ["223 providers.", "the cheapest one that works"],
   titles: [
     "Never hit limits",
     "Save up to 95% tokens",
@@ -30,13 +30,13 @@ export const PROMISE_PILLARS_COPY = {
     "Production-grade",
   ],
   bodies: [
-    "Auto-fallback across 367 providers in",
+    "Auto-fallback across 223 providers in",
     "milliseconds. Quota out? The next provider",
     "takes over while a healthy target remains.",
     "RTK + Caveman stacked compression cuts",
     "15–95% of eligible tokens — ~89% average",
     "on tool-heavy sessions.",
-    "150+ providers with a free tier, 51 free",
+    "85+ providers with a free tier, 34 free",
     "forever — Qoder, Pollinations, Cloudflare,",
     "SiliconFlow… No card needed.",
     "39 CLI/agent integrations — Claude Code, Codex,",
@@ -45,8 +45,8 @@ export const PROMISE_PILLARS_COPY = {
     "OpenAI ↔ Claude ↔ Gemini ↔ Responses API",
     "translation. Point any tool at /v1 —",
     "it just works.",
-    "Circuit breakers, TLS stealth, MCP (80",
-    "tools), A2A, memory, guardrails, evals —",
+    "Circuit breakers, TLS stealth, A2A,",
+    "memory, guardrails, evals —",
     "60,000+ static test declarations.",
   ],
   footer: [
@@ -148,7 +148,7 @@ export async function renderReadmePromisePillars() {
     svgOpen({
       viewBox: `0 0 ${W} ${H}`,
       title:
-        "The OmniRoute promise: one endpoint and 367 providers. Six pillars. Resilient fallback: automatic routing continues while another healthy target is available. Save up to 95 percent of eligible tokens: RTK plus Caveman stacked compression averages about 89 percent on tool-heavy sessions. Zero dollars to start: 150+ providers with a free tier and 51 recurring or keyless free-forever providers. Every tool works: 39 CLI and agent integration records, including Claude Code, Codex, Cursor, Cline, Copilot and Antigravity, through one config. One endpoint: OpenAI, Claude, Gemini and Responses API translation at /v1. Production controls: circuit breakers, TLS stealth, MCP with 80 tools, A2A, memory, guardrails, evals, and 60,000+ static test declarations across 8,400+ tracked test files.",
+        "The OmniRoute promise: one endpoint and 223 providers. Six pillars. Resilient fallback: automatic routing continues while another healthy target is available. Save up to 95 percent of eligible tokens: RTK plus Caveman stacked compression averages about 89 percent on tool-heavy sessions. Zero dollars to start: 85+ providers with a free tier and 34 recurring or keyless free-forever providers. Every tool works: 39 CLI and agent integration records, including Claude Code, Codex, Cursor, Cline, Copilot and Antigravity, through one config. One endpoint: OpenAI, Claude, Gemini and Responses API translation at /v1. Production controls: circuit breakers, TLS stealth, A2A, memory, guardrails, evals, and 60,000+ static test declarations across 8,400+ tracked test files.",
       desc: "Animated promise card: six pillar tiles in reading order, with a soft highlight sweeping from tile to tile in a continuous cycle.",
     }) +
       gridDefs("pp-grid") +

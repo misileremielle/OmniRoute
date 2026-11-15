@@ -41,7 +41,6 @@ Each deployment serves its own copy of the spec at `/openapi.yaml`, generated fr
 - [Resilience (extended)](#resilience-extended)
 - [Skills](#skills)
 - [Memory](#memory)
-- [MCP Server](#mcp-server)
 - [A2A Server](#a2a-server)
 - [Cloud, Evals & Assess](#cloud-evals--assess)
 - [Request Processing](#request-processing)
@@ -1812,28 +1811,6 @@ Full conceptual reference and breaker defaults: see [`CLAUDE.md`](../../CLAUDE.m
 ---
 
 ## Memory
-
----
-
-## MCP Server
-
-OmniRoute ships an embedded Model Context Protocol server with 3 transports (stdio, SSE, streamable-http) and scoped tools. The dashboard endpoints below read status/audit data and proxy the HTTP transports.
-
-| Method | Path | Description |
-| ------ | ---------------------- | ------------------------------------------------------------------------------------------------ | -------------------- |
-| GET | `/api/mcp/status` | Heartbeat, transport, online state, last call, top tools, 24h success rate |
-| GET | `/api/mcp/tools` | List of MCP tools with `name`, `description`, `scopes`, `phase`, `auditLevel`, `sourceEndpoints` |
-| GET | `/api/mcp/sse` | Open SSE stream for the SSE transport (returns `503` if MCP disabled or transport mismatch) |
-| POST | `/api/mcp/sse` | Send JSON-RPC frame on the SSE transport |
-| GET | `/api/mcp/stream` | Open SSE side of the Streamable HTTP transport (server-initiated messages) |
-| POST | `/api/mcp/stream` | Send JSON-RPC frame on the Streamable HTTP transport |
-| DELETE | `/api/mcp/stream` | End a Streamable HTTP session |
-| GET | `/api/mcp/audit` | Query audit log — `?limit=`, `?offset=`, `?tool=`, `?success=true                                | false`, `?apiKeyId=` |
-| GET | `/api/mcp/audit/stats` | Aggregate audit stats (totals, success rate, avg duration, top tools) |
-
-**Auth:** the `sse`/`stream` transports honor the MCP-specific auth surface (Bearer API key with `mcp` scope); the `status`/`tools`/`audit*` routes are readable from the dashboard (no extra auth required beyond reaching the dashboard host).
-
-> Both HTTP transports are gated by `settings.mcpEnabled` and `settings.mcpTransport` — a transport mismatch returns `400`, an MCP disabled state returns `503`.
 
 ---
 

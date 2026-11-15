@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Ṣètò àwọn ààtò ìfúnpọ̀",
-      "engine": "Ẹ́ńjìnnì ìfúnpọ̀ (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Ìpele líle Caveman 0.0–1.0",
-      "rtk_budget": "Ìpín token RTK",
-      "language_pack": "Àkójọpọ̀ èdè láti mú ṣiṣẹ́"
+      "engine": "Ẹ́ńjìnnì ìfúnpọ̀ (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Gba tàbí ṣètò ẹ́ńjìnnì ìfúnpọ̀ tó ń ṣiṣẹ́"
@@ -1107,33 +1104,17 @@
     "created": "A ti ṣẹ̀dá combo: {name}",
     "deleted": "A ti pa combo rẹ́: {name}",
     "noCombos": "Kò sí combo tí a ti ṣètò.",
-    "confirmDelete": "Pa combo {name} rẹ́?",
-    "suggest": {
-      "description": "Dábàá combo tó dára jù fún iṣẹ́ kan nípa lílo ìṣírò AI",
-      "task": "Àpèjúwe iṣẹ́",
-      "maxCost": "Iye owó tó pọ̀ jù fún ìbéèrè kọ̀ọ̀kan ní USD",
-      "maxLatencyMs": "Àkókò ìdádúró tó pọ̀ jù ní ìṣẹ́jú-àáyá ẹgbẹ̀rún",
-      "weights": "Àwọn ìwọ̀n ìṣírò JSON, fún àpẹẹrẹ {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Iye àwọn olùdíje tó ga jù láti ṣàfihàn (àìyípadà: 5)",
-      "explain": "Tẹ ìdí jáde sí stderr",
-      "switch": "Mú combo tó wà ní ipò àkọ́kọ́ ṣiṣẹ́"
-    }
+    "confirmDelete": "Pa combo {name} rẹ́?"
   },
   "oneproxy": {
     "description": "Ṣàkóso àkójọpọ̀ upstream OneProxy",
-    "stats": {
-      "provider": "Ṣe àlẹ̀mọ́ nípa olùpèsè",
-      "period": "Àkókò (àìyípadà: 24h)"
-    },
     "fetch": {
       "description": "Gba àwọn proxy láti inú àkójọpọ̀ náà",
       "count": "Iye àwọn proxy láti gbà (àìyípadà: 1)",
       "type": "Irú proxy: http|socks5 (àìyípadà: http)"
     },
     "rotate": {
-      "description": "Fi ipá mú ìyípo proxy ṣẹlẹ̀",
-      "provider": "Olùpèsè tí a ó yípo fún",
-      "connectionId": "ID ìsopọ̀ pàtó láti yípo"
+      "description": "Fi ipá mú ìyípo proxy ṣẹlẹ̀"
     },
     "config": {
       "description": "Ṣàfihàn tàbí ṣàfikún àtúnṣe sí ìṣètò OneProxy",

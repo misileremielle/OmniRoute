@@ -339,7 +339,6 @@ const STACKED_PIPELINE_ENGINE_IDS = new Set([
   "codex-responses",
   "headroom",
   "session-dedup",
-  "ccr",
   "llmlingua",
   "relevance",
   "omniglyph",
@@ -627,7 +626,7 @@ function parseStoredEnginesMap(value: unknown): Record<string, EngineToggle> | n
 // their behavior before they ever write an `engines` row. Single-engine modes (caveman/rtk/ultra)
 // come from their dedicated config blocks; aggressive has no enabled signal in its config and only
 // turns on via the `defaultMode` fallback below. Structural engines (lite/headroom/
-// session-dedup/ccr/llmlingua) come from the default-combo pipeline. `defaultMode` is a last-resort
+// session-dedup/llmlingua) come from the default-combo pipeline. `defaultMode` is a last-resort
 // signal that turns on its single-mode engine when nothing else already did.
 function deriveEnginesMap(config: CompressionConfig): Record<string, EngineToggle> {
   let defaultComboEngines = new Set<string>();
@@ -666,7 +665,7 @@ function deriveEnginesMap(config: CompressionConfig): Record<string, EngineToggl
         // on the legacy path). Only the defaultMode fallback below turns it on in this map.
         break;
       default:
-        // Structural engines (lite/headroom/session-dedup/ccr/llmlingua): on when present in the
+        // Structural engines (lite/headroom/session-dedup/llmlingua): on when present in the
         // default-combo pipeline.
         enabled = defaultComboEngines.has(id);
         break;
@@ -800,9 +799,6 @@ export async function getCompressionSettings(): Promise<CompressionConfig> {
           sawPreserveSystemPromptModeRow = true;
         }
         break;
-      case "mcpDescriptionCompressionEnabled":
-        config.mcpDescriptionCompressionEnabled = parsed !== false;
-        break;
       case "comboOverrides":
         if (parsed && typeof parsed === "object") {
           const overrides: Record<string, CompressionMode> = {};
@@ -873,7 +869,6 @@ export async function getCompressionSettings(): Promise<CompressionConfig> {
         }
         break;
       case "sessionDedup":
-      case "ccr":
         applyDetailConfigUpdate(config, key, parsed);
         break;
       case "contextBudget":

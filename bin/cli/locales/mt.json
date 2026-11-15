@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Ikkonfigura l-iffissar tal-kompressjoni",
-      "engine": "Magni tal-kompressjoni (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Aggressività tal-caveman 0.0–1.0",
-      "rtk_budget": "Baġit tal-token RTK",
-      "language_pack": "Pakkett tal-lingwa li għandu jiġi attivat"
+      "engine": "Magni tal-kompressjoni (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Ikseb jew issetta l-magni tal-kompressjoni attiva"
@@ -1107,33 +1104,17 @@
     "created": "Kombo ġie maħluq: {name}",
     "deleted": "Kombo tneħħa: {name}",
     "noCombos": "Ebda kombos ma ġew ikkonfigurati.",
-    "confirmDelete": "Tixtieq tneħħi l-kombo {name}?",
-    "suggest": {
-      "description": "Suġġerixxi l-aħjar kombo għal għan permezz ta' skoring AI",
-      "task": "Deskrizzjoni tal-kompitu",
-      "maxCost": "Spiża massima għal kull talba f'USD",
-      "maxLatencyMs": "Latenza massima f'millisekondi",
-      "weights": "Piżijiet ta' punteġġ JSON eż. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Numru ta' kandidati ewlenin biex jintwerew (default: 5)",
-      "explain": "Stampa r-raġunament għal stderr",
-      "switch": "Attiva l-combo bl-ogħla klassifikazzjoni"
-    }
+    "confirmDelete": "Tixtieq tneħħi l-kombo {name}?"
   },
   "oneproxy": {
     "description": "Immaniġġja l-pool upstream ta' OneProxy",
-    "stats": {
-      "provider": "Iffiltra skont il-fornitur",
-      "period": "Perjodu ta' żmien (default: 24h)"
-    },
     "fetch": {
       "description": "Ġib proxies mill-pool",
       "count": "Numru ta' proxies biex jinġiebu (default: 1)",
       "type": "Tip ta' proxy: http|socks5 (default: http)"
     },
     "rotate": {
-      "description": "Iġġiegħel ir-rotazzjoni tal-proxy",
-      "provider": "Fornitur li għalih issir ir-rotazzjoni",
-      "connectionId": "ID tal-konnessjoni speċifiku għar-rotazzjoni"
+      "description": "Iġġiegħel ir-rotazzjoni tal-proxy"
     },
     "config": {
       "description": "Uri jew aġġorna l-konfigurazzjoni ta' OneProxy",

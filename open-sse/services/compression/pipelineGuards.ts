@@ -32,7 +32,7 @@ export interface PipelineInflationResult {
  * returns the verbatim original.
  *
  * A net-zero result (`compressedTokens === originalTokens`) is a NO-OP, not inflation: a structural
- * engine (e.g. `ccr`, `session-dedup`) that found no candidate returns the body unchanged, so its
+ * engine (e.g. `session-dedup`) that found no candidate returns the body unchanged, so its
  * token count equals the original. That is zero savings, not a revert — flagging it as inflation
  * would emit a misleading "did not shrink; reverted to original" warning for an engine that never
  * touched the payload. Equality therefore must NOT trip the guard.

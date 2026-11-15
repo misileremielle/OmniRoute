@@ -32,11 +32,6 @@
  * Every key here is also OPERATOR-ONLY on `PATCH /api/settings`: a manage-scoped API key or an
  * `oma_` access token is refused with 403 even when it knows the password
  * (`tests/unit/security-settings-operator.test.ts`).
- *
- * Note: `mcpEnabled` is NOT gated server-side — the dedicated MCP page
- * (/dashboard/mcp) toggles it via patchSetting() without a currentPassword
- * prompt. The Authz section can still prompt client-side for consistency,
- * but the server accepts the change without re-auth.
  */
 export const SECURITY_IMPACTING_SETTINGS_KEYS = [
   "localOnlyManageScopeBypassEnabled",

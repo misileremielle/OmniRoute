@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Siqish sozlamalarini sozlash",
-      "engine": "Siqish mexanizmi (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman agressivligi 0.0–1.0",
-      "rtk_budget": "RTK token budjeti",
-      "language_pack": "Faollashtiriladigan til paketi"
+      "engine": "Siqish mexanizmi (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Faol siqish mexanizmini olish yoki o‘rnatish"
@@ -1107,33 +1104,17 @@
     "created": "Kombo yaratildi: {name}",
     "deleted": "Kombo oʻchirildi: {name}",
     "noCombos": "Hech qanday kombo sozlanmagan.",
-    "confirmDelete": "{name} kombosi oʻchirilsinmi?",
-    "suggest": {
-      "description": "AI baholashi yordamida vazifa uchun eng yaxshi komboni tavsiya qilish",
-      "task": "Vazifa tavsifi",
-      "maxCost": "Har bir soʻrov uchun AQSH dollaridagi maksimal xarajat",
-      "maxLatencyMs": "Millisekundlardagi maksimal kechikish",
-      "weights": "JSON baholash vaznlari, masalan, {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Koʻrsatiladigan eng yaxshi nomzodlar soni (standart: 5)",
-      "explain": "Asoslantirishni stderr ga chiqarish",
-      "switch": "Eng yuqori baholangan kombinatsiyani faollashtirish"
-    }
+    "confirmDelete": "{name} kombosi oʻchirilsinmi?"
   },
   "oneproxy": {
     "description": "OneProxy yuqori oqim pulini boshqarish",
-    "stats": {
-      "provider": "Provayder boʻyicha filtrlash",
-      "period": "Vaqt oraligʻi (standart: 24h)"
-    },
     "fetch": {
       "description": "Puldan proksilarni olish",
       "count": "Olinadigan proksilar soni (standart: 1)",
       "type": "Proksi turi: http|socks5 (standart: http)"
     },
     "rotate": {
-      "description": "Proksini majburiy almashtirish",
-      "provider": "Almashtiriladigan provayder",
-      "connectionId": "Almashtiriladigan muayyan ulanish identifikatori"
+      "description": "Proksini majburiy almashtirish"
     },
     "config": {
       "description": "OneProxy konfiguratsiyasini koʻrsatish yoki yangilash",

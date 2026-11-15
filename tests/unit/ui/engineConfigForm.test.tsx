@@ -125,7 +125,7 @@ describe("EngineConfigForm", () => {
     expect(numInput).toBeTruthy();
     expect(numInput?.getAttribute("min")).toBe("100");
     expect(numInput?.getAttribute("max")).toBe("8000");
-    // step=any so fractional settings (e.g. CCR retrievalRampFactor 1.5) pass
+    // step=any so fractional settings (e.g. a factor of 1.5) pass
     // browser step validation, whose default step is 1.
     expect(numInput?.getAttribute("step")).toBe("any");
   });

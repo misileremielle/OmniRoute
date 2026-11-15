@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "تهيئة إعدادات الضغط",
-      "engine": "محرك الضغط (caveman|rtk|hybrid|none)",
-      "caveman_agg": "مستوى شدة Caveman من 0.0 إلى 1.0",
-      "rtk_budget": "ميزانية رموز RTK",
-      "language_pack": "حزمة اللغة المراد تفعيلها"
+      "engine": "محرك الضغط (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "الحصول على محرك الضغط النشط أو تعيينه"
@@ -1107,33 +1104,17 @@
     "created": "تم إنشاء التركيبة: {name}",
     "deleted": "تم حذف التركيبة: {name}",
     "noCombos": "لم يتم تكوين أي تركيبات.",
-    "confirmDelete": "هل تريد حذف التركيبة {name}؟",
-    "suggest": {
-      "description": "اقتراح أفضل تركيبة لمهمة باستخدام تقييم الذكاء الاصطناعي",
-      "task": "وصف المهمة",
-      "maxCost": "الحد الأقصى لتكلفة كل طلب بالدولار الأمريكي",
-      "maxLatencyMs": "الحد الأقصى لزمن الاستجابة بالمللي ثانية",
-      "weights": "أوزان التقييم بصيغة JSON، مثال: {\"latency\":0.7,\"cost\":0.3}",
-      "top": "عدد أفضل المرشحين المراد عرضهم (الافتراضي: 5)",
-      "explain": "طباعة المبررات إلى stderr",
-      "switch": "تفعيل التركيبة الأعلى تصنيفًا"
-    }
+    "confirmDelete": "هل تريد حذف التركيبة {name}؟"
   },
   "oneproxy": {
     "description": "إدارة مجموعة المصادر العليا في OneProxy",
-    "stats": {
-      "provider": "التصفية حسب المزوّد",
-      "period": "الفترة الزمنية (الافتراضية: 24h)"
-    },
     "fetch": {
       "description": "جلب الوكلاء من المجموعة",
       "count": "عدد الوكلاء المراد جلبهم (الافتراضي: 1)",
       "type": "نوع الوكيل: http|socks5 (الافتراضي: http)"
     },
     "rotate": {
-      "description": "فرض تدوير الوكيل",
-      "provider": "المزوّد المراد إجراء التدوير له",
-      "connectionId": "معرّف الاتصال المحدد المراد تدويره"
+      "description": "فرض تدوير الوكيل"
     },
     "config": {
       "description": "عرض إعدادات OneProxy أو تحديثها",

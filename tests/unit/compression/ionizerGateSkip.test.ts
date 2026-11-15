@@ -3,7 +3,6 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { applyStackedCompression } from "../../../open-sse/services/compression/strategySelector.ts";
 import { registerBuiltinCompressionEngines } from "../../../open-sse/services/compression/engines/index.ts";
-import { resetCcrStore } from "../../../open-sse/services/compression/engines/ccr/index.ts";
 
 registerBuiltinCompressionEngines();
 
@@ -12,7 +11,6 @@ registerBuiltinCompressionEngines();
 const bigArray = JSON.stringify(Array.from({ length: 400 }, (_, i) => ({ id: i, port: 8080 + i })));
 
 test("fidelity gate ON skips the ionizer step (sampling) and keeps the sampled output", () => {
-  resetCcrStore();
   const body = { messages: [{ role: "user", content: bigArray }] };
   const res = applyStackedCompression(body, [{ engine: "ionizer" }], {
     fidelityGate: { enabled: true },

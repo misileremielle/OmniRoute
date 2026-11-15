@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurišite podešavanja kompresije",
-      "engine": "Mehanizam kompresije (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agresivnost caveman-a 0.0–1.0",
-      "rtk_budget": "Budžet RTK tokena",
-      "language_pack": "Jezički paket za aktivaciju"
+      "engine": "Mehanizam kompresije (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Preuzmite ili podesite aktivni mehanizam kompresije"
@@ -1107,33 +1104,17 @@
     "created": "Kombinacija kreirana: {name}",
     "deleted": "Kombinacija obrisana: {name}",
     "noCombos": "Nema konfigurisanih kombinacija.",
-    "confirmDelete": "Obrisati kombinaciju {name}?",
-    "suggest": {
-      "description": "Predloži najbolju kombinaciju za zadatak koristeći AI ocenjivanje",
-      "task": "Opis zadatka",
-      "maxCost": "Maksimalni trošak po zahtevu u USD",
-      "maxLatencyMs": "Maksimalna latencija u milisekundama",
-      "weights": "JSON ponderi za bodovanje, npr. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Broj najboljih kandidata za prikaz (podrazumevano: 5)",
-      "explain": "Ispiši obrazloženje u stderr",
-      "switch": "Aktiviraj najbolje rangiranu kombinaciju"
-    }
+    "confirmDelete": "Obrisati kombinaciju {name}?"
   },
   "oneproxy": {
     "description": "Upravljanje OneProxy skupom nadređenih proksija",
-    "stats": {
-      "provider": "Filtriraj po dobavljaču",
-      "period": "Vremenski period (podrazumevano: 24h)"
-    },
     "fetch": {
       "description": "Preuzmi proksije iz skupa",
       "count": "Broj proksija za preuzimanje (podrazumevano: 1)",
       "type": "Tip proksija: http|socks5 (podrazumevano: http)"
     },
     "rotate": {
-      "description": "Prisilna rotacija proksija",
-      "provider": "Dobavljač za koji se vrši rotacija",
-      "connectionId": "ID konkretne konekcije za rotaciju"
+      "description": "Prisilna rotacija proksija"
     },
     "config": {
       "description": "Prikaži ili ažuriraj OneProxy konfiguraciju",

@@ -19,7 +19,6 @@ const { headroomEngine } =
   await import("../../../open-sse/services/compression/engines/headroom/index.ts");
 const { sessionDedupEngine } =
   await import("../../../open-sse/services/compression/engines/session-dedup/index.ts");
-const { ccrEngine } = await import("../../../open-sse/services/compression/engines/ccr/index.ts");
 const {
   seedEngineForm,
   buildEngineDetailUpdate,
@@ -173,7 +172,6 @@ describe("engine config page save", () => {
       [ultraEngine, "ultra"],
       [headroomEngine, "headroom"],
       [sessionDedupEngine, "sessionDedup"],
-      [ccrEngine, "ccr"],
     ];
     for (const [engine, subKey] of pages) {
       const loadedSettings = await readSettings();

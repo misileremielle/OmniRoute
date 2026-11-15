@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Skonfiguruj ustawienia kompresji",
-      "engine": "Silnik kompresji (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Poziom agresywności Caveman 0.0–1.0",
-      "rtk_budget": "Budżet tokenów RTK",
-      "language_pack": "Pakiet językowy do aktywacji"
+      "engine": "Silnik kompresji (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Pobierz lub ustaw aktywny mechanizm kompresji"
@@ -1107,33 +1104,17 @@
     "created": "Utworzono kombinację: {name}",
     "deleted": "Usunięto kombinację: {name}",
     "noCombos": "Nie skonfigurowano żadnych kombinacji.",
-    "confirmDelete": "Usunąć kombinację {name}?",
-    "suggest": {
-      "description": "Zaproponuj najlepszą kombinację do zadania, korzystając z oceny AI",
-      "task": "Opis zadania",
-      "maxCost": "Maksymalny koszt żądania w USD",
-      "maxLatencyMs": "Maksymalne opóźnienie w milisekundach",
-      "weights": "Wagi oceny w formacie JSON, np. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Liczba najlepszych kandydatów do wyświetlenia (domyślnie: 5)",
-      "explain": "Wyświetl uzasadnienie na standardowym wyjściu błędów",
-      "switch": "Aktywuj najwyżej ocenioną kombinację"
-    }
+    "confirmDelete": "Usunąć kombinację {name}?"
   },
   "oneproxy": {
     "description": "Zarządzaj pulą serwerów nadrzędnych OneProxy",
-    "stats": {
-      "provider": "Filtruj według dostawcy",
-      "period": "Okres (domyślnie: 24h)"
-    },
     "fetch": {
       "description": "Pobierz serwery proxy z puli",
       "count": "Liczba serwerów proxy do pobrania (domyślnie: 1)",
       "type": "Typ proxy: http|socks5 (domyślnie: http)"
     },
     "rotate": {
-      "description": "Wymuś rotację proxy",
-      "provider": "Dostawca, dla którego ma zostać wykonana rotacja",
-      "connectionId": "Identyfikator konkretnego połączenia do rotacji"
+      "description": "Wymuś rotację proxy"
     },
     "config": {
       "description": "Wyświetl lub zaktualizuj konfigurację OneProxy",

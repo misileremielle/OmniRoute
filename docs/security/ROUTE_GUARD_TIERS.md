@@ -41,7 +41,6 @@ spawn-capable prefixes and fails CI if any is not classified local-only.
 
 | Prefix / pattern                                                                                         | Why it's local-only                                                                             |
 | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `/api/mcp/`                                                                                              | MCP server — spawns stdio bridges + SSE handlers                                                |
 | `/api/cli-tools/runtime/`                                                                                | CLI tool runtime — executes arbitrary plugin code                                               |
 | `/api/cli-tools/{omp,letta,grok-build,forge,jcode,qwen}-settings`                                        | Per-tool settings writers that can touch tool binaries/config on the host                       |
 | `/api/cli-tools/{claude,cline,codewhale,codex,crush,deepseek-tui,droid,kilo,openclaw,pi,smelt}-settings` | Same `getCliRuntimeStatus()` spawn as the six siblings above (GHSA-35fw-cv32-2373)              |
@@ -76,31 +75,19 @@ default for any new LOCAL_ONLY path remains strict-loopback. Unauthenticated
 requests and requests with non-manage keys are still rejected with
 `403 LOCAL_ONLY`.
 
-Today the only bypassable prefix is `/api/mcp/`. `/api/cli-tools/runtime/` and
-`/api/services/` are intentionally excluded because they can spawn arbitrary
-subprocesses (`npm install`, `node`), which is the exact CVE class the
-LOCAL_ONLY tier exists to prevent.
+No prefix is bypassable by default (the MCP routes it was added for were
+removed with the MCP server); an operator can add a non-spawning LOCAL_ONLY prefix
+in Settings. `/api/cli-tools/runtime/` and `/api/services/` can never be added
+because they can spawn arbitrary subprocesses (`npm install`, `node`), which is the
+exact CVE class the LOCAL_ONLY tier exists to prevent.
 
-**#7895 — `mcp:connect` narrow scope:** the `/api/mcp/` carve-out ALSO accepts
-a Bearer key holding the narrow `mcp:connect` scope
-(`src/shared/constants/managementScopes.ts::MCP_CONNECT_SCOPE`), checked via
-`hasMcpConnectOrManageScope()` in `src/server/authz/policies/management.ts`.
-This is scoped to `/api/mcp/` ONLY — `mcp:connect` grants nothing on any other
-management route (including every other LOCAL_ONLY bypass prefix, should one
-ever be added), and it is deliberately excluded from
-`MANAGEMENT_API_KEY_SCOPES`. A key holding `manage`/`admin` still passes the
-carve-out exactly as before; `mcp:connect` is a lower-privilege alternative
-for remote MCP-only callers who should not need broad management access.
-
-| Request                                             | Path                       | Result              |
-| --------------------------------------------------- | -------------------------- | ------------------- |
-| Non-loopback, no Bearer                             | `/api/mcp/*`               | 403 LOCAL_ONLY      |
-| Non-loopback, Bearer with `manage` scope            | `/api/mcp/*`               | Allow               |
-| Non-loopback, Bearer with `mcp:connect` scope       | `/api/mcp/*`               | Allow               |
-| Non-loopback, Bearer without `manage`/`mcp:connect` | `/api/mcp/*`               | 403 LOCAL_ONLY      |
-| Non-loopback, Bearer with `mcp:connect` scope       | `/api/cli-tools/runtime/*` | 403 LOCAL_ONLY      |
-| Non-loopback, Bearer with `manage` scope            | `/api/cli-tools/runtime/*` | 403 LOCAL_ONLY      |
-| Loopback, any/no Bearer                             | any LOCAL_ONLY             | Allow (gate passes) |
+| Request                                  | Path                              | Result              |
+| ---------------------------------------- | --------------------------------- | ------------------- |
+| Non-loopback, no Bearer                  | operator-configured bypass prefix | 403 LOCAL_ONLY      |
+| Non-loopback, Bearer with `manage` scope | operator-configured bypass prefix | Allow               |
+| Non-loopback, Bearer without `manage`    | operator-configured bypass prefix | 403 LOCAL_ONLY      |
+| Non-loopback, Bearer with `manage` scope | `/api/cli-tools/runtime/*`        | 403 LOCAL_ONLY      |
+| Loopback, any/no Bearer                  | any LOCAL_ONLY                    | Allow (gate passes) |
 
 #### Operator guidance & auditing
 
@@ -114,8 +101,8 @@ operator responsibilities remain:
   `X-Forwarded-For: 127.0.0.1`, or a proxy that rewrites the source address to
   loopback, re-opens exactly the RCE class this tier closes. Expose the
   dashboard/API through the proxy — never the spawn-capable routes.
-- **Keep the manage-scope bypass minimal.** Only `/api/mcp/` is bypassable, and
-  only with a `manage`-scoped API key. The `SPAWN_CAPABLE_PREFIXES` can never be
+- **Keep the manage-scope bypass minimal.** Nothing is bypassable by default,
+  and a bypass only ever admits a `manage`-scoped API key. The `SPAWN_CAPABLE_PREFIXES` can never be
   added to the bypass list — the zod schema rejects them and
   `isLocalOnlyBypassableByManageScope` denies them at runtime (defence-in-depth),
   which is what the dashboard means by "cannot be made bypassable". The same
@@ -179,7 +166,6 @@ server process.
 | `/api/settings/export-json`               | Exports the full settings blob (incl. secrets) |
 | `/api/settings/import-json`               | Replaces the full settings blob                |
 | `/api/providers/health-autopilot/actions` | Executes autopilot remediation actions         |
-| `/api/settings/obsidian`                  | Mints reusable WebDAV creds for any vault root |
 | `/api/relay/tokens`                       | Mints, lists, edits and revokes relay tokens   |
 | `/api/cli-tools/apply`                    | Rewrites the operator's host CLI config        |
 | `/api/cli-tools/guide-settings`           | Writes guide-driven CLI config files           |
@@ -188,13 +174,6 @@ server process.
 | `/api/restart`                            | Restarts the server process                    |
 
 **Response on violation:** `401 Authentication required`
-
-`/api/settings/obsidian` covers its `/webdav` child: `POST` points the WebDAV file service —
-served by the custom Node layer before Next.js, outside this pipeline — at a caller-chosen root
-and echoes freshly minted Basic credentials, `DELETE` rotates them, and the parent `POST` stores
-the Obsidian REST API token. GHSA-62vw only masked the `GET` password reveal; the issuance was
-still on the fail-open tier (GHSA-7pq4-8pvv-rx7r). `enableObsidianVaultSync()` additionally
-refuses a vault that is, sits inside, or contains the data directory.
 
 #### Credential exports and restores are operator-only
 
@@ -328,4 +307,3 @@ without also implementing the enforcement logic.
 
 - `docs/security/CLI_TOKEN.md` — CLI machine-ID token
 - `docs/architecture/AUTHZ_GUIDE.md` — full authorization pipeline
-- `docs/frameworks/MCP-SERVER.md` — MCP server transports and scopes

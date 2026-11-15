@@ -23,15 +23,12 @@ test.after(() => {
   rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });
 
-test("the ionizer lane samples an oversized JSON array into a CCR marker", async () => {
+test("the ionizer lane samples an oversized JSON array", async () => {
   const big = JSON.stringify(Array.from({ length: 400 }, (_, i) => ({ i, v: `r${i}` })));
   const res = await route.POST(
     makeReq({ messages: [{ role: "user", content: big }], engineId: "ionizer" })
   );
   assert.equal(res.status, 200);
   const body = await res.json();
-  assert.match(
-    body.compressed,
-    /\[ionizer: kept \d+\/400 rows; full → CCR retrieve hash=[0-9a-f]{24}/
-  );
+  assert.match(body.compressed, /\[ionizer: kept \d+\/400 rows; \d+ omitted\]/);
 });

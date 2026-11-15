@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurera komprimeringsinställningar",
-      "engine": "Komprimeringsmotor (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman-aggressivitet 0,0–1,0",
-      "rtk_budget": "RTK-tokenbudget",
-      "language_pack": "Språkpaket att aktivera"
+      "engine": "Komprimeringsmotor (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Hämta eller ange den aktiva komprimeringsmotorn"
@@ -1107,33 +1104,17 @@
     "created": "Kombination skapad: {name}",
     "deleted": "Kombination borttagen: {name}",
     "noCombos": "Inga kombinationer har konfigurerats.",
-    "confirmDelete": "Ta bort kombinationen {name}?",
-    "suggest": {
-      "description": "Föreslå den bästa kombinationen för en uppgift med hjälp av AI-poängsättning",
-      "task": "Uppgiftsbeskrivning",
-      "maxCost": "Maximal kostnad per begäran i USD",
-      "maxLatencyMs": "Maximal latens i millisekunder",
-      "weights": "JSON-vikter för poängsättning, t.ex. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Antal toppkandidater att visa (standard: 5)",
-      "explain": "Skriv motivering till stderr",
-      "switch": "Aktivera den högst rankade kombinationen"
-    }
+    "confirmDelete": "Ta bort kombinationen {name}?"
   },
   "oneproxy": {
     "description": "Hantera OneProxys uppströmspool",
-    "stats": {
-      "provider": "Filtrera efter leverantör",
-      "period": "Tidsperiod (standard: 24h)"
-    },
     "fetch": {
       "description": "Hämta proxyservrar från poolen",
       "count": "Antal proxyservrar att hämta (standard: 1)",
       "type": "Proxytyp: http|socks5 (standard: http)"
     },
     "rotate": {
-      "description": "Framtvinga proxyrotation",
-      "provider": "Leverantör att rotera för",
-      "connectionId": "Specifikt anslutnings-ID att rotera"
+      "description": "Framtvinga proxyrotation"
     },
     "config": {
       "description": "Visa eller uppdatera OneProxy-konfigurationen",

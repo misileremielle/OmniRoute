@@ -38,8 +38,7 @@ OmniRoute has **3 layers of monitoring**:
 ├──────────────────────────────────────────────────────────────┤
 │  Layer 3: Live Observability (runtime snapshots)               │
 │  ├─ observability.ts — circuit breakers, sessions, quota       │
-│  ├─ tokenHealthCheck.ts — OAuth token refresh health          │
-│  └─ MCP tools: omniroute_get_health, omniroute_get_session_snapshot │
+│  └─ tokenHealthCheck.ts — OAuth token refresh health          │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -110,7 +109,7 @@ OmniRoute exposes **two** HTTP health surfaces. They are not interchangeable for
 | `GET /healthz`               | Lifecycle liveness/readiness (`ok` / `starting` / `stopping`) | Trivial (phase flag only)         | Kubernetes **readiness**; soft **liveness** if you must use HTTP |
 | `GET /api/monitoring/health` | Deep system + provider summary (DB, heap, catalog counts, …)  | Heavy (sync DB / monitoring work) | Dashboards, blackbox deep checks, Docker’s built-in healthcheck  |
 
-> **Note:** Provider health matrices, autopilot issues, quota monitors, token health, and latency detail beyond `/api/monitoring/health` are available via the **MCP tool** `observability_snapshot` or the **dashboard** pages — there are no dedicated REST routes for those.
+> **Note:** Provider health matrices, autopilot issues, quota monitors, token health, and latency detail beyond `/api/monitoring/health` are available on the **dashboard** pages — there are no dedicated REST routes for those.
 
 Both routes run on the **same Node event loop** as request handling. A CPU-bound path (large `GET /v1/models` catalog work, long-context compression / token counting) can delay **all** HTTP handlers, including `/healthz`. Event-loop busy ≠ process dead. Prefer fixing the hog; probe tuning only reduces false kills.
 
@@ -264,7 +263,7 @@ Memory extraction, skills injection, and OAuth token refresh share the **main No
 
 ### Provider Health
 
-> **No REST endpoint.** Provider health data is available via the MCP tool `observability_snapshot` or the dashboard `/dashboard/providers` page.
+> **No REST endpoint.** Provider health data is available on the dashboard `/dashboard/providers` page.
 
 ### Provider Detail
 
@@ -306,7 +305,7 @@ The `providerHealthAutopilot.ts` module is a **self-healing system** that:
 
 ### API
 
-> **No REST endpoint.** Autopilot issues are available via the MCP tool `observability_snapshot` or the dashboard. The autopilot runs internally; its behavior is configured via the settings DB (per-connection `autopilotMode` field), not environment variables — `grep -rn` for an autopilot-mode env var returns zero hits.
+> **No REST endpoint.** Autopilot issues are available on the dashboard. The autopilot runs internally; its behavior is configured via the settings DB (per-connection `autopilotMode` field), not environment variables — `grep -rn` for an autopilot-mode env var returns zero hits.
 
 ### Autopilot Mode
 
@@ -370,42 +369,7 @@ interface QuotaMonitorSnapshot {
 
 ### API
 
-> **No REST endpoint.** Quota monitor data is available via the MCP tool `observability_snapshot` or the dashboard.
-
----
-
-## Observability Snapshot
-
-The MCP tool `observability_snapshot` returns a **complete system snapshot** for AI agents:
-
-```json
-{
-  "circuitBreakers": [
-    {
-      "name": "openai",
-      "state": "closed",
-      "failureCount": 0,
-      "lastFailureTime": null,
-      "retryAfterMs": null
-    }
-  ],
-  "sessions": [
-    {
-      "sessionId": "sess-123",
-      "createdAt": 1234567890,
-      "lastActive": 1234567999,
-      "requestCount": 42,
-      "connectionId": "conn-456",
-      "ageMs": 109
-    }
-  ],
-  "quotaMonitors": {/* see above */},
-  "uptime": 12345,
-  "version": "3.8.16"
-}
-```
-
-Agents use this to make **routing decisions** — for example, "if openai's circuit is open, route to anthropic first".
+> **No REST endpoint.** Quota monitor data is available on the dashboard.
 
 ---
 
@@ -437,7 +401,7 @@ Token health check configuration is handled internally by `tokenHealthCheck.ts`.
 
 ### Token Health
 
-> **No REST endpoint.** Token health data is available via the dashboard or the MCP tool `observability_snapshot`.
+> **No REST endpoint.** Token health data is available on the dashboard.
 
 ---
 

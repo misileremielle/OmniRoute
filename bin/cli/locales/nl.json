@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Compressie-instellingen configureren",
-      "engine": "Compressie-engine (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman-agressiviteit 0,0–1,0",
-      "rtk_budget": "RTK-tokenbudget",
-      "language_pack": "Te activeren taalpakket"
+      "engine": "Compressie-engine (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "De actieve compressie-engine ophalen of instellen"
@@ -1107,33 +1104,17 @@
     "created": "Combinatie aangemaakt: {name}",
     "deleted": "Combinatie verwijderd: {name}",
     "noCombos": "Geen combinaties geconfigureerd.",
-    "confirmDelete": "Combinatie {name} verwijderen?",
-    "suggest": {
-      "description": "De beste combinatie voor een taak voorstellen met behulp van AI-scores",
-      "task": "Taakbeschrijving",
-      "maxCost": "Maximale kosten per aanvraag in USD",
-      "maxLatencyMs": "Maximale latentie in milliseconden",
-      "weights": "JSON-scoregewichten, bijv. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Aantal beste kandidaten om weer te geven (standaard: 5)",
-      "explain": "Motivering naar stderr uitvoeren",
-      "switch": "De hoogst gerangschikte combinatie activeren"
-    }
+    "confirmDelete": "Combinatie {name} verwijderen?"
   },
   "oneproxy": {
     "description": "De OneProxy-upstreampool beheren",
-    "stats": {
-      "provider": "Filteren op provider",
-      "period": "Tijdsperiode (standaard: 24h)"
-    },
     "fetch": {
       "description": "Proxy's ophalen uit de pool",
       "count": "Aantal op te halen proxy's (standaard: 1)",
       "type": "Proxytype: http|socks5 (standaard: http)"
     },
     "rotate": {
-      "description": "Proxyrotatie forceren",
-      "provider": "Provider waarvoor moet worden geroteerd",
-      "connectionId": "Specifieke verbindings-ID om te roteren"
+      "description": "Proxyrotatie forceren"
     },
     "config": {
       "description": "OneProxy-configuratie weergeven of bijwerken",

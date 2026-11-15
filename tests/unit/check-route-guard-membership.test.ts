@@ -209,7 +209,7 @@ test("6A.8: spawn-capable routes in SPAWN_CAPABLE_ROUTE_ROOTS are still all clas
   // The original subcheck (SPAWN_CAPABLE_ROUTE_ROOTS) must still pass.
   // This test is a regression guard — the new source-scan does not break the old check.
   const { isLocalOnlyPath } = await import("../../src/server/authz/routeGuard.ts");
-  const rootPrefixes = ["/api/services/", "/api/mcp/", "/api/cli-tools/runtime/"];
+  const rootPrefixes = ["/api/services/", "/api/cli-tools/runtime/"];
   for (const prefix of rootPrefixes) {
     assert.ok(isLocalOnlyPath(prefix + "test"), `expected ${prefix} to be local-only`);
   }
@@ -239,10 +239,10 @@ test("#15438: raw variants that literally start with a LOCAL_ONLY prefix are loc
   // Literal prefix matches against LOCAL_ONLY_API_PREFIXES — blocked before
   // any normalization question arises.
   const variants = [
-    "/api/mcp/sse", // canonical baseline
-    "/api/mcp/../mcp/sse", // dot-segment traversal
-    "/api/mcp/%2e%2e/mcp/sse", // URL-encoded dot segments
-    "/api/mcp/..%2fmcp/sse", // encoded slash: '%2f' is not a separator, prefix still matches
+    "/api/services/sse", // canonical baseline
+    "/api/services/../services/sse", // dot-segment traversal
+    "/api/services/%2e%2e/services/sse", // URL-encoded dot segments
+    "/api/services/..%2fservices/sse", // encoded slash: '%2f' is not a separator, prefix still matches
   ];
   for (const variant of variants) {
     assert.equal(isLocalOnlyPath(variant), true, `${variant} must be classified local-only`);
@@ -257,10 +257,10 @@ test("#15438: variants without a literal prefix stay unclassified through URL pa
   // forms can reach a handler: whether the App Router dispatches any of them
   // to a spawn-capable route is the issue's unproven step 2, out of scope here.
   const variants = [
-    "/api//mcp/sse", // double slash — URL parsing does not collapse it
+    "/api//services/sse", // double slash — URL parsing does not collapse it
     "/API/MCP/sse", // case variation — parsing preserves case
     "/api/%6dcp/sse", // percent-encoded 'm' — parsing does not decode it
-    "/api/mcp%2fsse", // encoded slash — parsing does not split on '%2f'
+    "/api/services%2fsse", // encoded slash — parsing does not split on '%2f'
   ];
   for (const variant of variants) {
     assert.equal(isLocalOnlyPath(variant), false, `${variant} is not gated by the raw predicate`);
@@ -278,14 +278,14 @@ test("#15438: WHATWG URL parsing resolves dot-segment variants into LOCAL_ONLY p
   // predicate ever see it, so these forms reach the predicate already
   // canonicalised and must classify local-only at the pipeline layer.
   assert.equal(
-    isLocalOnlyPath("/api/foo/../mcp/sse"),
+    isLocalOnlyPath("/api/foo/../services/sse"),
     false,
     "raw form does not match any prefix — URL parsing is what gates it"
   );
   const cases: Array<readonly [string, string]> = [
-    ["/api/mcp/../mcp/sse", "/api/mcp/sse"],
-    ["/api/mcp/%2e%2e/mcp/sse", "/api/mcp/sse"],
-    ["/api/foo/../mcp/sse", "/api/mcp/sse"], // resolves INTO the prefix from outside
+    ["/api/services/../services/sse", "/api/services/sse"],
+    ["/api/services/%2e%2e/services/sse", "/api/services/sse"],
+    ["/api/foo/../services/sse", "/api/services/sse"], // resolves INTO the prefix from outside
     ["/api/x/../providers/cursor/refresh-cursor", "/api/providers/cursor/refresh-cursor"], // LOCAL_ONLY_API_PATTERNS match
   ];
   for (const [raw, resolved] of cases) {
@@ -297,19 +297,19 @@ test("#15438: WHATWG URL parsing resolves dot-segment variants into LOCAL_ONLY p
 
 test("#15438: '..%2f' is opaque to URL parsing but still matches the prefix literally", () => {
   // '%2f' never becomes a path separator in WHATWG parsing, so the segment
-  // survives resolution — but the string still starts with '/api/mcp/', so the
+  // survives resolution — but the string still starts with '/api/services/', so the
   // predicate blocks it either way.
-  const pathname = pipelinePathname("/api/mcp/..%2fmcp/sse");
-  assert.equal(pathname, "/api/mcp/..%2fmcp/sse", "URL parsing keeps '..%2f' intact");
+  const pathname = pipelinePathname("/api/services/..%2fservices/sse");
+  assert.equal(pathname, "/api/services/..%2fservices/sse", "URL parsing keeps '..%2f' intact");
   assert.equal(isLocalOnlyPath(pathname), true, "must stay classified local-only");
 });
 
 test("#15438: traversal that escapes a LOCAL_ONLY prefix classifies by the resolved path", () => {
-  // The raw form starts with '/api/mcp/' (literal match), but the pipeline
+  // The raw form starts with '/api/services/' (literal match), but the pipeline
   // never sees it raw: nextUrl.pathname is already resolved to a non-LOCAL_ONLY
   // path, so classification follows the resolved path — no over-broadening of
   // the LOCAL_ONLY tier.
-  const raw = "/api/mcp/../providers/connections";
+  const raw = "/api/services/../providers/connections";
   const pathname = pipelinePathname(raw);
   assert.equal(pathname, "/api/providers/connections");
   assert.equal(isLocalOnlyPath(raw), true, "raw form matches the literal prefix");

@@ -42,19 +42,6 @@ export const ENGINE_CATALOG: Record<string, EngineMeta> = {
       cacheImpact: "low",
     },
   },
-  ccr: {
-    id: "ccr",
-    label: "CCR (Retrieval)",
-    stackPriority: 4,
-    isSingleMode: false,
-    description: "Content-addressed retrieval markers.",
-    guidance: {
-      tradeoffs:
-        "Lossless — replaces large repeated/contiguous blocks with content-addressed references instead of deleting them; the original content stays retrievable.",
-      lossy: false,
-      cacheImpact: "low",
-    },
-  },
   lite: {
     id: "lite",
     label: "Lite",

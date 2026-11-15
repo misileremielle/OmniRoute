@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Tömörítési beállítások konfigurálása",
-      "engine": "Tömörítési motor (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman agresszivitása 0.0–1.0",
-      "rtk_budget": "RTK tokenkerete",
-      "language_pack": "Aktiválandó nyelvi csomag"
+      "engine": "Tömörítési motor (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Az aktív tömörítési motor lekérése vagy beállítása"
@@ -1107,33 +1104,17 @@
     "created": "Kombináció létrehozva: {name}",
     "deleted": "Kombináció törölve: {name}",
     "noCombos": "Nincsenek beállított kombinációk.",
-    "confirmDelete": "Törli ezt a kombinációt: {name}?",
-    "suggest": {
-      "description": "A legjobb kombináció javaslata egy feladathoz MI-alapú pontozással",
-      "task": "Feladat leírása",
-      "maxCost": "Kérésenkénti maximális költség USD-ben",
-      "maxLatencyMs": "Maximális késleltetés ezredmásodpercben",
-      "weights": "JSON-formátumú pontozási súlyok, pl. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "A megjelenítendő legjobb jelöltek száma (alapértelmezett: 5)",
-      "explain": "Indoklás kiírása stderr-re",
-      "switch": "A legmagasabbra rangsorolt kombináció aktiválása"
-    }
+    "confirmDelete": "Törli ezt a kombinációt: {name}?"
   },
   "oneproxy": {
     "description": "A OneProxy upstream-készlet kezelése",
-    "stats": {
-      "provider": "Szűrés szolgáltató alapján",
-      "period": "Időszak (alapértelmezett: 24h)"
-    },
     "fetch": {
       "description": "Proxyk lekérése a készletből",
       "count": "A lekérendő proxyk száma (alapértelmezett: 1)",
       "type": "Proxy típusa: http|socks5 (alapértelmezett: http)"
     },
     "rotate": {
-      "description": "Proxyrotáció kényszerítése",
-      "provider": "Szolgáltató, amelynél a rotáció végrehajtandó",
-      "connectionId": "A rotálandó konkrét kapcsolat azonosítója"
+      "description": "Proxyrotáció kényszerítése"
     },
     "config": {
       "description": "A OneProxy konfigurációjának megjelenítése vagy frissítése",

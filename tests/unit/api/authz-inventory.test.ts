@@ -71,7 +71,7 @@ test("AC-1: GET returns 5 tiers with prefixes + bypass state envelope", async ()
 
   const localOnly = body.tiers.find((t) => t.name === "LOCAL_ONLY");
   assert.ok(localOnly);
-  assert.ok(localOnly!.prefixes.includes("/api/mcp/"));
+  assert.ok(localOnly!.prefixes.includes("/api/cli-tools/runtime/"));
   assert.ok(localOnly!.prefixes.includes("/api/cli-tools/runtime/"));
   assert.equal(localOnly!.bypassable, true);
 
@@ -112,9 +112,9 @@ test("AC-2: bypassEnabled + bypassPrefixes reflect getSettings() (defaults)", as
     bypassEnabled: boolean;
     bypassPrefixes: string[];
   };
-  // Default snapshot: kill-switch ON, single prefix /api/mcp/.
+  // Default snapshot: kill-switch ON, no bypassable prefix.
   assert.equal(body.bypassEnabled, true);
-  assert.deepEqual(body.bypassPrefixes, ["/api/mcp/"]);
+  assert.deepEqual(body.bypassPrefixes, []);
 });
 
 test("AC-2: bypassEnabled flips after settings mutation", async () => {
@@ -143,7 +143,7 @@ test("AC-2: bypassPrefixes additions land in the inventory", async () => {
   await settingsDb.updateSettings({ requireLogin: true });
 
   await settingsDb.updateSettings({
-    localOnlyManageScopeBypassPrefixes: ["/api/mcp/", "/api/mcp/v2/"],
+    localOnlyManageScopeBypassPrefixes: ["/api/jobs/", "/api/resilience/connections"],
   });
 
   const response = await inventoryRoute.GET(
@@ -153,7 +153,7 @@ test("AC-2: bypassPrefixes additions land in the inventory", async () => {
   );
   assert.equal(response.status, 200);
   const body = (await response.json()) as { bypassPrefixes: string[] };
-  assert.deepEqual(body.bypassPrefixes, ["/api/mcp/", "/api/mcp/v2/"]);
+  assert.deepEqual(body.bypassPrefixes, ["/api/jobs/", "/api/resilience/connections"]);
 });
 
 // ─── #5602 — CORS status surfaced for the dashboard wildcard warning ──────

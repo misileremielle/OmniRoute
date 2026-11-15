@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurasikan pengaturan kompresi",
-      "engine": "Mesin kompresi (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agresivitas Caveman 0.0–1.0",
-      "rtk_budget": "Anggaran token RTK",
-      "language_pack": "Paket bahasa yang akan diaktifkan"
+      "engine": "Mesin kompresi (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Dapatkan atau atur mesin kompresi aktif"
@@ -1107,33 +1104,17 @@
     "created": "Kombinasi dibuat: {name}",
     "deleted": "Kombinasi dihapus: {name}",
     "noCombos": "Tidak ada kombinasi yang dikonfigurasi.",
-    "confirmDelete": "Hapus kombinasi {name}?",
-    "suggest": {
-      "description": "Sarankan kombinasi terbaik untuk suatu tugas menggunakan penilaian AI",
-      "task": "Deskripsi tugas",
-      "maxCost": "Biaya maksimum per permintaan dalam USD",
-      "maxLatencyMs": "Latensi maksimum dalam milidetik",
-      "weights": "Bobot penilaian JSON, mis. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Jumlah kandidat teratas yang ditampilkan (default: 5)",
-      "explain": "Cetak alasan ke stderr",
-      "switch": "Aktifkan kombinasi berperingkat teratas"
-    }
+    "confirmDelete": "Hapus kombinasi {name}?"
   },
   "oneproxy": {
     "description": "Kelola kumpulan upstream OneProxy",
-    "stats": {
-      "provider": "Filter berdasarkan penyedia",
-      "period": "Periode waktu (default: 24h)"
-    },
     "fetch": {
       "description": "Ambil proxy dari kumpulan",
       "count": "Jumlah proxy yang akan diambil (default: 1)",
       "type": "Jenis proxy: http|socks5 (default: http)"
     },
     "rotate": {
-      "description": "Paksa rotasi proxy",
-      "provider": "Penyedia yang akan dirotasi",
-      "connectionId": "ID koneksi tertentu yang akan dirotasi"
+      "description": "Paksa rotasi proxy"
     },
     "config": {
       "description": "Tampilkan atau perbarui konfigurasi OneProxy",

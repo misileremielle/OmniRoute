@@ -198,14 +198,11 @@ npm run test:scoped:full       # rebuild the import-graph map first (after addin
 # Exit 1 + "run the full suite" means a hub file (tsconfig, package.json, …) or an
 # unmapped source changed — the selector fails safe, it never silently skips.
 
-# Vitest (MCP server, autoCombo, cache)
+# Vitest (autoCombo, combo, cache)
 npm run test:vitest
 
 # E2E tests (requires Playwright)
 npm run test:e2e
-
-# Protocol clients E2E (MCP transports, A2A)
-npm run test:protocols:e2e
 
 # Ecosystem compatibility tests
 npm run test:ecosystem
@@ -334,7 +331,6 @@ src/                        # TypeScript (.ts / .tsx)
 open-sse/                   # @omniroute/open-sse workspace
 ├── executors/              # 150 executor modules (executor classes + per-provider helpers)
 ├── handlers/               # 11 request handlers (chat, responses, embeddings, images, etc.)
-├── mcp-server/             # MCP server (110 unique tools, 3 transports, 33 scopes)
 ├── services/               # 178 top-level services (combo, autoCombo, rateLimitManager, etc.)
 ├── translator/             # Format translators (OpenAI ↔ Claude ↔ Gemini ↔ Responses ↔ Ollama)
 ├── transformer/            # Responses API transformer
@@ -422,7 +418,6 @@ Write unit tests in `tests/unit/` covering at minimum:
 - [ ] Changelog **fragment** added under `changelog.d/{features|fixes|maintenance}/<PR>-<slug>.md` for user-facing changes (see [`changelog.d/README.md`](./changelog.d/README.md)) — do **not** edit `CHANGELOG.md` directly; fragments are aggregated at release time and never conflict between PRs
 - [ ] Documentation updated (if applicable)
 - [ ] No new CodeQL / Secret-Scanning alerts opened, or each one dismissed with technical justification referencing the relevant `docs/security/` doc
-- [ ] Routes that spawn child processes (`/api/mcp/`, `/api/cli-tools/runtime/`) classified as `isLocalOnlyPath()` in `src/server/authz/routeGuard.ts` — see [Hard Rule #15](docs/security/ROUTE_GUARD_TIERS.md)
 - [ ] No AI/bot `Co-authored-by` trailers in commit messages (`check:ai-attribution`) — human collaborators whose work is reused are credited with standard `Co-authored-by: Name <email>` trailers
 
 ---

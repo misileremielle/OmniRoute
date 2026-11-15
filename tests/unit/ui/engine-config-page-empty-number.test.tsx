@@ -12,23 +12,25 @@ import {
   ultraEngine,
 } from "@omniroute/open-sse/services/compression/engines/cavemanAdapter.ts";
 import { headroomEngine } from "@omniroute/open-sse/services/compression/engines/headroom/index.ts";
-import { ccrEngine } from "@omniroute/open-sse/services/compression/engines/ccr/index.ts";
+import { sessionDedupEngine } from "@omniroute/open-sse/services/compression/engines/session-dedup/index.ts";
 import { DEFAULT_AGGRESSIVE_CONFIG } from "@omniroute/open-sse/services/compression/types.ts";
 
 type Settings = Record<string, unknown>;
 
 // The same fields GET /api/compression/engines returns, taken from the real engines.
 const ENGINES = {
-  engines: [aggressiveEngine, ultraEngine, liteEngine, headroomEngine, ccrEngine].map((engine) => ({
-    id: engine.id,
-    name: engine.name,
-    description: engine.description,
-    icon: engine.icon,
-    stackable: engine.stackable,
-    stackPriority: engine.stackPriority,
-    metadata: engine.metadata,
-    configSchema: engine.getConfigSchema(),
-  })),
+  engines: [aggressiveEngine, ultraEngine, liteEngine, headroomEngine, sessionDedupEngine].map(
+    (engine) => ({
+      id: engine.id,
+      name: engine.name,
+      description: engine.description,
+      icon: engine.icon,
+      stackable: engine.stackable,
+      stackPriority: engine.stackPriority,
+      metadata: engine.metadata,
+      configSchema: engine.getConfigSchema(),
+    })
+  ),
 };
 
 // Lite rows merge with the stored row, as mergeLiteSettingsForWrite does: an omitted cap stays,
@@ -179,14 +181,14 @@ describe("EngineConfigPage treats an emptied number field as not set", () => {
   });
 
   it("saves a page whose emptied field rejects zero", async () => {
-    const server = startServer({ ccr: { minChars: 500 } });
-    await renderPage("ccr");
+    const server = startServer({ sessionDedup: { minBlockChars: 500 } });
+    await renderPage("session-dedup");
 
     fireEvent.change(inputFor("Minimum block characters"), { target: { value: "" } });
     await save();
 
     expect(server.puts.at(-1)?.status).toBe(200);
-    expect(server.stored.ccr).toEqual({});
+    expect(server.stored.sessionDedup).toEqual({});
     expect(screen.queryByText("Failed to save configuration.")).toBeNull();
   });
 

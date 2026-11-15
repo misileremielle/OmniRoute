@@ -11,13 +11,9 @@ import Button from "@/shared/components/Button";
 import Card from "@/shared/components/Card";
 import { CardSkeleton } from "@/shared/components/Loading";
 import Modal from "@/shared/components/Modal";
-import SegmentedControl, { SegmentedTabs } from "@/shared/components/SegmentedControl";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import { isPublicDisplayBaseUrl, useDisplayBaseUrl } from "@/shared/hooks";
 import { useTranslations } from "next-intl";
-import McpDashboardPage from "./components/MCPDashboard";
-import NotionSourceCard from "./components/NotionSourceCard";
-import ObsidianSourceCard from "./components/ObsidianSourceCard";
 
 const BUILD_TIME_CLOUD_URL = process.env.NEXT_PUBLIC_CLOUD_URL || null;
 const CLOUD_ACTION_TIMEOUT_MS = 15000;
@@ -51,14 +47,6 @@ type EndpointModelSummary = {
  */
 type CopyHandler = (text: string, key?: string) => void | Promise<boolean>;
 
-type EndpointTab = "apis" | "mcp" | "context-sources";
-
-const ENDPOINT_TABS: Array<{ value: EndpointTab; labelKey: string; icon: string }> = [
-  { value: "apis", labelKey: "tabApis", icon: "api" },
-  { value: "mcp", labelKey: "tabMcp", icon: "extension" },
-  { value: "context-sources", labelKey: "tabContextSources", icon: "database" },
-];
-
 function runEndpointBackgroundTask(taskName: string, task: () => Promise<unknown>) {
   void task().catch((error) => {
     console.log("Error running endpoint background task:", taskName, error);
@@ -87,13 +75,11 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
   const [selectedProvider, setSelectedProvider] = useState(null); // for provider models popup
   const [cloudBaseUrl, setCloudBaseUrl] = useState(BUILD_TIME_CLOUD_URL); // dynamic cloud URL from API response
   const [cloudConfigured, setCloudConfigured] = useState(Boolean(BUILD_TIME_CLOUD_URL));
-  const [_mcpStatus, setMcpStatus] = useState<any>(null);
   const [searchProviders, setSearchProviders] = useState<any[]>([]);
   const [localApiUrl, setLocalApiUrl] = useState(
     typeof window !== "undefined" ? `${window.location.origin}/v1` : "http://localhost:20128/v1"
   );
   const [lanUrls, setLanUrls] = useState<string[]>([]);
-  const [activeEndpointTab, setActiveEndpointTab] = useState<EndpointTab>("apis");
 
   const { copied, copy } = useCopyToClipboard();
 
@@ -136,18 +122,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       console.log("Error fetching models:", e);
     } finally {
       setModelsLoading(false);
-    }
-  };
-
-  const fetchProtocolStatus = async () => {
-    try {
-      const mcpRes = await fetch("/api/mcp/status");
-
-      if (mcpRes.ok) {
-        setMcpStatus(await mcpRes.json());
-      }
-    } catch {
-      // Ignore status failures; protocols panel has fallback text.
     }
   };
 
@@ -235,7 +209,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       setLoading(false);
 
       runEndpointBackgroundTask("models", fetchModels);
-      runEndpointBackgroundTask("protocol-status", fetchProtocolStatus);
       runEndpointBackgroundTask("search-providers", fetchSearchProviders);
       runEndpointBackgroundTask("network-info", async () => {
         try {
@@ -286,13 +259,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       return () => clearTimeout(timer);
     }
   }, [cloudStatus]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      void fetchProtocolStatus();
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   const dispatchCloudChange = () => {
     globalThis.dispatchEvent(new Event("cloud-status-changed"));
@@ -426,11 +392,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
       candidates.findIndex((other) => other.url === candidate.url) === index
   );
   return (
-    <SegmentedTabs
-      value={activeEndpointTab}
-      onChange={(value) => setActiveEndpointTab(value as EndpointTab)}
-      className="gap-8"
-    >
+    <div className="flex flex-col gap-8">
       {/* Guided connection header (#11228): /v1 URL + test action lead; advanced protocols demoted */}
       <div className="flex flex-col gap-2">
         <PageHeader compact title={t("title")} description={t("subtitle")} />
@@ -446,21 +408,6 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
           <span>{t("advancedProtocols")}</span>
         </div>
       </div>
-      <SegmentedControl
-        semantics="tabs"
-        options={ENDPOINT_TABS.map((tab) => ({ ...tab, label: t(tab.labelKey) }))}
-        aria-label={t("endpointSections")}
-        className="w-fit"
-      />
-
-      {activeEndpointTab === "mcp" ? <McpDashboardPage /> : null}
-      {activeEndpointTab === "context-sources" ? (
-        <div className="flex flex-col gap-4">
-          <NotionSourceCard />
-          <ObsidianSourceCard />
-        </div>
-      ) : null}
-
       {/* Endpoint Card */}
       <Card>
         <h2 className="text-lg font-semibold mb-4">{t("title")}</h2>
@@ -987,7 +934,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
           onClose={() => setSelectedProvider(null)}
         />
       )}
-    </SegmentedTabs>
+    </div>
   );
 }
 

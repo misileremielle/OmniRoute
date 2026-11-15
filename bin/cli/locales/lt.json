@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigūruoti glaudinimo nuostatas",
-      "engine": "Glaudinimo variklis (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman agresyvumas 0.0–1.0",
-      "rtk_budget": "RTK prieigos raktų limitas",
-      "language_pack": "Aktyvinamas kalbos paketas"
+      "engine": "Glaudinimo variklis (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Gauti arba nustatyti aktyvų glaudinimo variklį"
@@ -1107,33 +1104,17 @@
     "created": "Derinys sukurtas: {name}",
     "deleted": "Derinys ištrintas: {name}",
     "noCombos": "Nesukonfigūruota jokių derinių.",
-    "confirmDelete": "Ištrinti derinį {name}?",
-    "suggest": {
-      "description": "Pasiūlyti geriausią užduoties derinį taikant DI vertinimą",
-      "task": "Užduoties aprašymas",
-      "maxCost": "Didžiausia vienos užklausos kaina USD",
-      "maxLatencyMs": "Didžiausia delsa milisekundėmis",
-      "weights": "JSON vertinimo svoriai, pvz., {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Rodomų geriausių kandidatų skaičius (numatytoji reikšmė: 5)",
-      "explain": "Išvesti pagrindimą į stderr",
-      "switch": "Aktyvinti aukščiausiai įvertintą derinį"
-    }
+    "confirmDelete": "Ištrinti derinį {name}?"
   },
   "oneproxy": {
     "description": "Valdyti OneProxy išorinį telkinį",
-    "stats": {
-      "provider": "Filtruoti pagal teikėją",
-      "period": "Laikotarpis (numatytoji reikšmė: 24h)"
-    },
     "fetch": {
       "description": "Gauti tarpinius serverius iš telkinio",
       "count": "Gaunamų tarpinių serverių skaičius (numatytoji reikšmė: 1)",
       "type": "Tarpinio serverio tipas: http|socks5 (numatytoji reikšmė: http)"
     },
     "rotate": {
-      "description": "Priverstinai pakeisti tarpinį serverį",
-      "provider": "Teikėjas, kuriam atliekamas pakeitimas",
-      "connectionId": "Konkretaus ryšio ID, kuriam atliekamas pakeitimas"
+      "description": "Priverstinai pakeisti tarpinį serverį"
     },
     "config": {
       "description": "Rodyti arba atnaujinti OneProxy konfigūraciją",

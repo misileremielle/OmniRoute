@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Komprimierungseinstellungen konfigurieren",
-      "engine": "Komprimierungs-Engine (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman-Aggressivität 0,0–1,0",
-      "rtk_budget": "RTK-Tokenbudget",
-      "language_pack": "Zu aktivierendes Sprachpaket"
+      "engine": "Komprimierungs-Engine (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Aktive Komprimierungs-Engine abrufen oder festlegen"
@@ -1107,33 +1104,17 @@
     "created": "Kombination erstellt: {name}",
     "deleted": "Kombination gelöscht: {name}",
     "noCombos": "Keine Kombinationen konfiguriert.",
-    "confirmDelete": "Kombination {name} löschen?",
-    "suggest": {
-      "description": "Mithilfe einer KI-Bewertung die beste Kombination für eine Aufgabe vorschlagen",
-      "task": "Aufgabenbeschreibung",
-      "maxCost": "Maximale Kosten pro Anfrage in USD",
-      "maxLatencyMs": "Maximale Latenz in Millisekunden",
-      "weights": "JSON-Bewertungsgewichtungen, z. B. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Anzahl der anzuzeigenden besten Kandidaten (Standard: 5)",
-      "explain": "Begründung nach stderr ausgeben",
-      "switch": "Bestplatzierte Kombination aktivieren"
-    }
+    "confirmDelete": "Kombination {name} löschen?"
   },
   "oneproxy": {
     "description": "Den OneProxy-Upstream-Pool verwalten",
-    "stats": {
-      "provider": "Nach Anbieter filtern",
-      "period": "Zeitraum (Standard: 24h)"
-    },
     "fetch": {
       "description": "Proxys aus dem Pool abrufen",
       "count": "Anzahl der abzurufenden Proxys (Standard: 1)",
       "type": "Proxy-Typ: http|socks5 (Standard: http)"
     },
     "rotate": {
-      "description": "Proxy-Rotation erzwingen",
-      "provider": "Anbieter, für den die Rotation durchgeführt werden soll",
-      "connectionId": "Bestimmte Verbindungs-ID für die Rotation"
+      "description": "Proxy-Rotation erzwingen"
     },
     "config": {
       "description": "OneProxy-Konfiguration anzeigen oder aktualisieren",

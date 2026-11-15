@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Cumraigh socruithe comhbhrúite",
-      "engine": "Inneall comhbhrúite (caveman|rtk|hybrid|none)",
-      "caveman_agg": "ionsaitheacht Caveman 0.0–1.0",
-      "rtk_budget": "buiséad comhartha RTK",
-      "language_pack": "Pacáiste teanga le gníomhachtú"
+      "engine": "Inneall comhbhrúite (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Faigh nó socraigh an t-inneall comhbhrúite gníomhach"
@@ -1107,33 +1104,17 @@
     "created": "Comhoibriúchán cruthaithe: {name}",
     "deleted": "Comhoibriúchán scriosta: {name}",
     "noCombos": "Níl aon choimhoibriúcháin cumraithe.",
-    "confirmDelete": "Scrios comhoibriúchán {name}?",
-    "suggest": {
-      "description": "Mol an comhoibriúchán is fearr le haghaidh tasc le scóráil AI",
-      "task": "Cur síos ar an tasc",
-      "maxCost": "Costas uasta in aghaidh an iarratais i USD",
-      "maxLatencyMs": "Latency uasta i milleasoicindí",
-      "weights": "Meáchain scórála JSON m.sh. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Líon na moltaí is fearr le taispeáint (réamhshocrú: 5)",
-      "explain": "Priontáil an fáth chuig stderr",
-      "switch": "Gníomhachtaigh an comhoiriú is fearr ranga"
-    }
+    "confirmDelete": "Scrios comhoibriúchán {name}?"
   },
   "oneproxy": {
     "description": "Bainistigh linn uachtarach OneProxy",
-    "stats": {
-      "provider": "Scag de réir soláthraí",
-      "period": "Tréimhse ama (réamhshocrú: 24h)"
-    },
     "fetch": {
       "description": "Faigh seachfhreastalaithe ón linn",
       "count": "Líon na seachfhreastalaithe le fáil (réamhshocrú: 1)",
       "type": "Cineál seachfhreastalaí: http|socks5 (réamhshocrú: http)"
     },
     "rotate": {
-      "description": "Éiligh rothlú seachfhreastalaí",
-      "provider": "Soláthraí le rothlú dó",
-      "connectionId": "ID ceangail shonrach le rothlú"
+      "description": "Éiligh rothlú seachfhreastalaí"
     },
     "config": {
       "description": "Taispeáin nó nuashonraigh cumraíocht OneProxy",

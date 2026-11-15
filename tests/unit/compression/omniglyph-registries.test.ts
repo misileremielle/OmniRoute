@@ -21,7 +21,6 @@ const { getCompressionSettings, updateCompressionSettings, normalizeStackedPipel
 const { deriveDefaultPlan } =
   await import("@omniroute/open-sse/services/compression/deriveDefaultPlan.ts");
 const { compressionModeSchema } = await import("../../../src/shared/validation/schemas/combo.ts");
-const { compressionConfigureInput } = await import("../../../open-sse/mcp-server/schemas/tools.ts");
 
 beforeEach(() => {
   core.resetDbInstance();
@@ -70,15 +69,5 @@ describe("combo schema: compressionModeSchema", () => {
 
   it("accepts omniglyph", () => {
     assert.equal(compressionModeSchema.parse("omniglyph"), "omniglyph");
-  });
-});
-
-describe("MCP compressionConfigureInput: mode enums", () => {
-  it("accepts strategy:omniglyph", () => {
-    assert.doesNotThrow(() => compressionConfigureInput.parse({ strategy: "omniglyph" }));
-  });
-
-  it("accepts autoTriggerMode:omniglyph", () => {
-    assert.doesNotThrow(() => compressionConfigureInput.parse({ autoTriggerMode: "omniglyph" }));
   });
 });

@@ -52,7 +52,7 @@ const NPX_BIN = process.platform === "win32" ? "npx.cmd" : "npx";
 // On Windows the npm/npx entry points are `.cmd` shims, and Node >= 20 refuses to
 // spawn a `.cmd` without a shell (EINVAL, from the CVE-2024-27980 hardening). On
 // Node 24 that makes every `execFileSync(NPX_BIN, ...)` in this script fail, which
-// silently skipped the MITM utilities, the MCP server bundle, the LLMLingua worker
+// silently skipped the MITM utilities, the LLMLingua worker
 // and the OpenCode plugin while the build still reported success.
 //
 // `shell: true` would fix the spawn but disables argument escaping (DEP0190), so it
@@ -203,7 +203,7 @@ console.log("  ✅ Standalone artifact present:", standaloneServerJs);
 
 // ── Step 3–7: Assemble standalone into dist/ ───────────────
 // All shared copy/sync/sanitize/chunk-patch operations are delegated to
-// assembleStandalone.  npm-UNIQUE steps (MCP, CLI, sidecars) follow.
+// assembleStandalone.  npm-UNIQUE steps (CLI, sidecars) follow.
 console.log("  📋 Assembling standalone bundle into dist/...");
 assembleStandalone({
   distDir: join(ROOT, NEXT_DIST),
@@ -226,34 +226,6 @@ if (existsSync(distServer)) {
   if (!serverSource.includes("installHttpMethodGuard")) {
     writeFileSync(distServer, METHOD_GUARD_REQUIRE + serverSource);
     console.log("  ✅ Patched dist/server.js with HTTP method guard.");
-  }
-}
-
-// ── Step 8.5: Bundle MCP server ────────────────────────────
-const mcpSrcFile = join(ROOT, "open-sse", "mcp-server", "server.ts");
-const mcpDestDir = join(DIST_DIR, "open-sse", "mcp-server");
-const mcpDestFile = join(mcpDestDir, "server.js");
-
-if (existsSync(mcpSrcFile)) {
-  console.log("  🔨 Bundling MCP Server (TypeScript → JavaScript)...");
-  mkdirSync(mcpDestDir, { recursive: true });
-  try {
-    runBuildTool(
-      "esbuild",
-      "esbuild",
-      [
-        "open-sse/mcp-server/server.ts",
-        "--bundle",
-        "--platform=node",
-        "--packages=external",
-        "--format=esm",
-        `--outfile=${mcpDestFile}`,
-      ],
-      { cwd: ROOT, stdio: "inherit" }
-    );
-    console.log(`  ✅ MCP Server bundled to ${mcpDestFile}`);
-  } catch (err: any) {
-    console.warn("  ⚠️  MCP Server bundle error:", err.message);
   }
 }
 

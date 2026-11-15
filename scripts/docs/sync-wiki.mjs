@@ -220,16 +220,10 @@ function localeCount() {
     return null;
   }
 }
-function mcpToolCount() {
-  // Prefer a literal; the constant is computed at runtime so best-effort only.
-  const m = read("open-sse/mcp-server/server.ts").match(/TOTAL_MCP_TOOL_COUNT\s*=\s*(\d+)\b/);
-  return m ? Number(m[1]) : null;
-}
 export function readCounts() {
   return {
     providers: providerCount(),
     strategies: strategyCount(),
-    mcpTools: mcpToolCount(),
     locales: localeCount(),
   };
 }
@@ -252,9 +246,6 @@ export function syncHomeCounts(home, counts) {
       /\*\*\d+ Routing Strategies\*\*/g,
       `**${counts.strategies} Routing Strategies**`
     );
-  }
-  if (counts.mcpTools) {
-    out = out.replace(/(\|\s*\*\*MCP Server\*\*\s*\|\s*)\d+( tools)/g, `$1${counts.mcpTools}$2`);
   }
   return out;
 }

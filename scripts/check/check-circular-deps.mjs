@@ -31,12 +31,11 @@ import fs from "node:fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "../..");
 
-// Entrypoints: cobrem o pipeline principal (chat, combo, MCP, DB).
+// Entrypoints: cobrem o pipeline principal (chat, combo, DB).
 // Mantido enxuto para que `dpdm -T` (transform) termine em < 60s.
 const ENTRYPOINTS = [
   "open-sse/handlers/chatCore.ts",
   "open-sse/services/combo.ts",
-  "open-sse/mcp-server/index.ts",
   "src/lib/db/core.ts",
 ];
 

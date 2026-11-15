@@ -95,7 +95,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   health: "healthDescription",
   proxy: "proxyDescription",
   // Protocols
-  mcp: "mcpDescription",
   "api-endpoints": "apiEndpointsDescription",
   // Agents & AI sub-pages
   "batch-files": "batchFilesDescription",
@@ -112,8 +111,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   "logs-proxy": "logsProxyDescription",
   "logs-console": "logsConsoleDescription",
   "logs-activity": "logsActivityDescription",
-  // Audit sub-pages
-  "audit-mcp": "auditMcpDescription",
   // Settings sub-pages
   "settings-general": "settingsGeneralDescription",
   "settings-appearance": "settingsAppearanceDescription",

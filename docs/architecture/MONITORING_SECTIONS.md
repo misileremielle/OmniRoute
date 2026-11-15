@@ -101,7 +101,6 @@ the Activity feed. The allowlist includes:
 - Budget threshold reached
 - Auth login/logout
 - Cloud agent session creation
-- MCP tool registration
 - Webhook create/delete
 - Quota pool/plan changes (`quota.*` actions, Group B)
 - Platform events (update, deploy)

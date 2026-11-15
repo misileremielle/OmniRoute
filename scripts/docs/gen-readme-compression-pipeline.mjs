@@ -1,5 +1,5 @@
 // README compression funnel in the Cheaper Inference UI Kit style (KEA-6307). A client card
-// (illustrative 10,000-token request), a 12-engine pipeline the tokens flow through, a provider
+// (illustrative 10,000-token request), an 11-engine pipeline the tokens flow through, a provider
 // card (~1,080 tokens) and the savings-math badge — the same 8 s choreography as the previous
 // GitHub-dark file (five token dots, four evaporating at engines, one survivor plus the code
 // token that always passes; engine borders flash in sequence). Only type, color and spacing
@@ -20,15 +20,14 @@ import { outlineSvg } from "./readme-outline.mjs";
 import { svgOpen, gridDefs, esc } from "./readme-diagram-theme.mjs";
 
 export const COMPRESSION_PIPELINE_COPY = {
-  kickers: ["CLIENT", "PROVIDER", "OMNIROUTE COMPRESSION — 12 ENGINES"],
+  kickers: ["CLIENT", "PROVIDER", "OMNIROUTE COMPRESSION — 11 ENGINES"],
   figures: ["10,000 tok", "~1,080 tok"],
   captions: ["prompt · tools · history"],
   // Engine numbers and names, pipeline order. The two-line names of the previous file
   // ("Session"/"Dedup", "Responses"/"Tool Out", "LLM"/"Lingua-2") now sit on one line each.
-  numbers: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  numbers: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
   engines: [
     "Session Dedup",
-    "CCR",
     "Lite",
     "RTK",
     "Responses Tool Out",
@@ -50,18 +49,19 @@ export const COMPRESSION_PIPELINE_COPY = {
 };
 
 const TITLE =
-  "OmniRoute compression pipeline: a client request of 10,000 tokens passes through 12 stacked engines — Session-Dedup, CCR, Lite, RTK, Responses Tool Output, Headroom, Relevance, Caveman, Aggressive, LLMLingua-2, Ultra, OmniGlyph — and reaches the provider at about 1,080 tokens, up to 95% saved. The default stacked combo runs RTK then Caveman (average 89.2%, range 78.4–94.6%). Code, URLs and JSON are always preserved byte-perfect.";
+  "OmniRoute compression pipeline: a client request of 10,000 tokens passes through 11 stacked engines — Session-Dedup, Lite, RTK, Responses Tool Output, Headroom, Relevance, Caveman, Aggressive, LLMLingua-2, Ultra, OmniGlyph — and reaches the provider at about 1,080 tokens, up to 95% saved. The default stacked combo runs RTK then Caveman (average 89.2%, range 78.4–94.6%). Code, URLs and JSON are always preserved byte-perfect.";
 const DESC =
-  "Animated token funnel on an 8 s loop: five token dots leave the client, four evaporate at engines along the way, the survivor and the untouched code token reach the provider while the twelve engine cells light up in sequence.";
+  "Animated token funnel on an 8 s loop: five token dots leave the client, four evaporate at engines along the way, the survivor and the untouched code token reach the provider while the eleven engine cells light up in sequence.";
 
-// Engine cells: 46 × 86 on a 50 px pitch from x=302, top y=168 (unchanged geometry).
-const CELL_X0 = 302;
+// Engine cells: 46 × 86 on a 50 px pitch from x=327 (11 cells centred in the 273–927
+// container), top y=168.
+const CELL_X0 = 327;
 const CELL_PITCH = 50;
 const CELL_W = 46;
 const CELL_H = 86;
 const CELL_Y = 168;
-// RTK (4) and Caveman (8) are the default stack — drawn in --info, numbers and names included.
-const DEFAULT_STACK = new Set([3, 7]);
+// RTK (3) and Caveman (7) are the default stack — drawn in --info, numbers and names included.
+const DEFAULT_STACK = new Set([2, 6]);
 // Border-flash windows (keyTimes), verbatim from the previous file.
 const FLASH_KEYS = [
   "0;0.10;0.13;0.17;1",
@@ -75,7 +75,6 @@ const FLASH_KEYS = [
   "0;0.46;0.49;0.53;1",
   "0;0.50;0.53;0.57;1",
   "0;0.54;0.57;0.61;1",
-  "0;0.575;0.605;0.645;1",
 ];
 
 // Token dots: wait, travel to a keyPoint, park (evaporate) — verbatim windows.
@@ -151,7 +150,7 @@ export async function renderCompressionPipeline() {
       `  <rect x="273" y="112" width="654" height="254" rx="12" class="surface" stroke-width="1"/>\n` +
       `  <text x="600" y="140" text-anchor="middle" class="kicker">${esc(C.kickers[2])}</text>\n` +
       `  <path d="M 245,208 L 273,210 L 927,226 L 955,227 L 955,233 L 927,234 L 273,250 L 245,252 Z" fill="url(#cmp-funnel)"/>\n` +
-      // 12 engine cells + staggered names
+      // 11 engine cells + staggered names
       `  <g text-anchor="middle">\n` +
       cells.join("\n") +
       `\n  </g>\n` +
@@ -173,8 +172,8 @@ export async function renderCompressionPipeline() {
       `    <text y="3.5" text-anchor="middle" class="mono-xs ok">${esc(C.token[0])}</text>\n` +
       `  </g>\n` +
       // Default-stack bracket under the names
-      `  <path d="M 475,300 L 475,308 L 675,308 L 675,300" fill="none" class="stroke-info" stroke-width="1"/>\n` +
-      `  <text x="575" y="324" text-anchor="middle" class="label-sm info">${esc(C.notes[0])}</text>\n` +
+      `  <path d="M 450,300 L 450,308 L 650,308 L 650,300" fill="none" class="stroke-info" stroke-width="1"/>\n` +
+      `  <text x="550" y="324" text-anchor="middle" class="label-sm info">${esc(C.notes[0])}</text>\n` +
       `  <text x="600" y="350" text-anchor="middle" class="label-sm ok">${esc(C.notes[1])}</text>\n` +
       // Provider card
       `  <rect x="955" y="160" width="175" height="130" rx="12" class="surface" stroke-width="1"/>\n` +

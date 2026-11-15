@@ -4,11 +4,6 @@ import { createRequire } from "node:module";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { cavemanCompress } from "../../open-sse/services/compression/caveman.ts";
-import {
-  compressDescriptionsInPlace,
-  getMcpDescriptionCompressionStats,
-  resetMcpDescriptionCompressionStats,
-} from "../../open-sse/mcp-server/descriptionCompressor.ts";
 
 const require = createRequire(import.meta.url);
 const upstreamFixtureDir = path.resolve("_references/_outros/caveman/tests/caveman-compress");
@@ -77,26 +72,6 @@ describe("upstream Caveman parity benchmark", () => {
       ours.length <= Math.ceil(theirs.length * 1.2),
       `Expected OmniRoute within 20% of upstream shrink length. ours=${ours.length}, upstream=${theirs.length}`
     );
-  });
-
-  it("tracks MCP description shrink parity separately from prompt compression", () => {
-    resetMcpDescriptionCompressionStats();
-    const originalDescription =
-      "The tool returns the current weather for a given location and the temperature in Fahrenheit.";
-    const payload = {
-      tools: [
-        {
-          name: "get_weather",
-          description: originalDescription,
-        },
-      ],
-    };
-
-    compressDescriptionsInPlace(payload);
-    const stats = getMcpDescriptionCompressionStats();
-    assert.ok(payload.tools[0].description.length < originalDescription.length);
-    assert.equal(stats.descriptionsCompressed, 1);
-    assert.ok(stats.estimatedTokensSaved > 0);
   });
 
   it("runs offline parity against upstream Caveman fixture files", () => {

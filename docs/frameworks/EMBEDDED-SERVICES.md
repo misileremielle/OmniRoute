@@ -922,8 +922,7 @@ No. The LOCAL_ONLY tier is intentional (hard rule #16). Routes that can invoke
 `npm install` or spawn `node` processes must not be reachable from non-loopback
 traffic, because a leaked JWT via a tunnel (Cloudflare, Ngrok, Tailscale) would
 otherwise allow arbitrary process spawning. There is no opt-out carve-out for
-`/api/services/` — unlike `/api/mcp/`, it is excluded from the manage-scope bypass
-list. See `docs/security/ROUTE_GUARD_TIERS.md`.
+`/api/services/` — it can never be added to the manage-scope bypass list. See `docs/security/ROUTE_GUARD_TIERS.md`.
 
 ---
 

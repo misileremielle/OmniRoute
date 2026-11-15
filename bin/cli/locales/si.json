@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "සම්පීඩන සැකසුම් වින්යාස කරන්න",
-      "engine": "සම්පීඩන එන්ජිම (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman ආක්රමණශීලීත්වය 0.0–1.0",
-      "rtk_budget": "RTK ටෝකන අයවැය",
-      "language_pack": "සක්රිය කළ යුතු භාෂා පැකේජය"
+      "engine": "සම්පීඩන එන්ජිම (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "සක්රිය සම්පීඩන එන්ජිම ලබාගන්න හෝ සකසන්න"
@@ -1107,33 +1104,17 @@
     "created": "Combo එක සාදන ලදී: {name}",
     "deleted": "Combo එක මකා දමන ලදී: {name}",
     "noCombos": "කිසිදු combo එකක් වින්යාස කර නොමැත.",
-    "confirmDelete": "{name} combo එක මකා දමන්නද?",
-    "suggest": {
-      "description": "AI ලකුණු කිරීම භාවිතයෙන් කාර්යයක් සඳහා හොඳම combo එක යෝජනා කරන්න",
-      "task": "කාර්ය විස්තරය",
-      "maxCost": "එක් ඉල්ලීමකට USD වලින් උපරිම පිරිවැය",
-      "maxLatencyMs": "මිලි තත්පරවලින් උපරිම ප්රමාදය",
-      "weights": "JSON ලකුණුකරණ බර, උදා: {\"latency\":0.7,\"cost\":0.3}",
-      "top": "පෙන්විය යුතු ඉහළම අපේක්ෂකයන් ගණන (පෙරනිමිය: 5)",
-      "explain": "හේතු දැක්වීම stderr වෙත මුද්රණය කරන්න",
-      "switch": "ඉහළම ශ්රේණිගත කළ සංයෝජනය සක්රිය කරන්න"
-    }
+    "confirmDelete": "{name} combo එක මකා දමන්නද?"
   },
   "oneproxy": {
     "description": "OneProxy ඉහළ ධාරා පූලය කළමනාකරණය කරන්න",
-    "stats": {
-      "provider": "සපයන්නා අනුව පෙරහන් කරන්න",
-      "period": "කාල පරාසය (පෙරනිමිය: 24h)"
-    },
     "fetch": {
       "description": "පූලයෙන් ප්රොක්සි ලබාගන්න",
       "count": "ලබාගත යුතු ප්රොක්සි ගණන (පෙරනිමිය: 1)",
       "type": "ප්රොක්සි වර්ගය: http|socks5 (පෙරනිමිය: http)"
     },
     "rotate": {
-      "description": "ප්රොක්සි මාරු කිරීම බලෙන් ක්රියාත්මක කරන්න",
-      "provider": "මාරු කළ යුතු සපයන්නා",
-      "connectionId": "මාරු කළ යුතු නිශ්චිත සම්බන්ධතා ID එක"
+      "description": "ප්රොක්සි මාරු කිරීම බලෙන් ක්රියාත්මක කරන්න"
     },
     "config": {
       "description": "OneProxy වින්යාසය පෙන්වන්න හෝ යාවත්කාලීන කරන්න",

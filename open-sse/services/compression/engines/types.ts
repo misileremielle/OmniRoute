@@ -59,7 +59,7 @@ export interface CompressionEngineApplyOptions {
   config?: CompressionConfig;
   compressionComboId?: string | null;
   stepConfig?: Record<string, unknown>;
-  /** Authenticated principal (API key id) making the request. Used by CCR to scope its store. */
+  /** Authenticated principal (API key id) making the request. Lets an engine scope per-caller state. */
   principalId?: string;
   /** Provider resolvido do alvo. A contabilidade do omniglyph depende dele:
    *  Anthropic reporta input/cache em buckets disjuntos, OpenAI/xAI reportam
@@ -77,7 +77,7 @@ export interface CompressionEngine {
   stackPriority: number;
   /**
    * Marks an intentionally-lossy sampling engine (e.g. ionizer). The fidelity gate SKIPS such
-   * engines: their drop is deliberate and recoverable via CCR, not accidental corruption.
+   * engines: their drop is deliberate, not accidental corruption.
    */
   sampling?: boolean;
   metadata: CompressionEngineMetadata;

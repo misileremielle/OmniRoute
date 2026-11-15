@@ -1,7 +1,8 @@
 /**
  * replace-autotrigger + the lossless safe Default (lossy request policy output).
  *
- * Live evidence (2026-11-02): with the base plan `session-dedup -> lite -> ccr -> headroom`,
+ * Live evidence (2026-11-02): with the base plan `session-dedup -> lite -> headroom` (CCR, a
+ * fourth stage then, is removed),
  * lite truncated every earlier tool result on every request (55% of codex requests lost
  * >10% of their content, most of which already fit the window). The policy now keeps
  * lite lossless; the dial must restore truncation ONLY when a request does not fit,
@@ -18,12 +19,7 @@ const LOSSLESS_LITE = { engine: "lite", config: { compressToolResults: false } }
 const safeDefault: DerivedPlan = {
   mode: "stacked",
   source: "default",
-  stackedPipeline: [
-    { engine: "session-dedup" },
-    LOSSLESS_LITE,
-    { engine: "ccr" },
-    { engine: "headroom" },
-  ],
+  stackedPipeline: [{ engine: "session-dedup" }, LOSSLESS_LITE, { engine: "headroom" }],
 };
 const dial = { ...DEFAULT_CONTEXT_BUDGET, mode: "replace-autotrigger" as const };
 // gpt-6.1-sol: 872,000 window - 4,096 output reserve - 1,024 margin = 866,880 target.
@@ -56,7 +52,6 @@ test("slightly over the window: only lite truncation comes back, in place", () =
   assert.deepEqual(plan.stackedPipeline, [
     { engine: "session-dedup" },
     { engine: "lite" },
-    { engine: "ccr" },
     { engine: "headroom" },
   ]);
 });
@@ -66,7 +61,7 @@ test("further over (live 1,030,337-token case): truncation first, then the next 
   assert.equal(telemetry?.fit, true);
   assert.deepEqual(telemetry?.stagesApplied, ["lite", "rtk"]);
   const engines = plan.stackedPipeline.map((s) => s.engine);
-  assert.deepEqual(engines, ["session-dedup", "lite", "ccr", "headroom", "rtk"]);
+  assert.deepEqual(engines, ["session-dedup", "lite", "headroom", "rtk"]);
   assert.deepEqual(plan.stackedPipeline[1], { engine: "lite" });
   assert.ok(!engines.includes("aggressive") && !engines.includes("ultra"), "no over-escalation");
 });

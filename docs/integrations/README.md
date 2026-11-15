@@ -74,7 +74,6 @@ How to use the service with OmniRoute (if applicable).
 
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
 - [MCP Inspector](https://github.com/modelcontextprotocol/inspector)
-- [OmniRoute MCP Server Documentation](../frameworks/MCP-SERVER.md)
 
 ## Support
 

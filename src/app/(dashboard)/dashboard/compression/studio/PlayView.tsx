@@ -51,7 +51,6 @@ function LaneList({ lanes, onSelect }: { lanes: Lane[]; onSelect: (e: string) =>
 export function PlayView({ text, onText, laneEngines = LANE_ENGINES }: PlayViewProps) {
   const t = useTranslations("compressionStudio");
   const [active, setActive] = useState<string[]>(["rtk", "caveman"]);
-  const [fuzzyDedup, setFuzzyDedup] = useState(false);
   const [selectedLane, setSelectedLane] = useState<string | null>(null);
   const [fidelityGate, setFidelityGate] = useState(false);
   const [riskGate, setRiskGate] = useState(false);
@@ -73,7 +72,6 @@ export function PlayView({ text, onText, laneEngines = LANE_ENGINES }: PlayViewP
       laneEngines: [...laneEngines],
       activeEngines: orderByStack(active, laneEngines),
       fidelityGate,
-      fuzzyDedup,
       riskGate,
       quantumLock,
       ...(heatmapMode ? { heatmap: heatmapMode } : {}),
@@ -91,8 +89,6 @@ export function PlayView({ text, onText, laneEngines = LANE_ENGINES }: PlayViewP
           loading={loading}
           fidelityGate={fidelityGate}
           onToggleFidelity={() => setFidelityGate((v) => !v)}
-          fuzzyDedup={fuzzyDedup}
-          onToggleFuzzy={() => setFuzzyDedup((v) => !v)}
           riskGate={riskGate}
           onToggleRisk={() => setRiskGate((v) => !v)}
           quantumLock={quantumLock}

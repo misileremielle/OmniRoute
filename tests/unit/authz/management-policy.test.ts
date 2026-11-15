@@ -18,6 +18,15 @@ const apiKeysDb = await import("../../../src/lib/db/apiKeys.ts");
 const settingsDb = await import("../../../src/lib/db/settings.ts");
 const modelSync = await import("../../../src/shared/services/modelSyncScheduler.ts");
 const internalServiceAuth = await import("../../../src/lib/api/internalServiceAuth.ts");
+const runtimeSettings = await import("../../../src/lib/config/runtimeSettings.ts");
+
+// No prefix is bypassable by default; the bypass tests configure one non-spawning
+// LOCAL_ONLY prefix and load it into the runtime snapshot the policy reads.
+const BYPASS_PREFIX = "/api/resilience/connections";
+async function enableBypassPrefix() {
+  await settingsDb.updateSettings({ localOnlyManageScopeBypassPrefixes: [BYPASS_PREFIX] });
+  await runtimeSettings.applyRuntimeSettings(await settingsDb.getSettings());
+}
 
 const ORIGINAL_JWT = process.env.JWT_SECRET;
 const ORIGINAL_INITIAL = process.env.INITIAL_PASSWORD;
@@ -334,13 +343,12 @@ test("managementPolicy: rejects invalid API keys with 403 when bearer is present
   }
 });
 
-// ─── LOCAL_ONLY manage-scope bypass for /api/mcp/* ───────────────────────────
+// ─── LOCAL_ONLY manage-scope bypass ───────────────────────────────────────────
 //
-// `/api/mcp/*` is in LOCAL_ONLY_API_PREFIXES (because it can spawn child
-// processes for unauthenticated callers) AND in
-// LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES (so a manage-scoped API key
-// presented from non-loopback may reach it). `/api/cli-tools/runtime/*` is
-// LOCAL_ONLY but NOT bypassable — the carve-out is path-scoped.
+// BYPASS_PREFIX is LOCAL_ONLY and, once configured, in the manage-scope bypass
+// list (so a manage-scoped API key presented from non-loopback may reach it).
+// `/api/cli-tools/runtime/*` is LOCAL_ONLY but NOT bypassable — the carve-out
+// is path-scoped.
 //
 // `ctx()` uses `new Headers()` without an explicit `host`, so
 // `isLoopbackHost(null)` returns false → the policy treats it as non-loopback,
@@ -350,9 +358,10 @@ test("LOCAL_ONLY manage-scope bypass: no Bearer + non-loopback → 403 (regressi
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
+  await enableBypassPrefix();
 
   const policy = await loadPolicy();
-  const out = await policy.evaluate(ctx(new Headers(), "GET", "/api/mcp/stream"));
+  const out = await policy.evaluate(ctx(new Headers(), "GET", BYPASS_PREFIX));
 
   assert.equal(out.allow, false);
   if (!out.allow) {
@@ -365,11 +374,12 @@ test("LOCAL_ONLY manage-scope bypass: non-manage key + non-loopback → 403", as
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
+  await enableBypassPrefix();
   const created = await apiKeysDb.createApiKey("chat-only", "machine-chat-only", ["chat"]);
 
   const policy = await loadPolicy();
   const out = await policy.evaluate(
-    ctx(new Headers({ authorization: `Bearer ${created.key}` }), "GET", "/api/mcp/stream")
+    ctx(new Headers({ authorization: `Bearer ${created.key}` }), "GET", BYPASS_PREFIX)
   );
 
   assert.equal(out.allow, false);
@@ -383,11 +393,12 @@ test("LOCAL_ONLY manage-scope bypass: manage-scope key + non-loopback → allow"
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
-  const created = await apiKeysDb.createApiKey("mcp-bypass-key", "machine-mcp-bypass", ["manage"]);
+  await enableBypassPrefix();
+  const created = await apiKeysDb.createApiKey("bypass-key", "machine-bypass", ["manage"]);
 
   const policy = await loadPolicy();
   const out = await policy.evaluate(
-    ctx(new Headers({ authorization: `Bearer ${created.key}` }), "GET", "/api/mcp/stream")
+    ctx(new Headers({ authorization: `Bearer ${created.key}` }), "GET", BYPASS_PREFIX)
   );
 
   assert.equal(out.allow, true);
@@ -405,6 +416,7 @@ test("LOCAL_ONLY manage-scope bypass: carve-out does not extend to /api/cli-tool
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
+  await enableBypassPrefix();
   const created = await apiKeysDb.createApiKey("cli-runtime-denied", "machine-cli-runtime-denied", [
     "manage",
   ]);
@@ -433,10 +445,11 @@ test("LOCAL_ONLY manage-scope bypass: loopback + no Bearer → allow (local CLI 
   // under the peer-stamp model (2026-05-31) — the spoofable `host` header alone
   // is deliberately NOT enough.
   await settingsDb.updateSettings({ requireLogin: true, password: null });
+  await enableBypassPrefix();
 
   const policy = await loadPolicy();
   const out = await policy.evaluate(
-    ctx(new Headers({ host: "localhost:20128" }), "GET", "/api/mcp/stream", {
+    ctx(new Headers({ host: "localhost:20128" }), "GET", BYPASS_PREFIX, {
       socket: { remoteAddress: "127.0.0.1" },
     })
   );
@@ -449,17 +462,18 @@ test("LOCAL_ONLY manage-scope bypass: loopback + no Bearer → allow (local CLI 
 // Regression cover for commit ca284a91 ("refine LOCAL_ONLY bypass — dashboard
 // cookie + admin label + error log"). The dashboard-session bypass mirrors the
 // manage-scope bypass: an authenticated `auth_token` cookie reaching a
-// bypassable LOCAL_ONLY path (e.g. /api/mcp/status) from a public hostname is
+// bypassable LOCAL_ONLY path (e.g. BYPASS_PREFIX) from a public hostname is
 // allowed, but the cli-tools-runtime carve-out is NOT extended to it.
 
 test("LOCAL_ONLY dashboard-session bypass: authenticated dashboard cookie + non-loopback → allow", async () => {
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
+  await enableBypassPrefix();
 
   const cookie = await dashboardCookieHeader();
   const policy = await loadPolicy();
-  const out = await policy.evaluate(ctx(new Headers({ cookie }), "GET", "/api/mcp/stream"));
+  const out = await policy.evaluate(ctx(new Headers({ cookie }), "GET", BYPASS_PREFIX));
 
   assert.equal(out.allow, true);
   if (out.allow) {
@@ -473,6 +487,7 @@ test("LOCAL_ONLY dashboard-session bypass: authenticated dashboard cookie + /api
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
+  await enableBypassPrefix();
 
   const cookie = await dashboardCookieHeader();
   const policy = await loadPolicy();
@@ -491,6 +506,7 @@ test("managementPolicy: allows internal model sync only on the dedicated provide
   process.env.JWT_SECRET = "test-jwt-secret-for-mgmt-policy";
   process.env.INITIAL_PASSWORD = "initial-pass";
   await settingsDb.updateSettings({ requireLogin: true });
+  await enableBypassPrefix();
 
   const policy = await loadPolicy();
   const internalHeaders = new Headers(modelSync.buildModelSyncInternalHeaders());

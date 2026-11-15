@@ -47,9 +47,8 @@ export const APP_STAGING_ALLOWED_EXACT_PATHS: string[] = [
   "h2c-upgrade-guard.cjs",
   "head-response-guard.cjs",
   "http-method-guard.cjs",
-  "open-sse/mcp-server/server.js",
   // LLMLingua ONNX worker — esbuild'd standalone .js spawned via worker_threads
-  // (the Next.js bundler can't trace the computed Worker path). Kept like the MCP server.
+  // (the Next.js bundler can't trace the computed Worker path).
   "open-sse/services/compression/engines/llmlingua/onnxWorker.js",
   "open-sse/services/compression/compressionWorker.js",
   "src/lib/usage/callLogArtifactWorker.js",
@@ -76,7 +75,6 @@ export const APP_STAGING_ALLOWED_EXACT_PATHS: string[] = [
   // this bare entry the prepublish prune (Step 10.7) deletes it → `omniroute serve`
   // crashes with ERR_MODULE_NOT_FOUND (regressed in the published 3.8.41 tarball).
   "tls-options.mjs",
-  "webdav-handler.mjs",
 ];
 
 export const APP_STAGING_ALLOWED_PATH_PREFIXES: string[] = [
@@ -122,11 +120,6 @@ export const PACK_ARTIFACT_ROOT_ALLOWED_EXACT_PATHS: string[] = [
   // `data:text/javascript,...` URL dynamically). Loaded via pathToFileURL() at
   // runtime; shipped via package.json "files", so it must be allowed here.
   "bin/aliasResolverHook.mjs",
-  "bin/mcp-server.mjs",
-  // #9281: stdout/stderr console guard preloaded via `node --import` by
-  // bin/mcp-server.mjs before the MCP entry's module graph evaluates — without it
-  // the published CLI's `omniroute --mcp` crashes on the pathToFileURL() import.
-  "bin/mcpStdioConsoleGuard.mjs",
   "bin/nodeRuntimeSupport.mjs",
   "bin/omniroute.mjs",
   "bin/reset-password.mjs",
@@ -148,13 +141,6 @@ export const PACK_ARTIFACT_ROOT_ALLOWED_EXACT_PATHS: string[] = [
   // Read by bin/cli/cli-manifest.mjs for run/configure/completion contracts.
   // Allow the runtime manifest itself, not arbitrary files under config/.
   "config/cli-tools-manifest.json",
-  "open-sse/mcp-server/README.md",
-  "open-sse/mcp-server/audit.ts",
-  "open-sse/mcp-server/httpTransport.ts",
-  "open-sse/mcp-server/index.ts",
-  "open-sse/mcp-server/runtimeHeartbeat.ts",
-  "open-sse/mcp-server/scopeEnforcement.ts",
-  "open-sse/mcp-server/server.ts",
   // Runtime polyfill eagerly imported by bin/omniroute.mjs (Node <22 compat);
   // shipped via package.json "files", so it must be allowed in the tarball.
   "open-sse/utils/setupPolyfill.ts",
@@ -237,7 +223,6 @@ export const PACK_ARTIFACT_REQUIRED_PATHS: string[] = [
   "dist/head-response-guard.cjs",
   // Cleartext h2c upgrade guard (dist/server-ws.mjs import) — same boot-crash class as above.
   "dist/h2c-upgrade-guard.cjs",
-  "dist/webdav-handler.mjs",
   "bin/cli/program.mjs",
   // Direct imports of bin/omniroute.mjs — bin/cli/ is only an allowlist PREFIX, so a
   // file vanishing from the tarball never fails the unexpected-paths check; only these
@@ -256,11 +241,6 @@ export const PACK_ARTIFACT_REQUIRED_PATHS: string[] = [
   "bin/cli/utils/versionFastPath.mjs",
   // #11437 import — `describeVolatileEnvWarning`, called on every CLI boot.
   "bin/cli/utils/volatileEnvPath.mjs",
-  "bin/mcp-server.mjs",
-  // #9281: stdout/stderr console guard preloaded via `node --import` by
-  // bin/mcp-server.mjs before the MCP entry's module graph evaluates — without it
-  // the published CLI's `omniroute --mcp` crashes on the pathToFileURL() import.
-  "bin/mcpStdioConsoleGuard.mjs",
   "bin/nodeRuntimeSupport.mjs",
   "bin/omniroute.mjs",
   // #7808: aliasResolver + its hook file. bin/omniroute.mjs imports

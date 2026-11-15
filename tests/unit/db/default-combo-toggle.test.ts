@@ -46,7 +46,7 @@ test.after(() => {
 
 // ─── tests ────────────────────────────────────────────────────────────────────
 
-test("Fix #1: normalizePipeline passes through new engine IDs (headroom, session-dedup, ccr, llmlingua)", () => {
+test("Fix #1: normalizePipeline passes through new engine IDs (headroom, session-dedup, llmlingua) and drops the removed ccr", () => {
   // The default combo is seeded with [rtk, caveman]. Directly update the DB
   // to include new engine IDs, then read back via getDefaultCompressionCombo
   // to verify normalizePipeline no longer strips them.
@@ -73,12 +73,15 @@ test("Fix #1: normalizePipeline passes through new engine IDs (headroom, session
     engineIds.includes("session-dedup"),
     `expected session-dedup in pipeline, got: ${engineIds}`
   );
-  assert.ok(engineIds.includes("ccr"), `expected ccr in pipeline, got: ${engineIds}`);
+  assert.ok(
+    !engineIds.includes("ccr"),
+    `the removed ccr engine must be dropped, got: ${engineIds}`
+  );
   assert.ok(engineIds.includes("llmlingua"), `expected llmlingua in pipeline, got: ${engineIds}`);
   assert.equal(
     reloaded.pipeline.length,
-    5,
-    `expected 5 steps, got ${reloaded.pipeline.length}: ${engineIds}`
+    4,
+    `expected 4 steps, got ${reloaded.pipeline.length}: ${engineIds}`
   );
 });
 

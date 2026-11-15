@@ -30,7 +30,6 @@
  * abs-path sanitization in server.js + required-server-files  -               Y           Y    SHARED (opt-in: sanitizePaths)
  * Turbopack hashed-chunk patch (.next/server/ *.js)           -               Y           -    SHARED (opt-in: patchTurbopackChunks)
  * --- npm-UNIQUE ---
- * MCP server esbuild -> dist/open-sse/mcp-server/server.js    -               Y           -    UNIQUE (prepublish)
  * CLI esbuild -> bin/omniroute.mjs                            -               Y           -    UNIQUE (prepublish)
  * sidecar/doc copies (.env.example, docs/, sync-env, etc.)    -               Y           -    UNIQUE (prepublish)
  * prune + validate (pack-artifact-policy)                      -               Y           -    UNIQUE (prepublish)
@@ -350,11 +349,6 @@ export const EXTRA_MODULE_ENTRIES = [
     dest: ["httpClientAbortGuard.mjs"],
   },
   {
-    label: "webdav-handler (server-ws.mjs dependency)",
-    src: ["scripts", "dev", "webdav-handler.mjs"],
-    dest: ["webdav-handler.mjs"],
-  },
-  {
     // #5242: opt-in HTTPS/TLS resolver (server-ws.mjs dependency).
     label: "tls-options (server-ws.mjs dependency)",
     src: ["scripts", "dev", "tls-options.mjs"],
@@ -397,13 +391,11 @@ export const EXTRA_MODULE_ENTRIES = [
     dest: ["node_modules", "playwright-core"],
   },
   {
-    // esbuild's `--packages=external` leaves `undici` as a static top-level ESM
-    // import in the compiled MCP server bundle (dist/open-sse/mcp-server/server.js),
-    // resolved at module-link time. Next.js's standalone output-file tracer (nft)
-    // sometimes emits a hollow dist/node_modules/undici/ (package.json only), which
-    // SHADOWS the fully-populated sibling node_modules/undici and crashes
-    // `omniroute --mcp` at startup. See #7701.
-    label: "undici (MCP server static import — #7701)",
+    // Next.js's standalone output-file tracer (nft) sometimes emits a hollow
+    // dist/node_modules/undici/ (package.json only), which SHADOWS the
+    // fully-populated sibling node_modules/undici. Originally added for the removed
+    // MCP server bundle (#7701); kept as a guard for other undici importers.
+    label: "undici (externalized runtime package shadow fix — #7701)",
     src: ["node_modules", "undici"],
     dest: ["node_modules", "undici"],
   },

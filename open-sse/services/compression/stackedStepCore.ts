@@ -64,7 +64,7 @@ export function decideStep(
 
 /**
  * A dispatched step whose engine found nothing eligible (e.g. session-dedup with no repeated
- * blocks, ccr below its min-chars threshold) returns `stats: null` instead of throwing or
+ * blocks) returns `stats: null` instead of throwing or
  * advancing. Left unrecorded, that step vanishes from the pipeline's telemetry with zero trace —
  * no `engineBreakdown` entry, no warning, no error (#6479, #6491). Surface it as a validation
  * warning so operators can tell "engine ran but had nothing to do" apart from "engine never ran".
@@ -80,7 +80,7 @@ export function mergeStackStep(
   result: CompressionResult
 ): void {
   if (!result.stats) {
-    // No-op engine (e.g. ccr / session-dedup found no candidate): stats is null so there is no
+    // No-op engine (e.g. session-dedup found no candidate): stats is null so there is no
     // telemetry to fold, but the engine still RAN — record a zero-savings breakdown entry so its
     // identity survives. Without this the breakdown stays empty and ensureEngineBreakdown
     // synthesizes a generic "stacked" 0% node, hiding which engine an operator actually asked for.

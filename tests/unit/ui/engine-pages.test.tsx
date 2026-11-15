@@ -133,26 +133,6 @@ describe("SessionDedupPage", () => {
   });
 });
 
-describe("CcrPage", () => {
-  it("mounts without throwing and renders the engine name", async () => {
-    setupFetchMock([{ id: "ccr", name: "CCR" }]);
-    const { default: CcrPage } =
-      await import("../../../src/app/(dashboard)/dashboard/context/ccr/page");
-
-    let container!: HTMLElement;
-    await act(async () => {
-      container = mountInContainer(<CcrPage />);
-    });
-
-    await act(async () => {
-      await Promise.resolve();
-    });
-
-    expect(container).toBeTruthy();
-    expect(container.textContent).toContain("CCR");
-  });
-});
-
 describe("LlmlinguaPage", () => {
   it("mounts without throwing and renders the engine name", async () => {
     setupFetchMock([{ id: "llmlingua", name: "LLMLingua" }]);

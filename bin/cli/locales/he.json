@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "הגדרת אפשרויות הדחיסה",
-      "engine": "מנוע דחיסה (caveman|rtk|hybrid|none)",
-      "caveman_agg": "רמת האגרסיביות של Caveman‏ 0.0–1.0",
-      "rtk_budget": "תקציב הטוקנים של RTK",
-      "language_pack": "חבילת שפה להפעלה"
+      "engine": "מנוע דחיסה (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "קבלה או הגדרה של מנוע הדחיסה הפעיל"
@@ -1107,33 +1104,17 @@
     "created": "השילוב נוצר: {name}",
     "deleted": "השילוב נמחק: {name}",
     "noCombos": "לא הוגדרו שילובים.",
-    "confirmDelete": "למחוק את השילוב {name}?",
-    "suggest": {
-      "description": "הצעת השילוב הטוב ביותר למשימה באמצעות דירוג AI",
-      "task": "תיאור המשימה",
-      "maxCost": "עלות מרבית לבקשה ב-USD",
-      "maxLatencyMs": "זמן השהיה מרבי באלפיות השנייה",
-      "weights": "משקלי דירוג ב-JSON, למשל {\"latency\":0.7,\"cost\":0.3}",
-      "top": "מספר המועמדים המובילים להצגה (ברירת מחדל: 5)",
-      "explain": "הדפסת הנימוקים אל stderr",
-      "switch": "הפעלת השילוב המדורג במקום הראשון"
-    }
+    "confirmDelete": "למחוק את השילוב {name}?"
   },
   "oneproxy": {
     "description": "ניהול מאגר שרתי המקור של OneProxy",
-    "stats": {
-      "provider": "סינון לפי ספק",
-      "period": "תקופת זמן (ברירת מחדל: 24h)"
-    },
     "fetch": {
       "description": "משיכת שרתי Proxy מהמאגר",
       "count": "מספר שרתי ה-Proxy למשיכה (ברירת מחדל: 1)",
       "type": "סוג Proxy: http|socks5 (ברירת מחדל: http)"
     },
     "rotate": {
-      "description": "אילוץ החלפת Proxy",
-      "provider": "הספק שעבורו תתבצע ההחלפה",
-      "connectionId": "מזהה חיבור ספציפי להחלפה"
+      "description": "אילוץ החלפת Proxy"
     },
     "config": {
       "description": "הצגה או עדכון של תצורת OneProxy",

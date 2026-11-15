@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfiguriraj nastavitve stiskanja",
-      "engine": "Mehanizem stiskanja (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Agresivnost mehanizma Caveman 0.0–1.0",
-      "rtk_budget": "Proračun žetonov RTK",
-      "language_pack": "Jezikovni paket, ki ga želite aktivirati"
+      "engine": "Mehanizem stiskanja (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Pridobi ali nastavi aktivni mehanizem stiskanja"
@@ -1107,33 +1104,17 @@
     "created": "Kombinacija ustvarjena: {name}",
     "deleted": "Kombinacija izbrisana: {name}",
     "noCombos": "Nastavljena ni nobena kombinacija.",
-    "confirmDelete": "Želite izbrisati kombinacijo {name}?",
-    "suggest": {
-      "description": "Z ocenjevanjem z umetno inteligenco predlagaj najboljšo kombinacijo za opravilo",
-      "task": "Opis naloge",
-      "maxCost": "Najvišji strošek na zahtevo v USD",
-      "maxLatencyMs": "Največja zakasnitev v milisekundah",
-      "weights": "Uteži ocenjevanja v obliki JSON, npr. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Število najboljših kandidatov za prikaz (privzeto: 5)",
-      "explain": "Izpiši utemeljitev v stderr",
-      "switch": "Aktiviraj najbolje uvrščeno kombinacijo"
-    }
+    "confirmDelete": "Želite izbrisati kombinacijo {name}?"
   },
   "oneproxy": {
     "description": "Upravljaj skupino posredniških strežnikov OneProxy",
-    "stats": {
-      "provider": "Filtriraj po ponudniku",
-      "period": "Časovno obdobje (privzeto: 24h)"
-    },
     "fetch": {
       "description": "Pridobi posredniške strežnike iz skupine",
       "count": "Število posredniških strežnikov za pridobitev (privzeto: 1)",
       "type": "Vrsta posredniškega strežnika: http|socks5 (privzeto: http)"
     },
     "rotate": {
-      "description": "Vsili zamenjavo posredniškega strežnika",
-      "provider": "Ponudnik, za katerega naj se izvede zamenjava",
-      "connectionId": "ID določene povezave za zamenjavo"
+      "description": "Vsili zamenjavo posredniškega strežnika"
     },
     "config": {
       "description": "Prikaži ali posodobi konfiguracijo OneProxy",

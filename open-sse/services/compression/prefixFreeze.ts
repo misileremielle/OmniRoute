@@ -23,7 +23,7 @@ export interface PrefixFreezeConfig {
 
 export const DEFAULT_PREFIX_FREEZE: PrefixFreezeConfig = { enabled: false, threshold: 3 };
 
-/** Upper bound on tracked prefixes (oldest evicted first), mirroring the CCR store cap. */
+/** Upper bound on tracked prefixes (oldest evicted first). */
 export const MAX_PREFIX_ENTRIES = 5_000;
 
 const observations = new Map<string, number>();

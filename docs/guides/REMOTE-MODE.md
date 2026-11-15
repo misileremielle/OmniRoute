@@ -100,7 +100,7 @@ The server infers the scope each route requires from the HTTP method
 (`/api/cli/tokens`, `/api/providers` mutations, `/api/oauth`, `/api/services`, …).
 A token with insufficient scope gets `403` with a clear message.
 
-> Routes that spawn processes (`/api/services/*`, `/api/mcp/*`, …) stay
+> Routes that spawn processes (`/api/services/*`, `/api/cli-tools/runtime/*`, …) stay
 > **loopback-only** — a remote token can never reach them, regardless of scope.
 
 ---

@@ -17,7 +17,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "context-rtk",
   "context-headroom",
   "context-session-dedup",
-  "context-ccr",
   "context-llmlingua",
   "context-lite",
   "context-aggressive",
@@ -63,13 +62,10 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   "costs-teams",
   // Monitoring > Audit
   "audit",
-  "audit-mcp",
   // Dev Tools
   "translator",
   "playground",
   "search-tools",
-  // Agentic Features
-  "mcp",
   // Other Features > Batch
   "batch",
   "batch-files",
@@ -103,7 +99,6 @@ export type SidebarSectionId =
   | "costs"
   | "monitoring"
   | "devtools"
-  | "agentic-features"
   | "other-features"
   | "configuration";
 

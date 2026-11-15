@@ -50,9 +50,6 @@ export const PreviewRequestSchema = z.object({
   // restores them verbatim after, so they pass through byte-identical. Reported via
   // result.stats.riskGate (spansProtected + per-category counts).
   riskGate: z.object({ enabled: z.boolean() }).optional(),
-  // Playground fuzzy near-duplicate toggle → injects `{ fuzzy: { enabled: true } }` into the
-  // session-dedup step config (see buildStep).
-  fuzzyDedup: z.object({ enabled: z.boolean() }).optional(),
   // Playground QuantumLock toggle. The studio is a dry-run, so when enabled we force a caching
   // context (provider: "anthropic") so the operator can SEE what would be stabilized; real
   // cache-hit gains only show in production provider telemetry.
@@ -95,14 +92,10 @@ function messagesToText(messages: Array<{ role: string; content: unknown }>): st
 
 function buildStep(
   engine: string,
-  fuzzy?: { enabled: boolean },
   /** Optional detail bag (e.g. headroom.minRows from saved settings). */
   detail?: Record<string, unknown>
 ) {
   const config: Record<string, unknown> = { ...(detail ?? {}) };
-  if (engine === "session-dedup" && fuzzy?.enabled) {
-    config.fuzzy = { enabled: true };
-  }
   return Object.keys(config).length > 0 ? { engine, config } : { engine };
 }
 
@@ -147,7 +140,6 @@ async function dispatchCompression(
     effectiveMode: CompressionMode;
     config?: unknown;
     fidelityGate?: { enabled: boolean };
-    fuzzyDedup?: { enabled: boolean };
     riskGate?: { enabled: boolean };
     quantumLock?: { enabled: boolean };
   }
@@ -171,11 +163,7 @@ async function dispatchCompression(
     return applyCompressionAsync(requestBody, "stacked", {
       config: {
         stackedPipeline: [
-          buildStep(
-            opts.engineId,
-            opts.fuzzyDedup,
-            opts.engineId === "headroom" ? headroomStepDetail : undefined
-          ),
+          buildStep(opts.engineId, opts.engineId === "headroom" ? headroomStepDetail : undefined),
         ],
         ...(headroomDetail ? { headroom: headroomDetail } : {}),
         ...(sentConfig.aggressive ? { aggressive: sentConfig.aggressive } : {}),
@@ -192,7 +180,7 @@ async function dispatchCompression(
     return applyCompressionAsync(requestBody, "stacked", {
       config: {
         stackedPipeline: opts.pipeline.map((engine) =>
-          buildStep(engine, opts.fuzzyDedup, engine === "headroom" ? headroomStepDetail : undefined)
+          buildStep(engine, engine === "headroom" ? headroomStepDetail : undefined)
         ),
         ...(headroomDetail ? { headroom: headroomDetail } : {}),
         ...(sentConfig.aggressive ? { aggressive: sentConfig.aggressive } : {}),
@@ -242,7 +230,6 @@ export async function POST(req: Request) {
     pipeline,
     config,
     fidelityGate,
-    fuzzyDedup,
     riskGate,
     quantumLock,
     heatmap: heatmapMode,
@@ -257,20 +244,13 @@ export async function POST(req: Request) {
 
   try {
     const start = Date.now();
-    // #14983 made fuzzy dedup run only for callers that advertise omniroute_ccr_retrieve
-    // (its marker is otherwise unresolvable). The studio is a dry run with no real caller, so
-    // with the fuzzy toggle on it simulates a CCR-capable one (same as the compression
-    // benchmark harness) — without this the toggle is a silent no-op.
-    const requestBody = fuzzyDedup?.enabled
-      ? { messages, tools: [{ type: "function", function: { name: "omniroute_ccr_retrieve" } }] }
-      : { messages };
+    const requestBody = { messages };
     const result = await dispatchCompression(requestBody as Record<string, unknown>, {
       engineId,
       pipeline,
       effectiveMode,
       config,
       fidelityGate,
-      fuzzyDedup,
       riskGate,
       quantumLock,
     });

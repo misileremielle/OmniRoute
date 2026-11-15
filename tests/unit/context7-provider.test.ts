@@ -23,8 +23,6 @@ const {
 } = await import("../../open-sse/handlers/webFetch.ts");
 const { context7Fetch, parseContext7LibraryUrl, isValidContext7LibraryId } =
   await import("../../open-sse/executors/context7-fetch.ts");
-const { webSearchInput, webFetchInput } =
-  await import("../../open-sse/mcp-server/schemas/tools.ts");
 const { SEARCH_VALIDATOR_CONFIGS } =
   await import("../../src/lib/providers/validation/searchProviders.ts");
 
@@ -574,17 +572,6 @@ test("handleWebFetch dispatches provider=context7 to the context7 executor", asy
   }
 });
 
-test("MCP schemas expose context7 on web_search and web_fetch", () => {
-  const searchOk = webSearchInput.safeParse({ query: "react", provider: "context7" });
-  assert.equal(searchOk.success, true, "web_search must accept provider=context7");
-
-  const fetchOk = webFetchInput.safeParse({
-    url: "https://context7.com/reactjs/react.dev",
-    provider: "context7",
-  });
-  assert.equal(fetchOk.success, true, "web_fetch must accept provider=context7");
-});
-
 test("context7 validator probes the search endpoint with Bearer auth", () => {
   const validator = SEARCH_VALIDATOR_CONFIGS["context7"];
   assert.ok(validator, "context7 must have a validator config");
@@ -639,11 +626,6 @@ test("context7Fetch returns canonical context7.com url and empty links", async (
   } finally {
     globalThis.fetch = originalFetch;
   }
-});
-
-test("MCP webFetchInput rejects an unknown provider name", () => {
-  const bad = webFetchInput.safeParse({ url: "https://example.com", provider: "nonexistent" });
-  assert.equal(bad.success, false, "enum must be restrictive");
 });
 
 test("parseContext7LibraryUrl clamps tokens up to the 100 lower bound and rejects non-strings", () => {

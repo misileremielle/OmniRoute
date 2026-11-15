@@ -56,7 +56,6 @@ const EXEMPT = new Set([
   ".cache/**",
   // Live-server E2E: their own runner + vitest.e2e-live.config.ts, never this jsdom job.
   "tests/e2e/ecosystem.test.ts",
-  "tests/e2e/protocol-clients.test.ts",
 ]);
 
 /**

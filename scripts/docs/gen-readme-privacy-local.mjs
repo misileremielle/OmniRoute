@@ -57,7 +57,7 @@ export const PRIVACY_LOCAL_COPY = {
     " — deny-listed headers stripped before every provider call",
     " — built in, strictly opt-in — These redactions run only when enabled",
     " — redact credentials, stack traces & recognized file paths",
-    " — MCP tool calls & admin actions logged in your SQLite, not ours",
+    " — admin actions logged in your SQLite, not ours",
     " — audit every line, self-host forever",
   ],
   // Receipt chips, right-aligned — one per row.
@@ -77,7 +77,7 @@ export const PRIVACY_LOCAL_COPY = {
 };
 
 const TITLE =
-  "Private and local-first: your keys, your machine, your data. OmniRoute adds no OmniRoute-hosted prompt-processing hop; telemetry is disabled by default. Request routing runs on your hardware via npm, Docker, desktop or phone. Credentials encrypted at rest with AES-256-GCM. No OmniRoute-hosted account service — the operator controls dashboard identity with a local password or optional OIDC. Hardened gateway with API-key scoping, IP filtering, rate limits and prompt-injection guard. Process-spawning routes are loopback-only so a leaked token cannot spawn processes. Upstream header scrubbing strips deny-listed headers before every provider call. PII redaction and response sanitization are available and run only when enabled. Sanitized errors redact credentials, stack traces and recognized filesystem paths. A local audit trail logs MCP tool calls and admin actions in your own SQLite. MIT licensed and fully open-source — audit every line, self-host forever.";
+  "Private and local-first: your keys, your machine, your data. OmniRoute adds no OmniRoute-hosted prompt-processing hop; telemetry is disabled by default. Request routing runs on your hardware via npm, Docker, desktop or phone. Credentials encrypted at rest with AES-256-GCM. No OmniRoute-hosted account service — the operator controls dashboard identity with a local password or optional OIDC. Hardened gateway with API-key scoping, IP filtering, rate limits and prompt-injection guard. Process-spawning routes are loopback-only so a leaked token cannot spawn processes. Upstream header scrubbing strips deny-listed headers before every provider call. PII redaction and response sanitization are available and run only when enabled. Sanitized errors redact credentials, stack traces and recognized filesystem paths. A local audit trail logs admin actions in your own SQLite. MIT licensed and fully open-source — audit every line, self-host forever.";
 const DESC =
   "Animated privacy ledger: eleven fully readable rows on the first frame; a soft green highlight sweeps down the rows in a continuous cycle.";
 

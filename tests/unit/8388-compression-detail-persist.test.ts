@@ -29,30 +29,17 @@ test.after(() => {
   fs.rmSync(tmpDataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });
 
-test("#8388: PUT body carrying ccr detail (minChars/retrievalRampFactor) is ACCEPTED by the schema", () => {
+test("#8388: PUT body carrying session-dedup detail (minBlockChars) is ACCEPTED by the schema", () => {
   const parsed = compressionSettingsUpdateSchema.safeParse({
-    ccr: { minChars: 5000, retrievalRampFactor: 10 },
-  });
-  assert.equal(parsed.success, true);
-});
-
-test("#8388: PUT body carrying session-dedup detail (minBlockChars/fuzzy) is ACCEPTED by the schema", () => {
-  const parsed = compressionSettingsUpdateSchema.safeParse({
-    sessionDedup: { minBlockChars: 200, fuzzy: true },
+    sessionDedup: { minBlockChars: 200 },
   });
   assert.equal(parsed.success, true);
 });
 
 test("#8388: session-dedup detail round-trips through save -> reload (DB layer)", async () => {
-  await updateCompressionSettings({ sessionDedup: { minBlockChars: 321, fuzzy: true } });
+  await updateCompressionSettings({ sessionDedup: { minBlockChars: 321 } });
   const reloaded = await getCompressionSettings();
-  assert.deepEqual(reloaded.sessionDedup, { minBlockChars: 321, fuzzy: true });
-});
-
-test("#8388: ccr detail round-trips through save -> reload (DB layer)", async () => {
-  await updateCompressionSettings({ ccr: { minChars: 4242, retrievalRampFactor: 7 } });
-  const reloaded = await getCompressionSettings();
-  assert.deepEqual(reloaded.ccr, { minChars: 4242, retrievalRampFactor: 7 });
+  assert.deepEqual(reloaded.sessionDedup, { minBlockChars: 321 });
 });
 
 test("#8388: headroom minRows STILL round-trips (proves #8056 fix stays intact, no regression)", async () => {

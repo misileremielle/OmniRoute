@@ -6,10 +6,6 @@ import { allow, reject } from "../context";
 import { extractApiKey, isValidApiKey } from "../../../sse/services/auth";
 import { getApiKeyMetadata } from "../../../lib/db/apiKeys";
 import { hasManageScope } from "../../../lib/api/requireManagementAuth";
-import {
-  hasMcpConnectOrManageScope,
-  MCP_CONNECT_SCOPE,
-} from "../../../shared/constants/managementScopes";
 import { evaluateAccessTokenAuth } from "../accessTokenAuth";
 import { isInternalServiceRequest } from "../../../lib/api/internalServiceAuth";
 import {
@@ -73,11 +69,8 @@ export const managementPolicy: RoutePolicy = {
     // Carve-out: a small allow-list of LOCAL_ONLY paths (see
     // LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES) is reachable from non-loopback
     // when the caller presents EITHER (a) a valid API key with the `manage`
-    // scope, or (b) an authenticated dashboard session. This lets:
-    //   - headless / remote MCP clients drive the management surface with a
-    //     manage-scope Bearer key, and
-    //   - the Dashboard UI itself (cookie session) render its MCP pages
-    //     (/api/mcp/status, /api/mcp/tools) from a public hostname.
+    // scope, or (b) an authenticated dashboard session. The list is empty by
+    // default; operators can extend it in settings.
     //
     // The strict-loopback default still applies to everything else (notably
     // the subprocess-spawning /api/cli-tools/runtime/* surface, which is NOT
@@ -98,26 +91,10 @@ export const managementPolicy: RoutePolicy = {
           try {
             if (await isValidApiKey(apiKey)) {
               const meta = await getApiKeyMetadata(apiKey);
-              // #7895: the `/api/mcp/` carve-out ALSO accepts the narrow
-              // `mcp:connect` scope, so remote MCP-only callers don't need
-              // broad `manage`/`admin` just to reach the transport routes.
-              // Scoped to `/api/mcp/` ONLY — every other LOCAL_ONLY bypass
-              // prefix still requires full `hasManageScope` (below).
-              const scopeGranted =
-                path.startsWith("/api/mcp/") && meta
-                  ? hasMcpConnectOrManageScope(meta.scopes)
-                  : Boolean(meta && hasManageScope(meta.scopes));
-              if (meta && scopeGranted) {
-                // Distinguish admin vs manage vs the narrow mcp:connect scope in
-                // the audit label so log review can tell which privilege
-                // actually granted the bypass.
-                const grantedBy = meta.scopes.includes("admin")
-                  ? "admin"
-                  : meta.scopes.includes("manage")
-                    ? "manage"
-                    : meta.scopes.includes(MCP_CONNECT_SCOPE)
-                      ? "mcp-connect"
-                      : "manage";
+              if (meta && hasManageScope(meta.scopes)) {
+                // Distinguish admin vs manage in the audit label so log review
+                // can tell which privilege actually granted the bypass.
+                const grantedBy = meta.scopes.includes("admin") ? "admin" : "manage";
                 return allow({
                   kind: "management_key",
                   id: meta.id,
@@ -135,10 +112,9 @@ export const managementPolicy: RoutePolicy = {
             return reject(503, "AUTH_BACKEND_UNAVAILABLE", "Service temporarily unavailable");
           }
         }
-        // Dashboard session bypass: the Dashboard UI itself needs to render
-        // /api/mcp/status, /api/mcp/tools, etc. from a public hostname. Cookie
-        // auth is already proof of an authenticated admin — same trust level
-        // as a manage-scope Bearer for the surface in scope here.
+        // Dashboard session bypass: cookie auth is already proof of an
+        // authenticated admin — same trust level as a manage-scope Bearer for
+        // the surface in scope here.
         try {
           if (await isDashboardSessionAuthenticated(ctx.request)) {
             return allow({
@@ -173,39 +149,6 @@ export const managementPolicy: RoutePolicy = {
 
     if (hasValidLoopbackCliToken(ctx)) {
       return allow({ ...LOCAL_CLI_SUBJECT });
-    }
-
-    // MCP path carve-out (#9159): accept mcp:connect, manage, or admin
-    // scope for /api/mcp/* from any origin (loopback, private LAN, or remote).
-    // Loopback/LAN requests skip the Tier 1 bypass gate above, so with
-    // requireLogin=true they would fall through to the generic API-key check
-    // which only accepts manage/admin -- rejecting mcp:connect-only keys.
-    // This carve-out mirrors the existing Tier 1 MCP check but without the
-    // locality guard, so it catches the loopback/LAN requests that the Tier 1
-    // gate does not reach.
-    if (path.startsWith("/api/mcp/")) {
-      const apiKey = extractApiKey(ctx.request as unknown as Request);
-      if (apiKey) {
-        try {
-          if (await isValidApiKey(apiKey)) {
-            const meta = await getApiKeyMetadata(apiKey);
-            if (meta && hasMcpConnectOrManageScope(meta.scopes)) {
-              const grantedBy = meta.scopes.includes("admin")
-                ? "admin"
-                : meta.scopes.includes("manage")
-                  ? "manage"
-                  : "mcp-connect";
-              return allow({
-                kind: "management_key",
-                id: meta.id,
-                label: `api-key-${grantedBy}-scope-mcp-carve-out`,
-              });
-            }
-          }
-        } catch {
-          return reject(503, "AUTH_BACKEND_UNAVAILABLE", "Service temporarily unavailable");
-        }
-      }
     }
 
     // Tier 2: always-protected routes skip the requireLogin=false bypass.

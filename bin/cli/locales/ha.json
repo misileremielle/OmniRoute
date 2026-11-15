@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Saita saitunan matse bayanai",
-      "engine": "Injin matse bayanai (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Ƙarfin Caveman 0.0–1.0",
-      "rtk_budget": "Kasafin token na RTK",
-      "language_pack": "Kunshin harshe da za a kunna"
+      "engine": "Injin matse bayanai (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Samo ko saita injin matse bayanai mai aiki"
@@ -1107,33 +1104,17 @@
     "created": "An ƙirƙiri haɗi: {name}",
     "deleted": "An goge haɗi: {name}",
     "noCombos": "Ba a saita haɗe-haɗe ba.",
-    "confirmDelete": "A goge haɗin {name}?",
-    "suggest": {
-      "description": "Ba da shawarar haɗi mafi dacewa da aiki ta amfani da makin AI",
-      "task": "Bayanin aiki",
-      "maxCost": "Matsakaicin kuɗin kowace buƙata a USD",
-      "maxLatencyMs": "Matsakaicin jinkiri a cikin milisekondi",
-      "weights": "Ma'aunin maki na JSON, misali {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Adadin manyan zaɓuɓɓukan da za a nuna (tsoho: 5)",
-      "explain": "Buga dalili zuwa stderr",
-      "switch": "Kunna combo mafi girman matsayi"
-    }
+    "confirmDelete": "A goge haɗin {name}?"
   },
   "oneproxy": {
     "description": "Sarrafa tarin upstream na OneProxy",
-    "stats": {
-      "provider": "Tace ta provider",
-      "period": "Tsawon lokaci (tsoho: 24h)"
-    },
     "fetch": {
       "description": "Dauko proxies daga tarin",
       "count": "Adadin proxies da za a dauko (tsoho: 1)",
       "type": "Nau'in proxy: http|socks5 (tsoho: http)"
     },
     "rotate": {
-      "description": "Tilasta sauya proxy",
-      "provider": "Provider da za a sauya wa",
-      "connectionId": "Takamaiman ID na haɗin da za a sauya"
+      "description": "Tilasta sauya proxy"
     },
     "config": {
       "description": "Nuna ko sabunta saitunan OneProxy",

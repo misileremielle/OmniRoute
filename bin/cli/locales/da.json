@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurer komprimeringsindstillinger",
-      "engine": "Komprimeringsmotor (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman-aggressivitet 0.0–1.0",
-      "rtk_budget": "RTK-tokenbudget",
-      "language_pack": "Sprogpakke, der skal aktiveres"
+      "engine": "Komprimeringsmotor (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Hent eller indstil den aktive komprimeringsmotor"
@@ -1107,33 +1104,17 @@
     "created": "Kombination oprettet: {name}",
     "deleted": "Kombination slettet: {name}",
     "noCombos": "Ingen kombinationer er konfigureret.",
-    "confirmDelete": "Slet kombinationen {name}?",
-    "suggest": {
-      "description": "Foreslå den bedste kombination til en opgave ved hjælp af AI-scoring",
-      "task": "Opgavebeskrivelse",
-      "maxCost": "Maksimal pris pr. anmodning i USD",
-      "maxLatencyMs": "Maksimal latenstid i millisekunder",
-      "weights": "JSON-vægtning til scoring, f.eks. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Antal topkandidater, der skal vises (standard: 5)",
-      "explain": "Udskriv begrundelse til stderr",
-      "switch": "Aktivér den højest rangerede kombination"
-    }
+    "confirmDelete": "Slet kombinationen {name}?"
   },
   "oneproxy": {
     "description": "Administrer OneProxy-upstreampuljen",
-    "stats": {
-      "provider": "Filtrer efter udbyder",
-      "period": "Tidsperiode (standard: 24h)"
-    },
     "fetch": {
       "description": "Hent proxyer fra puljen",
       "count": "Antal proxyer, der skal hentes (standard: 1)",
       "type": "Proxytype: http|socks5 (standard: http)"
     },
     "rotate": {
-      "description": "Gennemtving proxyrotation",
-      "provider": "Udbyder, der skal roteres for",
-      "connectionId": "Specifikt forbindelses-id, der skal roteres"
+      "description": "Gennemtving proxyrotation"
     },
     "config": {
       "description": "Vis eller opdater OneProxy-konfigurationen",

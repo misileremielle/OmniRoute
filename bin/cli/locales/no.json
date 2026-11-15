@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Konfigurer komprimeringsinnstillinger",
-      "engine": "Komprimeringsmotor (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman-aggressivitet 0.0–1.0",
-      "rtk_budget": "RTK-tokenbudsjett",
-      "language_pack": "Språkpakke som skal aktiveres"
+      "engine": "Komprimeringsmotor (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Hent eller angi den aktive komprimeringsmotoren"
@@ -1107,33 +1104,17 @@
     "created": "Kombinasjon opprettet: {name}",
     "deleted": "Kombinasjon slettet: {name}",
     "noCombos": "Ingen kombinasjoner er konfigurert.",
-    "confirmDelete": "Slette kombinasjonen {name}?",
-    "suggest": {
-      "description": "Foreslå den beste kombinasjonen for en oppgave ved hjelp av AI-poengberegning",
-      "task": "Oppgavebeskrivelse",
-      "maxCost": "Maksimal kostnad per forespørsel i USD",
-      "maxLatencyMs": "Maksimal ventetid i millisekunder",
-      "weights": "JSON-vekter for poengberegning, f.eks. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Antall toppkandidater som skal vises (standard: 5)",
-      "explain": "Skriv begrunnelsen til stderr",
-      "switch": "Aktiver den høyest rangerte kombinasjonen"
-    }
+    "confirmDelete": "Slette kombinasjonen {name}?"
   },
   "oneproxy": {
     "description": "Administrer oppstrømsservergruppen for OneProxy",
-    "stats": {
-      "provider": "Filtrer etter leverandør",
-      "period": "Tidsperiode (standard: 24h)"
-    },
     "fetch": {
       "description": "Hent proxyer fra gruppen",
       "count": "Antall proxyer som skal hentes (standard: 1)",
       "type": "Proxytype: http|socks5 (standard: http)"
     },
     "rotate": {
-      "description": "Tving proxyrotasjon",
-      "provider": "Leverandør det skal roteres for",
-      "connectionId": "Spesifikk tilkoblings-ID som skal roteres"
+      "description": "Tving proxyrotasjon"
     },
     "config": {
       "description": "Vis eller oppdater OneProxy-konfigurasjonen",

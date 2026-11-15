@@ -79,7 +79,6 @@ interface CompressionConfig extends CompressionTokenSaverConfig {
   cacheMinutes: number;
   preserveSystemPrompt: boolean;
   preserveSystemPromptMode?: "always" | "whenNoCache" | "never";
-  mcpDescriptionCompressionEnabled?: boolean;
   comboOverrides: Record<string, CompressionMode>;
   cavemanConfig?: CavemanConfig;
   rtkConfig?: RtkConfig;
@@ -488,17 +487,6 @@ export default function CompressionSettingsTab() {
                 <option value="never">{t("compressionPreserveSystemNever")}</option>
               </Select>
             </div>
-
-            <Toggle
-              label={t("compressionSettingsMcpDescriptionCompression")}
-              checked={config.mcpDescriptionCompressionEnabled !== false}
-              onChange={() =>
-                save({
-                  mcpDescriptionCompressionEnabled:
-                    config.mcpDescriptionCompressionEnabled === false,
-                })
-              }
-            />
           </div>
         )}
 

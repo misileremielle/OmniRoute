@@ -12,10 +12,8 @@ process.env.DATA_DIR = TEST_DATA_DIR;
 
 const core = await import("../../src/lib/db/core.ts");
 const providersDb = await import("../../src/lib/db/providers.ts");
-const { sanitizeQuotaProvider, normalizeQuotaResponse } =
-  await import("../../src/shared/contracts/quota.ts");
+const { sanitizeQuotaProvider } = await import("../../src/shared/contracts/quota.ts");
 const { GET } = await import("../../src/app/api/usage/quota/route.ts");
-const { checkQuotaOutput } = await import("../../open-sse/mcp-server/schemas/tools.ts");
 
 test.after(() => {
   core.resetDbInstance();
@@ -57,12 +55,4 @@ test("#18745 GET /api/usage/quota reports a connection with no quota signal as u
   assert.equal(body.providers[0].connectionId, conn.id);
   assert.equal(body.providers[0].quotaTotal, null);
   assert.equal(body.providers[0].percentRemaining, null);
-});
-
-test("#18745 the MCP check_quota output schema accepts an unknown percentage", () => {
-  const response = normalizeQuotaResponse({
-    providers: [{ provider: "github", name: "main", connectionId: "c1", quotaTotal: null }],
-  });
-  assert.equal(response.providers[0].percentRemaining, null);
-  assert.equal(checkQuotaOutput.safeParse(response).success, true);
 });

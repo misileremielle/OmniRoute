@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "Määritä pakkausasetukset",
-      "engine": "Pakkausmoottori (caveman|rtk|hybrid|none)",
-      "caveman_agg": "Caveman-aggressiivisuus 0.0–1.0",
-      "rtk_budget": "RTK-tunnistebudjetti",
-      "language_pack": "Aktivoitava kielipaketti"
+      "engine": "Pakkausmoottori (caveman|rtk|hybrid|none)"
     },
     "engine": {
       "description": "Hae tai aseta aktiivinen pakkausmoottori"
@@ -1107,33 +1104,17 @@
     "created": "Yhdistelmä luotu: {name}",
     "deleted": "Yhdistelmä poistettu: {name}",
     "noCombos": "Yhdistelmiä ei ole määritetty.",
-    "confirmDelete": "Poistetaanko yhdistelmä {name}?",
-    "suggest": {
-      "description": "Ehdota tehtävään parasta yhdistelmää tekoälypisteytyksen avulla",
-      "task": "Tehtävän kuvaus",
-      "maxCost": "Enimmäiskustannus pyyntöä kohden Yhdysvaltain dollareina",
-      "maxLatencyMs": "Enimmäisviive millisekunteina",
-      "weights": "JSON-pisteytyspainot, esim. {\"latency\":0.7,\"cost\":0.3}",
-      "top": "Näytettävien parhaiden ehdokkaiden määrä (oletus: 5)",
-      "explain": "Tulosta perustelut vakiovirhetulosteeseen",
-      "switch": "Aktivoi parhaaksi sijoittunut yhdistelmä"
-    }
+    "confirmDelete": "Poistetaanko yhdistelmä {name}?"
   },
   "oneproxy": {
     "description": "Hallitse OneProxy-ylävirran välityspalvelinjoukkoa",
-    "stats": {
-      "provider": "Suodata palveluntarjoajan mukaan",
-      "period": "Ajanjakso (oletus: 24h)"
-    },
     "fetch": {
       "description": "Nouda välityspalvelimia joukosta",
       "count": "Noudettavien välityspalvelimien määrä (oletus: 1)",
       "type": "Välityspalvelimen tyyppi: http|socks5 (oletus: http)"
     },
     "rotate": {
-      "description": "Pakota välityspalvelimen vaihto",
-      "provider": "Palveluntarjoaja, jolle vaihto tehdään",
-      "connectionId": "Tietty vaihdettava yhteystunnus"
+      "description": "Pakota välityspalvelimen vaihto"
     },
     "config": {
       "description": "Näytä tai päivitä OneProxy-määritykset",

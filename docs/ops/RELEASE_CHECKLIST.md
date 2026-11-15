@@ -152,7 +152,6 @@ matrix automatically, without any label.
 - [ ] `RUN_COMBO_LIVE=1 npm run test:combo:live` — **optional/manual** (gated real-upstream smoke; sources a read-only DB snapshot from VPS `root@192.168.0.15`; hits real providers, costs credits; never runs in CI; skips cleanly without the gate)
 - [ ] `npm run test:combo:live:vps` — **optional/manual** (Phase-3 VPS live smoke: 7 HTTP scenarios against the live `.15` server via plain Node ESM; requires `ssh root@192.168.0.15`; creates/deletes only `__live_test__*` combos; hits real providers; never runs in CI)
 - [ ] `npm run test:e2e` — pass (UI changes)
-- [ ] `npm run test:protocols:e2e` — pass (MCP/A2A changes)
 - [ ] `npm run test:ecosystem` — pass
 
 ### Hooks (Husky validated)
@@ -347,7 +346,6 @@ Before shipping any v3.8.x release, verify these additional items:
       and the SLM tier would silently fail-open.
 - [ ] `omniroute status` works with no `.env` (CLI token path, loopback only)
 - [ ] `curl http://localhost:20128/api/shutdown` returns 401 (always-protected route)
-- [ ] `curl -H "host: evil.com" http://localhost:20128/api/mcp/sse` returns 401 (loopback guard)
 - [ ] SQLite runtime resolves to `bundled` on first run (bundled binary valid for platform)
 - [ ] SQLite runtime falls back to `runtime` when `node_modules/better-sqlite3` is deleted
 - [ ] Smart MCP filter compresses real `playwright-mcp browser_snapshot` output (≥50% reduction)

@@ -71,7 +71,6 @@ const KNOWN_ENGINE_IDS = [
   "rtk",
   "headroom",
   "session-dedup",
-  "ccr",
   "llmlingua",
   "relevance",
   "codex-responses",
@@ -422,7 +421,6 @@ export function assignRoutingCombo(compressionComboId: string, routingComboId: s
 // would introduce a circular dependency detected by check:cycles.
 const ENGINE_STACK_PRIORITY: Record<string, number> = {
   "session-dedup": 3,
-  ccr: 4,
   lite: 5,
   rtk: 10,
   headroom: 15,

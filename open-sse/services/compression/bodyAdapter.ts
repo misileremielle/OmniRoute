@@ -243,7 +243,7 @@ function messageToResponsesItem(message: MessageLike, originalItem: ResponsesIte
   };
 }
 /**
- * Engines can inject messages that have no source `input[]` item (CCR prepends its
+ * Engines can inject messages that have no source `input[]` item (session-dedup prepends its
  * protocol instruction). Restore them as new input items instead of dropping them.
  */
 function injectedMessageToResponsesItem(message: MessageLike): ResponsesItem {
@@ -435,7 +435,7 @@ export function adaptBodyForCompression(
           }
         }
       }
-      // Messages an engine injected have no source item (CCR prepends its protocol instruction).
+      // Messages an engine injected have no source item (session-dedup prepends its marker note).
       const injectedItems = injectedMessages.map(injectedMessageToResponsesItem);
 
       if (!dropMissingMappedItems) {

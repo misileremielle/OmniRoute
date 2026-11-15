@@ -462,10 +462,7 @@
     },
     "configure": {
       "description": "配置压缩设置",
-      "engine": "压缩引擎（caveman|rtk|hybrid|none）",
-      "caveman_agg": "Caveman 激进程度 0.0–1.0",
-      "rtk_budget": "RTK 令牌预算",
-      "language_pack": "要激活的语言包"
+      "engine": "压缩引擎（caveman|rtk|hybrid|none）"
     },
     "engine": {
       "description": "获取或设置活动压缩引擎"
@@ -1107,33 +1104,17 @@
     "created": "组合已创建：{name}",
     "deleted": "组合已删除：{name}",
     "noCombos": "未配置组合。",
-    "confirmDelete": "删除组合 {name}？",
-    "suggest": {
-      "description": "使用 AI 评分为任务推荐最佳组合",
-      "task": "任务描述",
-      "maxCost": "每次请求的最大成本（美元）",
-      "maxLatencyMs": "最大延迟（毫秒）",
-      "weights": "JSON 评分权重，例如 {\"latency\":0.7,\"cost\":0.3}",
-      "top": "要显示的候选数（默认：5）",
-      "explain": "将理由打印到 stderr",
-      "switch": "激活排名最高的组合"
-    }
+    "confirmDelete": "删除组合 {name}？"
   },
   "oneproxy": {
     "description": "管理 OneProxy 上游代理池",
-    "stats": {
-      "provider": "按提供者筛选",
-      "period": "时间范围（默认：24h）"
-    },
     "fetch": {
       "description": "从代理池获取代理",
       "count": "要获取的代理数（默认：1）",
       "type": "代理类型：http|socks5（默认：http）"
     },
     "rotate": {
-      "description": "强制轮换代理",
-      "provider": "要轮换的提供者",
-      "connectionId": "要轮换的特定连接 ID"
+      "description": "强制轮换代理"
     },
     "config": {
       "description": "显示或更新 OneProxy 配置",

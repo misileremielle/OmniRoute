@@ -39,7 +39,6 @@ open-sse/
 ├── executors/            # Per-provider HTTP executors (150 modules + base.ts/index.ts)
 ├── handlers/             # Request handlers (chatCore, responses, etc.)
 ├── lib/                  # Internal utilities
-├── mcp-server/           # Model Context Protocol server
 ├── services/             # ~298 service modules
 ├── transformer/          # Responses API format transformer
 ├── translator/           # Format translation (OpenAI ↔ Claude ↔ Gemini)
@@ -53,7 +52,6 @@ open-sse/
 | `handlers/` | 157 | Request entry points (chatCore, responses, embeddings) |
 | `services/` | ~536 | Routing, caching, rate limiting, refresh, etc. |
 | `translator/` | 56 | Format conversion (OpenAI ↔ Claude ↔ Gemini) |
-| `mcp-server/` | 44 | MCP tools and transports |
 | `utils/` | ~108 | Cross-cutting utilities (logging, error, stream) |
 | `config/` | ~339 | Provider configs, constants, registries |
 
@@ -405,57 +403,6 @@ Common translations:
 
 ---
 
-## MCP Server
-
-`open-sse/mcp-server/` implements the **Model Context Protocol** server:
-
-- **80 tools** (provider management, combos, memory, cache, compression, proxy, skills, plugins, Notion, Obsidian, local corpus)
-- **3 transports**: stdio, SSE, Streamable HTTP
-- **22 scopes** for fine-grained authorization
-
-### Tool Registration
-
-Tools are registered as standalone files in `open-sse/mcp-server/tools/`, each exporting a name, schema, handler, and scope:
-
-```ts
-// open-sse/mcp-server/tools/getHealth.ts
-import { z } from "zod";
-export default {
-  name: "omniroute_get_health",
-  description: "Get system health snapshot",
-  scope: "read:health",
-  inputSchema: z.object({}),
-  handler: async (_args, ctx) => {
-    return await getSystemHealth();
-  },
-};
-```
-
-### Transports
-
-```ts
-// stdio (CLI usage)
-startMcpStdio(server);
-
-// SSE (HTTP-based streaming)
-startMcpSse(server, port);
-
-// Streamable HTTP (modern MCP)
-startMcpStreamable(server, port);
-```
-
-### Authorization
-
-Every tool call goes through scope checks (`open-sse/mcp-server/auth/`):
-
-```ts
-if (!hasScope(apiKey, "providers:read")) {
-  throw new Error("Insufficient scope");
-}
-```
-
----
-
 ## Transformers
 
 `open-sse/transformer/` converts between **Chat Completions** and **Responses API** formats.
@@ -558,21 +505,10 @@ The routing engine has strict performance budgets:
 4. Add unit tests for the executor
 5. Document in `docs/architecture/ARCHITECTURE.md`
 
-### Adding a New MCP Tool
-
-1. Create or update `open-sse/mcp-server/tools/[category]Tools.ts`
-2. Define Zod schema for inputs
-3. Register tool in `mcp-server/index.ts`
-4. Add to scope matrix in `mcp-server/auth/`
-5. Add unit tests
-
----
-
 ## See Also
 
 - [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) — high-level architecture
 - [CODEBASE_DOCUMENTATION.md](../architecture/CODEBASE_DOCUMENTATION.md) — engineering reference
 - [REPOSITORY_MAP.md](../architecture/REPOSITORY_MAP.md) — directory-by-directory
 - [AUTO-COMBO.md](../routing/AUTO-COMBO.md) — 16-factor scoring
-- [MCP-SERVER.md](./MCP-SERVER.md) — MCP server
 - Source: `open-sse/` (400+ files, ~143K LOC)

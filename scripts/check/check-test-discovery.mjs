@@ -102,7 +102,6 @@ export const COLLECTORS = [
   // Node native runner — test:system
   { glob: "tests/e2e/system-failover.test.ts", sources: ["package.json"] },
   // vitest.mcp.config.ts — test:vitest
-  { glob: "open-sse/mcp-server/__tests__/**/*.test.ts", sources: ["vitest.mcp.config.ts"] },
   { glob: "open-sse/services/autoCombo/__tests__/**/*.test.ts", sources: ["vitest.mcp.config.ts"] },
   { glob: "open-sse/services/combo/__tests__/**/*.test.ts", sources: ["vitest.mcp.config.ts"] },
   // Single-file include: the rest of open-sse/services/__tests__/ are frozen orphans
@@ -155,12 +154,8 @@ export const COLLECTORS = [
       "playwright.config.ts": 'testDir: "./tests/e2e"',
     },
   },
-  // Runners custom — test:ecosystem / test:protocols:e2e (spawnam vitest com o arquivo)
+  // Runner custom — test:ecosystem (spawna vitest com o arquivo)
   { glob: "tests/e2e/ecosystem.test.ts", sources: ["scripts/dev/run-ecosystem-tests.mjs"] },
-  {
-    glob: "tests/e2e/protocol-clients.test.ts",
-    sources: ["scripts/dev/run-protocol-clients-tests.mjs"],
-  },
   // Playwright — suíte de homologação real (pnpm run homolog, L4 UI): run.mjs invoca
   // `playwright test -c tests/homolog/ui/playwright.config.ts` (testMatch **/*.spec.ts).
   {
