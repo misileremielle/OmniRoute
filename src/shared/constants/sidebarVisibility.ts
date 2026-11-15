@@ -113,7 +113,6 @@ const ESSENTIALS_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
 export const ESSENTIALS_ADVANCED_TOOL_IDS: ReadonlySet<HideableSidebarItemId> = new Set([
   "logs",
   "batch",
-  "translator",
   "combos",
   "quota",
   "analytics",
@@ -158,7 +157,6 @@ const DEVELOPER_SHOWN: ReadonlySet<HideableSidebarItemId> = new Set([
   "health",
   "runtime",
   "resilience-connections",
-  "translator",
   "settings-general",
   "settings-modality-bridge",
   "settings-routing",

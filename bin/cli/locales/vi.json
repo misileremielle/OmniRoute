@@ -885,29 +885,6 @@
       "out": "Lưu lỗi vào đường dẫn"
     }
   },
-  "translator": {
-    "description": "Chuyển đổi nội dung yêu cầu giữa các định dạng LLM",
-    "detect": {
-      "description": "Phát hiện định dạng nội dung"
-    },
-    "translate": {
-      "description": "Chuyển đổi nội dung từ định dạng này sang định dạng khác"
-    },
-    "send": {
-      "description": "Chuyển đổi và gửi yêu cầu đến máy chủ nguồn"
-    },
-    "stream": {
-      "description": "Chuyển đổi nội dung yêu cầu theo luồng"
-    },
-    "from": "Định dạng nguồn (openai|anthropic|gemini|cohere)",
-    "to": "Định dạng đích (openai|anthropic|gemini|cohere)",
-    "file": "Đường dẫn đến tệp JSON chứa nội dung yêu cầu",
-    "out": "Lưu đầu ra vào tệp",
-    "model": "Ghi đè mô hình",
-    "history": {
-      "limit": "Số kết quả tối đa"
-    }
-  },
   "pricing": {
     "description": "Quản lý dữ liệu giá cho các mô hình",
     "sync": {

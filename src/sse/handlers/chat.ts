@@ -67,14 +67,9 @@ import {
   REQUEST_SCOPED_UPSTREAM_TIMEOUT_CODE,
 } from "@omniroute/open-sse/config/constants.ts";
 import {
-  getTargetFormat,
   detectFormatFromEndpoint,
   detectFormatFromUrl,
 } from "@omniroute/open-sse/services/provider.ts";
-import {
-  getModelTargetFormat,
-  PROVIDER_ID_TO_ALIAS,
-} from "@omniroute/open-sse/config/providerModels.ts";
 import { getPassthroughProviders } from "@omniroute/open-sse/config/providerRegistry.ts";
 import { isPassiveCodex } from "@omniroute/open-sse/services/tokenRefresh/passiveCodex.ts";
 import * as log from "../utils/logger";
@@ -1586,7 +1581,6 @@ async function handleSingleModelChat(
     provider: resolvedProvider,
     model,
     sourceFormat,
-    targetFormat,
     customModelTargetFormat,
     extendedContext,
     apiFormat,
@@ -2268,11 +2262,6 @@ async function handleSingleModelChat(
         continue;
       }
       const proxyLatency = Date.now() - proxyStartTime;
-      const providerAlias = PROVIDER_ID_TO_ALIAS[provider] || provider;
-      const effectiveTargetFormat =
-        getModelTargetFormat(providerAlias, model) ||
-        getTargetFormat(provider, credentials.providerSpecificData) ||
-        targetFormat;
 
       // Log the applied proxy and optional rotation attribution without blocking the response.
       const rotationAttributionOn = isRotationAttributionEnabled();
@@ -2282,8 +2271,6 @@ async function handleSingleModelChat(
         proxyLatency,
         provider,
         model,
-        sourceFormat,
-        targetFormat: effectiveTargetFormat,
         credentials,
         comboName,
         clientRawRequest,

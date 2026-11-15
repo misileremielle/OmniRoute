@@ -885,29 +885,6 @@
       "out": "Spara fel till sökväg"
     }
   },
-  "translator": {
-    "description": "Översätt begärandetexter mellan LLM-format",
-    "detect": {
-      "description": "Identifiera brödtextformat"
-    },
-    "translate": {
-      "description": "Konvertera brödtext från ett format till ett annat"
-    },
-    "send": {
-      "description": "Översätt och skicka vidare uppströms"
-    },
-    "stream": {
-      "description": "Strömöversätt en begärandetext"
-    },
-    "from": "Källformat (openai|anthropic|gemini|cohere)",
-    "to": "Målformat (openai|anthropic|gemini|cohere)",
-    "file": "Sökväg till JSON-fil med begärandetext",
-    "out": "Spara utdata till fil",
-    "model": "Åsidosätt modell",
-    "history": {
-      "limit": "Maximalt antal resultat"
-    }
-  },
   "pricing": {
     "description": "Hantera prisdata för modeller",
     "sync": {

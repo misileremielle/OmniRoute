@@ -885,29 +885,6 @@
       "out": "Xətaları göstərilən yolda yadda saxlayın"
     }
   },
-  "translator": {
-    "description": "Sorğu gövdələrini LLM formatları arasında çevirin",
-    "detect": {
-      "description": "Gövdə formatını müəyyənləşdirin"
-    },
-    "translate": {
-      "description": "Gövdəni bir formatdan digərinə çevirin"
-    },
-    "send": {
-      "description": "Çevirin və yuxarı axına göndərin"
-    },
-    "stream": {
-      "description": "Sorğu gövdəsini axın rejimində çevirin"
-    },
-    "from": "Mənbə formatı (openai|anthropic|gemini|cohere)",
-    "to": "Hədəf formatı (openai|anthropic|gemini|cohere)",
-    "file": "Sorğu gövdəsinin JSON faylına gedən yol",
-    "out": "Çıxışı faylda yadda saxlayın",
-    "model": "Modeli əvəz edin",
-    "history": {
-      "limit": "Maksimum nəticə sayı"
-    }
-  },
   "pricing": {
     "description": "Modellər üçün qiymət məlumatlarını idarə edin",
     "sync": {

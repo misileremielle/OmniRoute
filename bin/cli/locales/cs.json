@@ -885,29 +885,6 @@
       "out": "Uložit chyby do cesty"
     }
   },
-  "translator": {
-    "description": "Překládat těla požadavků mezi formáty LLM",
-    "detect": {
-      "description": "Detekovat formát těla"
-    },
-    "translate": {
-      "description": "Převést tělo z jednoho formátu do jiného"
-    },
-    "send": {
-      "description": "Přeložit a odeslat nadřazené službě"
-    },
-    "stream": {
-      "description": "Překládat tělo požadavku průběžně"
-    },
-    "from": "Zdrojový formát (openai|anthropic|gemini|cohere)",
-    "to": "Cílový formát (openai|anthropic|gemini|cohere)",
-    "file": "Cesta k souboru JSON s tělem požadavku",
-    "out": "Uložit výstup do souboru",
-    "model": "Přepsat model",
-    "history": {
-      "limit": "Maximální počet výsledků"
-    }
-  },
   "pricing": {
     "description": "Spravovat cenové údaje modelů",
     "sync": {

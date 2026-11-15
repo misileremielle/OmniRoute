@@ -885,29 +885,6 @@
       "out": "ભૂલો પાથ પર સાચવો"
     }
   },
-  "translator": {
-    "description": "LLM ફોર્મેટ્સ વચ્ચે વિનંતી બોડીઝનું ભાષાંતર કરો",
-    "detect": {
-      "description": "બોડી ફોર્મેટ શોધો"
-    },
-    "translate": {
-      "description": "બોડીને એક ફોર્મેટમાંથી બીજા ફોર્મેટમાં રૂપાંતરિત કરો"
-    },
-    "send": {
-      "description": "ભાષાંતર કરીને અપસ્ટ્રીમ મોકલો"
-    },
-    "stream": {
-      "description": "વિનંતી બોડીનું સ્ટ્રીમિંગ સાથે ભાષાંતર કરો"
-    },
-    "from": "સ્રોત ફોર્મેટ (openai|anthropic|gemini|cohere)",
-    "to": "લક્ષ્ય ફોર્મેટ (openai|anthropic|gemini|cohere)",
-    "file": "વિનંતી બોડીની JSON ફાઇલનો પાથ",
-    "out": "આઉટપુટ ફાઇલમાં સાચવો",
-    "model": "મોડેલ ઓવરરાઇડ કરો",
-    "history": {
-      "limit": "મહત્તમ પરિણામો"
-    }
-  },
   "pricing": {
     "description": "મોડેલ્સ માટેના કિંમત ડેટાનું સંચાલન કરો",
     "sync": {

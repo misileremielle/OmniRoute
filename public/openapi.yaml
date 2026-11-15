@@ -64,8 +64,6 @@ tags:
     description: Prompt compression, RTK filters, Caveman rules, and compression combos
   - name: Usage
     description: Usage analytics and logs
-  - name: Translator
-    description: Format translation debug & testing
   - name: CLI Tools
     description: CLI tool configuration management
   - name: Embedded Services
@@ -3875,83 +3873,6 @@ paths:
           $ref: "#/components/responses/ManagementAuthenticationRequired"
         "403":
           $ref: "#/components/responses/ManagementInvalidToken"
-
-  # ─── Translator ────────────────────────────────────────────────
-
-  /api/translator/detect:
-    post:
-      tags: [Translator]
-      summary: Detect request format
-      description: Detects the API format of a request body (OpenAI, Claude, Gemini, etc.)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [body]
-              properties:
-                body:
-                  type: object
-      responses:
-        "200":
-          description: Detected format
-
-  /api/translator/translate:
-    post:
-      tags: [Translator]
-      summary: Translate between formats
-      description: Converts a request between API formats (e.g. Claude → OpenAI)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [sourceFormat, targetFormat, body]
-              properties:
-                step:
-                  type: string
-                sourceFormat:
-                  type: string
-                targetFormat:
-                  type: string
-                provider:
-                  type: string
-                body:
-                  type: object
-      responses:
-        "200":
-          description: Translated request
-
-  /api/translator/send:
-    post:
-      tags: [Translator]
-      summary: Send translated request to provider
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [provider, body]
-              properties:
-                provider:
-                  type: string
-                body:
-                  type: object
-      responses:
-        "200":
-          description: Provider response (may be SSE stream)
-
-  /api/translator/history:
-    get:
-      tags: [Translator]
-      summary: Get translation history
-      description: Returns recent translation events for the Live Monitor
-      responses:
-        "200":
-          description: Translation history entries
 
   # ─── CLI Remote Mode ───────────────────────────────────────────
 
@@ -11218,14 +11139,6 @@ paths:
         - System
       summary: "POST system › version"
       x-loopback-only: true
-      responses:
-        "200":
-          description: OK
-  /api/translator/transform-stream:
-    post:
-      tags:
-        - Translator
-      summary: "POST translator › transform stream"
       responses:
         "200":
           description: OK

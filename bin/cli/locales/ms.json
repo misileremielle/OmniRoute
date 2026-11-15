@@ -885,29 +885,6 @@
       "out": "Simpan ralat ke laluan"
     }
   },
-  "translator": {
-    "description": "Terjemahkan isi permintaan antara format LLM",
-    "detect": {
-      "description": "Kesan format isi"
-    },
-    "translate": {
-      "description": "Tukar isi daripada satu format kepada format yang lain"
-    },
-    "send": {
-      "description": "Terjemahkan dan hantar ke huluan"
-    },
-    "stream": {
-      "description": "Terjemahkan secara penstriman isi permintaan"
-    },
-    "from": "Format sumber (openai|anthropic|gemini|cohere)",
-    "to": "Format sasaran (openai|anthropic|gemini|cohere)",
-    "file": "Laluan ke fail JSON isi permintaan",
-    "out": "Simpan output ke fail",
-    "model": "Gantikan model",
-    "history": {
-      "limit": "Hasil maksimum"
-    }
-  },
   "pricing": {
     "description": "Urus data harga untuk model",
     "sync": {

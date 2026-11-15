@@ -885,29 +885,6 @@
       "out": "Lagre feil til bane"
     }
   },
-  "translator": {
-    "description": "Oversett forespørselskropper mellom LLM-formater",
-    "detect": {
-      "description": "Identifiser formatet på forespørselskroppen"
-    },
-    "translate": {
-      "description": "Konverter forespørselskroppen fra ett format til et annet"
-    },
-    "send": {
-      "description": "Oversett og send videre til oppstrømstjenesten"
-    },
-    "stream": {
-      "description": "Strømmeoversett en forespørselskropp"
-    },
-    "from": "Kildeformat (openai|anthropic|gemini|cohere)",
-    "to": "Målformat (openai|anthropic|gemini|cohere)",
-    "file": "Bane til JSON-fil med forespørselskropp",
-    "out": "Lagre utdata til fil",
-    "model": "Overstyr modell",
-    "history": {
-      "limit": "Maks. antall resultater"
-    }
-  },
   "pricing": {
     "description": "Administrer prisdata for modeller",
     "sync": {

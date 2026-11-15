@@ -885,29 +885,6 @@
       "out": "บันทึกข้อผิดพลาดไปยังพาธ"
     }
   },
-  "translator": {
-    "description": "แปลเนื้อหาคำขอระหว่างรูปแบบ LLM",
-    "detect": {
-      "description": "ตรวจหารูปแบบเนื้อหา"
-    },
-    "translate": {
-      "description": "แปลงเนื้อหาจากรูปแบบหนึ่งเป็นอีกรูปแบบหนึ่ง"
-    },
-    "send": {
-      "description": "แปลและส่งต่อไปยังต้นทาง"
-    },
-    "stream": {
-      "description": "แปลเนื้อหาคำขอแบบสตรีม"
-    },
-    "from": "รูปแบบต้นทาง (openai|anthropic|gemini|cohere)",
-    "to": "รูปแบบเป้าหมาย (openai|anthropic|gemini|cohere)",
-    "file": "พาธไปยังไฟล์ JSON เนื้อหาคำขอ",
-    "out": "บันทึกเอาต์พุตลงในไฟล์",
-    "model": "แทนที่โมเดล",
-    "history": {
-      "limit": "จำนวนผลลัพธ์สูงสุด"
-    }
-  },
   "pricing": {
     "description": "จัดการข้อมูลราคาสำหรับโมเดล",
     "sync": {

@@ -885,29 +885,6 @@
       "out": "Hifadhi hitilafu kwenye njia"
     }
   },
-  "translator": {
-    "description": "Tafsiri miili ya maombi kati ya miundo ya LLM",
-    "detect": {
-      "description": "Tambua muundo wa mwili"
-    },
-    "translate": {
-      "description": "Badilisha mwili kutoka muundo mmoja hadi mwingine"
-    },
-    "send": {
-      "description": "Tafsiri na utume kwa huduma ya juu"
-    },
-    "stream": {
-      "description": "Tafsiri mwili wa ombi kwa mtiririko"
-    },
-    "from": "Muundo chanzo (openai|anthropic|gemini|cohere)",
-    "to": "Muundo lengwa (openai|anthropic|gemini|cohere)",
-    "file": "Njia ya faili ya JSON ya mwili wa ombi",
-    "out": "Hifadhi matokeo kwenye faili",
-    "model": "Batilisha modeli",
-    "history": {
-      "limit": "Idadi ya juu ya matokeo"
-    }
-  },
   "pricing": {
     "description": "Dhibiti data ya bei za modeli",
     "sync": {

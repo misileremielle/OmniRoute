@@ -208,8 +208,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     // requireManagementAuth; it never selects a connection to serve a
     // request, so it stays class C.
     "src/app/api/token-health/route.ts": 2,
-    "src/app/api/translator/send/route.ts": 1,
-    "src/app/api/translator/translate/route.ts": 1,
     "src/app/api/usage/call-logs/route.ts": 1,
     // v3.8.51 #12805 (c042a5188): the reset-credit endpoint now serves codex and
     // grok-cli, so it reads the connection once only to decide which handler runs
@@ -373,7 +371,6 @@ const CLASSIFICATION: Record<InventoryKind, Record<string, BypassClass>> = {
         "open-sse/services/alibabaFreeTierQuotaFetcher.ts",
         "open-sse/services/combo/executeTargetGates.ts",
         "open-sse/services/tokenRefresh.ts",
-        "src/app/api/translator/send/route.ts",
         "src/lib/cliproxyCompat/managementApi.ts",
         "src/lib/credentialHealth/scheduler.ts",
         "src/lib/modelValidation/runner.ts",
@@ -485,8 +482,6 @@ test("managed request surfaces are fenced centrally or rejected before independe
   const internalKeys = fs.readFileSync(path.join(REPO_ROOT, "src/lib/db/apiKeys.ts"), "utf8");
   const auxiliaryIsolationSources = [
     "src/app/api/providers/[id]/models/route.ts",
-    "src/app/api/translator/send/route.ts",
-    "src/app/api/translator/translate/route.ts",
     "src/lib/api/modelTestRunner.ts",
     "src/lib/cliproxyCompat/managementApi.ts",
     "src/lib/modelValidation/runner.ts",

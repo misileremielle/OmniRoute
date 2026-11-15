@@ -885,29 +885,6 @@
       "out": "Ajiye kurakurai zuwa path"
     }
   },
-  "translator": {
-    "description": "Fassara jikin buƙatu tsakanin tsarin LLM",
-    "detect": {
-      "description": "Gano tsarin body"
-    },
-    "translate": {
-      "description": "Canza body daga wani tsari zuwa wani"
-    },
-    "send": {
-      "description": "Fassara kuma aika zuwa upstream"
-    },
-    "stream": {
-      "description": "Fassara request body ta hanyar stream"
-    },
-    "from": "Tsarin tushe (openai|anthropic|gemini|cohere)",
-    "to": "Tsarin manufa (openai|anthropic|gemini|cohere)",
-    "file": "Hanyar fayil ɗin JSON na request body",
-    "out": "Ajiye sakamako zuwa fayil",
-    "model": "Maye gurbin model",
-    "history": {
-      "limit": "Matsakaicin adadin sakamako"
-    }
-  },
   "pricing": {
     "description": "Sarrafa bayanan farashi na models",
     "sync": {

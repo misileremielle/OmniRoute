@@ -885,29 +885,6 @@
       "out": "Tallenna virheet polkuun"
     }
   },
-  "translator": {
-    "description": "Muunna pyyntöjen rungot LLM-muotojen välillä",
-    "detect": {
-      "description": "Tunnista rungon muoto"
-    },
-    "translate": {
-      "description": "Muunna runko muodosta toiseen"
-    },
-    "send": {
-      "description": "Muunna ja lähetä ylävirran palveluun"
-    },
-    "stream": {
-      "description": "Muunna pyynnön runko suoratoistona"
-    },
-    "from": "Lähdemuoto (openai|anthropic|gemini|cohere)",
-    "to": "Kohdemuoto (openai|anthropic|gemini|cohere)",
-    "file": "Pyynnön rungon sisältävän JSON-tiedoston polku",
-    "out": "Tallenna tuloste tiedostoon",
-    "model": "Ohita mallimääritys",
-    "history": {
-      "limit": "Tulosten enimmäismäärä"
-    }
-  },
   "pricing": {
     "description": "Hallitse mallien hintatietoja",
     "sync": {

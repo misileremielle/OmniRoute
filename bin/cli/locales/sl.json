@@ -885,29 +885,6 @@
       "out": "Shrani napake na pot"
     }
   },
-  "translator": {
-    "description": "Prevajaj telesa zahtev med oblikami LLM",
-    "detect": {
-      "description": "Zaznaj obliko telesa"
-    },
-    "translate": {
-      "description": "Pretvori telo iz ene oblike v drugo"
-    },
-    "send": {
-      "description": "Pretvori in posreduj nadrejenemu strežniku"
-    },
-    "stream": {
-      "description": "Pretočno pretvori telo zahteve"
-    },
-    "from": "Izvorna oblika (openai|anthropic|gemini|cohere)",
-    "to": "Ciljna oblika (openai|anthropic|gemini|cohere)",
-    "file": "Pot do datoteke JSON s telesom zahteve",
-    "out": "Shrani izhod v datoteko",
-    "model": "Preglasi model",
-    "history": {
-      "limit": "Največje število rezultatov"
-    }
-  },
   "pricing": {
     "description": "Upravljaj podatke o cenah modelov",
     "sync": {

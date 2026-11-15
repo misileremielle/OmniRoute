@@ -1,4 +1,4 @@
-// ABOUTME: Guard test — the 4 dashboard files translated in #6761/#6768 must stay free of
+// ABOUTME: Guard test — the dashboard files translated in #6761/#6768 must stay free of
 // ABOUTME: hardcoded Portuguese UI strings (regression guard for the i18n cleanup).
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -13,7 +13,6 @@ const FILES = [
   "src/app/(dashboard)/dashboard/compression/studio/CompareView.tsx",
   "src/app/(dashboard)/dashboard/compression/studio/PlaygroundInput.tsx",
   "src/app/(dashboard)/dashboard/context/combos/CompressionHub.tsx",
-  "src/app/(dashboard)/dashboard/translator/components/advanced/CompressionPreviewAccordion.tsx",
 ];
 
 // Portuguese-only words that appeared as hardcoded UI copy before the fix.

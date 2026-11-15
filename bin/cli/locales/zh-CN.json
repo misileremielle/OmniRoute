@@ -885,29 +885,6 @@
       "out": "将错误保存到路径"
     }
   },
-  "translator": {
-    "description": "在 LLM 格式之间转换请求体",
-    "detect": {
-      "description": "检测请求体格式"
-    },
-    "translate": {
-      "description": "将请求体从一种格式转换为另一种格式"
-    },
-    "send": {
-      "description": "转换并发送到上游"
-    },
-    "stream": {
-      "description": "流式转换请求体"
-    },
-    "from": "源格式（openai|anthropic|gemini|cohere）",
-    "to": "目标格式（openai|anthropic|gemini|cohere）",
-    "file": "请求体 JSON 文件路径",
-    "out": "将输出保存到文件",
-    "model": "覆盖模型",
-    "history": {
-      "limit": "最大结果数"
-    }
-  },
   "pricing": {
     "description": "管理模型定价数据",
     "sync": {

@@ -87,7 +87,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   "context-caveman": "contextCavemanDescription",
   "context-rtk": "contextRtkDescription",
   "context-combos": "contextCombosDescription",
-  translator: "translatorDescription",
   "search-tools": "searchToolsDescription",
   logs: "logsDescription",
   audit: "auditDescription",

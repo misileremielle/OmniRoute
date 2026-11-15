@@ -41,7 +41,6 @@ const PATH_LABELS = {
   "audit-log": "auditLog",
   console: "console",
   logger: "logger",
-  translator: "translator",
   add: "add",
   edit: "edit",
   keys: "apiKeys",

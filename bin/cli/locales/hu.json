@@ -885,29 +885,6 @@
       "out": "Hibák mentése elérési útra"
     }
   },
-  "translator": {
-    "description": "Kérés törzsének átalakítása LLM-formátumok között",
-    "detect": {
-      "description": "Törzsformátum felismerése"
-    },
-    "translate": {
-      "description": "Törzs átalakítása egyik formátumból egy másikba"
-    },
-    "send": {
-      "description": "Átalakítás és továbbítás a felsőbb szintű szolgáltatásnak"
-    },
-    "stream": {
-      "description": "Kérés törzsének streamelt átalakítása"
-    },
-    "from": "Forrásformátum (openai|anthropic|gemini|cohere)",
-    "to": "Célformátum (openai|anthropic|gemini|cohere)",
-    "file": "A kérés törzsét tartalmazó JSON-fájl elérési útja",
-    "out": "Kimenet mentése fájlba",
-    "model": "Modell felülbírálása",
-    "history": {
-      "limit": "Találatok maximális száma"
-    }
-  },
   "pricing": {
     "description": "Modellek árképzési adatainak kezelése",
     "sync": {

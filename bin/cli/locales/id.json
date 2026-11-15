@@ -885,29 +885,6 @@
       "out": "Simpan kesalahan ke path"
     }
   },
-  "translator": {
-    "description": "Terjemahkan body permintaan antarformat LLM",
-    "detect": {
-      "description": "Deteksi format body"
-    },
-    "translate": {
-      "description": "Konversi body dari satu format ke format lainnya"
-    },
-    "send": {
-      "description": "Terjemahkan dan teruskan ke upstream"
-    },
-    "stream": {
-      "description": "Terjemahkan body permintaan secara streaming"
-    },
-    "from": "Format sumber (openai|anthropic|gemini|cohere)",
-    "to": "Format target (openai|anthropic|gemini|cohere)",
-    "file": "Path ke file JSON body permintaan",
-    "out": "Simpan output ke file",
-    "model": "Ganti model",
-    "history": {
-      "limit": "Hasil maksimum"
-    }
-  },
   "pricing": {
     "description": "Kelola data harga untuk model",
     "sync": {

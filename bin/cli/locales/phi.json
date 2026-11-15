@@ -885,29 +885,6 @@
       "out": "I-save ang mga error sa path"
     }
   },
-  "translator": {
-    "description": "Isalin ang mga request body sa pagitan ng mga format ng LLM",
-    "detect": {
-      "description": "Tukuyin ang format ng body"
-    },
-    "translate": {
-      "description": "I-convert ang body mula sa isang format patungo sa iba"
-    },
-    "send": {
-      "description": "Isalin at ipadala sa upstream"
-    },
-    "stream": {
-      "description": "Isalin habang sini-stream ang isang request body"
-    },
-    "from": "Pinagmumulan na format (openai|anthropic|gemini|cohere)",
-    "to": "Target na format (openai|anthropic|gemini|cohere)",
-    "file": "Path sa JSON file ng request body",
-    "out": "I-save ang output sa file",
-    "model": "I-override ang modelo",
-    "history": {
-      "limit": "Maximum na bilang ng resulta"
-    }
-  },
   "pricing": {
     "description": "Pamahalaan ang datos ng pagpepresyo para sa mga modelo",
     "sync": {

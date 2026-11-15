@@ -885,29 +885,6 @@
       "out": "Gem fejl på sti"
     }
   },
-  "translator": {
-    "description": "Oversæt anmodningstekster mellem LLM-formater",
-    "detect": {
-      "description": "Registrer formatet på anmodningsteksten"
-    },
-    "translate": {
-      "description": "Konvertér anmodningsteksten fra ét format til et andet"
-    },
-    "send": {
-      "description": "Oversæt, og send videre til upstream"
-    },
-    "stream": {
-      "description": "Stream-oversæt en anmodningstekst"
-    },
-    "from": "Kildeformat (openai|anthropic|gemini|cohere)",
-    "to": "Målformat (openai|anthropic|gemini|cohere)",
-    "file": "Sti til JSON-fil med anmodningstekst",
-    "out": "Gem output i fil",
-    "model": "Tilsidesæt model",
-    "history": {
-      "limit": "Maks. antal resultater"
-    }
-  },
   "pricing": {
     "description": "Administrer prisdata for modeller",
     "sync": {

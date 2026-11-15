@@ -885,29 +885,6 @@
       "out": "Fi àwọn àṣìṣe pamọ́ sí path"
     }
   },
-  "translator": {
-    "description": "Túmọ̀ àwọn ara ìbéèrè láàárín àwọn àgbékalẹ̀ LLM",
-    "detect": {
-      "description": "Ṣàwárí ìgúnrégé ara ìbéèrè"
-    },
-    "translate": {
-      "description": "Yí ara ìbéèrè padà láti ìgúnrégé kan sí òmíràn"
-    },
-    "send": {
-      "description": "Túmọ̀ kí o sì fi ránṣẹ́ sí upstream"
-    },
-    "stream": {
-      "description": "Túmọ̀ ara ìbéèrè lọ́wọ́lọ́wọ́"
-    },
-    "from": "Ìgúnrégé orísun (openai|anthropic|gemini|cohere)",
-    "to": "Ìgúnrégé àfojúsùn (openai|anthropic|gemini|cohere)",
-    "file": "Ọ̀nà sí fáìlì JSON ara ìbéèrè",
-    "out": "Fi àbájáde pamọ́ sínú fáìlì",
-    "model": "Fagilé model",
-    "history": {
-      "limit": "Iye àbájáde tó pọ̀ jù"
-    }
-  },
   "pricing": {
     "description": "Ṣàkóso dátà iye owó fún àwọn model",
     "sync": {

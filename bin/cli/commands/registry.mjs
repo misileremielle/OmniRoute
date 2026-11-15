@@ -6,7 +6,6 @@ import { registerPolicy } from "./policy.mjs";
 import { registerCompression } from "./compression.mjs";
 import { registerFiles } from "./files.mjs";
 import { registerBatches } from "./batches.mjs";
-import { registerTranslator } from "./translator.mjs";
 import { registerPricing } from "./pricing.mjs";
 import { registerResilience } from "./resilience.mjs";
 import { registerNodes } from "./nodes.mjs";
@@ -89,7 +88,6 @@ export function registerCommands(program) {
   registerCompression(program);
   registerFiles(program);
   registerBatches(program);
-  registerTranslator(program);
   registerPricing(program);
   registerResilience(program);
   registerNodes(program);

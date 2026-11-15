@@ -885,29 +885,6 @@
       "out": "Salvesta vead asukohta"
     }
   },
-  "translator": {
-    "description": "Teisenda päringu kehad LLM-vormingute vahel",
-    "detect": {
-      "description": "Tuvasta sisu vorming"
-    },
-    "translate": {
-      "description": "Teisenda sisu ühest vormingust teise"
-    },
-    "send": {
-      "description": "Tõlgi ja edasta upstream-teenusele"
-    },
-    "stream": {
-      "description": "Voogedasta ja tõlgi päringu sisu"
-    },
-    "from": "Lähtevorming (openai|anthropic|gemini|cohere)",
-    "to": "Sihtvorming (openai|anthropic|gemini|cohere)",
-    "file": "Tee päringu sisu JSON-failini",
-    "out": "Salvesta väljund faili",
-    "model": "Tühista mudel",
-    "history": {
-      "limit": "Maksimaalne tulemuste arv"
-    }
-  },
   "pricing": {
     "description": "Halda mudelite hinnaandmeid",
     "sync": {

@@ -885,29 +885,6 @@
       "out": "ذخیرهٔ خطاها در مسیر"
     }
   },
-  "translator": {
-    "description": "ترجمهٔ بدنهٔ درخواستها بین قالبهای LLM",
-    "detect": {
-      "description": "تشخیص قالب بدنه"
-    },
-    "translate": {
-      "description": "تبدیل بدنه از یک قالب به قالب دیگر"
-    },
-    "send": {
-      "description": "ترجمه و ارسال به بالادست"
-    },
-    "stream": {
-      "description": "ترجمهٔ جریانی بدنهٔ درخواست"
-    },
-    "from": "قالب مبدأ (openai|anthropic|gemini|cohere)",
-    "to": "قالب مقصد (openai|anthropic|gemini|cohere)",
-    "file": "مسیر فایل JSON بدنهٔ درخواست",
-    "out": "ذخیرهٔ خروجی در فایل",
-    "model": "بازنویسی مدل",
-    "history": {
-      "limit": "حداکثر نتایج"
-    }
-  },
   "pricing": {
     "description": "مدیریت دادههای قیمتگذاری مدلها",
     "sync": {

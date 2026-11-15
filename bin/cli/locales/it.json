@@ -885,29 +885,6 @@
       "out": "Salva gli errori nel percorso"
     }
   },
-  "translator": {
-    "description": "Traduci i corpi delle richieste tra formati LLM",
-    "detect": {
-      "description": "Rileva il formato del corpo"
-    },
-    "translate": {
-      "description": "Converti il corpo da un formato a un altro"
-    },
-    "send": {
-      "description": "Traduci e inoltra all'upstream"
-    },
-    "stream": {
-      "description": "Traduci in streaming il corpo di una richiesta"
-    },
-    "from": "Formato di origine (openai|anthropic|gemini|cohere)",
-    "to": "Formato di destinazione (openai|anthropic|gemini|cohere)",
-    "file": "Percorso del file JSON del corpo della richiesta",
-    "out": "Salva l'output in un file",
-    "model": "Sovrascrivi il modello",
-    "history": {
-      "limit": "Numero massimo di risultati"
-    }
-  },
   "pricing": {
     "description": "Gestisci i dati sui prezzi dei modelli",
     "sync": {

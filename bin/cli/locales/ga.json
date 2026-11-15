@@ -885,29 +885,6 @@
       "out": "Sábháil earráidí go cosán"
     }
   },
-  "translator": {
-    "description": "Aistrigh coirp iarratais idir formáidí LLM",
-    "detect": {
-      "description": "Braigh formáid an choirp"
-    },
-    "translate": {
-      "description": "Tiontaigh corp ó fhormáid amháin go formáid eile"
-    },
-    "send": {
-      "description": "Aistrigh agus seol suas an t-iarratas"
-    },
-    "stream": {
-      "description": "Sruth-aistrigh corp iarratais"
-    },
-    "from": "Formáid foinse (openai|anthropic|gemini|cohere)",
-    "to": "Formáid sprice (openai|anthropic|gemini|cohere)",
-    "file": "Cosán go comhad JSON de chor iarratais",
-    "out": "Sábháil aschur go comhad",
-    "model": "Sáraigh samhail",
-    "history": {
-      "limit": "Torthaí uasta"
-    }
-  },
   "pricing": {
     "description": "Bainistigh sonraí praghsála do shamhlanna",
     "sync": {

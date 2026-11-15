@@ -63,7 +63,6 @@ export const HIDEABLE_SIDEBAR_ITEM_IDS = [
   // Monitoring > Audit
   "audit",
   // Dev Tools
-  "translator",
   "search-tools",
   // Other Features > Batch
   "batch",

@@ -885,29 +885,6 @@
       "out": "Chekwaa njehie n'ụzọ"
     }
   },
-  "translator": {
-    "description": "Tụgharịa ahụ arịrịọ n'etiti usoro LLM",
-    "detect": {
-      "description": "Chọpụta usoro body"
-    },
-    "translate": {
-      "description": "Tụgharịa body site n'otu usoro gaa na nke ọzọ"
-    },
-    "send": {
-      "description": "Tụgharịa ma zipụ ya upstream"
-    },
-    "stream": {
-      "description": "Tụgharịa body arịrịọ ka ọ na-asọba"
-    },
-    "from": "Usoro mmalite (openai|anthropic|gemini|cohere)",
-    "to": "Usoro ebumnuche (openai|anthropic|gemini|cohere)",
-    "file": "Ụzọ faịlụ JSON nke body arịrịọ",
-    "out": "Chekwaa nsonaazụ na faịlụ",
-    "model": "Dochiejie model",
-    "history": {
-      "limit": "Ọnụọgụ nsonaazụ kachasị"
-    }
-  },
   "pricing": {
     "description": "Jikwaa data ọnụahịa maka model",
     "sync": {

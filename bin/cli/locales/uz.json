@@ -885,29 +885,6 @@
       "out": "Xatolarni ko‘rsatilgan yo‘lga saqlash"
     }
   },
-  "translator": {
-    "description": "So‘rov tanalarini LLM formatlari o‘rtasida tarjima qilish",
-    "detect": {
-      "description": "Tana formatini aniqlash"
-    },
-    "translate": {
-      "description": "Tanani bir formatdan boshqasiga oʻgirish"
-    },
-    "send": {
-      "description": "Tarjima qilish va yuqori oqimga yuborish"
-    },
-    "stream": {
-      "description": "Soʻrov tanasini oqim tarzida tarjima qilish"
-    },
-    "from": "Manba formati (openai|anthropic|gemini|cohere)",
-    "to": "Maqsad formati (openai|anthropic|gemini|cohere)",
-    "file": "Soʻrov tanasi JSON fayliga yoʻl",
-    "out": "Natijani faylga saqlash",
-    "model": "Modelni qayta belgilash",
-    "history": {
-      "limit": "Maksimal natijalar soni"
-    }
-  },
   "pricing": {
     "description": "Modellar uchun narx maʼlumotlarini boshqarish",
     "sync": {

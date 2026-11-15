@@ -885,29 +885,6 @@
       "out": "Salvar erros no caminho"
     }
   },
-  "translator": {
-    "description": "Traduzir payloads entre formatos LLM",
-    "detect": {
-      "description": "Detectar formato do body"
-    },
-    "translate": {
-      "description": "Converter body de um formato para outro"
-    },
-    "send": {
-      "description": "Traduzir e despachar para upstream"
-    },
-    "stream": {
-      "description": "Tradução de request em stream"
-    },
-    "from": "Formato de origem (openai|anthropic|gemini|cohere)",
-    "to": "Formato de destino (openai|anthropic|gemini|cohere)",
-    "file": "Caminho para o arquivo JSON do request",
-    "out": "Salvar output em arquivo",
-    "model": "Sobrescrever model",
-    "history": {
-      "limit": "Máximo de resultados"
-    }
-  },
   "pricing": {
     "description": "Gerenciar dados de precificação dos modelos",
     "sync": {

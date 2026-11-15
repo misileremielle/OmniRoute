@@ -66,12 +66,6 @@
   "src/app/(dashboard)/dashboard/quota/page.tsx": {
     "TS2339": 4
   },
-  "src/app/(dashboard)/dashboard/translator/components/MonitorTab.tsx": {
-    "TS2345": 1
-  },
-  "src/app/(dashboard)/dashboard/translator/components/advanced/StreamTransformerAccordion.tsx": {
-    "TS2345": 1
-  },
   "src/app/(dashboard)/dashboard/usage/components/ProviderLimits/index.tsx": {
     "TS2339": 2
   },
@@ -236,14 +230,6 @@
   "src/app/api/system/env/repair/route.ts": {
     "TS2578": 1,
     "TS2353": 3
-  },
-  "src/app/api/translator/send/route.ts": {
-    "TS2345": 1,
-    "TS2322": 1
-  },
-  "src/app/api/translator/translate/route.ts": {
-    "TS2345": 1,
-    "TS2322": 1
   },
   "src/app/api/usage/combo-health-autopilot/route.ts": {
     "TS2769": 2

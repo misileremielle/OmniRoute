@@ -885,29 +885,6 @@
       "out": "Save errors to path"
     }
   },
-  "translator": {
-    "description": "Translate request bodies between LLM formats",
-    "detect": {
-      "description": "Detect body format"
-    },
-    "translate": {
-      "description": "Convert body from one format to another"
-    },
-    "send": {
-      "description": "Translate and dispatch upstream"
-    },
-    "stream": {
-      "description": "Stream-translate a request body"
-    },
-    "from": "Source format (openai|anthropic|gemini|cohere)",
-    "to": "Target format (openai|anthropic|gemini|cohere)",
-    "file": "Path to request body JSON file",
-    "out": "Save output to file",
-    "model": "Override model",
-    "history": {
-      "limit": "Max results"
-    }
-  },
   "pricing": {
     "description": "Manage pricing data for models",
     "sync": {

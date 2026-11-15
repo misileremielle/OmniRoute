@@ -66,7 +66,6 @@ import {
 import { noteProxyOutcome } from "./proxyOutcomeMemory";
 import { logProxyJournal } from "./proxyJournal";
 import type { AttemptJournalEntry } from "./proxyJournal";
-import { logTranslationEvent } from "../../lib/translatorEvents";
 import { getRuntimeProviderProfile } from "@omniroute/open-sse/services/accountFallback.ts";
 import { recordConnectionOutcome } from "@omniroute/open-sse/services/connectionLatencyTracker.ts";
 import { describeConnectionRestriction } from "../services/credentialSelectionDiagnostics.ts";
@@ -1140,8 +1139,6 @@ export async function safeLogEvents({
   proxyLatency,
   provider,
   model,
-  sourceFormat,
-  targetFormat,
   credentials,
   comboName,
   clientRawRequest,
@@ -1175,21 +1172,6 @@ export async function safeLogEvents({
       tlsFingerprintUsed,
       rotationAccount,
       correlationId,
-    });
-  } catch {}
-
-  try {
-    logTranslationEvent({
-      provider,
-      model,
-      sourceFormat,
-      targetFormat,
-      status: result.success ? "success" : "error",
-      statusCode: result.success ? 200 : result.status || 500,
-      latency: proxyLatency,
-      endpoint: clientRawRequest?.endpoint || "/v1/chat/completions",
-      connectionId: credentials.connectionId || null,
-      comboName: comboName || null,
     });
   } catch {}
 }

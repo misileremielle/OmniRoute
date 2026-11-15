@@ -885,29 +885,6 @@
       "out": "Salvează erorile în calea specificată"
     }
   },
-  "translator": {
-    "description": "Tradu corpurile cererilor între formatele LLM",
-    "detect": {
-      "description": "Detectează formatul corpului"
-    },
-    "translate": {
-      "description": "Convertește corpul dintr-un format în altul"
-    },
-    "send": {
-      "description": "Tradu și trimite către upstream"
-    },
-    "stream": {
-      "description": "Tradu în flux corpul unei cereri"
-    },
-    "from": "Format sursă (openai|anthropic|gemini|cohere)",
-    "to": "Format țintă (openai|anthropic|gemini|cohere)",
-    "file": "Calea către fișierul JSON cu corpul cererii",
-    "out": "Salvează rezultatul într-un fișier",
-    "model": "Suprascrie modelul",
-    "history": {
-      "limit": "Număr maxim de rezultate"
-    }
-  },
   "pricing": {
     "description": "Gestionează datele de preț pentru modele",
     "sync": {

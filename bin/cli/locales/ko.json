@@ -885,29 +885,6 @@
       "out": "오류 저장 경로"
     }
   },
-  "translator": {
-    "description": "LLM 형식 간 요청 본문 변환",
-    "detect": {
-      "description": "본문 형식 감지"
-    },
-    "translate": {
-      "description": "본문을 한 형식에서 다른 형식으로 변환"
-    },
-    "send": {
-      "description": "변환 후 업스트림으로 전달"
-    },
-    "stream": {
-      "description": "요청 본문을 스트리밍 방식으로 변환"
-    },
-    "from": "소스 형식 (openai|anthropic|gemini|cohere)",
-    "to": "대상 형식 (openai|anthropic|gemini|cohere)",
-    "file": "요청 본문 JSON 파일 경로",
-    "out": "출력을 파일에 저장",
-    "model": "모델 재정의",
-    "history": {
-      "limit": "최대 결과 수"
-    }
-  },
   "pricing": {
     "description": "모델 가격 데이터 관리",
     "sync": {

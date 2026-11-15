@@ -20,8 +20,6 @@ const core = await import("../../src/lib/db/core.ts");
 const providers = await import("../../src/lib/db/providers.ts");
 const apiKeys = await import("../../src/lib/db/apiKeys.ts");
 const leases = await import("../../src/lib/db/exclusiveConnectionLeases.ts");
-const translator = await import("../../src/app/api/translator/send/route.ts");
-const translatorPreview = await import("../../src/app/api/translator/translate/route.ts");
 const modelTests = await import("../../src/lib/api/modelTestRunner.ts");
 const usageRoute = await import("../../src/app/api/usage/[connectionId]/route.ts");
 const providerLimits = await import("../../src/lib/usage/providerLimits.ts");
@@ -65,99 +63,6 @@ test.after(() => {
   core.resetDbInstance();
   apiKeys.resetApiKeyState();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-});
-
-test("translator send accepts a FREE lease-capable connection and attempts provider fetch", async () => {
-  const connection = await seedConnection("translator-free-lease");
-  await markLeaseOnly(connection.id);
-
-  const _response = await translator.POST(
-    new Request("http://omniroute.local/api/translator/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        provider: "openai",
-        body: { model: "gpt-4.1-mini", messages: [{ role: "user", content: "test" }] },
-      }),
-    })
-  );
-
-  assert.equal(externalCalls, 1);
-});
-
-test("translator send excludes an ACTIVE leased connection before provider fetch", async () => {
-  const connection = await seedConnection("translator-active-lease");
-  const acquired = leases.acquireExclusiveConnectionLease({
-    leaseOwnerId: OWNER,
-    apiKeyId: "managed-key",
-    provider: "openai",
-    connectionId: connection.id,
-  });
-  assert.equal(acquired.kind, "ACQUIRED");
-
-  const response = await translator.POST(
-    new Request("http://omniroute.local/api/translator/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        provider: "openai",
-        body: { model: "gpt-4.1-mini", messages: [{ role: "user", content: "test" }] },
-      }),
-    })
-  );
-
-  assert.equal(response.status, 400);
-  assert.equal(externalCalls, 0);
-});
-
-test("translator request preview materializes a FREE lease-capable credential", async () => {
-  const connection = await seedConnection("translator-preview-free-lease");
-  await markLeaseOnly(connection.id);
-
-  const response = await translatorPreview.POST(
-    new Request("http://omniroute.local/api/translator/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        step: 4,
-        provider: "openai",
-        body: { model: "gpt-4.1-mini", messages: [{ role: "user", content: "test" }] },
-      }),
-    })
-  );
-  const body = await response.text();
-
-  assert.equal(response.status, 200);
-  assert.equal(body.includes("sk-translator-preview-free-lease"), true);
-  assert.equal(externalCalls, 0);
-});
-
-test("translator request preview never materializes an ACTIVE leased credential", async () => {
-  const connection = await seedConnection("translator-preview-active-lease");
-  const acquired = leases.acquireExclusiveConnectionLease({
-    leaseOwnerId: OWNER,
-    apiKeyId: "managed-key",
-    provider: "openai",
-    connectionId: connection.id,
-  });
-  assert.equal(acquired.kind, "ACQUIRED");
-
-  const response = await translatorPreview.POST(
-    new Request("http://omniroute.local/api/translator/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        step: 4,
-        provider: "openai",
-        body: { model: "gpt-4.1-mini", messages: [{ role: "user", content: "test" }] },
-      }),
-    })
-  );
-  const body = await response.text();
-
-  assert.equal(response.status, 400);
-  assert.equal(body.includes("sk-translator-preview-active-lease"), false);
-  assert.equal(externalCalls, 0);
 });
 
 test("forced model tests accept FREE lease-capable connections and attempt model dispatch", async () => {

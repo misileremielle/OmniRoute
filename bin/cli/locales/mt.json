@@ -885,29 +885,6 @@
       "out": "Issejvja l-iżbalji f'path"
     }
   },
-  "translator": {
-    "description": "Ittraduċi l-korpi tat-talbiet bejn formati LLM",
-    "detect": {
-      "description": "Identifika l-format tal-ġisem"
-    },
-    "translate": {
-      "description": "Konverti l-ġisem minn format għal ieħor"
-    },
-    "send": {
-      "description": "Traduci u niżgħad 'il fuq"
-    },
-    "stream": {
-      "description": "Traduci streaming ta' talba ġisem"
-    },
-    "from": "Format tas-sors (openai|anthropic|gemini|cohere)",
-    "to": "Format fil-mira (openai|anthropic|gemini|cohere)",
-    "file": "Triq lejn il-fajl tal-JSON tal-ġisem tal-talba",
-    "out": "Ħlief l-output fil-fajl",
-    "model": "Overrides il-mudell",
-    "history": {
-      "limit": "Riżultati massi"
-    }
-  },
   "pricing": {
     "description": "Immaniġġa d-data tal-prezzijiet għall-mudelli",
     "sync": {

@@ -885,29 +885,6 @@
       "out": "Fehler unter Pfad speichern"
     }
   },
-  "translator": {
-    "description": "Anfrageinhalte zwischen LLM-Formaten übersetzen",
-    "detect": {
-      "description": "Format des Anfrageinhalts erkennen"
-    },
-    "translate": {
-      "description": "Anfrageinhalt von einem Format in ein anderes konvertieren"
-    },
-    "send": {
-      "description": "Übersetzen und an Upstream senden"
-    },
-    "stream": {
-      "description": "Anfrageinhalt per Stream übersetzen"
-    },
-    "from": "Quellformat (openai|anthropic|gemini|cohere)",
-    "to": "Zielformat (openai|anthropic|gemini|cohere)",
-    "file": "Pfad zur JSON-Datei mit dem Anfrageinhalt",
-    "out": "Ausgabe in Datei speichern",
-    "model": "Modell überschreiben",
-    "history": {
-      "limit": "Maximale Anzahl an Ergebnissen"
-    }
-  },
   "pricing": {
     "description": "Preisdaten für Modelle verwalten",
     "sync": {

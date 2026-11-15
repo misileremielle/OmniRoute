@@ -885,29 +885,6 @@
       "out": "Spremi pogreške na putanju"
     }
   },
-  "translator": {
-    "description": "Prevedi tijela zahtjeva između LLM formata",
-    "detect": {
-      "description": "Otkrij format tijela"
-    },
-    "translate": {
-      "description": "Pretvori tijelo iz jednog formata u drugi"
-    },
-    "send": {
-      "description": "Prevedi i pošalji uzvodno"
-    },
-    "stream": {
-      "description": "Prevedi tijelo zahtjeva u streamu"
-    },
-    "from": "Izvorni format (openai|anthropic|gemini|cohere)",
-    "to": "Ciljni format (openai|anthropic|gemini|cohere)",
-    "file": "Putanja do JSON datoteke tijela zahtjeva",
-    "out": "Spremi izlaz u datoteku",
-    "model": "Prepiši model",
-    "history": {
-      "limit": "Maksimalan broj rezultata"
-    }
-  },
   "pricing": {
     "description": "Upravljanje podacima o cijenama za modele",
     "sync": {

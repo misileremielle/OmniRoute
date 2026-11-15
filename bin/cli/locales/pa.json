@@ -885,29 +885,6 @@
       "out": "ਗਲਤੀਆਂ ਨੂੰ ਪਾਥ 'ਤੇ ਸੰਭਾਲੋ"
     }
   },
-  "translator": {
-    "description": "LLM ਫਾਰਮੈਟਾਂ ਵਿਚਕਾਰ ਬੇਨਤੀ ਬਾਡੀਆਂ ਦਾ ਅਨੁਵਾਦ ਕਰੋ",
-    "detect": {
-      "description": "ਬਾਡੀ ਫਾਰਮੈਟ ਦਾ ਪਤਾ ਲਗਾਓ"
-    },
-    "translate": {
-      "description": "ਬਾਡੀ ਨੂੰ ਇੱਕ ਫਾਰਮੈਟ ਤੋਂ ਦੂਜੇ ਵਿੱਚ ਬਦਲੋ"
-    },
-    "send": {
-      "description": "ਅਨੁਵਾਦ ਕਰੋ ਅਤੇ ਅੱਪਸਟ੍ਰੀਮ ਨੂੰ ਭੇਜੋ"
-    },
-    "stream": {
-      "description": "ਬੇਨਤੀ ਬਾਡੀ ਦਾ ਸਟ੍ਰੀਮ-ਅਨੁਵਾਦ ਕਰੋ"
-    },
-    "from": "ਸਰੋਤ ਫਾਰਮੈਟ (openai|anthropic|gemini|cohere)",
-    "to": "ਟੀਚਾ ਫਾਰਮੈਟ (openai|anthropic|gemini|cohere)",
-    "file": "ਬੇਨਤੀ ਬਾਡੀ ਦੀ JSON ਫਾਈਲ ਦਾ ਪਾਥ",
-    "out": "ਆਉਟਪੁੱਟ ਨੂੰ ਫਾਈਲ ਵਿੱਚ ਸੰਭਾਲੋ",
-    "model": "ਮਾਡਲ ਨੂੰ ਓਵਰਰਾਈਡ ਕਰੋ",
-    "history": {
-      "limit": "ਵੱਧ ਤੋਂ ਵੱਧ ਨਤੀਜੇ"
-    }
-  },
   "pricing": {
     "description": "ਮਾਡਲਾਂ ਲਈ ਕੀਮਤ ਡਾਟਾ ਪ੍ਰਬੰਧਿਤ ਕਰੋ",
     "sync": {

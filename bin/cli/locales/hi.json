@@ -885,29 +885,6 @@
       "out": "त्रुटियों को पाथ में सहेजें"
     }
   },
-  "translator": {
-    "description": "LLM प्रारूपों के बीच अनुरोध बॉडी का अनुवाद करें",
-    "detect": {
-      "description": "बॉडी प्रारूप पहचानें"
-    },
-    "translate": {
-      "description": "बॉडी को एक प्रारूप से दूसरे में बदलें"
-    },
-    "send": {
-      "description": "अनुवाद करके अपस्ट्रीम पर भेजें"
-    },
-    "stream": {
-      "description": "अनुरोध बॉडी का स्ट्रीम-अनुवाद करें"
-    },
-    "from": "स्रोत प्रारूप (openai|anthropic|gemini|cohere)",
-    "to": "लक्षित प्रारूप (openai|anthropic|gemini|cohere)",
-    "file": "अनुरोध बॉडी की JSON फ़ाइल का पाथ",
-    "out": "आउटपुट को फ़ाइल में सहेजें",
-    "model": "मॉडल ओवरराइड करें",
-    "history": {
-      "limit": "अधिकतम परिणाम"
-    }
-  },
   "pricing": {
     "description": "मॉडल के लिए मूल्य-निर्धारण डेटा प्रबंधित करें",
     "sync": {

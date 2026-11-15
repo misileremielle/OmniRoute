@@ -574,21 +574,6 @@
       "count": 1
     }
   },
-  "src/app/(dashboard)/dashboard/translator/components/ResultNarrated.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/app/(dashboard)/dashboard/translator/components/SimpleControls.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/app/(dashboard)/dashboard/translator/components/TranslateTab.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/(dashboard)/dashboard/usage/components/ProviderLimits/utils.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
@@ -1208,11 +1193,6 @@
     }
   },
   "src/shared/validation/schemas/settings.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 11
-    }
-  },
-  "src/shared/validation/schemas/translator.ts": {
     "@typescript-eslint/no-unused-vars": {
       "count": 11
     }

@@ -885,29 +885,6 @@
       "out": "រក្សាទុកកំហុសទៅផ្លូវ"
     }
   },
-  "translator": {
-    "description": "បកប្រែតួសំណើរវាងទម្រង់ LLM",
-    "detect": {
-      "description": "រកឃើញទម្រង់តួសារ"
-    },
-    "translate": {
-      "description": "បម្លែងតួសារពីទម្រង់មួយទៅទម្រង់មួយទៀត"
-    },
-    "send": {
-      "description": "បម្លែង និងបញ្ជូនទៅប្រភពខាងលើ"
-    },
-    "stream": {
-      "description": "បម្លែងតួសារសំណើតាមស្ទ្រីម"
-    },
-    "from": "ទម្រង់ប្រភព (openai|anthropic|gemini|cohere)",
-    "to": "ទម្រង់គោលដៅ (openai|anthropic|gemini|cohere)",
-    "file": "ផ្លូវទៅកាន់ឯកសារ JSON នៃតួសារសំណើ",
-    "out": "រក្សាទុកលទ្ធផលទៅឯកសារ",
-    "model": "ប្រើម៉ូដែលជំនួស",
-    "history": {
-      "limit": "ចំនួនលទ្ធផលអតិបរមា"
-    }
-  },
   "pricing": {
     "description": "គ្រប់គ្រងទិន្នន័យតម្លៃសម្រាប់ម៉ូដែល",
     "sync": {

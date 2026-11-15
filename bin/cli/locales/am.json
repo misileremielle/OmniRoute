@@ -885,29 +885,6 @@
       "out": "ስህተቶችን ወደ ዱካ አስቀምጥ"
     }
   },
-  "translator": {
-    "description": "የጥያቄ አካሎችን በLLM ቅርጸቶች መካከል ተርጉም",
-    "detect": {
-      "description": "የይዘቱን ቅርጸት ለይ"
-    },
-    "translate": {
-      "description": "ይዘቱን ከአንድ ቅርጸት ወደ ሌላ ቀይር"
-    },
-    "send": {
-      "description": "ተርጉምና ወደ ላይኛው ምንጭ ላክ"
-    },
-    "stream": {
-      "description": "የጥያቄውን ይዘት በዥረት ተርጉም"
-    },
-    "from": "የምንጭ ቅርጸት (openai|anthropic|gemini|cohere)",
-    "to": "የመድረሻ ቅርጸት (openai|anthropic|gemini|cohere)",
-    "file": "የጥያቄ ይዘት JSON ፋይል ዱካ",
-    "out": "ውጤቱን ወደ ፋይል አስቀምጥ",
-    "model": "ሞዴሉን ተካ",
-    "history": {
-      "limit": "ከፍተኛው የውጤቶች ብዛት"
-    }
-  },
   "pricing": {
     "description": "የሞዴሎችን የዋጋ መረጃ አስተዳድር",
     "sync": {

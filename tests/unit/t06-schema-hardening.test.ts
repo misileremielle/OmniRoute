@@ -2,9 +2,6 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   validateBody,
-  translatorDetectSchema,
-  translatorSendSchema,
-  translatorTranslateSchema,
   cliSettingsEnvSchema,
   v1EmbeddingsSchema,
   providerChatCompletionSchema,
@@ -15,35 +12,6 @@ import {
   taskRoutingActionSchema,
   codexProfileIdSchema,
 } from "../../src/shared/validation/schemas.ts";
-
-test("translatorDetectSchema rejects empty body object", () => {
-  const validation = validateBody(translatorDetectSchema, { body: {} });
-  assert.equal(validation.success, false);
-});
-
-test("translatorSendSchema rejects empty body object", () => {
-  const validation = validateBody(translatorSendSchema, {
-    provider: "openai",
-    body: {},
-  });
-  assert.equal(validation.success, false);
-});
-
-test("translatorTranslateSchema requires explicit step", () => {
-  const validation = validateBody(translatorTranslateSchema, {
-    provider: "openai",
-    body: { model: "gpt-4o-mini" },
-  });
-  assert.equal(validation.success, false);
-});
-
-test("translatorTranslateSchema requires provider for non-direct step", () => {
-  const validation = validateBody(translatorTranslateSchema, {
-    step: 2,
-    body: { model: "gpt-4o-mini" },
-  });
-  assert.equal(validation.success, false);
-});
 
 test("cliSettingsEnvSchema coerces numeric and boolean values to string", () => {
   const validation = validateBody(cliSettingsEnvSchema, {

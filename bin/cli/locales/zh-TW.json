@@ -885,29 +885,6 @@
       "out": "將錯誤儲存到路徑"
     }
   },
-  "translator": {
-    "description": "在 LLM 格式之間轉換請求體",
-    "detect": {
-      "description": "檢測請求體格式"
-    },
-    "translate": {
-      "description": "將請求體從一種格式轉換為另一種格式"
-    },
-    "send": {
-      "description": "轉換併發送到上游"
-    },
-    "stream": {
-      "description": "流式轉換請求體"
-    },
-    "from": "源格式（openai|anthropic|gemini|cohere）",
-    "to": "目標格式（openai|anthropic|gemini|cohere）",
-    "file": "請求體 JSON 檔案路徑",
-    "out": "將輸出儲存到檔案",
-    "model": "覆蓋模型",
-    "history": {
-      "limit": "最大結果數"
-    }
-  },
   "pricing": {
     "description": "管理模型定價資料",
     "sync": {

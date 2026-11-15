@@ -885,29 +885,6 @@
       "out": "දෝෂ මාර්ගයට සුරකින්න"
     }
   },
-  "translator": {
-    "description": "LLM ආකෘති අතර ඉල්ලීම් අන්තර්ගත පරිවර්තනය කරන්න",
-    "detect": {
-      "description": "බොඩි ආකෘතිය හඳුනා ගන්න"
-    },
-    "translate": {
-      "description": "බොඩිය එක් ආකෘතියකින් තවත් ආකෘතියකට පරිවර්තනය කරන්න"
-    },
-    "send": {
-      "description": "පරිවර්තනය කර upstream වෙත යවන්න"
-    },
-    "stream": {
-      "description": "ඉල්ලීම් බොඩියක් ප්රවාහගතව පරිවර්තනය කරන්න"
-    },
-    "from": "මූලාශ්ර ආකෘතිය (openai|anthropic|gemini|cohere)",
-    "to": "ඉලක්ක ආකෘතිය (openai|anthropic|gemini|cohere)",
-    "file": "ඉල්ලීම් බොඩිය අඩංගු JSON ගොනුවට මාර්ගය",
-    "out": "ප්රතිදානය ගොනුවකට සුරකින්න",
-    "model": "ආකෘතිය අතික්රමණය කරන්න",
-    "history": {
-      "limit": "උපරිම ප්රතිඵල ගණන"
-    }
-  },
   "pricing": {
     "description": "මාදිලි සඳහා මිල දත්ත කළමනාකරණය කරන්න",
     "sync": {

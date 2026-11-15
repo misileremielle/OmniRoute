@@ -885,29 +885,6 @@
       "out": "Fouten opslaan in pad"
     }
   },
-  "translator": {
-    "description": "Aanvraaginhoud vertalen tussen LLM-indelingen",
-    "detect": {
-      "description": "Indeling van aanvraaginhoud detecteren"
-    },
-    "translate": {
-      "description": "Aanvraaginhoud van de ene indeling naar de andere converteren"
-    },
-    "send": {
-      "description": "Vertalen en doorsturen naar upstream"
-    },
-    "stream": {
-      "description": "Aanvraaginhoud streamend vertalen"
-    },
-    "from": "Bronindeling (openai|anthropic|gemini|cohere)",
-    "to": "Doelindeling (openai|anthropic|gemini|cohere)",
-    "file": "Pad naar JSON-bestand met aanvraaginhoud",
-    "out": "Uitvoer opslaan in bestand",
-    "model": "Model overschrijven",
-    "history": {
-      "limit": "Maximumaantal resultaten"
-    }
-  },
   "pricing": {
     "description": "Prijsgegevens voor modellen beheren",
     "sync": {

@@ -464,13 +464,6 @@ const AUDIT_GROUP: SidebarItemGroup = {
 
 const DEVTOOLS_ITEMS: readonly SidebarItemDefinition[] = [
   {
-    id: "translator",
-    href: "/dashboard/translator",
-    i18nKey: "translator",
-    subtitleKey: "translatorSubtitle",
-    icon: "translate",
-  },
-  {
     id: "search-tools",
     href: "/dashboard/search-tools",
     i18nKey: "searchTools",

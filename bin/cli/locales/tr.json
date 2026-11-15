@@ -885,29 +885,6 @@
       "out": "Hataları yola kaydet"
     }
   },
-  "translator": {
-    "description": "İstek gövdelerini LLM biçimleri arasında dönüştür",
-    "detect": {
-      "description": "Gövde biçimini algıla"
-    },
-    "translate": {
-      "description": "Gövdeyi bir biçimden diğerine dönüştür"
-    },
-    "send": {
-      "description": "Dönüştür ve üst akışa gönder"
-    },
-    "stream": {
-      "description": "İstek gövdesini akış sırasında dönüştür"
-    },
-    "from": "Kaynak biçim (openai|anthropic|gemini|cohere)",
-    "to": "Hedef biçim (openai|anthropic|gemini|cohere)",
-    "file": "İstek gövdesi JSON dosyasının yolu",
-    "out": "Çıktıyı dosyaya kaydet",
-    "model": "Modeli geçersiz kıl",
-    "history": {
-      "limit": "Maksimum sonuç sayısı"
-    }
-  },
   "pricing": {
     "description": "Modellerin fiyatlandırma verilerini yönet",
     "sync": {

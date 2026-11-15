@@ -885,29 +885,6 @@
       "out": "שמירת שגיאות בנתיב"
     }
   },
-  "translator": {
-    "description": "תרגום גופי בקשות בין פורמטים של LLM",
-    "detect": {
-      "description": "זיהוי פורמט הגוף"
-    },
-    "translate": {
-      "description": "המרת הגוף מפורמט אחד לאחר"
-    },
-    "send": {
-      "description": "תרגום ושליחה לשירות במעלה הזרם"
-    },
-    "stream": {
-      "description": "תרגום בהזרמה של גוף בקשה"
-    },
-    "from": "פורמט מקור (openai|anthropic|gemini|cohere)",
-    "to": "פורמט יעד (openai|anthropic|gemini|cohere)",
-    "file": "נתיב לקובץ JSON של גוף הבקשה",
-    "out": "שמירת הפלט בקובץ",
-    "model": "דריסת המודל",
-    "history": {
-      "limit": "מספר תוצאות מרבי"
-    }
-  },
   "pricing": {
     "description": "ניהול נתוני תמחור למודלים",
     "sync": {

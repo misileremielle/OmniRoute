@@ -885,29 +885,6 @@
       "out": "حفظ الأخطاء في مسار"
     }
   },
-  "translator": {
-    "description": "ترجمة نصوص الطلبات بين تنسيقات LLM",
-    "detect": {
-      "description": "اكتشاف تنسيق النص"
-    },
-    "translate": {
-      "description": "تحويل النص من تنسيق إلى آخر"
-    },
-    "send": {
-      "description": "الترجمة والإرسال إلى المصدر الرئيسي"
-    },
-    "stream": {
-      "description": "ترجمة نص الطلب المتدفق"
-    },
-    "from": "تنسيق المصدر (openai|anthropic|gemini|cohere)",
-    "to": "التنسيق المستهدف (openai|anthropic|gemini|cohere)",
-    "file": "مسار ملف JSON لنص الطلب",
-    "out": "حفظ المخرجات في ملف",
-    "model": "تجاوز النموذج",
-    "history": {
-      "limit": "الحد الأقصى للنتائج"
-    }
-  },
   "pricing": {
     "description": "إدارة بيانات تسعير النماذج",
     "sync": {

@@ -885,29 +885,6 @@
       "out": "エラーの保存先パス"
     }
   },
-  "translator": {
-    "description": "LLM形式間でリクエストボディを変換",
-    "detect": {
-      "description": "ボディ形式を検出"
-    },
-    "translate": {
-      "description": "ボディを別の形式に変換"
-    },
-    "send": {
-      "description": "変換してアップストリームに送信"
-    },
-    "stream": {
-      "description": "リクエストボディをストリーム変換"
-    },
-    "from": "変換元の形式（openai|anthropic|gemini|cohere）",
-    "to": "変換先の形式（openai|anthropic|gemini|cohere）",
-    "file": "リクエストボディのJSONファイルへのパス",
-    "out": "出力をファイルに保存",
-    "model": "モデルを上書き",
-    "history": {
-      "limit": "最大結果数"
-    }
-  },
   "pricing": {
     "description": "モデルの料金データを管理",
     "sync": {

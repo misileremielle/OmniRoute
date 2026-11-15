@@ -885,29 +885,6 @@
       "out": "Zapisz błędy w ścieżce"
     }
   },
-  "translator": {
-    "description": "Konwertuj treści żądań między formatami LLM",
-    "detect": {
-      "description": "Wykryj format treści"
-    },
-    "translate": {
-      "description": "Konwertuj treść z jednego formatu na inny"
-    },
-    "send": {
-      "description": "Przetłumacz i wyślij do usługi nadrzędnej"
-    },
-    "stream": {
-      "description": "Konwertuj strumieniowo treść żądania"
-    },
-    "from": "Format źródłowy (openai|anthropic|gemini|cohere)",
-    "to": "Format docelowy (openai|anthropic|gemini|cohere)",
-    "file": "Ścieżka do pliku JSON z treścią żądania",
-    "out": "Zapisz dane wyjściowe do pliku",
-    "model": "Zastąp model",
-    "history": {
-      "limit": "Maksymalna liczba wyników"
-    }
-  },
   "pricing": {
     "description": "Zarządzaj danymi cenowymi modeli",
     "sync": {

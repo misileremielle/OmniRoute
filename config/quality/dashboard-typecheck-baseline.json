@@ -58,12 +58,6 @@
   "src/app/(dashboard)/dashboard/settings/components/AppearanceTab.tsx": {
     "TS2339": 4
   },
-  "src/app/(dashboard)/dashboard/translator/components/MonitorTab.tsx": {
-    "TS2345": 1
-  },
-  "src/app/(dashboard)/dashboard/translator/components/advanced/StreamTransformerAccordion.tsx": {
-    "TS2345": 1
-  },
   "src/app/(dashboard)/dashboard/usage/components/ProviderLimits/index.tsx": {
     "TS2339": 2
   },

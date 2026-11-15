@@ -885,29 +885,6 @@
       "out": "Saglabāt kļūdas ceļā"
     }
   },
-  "translator": {
-    "description": "Tulkot pieprasījuma ķermeņus starp LLM formātiem",
-    "detect": {
-      "description": "Noteikt satura formātu"
-    },
-    "translate": {
-      "description": "Pārvērst satura formātu no viena formāta uz citu"
-    },
-    "send": {
-      "description": "Tulkot un nosūtīt augšup"
-    },
-    "stream": {
-      "description": "Tulkot pieprasījuma saturu strauta veidā"
-    },
-    "from": "Avota formāts (openai|anthropic|gemini|cohere)",
-    "to": "Mērķa formāts (openai|anthropic|gemini|cohere)",
-    "file": "Ceļš uz pieprasījuma satura JSON failu",
-    "out": "Saglabāt izvadi failā",
-    "model": "Pārrakstīt modeli",
-    "history": {
-      "limit": "Maksimālie rezultāti"
-    }
-  },
   "pricing": {
     "description": "Pārvaldīt cenu datus modeļiem",
     "sync": {

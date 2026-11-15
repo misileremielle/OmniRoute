@@ -10,15 +10,7 @@ export default function BadRequestPage() {
       icon="rule"
       title={t("statusPages.400.title")}
       description={t("statusPages.400.description")}
-      suggestions={[
-        t("statusPages.400.suggestion1"),
-        t("statusPages.400.suggestion2"),
-        t("statusPages.400.suggestion3"),
-      ]}
-      primaryAction={{
-        href: "/dashboard/translator",
-        label: t("statusPages.400.secondaryAction"),
-      }}
+      suggestions={[t("statusPages.400.suggestion1"), t("statusPages.400.suggestion2")]}
     />
   );
 }

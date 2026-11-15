@@ -134,7 +134,6 @@ Main pages under `src/app/(dashboard)/dashboard/`:
 - `/dashboard/context/caveman` — Caveman compression rules, language packs, preview, and output mode
 - `/dashboard/context/rtk` — RTK command-output filters, preview, and runtime safety settings
 - `/dashboard/context/combos` — named compression pipelines assigned to routing combos
-- `/dashboard/translator` — translator inspection and request format conversion preview
 - `/dashboard/audit` — compliance audit log browser with pagination and structured metadata
 - `/dashboard/usage` — per-request usage browser tied to `usage_history`
 - `/dashboard/compression` — compression analytics, statistics, and pipeline assignment

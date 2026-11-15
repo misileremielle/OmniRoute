@@ -885,29 +885,6 @@
       "out": "Išsaugoti klaidas nurodytu keliu"
     }
   },
-  "translator": {
-    "description": "Konvertuoti užklausų turinius tarp LLM formatų",
-    "detect": {
-      "description": "Aptikti užklausos turinio formatą"
-    },
-    "translate": {
-      "description": "Konvertuoti užklausos turinį iš vieno formato į kitą"
-    },
-    "send": {
-      "description": "Konvertuoti ir išsiųsti pirminiam serveriui"
-    },
-    "stream": {
-      "description": "Srautiniu būdu konvertuoti užklausos turinį"
-    },
-    "from": "Šaltinio formatas (openai|anthropic|gemini|cohere)",
-    "to": "Tikslinis formatas (openai|anthropic|gemini|cohere)",
-    "file": "Kelias į užklausos turinio JSON failą",
-    "out": "Įrašyti išvestį į failą",
-    "model": "Pakeisti modelį",
-    "history": {
-      "limit": "Didžiausias rezultatų skaičius"
-    }
-  },
   "pricing": {
     "description": "Tvarkyti modelių kainodaros duomenis",
     "sync": {

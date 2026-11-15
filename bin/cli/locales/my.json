@@ -885,29 +885,6 @@
       "out": "အမှားများကို path တွင် သိမ်းရန်"
     }
   },
-  "translator": {
-    "description": "တောင်းဆိုမှု body များကို LLM format များအကြား ဘာသာပြန်ရန်",
-    "detect": {
-      "description": "Body ဖော်မတ်ကို စစ်ဆေးသတ်မှတ်ပါ"
-    },
-    "translate": {
-      "description": "Body ကို ဖော်မတ်တစ်ခုမှ အခြားဖော်မတ်တစ်ခုသို့ ပြောင်းပါ"
-    },
-    "send": {
-      "description": "ဘာသာပြန်ပြီး upstream သို့ ပေးပို့ပါ"
-    },
-    "stream": {
-      "description": "တောင်းဆိုချက် body ကို stream ဖြင့် ဘာသာပြန်ပါ"
-    },
-    "from": "မူရင်းဖော်မတ် (openai|anthropic|gemini|cohere)",
-    "to": "ပစ်မှတ်ဖော်မတ် (openai|anthropic|gemini|cohere)",
-    "file": "တောင်းဆိုချက် body JSON ဖိုင်သို့ လမ်းကြောင်း",
-    "out": "ရလဒ်ကို ဖိုင်သို့ သိမ်းပါ",
-    "model": "မော်ဒယ်ကို အစားထိုးသတ်မှတ်ပါ",
-    "history": {
-      "limit": "အများဆုံးရလဒ်အရေအတွက်"
-    }
-  },
   "pricing": {
     "description": "မော်ဒယ်များအတွက် ဈေးနှုန်းဒေတာကို စီမံပါ",
     "sync": {
