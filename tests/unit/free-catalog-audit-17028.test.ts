@@ -37,7 +37,7 @@ for (const id of pricedCloudIds) {
   });
 }
 
-test("#17028 seven exact free offers have evidence while regional and account gaps remain debt", () => {
+test("#17028 five exact free offers have evidence while regional and account gaps remain debt", () => {
   const policy = JSON.parse(
     readFileSync(
       new URL("../../config/quality/free-catalog-evidence.json", import.meta.url),
@@ -55,13 +55,11 @@ test("#17028 seven exact free offers have evidence while regional and account ga
     "gemini/gemini-2.5-flash",
     "gemini/gemini-2.5-flash-lite",
     "glm-cn/glm-4.5-flash",
-    "requesty/mistral/leanstral-1-5",
-    "requesty/nvidia/nemotron-3-nano-30b-a3b",
   ]) {
     assert.ok(evidence.has(key), key);
     assert.equal(policy.debt.includes(key), false, key);
   }
-  for (const key of ["agnes-cn/agnes-2.5-flash", "aion/aion-labs/aion-3.0"]) {
+  for (const key of ["agnes-cn/agnes-2.5-flash"]) {
     assert.equal(evidence.has(key), false, key);
     assert.ok(policy.debt.includes(key), key);
   }

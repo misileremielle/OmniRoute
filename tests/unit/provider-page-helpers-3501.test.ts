@@ -35,7 +35,6 @@ import {
   getCodexRequestDefaults,
   getClaudeCodeCompatibleRequestDefaults,
   compatProtocolLabelKey,
-  extractCommandCodeCredentialInput,
   normalizeAndValidateHttpBaseUrl,
   SILICONFLOW_ENDPOINTS,
   type HeaderDraftRow,
@@ -191,12 +190,6 @@ test("compatProtocolLabelKey maps protocol strings to i18n keys", () => {
   assert.equal(compatProtocolLabelKey("openai"), "compatProtocolOpenAI");
   assert.equal(compatProtocolLabelKey("claude"), "compatProtocolClaude");
   assert.equal(compatProtocolLabelKey("unknown"), "compatProtocolOpenAI");
-});
-
-test("extractCommandCodeCredentialInput extracts from JSON/URL/raw (transitive import guard)", () => {
-  assert.equal(extractCommandCodeCredentialInput("  "), "");
-  assert.equal(extractCommandCodeCredentialInput("rawtoken"), "rawtoken");
-  assert.equal(extractCommandCodeCredentialInput(JSON.stringify({ apiKey: "abc123" })), "abc123");
 });
 
 test("normalizeAndValidateHttpBaseUrl validates http/https URLs", () => {

@@ -8,8 +8,9 @@ import {
 
 test("FREE_TIER_BUDGETS holds positive integer monthly-token budgets", () => {
   // 2026-09-02 re-audit: gemini + ollama-cloud left (no published cap), nara joined;
-  // #12591 then dropped cerebras (one-time credit) → 17 legacy keys.
-  assert.ok(Object.keys(FREE_TIER_BUDGETS).length >= 17);
+  // #12591 then dropped cerebras (one-time credit) → 17 legacy keys; the fork's
+  // router/gateway removal took six more → 11.
+  assert.ok(Object.keys(FREE_TIER_BUDGETS).length >= 11);
   for (const [id, tokens] of Object.entries(FREE_TIER_BUDGETS)) {
     assert.ok(Number.isInteger(tokens) && tokens > 0, `${id} must be a positive integer`);
   }
@@ -31,19 +32,20 @@ test("FREE_TIER_TOS marks proxy-prohibited providers as avoid", () => {
 test("computeFreeTierTotals sums the documented budgets", () => {
   const t = computeFreeTierTotals();
   // 2026-09-02 re-audit: gemini + ollama-cloud left the legacy map (no published cap),
-  // nara joined, groq → 30M; #12591 dropped cerebras → 17 providers, legacy sum 1,475,025,000.
-  assert.equal(t.providerCount, 17);
-  assert.ok(t.documentedMonthlyTokens >= 1_425_000_000);
-  assert.ok(t.documentedMonthlyTokens <= 1_525_000_000);
+  // nara joined, groq → 30M; #12591 dropped cerebras → 17 providers. The fork's
+  // router/gateway removal left 11 providers, legacy sum 1,225,425,000.
+  assert.equal(t.providerCount, 11);
+  assert.ok(t.documentedMonthlyTokens >= 1_200_000_000);
+  assert.ok(t.documentedMonthlyTokens <= 1_250_000_000);
   assert.equal(typeof t.headline, "string");
-  // 2026-09-02 re-audit + #12591 (cerebras dropped): headline reads "over 1.48B …".
-  assert.match(t.headline, /1\.4/);
+  // After the fork's provider removals the headline reads "over 1.23B …".
+  assert.match(t.headline, /1\.2/);
 });
 
 test("computeFreeTierTotals can exclude ToS-avoid providers", () => {
   const all = computeFreeTierTotals();
   const clean = computeFreeTierTotals({ excludeTosAvoid: true });
   assert.equal(all.documentedMonthlyTokens - clean.documentedMonthlyTokens, 25_000);
-  // 2026-09-02 re-audit + #12591: 17 legacy providers, minus kiro (ToS avoid) → 16.
-  assert.equal(clean.providerCount, 16);
+  // 11 legacy providers, minus kiro (ToS avoid) → 10.
+  assert.equal(clean.providerCount, 10);
 });

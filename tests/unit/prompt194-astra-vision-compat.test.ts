@@ -56,7 +56,7 @@ test("prompt194: codex/gpt-6-astra remains admitted for image requests", () => {
 
 test("prompt194: unknown and explicit non-vision targets remain fail-closed", () => {
   const unknown = target("unknown-provider", "unknown-model");
-  const nonVision = target("cnl", "deepseek/deepseek-v4-pro");
+  const nonVision = target("mimo", "mimo/mimo-v2.5-pro");
 
   assert.equal(
     getResolvedModelCapabilities({ provider: unknown.providerId, model: unknown.modelStr })

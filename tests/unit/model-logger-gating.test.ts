@@ -27,12 +27,14 @@ const CASES: Array<[string, ReturnType<typeof parseModel>]> = [
     },
   ],
   [
+    // Was an exact id (provider null) while the zenmux gateways catalogued
+    // "deepseek/deepseek-chat" verbatim; with them removed it routes to deepseek.
     "deepseek/deepseek-chat",
     {
-      provider: null,
-      model: "deepseek/deepseek-chat",
-      isAlias: true,
-      providerAlias: null,
+      provider: "deepseek",
+      model: "deepseek-chat",
+      isAlias: false,
+      providerAlias: "deepseek",
       extendedContext: false,
     },
   ],

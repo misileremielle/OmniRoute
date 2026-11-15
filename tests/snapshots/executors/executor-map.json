@@ -1,10 +1,5 @@
 {
   "entries": {
-    "1min": {
-      "className": "OneMinAiExecutor",
-      "configSource": "oneminai",
-      "provider": "oneminai"
-    },
     "9router": {
       "className": "NineRouterExecutor",
       "configSource": "<custom-config>",
@@ -75,16 +70,6 @@
       "configSource": "chatgpt",
       "provider": "chatgpt"
     },
-    "cheaperinference": {
-      "className": "CheaperInferenceExecutor",
-      "configSource": "cheaperinference",
-      "provider": "cheaperinference"
-    },
-    "cinf": {
-      "className": "CheaperInferenceExecutor",
-      "configSource": "cheaperinference",
-      "provider": "cheaperinference"
-    },
     "cliproxyapi": {
       "className": "CliproxyapiExecutor",
       "configSource": "<custom-config>",
@@ -105,11 +90,6 @@
       "configSource": "clova-studio",
       "provider": "clova-studio"
     },
-    "cmd": {
-      "className": "CommandCodeExecutor",
-      "configSource": "<custom-config>",
-      "provider": "command-code"
-    },
     "codebuddy-cn": {
       "className": "CodeBuddyCnExecutor",
       "configSource": "codebuddy-cn",
@@ -129,11 +109,6 @@
       "className": "CodexAppServerExecutor",
       "configSource": "codex-app-server",
       "provider": "codex-app-server"
-    },
-    "command-code": {
-      "className": "CommandCodeExecutor",
-      "configSource": "<custom-config>",
-      "provider": "command-code"
     },
     "cpa": {
       "className": "CliproxyapiExecutor",
@@ -295,11 +270,6 @@
       "configSource": "<custom-config>",
       "provider": "9router"
     },
-    "oneminai": {
-      "className": "OneMinAiExecutor",
-      "configSource": "oneminai",
-      "provider": "oneminai"
-    },
     "opencode-go": {
       "className": "OpencodeExecutor",
       "configSource": "opencode-go",
@@ -381,6 +351,6 @@
       "provider": "zed-hosted"
     }
   },
-  "keyCount": 76,
+  "keyCount": 70,
   "sharedInstances": []
 }

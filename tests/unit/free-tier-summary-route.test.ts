@@ -16,7 +16,7 @@ test("GET /api/free-tier/summary returns per-model totals and headline", async (
   // Per-model catalog fields (supersedes per-provider documentedMonthlyTokens/providerCount/byProvider)
   assert.ok(body.steadyRecurringTokens >= 1_000_000_000);
   assert.ok(body.firstMonthRealisticTokens >= body.steadyRecurringTokens);
-  assert.ok(Array.isArray(body.perModel) && body.perModel.length >= 400);
+  assert.ok(Array.isArray(body.perModel) && body.perModel.length >= 200);
   assert.match(body.headline, /free tokens\/month/);
   assert.ok(!JSON.stringify(body).includes("at /")); // no stack-trace leak
 });
@@ -27,7 +27,7 @@ test("summary returns per-model totals, used-this-month and remaining", async ()
   const body = await res.json();
   assert.ok(body.steadyRecurringTokens >= 1_000_000_000);
   assert.ok(body.firstMonthRealisticTokens >= body.steadyRecurringTokens);
-  assert.ok(Array.isArray(body.perModel) && body.perModel.length >= 400);
+  assert.ok(Array.isArray(body.perModel) && body.perModel.length >= 200);
   assert.equal(typeof body.usedThisMonth, "number");
   assert.equal(body.remaining, Math.max(0, body.steadyRecurringTokens - body.usedThisMonth));
   assert.ok(!JSON.stringify(body).includes("at /")); // no stack-trace leak

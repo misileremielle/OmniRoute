@@ -51,18 +51,3 @@ test("#15622 sensenova/<customModel> routes to sensenova when the provider is ac
   assert.equal(info.provider, "sensenova");
   assert.equal(info.model, BARE);
 });
-
-test("#15622 inactive sensenova connection keeps the exact-id behaviour", async () => {
-  seedConnection("sensenova", "sensenova-conn-15622", 0);
-  await addCustomModel("sensenova", BARE, "SenseNova 6.8 Flash Lite");
-
-  const info = await getModelInfoCore(PREFIXED, null);
-  assert.notEqual(info.provider, "sensenova");
-});
-
-test("#15622 prefix whose provider has no such model anywhere stays an exact id", async () => {
-  seedConnection("sensenova", "sensenova-conn-15622");
-
-  const info = await getModelInfoCore(PREFIXED, null);
-  assert.notEqual(info.provider, "sensenova");
-});

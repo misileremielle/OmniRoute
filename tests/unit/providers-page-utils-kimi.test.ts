@@ -8,15 +8,7 @@ const providerPageUtils =
 
 test("kimi-coding-apikey and kimi never render as their own dashboard card in ANY section (hiddenFromDashboard)", () => {
   const getProviderStats = () => ({ total: 0 });
-  const categories = [
-    "no-auth",
-    "oauth",
-    "web-cookie",
-    "local",
-    "search",
-    "upstream-proxy",
-    "apikey",
-  ] as const;
+  const categories = ["no-auth", "oauth", "local", "search", "upstream-proxy", "apikey"] as const;
 
   for (const category of categories) {
     const entries = providerPageUtils.buildStaticProviderEntries(category, getProviderStats);

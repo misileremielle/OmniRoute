@@ -12,11 +12,10 @@ const openai = await import("../../src/lib/providers/validation/openaiFormat.ts"
 const anthropic = await import("../../src/lib/providers/validation/anthropicFormat.ts");
 const HOST = await import("../../src/lib/providers/validation.ts");
 
-test("openaiFormat exposes its five validators", () => {
+test("openaiFormat exposes its four validators", () => {
   for (const name of [
     "validateBedrockProvider",
     "validateOpenAILikeProvider",
-    "validateCommandCodeProvider",
     "validateGeminiLikeProvider",
     "validateOpenAICompatibleProvider",
   ]) {
@@ -39,9 +38,8 @@ test("anthropicFormat exposes its four validators (incl. the internal claude-oau
   }
 });
 
-test("host re-exports the two historically-public validators + keeps the dispatcher", () => {
+test("host re-exports the historically-public validator + keeps the dispatcher", () => {
   assert.equal(typeof (HOST as Record<string, unknown>).validateProviderApiKey, "function");
-  assert.equal(typeof (HOST as Record<string, unknown>).validateCommandCodeProvider, "function");
   assert.equal(
     typeof (HOST as Record<string, unknown>).validateClaudeCodeCompatibleProvider,
     "function"

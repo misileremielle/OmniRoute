@@ -77,7 +77,7 @@ test("#17289 WorkBuddy's exact DeepSeek Flash aliases have scoped vision evidenc
 test("#17289 confirmed vision takes precedence over unknown; explicit false stays blocked", () => {
   const known = target("workbuddy/global:deepseek-v4.1-flash");
   const unknown = target("workbuddy/unknown-model-17289");
-  const blind = target("cmd/gpt-5.3-codex");
+  const blind = target("mimo/mimo-v2.5-pro");
   assert.equal(deriveRequestCompatibilityRequirements(request).requiresVision, true);
   assert.equal(getResolvedModelCapabilities(unknown.modelStr).supportsVision, null);
   assert.equal(getResolvedModelCapabilities(blind.modelStr).supportsVision, false);

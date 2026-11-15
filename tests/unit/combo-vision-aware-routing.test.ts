@@ -123,19 +123,16 @@ test("nested case-insensitive image indicators still enforce hard vision compati
   assert.equal(hasHardCapabilityFailure(["context_window"]), false);
 });
 
-test(
-  "image request with explicitly non-vision targets fails closed (#8332, #17289)",
-  () => {
-    // Explicitly text-only variants stay excluded even after unknown-capability
-    // fallbacks were enabled for other models.
-    const models = ["cmd/gpt-5.3-codex", "mimo/mimo-v2.5-pro"];
-    for (const model of models) {
-      assert.equal(getResolvedModelCapabilities(model).supportsVision, false, model);
-    }
-    const out = filterTargetsByRequestCompatibility(models.map(target), imageBody, noopLog);
-    assert.deepEqual(out, [], "confirmed text-only targets must not receive images");
+test("image request with explicitly non-vision targets fails closed (#8332, #17289)", () => {
+  // Explicitly text-only variants stay excluded even after unknown-capability
+  // fallbacks were enabled for other models.
+  const models = ["mimo/mimo-v2.5-pro"];
+  for (const model of models) {
+    assert.equal(getResolvedModelCapabilities(model).supportsVision, false, model);
   }
-);
+  const out = filterTargetsByRequestCompatibility(models.map(target), imageBody, noopLog);
+  assert.deepEqual(out, [], "confirmed text-only targets must not receive images");
+});
 
 test("text-only request: targets are untouched by the vision filter", () => {
   const out = filterTargetsByRequestCompatibility(

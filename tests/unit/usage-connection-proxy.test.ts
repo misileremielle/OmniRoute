@@ -65,15 +65,11 @@ test("usage leaves route every proxied fetch through the connection proxy helper
   const here = dirname(fileURLToPath(import.meta.url));
   const root = join(here, "..", "..", "open-sse", "services");
   const leaves = [
-    join(root, "conolUsage.ts"),
     join(root, "usage", "github.ts"),
     join(root, "usage", "claude.ts"),
     join(root, "usage", "codex.ts"),
     join(root, "usage", "cursor.ts"),
-    join(root, "usage", "syntx.ts"),
     join(root, "usage", "devinCli.ts"),
-    join(root, "usage", "chatplayground.ts"),
-    join(root, "usage", "command-code.ts"),
   ];
   for (const file of leaves) {
     const source = readFileSync(file, "utf8");

@@ -38,7 +38,7 @@ test("Antigravity provider namespaces price every live Gemini 3.8 Flash tier", (
   }
 });
 
-test("Antigravity pricing excludes retired Flash ids without affecting other providers", () => {
+test("Antigravity pricing excludes retired Flash ids", () => {
   const pricing = getDefaultPricing() as Record<string, Record<string, unknown>>;
 
   for (const provider of ["ag", "antigravity", "agy"] as const) {
@@ -46,9 +46,4 @@ test("Antigravity pricing excludes retired Flash ids without affecting other pro
       assert.equal(pricing[provider][modelId], undefined, `${provider}/${modelId}`);
     }
   }
-
-  assert.ok(
-    pricing.orcarouter["google/gemini-3.6-flash"],
-    "OrcaRouter must retain the Gemini 3.6 model it still serves"
-  );
 });

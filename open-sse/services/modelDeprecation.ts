@@ -74,13 +74,6 @@ const BUILT_IN_ALIASES: Record<string, string> = {
   // Sweep 2026-06-19: codestral-2405 retired 2025-06-16 — forward to the current stable.
   "codestral-2405": "codestral-2508",
 
-  // Llama short aliases
-  "llama-3.3": "llama-3.3-70b-versatile",
-  "llama-3-70b": "llama-3.3-70b-versatile",
-  // #11503: llama3-8b-8192 deprecated on Groq 2025-08-30 and not in the
-  // catalog; llama-3.1-8b-instant is the replacement Groq names.
-  "llama-3-8b": "llama-3.1-8b-instant",
-
   // Agnes 1.5 Flash: wiki marks deprecated; live GET /v1/models
   // (2026-09-09) no longer lists it (503 no channel).
   "agnes-1.5-flash": "agnes-3.0-flash",

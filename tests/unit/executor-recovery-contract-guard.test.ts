@@ -494,12 +494,8 @@ test("new executor overrides have explicit recovery ownership", () => {
   );
   assert.equal(snapshot.originCommit, ORIGIN);
   assert.deepEqual(snapshot.identities, [...new Set(snapshot.identities)].sort());
-  assert.ok(
-    snapshot.identities.includes("open-sse/executors/commandCode.ts::CommandCodeExecutor::execute")
-  );
+  assert.ok(snapshot.identities.includes("open-sse/executors/codex.ts::CodexExecutor::execute"));
   const result = inspectExecutors(ROOT, new Set(snapshot.identities));
-  assert.ok(
-    result.identities.includes("open-sse/executors/commandCode.ts::CommandCodeExecutor::execute")
-  );
+  assert.ok(result.identities.includes("open-sse/executors/codex.ts::CodexExecutor::execute"));
   assert.deepEqual(result.issues, [], result.issues.join("\n"));
 });

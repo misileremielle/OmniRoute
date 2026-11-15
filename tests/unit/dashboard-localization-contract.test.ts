@@ -104,10 +104,7 @@ test("analytics charts localize calendar, account, and diversity labels", () => 
 });
 
 test("no-auth provider controls contain no raw English headings", () => {
-  const sources = [
-    readSource("src/shared/components/NoAuthAccountCard.tsx"),
-    readSource("src/shared/components/NoAuthProviderCard.tsx"),
-  ].join("\n");
+  const sources = readSource("src/shared/components/NoAuthProviderCard.tsx");
   assert.equal(sources.includes(">No authentication required<"), false);
   assert.equal(sources.includes(">Configure proxy<"), false);
   assert.equal(sources.includes(">Remove account<"), false);

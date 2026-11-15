@@ -34,5 +34,4 @@ test("directChatProbe exposes the shared validateDirectChatProvider helper", () 
 
 test("host dispatcher surface stays intact after the move", () => {
   assert.equal(typeof (HOST as Record<string, unknown>).validateProviderApiKey, "function");
-  assert.equal(typeof (HOST as Record<string, unknown>).validateCommandCodeProvider, "function");
 });
