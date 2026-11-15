@@ -85,9 +85,6 @@
   "src/app/api/omniroute/route/preview/route.ts": {
     "TS2345": 1
   },
-  "src/app/api/playground/presets/[id]/route.ts": {
-    "TS2339": 3
-  },
   "src/app/api/provider-nodes/validate/route.ts": {
     "TS2339": 2
   },

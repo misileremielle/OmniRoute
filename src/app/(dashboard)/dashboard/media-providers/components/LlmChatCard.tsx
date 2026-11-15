@@ -20,7 +20,7 @@ import { getProviderAlias } from "@/shared/constants/providers";
 import {
   buildNativeCodexPlaygroundRequest,
   isNativeCodexPlaygroundModel,
-} from "../../playground/components/tabs/chatTabEndpointRequest";
+} from "@/lib/playground/chatEndpointRequest";
 import { playgroundMessagesStorageKey } from "./llmChatStorage";
 import { usePersistedPlaygroundMessages } from "./usePersistedPlaygroundMessages";
 

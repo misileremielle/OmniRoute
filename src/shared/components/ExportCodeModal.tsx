@@ -1,6 +1,6 @@
 "use client";
 
-// src/app/(dashboard)/dashboard/playground/components/ExportCodeModal.tsx
+// src/shared/components/ExportCodeModal.tsx
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";

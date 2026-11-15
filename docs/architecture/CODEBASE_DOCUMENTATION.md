@@ -116,7 +116,7 @@ Top-level segments under `src/app/`:
 `agents`, `analytics`, `api-manager`, `audit`, `auto-combo`, `batch`, `cache`,
 `changelog`, `cli-tools`, `combos`, `compression`, `context`,
 `costs`, `endpoint`, `health`, `limits`, `logs`, `memory`, `onboarding`,
-`playground`, `providers`, `search-tools`, `settings`, `skills`, `system`,
+`providers`, `search-tools`, `settings`, `skills`, `system`,
 `translator`, `usage`, `webhooks`, plus root `page.tsx`, `HomePageClient.tsx`,
 `BootstrapBanner.tsx`.
 

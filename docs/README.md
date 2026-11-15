@@ -96,7 +96,6 @@ Pluggable subsystems exposed to clients, agents, and operators.
 - [EMBEDDED-SERVICES.md](frameworks/EMBEDDED-SERVICES.md) — embedded sidecar services (9Router, CLIProxyAPI).
 - [OPENCODE.md](frameworks/OPENCODE.md) — OpenCode integration.
 - [OPEN_SSE_ARCHITECTURE.md](frameworks/OPEN_SSE_ARCHITECTURE.md) — open-sse streaming engine internals.
-- [PLAYGROUND_STUDIO.md](frameworks/PLAYGROUND_STUDIO.md) — Playground Studio UI.
 - [SEARCH_TOOLS_STUDIO.md](frameworks/SEARCH_TOOLS_STUDIO.md) — Search Tools Studio UI.
 
 ## routing/

@@ -459,11 +459,6 @@
       "count": 1
     }
   },
-  "src/app/(dashboard)/dashboard/playground/components/tabs/CompareTab.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "src/app/(dashboard)/dashboard/providers/[id]/ProviderDetailPageClient.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -2457,11 +2452,6 @@
       "count": 5
     }
   },
-  "tests/unit/db-playground-presets.test.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 1
-    }
-  },
   "tests/unit/db-provider-plans.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1
@@ -3768,16 +3758,6 @@
       "count": 1
     }
   },
-  "tests/unit/ui/playground-compare-tab.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/ui/playground-structured-output-editor.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
   "tests/unit/ui/provider-quota-widget-auto-refresh-label-4611.test.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
@@ -3794,11 +3774,6 @@
     }
   },
   "tests/unit/ui/search-tools-search-tab.test.tsx": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "tests/unit/ui/use-stream-metrics.test.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 1
     }

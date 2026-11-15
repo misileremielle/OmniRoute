@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import type { NormalizedBlock } from "@/shared/conversation/types";
 import { ToolCallBlock } from "./ToolCallBlock";
 import { ToolResultBlock } from "./ToolResultBlock";
-import MarkdownMessage from "@/app/(dashboard)/dashboard/playground/components/MarkdownMessage";
+import MarkdownMessage from "@/shared/components/MarkdownMessage";
 
 interface MessageContentProps {
   blocks: NormalizedBlock[];

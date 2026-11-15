@@ -126,7 +126,6 @@ Main pages under `src/app/(dashboard)/dashboard/`:
 - `/dashboard/cli-code` — CLI onboarding, runtime detection, config generation
 - `/dashboard/batch` — batch job submission and progress
 - `/dashboard/cache` — read-through and reasoning cache statistics, eviction controls
-- `/dashboard/playground` — interactive chat playground against any configured combo/model
 - `/dashboard/onboarding` — first-run setup wizard for new installations
 - `/dashboard/search-tools` — search provider testing and history
 - `/dashboard/health` — uptime, circuit breakers, rate limits, quota-monitored sessions

@@ -1,6 +1,6 @@
 "use client";
 
-// src/app/(dashboard)/dashboard/playground/components/MarkdownMessage.tsx
+// src/shared/components/MarkdownMessage.tsx
 import {
   Table,
   TableBody,

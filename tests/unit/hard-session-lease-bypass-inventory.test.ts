@@ -180,7 +180,6 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     "src/app/api/oauth/kiro/auto-import/route.ts": 2,
     "src/app/api/oauth/kiro/import/route.ts": 1,
     "src/app/api/oauth/kiro/social-exchange/route.ts": 1,
-    "src/app/api/playground/simulate-route/route.ts": 1,
     "src/app/api/provider-nodes/[id]/route.ts": 1,
     // #15130: the connection test re-reads the row uncached right before its write so an
     // operator disable that landed mid-probe is honored — a state re-read of the connection

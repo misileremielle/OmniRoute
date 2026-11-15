@@ -471,13 +471,6 @@ const DEVTOOLS_ITEMS: readonly SidebarItemDefinition[] = [
     icon: "translate",
   },
   {
-    id: "playground",
-    href: "/dashboard/playground",
-    i18nKey: "playground",
-    subtitleKey: "playgroundSubtitle",
-    icon: "science",
-  },
-  {
     id: "search-tools",
     href: "/dashboard/search-tools",
     i18nKey: "searchTools",

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Tabs, TabsList, TabsTrigger } from "@omniroute/ui-kit/tabs";
 import Button from "@/shared/components/Button";
 import Icon from "@/shared/components/Icon";
-import ExportCodeModal from "@/app/(dashboard)/dashboard/playground/components/ExportCodeModal";
+import ExportCodeModal from "@/shared/components/ExportCodeModal";
 import type { PlaygroundState } from "@/lib/playground/codeExport";
 
 export type ActiveTab = "search" | "scrape" | "compare";

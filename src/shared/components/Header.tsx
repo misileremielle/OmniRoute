@@ -88,7 +88,6 @@ const HEADER_DESCRIPTIONS: Partial<Record<HideableSidebarItemId | "proxy", strin
   "context-rtk": "contextRtkDescription",
   "context-combos": "contextCombosDescription",
   translator: "translatorDescription",
-  playground: "playgroundDescription",
   "search-tools": "searchToolsDescription",
   logs: "logsDescription",
   audit: "auditDescription",

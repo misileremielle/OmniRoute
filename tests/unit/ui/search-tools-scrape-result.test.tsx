@@ -13,7 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // modal']` never matched and the truncation-warning text check failed.
 
 // Lazy import of MarkdownMessage via ScrapeResult's dynamic import — mock it
-vi.mock("../../../src/app/(dashboard)/dashboard/playground/components/MarkdownMessage", () => ({
+vi.mock("../../../src/shared/components/MarkdownMessage", () => ({
   default: ({ content }: { content: string }) =>
     React.createElement("div", { "data-testid": "markdown-render" }, content),
 }));

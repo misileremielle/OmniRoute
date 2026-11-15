@@ -4,18 +4,15 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-// Three update routes merged the parsed body over the stored row, and zod 4 filled every
-// omitted field with its creation default:
-// wiped a playground preset's params and reset a proxy's address family. A partial update
-// must only change what the client sent.
+// Update routes merged the parsed body over the stored row, and zod 4 filled every
+// omitted field with its creation default, resetting a proxy's address family. A partial
+// update must only change what the client sent.
 
 const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-update-omitted-"));
 process.env.DATA_DIR = TEST_DATA_DIR;
 process.env.API_KEY_SECRET = "test-secret";
 
 const core = await import("../../src/lib/db/core.ts");
-const presetsDb = await import("../../src/lib/db/playgroundPresets.ts");
-const presetRoute = await import("../../src/app/api/playground/presets/[id]/route.ts");
 const proxiesDb = await import("../../src/lib/db/proxies.ts");
 const { handleProxyUpdate } = await import("../../src/lib/api/proxyRegistryRouteHandlers.ts");
 const bulkImportRoute = await import("../../src/app/api/settings/proxies/bulk-import/route.ts");
@@ -32,25 +29,6 @@ function jsonRequest(method: string, body: unknown) {
     body: JSON.stringify(body),
   });
 }
-
-test("renaming a playground preset keeps its params", async () => {
-  const preset = presetsDb.createPlaygroundPreset({
-    name: "before",
-    endpoint: "chat",
-    model: "m",
-    system: null,
-    params: { temperature: 0.2 },
-  });
-
-  const response = await presetRoute.PUT(jsonRequest("PUT", { name: "after" }), {
-    params: Promise.resolve({ id: preset.id }),
-  });
-
-  assert.equal(response.status, 200);
-  const body = (await response.json()) as { name: string; params: Record<string, unknown> };
-  assert.equal(body.name, "after");
-  assert.deepEqual(body.params, { temperature: 0.2 });
-});
 
 test("renaming a proxy keeps its address family", async () => {
   const proxy = await proxiesDb.createProxy({

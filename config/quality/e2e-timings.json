@@ -21,9 +21,6 @@
   "memory-qdrant-routes.spec.ts": 360,
   "memory-settings.spec.ts": 193,
   "navigation.spec.ts": 28,
-  "playground-compare.spec.ts": 138,
-  "playground-studio.spec.ts": 101,
-  "protocol-visibility.spec.ts": 25,
   "providers-bailian-coding-plan.spec.ts": 240,
   "providers-cli-version.spec.ts": 136,
   "providers-management.spec.ts": 324,
@@ -39,6 +36,5 @@
   "smoke.spec.ts": 33,
   "translator-friendly.spec.ts": 115,
   "visual-resilience-smoke.spec.ts": 20,
-  "rtl-font-loading.spec.ts": 114,
-  "zai-web-current-browser-controls.spec.ts": 97
+  "rtl-font-loading.spec.ts": 114
 }

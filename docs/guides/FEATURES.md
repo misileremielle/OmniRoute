@@ -103,12 +103,6 @@ Four modes for debugging API translations: **Playground** (format converter), **
 
 ---
 
-## 🎮 Model Playground _(v2.0.9+)_
-
-Test any model directly from the dashboard. Select provider, model, and endpoint, write prompts with Monaco Editor, stream responses in real-time, abort mid-stream, and view timing metrics.
-
----
-
 ## 🎨 Themes _(v2.0.5+)_
 
 Customizable color themes for the entire dashboard. Choose from 7 preset colors (Coral, Blue, Red, Green, Violet, Orange, Cyan) or create a custom theme by picking any hex color. Supports light, dark, and system mode.

@@ -11,9 +11,7 @@
  *    `REQUIRE_API_KEY=true`; with enforcement off a stale CLI key degrades to
  *    anonymous instead of failing the whole request (#2257);
  *  - a cookie-authenticated dashboard session is accepted in place of a key —
- *    the dashboard Media page and Playground call these routes with a session
- *    only (same fix as the preset auth mismatch in
- *    `src/app/api/playground/presets/route.ts`);
+ *    the dashboard Media page calls these routes with a session only;
  *  - anonymous traffic stays allowed while `REQUIRE_API_KEY=false`.
  *
  * @module shared/utils/clientApiRouteAuth

@@ -1,4 +1,5 @@
-// src/app/(dashboard)/dashboard/playground/components/tabs/chatTabEndpointRequest.ts
+// src/lib/playground/chatEndpointRequest.ts — request helpers shared by the media
+// providers chat card (moved here when the Playground studio was removed).
 //
 // #10592 — ChatTab.tsx hardcoded every "Send" click to POST /api/v1/chat/completions,
 // ignoring configState.endpoint entirely. Selecting a search-only provider (exa-search,

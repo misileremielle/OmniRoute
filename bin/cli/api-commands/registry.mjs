@@ -1,5 +1,4 @@
 // AUTO-GENERATED. Do not edit.
-import { register_playground } from "./playground.mjs";
 import { register_chat } from "./chat.mjs";
 import { register_messages } from "./messages.mjs";
 import { register_responses } from "./responses.mjs";
@@ -25,7 +24,6 @@ import { register_telemetry } from "./telemetry.mjs";
 import { register_quota } from "./quota.mjs";
 
 export const API_TAGS = [
-  "playground",
   "chat",
   "messages",
   "responses",
@@ -61,7 +59,6 @@ export function registerApiCommands(program) {
     .action(() => {
       API_TAGS.forEach((t) => console.log(t));
     });
-  register_playground(api);
   register_chat(api);
   register_messages(api);
   register_responses(api);
