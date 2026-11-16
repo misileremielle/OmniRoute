@@ -34,7 +34,7 @@ env:
   # test installed a fake PEM on a persistent self-hosted runner and broke all
   # system TLS). Belt-and-suspenders with tests/_setup/isolateDataDir.ts.
   OMNIROUTE_SKIP_SYSTEM_TRUST: "1"
-  CI_NODE_VERSION: "24"
+  CI_NODE_VERSION: "26"
   CI_NODE_24_VERSION: "24"
   CI_NODE_26_VERSION: "26"
 
