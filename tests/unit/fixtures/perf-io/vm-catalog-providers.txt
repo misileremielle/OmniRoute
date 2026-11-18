@@ -1,0 +1,33 @@
+# Addendum A1 (cold /v1/models, M10): provider ids seeded with fake keys.
+# Rule: every owned_by value in the vm gateway's /v1/models response of 2026-11-18 that is
+# exactly a folder name under open-sse/config/providers/registry/ on fix-unit-tests-ccr.
+# No keys or URLs here. Changing this file changes its sha256, which vm-session.sh checks.
+agy
+anthropic
+auggie
+cerebras
+claude
+cline
+cloudflare-playground
+codex
+codex-app-server
+deepinfra
+deepseek
+devin-cli-agentic
+duckduckgo-web
+gemini
+github
+grok-cli
+groq
+kilocode
+minimax-code
+mistral
+nanogpt
+nvidia
+ollama-cloud
+openrouter
+stepfun
+uncloseai
+v0-vercel
+xiaomi-mimo
+zcode

@@ -40,6 +40,14 @@ TO_PROBE=10m        # P <= 0.1 h, plus the 60 s idle check
 TO_SUITE_S=9000     # S <= 2 h for all three parts together -> 150 min total, shared by the parts
 TO_M5=23m           # M5 <= 0.3 h
 TO_INSTALL=30m
+# Addendum A1 (cold /v1/models, M10/M11): one cold-catalog run after every successful probe run.
+# Upper 16 min; 19 min + 45 s kill grace + 15 s sweep = 20 min = 1.25 x. Never rerun, never fatal
+# by itself (a network-block failure, an OOM kill or a leftover server still stop the session).
+TO_M10=19m
+M10_KILL_AFTER=45s
+M10_FIXTURE="$(cd "$DRIVER_DIR/../.." && pwd)/tests/unit/fixtures/perf-io/vm-catalog-providers.txt"
+M10_FIXTURE_SHA256=13db8afdaf9218d42f77bf4c06544f4378fc5e19d5abf37ca00bc1242604fece
+M10_ROOT="$HOME/perf-m10"   # each session's folders go under "$M10_ROOT/<M10_SESSION>"
 
 # Measurement environment (plan): set here, so a re-login can never lose it.
 export OMNIROUTE_DISABLE_BACKGROUND_SERVICES=true OMNIROUTE_DISABLE_TOKEN_HEALTHCHECK=true \
@@ -167,15 +175,25 @@ RUNS="$OUT/runs.tsv"          # label  kind  arm  started  ended  load1  status 
 [[ -f "$RUNS" ]] || printf 'label\tkind\tarm\tstarted\tended\tload1\tstatus\tattempt\n' > "$RUNS"
 # Budgets survive a resume: the wait total is a file, attempts and reruns are counted from the
 # "started" rows in runs.tsv (written before each attempt, so an interrupted attempt counts).
+# A1: a random id per session, written once to $OUT and read back on resume. The cold-catalog
+# folders and owner tokens use it, so two sessions never share a folder or a token, even when
+# their OUT paths have the same basename.
+M10_SESSION_FILE="$OUT/m10-session-id"
+if [[ ! -s "$M10_SESSION_FILE" ]]; then
+  od -An -N16 -tx1 /dev/urandom | tr -d ' \n' > "$M10_SESSION_FILE"
+fi
+M10_SESSION="$(cat "$M10_SESSION_FILE")"
+[[ "$M10_SESSION" =~ ^[0-9a-f]{32}$ ]] || { echo "bad $M10_SESSION_FILE" >&2; exit 1; }
 WAIT_FILE="$OUT/wait_total_s"
 WAIT_TOTAL="$(cat "$WAIT_FILE" 2>/dev/null || echo 0)"
 date -u +%FT%TZ >> "$OUT/starts.txt"
 START_N="$(wc -l < "$OUT/starts.txt")"
 attempts_of() { awk -F'\t' -v l="$1" '$1 == l && $7 == "started" { n++ } END { print n + 0 }' "$RUNS"; }
-reruns_used() {  # reruns_used <build|suite|bench>
+reruns_used() {  # reruns_used <build|suite|bench>; m10 rows never count (A1: no rerun caps used)
   awk -F'\t' -v c="$1" 'function cls(k) { return k == "build" ? "build" : k == "suite" ? "suite" : "bench" }
-    $7 == "started" && $8 == 2 && cls($2) == c { n++ } END { print n + 0 }' "$RUNS"
+    $7 == "started" && $8 == 2 && $2 != "m10" && cls($2) == c { n++ } END { print n + 0 }' "$RUNS"
 }
+ended_any() { awk -F'\t' -v l="$1" '$1 == l && $7 != "started" { f = 1 } END { exit !f }' "$RUNS"; }
 
 say() { echo "[$(date -u +%FT%TZ)] $*" | tee -a "$LOG" >&2; }
 die() { say "SESSION STOPPED: $*"; summary "stopped: $*"; exit 1; }
@@ -217,6 +235,11 @@ preflight() {
   if [[ "$(cat /proc/sys/net/ipv6/conf/all/disable_ipv6 2>/dev/null || echo 0)" != "1" ]]; then
     command -v ip6tables >/dev/null || die "IPv6 is on but ip6tables is missing"
   fi
+  # A1: both arms read the same provider list, from the driver's checkout (the arms predate it).
+  [[ -f "$M10_FIXTURE" ]] || die "A1 fixture missing: $M10_FIXTURE"
+  [[ "$(sha256sum "$M10_FIXTURE" | cut -d' ' -f1)" == "$M10_FIXTURE_SHA256" ]] \
+    || die "A1 fixture hash differs from M10_FIXTURE_SHA256: $M10_FIXTURE"
+  echo "m10 fixture=$M10_FIXTURE sha256=$M10_FIXTURE_SHA256" >> "$OUT/host.txt"
 }
 
 no_leftovers() {
@@ -259,7 +282,7 @@ arm() {  # arm <dir> <sha>: (re)create the worktree unless it already holds <sha
 # seed migrates DATA_DIR with the arm's own src/. lts-baseline is in every arm and stays the arm's.
 tools() {  # tools <dir>
   local f
-  for f in request-io-probe.ts request-io-seed.ts request-io-preload.mjs time-build.mjs; do
+  for f in request-io-probe.ts request-io-seed.ts request-io-preload.mjs time-build.mjs catalog-cold-probe.ts; do
     cp "$DRIVER_DIR/$f" "$1/scripts/perf/$f" || die "could not copy $f into $1"
   done
 }
@@ -336,6 +359,77 @@ measure() {
   done
 }
 
+# ── A1: one cold-catalog run (M10/M11) ─────────────────────────────────────────────────────
+# m10_sweep <label> <data-dir> <token>: after a non-ok ending, stop whatever still uses the run's
+# folder and delete it, but only when the folder's owner marker carries this attempt's token, so
+# nothing this attempt did not create is touched. m10-sweep.mjs is plain node (the driver checkout
+# has no node_modules) and deletes the folder only once no process uses it. A server that
+# survives is caught by the next no_leftovers, which stops the session.
+m10_sweep() {
+  local label="$1" d="$2" token="$3" rc=0
+  timeout 15s node "$DRIVER_DIR/m10-sweep.mjs" "$d" "$token" >> "$LOG" 2>&1 || rc=$?
+  case "$rc" in
+    0) ;;
+    2) say "$label: $d has no owner marker for this attempt; left alone" ;;
+    3) say "$label: a process still uses $d after the sweep; folder left, no_leftovers decides" ;;
+    *) say "$label: sweep of $d failed (rc=$rc, see $LOG); folder left" ;;
+  esac
+}
+
+# m10 <probe-label> <arm-dir>: label <probe-label>-m10 in runs.tsv (kind m10). Skipped once it has
+# an ended row; a label interrupted twice is recorded invalid(interrupted). No load gate (it
+# follows a probe run that passed one; the probe itself marks load >= 2.0 invalid(load)).
+m10() {
+  local label="$1-m10" dir="$2" n attempt rc=0 status started load since token d reason
+  if ended_any "$label"; then say "skip $label (recorded)"; return 0; fi
+  n="$(attempts_of "$label")"
+  if [[ "$n" -ge 2 ]]; then
+    printf '%s\tm10\t%s\t-\t%s\t-\tinvalid(interrupted)\t%s\n' "$label" "$(basename "$dir")" \
+      "$(date -u +%FT%TZ)" "$n" >> "$RUNS"
+    say "$label: interrupted twice, recorded invalid"
+    return 0
+  fi
+  attempt=$((n + 1))
+  # Folder and token are fixed per session id, label and attempt, so a resumed driver can still
+  # prove it created an interrupted attempt's folder and sweep it before the next attempt.
+  m10_dir() { echo "$M10_ROOT/$M10_SESSION/$label-a$1"; }
+  m10_token() { echo "$M10_SESSION:$label:a$1"; }
+  [[ "$attempt" -eq 2 ]] && m10_sweep "$label" "$(m10_dir 1)" "$(m10_token 1)"
+  no_leftovers
+  rm -f "${OUT:?}/$label.json" "${OUT:?}/$label.json.tmp" "${OUT:?}/$label.log" "${OUT:?}/$label.out"
+  d="$(m10_dir "$attempt")"
+  token="$(m10_token "$attempt")"
+  load="$(cut -d' ' -f1 /proc/loadavg)"
+  started="$(date -u +%FT%TZ)"
+  printf '%s\tm10\t%s\t%s\t-\t%s\tstarted\t%s\n' "$label" "$(basename "$dir")" "$started" \
+    "$load" "$attempt" >> "$RUNS"
+  say "run $label (m10, $(basename "$dir"), attempt $attempt, load $load)"
+  since="@$(date +%s)"
+  (cd "$dir" && timeout --kill-after="$M10_KILL_AFTER" "$TO_M10" "${NB[@]}" \
+     node --import tsx/esm scripts/perf/catalog-cold-probe.ts --root . --label "$label" \
+     --providers "$M10_FIXTURE" --out "$OUT/$label.json" --log "$OUT/$label.log" \
+     --data-dir "$d" --owner-token "$token") > "$OUT/$label.out" 2>> "$OUT/$label.log" || rc=$?
+  if [[ "$rc" -eq 124 || "$rc" -eq 137 ]]; then status="timeout"
+  elif [[ "$rc" -eq 90 || "$rc" -eq 91 ]]; then status="netblock-$rc"
+  elif [[ "$rc" -ne 0 ]]; then status="invalid(rc=$rc)"
+  else
+    reason="$(node -e '
+      const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+      console.log(r.valid === true ? "ok" : String(r.invalidReason || "unknown").replace(/[\t\n]/g, " "));' \
+      "$OUT/$label.json" 2>/dev/null || echo "no-report")"
+    if [[ "$reason" == "ok" ]]; then status="ok"; else status="invalid($reason)"; fi
+  fi
+  printf '%s\tm10\t%s\t%s\t%s\t%s\t%s\t%s\n' "$label" "$(basename "$dir")" "$started" \
+    "$(date -u +%FT%TZ)" "$load" "$status" "$attempt" >> "$RUNS"
+  [[ "$status" == "ok" ]] || m10_sweep "$label" "$d" "$token"
+  if sudo -n journalctl -k --since "$since" --no-pager 2>/dev/null | grep -qiE 'out of memory|oom-kill'; then
+    die "OOM kill during $label"
+  fi
+  [[ "$status" == netblock-* ]] && die "network block failed ($status) in $label"
+  say "$label: $status"
+  return 0
+}
+
 NB=(bash "$DRIVER_DIR/netblock-run.sh" --)
 
 build()  { measure "$1" build "$2" "$TO_BUILD" "$OUT/$1.json" -- node scripts/perf/time-build.mjs --root . --out "$OUT/$1.json"; }
@@ -346,6 +440,7 @@ probe()  { local idle=(); [[ "${3:-0}" -gt 0 ]] && idle=(--idle-check-seconds "$
            measure "$1" probe "$2" "$TO_PROBE" "$OUT/$1.json" -- \
              "${NB[@]}" node --import tsx/esm scripts/perf/request-io-probe.ts --root . \
              --out "$OUT/$1.json" --counters-out "$OUT/$1.counters" "${idle[@]}"
+           m10 "$1" "$2"   # measure returned: this label's counted attempt is ok
            if [[ "${3:-0}" -gt 0 ]]; then   # idle check: reported and flagged, never a gate (plan)
              node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
                const z = r.metrics?.idleCheck?.allZero;

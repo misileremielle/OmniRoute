@@ -12,16 +12,22 @@
  * Arguments:
  *   --kind fake --base-url <url>   openai-compatible node + apikey connection
  *   --kind openrouter              openrouter apikey connection (key from env)
+ *   --kind catalog --providers <file>
+ *                                  addendum A1 (cold /v1/models, M10): settings first, then
+ *                                  one apikey connection with a fake key per provider id in
+ *                                  <file>, then the catalog cache TTL set to CATALOG_TTL_MS
  *
  * The OpenRouter key is read from env OPENROUTER_API_KEY, never argv. Nothing
  * here prints or logs secrets.
  */
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 export interface SeedArgs {
-  kind: "fake" | "openrouter";
+  kind: "fake" | "openrouter" | "catalog";
   baseUrl: string | null;
+  providers: string | null;
   help: boolean;
 }
 
@@ -29,6 +35,10 @@ export const PROBE_PREFIX = "perfio";
 export const PROBE_MODEL = "perfio/test-model";
 export const OPENROUTER_PROVIDER_ID = "openrouter";
 export const OPENROUTER_MODEL = "openrouter/openrouter/free";
+/** Catalog cache TTL for the A1 cold-catalog run: 1 s + the 30 s stale window < the 32 s wait. */
+export const CATALOG_TTL_MS = 1000;
+export const CATALOG_FAKE_KEY = "perf-m10-fake-key";
+const PROVIDER_ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 
 function requireValue(argv: string[], i: number, flag: string): string {
   const value = argv[i + 1];
@@ -38,19 +48,22 @@ function requireValue(argv: string[], i: number, flag: string): string {
 
 /** Parse argv. `--kind fake` requires `--base-url`. */
 export function parseSeedArgs(argv: string[]): SeedArgs {
-  const out: SeedArgs = { kind: "fake", baseUrl: null, help: false };
+  const out: SeedArgs = { kind: "fake", baseUrl: null, providers: null, help: false };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
     switch (flag) {
       case "--kind": {
         const raw = requireValue(argv, i++, flag);
-        if (raw !== "fake" && raw !== "openrouter")
-          throw new Error(`--kind must be fake or openrouter`);
+        if (raw !== "fake" && raw !== "openrouter" && raw !== "catalog")
+          throw new Error(`--kind must be fake, openrouter or catalog`);
         out.kind = raw;
         break;
       }
       case "--base-url":
         out.baseUrl = requireValue(argv, i++, flag);
+        break;
+      case "--providers":
+        out.providers = requireValue(argv, i++, flag);
         break;
       case "-h":
       case "--help":
@@ -63,13 +76,38 @@ export function parseSeedArgs(argv: string[]): SeedArgs {
   if (!out.help && out.kind === "fake" && !out.baseUrl) {
     throw new Error("--kind fake requires --base-url");
   }
+  if (!out.help && out.kind === "catalog" && !out.providers) {
+    throw new Error("--kind catalog requires --providers");
+  }
   return out;
 }
 
-export const SEED_USAGE = `Usage: node --import tsx/esm scripts/perf/request-io-seed.ts [--kind fake|openrouter] [--base-url <url>]
+/**
+ * Parse a provider list: one id per line; blank lines and `#` comments are skipped.
+ * Throws on a malformed id, a duplicate, or an empty list, so a bad fixture fails the seed.
+ */
+export function parseProviderList(text: string): string[] {
+  const ids: string[] = [];
+  const seen = new Set<string>();
+  for (const [n, raw] of text.split(/\r?\n/).entries()) {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+    if (!PROVIDER_ID_RE.test(line)) throw new Error(`providers line ${n + 1}: bad id "${line}"`);
+    if (seen.has(line)) throw new Error(`providers line ${n + 1}: duplicate id "${line}"`);
+    seen.add(line);
+    ids.push(line);
+  }
+  if (ids.length === 0) throw new Error("providers list is empty");
+  return ids;
+}
+
+export const SEED_USAGE = `Usage: node --import tsx/esm scripts/perf/request-io-seed.ts [--kind fake|openrouter|catalog] [--base-url <url>] [--providers <file>]
 
   --kind fake --base-url <url>  seed an openai-compatible node for the probe fake upstream
   --kind openrouter             seed an openrouter apikey connection (key from OPENROUTER_API_KEY env)
+  --kind catalog --providers <file>
+                                seed one fake-key apikey connection per provider id and a
+                                ${CATALOG_TTL_MS} ms catalog cache TTL (cold /v1/models run)
   -h, --help                    show this help`;
 
 const QUEUE_SETTING_KEYS = [
@@ -156,6 +194,34 @@ async function seedOpenRouter(): Promise<{ model: string }> {
   return { model: OPENROUTER_MODEL };
 }
 
+/**
+ * A1 cold-catalog seed: one apikey connection with a fake key per provider id, then the model
+ * catalog cache TTL. The TTL is read back so a clamped or ignored value fails the seed instead
+ * of silently turning every M10 sample warm.
+ */
+export async function seedCatalog(ids: string[]): Promise<{ providers: number; ttlMs: number }> {
+  const providers = await import("../../src/lib/db/providers.ts");
+  for (const id of ids) {
+    await providers.createProviderConnection({
+      provider: id,
+      authType: "apikey",
+      name: `perf-m10-${id}`,
+      apiKey: CATALOG_FAKE_KEY,
+      isActive: true,
+      testStatus: "active",
+    });
+  }
+  const dbSettings = await import("../../src/lib/db/databaseSettings.ts");
+  dbSettings.updateDatabaseSettings({
+    cache: { modelCatalogCacheTtlMs: CATALOG_TTL_MS },
+  } as Parameters<typeof dbSettings.updateDatabaseSettings>[0]);
+  const ttlMs = dbSettings.getUserDatabaseSettings().cache?.modelCatalogCacheTtlMs;
+  if (ttlMs !== CATALOG_TTL_MS) {
+    throw new Error(`catalog TTL reads back as ${String(ttlMs)}, not ${CATALOG_TTL_MS}`);
+  }
+  return { providers: ids.length, ttlMs };
+}
+
 /** Seed settings: setup complete, no login wall, no retries. Returns the report header. */
 export async function seedSettings(): Promise<{ queueRaised: boolean }> {
   const settings = await import("../../src/lib/db/settings.ts");
@@ -199,6 +265,16 @@ export async function runSeed(argv: string[], env: NodeJS.ProcessEnv): Promise<v
     return;
   }
   if (!env.DATA_DIR) throw new Error("DATA_DIR is not set");
+  if (args.kind === "catalog") {
+    // Read the list before touching the DB, so a bad fixture leaves no half-seeded folder.
+    const ids = parseProviderList(readFileSync(args.providers as string, "utf8"));
+    const { queueRaised } = await seedSettings();
+    const catalog = await seedCatalog(ids);
+    const { closeDbInstance } = await import("../../src/lib/db/core.ts");
+    closeDbInstance();
+    console.log(JSON.stringify({ status: "ok", kind: args.kind, ...catalog, queueRaised }));
+    return;
+  }
   const seeded =
     args.kind === "fake" ? await seedFake(args.baseUrl as string) : await seedOpenRouter();
   const { queueRaised } = await seedSettings();

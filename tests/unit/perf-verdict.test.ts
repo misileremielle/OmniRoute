@@ -20,7 +20,10 @@ const verdictCli = path.resolve(here, "../../scripts/perf/perf-verdict.mjs");
 const {
   ABORT_EXIT_CODE,
   abortCheck,
+  abortCheckInput,
+  abortRows,
   abortTable,
+  countingPairs,
   effect,
   exactChange,
   noise,
@@ -230,6 +233,111 @@ test("abort CLI exits 3 when abortCheck is true, 0 otherwise", async () => {
   });
   assert.equal(calm.code, 0);
   assert.match(calm.stdout, /\| no \|/);
+});
+
+// ── Addendum A1: M10/M11 fields ────────────────────────────────────────────────────────────────────
+
+const sized = (a: number, b: number, sizeA = 3000, sizeB = 3000) => ({ a, b, sizeA, sizeB });
+
+test("A1: an abort-exempt band is shown but never aborts; others still do", async () => {
+  const m10 = { name: "M10", kind: "ratio", abortExempt: true, baselineSamples: [100, 200, 100] };
+  const rows = abortRows([m10]);
+  assert.equal(rows[0].over, true);
+  assert.equal(rows[0].exempt, true);
+  assert.deepEqual(abortCheckInput(rows), []);
+  assert.match(abortTable([m10]) as string, /\| M10 \| ratio \| 1 \| 20% \| yes \(exempt\)/);
+  const exempt = await runCli(["--abort"], { metrics: [m10] });
+  assert.equal(exempt.code, 0);
+  const both = await runCli(["--abort"], {
+    metrics: [m10, { name: "M8", kind: "ratio", baselineSamples: [100, 200, 100] }],
+  });
+  assert.equal(both.code, ABORT_EXIT_CODE);
+});
+
+test("A1: fewer baseline samples than minSamples is not measured: no abort, no verdict", async () => {
+  const m10 = {
+    name: "M10",
+    kind: "ratio",
+    minSamples: 4,
+    baselineSamples: [100, 300, 100],
+    requiredPairs: 3,
+    pairs: [sized(100, 50), sized(100, 50), sized(100, 50)],
+  };
+  assert.equal(abortRows([m10])[0].notMeasured, true);
+  assert.match(abortTable([m10]) as string, /\| M10 \| ratio \| - \| - \| not measured \|/);
+  assert.equal((await runCli(["--abort"], { metrics: [m10] })).code, 0);
+  assert.match(verdictTable([m10]) as string, /\| M10 \| - \| - \| - \| - \| not measured \|/);
+  assert.throws(() => abortRows([{ ...m10, minSamples: 1 }]), /minSamples must be/);
+});
+
+test("A1: countingPairs drops invalid runs, missing sizes and size mismatches", () => {
+  const { kept, dropped } = countingPairs({
+    pairs: [
+      sized(100, 90),
+      null,
+      { a: 100, b: 90 }, // no sizes: never counts
+      sized(100, 90, 3000, 2999),
+      { a: 100, b: null, sizeA: 1, sizeB: 1 },
+    ],
+  });
+  assert.deepEqual(kept, [{ a: 100, b: 90 }]);
+  assert.deepEqual(dropped, [
+    "pair 2: invalid run",
+    "pair 3: catalog size missing",
+    "pair 4: catalog size 3000 -> 2999",
+    "pair 5: invalid run",
+  ]);
+  // A fix's addendum may state the size change.
+  assert.equal(
+    countingPairs({ allowedSizeDelta: -762, pairs: [sized(100, 90, 3762, 3000)] }).kept.length,
+    1
+  );
+});
+
+test("A1: requiredPairs gives no verdict when too few pairs count, a verdict otherwise", () => {
+  const base = { name: "M10", kind: "ratio", baselineSamples: [100, 101, 102], requiredPairs: 3 };
+  const unsized = verdictTable([
+    {
+      ...base,
+      pairs: [
+        { a: 100, b: 50 },
+        { a: 100, b: 50 },
+        { a: 100, b: 50 },
+      ],
+    },
+  ]) as string;
+  assert.match(unsized, /no verdict: 0 of 3 pairs count \(pair 1: catalog size missing;/);
+  const short = verdictTable([
+    { ...base, pairs: [sized(100, 50), null, sized(100, 50)] },
+  ]) as string;
+  assert.match(
+    short,
+    /\| M10 \| - \| - \| - \| - \| no verdict: 2 of 3 pairs count \(pair 2: invalid run\) \|/
+  );
+  const full = verdictTable([
+    { ...base, pairs: [sized(100, 50), sized(100, 52), sized(100, 51)] },
+  ]) as string;
+  assert.match(full, /\| M10 \| 100 \| 51 \| -49% \| 5% \| improvement \|/);
+  assert.throws(() => verdictTable([{ ...base, requiredPairs: 0, pairs: [] }]), /requiredPairs/);
+});
+
+test("A1: a ratio threshold of 100 % or more is flagged: no improvement can be shown", () => {
+  // band (250 - 100) / 150 = 1 -> T = 2.
+  const wide = { name: "M10", kind: "ratio", abortExempt: true, baselineSamples: [100, 150, 250] };
+  assert.equal(abortRows([wide])[0].noImprovementPossible, true);
+  assert.match(abortTable([wide]) as string, /T >= 100 %: no improvement can be shown/);
+  // band 40 / 120 = 0.33 -> T = 0.67: still possible.
+  const narrow = { ...wide, baselineSamples: [100, 120, 140] };
+  assert.equal(abortRows([narrow])[0].noImprovementPossible, false);
+});
+
+test("A1: metrics without the new fields behave as before", () => {
+  const rows = abortRows([{ name: "M8", kind: "ratio", baselineSamples: [100, 200, 100] }]);
+  assert.deepEqual(abortCheckInput(rows), [{ kind: "ratio", guard: true, noise: 1 }]);
+  assert.throws(
+    () => verdictTable([{ name: "M8", kind: "ratio", baselineSamples: [1, 1], pairs: [null] }]),
+    /finite numeric \{a, b\} pairs/
+  );
 });
 
 test("verdictTable renders the CLI Markdown columns", () => {

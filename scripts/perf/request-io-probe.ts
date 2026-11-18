@@ -809,7 +809,8 @@ interface ServerHandle {
   stop: () => Promise<void>;
 }
 
-function probeBackgroundOff(): Record<string, string> {
+/** Background-off env shared with catalog-cold-probe.ts (addendum A1), so both servers match. */
+export function probeBackgroundOff(): Record<string, string> {
   return {
     OMNIROUTE_DISABLE_BACKGROUND_SERVICES: "true",
     OMNIROUTE_DISABLE_TOKEN_HEALTHCHECK: "true",

@@ -56,6 +56,20 @@
  * For ratio metrics the default floor is 0.05 (M6 passes floor 0.10). For
  * absolute metrics `floor` is required (heap growth 1 MB, M7 1 count). For
  * absolute guards `cap` is required (heap growth 5 MB, M7 statements 2).
+ *
+ * Addendum A1 (cold /v1/models, M10/M11) adds optional fields; metrics without them behave
+ * exactly as above:
+ * - `abortExempt: true` (abort input): the band is shown but never aborts (M10, Proxy's choice).
+ * - `minSamples: n` (both inputs): fewer valid baseline samples make the metric "not
+ *   measured": no abort, no verdict. M10 uses 4 (4 of 5 step-10 runs), or 3 after a CPU change.
+ * - `requiredPairs: n` (comparison input): pairs may then be null (an invalid run), and each
+ *   must carry `sizeA`/`sizeB` (catalog sizes). A pair counts only if a, b, sizeA and sizeB are
+ *   all numbers and sizeB - sizeA equals `allowedSizeDelta` (default 0, or the change a fix's
+ *   addendum states); a pair without sizes never counts. Fewer counting pairs than
+ *   `requiredPairs` gives "no verdict".
+ * - Every ratio abort row reports `noImprovementPossible` when T >= 100 %: B / A - 1 is never
+ *   below -1, so no improvement can be shown. The abort table prints it for exempt rows (A1:
+ *   the step-10 checkpoint flags it for M10).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -258,8 +272,74 @@ function formatEffect(kind, e) {
   return formatNumber(e);
 }
 
+/** A1: fewer valid baseline samples than `minSamples` (when set) means "not measured". */
+export function notMeasured(m) {
+  if (m.minSamples === undefined) return false;
+  if (!Number.isInteger(m.minSamples) || m.minSamples < 2) {
+    throw new Error("minSamples must be an integer >= 2");
+  }
+  return !Array.isArray(m.baselineSamples) || m.baselineSamples.length < m.minSamples;
+}
+
+/** A1: a ratio threshold at or above 100 % can never be met by an improvement. */
+export function noImprovementPossible(T) {
+  return T >= 1;
+}
+
+/**
+ * A1: the pairs that count for a metric with `requiredPairs`. A pair counts when it is an
+ * object with numeric a, b, sizeA and sizeB, and sizeB - sizeA === allowedSizeDelta (default
+ * 0). Sizes are required: a pair that does not show matching catalogs never counts. Returns
+ * the counting pairs and a reason for each dropped one.
+ */
+export function countingPairs(m) {
+  const delta = m.allowedSizeDelta ?? 0;
+  if (typeof delta !== "number" || !Number.isFinite(delta)) {
+    throw new Error("allowedSizeDelta must be a finite number");
+  }
+  const kept = [];
+  const dropped = [];
+  (Array.isArray(m.pairs) ? m.pairs : []).forEach((p, i) => {
+    const k = i + 1;
+    if (p === null || typeof p !== "object") return dropped.push(`pair ${k}: invalid run`);
+    if (![p.a, p.b].every((v) => typeof v === "number" && Number.isFinite(v))) {
+      return dropped.push(`pair ${k}: invalid run`);
+    }
+    if (![p.sizeA, p.sizeB].every((v) => typeof v === "number" && Number.isFinite(v))) {
+      return dropped.push(`pair ${k}: catalog size missing`);
+    }
+    if (p.sizeB - p.sizeA !== delta) {
+      return dropped.push(`pair ${k}: catalog size ${p.sizeA} -> ${p.sizeB}`);
+    }
+    kept.push({ a: p.a, b: p.b });
+  });
+  return { kept, dropped };
+}
+
 export function verdictTable(metrics) {
   const rows = metrics.map((m) => {
+    const usesRequired = m.requiredPairs !== undefined;
+    if (usesRequired && (!Number.isInteger(m.requiredPairs) || m.requiredPairs < 1)) {
+      throw new Error("requiredPairs must be a positive integer");
+    }
+    if (notMeasured(m)) {
+      return { name: m.name, aMed: null, bMed: null, effect: "-", t: "-", verdict: "not measured" };
+    }
+    if (usesRequired) {
+      const { kept, dropped } = countingPairs(m);
+      if (kept.length < m.requiredPairs) {
+        const why = dropped.length ? ` (${dropped.join("; ")})` : "";
+        return {
+          name: m.name,
+          aMed: null,
+          bMed: null,
+          effect: "-",
+          t: "-",
+          verdict: `no verdict: ${kept.length} of ${m.requiredPairs} pairs count${why}`,
+        };
+      }
+      m = { ...m, pairs: kept };
+    }
     const n = noise(m.kind, m.baselineSamples);
     const t = threshold(m.kind, n, { floor: m.floor });
     const e = effect(m.kind, m.pairs);
@@ -281,7 +361,7 @@ export function verdictTable(metrics) {
   ];
   for (const r of rows) {
     lines.push(
-      `| ${r.name} | ${formatNumber(r.aMed)} | ${formatNumber(r.bMed)} | ${r.effect} | ${r.t} | ${r.verdict} |`
+      `| ${r.name} | ${r.aMed === null ? "-" : formatNumber(r.aMed)} | ${r.bMed === null ? "-" : formatNumber(r.bMed)} | ${r.effect} | ${r.t} | ${r.verdict} |`
     );
   }
   return lines.join("\n");
@@ -305,6 +385,10 @@ export function abortRows(metrics) {
       throw new Error("abortRows needs metric objects");
     }
     const name = typeof m.name === "string" && m.name.length > 0 ? m.name : "(unnamed)";
+    const exempt = m.abortExempt === true;
+    if (notMeasured(m)) {
+      return { name, kind: m.kind, noise: null, cap: null, over: false, exempt, notMeasured: true };
+    }
     const n = noise(m.kind, m.baselineSamples);
     if (m.kind === "ratio") {
       return {
@@ -313,16 +397,38 @@ export function abortRows(metrics) {
         noise: n,
         cap: ABORT_RATIO_BAND,
         over: n > ABORT_RATIO_BAND,
+        exempt,
+        notMeasured: false,
+        noImprovementPossible: noImprovementPossible(threshold("ratio", n, { floor: m.floor })),
       };
     }
     if (m.kind === "absolute") {
       if (typeof m.cap !== "number" || !Number.isFinite(m.cap) || m.cap < 0) {
         throw new Error("abortRows needs a finite non-negative cap for absolute guards");
       }
-      return { name, kind: m.kind, noise: n, cap: m.cap, over: n > m.cap };
+      return {
+        name,
+        kind: m.kind,
+        noise: n,
+        cap: m.cap,
+        over: n > m.cap,
+        exempt,
+        notMeasured: false,
+      };
     }
     throw new Error(`unknown metric kind: ${m.kind}`);
   });
+}
+
+/** A1: rows that can stop the experiment (measured and not exempt), as abortCheck input. */
+export function abortCheckInput(rows) {
+  return rows
+    .filter((r) => !r.notMeasured && !r.exempt)
+    .map((r) =>
+      r.kind === "ratio"
+        ? { kind: r.kind, guard: true, noise: r.noise }
+        : { kind: r.kind, guard: true, noise: r.noise, cap: r.cap }
+    );
 }
 
 /**
@@ -333,10 +439,16 @@ export function abortTable(metrics) {
   const rows = abortRows(metrics);
   const lines = ["| metric | kind | noise | cap | over? |", "| --- | --- | --- | --- | --- |"];
   for (const r of rows) {
+    if (r.notMeasured) {
+      lines.push(`| ${r.name} | ${r.kind} | - | - | not measured |`);
+      continue;
+    }
     const capText = r.kind === "ratio" ? "20%" : formatNumber(r.cap);
-    lines.push(
-      `| ${r.name} | ${r.kind} | ${formatNumber(r.noise)} | ${capText} | ${r.over ? "yes" : "no"} |`
-    );
+    let over = r.over ? "yes" : "no";
+    if (r.exempt) over += " (exempt)";
+    // Only exempt rows: a non-exempt band that high aborts anyway, and old rows stay unchanged.
+    if (r.exempt && r.noImprovementPossible) over += "; T >= 100 %: no improvement can be shown";
+    lines.push(`| ${r.name} | ${r.kind} | ${formatNumber(r.noise)} | ${capText} | ${over} |`);
   }
   return lines.join("\n");
 }
@@ -351,12 +463,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     try {
       const metrics = readMetrics(second);
       console.log(abortTable(metrics));
-      const checkInput = abortRows(metrics).map((r) =>
-        r.kind === "ratio"
-          ? { kind: r.kind, guard: true, noise: r.noise }
-          : { kind: r.kind, guard: true, noise: r.noise, cap: r.cap }
-      );
-      process.exit(abortCheck(checkInput) ? ABORT_EXIT_CODE : 0);
+      process.exit(abortCheck(abortCheckInput(abortRows(metrics))) ? ABORT_EXIT_CODE : 0);
     } catch (err) {
       console.error(`perf-verdict: ${err instanceof Error ? err.message : String(err)}`);
       process.exit(1);
