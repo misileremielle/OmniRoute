@@ -67,6 +67,9 @@
  *   all numbers and sizeB - sizeA equals `allowedSizeDelta` (default 0, or the change a fix's
  *   addendum states); a pair without sizes never counts. Fewer counting pairs than
  *   `requiredPairs` gives "no verdict".
+ * - `sizeCheck: false` (addendum A2, with `requiredPairs`): no catalog-size condition, for
+ *   metrics where both arms seed the same data (M12). Pairs then need only numeric a and b;
+ *   `allowedSizeDelta` is refused with it. Any value other than false or absent is refused.
  * - Every ratio abort row reports `noImprovementPossible` when T >= 100 %: B / A - 1 is never
  *   below -1, so no improvement can be shown. The abort table prints it for exempt rows (A1:
  *   the step-10 checkpoint flags it for M10).
@@ -293,6 +296,13 @@ export function noImprovementPossible(T) {
  * the counting pairs and a reason for each dropped one.
  */
 export function countingPairs(m) {
+  if (m.sizeCheck !== undefined && m.sizeCheck !== false) {
+    throw new Error("sizeCheck may only be false");
+  }
+  const checkSizes = m.sizeCheck !== false;
+  if (!checkSizes && m.allowedSizeDelta !== undefined) {
+    throw new Error("allowedSizeDelta needs the size check");
+  }
   const delta = m.allowedSizeDelta ?? 0;
   if (typeof delta !== "number" || !Number.isFinite(delta)) {
     throw new Error("allowedSizeDelta must be a finite number");
@@ -305,6 +315,7 @@ export function countingPairs(m) {
     if (![p.a, p.b].every((v) => typeof v === "number" && Number.isFinite(v))) {
       return dropped.push(`pair ${k}: invalid run`);
     }
+    if (!checkSizes) return kept.push({ a: p.a, b: p.b });
     if (![p.sizeA, p.sizeB].every((v) => typeof v === "number" && Number.isFinite(v))) {
       return dropped.push(`pair ${k}: catalog size missing`);
     }

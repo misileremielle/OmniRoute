@@ -46,7 +46,22 @@ test("vm-session: fixture hash constant matches the fixture; tools() copies the 
   );
 });
 
-test("vm-session: reruns_used never counts m10 rows", (t) => {
+test("vm-session: A2 writes step wired after m10, copied into arms, bounded", () => {
+  assert.match(SCRIPT, /^TO_WRITES=26m$/m);
+  assert.match(SCRIPT, /^WRITES_KILL_AFTER=45s$/m);
+  assert.match(fn("tools"), /write-bytes-probe\.ts/);
+  assert.match(SCRIPT, /^\s+m10 "\$1" "\$2"[^\n]*\n\s+writes "\$1" "\$2"/m);
+  const w = fn("writes");
+  assert.match(w, /timeout --kill-after="\$WRITES_KILL_AFTER" "\$TO_WRITES" "\$\{NB\[@\]\}"/);
+  assert.match(w, /--data-dir-d "\$\(writes_dir "\$attempt" D\)" --data-dir-l/);
+  // Both owned folders swept on every ending (two 15 s sweeps in A2's bound).
+  assert.match(
+    w,
+    /for s in D L; do m10_sweep "\$label" "\$\(writes_dir "\$attempt" "\$s"\)" "\$token"; done/
+  );
+});
+
+test("vm-session: reruns_used never counts m10 or writes rows", (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-vm-m10-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   const runs = path.join(dir, "runs.tsv");
@@ -59,6 +74,7 @@ test("vm-session: reruns_used never counts m10 rows", (t) => {
       row("probe-r1", "probe", "started", 2),
       row("probe-r1-m10", "m10", "started", 2),
       row("probe-r2-m10", "m10", "started", 2),
+      row("probe-r1-writes", "writes", "started", 2),
       row("build-1", "build", "started", 2),
     ].join("\n") + "\n"
   );

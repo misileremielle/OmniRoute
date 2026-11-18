@@ -13,6 +13,7 @@ import {
   parseProviderList,
   parseSeedArgs,
   runSeed,
+  seedLogging,
 } from "../../scripts/perf/request-io-seed.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -23,6 +24,7 @@ test("parseSeedArgs: catalog needs --providers; unknown kinds are refused", () =
     kind: "catalog",
     baseUrl: null,
     providers: "/x.txt",
+    logging: null,
     help: false,
   });
   assert.throws(() => parseSeedArgs(["--kind", "catalog"]), /requires --providers/);
@@ -42,6 +44,37 @@ test("parseProviderList: comments and blanks skipped; bad, duplicate and empty l
   assert.throws(() => parseProviderList("a\nB\n"), /line 2: bad id/);
   assert.throws(() => parseProviderList("a\n# x\na\n"), /line 3: duplicate id "a"/);
   assert.throws(() => parseProviderList("# only a comment\n\n"), /empty/);
+});
+
+test("parseSeedArgs: --logging on|off only with --kind fake (A2)", () => {
+  const fake = ["--kind", "fake", "--base-url", "http://127.0.0.1:1/v1"];
+  assert.equal(parseSeedArgs([...fake, "--logging", "on"]).logging, "on");
+  assert.equal(parseSeedArgs([...fake, "--logging", "off"]).logging, "off");
+  assert.equal(parseSeedArgs(fake).logging, null);
+  assert.throws(() => parseSeedArgs([...fake, "--logging", "yes"]), /on or off/);
+  assert.throws(
+    () => parseSeedArgs(["--kind", "catalog", "--providers", "/x", "--logging", "on"]),
+    /needs --kind fake/
+  );
+});
+
+// Runs before the catalog test below: "off" must see the fresh database's stored values.
+test("seedLogging: off leaves the fresh defaults; on turns both on; env override refused", async () => {
+  assert.ok(process.env.DATA_DIR, "isolateDataDir must set DATA_DIR");
+  const saved = process.env.ENABLE_REQUEST_LOGS;
+  delete process.env.ENABLE_REQUEST_LOGS;
+  try {
+    // Fresh install: pipeline off; detailed logs stored on by migration 046.
+    assert.deepEqual(await seedLogging("off"), { pipeline: false, detailed: true });
+    assert.deepEqual(await seedLogging("on"), { pipeline: true, detailed: true });
+    // Now that the pipeline is on, "off" (which writes nothing) must fail its check.
+    await assert.rejects(seedLogging("off"), /pipeline reads back as true, wanted false/);
+    process.env.ENABLE_REQUEST_LOGS = "false";
+    await assert.rejects(seedLogging("on"), /ENABLE_REQUEST_LOGS is set/);
+  } finally {
+    if (saved === undefined) delete process.env.ENABLE_REQUEST_LOGS;
+    else process.env.ENABLE_REQUEST_LOGS = saved;
+  }
 });
 
 test("fixture: 29 ids, each a provider the branch registers", async () => {

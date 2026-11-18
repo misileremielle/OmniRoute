@@ -410,14 +410,18 @@ export function startFailureReason(error: unknown): string {
   return error instanceof StartError ? error.code : "server-start";
 }
 
-interface Server {
+export interface Server {
   baseUrl: string;
   bootMs: number;
   stop: () => Promise<void>;
 }
 
-/** Same spawn as lts-baseline's startTreeServer, with output to the log. */
-async function startServer(root: string, env: NodeJS.ProcessEnv, logFd: number): Promise<Server> {
+/** Same spawn as lts-baseline's startTreeServer, with output to the log. Also used by A2. */
+export async function startServer(
+  root: string,
+  env: NodeJS.ProcessEnv,
+  logFd: number
+): Promise<Server> {
   fs.mkdirSync(env.DATA_DIR as string, { recursive: true });
   const port = await getFreePort();
   const started = performance.now();

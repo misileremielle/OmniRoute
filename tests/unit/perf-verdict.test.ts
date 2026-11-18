@@ -321,6 +321,44 @@ test("A1: requiredPairs gives no verdict when too few pairs count, a verdict oth
   assert.throws(() => verdictTable([{ ...base, requiredPairs: 0, pairs: [] }]), /requiredPairs/);
 });
 
+test("A2: sizeCheck false counts unsized pairs; only false is allowed; no delta with it", () => {
+  const base = {
+    name: "M12a",
+    kind: "ratio",
+    baselineSamples: [100, 101, 102],
+    requiredPairs: 3,
+    sizeCheck: false,
+  };
+  const pairs = [{ a: 100, b: 50 }, null, { a: 100, b: 52 }];
+  assert.deepEqual(countingPairs({ ...base, pairs }), {
+    kept: [
+      { a: 100, b: 50 },
+      { a: 100, b: 52 },
+    ],
+    dropped: ["pair 2: invalid run"],
+  });
+  assert.match(
+    verdictTable([{ ...base, pairs }]) as string,
+    /no verdict: 2 of 3 pairs count \(pair 2: invalid run\)/
+  );
+  const full = verdictTable([
+    {
+      ...base,
+      pairs: [
+        { a: 100, b: 50 },
+        { a: 100, b: 52 },
+        { a: 100, b: 51 },
+      ],
+    },
+  ]) as string;
+  assert.match(full, /\| M12a \| 100 \| 51 \| -49% \| 5% \| improvement \|/);
+  assert.throws(() => countingPairs({ ...base, sizeCheck: true, pairs }), /only be false/);
+  assert.throws(
+    () => countingPairs({ ...base, allowedSizeDelta: 0, pairs }),
+    /needs the size check/
+  );
+});
+
 test("A1: a ratio threshold of 100 % or more is flagged: no improvement can be shown", () => {
   // band (250 - 100) / 150 = 1 -> T = 2.
   const wide = { name: "M10", kind: "ratio", abortExempt: true, baselineSamples: [100, 150, 250] };

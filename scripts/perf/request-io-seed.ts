@@ -16,6 +16,10 @@
  *                                  addendum A1 (cold /v1/models, M10): settings first, then
  *                                  one apikey connection with a fake key per provider id in
  *                                  <file>, then the catalog cache TTL set to CATALOG_TTL_MS
+ *   --logging on|off               addendum A2 (disk writes), with --kind fake: "on" turns the
+ *                                  call-log pipeline and detailed logs on; "off" changes
+ *                                  nothing. Both read the stored values back and check the
+ *                                  pipeline as the request path resolves it.
  *
  * The OpenRouter key is read from env OPENROUTER_API_KEY, never argv. Nothing
  * here prints or logs secrets.
@@ -28,6 +32,7 @@ export interface SeedArgs {
   kind: "fake" | "openrouter" | "catalog";
   baseUrl: string | null;
   providers: string | null;
+  logging: "on" | "off" | null;
   help: boolean;
 }
 
@@ -48,7 +53,13 @@ function requireValue(argv: string[], i: number, flag: string): string {
 
 /** Parse argv. `--kind fake` requires `--base-url`. */
 export function parseSeedArgs(argv: string[]): SeedArgs {
-  const out: SeedArgs = { kind: "fake", baseUrl: null, providers: null, help: false };
+  const out: SeedArgs = {
+    kind: "fake",
+    baseUrl: null,
+    providers: null,
+    logging: null,
+    help: false,
+  };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
     switch (flag) {
@@ -65,6 +76,12 @@ export function parseSeedArgs(argv: string[]): SeedArgs {
       case "--providers":
         out.providers = requireValue(argv, i++, flag);
         break;
+      case "--logging": {
+        const raw = requireValue(argv, i++, flag);
+        if (raw !== "on" && raw !== "off") throw new Error("--logging must be on or off");
+        out.logging = raw;
+        break;
+      }
       case "-h":
       case "--help":
         out.help = true;
@@ -78,6 +95,9 @@ export function parseSeedArgs(argv: string[]): SeedArgs {
   }
   if (!out.help && out.kind === "catalog" && !out.providers) {
     throw new Error("--kind catalog requires --providers");
+  }
+  if (!out.help && out.logging !== null && out.kind !== "fake") {
+    throw new Error("--logging needs --kind fake");
   }
   return out;
 }
@@ -101,13 +121,15 @@ export function parseProviderList(text: string): string[] {
   return ids;
 }
 
-export const SEED_USAGE = `Usage: node --import tsx/esm scripts/perf/request-io-seed.ts [--kind fake|openrouter|catalog] [--base-url <url>] [--providers <file>]
+export const SEED_USAGE = `Usage: node --import tsx/esm scripts/perf/request-io-seed.ts [--kind fake|openrouter|catalog] [--base-url <url>] [--providers <file>] [--logging on|off]
 
   --kind fake --base-url <url>  seed an openai-compatible node for the probe fake upstream
   --kind openrouter             seed an openrouter apikey connection (key from OPENROUTER_API_KEY env)
   --kind catalog --providers <file>
                                 seed one fake-key apikey connection per provider id and a
                                 ${CATALOG_TTL_MS} ms catalog cache TTL (cold /v1/models run)
+  --logging on|off              with --kind fake: call-log pipeline and detailed logs on, or
+                                unchanged; both verified as the request path reads them
   -h, --help                    show this help`;
 
 const QUEUE_SETTING_KEYS = [
@@ -222,6 +244,45 @@ export async function seedCatalog(ids: string[]): Promise<{ providers: number; t
   return { providers: ids.length, ttlMs };
 }
 
+export interface LoggingState {
+  pipeline: boolean;
+  detailed: boolean;
+}
+
+/**
+ * A2: apply and verify the logging setting. "on" writes callLogPipelineEnabled and
+ * detailedLogsEnabled through updateDatabaseSettings; "off" writes nothing. Either way the
+ * pipeline is checked as the request path resolves it (resolveCallLogPipelineEnabled on the
+ * stored settings), so a value the request path would not see fails the seed. ENABLE_REQUEST_LOGS
+ * would override the stored value, so its presence fails the seed too.
+ */
+export async function seedLogging(mode: "on" | "off"): Promise<LoggingState> {
+  if (process.env.ENABLE_REQUEST_LOGS !== undefined) {
+    throw new Error("ENABLE_REQUEST_LOGS is set; it would override the stored pipeline setting");
+  }
+  const dbSettings = await import("../../src/lib/db/databaseSettings.ts");
+  if (mode === "on") {
+    dbSettings.updateDatabaseSettings({
+      logs: { callLogPipelineEnabled: true, detailedLogsEnabled: true },
+    } as Parameters<typeof dbSettings.updateDatabaseSettings>[0]);
+  }
+  const settings = await import("../../src/lib/db/settings.ts");
+  const { resolveCallLogPipelineEnabled } = await import("../../src/lib/logEnv.ts");
+  const stored = (await settings.getSettings()) as Record<string, unknown>;
+  const state: LoggingState = {
+    pipeline: resolveCallLogPipelineEnabled(stored),
+    detailed: dbSettings.getUserDatabaseSettings().logs?.detailedLogsEnabled === true,
+  };
+  const want = mode === "on";
+  if (state.pipeline !== want) {
+    throw new Error(`call-log pipeline reads back as ${state.pipeline}, wanted ${want}`);
+  }
+  if (mode === "on" && !state.detailed) {
+    throw new Error("detailed logs read back as off, wanted on");
+  }
+  return state;
+}
+
 /** Seed settings: setup complete, no login wall, no retries. Returns the report header. */
 export async function seedSettings(): Promise<{ queueRaised: boolean }> {
   const settings = await import("../../src/lib/db/settings.ts");
@@ -278,9 +339,18 @@ export async function runSeed(argv: string[], env: NodeJS.ProcessEnv): Promise<v
   const seeded =
     args.kind === "fake" ? await seedFake(args.baseUrl as string) : await seedOpenRouter();
   const { queueRaised } = await seedSettings();
+  const logs = args.logging ? await seedLogging(args.logging) : undefined;
   const { closeDbInstance } = await import("../../src/lib/db/core.ts");
   closeDbInstance();
-  console.log(JSON.stringify({ status: "ok", kind: args.kind, model: seeded.model, queueRaised }));
+  console.log(
+    JSON.stringify({
+      status: "ok",
+      kind: args.kind,
+      model: seeded.model,
+      queueRaised,
+      ...(logs ? { logging: args.logging, logs } : {}),
+    })
+  );
 }
 
 const invokedAsMain =
