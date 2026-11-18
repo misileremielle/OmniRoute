@@ -46,7 +46,7 @@ test("#3496 GET /api/guardrails lists the registered guardrails with status", as
   assert.ok(Array.isArray(body.guardrails), "expected guardrails[] in the body");
 
   const names = body.guardrails.map((g) => g.name);
-  for (const expected of ["vision-bridge", "pii-masker", "prompt-injection"]) {
+  for (const expected of ["vision-bridge", "credential-masker"]) {
     assert.ok(names.includes(expected), `expected ${expected} in [${names.join(", ")}]`);
   }
 
@@ -71,23 +71,23 @@ test("#3496 POST /api/guardrails/test runs the pre-call pipeline over a sample i
 
   const evaluated = body.results.map((r) => r.guardrail);
   assert.ok(
-    evaluated.includes("pii-masker"),
-    `expected pii-masker to be evaluated, got [${evaluated.join(", ")}]`
+    evaluated.includes("credential-masker"),
+    `expected credential-masker to be evaluated, got [${evaluated.join(", ")}]`
   );
 });
 
 test("#3496 POST /api/guardrails/test honors disabledGuardrails", async () => {
   const req = await makeManagementSessionRequest("http://localhost/api/guardrails/test", {
     method: "POST",
-    body: { input: "hello", disabledGuardrails: ["pii-masker"] },
+    body: { input: "hello", disabledGuardrails: ["credential-masker"] },
   });
   const res = await testRoute.POST(req);
   assert.equal(res.status, 200);
 
   const body = await res.json();
-  const pii = body.results.find((r) => r.guardrail === "pii-masker");
-  assert.ok(pii, "pii-masker should still appear in results");
-  assert.equal(pii.skipped, true, "pii-masker should be skipped when disabled");
+  const masker = body.results.find((r) => r.guardrail === "credential-masker");
+  assert.ok(masker, "credential-masker should still appear in results");
+  assert.equal(masker.skipped, true, "credential-masker should be skipped when disabled");
 });
 
 test("#3496 POST /api/guardrails/test rejects a body without input (400)", async () => {

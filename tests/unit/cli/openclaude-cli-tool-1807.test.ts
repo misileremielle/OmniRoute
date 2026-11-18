@@ -15,7 +15,6 @@ import { fileURLToPath } from "node:url";
 import { CLI_TOOLS } from "../../../src/shared/constants/cliTools.ts";
 import { CliCatalogEntrySchema } from "../../../src/shared/schemas/cliCatalog.ts";
 import { CLI_INTEGRATION_MANIFEST } from "../../../src/shared/constants/cliIntegrationManifest.ts";
-import en from "../../../src/i18n/messages/en.json" with { type: "json" };
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const tool = CLI_TOOLS.openclaude;
@@ -75,9 +74,4 @@ test("openclaude is declared in the CLI integration manifest as a catalog-only t
   assert.equal(entry.surfaces.configure, false);
   assert.equal(entry.surfaces.generate, false);
   assert.deepEqual(entry.binaries, ["openclaude"]);
-});
-
-test("openclaude has an English card description", () => {
-  const descriptions = en.cliTools.toolDescriptions as Record<string, string>;
-  assert.ok(descriptions.openclaude?.trim());
 });

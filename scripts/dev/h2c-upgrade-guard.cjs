@@ -68,14 +68,19 @@ function stripNegotiationTokens(connectionValue) {
   return kept.length > 0 ? kept.join(", ") : null;
 }
 
+// Headers that frame the body; replaced when the body is re-sent with a known length.
+const FRAMING_HEADERS = new Set(["content-length", "transfer-encoding"]);
+
 // Rebuild the request head from `rawHeaders` (preserves case, order and duplicates).
-function serializeRequestHead(req) {
+// With `bodyLength`, the original framing is replaced by `Content-Length: bodyLength`.
+function serializeRequestHead(req, bodyLength) {
   let head = `${req.method} ${req.url} HTTP/${req.httpVersion}\r\n`;
   const raw = req.rawHeaders;
   for (let i = 0; i + 1 < raw.length; i += 2) {
     const name = raw[i];
     const lower = name.toLowerCase();
     if (NEGOTIATION_HEADERS.has(lower)) continue;
+    if (bodyLength !== undefined && FRAMING_HEADERS.has(lower)) continue;
     let value = raw[i + 1];
     if (lower === "connection") {
       value = stripNegotiationTokens(value);
@@ -83,7 +88,27 @@ function serializeRequestHead(req) {
     }
     head += `${name}: ${value}\r\n`;
   }
+  if (bodyLength !== undefined) head += `Content-Length: ${bodyLength}\r\n`;
   return Buffer.from(`${head}\r\n`, "latin1");
+}
+
+// Same limit and parsing as src/shared/constants/bodySize.ts (parseRequestBodyLimitBytes),
+// which the app's body-size guard applies to MAX_BODY_SIZE_BYTES. Read per request.
+const DEFAULT_BODY_LIMIT_BYTES = 10 * 1024 * 1024;
+function bodyLimitBytes() {
+  const value = process.env.MAX_BODY_SIZE_BYTES;
+  if (!value) return DEFAULT_BODY_LIMIT_BYTES;
+  const parsed = parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_BODY_LIMIT_BYTES;
+}
+
+function rejectTooLarge(socket) {
+  socket.end("HTTP/1.1 413 Payload Too Large\r\nConnection: close\r\nContent-Length: 0\r\n\r\n");
+}
+
+function reinject(server, socket, bytes) {
+  socket.unshift(bytes);
+  server.emit("connection", socket);
 }
 
 /**
@@ -98,9 +123,43 @@ function serializeRequestHead(req) {
  */
 function handleH2cUpgrade(server, req, socket, head) {
   if (!isCleartextH2cUpgrade(req, socket)) return false;
-  const requestHead = serializeRequestHead(req);
-  socket.unshift(head && head.length > 0 ? Buffer.concat([requestHead, head]) : requestHead);
-  server.emit("connection", socket);
+  const rest = head && head.length > 0 ? head : Buffer.alloc(0);
+  // A declared body over the app's limit is refused before anything is read.
+  const limit = bodyLimitBytes();
+  const declared = Number(req.headers["content-length"]);
+  if (Number.isFinite(declared) && declared > limit) {
+    rejectTooLarge(socket);
+    return true;
+  }
+  // Node 24 and older leave the body in `head` or on the socket, so the request head
+  // goes back in front of it unchanged.
+  if (req.complete && !(req.readableLength > 0)) {
+    reinject(server, socket, Buffer.concat([serializeRequestHead(req), rest]));
+    return true;
+  }
+  // Node 26 delivers a declared body through `req` instead, already de-chunked: read it
+  // there and send it back with a Content-Length that matches what was read. This runs
+  // before any auth or size check downstream, so the body is capped at the app's limit.
+  const chunks = [];
+  let size = 0;
+  let rejected = false;
+  req.on("data", (chunk) => {
+    if (rejected) return;
+    size += chunk.length;
+    if (size > limit) {
+      rejected = true;
+      chunks.length = 0;
+      rejectTooLarge(socket);
+      return;
+    }
+    chunks.push(chunk);
+  });
+  req.once("end", () => {
+    if (rejected) return;
+    const body = Buffer.concat(chunks);
+    reinject(server, socket, Buffer.concat([serializeRequestHead(req, body.length), body, rest]));
+  });
+  req.once("error", () => socket.destroy());
   return true;
 }
 

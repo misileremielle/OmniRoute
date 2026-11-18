@@ -271,15 +271,12 @@ test("forks and hotfix labels do not waive an applicable required result", () =>
 
 test("only explicitly advisory jobs can fail without blocking", () => {
   const needs = needsFor("ci");
-  needs["test-protocols-e2e"].result = "failure";
+  needs.sonarqube.result = "failure";
   const result = run(needs);
   assert.equal(result.verdict, "PASS");
   assert.ok(
     result.jobs.some(
-      (job) =>
-        job.id === "test-protocols-e2e" &&
-        job.result === "failure" &&
-        job.disposition === "advisory"
+      (job) => job.id === "sonarqube" && job.result === "failure" && job.disposition === "advisory"
     )
   );
   needs["test-vitest"].result = "failure";

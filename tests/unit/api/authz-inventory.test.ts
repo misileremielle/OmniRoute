@@ -72,7 +72,8 @@ test("AC-1: GET returns 5 tiers with prefixes + bypass state envelope", async ()
   const localOnly = body.tiers.find((t) => t.name === "LOCAL_ONLY");
   assert.ok(localOnly);
   assert.ok(localOnly!.prefixes.includes("/api/services/"));
-  assert.equal(localOnly!.bypassable, true);
+  // The compile-time bypass list is empty since the MCP server was removed.
+  assert.equal(localOnly!.bypassable, false);
 
   const alwaysProtected = body.tiers.find((t) => t.name === "ALWAYS_PROTECTED");
   assert.ok(alwaysProtected);

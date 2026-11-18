@@ -159,6 +159,12 @@ const IGNORE_FROM_CODE = new Set([
   // verify-coverage). Operator-supplied script secrets, not OmniRoute runtime config.
   "BOT_TOKEN",
   "BOT_URL",
+  // Perf experiment harness (scripts/perf/request-io-probe.ts and request-io-preload.mjs):
+  // the probe's per-run counter folder and process role, and the OpenRouter key it reads
+  // only for its opt-in real-model test. Harness inputs, never OmniRoute runtime config.
+  "PERF_IO_COUNTER_DIR",
+  "PERF_IO_ROLE",
+  "OPENROUTER_API_KEY",
   // Homologation E2E suite (pnpm run homolog) vars — configured via the dedicated
   // .env.homolog file (template: .env.homolog.example), never in the runtime .env.
   // Test/ops-only signals against the homologation VPS, same class as COMBO_LIVE_*.

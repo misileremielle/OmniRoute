@@ -300,24 +300,6 @@
             "workflow"
           ]
         },
-        "test-protocols-e2e": {
-          "when": "full-code",
-          "disposition": "advisory",
-          "reason": "Existing protocol E2E advisory policy, issue #10049; not counted as required PASS.",
-          "domains": [
-            "build",
-            "catalog",
-            "cli",
-            "core",
-            "db",
-            "i18n",
-            "provider",
-            "routing",
-            "tests",
-            "ui",
-            "workflow"
-          ]
-        },
         "sonarqube": {
           "when": "code",
           "disposition": "advisory",

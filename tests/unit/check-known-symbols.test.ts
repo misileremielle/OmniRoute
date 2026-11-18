@@ -9,11 +9,6 @@ import {
   findNewTranslatorPairs,
   IMPLICIT_DEFAULT_STRATEGIES,
   KNOWN_TRANSLATOR_PAIRS,
-  // (4) MCP tools
-  checkMcpToolsHaveScopes,
-  findMissingMcpTools,
-  findNewMcpTools,
-  KNOWN_MCP_TOOL_NAMES,
   // (5) A2A skills
   // (6) Cloud agents
   type ExecutorLike,
@@ -295,66 +290,6 @@ test("KNOWN_TRANSLATOR_PAIRS is a non-empty, well-formed, deduped from:to snapsh
   assert.equal(new Set(KNOWN_TRANSLATOR_PAIRS).size, KNOWN_TRANSLATOR_PAIRS.length);
   for (const pair of KNOWN_TRANSLATOR_PAIRS) {
     assert.match(pair, /^[a-z0-9-]+:[a-z0-9-]+$/, `malformed translator pair: ${pair}`);
-  }
-});
-
-// ───────────────────────────────────────────────────────────────────────────
-// (4) MCP TOOLS — scope check + snapshot catraca
-// ───────────────────────────────────────────────────────────────────────────
-
-test("checkMcpToolsHaveScopes returns [] when every tool has at least one scope", () => {
-  const tools = [
-    { name: "tool_a", scopes: ["read:health"] },
-    { name: "tool_b", scopes: ["write:combos"] },
-  ];
-  assert.deepEqual(checkMcpToolsHaveScopes(tools), []);
-});
-
-test("checkMcpToolsHaveScopes flags tools with empty scopes array", () => {
-  const tools = [
-    { name: "tool_ok", scopes: ["read:health"] },
-    { name: "tool_bad", scopes: [] as string[] },
-  ];
-  assert.deepEqual(checkMcpToolsHaveScopes(tools), ["tool_bad"]);
-});
-
-test("checkMcpToolsHaveScopes flags tools with undefined scopes", () => {
-  const tools = [
-    { name: "tool_ok", scopes: ["read:health"] },
-    { name: "tool_no_scope", scopes: undefined as unknown as string[] },
-  ];
-  assert.deepEqual(checkMcpToolsHaveScopes(tools), ["tool_no_scope"]);
-});
-
-test("findMissingMcpTools returns [] when every frozen tool is still registered", () => {
-  const frozen = ["tool_a", "tool_b"];
-  const live = new Set(["tool_a", "tool_b", "tool_c"]);
-  assert.deepEqual(findMissingMcpTools(frozen, live), []);
-});
-
-test("findMissingMcpTools flags a frozen tool that disappeared from the live registry", () => {
-  const frozen = ["tool_a", "tool_b"];
-  const live = new Set(["tool_a"]);
-  assert.deepEqual(findMissingMcpTools(frozen, live), ["tool_b"]);
-});
-
-test("findNewMcpTools reports live tools absent from the frozen snapshot, sorted", () => {
-  const frozen = ["tool_a"];
-  const live = new Set(["tool_a", "tool_z", "tool_m"]);
-  assert.deepEqual(findNewMcpTools(frozen, live), ["tool_m", "tool_z"]);
-});
-
-test("findNewMcpTools returns [] when live is a subset of frozen", () => {
-  const frozen = ["tool_a", "tool_b"];
-  const live = new Set(["tool_a"]);
-  assert.deepEqual(findNewMcpTools(frozen, live), []);
-});
-
-test("KNOWN_MCP_TOOL_NAMES is a non-empty, well-formed, deduped snapshot", () => {
-  assert.ok(KNOWN_MCP_TOOL_NAMES.length > 0);
-  assert.equal(new Set(KNOWN_MCP_TOOL_NAMES).size, KNOWN_MCP_TOOL_NAMES.length);
-  for (const name of KNOWN_MCP_TOOL_NAMES) {
-    assert.match(name, /^[a-z0-9_]+$/, `malformed MCP tool name: ${name}`);
   }
 });
 

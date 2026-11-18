@@ -59,17 +59,15 @@ Request → CORS → Authz pipeline (classify → policies → enforce)
 
 ### 🔐 Authentication & Authorization
 
-| Feature               | Implementation                                                                                                                            |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Dashboard Login**   | Password-based auth with JWT tokens (HttpOnly cookies)                                                                                    |
-| **API Key Auth**      | HMAC-signed keys with CRC validation                                                                                                      |
-| **OAuth 2.0 + PKCE**  | Provider-specific browser/device OAuth uses PKCE where supported; import-only Devin credentials are handled separately.                   |
-| **Token Refresh**     | Automatic OAuth token refresh before expiry                                                                                               |
-| **Secure Cookies**    | `AUTH_COOKIE_SECURE=true` for HTTPS environments                                                                                          |
-| **Authz Pipeline**    | Route classification (PUBLIC / CLIENT_API / MANAGEMENT) — see `docs/architecture/AUTHZ_GUIDE.md`                                          |
-| **Route Guard Tiers** | 3-tier model for management routes (LOCAL_ONLY / ALWAYS_PROTECTED / MANAGEMENT) — see `docs/security/ROUTE_GUARD_TIERS.md`                |
-| **Manage-Scope MCP**  | Remote `/api/mcp/*` access gated by API keys with `manage` scope; `/api/cli-tools/runtime/*` stays strict-loopback. See ROUTE_GUARD_TIERS |
-| **MCP Scopes**        | 32 granular scopes (read:health, write:combos, execute:completions, etc.) — see `docs/frameworks/MCP-SERVER.md`                           |
+| Feature               | Implementation                                                                                                             |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Dashboard Login**   | Password-based auth with JWT tokens (HttpOnly cookies)                                                                     |
+| **API Key Auth**      | HMAC-signed keys with CRC validation                                                                                       |
+| **OAuth 2.0 + PKCE**  | Provider-specific browser/device OAuth uses PKCE where supported; import-only Devin credentials are handled separately.    |
+| **Token Refresh**     | Automatic OAuth token refresh before expiry                                                                                |
+| **Secure Cookies**    | `AUTH_COOKIE_SECURE=true` for HTTPS environments                                                                           |
+| **Authz Pipeline**    | Route classification (PUBLIC / CLIENT_API / MANAGEMENT) — see `docs/architecture/AUTHZ_GUIDE.md`                           |
+| **Route Guard Tiers** | 3-tier model for management routes (LOCAL_ONLY / ALWAYS_PROTECTED / MANAGEMENT) — see `docs/security/ROUTE_GUARD_TIERS.md` |
 
 ### 🛡️ Encryption at Rest
 
@@ -122,7 +120,6 @@ Custom guardrails register via `registerGuardrail(new MyGuardrail())`. The model
 | **Log Retention**  | Automatic cleanup after `CALL_LOG_RETENTION_DAYS`           |
 | **No-Log Opt-out** | Per API key `noLog` flag disables request logging           |
 | **Audit Log**      | Administrative actions tracked in `audit_log` table         |
-| **MCP Audit**      | SQLite-backed audit logging for all MCP tool calls          |
 | **Zod Validation** | All API inputs validated with Zod v4 schemas at module load |
 
 ---

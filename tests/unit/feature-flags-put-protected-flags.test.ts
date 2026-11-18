@@ -182,7 +182,8 @@ describe("PUT/DELETE /api/settings/feature-flags protect security flags with log
     const protectedKeys = defs.FEATURE_FLAG_DEFINITIONS.map((d) => d.key).filter((k) =>
       protectedFlags.isProtectedFeatureFlag(k)
     );
-    assert.ok(protectedKeys.length >= 13, `protected flags: ${protectedKeys.join(",")}`);
+    // 8 since the PII masker and prompt-injection guard (and their flags) were removed.
+    assert.ok(protectedKeys.length >= 8, `protected flags: ${protectedKeys.join(",")}`);
     for (const key of protectedKeys) {
       assert.equal(await put(key, sampleValue(key)), 401, `${key} anonymous`);
       assert.equal(await put(key, sampleValue(key), { bearer: "sk-junk" }), 403, `${key} junk`);

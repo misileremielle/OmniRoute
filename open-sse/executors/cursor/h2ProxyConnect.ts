@@ -240,8 +240,16 @@ export function createProxyTunnelSocket(options: ProxyTunnelOptions): Promise<ne
     const port = Number(proxy.port) || (isTlsProxy ? 443 : 80);
     // An https:// proxy speaks TLS before CONNECT. Writing CONNECT in cleartext
     // makes it drop the connection and would expose Proxy-Authorization.
+    // SNI carries host names only: Node 26 throws ERR_INVALID_ARG_VALUE for an
+    // IP servername (older Node only warned), so an IP proxy sends no SNI.
+    // URL keeps IPv6 hosts bracketed; strip them before the check.
+    const proxyHost = proxy.hostname.replace(/^\[(.*)\]$/, "$1");
     const socket: net.Socket = isTlsProxy
-      ? tls.connect({ host: proxy.hostname, port, servername: proxy.hostname })
+      ? tls.connect({
+          host: proxyHost,
+          port,
+          ...(net.isIP(proxyHost) ? {} : { servername: proxyHost }),
+        })
       : net.connect({ host: proxy.hostname, port });
     const readyEvent = isTlsProxy ? "secureConnect" : "connect";
 

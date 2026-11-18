@@ -133,6 +133,52 @@ function createReader(socket: net.Socket) {
   };
 }
 
+function chunkedH2cHead(url: string) {
+  return [
+    `POST ${url} HTTP/1.1`,
+    "Host: 127.0.0.1",
+    "Connection: Upgrade, HTTP2-Settings",
+    "Upgrade: h2c",
+    "HTTP2-Settings: AAMAAABkAAQAoAAAAAIAAAAA",
+    "Content-Type: text/plain",
+    "Transfer-Encoding: chunked",
+    "",
+    "",
+  ].join("\r\n");
+}
+
+async function withBodyLimit(bytes: string, fn: () => Promise<void>) {
+  const saved = process.env.MAX_BODY_SIZE_BYTES;
+  process.env.MAX_BODY_SIZE_BYTES = bytes;
+  try {
+    await fn();
+  } finally {
+    if (saved === undefined) delete process.env.MAX_BODY_SIZE_BYTES;
+    else process.env.MAX_BODY_SIZE_BYTES = saved;
+  }
+}
+
+// True when Node passes an upgrade request's body to `req` instead of `head` (Node 26).
+async function upgradeBodyArrivesThroughReq(): Promise<boolean> {
+  const server = http.createServer();
+  const headLength = new Promise<number>((resolve) => {
+    server.on("upgrade", (_req, socket, head) => {
+      resolve(head.length);
+      socket.destroy();
+    });
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const socket = net.connect((server.address() as AddressInfo).port, "127.0.0.1");
+  socket.on("error", () => {});
+  socket.write(
+    "POST / HTTP/1.1\r\nHost: a\r\nConnection: Upgrade\r\nUpgrade: h2c\r\nContent-Length: 3\r\n\r\nabc"
+  );
+  const length = await headLength;
+  socket.destroy();
+  await new Promise<void>((resolve) => server.close(() => resolve()));
+  return length === 0;
+}
+
 function h2cRequest(method: string, url: string, body = "") {
   const lines = [
     `${method} ${url} HTTP/1.1`,
@@ -280,6 +326,63 @@ describe("h2c upgrade guard — real sockets", () => {
     socket.destroy();
     assert.ok(res);
     assert.equal((JSON.parse(res.body) as Echo).body, body);
+  });
+
+  it("re-frames a chunked body so the handler receives it whole", async () => {
+    const { port } = await startServer();
+    const socket = net.connect(port, "127.0.0.1");
+    const read = createReader(socket);
+    socket.write(chunkedH2cHead("/v1/chat/completions"));
+    await new Promise((resolve) => setTimeout(resolve, 40));
+    socket.write("5\r\nhello\r\n6\r\n world\r\n0\r\n\r\n");
+
+    const res = await read();
+    socket.destroy();
+    assert.ok(res, "the server must answer instead of dropping the connection");
+    assert.equal(res.status, 200);
+    assert.equal((JSON.parse(res.body) as Echo).body, "hello world");
+  });
+
+  it("answers 413 when the declared body is over MAX_BODY_SIZE_BYTES", async () => {
+    await withBodyLimit("16", async () => {
+      let handled = 0;
+      const { server, port } = await startServer();
+      server.prependListener("request", () => handled++);
+      const socket = net.connect(port, "127.0.0.1");
+      const read = createReader(socket);
+      socket.write(
+        h2cRequest("POST", "/v1/chat/completions", JSON.stringify({ text: "x".repeat(40) }))
+      );
+
+      const res = await read();
+      socket.destroy();
+      assert.equal(res?.status, 413);
+      assert.equal(handled, 0, "an oversized body must never reach the request handler");
+    });
+  });
+
+  it("answers 413 when a buffered chunked body grows past MAX_BODY_SIZE_BYTES", async (t) => {
+    // Only runtimes that hand an upgrade request's body to `req` (Node 26) make the guard
+    // buffer it; elsewhere the body stays on the socket and the app's own guard applies.
+    if (!(await upgradeBodyArrivesThroughReq())) {
+      t.skip("this runtime leaves the body on the socket; the guard buffers nothing");
+      return;
+    }
+    await withBodyLimit("16", async () => {
+      let handled = 0;
+      const { server, port } = await startServer();
+      server.prependListener("request", () => handled++);
+      const socket = net.connect(port, "127.0.0.1");
+      const read = createReader(socket);
+      socket.write(chunkedH2cHead("/v1/chat/completions"));
+      socket.write("a\r\n0123456789\r\n");
+      socket.write("a\r\n0123456789\r\n0\r\n\r\n");
+
+      const res = await read();
+      socket.destroy();
+      assert.equal(res?.status, 413);
+      assert.equal(handled, 0, "an oversized body must never reach the request handler");
+    });
   });
 
   it("does not claim WebSocket upgrades — they still reach the existing upgrade handlers", async () => {
