@@ -353,6 +353,31 @@ function killGroup(child: ChildProcess, signal: NodeJS.Signals): void {
   }
 }
 
+/**
+ * The cold-catalog server's env: lts-baseline's isolated child env, background work off, the
+ * preload, the 60 s build timeout, and INITIAL_PASSWORD set to "" (A1: /v1/models is open
+ * through the seed's requireLogin:false and the calls send no key). With a non-empty
+ * INITIAL_PASSWORD the server's startup (ensurePersistentManagementPasswordHash,
+ * instrumentation-node.ts) stores it and sets requireLogin back to true, so every call got 401.
+ * Empty, not deleted: bin/omniroute.mjs fills only undefined keys from the arm's .env, which
+ * sets INITIAL_PASSWORD=CHANGEME; every server check treats "" as unset.
+ */
+export function coldServerEnv(
+  baseEnv: NodeJS.ProcessEnv,
+  dataDir: string,
+  counterDir: string,
+  preloadUrl: string
+): NodeJS.ProcessEnv {
+  return {
+    ...buildChildEnv(baseEnv, dataDir),
+    ...probeBackgroundOff(),
+    PERF_IO_COUNTER_DIR: counterDir,
+    NODE_OPTIONS: `--import ${preloadUrl}`,
+    CATALOG_BUILD_TIMEOUT_MS: String(SERVER_BUILD_TIMEOUT_MS),
+    INITIAL_PASSWORD: "",
+  };
+}
+
 /** Seed the folder through the arm's own seed helper, under SEED_TIMEOUT_MS. */
 async function runSeed(
   root: string,
@@ -619,13 +644,7 @@ export async function runCold(args: ColdArgs): Promise<ColdReport> {
     const preloadUrl = pathToFileURL(
       path.join(root, "scripts", "perf", "request-io-preload.mjs")
     ).href;
-    const env: NodeJS.ProcessEnv = {
-      ...buildChildEnv(process.env, dataDir),
-      ...probeBackgroundOff(),
-      PERF_IO_COUNTER_DIR: counterDir,
-      NODE_OPTIONS: `--import ${preloadUrl}`,
-      CATALOG_BUILD_TIMEOUT_MS: String(SERVER_BUILD_TIMEOUT_MS),
-    };
+    const env = coldServerEnv(process.env, dataDir, counterDir, preloadUrl);
     try {
       server = await startServer(root, env, logFd);
     } catch (error) {

@@ -19,6 +19,7 @@ import {
   WAIT_MS,
   buildSample,
   claimDataDir,
+  coldServerEnv,
   parseColdArgs,
   pingOnce,
   pingsDuring,
@@ -56,6 +57,51 @@ const sample = (i: number, ms: number, maxPingMs: number | null, invalid: string
     pingTimedOut: false,
     invalidReason: invalid,
   }) satisfies Sample;
+
+test("coldServerEnv: INITIAL_PASSWORD is empty (not deleted); preload, timeout and DATA_DIR set", () => {
+  const env = coldServerEnv(
+    { INITIAL_PASSWORD: "from-shell", OMNIROUTE_API_KEY: "leak", PATH: "/bin" },
+    "/iso/m10",
+    "/iso/counters",
+    "file:///r/scripts/perf/request-io-preload.mjs"
+  );
+  // Present and empty, so bin/omniroute.mjs does not refill it from the arm's .env.
+  assert.equal(Object.hasOwn(env, "INITIAL_PASSWORD"), true);
+  assert.equal(env.INITIAL_PASSWORD, "");
+  assert.equal(env.DATA_DIR, "/iso/m10");
+  assert.equal(env.PERF_IO_COUNTER_DIR, "/iso/counters");
+  assert.equal(env.NODE_OPTIONS, "--import file:///r/scripts/perf/request-io-preload.mjs");
+  assert.equal(env.CATALOG_BUILD_TIMEOUT_MS, String(SERVER_BUILD_TIMEOUT_MS));
+  assert.equal(env.OMNIROUTE_API_KEY, undefined);
+  assert.equal(env.REQUIRE_API_KEY, "false");
+});
+
+test("startup keeps the seed's requireLogin:false only when INITIAL_PASSWORD is empty", async () => {
+  // The server's startup step (instrumentation-node.ts) on a DB seeded like the catalog seed.
+  const { updateSettings, getSettings } = await import("../../src/lib/db/settings.ts");
+  const { ensurePersistentManagementPasswordHash } =
+    await import("../../src/lib/auth/managementPassword.ts");
+  const { isAuthRequired } = await import("../../src/shared/utils/apiAuth.ts");
+  const { invalidateDbCache } = await import("../../src/lib/db/readCache.ts");
+  const saved = process.env.INITIAL_PASSWORD;
+  const bootWith = async (initialPassword: string) => {
+    await updateSettings({ requireLogin: false, setupComplete: true, password: "" });
+    process.env.INITIAL_PASSWORD = initialPassword;
+    await ensurePersistentManagementPasswordHash({ settings: await getSettings(), source: "test" });
+    invalidateDbCache("settings");
+    return isAuthRequired();
+  };
+  try {
+    // A non-empty INITIAL_PASSWORD (what buildChildEnv sets) turns login back on: the 401.
+    assert.equal(await bootWith("lts-baseline-fake-initial-password"), true);
+    // Empty (coldServerEnv): no password is stored and requireLogin stays false.
+    assert.equal(await bootWith(""), false);
+    assert.equal((await getSettings()).requireLogin, false);
+  } finally {
+    if (saved === undefined) delete process.env.INITIAL_PASSWORD;
+    else process.env.INITIAL_PASSWORD = saved;
+  }
+});
 
 test("constants match addendum A1", () => {
   assert.equal(SAMPLES, 5);
