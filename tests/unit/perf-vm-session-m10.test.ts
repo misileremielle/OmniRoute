@@ -61,6 +61,51 @@ test("vm-session: A2 writes step wired after m10, copied into arms, bounded", ()
   );
 });
 
+test("vm-session: keep_attempt moves an attempt's files aside, never overwrites, never deletes", (t) => {
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), "perf-vm-keep-"));
+  t.after(() => fs.rmSync(out, { recursive: true, force: true }));
+  const put = (name: string, body: string) => fs.writeFileSync(path.join(out, name), body);
+  put("build-1.json", "a1");
+  put("build-1.log", "a1 log");
+  put("build-10.json", "other label"); // a longer label sharing the prefix: not touched
+  put("probe-r1.json", "p");
+  put("probe-r1-m10.json", "m10"); // <label>-* belongs to the label
+  const run = (label: string, n: number) =>
+    bash(
+      `die() { echo "DIE $*" >&2; exit 1; }\nOUT="${out}"\n${fn("keep_attempt")}\nkeep_attempt ${label} ${n}`
+    );
+  run("build-1", 1);
+  assert.equal(
+    fs.readFileSync(path.join(out, "attempts", "build-1-a1", "build-1.json"), "utf8"),
+    "a1"
+  );
+  assert.ok(fs.existsSync(path.join(out, "attempts", "build-1-a1", "build-1.log")));
+  assert.equal(fs.existsSync(path.join(out, "build-1.json")), false);
+  assert.equal(fs.readFileSync(path.join(out, "build-10.json"), "utf8"), "other label");
+  // Same attempt number again (a resumed session): a numbered sibling, the first kept as is.
+  put("build-1.json", "again");
+  run("build-1", 1);
+  assert.equal(
+    fs.readFileSync(path.join(out, "attempts", "build-1-a1", "build-1.json"), "utf8"),
+    "a1"
+  );
+  assert.equal(
+    fs.readFileSync(path.join(out, "attempts", "build-1-a1.1", "build-1.json"), "utf8"),
+    "again"
+  );
+  // Nothing to move: no folder is created.
+  run("build-2", 1);
+  assert.equal(fs.existsSync(path.join(out, "attempts", "build-2-a1")), false);
+  run("probe-r1", 1);
+  assert.ok(fs.existsSync(path.join(out, "attempts", "probe-r1-a1", "probe-r1-m10.json")));
+  // measure, m10 and writes all keep files instead of deleting them.
+  assert.doesNotMatch(fn("measure"), /rm -rf/);
+  assert.match(fn("measure"), /keep_attempt "\$label" "\$\(\(attempt - 1\)\)"/);
+  assert.match(fn("m10"), /keep_attempt "\$label"/);
+  assert.match(fn("writes"), /keep_attempt "\$label"/);
+  assert.doesNotMatch(fn("m10") + fn("writes"), /rm -f "\$\{OUT:\?\}\/\$label\.json"/);
+});
+
 test("vm-session: reruns_used never counts m10 or writes rows", (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-vm-m10-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));

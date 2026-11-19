@@ -327,6 +327,23 @@ rerun_allowed() {  # rerun_allowed <kind>: session cap, counted from runs.tsv
   esac
 }
 
+# keep_attempt <label> <n>: move $OUT/<label>.* and $OUT/<label>-* into $OUT/attempts/<label>-a<n>/.
+# With no matching files it does nothing; stray files before a first attempt go to -a0. A
+# folder that already exists (a resumed session) gets a numbered sibling, so nothing is
+# ever overwritten.
+keep_attempt() {
+  local label="$1" n="$2" keep f i=1
+  local files=()
+  shopt -s nullglob
+  files=("${OUT:?}/$label".* "${OUT:?}/$label"-*)
+  shopt -u nullglob
+  [[ "${#files[@]}" -gt 0 ]] || return 0
+  keep="$OUT/attempts/$label-a$n"
+  while [[ -e "$keep" ]]; do keep="$OUT/attempts/$label-a$n.$i"; i=$((i + 1)); done
+  mkdir -p "$keep" || die "could not create $keep"
+  for f in "${files[@]}"; do mv -- "$f" "$keep/" || die "could not move $f to $keep"; done
+}
+
 # measure <label> <kind> <arm-dir> <timeout> <report-file> -- <command...>
 measure() {
   local label="$1" kind="$2" dir="$3" to="$4" report="$5"; shift 6
@@ -338,8 +355,9 @@ measure() {
     if [[ "$attempt" -eq 2 ]] && ! rerun_allowed "$kind"; then die "$label failed: no rerun left this session"; fi
     no_leftovers
     idle_gate
-    # A failed attempt must never leave an earlier report behind to be read as this run's.
-    rm -rf "${OUT:?}/$label".* "${OUT:?}/$label"-*
+    # A failed attempt must never leave an earlier report behind to be read as this run's, but
+    # its files are evidence: move them to attempts/<label>-a<n>/ (copied off with $OUT).
+    keep_attempt "$label" "$((attempt - 1))"
     load="$(cut -d' ' -f1 /proc/loadavg)"
     started="$(date -u +%FT%TZ)"
     printf '%s\t%s\t%s\t%s\t-\t%s\tstarted\t%s\n' "$label" "$kind" "$(basename "$dir")" "$started" \
@@ -403,7 +421,7 @@ m10() {
   m10_token() { echo "$M10_SESSION:$label:a$1"; }
   [[ "$attempt" -eq 2 ]] && m10_sweep "$label" "$(m10_dir 1)" "$(m10_token 1)"
   no_leftovers
-  rm -f "${OUT:?}/$label.json" "${OUT:?}/$label.json.tmp" "${OUT:?}/$label.log" "${OUT:?}/$label.out"
+  keep_attempt "$label" "$((attempt - 1))"   # an interrupted attempt's files are kept
   d="$(m10_dir "$attempt")"
   token="$(m10_token "$attempt")"
   load="$(cut -d' ' -f1 /proc/loadavg)"
@@ -460,7 +478,7 @@ writes() {
     for s in D L; do m10_sweep "$label" "$(writes_dir 1 "$s")" "$(writes_token 1)"; done
   fi
   no_leftovers
-  rm -f "${OUT:?}/$label.json" "${OUT:?}/$label.json.tmp" "${OUT:?}/$label.log" "${OUT:?}/$label.out"
+  keep_attempt "$label" "$((attempt - 1))"   # an interrupted attempt's files are kept
   token="$(writes_token "$attempt")"
   load="$(cut -d' ' -f1 /proc/loadavg)"
   started="$(date -u +%FT%TZ)"

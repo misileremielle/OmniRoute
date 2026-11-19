@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  AUTH_TTFB_ENDPOINTS,
   DEFAULT_TTFB_ENDPOINTS,
   buildChildEnv,
   buildReport,
@@ -19,6 +20,7 @@ import {
   renderMarkdown,
   resolveServerPlan,
   runBaseline,
+  seedTtfbKey,
   summarizeSamples,
 } from "../../scripts/perf/lts-baseline.mjs";
 
@@ -369,20 +371,30 @@ const OK_OUTPUTS: Record<string, string> = {
     "baseline: calculateFactors+Score  10 ops in 1.0ms | 0.100µs/op | 10,000,000 ops/s",
 };
 
-function fakeRunner(seen: string[]) {
+const FAKE_KEY = "sk-fake-lts-baseline-key";
+
+function fakeRunner(
+  seen: string[],
+  seedStdout = `migrating...\n${JSON.stringify({ key: FAKE_KEY })}\n`
+) {
   return async (spec: { command: string; args: string[] }) => {
-    const script = spec.args.find((a) => a in OK_OUTPUTS || a === "build:release") ?? "";
+    const isSeed = spec.args.some((a) => a.endsWith("lts-baseline-seed-key.ts"));
+    const script = isSeed
+      ? "seed-key"
+      : (spec.args.find((a) => a in OK_OUTPUTS || a === "build:release") ?? "");
     seen.push(script);
     return {
       exitCode: 0,
       signal: null,
       timedOut: false,
-      stdout: OK_OUTPUTS[script] ?? "",
+      stdout: isSeed ? seedStdout : (OK_OUTPUTS[script] ?? ""),
       stderr: "",
       durationMs: 10,
     };
   };
 }
+
+type FetchInit = { headers?: Record<string, string> };
 
 const fakeHost = { cpuCount: 2, totalMemMB: 1024, loadAvg: [0, 0, 0], nodeVersion: "v24" };
 
@@ -421,6 +433,7 @@ test("runBaseline without a built tree: benches run, build and TTFB are skipped"
 test("runBaseline with a built tree boots the server once and always stops it", async () => {
   const seen: string[] = [];
   let stops = 0;
+  const auth: Record<string, Set<string>> = {};
   const report = await runBaseline(parseArgs(["--runs", "4"]), {
     root: "/r",
     dataDir: "/iso",
@@ -433,7 +446,11 @@ test("runBaseline with a built tree boots the server once and always stops it", 
         stops += 1;
       },
     }),
-    fetchImpl: async () => ({ status: 200, arrayBuffer: async () => new ArrayBuffer(0) }),
+    fetchImpl: async (url: string, init?: FetchInit) => {
+      const ep = new URL(url).pathname;
+      (auth[ep] ??= new Set()).add(init?.headers?.authorization ?? "none");
+      return { status: 200, arrayBuffer: async () => new ArrayBuffer(0) };
+    },
     now: fakeClock(3),
     host: fakeHost,
     gitSha: "x",
@@ -447,6 +464,95 @@ test("runBaseline with a built tree boots the server once and always stops it", 
     assert.equal(report.measurements.ttft[ep].status, "ok");
     assert.equal(report.measurements.ttft[ep].raw.n, 4);
   }
+  // One key seeded after boot; sent only on the endpoints that need it.
+  assert.equal(seen.filter((s) => s === "seed-key").length, 1);
+  assert.deepEqual([...auth["/v1/models"]], [`Bearer ${FAKE_KEY}`]);
+  assert.deepEqual([...auth["/api/health"]], ["none"]);
+  assert.deepEqual([...auth["/api/monitoring/health"]], ["none"]);
+  assert.deepEqual(AUTH_TTFB_ENDPOINTS, ["/v1/models"]);
+  // The key never reaches the report.
+  assert.doesNotMatch(JSON.stringify(report), new RegExp(FAKE_KEY));
+});
+
+test("runBaseline: a failed key seed fails /v1/models only; the others are measured", async () => {
+  const seen: string[] = [];
+  const asked: string[] = [];
+  const report = await runBaseline(parseArgs(["--runs", "2"]), {
+    root: "/r",
+    dataDir: "/iso",
+    runner: fakeRunner(seen, `noise, no key ${FAKE_KEY.slice(0, 3)}\n`),
+    exists: () => true,
+    startServer: async () => ({ baseUrl: "http://127.0.0.1:9", bootMs: 5, stop: async () => {} }),
+    fetchImpl: async (url: string) => {
+      asked.push(new URL(url).pathname);
+      return { status: 200, arrayBuffer: async () => new ArrayBuffer(0) };
+    },
+    now: fakeClock(1),
+    host: fakeHost,
+    gitSha: "x",
+    generatedAt: "2026-10-10T00:00:00.000Z",
+    log: () => {},
+  });
+  const ttft = report.measurements.ttft;
+  assert.deepEqual(Object.keys(ttft), [...DEFAULT_TTFB_ENDPOINTS]);
+  assert.equal(ttft["/v1/models"].status, "failed");
+  assert.equal(ttft["/v1/models"].summary, "api key seed printed no key");
+  assert.equal(ttft["/api/health"].status, "ok");
+  assert.equal(ttft["/api/monitoring/health"].status, "ok");
+  assert.equal(asked.includes("/v1/models"), false);
+});
+
+test("seedTtfbKey: last JSON line wins; fixed reasons for every failure", async () => {
+  const run =
+    (r: Partial<{ exitCode: number; timedOut: boolean; stdout: string }>) => async () => ({
+      exitCode: 0,
+      signal: null,
+      timedOut: false,
+      stdout: "",
+      stderr: "",
+      durationMs: 1,
+      ...r,
+    });
+  const env = { DATA_DIR: "/iso/server" };
+  let spec: {
+    command: string;
+    args: string[];
+    cwd: string;
+    env: unknown;
+    timeoutMs: number;
+  } | null = null;
+  const ok = await seedTtfbKey({
+    root: "/r",
+    env,
+    runner: async (s: typeof spec) => {
+      spec = s;
+      return run({ stdout: `{"x":1}\nlog line\n{"key":"k1"}\n` })();
+    },
+  });
+  assert.deepEqual(ok, { key: "k1" });
+  assert.deepEqual(spec?.args, ["--import", "tsx/esm", "/r/scripts/perf/lts-baseline-seed-key.ts"]);
+  assert.equal(spec?.env, env);
+  assert.equal(spec?.cwd, "/r");
+  assert.deepEqual(await seedTtfbKey({ root: "/r", env, runner: run({ timedOut: true }) }), {
+    error: "api key seed timed out",
+  });
+  assert.deepEqual(
+    await seedTtfbKey({ root: "/r", env, runner: run({ exitCode: 1, stdout: '{"key":"leak"}' }) }),
+    { error: "api key seed exited 1" }
+  );
+  assert.deepEqual(
+    await seedTtfbKey({
+      root: "/r",
+      env,
+      runner: async () => {
+        throw new Error("ENOENT secret-path");
+      },
+    }),
+    { error: "api key seed could not start" }
+  );
+  assert.deepEqual(await seedTtfbKey({ root: "/r", env, runner: run({ stdout: "" }) }), {
+    error: "api key seed printed no key",
+  });
 });
 
 test("runBaseline stops the server even when the TTFB phase throws", async () => {

@@ -83,6 +83,12 @@ The JSON shape is `{ generatedAt, host, gitSha, options, measurements }`. Each m
 `ttft` needs a server. When no `--url` is given and `dist/server.js` does not exist, every
 `ttft` entry is `skipped` with the reason: `omniroute serve` cannot boot an unbuilt tree.
 When the bundle exists, the script boots it with `NODE_ENV=production` on an ephemeral port.
+Because the server gets an `INITIAL_PASSWORD`, `/v1/models` requires a credential: after the
+boot (so `serverBoot` does not include it), `scripts/perf/lts-baseline-seed-key.ts` creates one
+API key in the server's `DATA_DIR`, and only `/v1/models` is requested with it as a Bearer
+token. The key is never logged or written to the report. If the seed fails, `/v1/models` is
+`failed` with the reason and the other endpoints are still measured. With `--url` no key is
+seeded.
 
 ## Procedure on an idle host (VPS or the .113 runner box)
 

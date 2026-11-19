@@ -13,6 +13,13 @@
  *   ttft           time-to-first-byte (response headers) per endpoint: median + p95 of
  *                  --runs requests after 3 discarded warmup requests
  *
+ * The booted server gets an INITIAL_PASSWORD, so /v1/models requires a credential. After boot
+ * (so serverBoot is unchanged) one API key is seeded into the server's DATA_DIR through
+ * src/lib/db/apiKeys.ts (`scripts/perf/lts-baseline-seed-key.ts`) and sent as a Bearer token on
+ * AUTH_TTFB_ENDPOINTS only; the health endpoints stay unauthenticated. The key is never logged
+ * or written to the report. With --url no key is seeded (the operator's server, the operator's
+ * auth).
+ *
  * Every measurement is `{ status: ok|skipped|failed, durationMs, summary, raw? }`. A failed
  * or skipped measurement is DATA, not a crash: the script still writes the report and
  * exits 0. Only a usage error (bad flag) exits non-zero.
@@ -51,7 +58,10 @@ export const DEFAULT_TTFB_ENDPOINTS = Object.freeze([
   "/v1/models",
   "/api/monitoring/health",
 ]);
+/** Endpoints that need a credential on the booted server; they get the seeded key. */
+export const AUTH_TTFB_ENDPOINTS = Object.freeze(["/v1/models"]);
 export const WARMUP_REQUESTS = 3;
+const SEED_KEY_TIMEOUT_MS = 120_000;
 const DEFAULT_RUNS = 20;
 const DEFAULT_HEAP_TIMEOUT_MS = 15 * 60_000;
 const BENCH_TIMEOUT_MS = 10 * 60_000;
@@ -359,10 +369,19 @@ export async function measureCommand({ spec, runner, parse, summarize, skippedRe
  * until the response status line + headers arrive (≈ first byte); the body is then drained
  * so the keep-alive connection is reusable. Warmup requests are not timed.
  */
-export async function measureTtfb({ baseUrl, endpoints, runs, warmup, fetchImpl, now }) {
+export async function measureTtfb({
+  baseUrl,
+  endpoints,
+  runs,
+  warmup,
+  fetchImpl,
+  now,
+  headersFor = () => ({}),
+}) {
   const results = {};
   for (const endpoint of endpoints) {
     const url = `${baseUrl}${endpoint}`;
+    const headers = { accept: "application/json", ...headersFor(endpoint) };
     const samples = [];
     const statuses = new Set();
     let failure = null;
@@ -371,7 +390,7 @@ export async function measureTtfb({ baseUrl, endpoints, runs, warmup, fetchImpl,
       const t0 = timed ? now() : 0;
       let res;
       try {
-        res = await fetchImpl(url, { headers: { accept: "application/json" } });
+        res = await fetchImpl(url, { headers });
       } catch (e) {
         failure = `request failed: ${errorMessage(e)}`;
         break;
@@ -398,6 +417,60 @@ export async function measureTtfb({ baseUrl, endpoints, runs, warmup, fetchImpl,
     );
   }
   return results;
+}
+
+/**
+ * Seed one API key for the booted server (see the header): runs lts-baseline-seed-key.ts with
+ * the server's env through the injected runner and returns `{ key }`, or `{ error }` with a
+ * fixed reason (never the child's output, which may carry the key).
+ */
+export async function seedTtfbKey({ root, env, runner }) {
+  let result;
+  try {
+    result = await runner({
+      command: process.execPath,
+      args: ["--import", "tsx/esm", path.join(root, "scripts", "perf", "lts-baseline-seed-key.ts")],
+      cwd: root,
+      env,
+      timeoutMs: SEED_KEY_TIMEOUT_MS,
+    });
+  } catch {
+    return { error: "api key seed could not start" };
+  }
+  if (result.timedOut) return { error: "api key seed timed out" };
+  if (result.exitCode !== 0) return { error: `api key seed exited ${result.exitCode}` };
+  const lines = String(result.stdout ?? "")
+    .trim()
+    .split("\n")
+    .reverse();
+  for (const line of lines) {
+    try {
+      const parsed = JSON.parse(line);
+      if (typeof parsed?.key === "string" && parsed.key.length > 0) return { key: parsed.key };
+    } catch {
+      // migration logs share stdout
+    }
+  }
+  return { error: "api key seed printed no key" };
+}
+
+/** TTFB on the booted server: the key goes only on AUTH_TTFB_ENDPOINTS; a failed seed fails them. */
+async function measureBootedTtfb({ server, endpoints, seeded, options, fetchImpl, now }) {
+  const needsKey = new Set(AUTH_TTFB_ENDPOINTS);
+  const timed = seeded.key ? endpoints : endpoints.filter((ep) => !needsKey.has(ep));
+  const results = await measureTtfb({
+    baseUrl: server.baseUrl,
+    endpoints: timed,
+    runs: options.runs,
+    warmup: WARMUP_REQUESTS,
+    fetchImpl,
+    now,
+    headersFor: (ep) =>
+      seeded.key && needsKey.has(ep) ? { authorization: `Bearer ${seeded.key}` } : {},
+  });
+  return Object.fromEntries(
+    endpoints.map((ep) => [ep, results[ep] ?? measurement("failed", 0, seeded.error)])
+  );
 }
 
 // ── orchestration ────────────────────────────────────────────────────────────
@@ -507,9 +580,10 @@ export async function runBaseline(options, deps) {
   } else {
     log("ttft: booting dist/server.js via `omniroute serve` (NODE_ENV=production)");
     let server = null;
+    const serverEnv = childEnv("server");
     try {
       try {
-        server = await startServer({ root, env: childEnv("server") });
+        server = await startServer({ root, env: serverEnv });
       } catch (e) {
         const why = `server boot failed: ${errorMessage(e)}`;
         measurements.serverBoot = measurement("failed", 0, why);
@@ -521,11 +595,13 @@ export async function runBaseline(options, deps) {
           server.bootMs,
           `spawn → first /api/health/ping 200 in ${fmtMs(server.bootMs)}`
         );
-        measurements.ttft = await measureTtfb({
-          baseUrl: server.baseUrl,
+        const seeded = await (deps.seedKey ?? seedTtfbKey)({ root, env: serverEnv, runner });
+        log(seeded.key ? "ttft: api key seeded for /v1/models" : `ttft: ${seeded.error}`);
+        measurements.ttft = await measureBootedTtfb({
+          server,
           endpoints,
-          runs: options.runs,
-          warmup: WARMUP_REQUESTS,
+          seeded,
+          options,
           fetchImpl,
           now,
         });
