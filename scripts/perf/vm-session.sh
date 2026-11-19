@@ -38,6 +38,10 @@ TO_BUILD=75m        # B <= 1 h (time-build.mjs also stops at 60 min)
 TO_BASE=45m         # R <= 0.6 h
 TO_PROBE=10m        # P <= 0.1 h, plus the 60 s idle check
 TO_SUITE_S=9000     # S <= 2 h for all three parts together -> 150 min total, shared by the parts
+# A suite part whose log does not grow for this long is killed (stall-guard.sh, exit 75) and the
+# run counts as failed, so the suite rerun applies (Proxy, 2026-11-19: 10 min). Step 10's slowest
+# healthy files kept the log quiet for about 310 s; a futex-hung file froze part 1 for 70 min.
+SUITE_STALL_S=600
 TO_M5=23m           # M5 <= 0.3 h
 TO_INSTALL=30m
 # Addendum A1 (cold /v1/models, M10/M11): one cold-catalog run after every successful probe run.
@@ -104,6 +108,22 @@ while [[ $# -gt 0 ]]; do
     *) usage ;;
   esac
 done
+
+# Gate caps: cap = max(GATE_MIN_S, the given cap) (Proxy, 2026-11-19). The runbook passes 2 x
+# each gate's step-10 time, and step 10's focused gate took under 1 s, so its cap would round
+# to 0 s and fail every fix. gates-*.txt records the cap actually used.
+GATE_MIN_S=60
+dur_s() {  # dur_s <n>[smhd] -> seconds (input already validated above)
+  local n="${1%[smhd]}" u="${1##*[0-9]}"
+  n=$((10#$n))
+  case "$u" in m) n=$((n * 60)) ;; h) n=$((n * 3600)) ;; d) n=$((n * 86400)) ;; esac
+  echo "$n"
+}
+gate_floor() {
+  if [[ "$(dur_s "$1")" -lt "$GATE_MIN_S" ]]; then echo "${GATE_MIN_S}s"; else echo "$1"; fi
+}
+GATE_TIMEOUT="$(gate_floor "$GATE_TIMEOUT")"
+for _i in "${!GATE_TIMEOUTS[@]}"; do GATE_TIMEOUTS[_i]="$(gate_floor "${GATE_TIMEOUTS[_i]}")"; done
 
 # ── account checks and copy-off staging (all modes) ────────────────────────────────────────
 RUNNER="${PERF_RUNNER:-runner}"
@@ -246,6 +266,11 @@ preflight() {
   [[ "$(sha256sum "$M10_FIXTURE" | cut -d' ' -f1)" == "$M10_FIXTURE_SHA256" ]] \
     || die "A1 fixture hash differs from M10_FIXTURE_SHA256: $M10_FIXTURE"
   echo "m10 fixture=$M10_FIXTURE sha256=$M10_FIXTURE_SHA256" >> "$OUT/host.txt"
+  # The suite parts run under stall-guard.sh (bash 5.1+); a one-second self-test here fails the
+  # session at the start instead of in part 1.
+  bash "$DRIVER_DIR/stall-guard.sh" 5 /dev/null -- true 2>> "$LOG" \
+    || die "stall-guard.sh self-test failed (needs bash 5.1+; see $LOG)"
+  echo "suite stall limit=${SUITE_STALL_S}s; gate caps=${GATE_TIMEOUTS[*]:-$GATE_TIMEOUT} (min ${GATE_MIN_S}s)" >> "$OUT/host.txt"
 }
 
 no_leftovers() {
@@ -545,21 +570,27 @@ m5()     { measure "$1" m5 "$2" "$TO_M5" "" -- bash -c '
              du -sb "$pfx" > "$out-install.txt"
              (cd "$pfx" && npm ls --all --json > "$out-tree.json") || true' m5 "$OUT/$1" "$NPM_CACHE"; }
 suite()  { measure "$1" suite "$2" "$((TO_SUITE_S + 60))s" "" -- bash -c '
-             out="$1"; deadline=$(( $(date +%s) + $2 )); export DISABLE_SQLITE_AUTO_BACKUP=true C=8
+             out="$1"; deadline=$(( $(date +%s) + $2 )); g="$3"; stall="$4"
+             export DISABLE_SQLITE_AUTO_BACKUP=true C=8
              for p in 1 2 3; do
                to=$(( deadline - $(date +%s) )); [ "$to" -gt 0 ] || exit 124
                to="${to}s"; s=$(date +%s.%N); rc=0
                case $p in
-                 1) timeout "$to" node --max-old-space-size=8192 --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit --test-concurrency=$C tests/unit/*.test.ts "tests/unit/{api,auth,authz,build,chatcore,cli,cli-helper,combo,compression,correctness,cors,db,db-adapters,docs,guardrails,lib,memory,runtime,security,services,settings,shared,translator,ui,usage}/**/*.test.ts" "tests/unit/**/*.test.mjs" ;;
-                 2) timeout "$to" node --max-old-space-size=8192 --import tsx --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit --test-concurrency=$C "tests/unit/dashboard/**/*.test.ts" ;;
-                 3) timeout "$to" pnpm run test:unit:serial ;;
+                 1) bash "$g" "$stall" "$out.part$p.log" -- timeout --kill-after=30s "$to" node --max-old-space-size=8192 --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit --test-concurrency=$C tests/unit/*.test.ts "tests/unit/{api,auth,authz,build,chatcore,cli,cli-helper,combo,compression,correctness,cors,db,db-adapters,docs,guardrails,lib,memory,runtime,security,services,settings,shared,translator,ui,usage}/**/*.test.ts" "tests/unit/**/*.test.mjs" ;;
+                 2) bash "$g" "$stall" "$out.part$p.log" -- timeout --kill-after=30s "$to" node --max-old-space-size=8192 --import tsx --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit --test-concurrency=$C "tests/unit/dashboard/**/*.test.ts" ;;
+                 3) bash "$g" "$stall" "$out.part$p.log" -- timeout --kill-after=30s "$to" pnpm run test:unit:serial ;;
                esac > "$out.part$p.log" 2>&1 || rc=$?
                awk -v a="$s" -v b="$(date +%s.%N)" -v p="$p" -v rc="$rc" "BEGIN { printf \"part%s %.1f rc=%s\\n\", p, b - a, rc }" >> "$out.txt"
                [ "$rc" -eq 124 ] && exit 124
+               # 137 after the deadline = the inner timeout had to SIGKILL (--kill-after): still the
+               # deadline. Before it, 137 is a SIGKILL from outside (failed, below).
+               [ "$rc" -eq 137 ] && [ "$(date +%s)" -ge "$deadline" ] && exit 124
+               # 75 = stall-guard killed a part whose log stopped growing: failed, rerun allowed.
+               [ "$rc" -eq 75 ] && exit 75
                # 0 = pass, 1 = failing tests (still a valid timing). Anything else (signal, OOM, no
                # start) is not a suite run and must not count as a fast sample.
                [ "$rc" -eq 0 ] || [ "$rc" -eq 1 ] || exit 70
-             done; exit 0' suite "$OUT/$1" "$TO_SUITE_S"; }
+             done; exit 0' suite "$OUT/$1" "$TO_SUITE_S" "$DRIVER_DIR/stall-guard.sh" "$SUITE_STALL_S"; }
 gates()  {  # gates <label> <dir>: timed; a failing gate is recorded, a gate past its cap stops
   local label="$1" dir="$2" i=0 c s rc to
   rm -f "$OUT/$label.txt"

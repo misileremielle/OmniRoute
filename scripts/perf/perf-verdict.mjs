@@ -37,6 +37,9 @@
  *   ]
  * }
  * Ratio guards compare the band against 20 %; absolute guards against `cap`.
+ * `"guard": false` (2026-11-19) makes a row reported only: its noise is shown, it never
+ * aborts, and an absolute one needs no `cap`. A missing `guard` still counts as a guard, so
+ * a forgotten field can only make the check stricter.
  *
  * Input shape:
  * {
@@ -203,6 +206,7 @@ export function verdict(kind, pairs, T) {
  * absolute guard's noise is above its cap (heap growth 5 MB, M7 statements 2).
  * The caps are independent of the median. Each entry:
  * { kind: "ratio" | "absolute", guard: boolean, noise: number, cap?: number }.
+ * Only `guard: false` skips an entry; a missing guard counts as a guard, as in abortRows.
  */
 export function abortCheck(metrics) {
   if (!Array.isArray(metrics)) {
@@ -212,7 +216,7 @@ export function abortCheck(metrics) {
     if (m === null || typeof m !== "object") {
       throw new Error("abortCheck needs metric objects");
     }
-    if (m.guard !== true) {
+    if (m.guard === false) {
       continue;
     }
     if (typeof m.noise !== "number" || !Number.isFinite(m.noise) || m.noise < 0) {
@@ -397,8 +401,18 @@ export function abortRows(metrics) {
     }
     const name = typeof m.name === "string" && m.name.length > 0 ? m.name : "(unnamed)";
     const exempt = m.abortExempt === true;
+    const reported = m.guard === false;
     if (notMeasured(m)) {
-      return { name, kind: m.kind, noise: null, cap: null, over: false, exempt, notMeasured: true };
+      return {
+        name,
+        kind: m.kind,
+        noise: null,
+        cap: null,
+        over: false,
+        exempt,
+        reported,
+        notMeasured: true,
+      };
     }
     const n = noise(m.kind, m.baselineSamples);
     if (m.kind === "ratio") {
@@ -409,21 +423,24 @@ export function abortRows(metrics) {
         cap: ABORT_RATIO_BAND,
         over: n > ABORT_RATIO_BAND,
         exempt,
+        reported,
         notMeasured: false,
         noImprovementPossible: noImprovementPossible(threshold("ratio", n, { floor: m.floor })),
       };
     }
     if (m.kind === "absolute") {
-      if (typeof m.cap !== "number" || !Number.isFinite(m.cap) || m.cap < 0) {
+      const capOk = typeof m.cap === "number" && Number.isFinite(m.cap) && m.cap >= 0;
+      if (!capOk && !(reported && m.cap === undefined)) {
         throw new Error("abortRows needs a finite non-negative cap for absolute guards");
       }
       return {
         name,
         kind: m.kind,
         noise: n,
-        cap: m.cap,
-        over: n > m.cap,
+        cap: capOk ? m.cap : null,
+        over: capOk ? n > m.cap : false,
         exempt,
+        reported,
         notMeasured: false,
       };
     }
@@ -434,7 +451,7 @@ export function abortRows(metrics) {
 /** A1: rows that can stop the experiment (measured and not exempt), as abortCheck input. */
 export function abortCheckInput(rows) {
   return rows
-    .filter((r) => !r.notMeasured && !r.exempt)
+    .filter((r) => !r.notMeasured && !r.exempt && !r.reported)
     .map((r) =>
       r.kind === "ratio"
         ? { kind: r.kind, guard: true, noise: r.noise }
@@ -454,9 +471,10 @@ export function abortTable(metrics) {
       lines.push(`| ${r.name} | ${r.kind} | - | - | not measured |`);
       continue;
     }
-    const capText = r.kind === "ratio" ? "20%" : formatNumber(r.cap);
-    let over = r.over ? "yes" : "no";
+    const capText = r.kind === "ratio" ? "20%" : r.cap === null ? "-" : formatNumber(r.cap);
+    let over = r.cap === null && r.kind === "absolute" ? "-" : r.over ? "yes" : "no";
     if (r.exempt) over += " (exempt)";
+    if (r.reported) over += " (reported only)";
     // Only exempt rows: a non-exempt band that high aborts anyway, and old rows stay unchanged.
     if (r.exempt && r.noImprovementPossible) over += "; T >= 100 %: no improvement can be shown";
     lines.push(`| ${r.name} | ${r.kind} | ${formatNumber(r.noise)} | ${capText} | ${over} |`);

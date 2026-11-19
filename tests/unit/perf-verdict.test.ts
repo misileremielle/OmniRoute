@@ -378,6 +378,52 @@ test("A1: metrics without the new fields behave as before", () => {
   );
 });
 
+test("guard: false rows are reported only: shown, never abort, absolute ones need no cap", async () => {
+  const wideRatio = { name: "M2b", kind: "ratio", guard: false, baselineSamples: [100, 200, 100] };
+  const capless = { name: "M7 stream", kind: "absolute", guard: false, baselineSamples: [1, 9] };
+  const rows = abortRows([wideRatio, capless]);
+  assert.equal(rows[0].reported, true);
+  assert.equal(rows[0].over, true);
+  assert.equal(rows[1].cap, null);
+  assert.equal(rows[1].noise, 8);
+  assert.deepEqual(abortCheckInput(rows), []);
+  const table = abortTable([wideRatio, capless]) as string;
+  assert.match(table, /\| M2b \| ratio \| 1 \| 20% \| yes \(reported only\) \|/);
+  assert.match(table, /\| M7 stream \| absolute \| 8 \| - \| - \(reported only\) \|/);
+  assert.equal((await runCli(["--abort"], { metrics: [wideRatio, capless] })).code, 0);
+  // A guard next to them still aborts.
+  const both = await runCli(["--abort"], {
+    metrics: [
+      wideRatio,
+      capless,
+      { name: "M8", kind: "ratio", guard: true, baselineSamples: [100, 200, 100] },
+    ],
+  });
+  assert.equal(both.code, ABORT_EXIT_CODE);
+});
+
+test("guard: missing still counts as a guard; a bad cap still throws for reported rows", () => {
+  // Fail-safe: only an explicit false relaxes the check.
+  assert.throws(
+    () => abortRows([{ name: "M4", kind: "absolute", baselineSamples: [1, 2] }]),
+    /finite non-negative cap/
+  );
+  assert.throws(
+    () => abortRows([{ name: "M4", kind: "absolute", guard: true, baselineSamples: [1, 2] }]),
+    /finite non-negative cap/
+  );
+  assert.throws(
+    () =>
+      abortRows([{ name: "M4", kind: "absolute", guard: false, cap: -1, baselineSamples: [1, 2] }]),
+    /finite non-negative cap/
+  );
+  const withCap = abortRows([
+    { name: "M4", kind: "absolute", guard: false, cap: 2, baselineSamples: [1, 9] },
+  ]);
+  assert.equal(withCap[0].over, true);
+  assert.deepEqual(abortCheckInput(withCap), []);
+});
+
 test("verdictTable renders the CLI Markdown columns", () => {
   const table = verdictTable([
     {
