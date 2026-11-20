@@ -17,6 +17,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 
 import {
+  BATCH_SETTLE_MS,
   STREAM_CHUNKS,
   checkSelfChecks,
   chunkHasContent,
@@ -64,6 +65,18 @@ function counterFile(overrides: Partial<CounterFile> = {}): CounterFile {
     ...overrides,
   };
 }
+
+test("M7 snapshots wait the log batch window plus 1 s, and the report records it", () => {
+  assert.equal(BATCH_SETTLE_MS, 6_000);
+  const source = fs.readFileSync(
+    path.join(import.meta.dirname, "../../scripts/perf/request-io-probe.ts"),
+    "utf8"
+  );
+  // After the warm-up, the plain window and the streamed window; the idle window stays 10 s.
+  assert.equal(source.match(/await sleep\(BATCH_SETTLE_MS\);/g)?.length, 3);
+  assert.match(source, /await sleep\(10_000\);\n\s+const idleSnapshot/);
+  assert.match(source, /settleMs: BATCH_SETTLE_MS,/);
+});
 
 test("parseProbeArgs: defaults, io flags and real flags", () => {
   const io = parseProbeArgs(["--root", "/arm", "--out", "report.json"]);

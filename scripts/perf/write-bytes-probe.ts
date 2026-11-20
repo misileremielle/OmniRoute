@@ -13,6 +13,14 @@
  * time. A window is invalid if any process seen during it exits before its end (a reaped child's
  * counters move to its parent, so its bytes would be double-counted or lost).
  *
+ * Step-11 fix 3 controls (OmniRoute may hold log rows up to 5 s): before each request-carrying
+ * window the probe checkpoints the database (PASSIVE, node:sqlite, retried up to 3 times) and
+ * records the main file's size/mtime and the WAL header; a changed main file means a checkpoint
+ * ran inside the window (`checkpoint-in-window`). The server's 5-minute PASSIVE timer is pushed
+ * out of the run. Windows settle at least 6 s after their last reply (at most 16 s), then 1 s.
+ * Setting D adds a paced window (M12c: 20 requests at one per second) after the idle window.
+ * After the server stops, each request-carrying window must hold 20 usage and 20 call-log rows.
+ *
  * Exit 0 whenever a report is written; `valid` per setting decides. Exit 1 only when no report
  * could be written. SIGINT/SIGTERM/SIGHUP stop the servers by DATA_DIR, delete the claimed folders
  * and exit 128+signal.
@@ -21,6 +29,7 @@ import { spawn, execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -54,6 +63,17 @@ export const SEED_TIMEOUT_MS = 60_000;
 export const STOP_GRACE_MS = 10_000;
 export const KILL_SETTLE_MS = 4_000;
 export const LOAD_LIMIT = 2.0;
+// Step-11 fix 3: OmniRoute may hold log rows up to 5 s before writing them.
+/** A window settles at least this long after its last reply (the batch window plus 1 s). */
+export const BATCH_SETTLE_MS = 6_000;
+/** ...and at most this long after it. */
+export const SETTLE_MAX_MS = 16_000;
+export const CHECKPOINT_RETRIES = 3;
+export const CHECKPOINT_RETRY_MS = 200;
+export const PACED_INTERVAL_MS = 1_000;
+/** The server's 5-minute PASSIVE checkpoint timer is pushed out of every window (one day). */
+export const WAL_PASSIVE_INTERVAL_OFF_MS = "86400000";
+export const DB_FILE_NAME = "storage.sqlite";
 /** Removed from the server env so the app's log-file default and the stored pipeline apply. */
 export const REMOVED_ENV = [
   "APP_LOG_TO_FILE",
@@ -61,6 +81,8 @@ export const REMOVED_ENV = [
   "ENABLE_REQUEST_LOGS",
   "NODE_OPTIONS",
   "PERF_IO_COUNTER_DIR",
+  // Both arms run with OmniRoute's default log batching.
+  "OMNIROUTE_LOG_BATCH_MS",
 ] as const;
 
 export type Setting = "D" | "L";
@@ -573,11 +595,195 @@ export function hasPipeline(file: string): boolean | null {
   }
 }
 
-// ── live run ─────────────────────────────────────────────────────────────────
+// ── database controls (step-11 fix 3) ────────────────────────────────────────
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/** One `PRAGMA wal_checkpoint(PASSIVE)` result, or why it could not run. */
+export type CheckpointAttempt =
+  { busy: number; log: number; checkpointed: number } | { error: string };
+
+export interface CheckpointRun {
+  attempts: CheckpointAttempt[];
+  /** The last attempt moved every WAL frame into the main file. */
+  ok: boolean;
+}
+
+export function checkpointComplete(attempt: CheckpointAttempt): boolean {
+  return (
+    !("error" in attempt) &&
+    attempt.busy === 0 &&
+    attempt.log >= 0 &&
+    attempt.checkpointed === attempt.log
+  );
+}
+
+/**
+ * Checkpoint the server's database from this process, with node:sqlite (built into Node, so the
+ * arm's native module is not involved). No read transaction is held: one pragma, then close.
+ */
+export function checkpointOnce(dbFile: string): CheckpointAttempt {
+  let db: DatabaseSync | null = null;
+  try {
+    db = new DatabaseSync(dbFile);
+    const row = db.prepare("PRAGMA wal_checkpoint(PASSIVE)").get() as
+      { busy: number; log: number; checkpointed: number } | undefined;
+    if (!row) return { error: "no-result" };
+    return { busy: Number(row.busy), log: Number(row.log), checkpointed: Number(row.checkpointed) };
+  } catch (error) {
+    return { error: errText(error) };
+  } finally {
+    try {
+      db?.close();
+    } catch {
+      /* closed */
+    }
+  }
+}
+
+/**
+ * Checkpoint, retrying an incomplete one up to `retries` times `retryMs` apart (arm B can still be
+ * writing the ready update of its last warm-up rows). Every result is kept.
+ */
+export async function checkpointWithRetry(
+  run: () => CheckpointAttempt,
+  wait: (ms: number) => Promise<void> = sleep,
+  retries = CHECKPOINT_RETRIES,
+  retryMs = CHECKPOINT_RETRY_MS
+): Promise<CheckpointRun> {
+  const attempts: CheckpointAttempt[] = [run()];
+  while (!checkpointComplete(attempts[attempts.length - 1]) && attempts.length <= retries) {
+    await wait(retryMs);
+    attempts.push(run());
+  }
+  return { attempts, ok: checkpointComplete(attempts[attempts.length - 1]) };
+}
+
+/** The WAL header's checkpoint sequence and salts; they change when the WAL is reset. */
+export function walHeader(
+  walFile: string
+): { checkpointSeq: number; salt1: number; salt2: number } | null {
+  let fd: number | null = null;
+  try {
+    fd = fs.openSync(walFile, "r");
+    const buf = Buffer.alloc(32);
+    if (fs.readSync(fd, buf, 0, 32, 0) < 32) return null;
+    return {
+      checkpointSeq: buf.readUInt32BE(12),
+      salt1: buf.readUInt32BE(16),
+      salt2: buf.readUInt32BE(20),
+    };
+  } catch {
+    return null;
+  } finally {
+    if (fd !== null) fs.closeSync(fd);
+  }
+}
+
+export interface DbReading {
+  main: { size: number; mtimeMs: number } | null;
+  walSize: number | null;
+  wal: { checkpointSeq: number; salt1: number; salt2: number } | null;
+}
+
+export function dbReading(dbFile: string): DbReading {
+  const stat = (file: string): fs.Stats | null => {
+    try {
+      return fs.statSync(file);
+    } catch {
+      return null;
+    }
+  };
+  const main = stat(dbFile);
+  const wal = stat(`${dbFile}-wal`);
+  return {
+    main: main ? { size: main.size, mtimeMs: main.mtimeMs } : null,
+    walSize: wal ? wal.size : null,
+    wal: walHeader(`${dbFile}-wal`),
+  };
+}
+
+/**
+ * In WAL mode only a checkpoint writes the main database file, so a window whose main file
+ * changed (size or mtime) had a checkpoint inside it. A missing reading also counts.
+ */
+export function checkpointInWindow(start: DbReading, end: DbReading): boolean {
+  if (!start.main || !end.main) return true;
+  return start.main.size !== end.main.size || start.main.mtimeMs !== end.main.mtimeMs;
+}
+
+export interface RowCounts {
+  usage: number;
+  callLogs: number;
+}
+
+/**
+ * Rows timestamped inside [startIso, endIso]: usage_history, and logical call_logs (not the
+ * per-attempt `upstream_http_attempt` rows). Run after the server stops.
+ */
+export function countWindowRows(dbFile: string, startIso: string, endIso: string): RowCounts {
+  const db = new DatabaseSync(dbFile);
+  try {
+    const n = (sql: string): number =>
+      Number((db.prepare(sql).get(startIso, endIso) as { n: number }).n);
+    return {
+      usage: n("SELECT COUNT(*) AS n FROM usage_history WHERE timestamp >= ? AND timestamp <= ?"),
+      callLogs: n(
+        "SELECT COUNT(*) AS n FROM call_logs WHERE timestamp >= ? AND timestamp <= ? " +
+          "AND (request_type IS NULL OR request_type <> 'upstream_http_attempt')"
+      ),
+    };
+  } finally {
+    db.close();
+  }
+}
+
+export function rowsOk(rows: RowCounts | null, min = WINDOW_ARTIFACTS): boolean {
+  return rows !== null && rows.usage >= min && rows.callLogs >= min;
+}
+
+// ── timing ───────────────────────────────────────────────────────────────────
+
+/**
+ * Paced window: request i starts at t0 + i × interval, or when request i − 1 returned if that is
+ * later. Lateness is how far past its planned time it starts.
+ */
+export function pacedStart(
+  t0: number,
+  i: number,
+  prevEndMs: number | null,
+  intervalMs = PACED_INTERVAL_MS
+): { at: number; latenessMs: number } {
+  const planned = t0 + i * intervalMs;
+  const at = Math.max(planned, prevEndMs ?? planned);
+  return { at, latenessMs: at - planned };
+}
+
+/**
+ * Window settle: done once BATCH_SETTLE_MS have passed since the last reply and the window has
+ * its artifacts; bounded at SETTLE_MAX_MS after the last reply (then "timeout" if short).
+ */
+export function settleState(
+  nowMs: number,
+  lastReplyMs: number,
+  artifacts: number,
+  want: number
+): "wait" | "done" | "timeout" {
+  const since = nowMs - lastReplyMs;
+  if (since >= BATCH_SETTLE_MS && artifacts >= want) return "done";
+  if (since >= SETTLE_MAX_MS) return "timeout";
+  return "wait";
+}
+
+/** `VmRSS` in kB from /proc/<pid>/status text; null when absent. */
+export function parseVmRssKb(text: string): number | null {
+  const m = text.match(/^VmRSS:\s+(\d+)\s+kB$/m);
+  return m ? Number(m[1]) : null;
+}
+
+// ── live run ─────────────────────────────────────────────────────────────────
 
 function errText(error: unknown): string {
   return redactSecrets(error instanceof Error ? error.message : String(error));
@@ -689,6 +895,27 @@ async function seed(
   return { ok: true, reason: null, ms, logs };
 }
 
+export interface RequestWindowReport extends WindowResult {
+  files: Record<string, number>;
+  logDelta: number;
+  startIso: string;
+  endIso: string;
+  checkpoint: CheckpointRun;
+  db: { start: DbReading; end: DbReading };
+  settled: boolean;
+  /** Counted after the server stops; null until then or when the count failed. */
+  rows: RowCounts | null;
+}
+
+export interface PacedWindowReport extends RequestWindowReport {
+  latenessMs: number[];
+  artifacts: { window: number; withPipeline: number };
+  /** VmRSS of each live server process at the window's end, by process key. */
+  rssKb: Record<string, number | null>;
+  /** The window's own verdict; `valid` (from WindowResult) is only the process tracker's. */
+  verdict: { valid: boolean; reason: string | null };
+}
+
 export interface SettingReport {
   setting: Setting;
   dataDir: string;
@@ -699,11 +926,15 @@ export interface SettingReport {
   seedMs: number | null;
   bootMs: number | null;
   processes: Array<{ key: string; first: Reading; last: Reading; gone: boolean }>;
-  request: (WindowResult & { files: Record<string, number>; logDelta: number }) | null;
+  request: RequestWindowReport | null;
   idle: (WindowResult & { files: Record<string, number>; logDelta: number }) | null;
   artifacts: { atStart: number; window: number; withPipeline: number } | null;
+  /** Setting D only: 20 requests at one per second, after the idle window. */
+  paced: PacedWindowReport | null;
   m12: number | null;
   m13: number | null;
+  /** Paced-window bytes; null when that window is invalid (the others can still be valid). */
+  m12c: number | null;
   /** True when the folder was left for the driver's sweep because a process still used it. */
   kept?: boolean;
   valid: boolean;
@@ -757,6 +988,73 @@ async function waitArtifacts(count: () => number, want: number): Promise<boolean
   return ok;
 }
 
+/**
+ * Why a paced window is invalid, or null. Its replies were all 200 (otherwise the setting
+ * ended). `flags` holds each window artifact's has-pipeline flag (setting D: all false).
+ */
+export function pacedInvalidReason(
+  window: Pick<RequestWindowReport, "valid" | "readFailed" | "writeBytes" | "checkpoint" | "db">,
+  flags: Array<boolean | null>
+): string | null {
+  if (!window.valid) return window.readFailed ? "paced-read" : "paced-exit";
+  if (window.writeBytes <= 0) return "paced-zero";
+  if (!window.checkpoint.ok) return "paced-checkpoint";
+  if (checkpointInWindow(window.db.start, window.db.end)) return "paced-checkpoint-in-window";
+  if (flags.length < WINDOW_ARTIFACTS) return `paced-artifacts(${flags.length})`;
+  if (flags.some((v) => v === null)) return "paced-artifact-unreadable";
+  if (flags.some((v) => v !== false)) return "paced-artifact-pipeline(D)";
+  return null;
+}
+
+async function settleWindow(
+  lastReplyMs: number,
+  count: () => number,
+  want: number
+): Promise<boolean> {
+  let state = settleState(Date.now(), lastReplyMs, count(), want);
+  while (state === "wait") {
+    await sleep(200);
+    state = settleState(Date.now(), lastReplyMs, count(), want);
+  }
+  await sleep(ARTIFACT_EXTRA_MS);
+  return state === "done";
+}
+
+/**
+ * After the server stops: every request-carrying window must hold at least 20 usage rows and 20
+ * logical call-log rows. It shows no row was lost; commit timing inside the window rests on
+ * the settle. A failed request-window check invalidates the setting; a failed paced check only
+ * the paced window. Exported for its tests.
+ */
+export function rowCheck(
+  report: SettingReport,
+  dbFile: string,
+  logFd: number | null,
+  fail: (reason: string) => void,
+  count: (file: string, startIso: string, endIso: string) => RowCounts = countWindowRows
+): void {
+  for (const window of [report.request, report.paced]) {
+    if (!window) continue;
+    try {
+      window.rows = count(dbFile, window.startIso, window.endIso);
+    } catch (error) {
+      window.rows = null;
+      if (logFd !== null) {
+        fs.writeSync(logFd, `[write-bytes-probe] row check failed: ${errText(error)}\n`);
+      }
+    }
+  }
+  const label = (rows: RowCounts | null): string =>
+    rows ? `${rows.usage},${rows.callLogs}` : "error";
+  if (report.valid && report.request && !rowsOk(report.request.rows)) {
+    fail(`rows-request(${label(report.request.rows)})`);
+  }
+  if (report.paced && report.paced.verdict.valid && !rowsOk(report.paced.rows)) {
+    report.paced.verdict = { valid: false, reason: `paced-rows(${label(report.paced.rows)})` };
+    report.m12c = null;
+  }
+}
+
 async function runSetting(
   args: WritesArgs,
   setting: Setting,
@@ -772,7 +1070,9 @@ async function runSetting(
     report.invalidReason = reason;
     report.m12 = null;
     report.m13 = null;
+    report.m12c = null;
   };
+  const dbFile = path.join(dir, DB_FILE_NAME);
 
   report.counterCheck = counterCheck(dir);
   if (!report.counterCheck.ok) return fail("counter-check");
@@ -790,6 +1090,8 @@ async function runSetting(
 
     const env: NodeJS.ProcessEnv = { ...buildChildEnv(process.env, dir), ...probeBackgroundOff() };
     for (const key of REMOVED_ENV) delete env[key];
+    // A window is ~40 s; the 5-minute PASSIVE timer would land in about 1 window in 8.
+    env.OMNIROUTE_WAL_PASSIVE_INTERVAL_MS = WAL_PASSIVE_INTERVAL_OFF_MS;
     try {
       server = await startServer(root, env, logFd);
     } catch (error) {
@@ -813,28 +1115,59 @@ async function runSetting(
       return fail("warmup-artifacts");
     }
 
-    // Request window.
-    const startSet = new Set(listArtifacts(dir));
-    tracker.begin();
-    const filesA = fileSizes(dir);
-    const logA = logSize(logFile);
-    const windowStartMs = Date.now();
-    for (let i = 0; i < REQUESTS_EACH; i++) {
-      if ((await chat(baseUrl, false)) !== 200) return fail("request-status");
-    }
-    for (let i = 0; i < REQUESTS_EACH; i++) {
-      if ((await chat(baseUrl, true)) !== 200) return fail("request-status");
-    }
-    const inWindow = (): string[] => windowArtifacts(listArtifacts(dir), startSet, windowStartMs);
-    await waitArtifacts(() => inWindow().length, WINDOW_ARTIFACTS);
-    const req = tracker.finish();
-    const filesB = fileSizes(dir);
-    const logB = logSize(logFile);
-    report.request = { ...req, files: sizeDeltas(filesA, filesB), logDelta: logB - logA };
-    const arts = inWindow();
-    const flags = arts.map((f) => hasPipeline(path.join(dir, "call_logs", f)));
+    // One request-carrying window: checkpoint, start readings, send, settle, end readings.
+    // `send` returns false on a non-200 reply (the caller ends the setting).
+    const measureWindow = async (send: () => Promise<boolean>) => {
+      const checkpoint = await checkpointWithRetry(() => checkpointOnce(dbFile));
+      const startSet = new Set(listArtifacts(dir));
+      tracker.begin();
+      const dbStart = dbReading(dbFile);
+      const filesBefore = fileSizes(dir);
+      const logBefore = logSize(logFile);
+      const windowStartMs = Date.now();
+      if (!(await send())) return null;
+      const lastReplyMs = Date.now();
+      const inWindow = (): string[] => windowArtifacts(listArtifacts(dir), startSet, windowStartMs);
+      const settled = await settleWindow(lastReplyMs, () => inWindow().length, WINDOW_ARTIFACTS);
+      const result = tracker.finish();
+      const dbEnd = dbReading(dbFile);
+      const windowEndMs = Date.now();
+      const filesAfter = fileSizes(dir);
+      const logAfter = logSize(logFile);
+      const arts = inWindow();
+      const flags = arts.map((f) => hasPipeline(path.join(dir, "call_logs", f)));
+      const window: RequestWindowReport = {
+        ...result,
+        files: sizeDeltas(filesBefore, filesAfter),
+        logDelta: logAfter - logBefore,
+        startIso: new Date(windowStartMs).toISOString(),
+        endIso: new Date(windowEndMs).toISOString(),
+        checkpoint,
+        db: { start: dbStart, end: dbEnd },
+        settled,
+        rows: null,
+      };
+      return { window, startSet, arts, flags, filesAfter, logAfter };
+    };
+
+    // Request window: 10 plain then 10 streamed, back to back.
+    const measured = await measureWindow(async () => {
+      for (let i = 0; i < REQUESTS_EACH; i++) {
+        if ((await chat(baseUrl, false)) !== 200) return false;
+      }
+      for (let i = 0; i < REQUESTS_EACH; i++) {
+        if ((await chat(baseUrl, true)) !== 200) return false;
+      }
+      return true;
+    });
+    if (!measured) return fail("request-status");
+    const req = measured.window;
+    report.request = req;
+    const { arts, flags } = measured;
+    const filesB = measured.filesAfter;
+    const logB = measured.logAfter;
     report.artifacts = {
-      atStart: startSet.size,
+      atStart: measured.startSet.size,
       window: arts.length,
       withPipeline: flags.filter((v) => v === true).length,
     };
@@ -850,6 +1183,8 @@ async function runSetting(
     if (tracker.tracked.size === 0) return fail("no-server-process");
     if (!req.valid) return fail(req.readFailed ? "request-read" : "request-exit");
     if (req.writeBytes <= 0) return fail("request-zero");
+    if (!req.checkpoint.ok) return fail("request-checkpoint");
+    if (checkpointInWindow(req.db.start, req.db.end)) return fail("checkpoint-in-window");
     if (arts.length < WINDOW_ARTIFACTS) return fail(`artifacts(${arts.length})`);
     const wantPipeline = setting === "L";
     if (flags.some((v) => v === null)) return fail("artifact-unreadable");
@@ -858,6 +1193,48 @@ async function runSetting(
     report.m13 = idle.valid ? idle.writeBytes : null;
     report.valid = true;
     report.invalidReason = null;
+
+    if (setting !== "D") return;
+    // Paced window (M12c): request i at t0 + i s, or when request i - 1 returned if later.
+    const latenessMs: number[] = [];
+    const paced = await measureWindow(async () => {
+      const t0 = Date.now();
+      let prevEnd: number | null = null;
+      for (let i = 0; i < 2 * REQUESTS_EACH; i++) {
+        const { at } = pacedStart(t0, i, prevEnd);
+        const wait = at - Date.now();
+        if (wait > 0) await sleep(wait);
+        latenessMs.push(Math.max(0, Date.now() - (t0 + i * PACED_INTERVAL_MS)));
+        const status = await chat(baseUrl, i >= REQUESTS_EACH);
+        prevEnd = Date.now();
+        if (status !== 200) return false;
+      }
+      return true;
+    });
+    // A non-200 reply in any window of setting D ends the setting (all its windows invalid).
+    if (!paced) return fail("paced-status");
+    const rssKb: Record<string, number | null> = {};
+    for (const t of tracker.tracked.values()) {
+      if (t.gone) continue;
+      try {
+        rssKb[t.key] = parseVmRssKb(fs.readFileSync(`/proc/${t.pid}/status`, "utf8"));
+      } catch {
+        rssKb[t.key] = null;
+      }
+    }
+    const pw = paced.window;
+    const pacedReason = pacedInvalidReason(pw, paced.flags);
+    report.paced = {
+      ...pw,
+      latenessMs,
+      artifacts: {
+        window: paced.arts.length,
+        withPipeline: paced.flags.filter((v) => v === true).length,
+      },
+      rssKb,
+      verdict: { valid: pacedReason === null, reason: pacedReason },
+    };
+    report.m12c = pacedReason === null ? pw.writeBytes : null;
   } finally {
     if (timer) clearInterval(timer);
     report.processes = [...tracker.tracked.values()].map((t) => ({
@@ -870,6 +1247,7 @@ async function runSetting(
       await server.stop().catch(() => undefined);
       live.servers.delete(server);
     }
+    rowCheck(report, dbFile, logFd, fail);
     await upstream.stop().catch(() => undefined);
     live.stoppers.delete(upstream.stop);
     report.endedAt = new Date().toISOString();
@@ -941,8 +1319,10 @@ export async function runWrites(args: WritesArgs): Promise<WritesReport> {
     request: null,
     idle: null,
     artifacts: null,
+    paced: null,
     m12: null,
     m13: null,
+    m12c: null,
     valid: false,
     invalidReason: null,
   });

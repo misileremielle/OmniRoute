@@ -111,6 +111,9 @@ export const WARMUP_EACH = 5;
 export const WINDOW_REQUESTS = 20;
 export const REAL_REQUESTS_PER_ARM = 10;
 export const REAL_REQUEST_GAP_MS = 10_000;
+// Wait before each M7 window snapshot: OmniRoute's log batch window (5 s, step-11 fix 3) plus
+// 1 s, so a window's queued rows are written inside that window. Both arms wait the same.
+export const BATCH_SETTLE_MS = 6_000;
 
 function requireValue(argv: string[], i: number, flag: string): string {
   const value = argv[i + 1];
@@ -1090,7 +1093,7 @@ async function runIoMode(args: ProbeArgs): Promise<IoReport> {
       }
     }
 
-    await sleep(1_000);
+    await sleep(BATCH_SETTLE_MS);
     const warmupSnapshot = await snapshotSums(counterDir);
     const afterWarmup = warmupSnapshot.sums;
     const warmupFiles = groupCounterFiles(readCounterFiles(counterDir));
@@ -1136,7 +1139,7 @@ async function runIoMode(args: ProbeArgs): Promise<IoReport> {
       }
       nonStreamSamples.push(result.fullMs);
     }
-    await sleep(1_000);
+    await sleep(BATCH_SETTLE_MS);
     const nonStreamSnapshot = await snapshotSums(counterDir);
     const afterNonStream = nonStreamSnapshot.sums;
 
@@ -1167,7 +1170,7 @@ async function runIoMode(args: ProbeArgs): Promise<IoReport> {
       streamTtft.push(result.ttftMs);
       streamFull.push(result.fullMs);
     }
-    await sleep(1_000);
+    await sleep(BATCH_SETTLE_MS);
     const streamSnapshot = await snapshotSums(counterDir);
     const afterStream = streamSnapshot.sums;
 
@@ -1204,6 +1207,7 @@ async function runIoMode(args: ProbeArgs): Promise<IoReport> {
       nonStream: m7nonStream,
       stream: m7stream,
       idle: m7idle,
+      settleMs: BATCH_SETTLE_MS,
       driversUsed: [...usedDrivers].sort(),
       otherGroups: {
         nonStream: otherNonStream,

@@ -47,7 +47,7 @@ test("vm-session: fixture hash constant matches the fixture; tools() copies the 
 });
 
 test("vm-session: A2 writes step wired after m10, copied into arms, bounded", () => {
-  assert.match(SCRIPT, /^TO_WRITES=26m$/m);
+  assert.match(SCRIPT, /^TO_WRITES=30m$/m);
   assert.match(SCRIPT, /^WRITES_KILL_AFTER=45s$/m);
   assert.match(fn("tools"), /write-bytes-probe\.ts/);
   assert.match(SCRIPT, /^\s+m10 "\$1" "\$2"[^\n]*\n\s+writes "\$1" "\$2"/m);

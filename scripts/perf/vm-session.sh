@@ -53,9 +53,10 @@ M10_FIXTURE="$(cd "$DRIVER_DIR/../.." && pwd)/tests/unit/fixtures/perf-io/vm-cat
 M10_FIXTURE_SHA256=13db8afdaf9218d42f77bf4c06544f4378fc5e19d5abf37ca00bc1242604fece
 M10_ROOT="$HOME/perf-m10"   # each session's folders go under "$M10_ROOT/<M10_SESSION>"
 # Addendum A2 (disk writes, M12/M13): one write step (settings D then L) after every A1 run.
-# Upper 22 min; 26 min + 45 s kill grace + two 15 s sweeps = 27.25 min < 1.25 x. Never rerun,
+# Upper 26.03 min since step-11 fix 3 (checkpoints, 6-16 s settles, paced window, row checks;
+# was 22); 30 min + 45 s kill grace + two 15 s sweeps = 31.25 min < 1.25 x. Never rerun,
 # never fatal by itself (network-block failure, OOM kill or a leftover server still stop it).
-TO_WRITES=26m
+TO_WRITES=30m
 WRITES_KILL_AFTER=45s
 WRITES_ROOT="$HOME/perf-writes"   # "$WRITES_ROOT/<M10_SESSION>/<label>-<D|L>-a<attempt>"
 

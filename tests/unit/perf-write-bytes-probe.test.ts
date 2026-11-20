@@ -5,8 +5,25 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  BATCH_SETTLE_MS,
   ProcTracker,
+  REMOVED_ENV,
+  SETTLE_MAX_MS,
+  WAL_PASSIVE_INTERVAL_OFF_MS,
   artifactTime,
+  checkpointComplete,
+  checkpointInWindow,
+  checkpointOnce,
+  checkpointWithRetry,
+  countWindowRows,
+  dbReading,
+  pacedInvalidReason,
+  pacedStart,
+  parseVmRssKb,
+  rowCheck,
+  rowsOk,
+  settleState,
+  walHeader,
   fsTypeFor,
   parseProcIo,
   parseProcStat,
@@ -17,10 +34,15 @@ import {
   stopAndRemove,
   windowArtifacts,
   windowDelta,
+  type CheckpointAttempt,
+  type DbReading,
   type ProcEntry,
   type Reading,
+  type RowCounts,
+  type SettingReport,
   type Tracked,
 } from "../../scripts/perf/write-bytes-probe.ts";
+import { DatabaseSync } from "node:sqlite";
 
 const ARGS = [
   "--root",
@@ -456,4 +478,221 @@ test("stopAndRemove: deletes only when no process remains, after a bounded wait"
   });
   assert.equal(done, true);
   assert.deepEqual(removed, ["/d"]);
+});
+
+// ── step-11 fix 3 controls ──
+
+test("constants: 6 s settle bounded at 16 s, WAL timer pushed out, default log batching", () => {
+  assert.equal(BATCH_SETTLE_MS, 6_000);
+  assert.equal(SETTLE_MAX_MS, 16_000);
+  assert.equal(WAL_PASSIVE_INTERVAL_OFF_MS, "86400000");
+  assert.ok((REMOVED_ENV as readonly string[]).includes("OMNIROUTE_LOG_BATCH_MS"));
+  const source = fs.readFileSync(
+    path.join(import.meta.dirname, "../../scripts/perf/write-bytes-probe.ts"),
+    "utf8"
+  );
+  assert.match(source, /env\.OMNIROUTE_WAL_PASSIVE_INTERVAL_MS = WAL_PASSIVE_INTERVAL_OFF_MS;/);
+});
+
+test("pacedStart: one per second; a late reply pushes the next start and counts as lateness", () => {
+  assert.deepEqual(pacedStart(1_000, 0, null), { at: 1_000, latenessMs: 0 });
+  assert.deepEqual(pacedStart(1_000, 3, 3_200), { at: 4_000, latenessMs: 0 });
+  assert.deepEqual(pacedStart(1_000, 3, 4_700), { at: 4_700, latenessMs: 700 });
+  assert.deepEqual(pacedStart(0, 2, 100, 500), { at: 1_000, latenessMs: 0 });
+});
+
+test("settleState: at least 6 s after the last reply and enough artifacts, at most 16 s", () => {
+  assert.equal(settleState(5_999, 0, 20, 20), "wait", "artifacts in, but under 6 s");
+  assert.equal(settleState(6_000, 0, 20, 20), "done");
+  assert.equal(settleState(10_000, 0, 19, 20), "wait", "short of artifacts");
+  assert.equal(settleState(15_999, 0, 19, 20), "wait");
+  assert.equal(settleState(16_000, 0, 19, 20), "timeout");
+  assert.equal(settleState(16_000, 0, 25, 20), "done");
+});
+
+test("checkpointWithRetry: retries an incomplete checkpoint up to 3 times, keeps each result", async () => {
+  const waits: number[] = [];
+  const wait = async (ms: number) => void waits.push(ms);
+  const done = { busy: 0, log: 5, checkpointed: 5 };
+  const busy = { busy: 1, log: 5, checkpointed: 3 };
+
+  const first = await checkpointWithRetry(() => done, wait);
+  assert.deepEqual(first, { attempts: [done], ok: true });
+  assert.deepEqual(waits, []);
+
+  const seq: CheckpointAttempt[] = [busy, { error: "locked" }, done];
+  const later = await checkpointWithRetry(() => seq.shift()!, wait);
+  assert.equal(later.ok, true);
+  assert.equal(later.attempts.length, 3);
+  assert.deepEqual(waits, [200, 200]);
+
+  const never = await checkpointWithRetry(() => busy, wait);
+  assert.equal(never.ok, false);
+  assert.equal(never.attempts.length, 4, "one try and 3 retries");
+
+  assert.equal(checkpointComplete({ busy: 0, log: -1, checkpointed: -1 }), false, "not WAL");
+  assert.equal(checkpointComplete({ busy: 0, log: 0, checkpointed: 0 }), true, "empty WAL");
+  assert.equal(checkpointComplete({ busy: 0, log: 4, checkpointed: 3 }), false);
+});
+
+function tmpDb(): { dir: string; file: string } {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-writes-db-"));
+  return { dir, file: path.join(dir, "storage.sqlite") };
+}
+
+test("checkpointOnce + dbReading: a real WAL database; the checkpoint changes the main file", async () => {
+  const { dir, file } = tmpDb();
+  const writer = new DatabaseSync(file);
+  try {
+    writer.exec("PRAGMA journal_mode = WAL; PRAGMA wal_autocheckpoint = 0;");
+    writer.exec("CREATE TABLE t (v BLOB)");
+    writer.exec("INSERT INTO t VALUES (zeroblob(65536))");
+    const before = dbReading(file);
+    assert.ok(before.main && before.walSize !== null && before.walSize > 0);
+    assert.ok(before.wal, "WAL header read");
+    assert.equal(checkpointInWindow(before, dbReading(file)), false, "nothing changed");
+
+    // A different mtime is guaranteed only across a clock tick.
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    const result = checkpointOnce(file);
+    assert.ok(checkpointComplete(result), JSON.stringify(result));
+    const after = dbReading(file);
+    assert.equal(checkpointInWindow(before, after), true, "the checkpoint wrote the main file");
+
+    const missing: DbReading = { main: null, walSize: null, wal: null };
+    assert.equal(checkpointInWindow(missing, after), true);
+    // A checkpoint that only rewrites existing pages keeps the size; the mtime still moves.
+    const sameSize: DbReading = {
+      ...after,
+      main: { ...after.main!, mtimeMs: after.main!.mtimeMs + 1 },
+    };
+    assert.equal(checkpointInWindow(after, sameSize), true, "same size, newer mtime");
+    assert.equal(walHeader(path.join(dir, "absent-wal")), null);
+    assert.ok("error" in checkpointOnce(path.join(dir, "nope", "x.sqlite")));
+  } finally {
+    writer.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("countWindowRows: in-window usage rows and logical call-log rows only", () => {
+  const { dir, file } = tmpDb();
+  const db = new DatabaseSync(file);
+  try {
+    db.exec("CREATE TABLE usage_history (timestamp TEXT)");
+    db.exec("CREATE TABLE call_logs (timestamp TEXT, request_type TEXT)");
+    const u = db.prepare("INSERT INTO usage_history VALUES (?)");
+    const c = db.prepare("INSERT INTO call_logs VALUES (?, ?)");
+    for (const ts of ["2026-11-20T00:00:00.000Z", "2026-11-20T00:00:05.000Z"]) u.run(ts);
+    u.run("2026-11-19T23:59:59.999Z");
+    c.run("2026-11-20T00:00:01.000Z", null);
+    c.run("2026-11-20T00:00:02.000Z", "chat");
+    c.run("2026-11-20T00:00:03.000Z", "upstream_http_attempt");
+    c.run("2026-11-20T00:00:06.000Z", "chat");
+  } finally {
+    db.close();
+  }
+  try {
+    assert.deepEqual(
+      countWindowRows(file, "2026-11-20T00:00:00.000Z", "2026-11-20T00:00:05.000Z"),
+      { usage: 2, callLogs: 2 }
+    );
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+function windowFor(overrides: Record<string, unknown> = {}) {
+  const reading: DbReading = { main: { size: 4096, mtimeMs: 1 }, walSize: 0, wal: null };
+  return {
+    valid: true,
+    readFailed: false,
+    writeBytes: 1000,
+    checkpoint: { attempts: [], ok: true },
+    db: { start: reading, end: reading },
+    startIso: "2026-11-20T00:00:00.000Z",
+    endIso: "2026-11-20T00:01:00.000Z",
+    rows: null as RowCounts | null,
+    ...overrides,
+  };
+}
+
+test("pacedInvalidReason: each validity case", () => {
+  const clean = Array(20).fill(false);
+  assert.equal(pacedInvalidReason(windowFor(), clean), null);
+  assert.equal(pacedInvalidReason(windowFor({ valid: false }), clean), "paced-exit");
+  assert.equal(
+    pacedInvalidReason(windowFor({ valid: false, readFailed: true }), clean),
+    "paced-read"
+  );
+  assert.equal(pacedInvalidReason(windowFor({ writeBytes: 0 }), clean), "paced-zero");
+  assert.equal(
+    pacedInvalidReason(windowFor({ checkpoint: { attempts: [], ok: false } }), clean),
+    "paced-checkpoint"
+  );
+  const moved: DbReading = { main: { size: 8192, mtimeMs: 2 }, walSize: 0, wal: null };
+  assert.equal(
+    pacedInvalidReason(windowFor({ db: { start: windowFor().db.start, end: moved } }), clean),
+    "paced-checkpoint-in-window"
+  );
+  assert.equal(pacedInvalidReason(windowFor(), clean.slice(1)), "paced-artifacts(19)");
+  assert.equal(
+    pacedInvalidReason(windowFor(), [...clean.slice(1), null]),
+    "paced-artifact-unreadable"
+  );
+  assert.equal(
+    pacedInvalidReason(windowFor(), [...clean.slice(1), true]),
+    "paced-artifact-pipeline(D)"
+  );
+});
+
+function settingWithWindows(): SettingReport {
+  return {
+    valid: true,
+    invalidReason: null,
+    m12: 100,
+    m13: 5,
+    m12c: 50,
+    request: windowFor(),
+    paced: { ...windowFor(), verdict: { valid: true, reason: null } },
+  } as unknown as SettingReport;
+}
+
+test("rowCheck: 20 of each per window; request shortfall voids the setting, paced only M12c", () => {
+  const failed: string[] = [];
+  const fail = (reason: string) => failed.push(reason);
+  const full: RowCounts = { usage: 20, callLogs: 21 };
+
+  const ok = settingWithWindows();
+  rowCheck(ok, "/db", null, fail, () => full);
+  assert.deepEqual(failed, []);
+  assert.equal(ok.m12c, 50);
+  assert.deepEqual(ok.request!.rows, full);
+
+  // Windows are counted in order: request first, paced second.
+  const order: RowCounts[] = [full, { usage: 20, callLogs: 19 }];
+  const paced2 = settingWithWindows();
+  rowCheck(paced2, "/db", null, fail, () => order.shift()!);
+  assert.deepEqual(failed, []);
+  assert.equal(paced2.valid, true, "the setting stays valid");
+  assert.equal(paced2.m12c, null);
+  assert.deepEqual(paced2.paced!.verdict, { valid: false, reason: "paced-rows(20,19)" });
+
+  const reqShort = settingWithWindows();
+  rowCheck(reqShort, "/db", null, fail, () => ({ usage: 19, callLogs: 20 }));
+  assert.deepEqual(failed, ["rows-request(19,20)"]);
+
+  failed.length = 0;
+  const broken = settingWithWindows();
+  rowCheck(broken, "/db", null, fail, () => {
+    throw new Error("no such table");
+  });
+  assert.deepEqual(failed, ["rows-request(error)"]);
+  assert.equal(broken.request!.rows, null);
+  assert.equal(rowsOk(null), false);
+});
+
+test("parseVmRssKb: VmRSS line in kB, or null", () => {
+  assert.equal(parseVmRssKb("Name:\tnode\nVmRSS:\t  812345 kB\nThreads:\t11\n"), 812345);
+  assert.equal(parseVmRssKb("Name:\tkthreadd\n"), null);
 });
