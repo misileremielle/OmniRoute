@@ -187,7 +187,7 @@ export const getCachedProviderMetrics = createProviderMetricsCache(getProviderMe
  * Deliberately NOT `getProviderMetrics()` with a `since` parameter: that query
  * carries two correlated subqueries (`lastStatus`, `lastErrorStatus`) which a
  * ranking never displays, and they dominate its cost. Here a single bounded
- * `GROUP BY` leans on `idx_cl_timestamp` plus `idx_cl_provider_timestamp` /
+ * `GROUP BY` leans on `idx_cl_timestamp` plus `idx_cl_health_matrix_cover` /
  * `idx_cl_request_provider` (migration 174) and stops there. The rules are shared with its neighbour, not the query: same success
  * definition, same `#10714` guard against providers whose connections are gone.
  */

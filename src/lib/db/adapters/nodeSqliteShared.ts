@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { probeOpenTransaction } from "./transactionProbe";
 import type { PreparedStatement, RunResult, SqliteAdapter } from "./types";
 
 export interface NodeSqliteDatabaseLike {
@@ -13,6 +14,9 @@ export interface NodeSqliteDatabaseLike {
   };
   exec(sql: string): void;
   close(): void;
+  // DatabaseSync.isTransaction (Node >= 24): true inside any open transaction or savepoint,
+  // including a raw `BEGIN IMMEDIATE` this adapter did not open.
+  readonly isTransaction?: boolean;
 }
 
 const MAX_STMT_CACHE_SIZE = 200;
@@ -172,6 +176,13 @@ export function createNodeSqliteAdapterFromDatabase(
     driver: "node:sqlite",
     get open() {
       return _isOpen;
+    },
+    get inTransaction() {
+      // Prefer SQLite's own flag: transactionDepth misses raw BEGIN statements. Without it
+      // (Node 22), probe SQLite once the adapter's own depth is zero.
+      if (typeof db.isTransaction === "boolean") return db.isTransaction;
+      if (transactionDepth > 0) return true;
+      return probeOpenTransaction((sql) => db.exec(sql));
     },
     get name() {
       return filePath;

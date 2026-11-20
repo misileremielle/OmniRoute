@@ -1,4 +1,5 @@
 import { getDbInstance } from "./core";
+import { flushLogWriteBatchSync } from "../usage/logWriteBatch";
 
 interface UsageCostRow {
   storedCost: number | null;
@@ -17,6 +18,8 @@ interface UsageCostRow {
 
 /** Cost snapshots take precedence over token repricing, without double charging. */
 export function getApiKeySpendRows(apiKeyId: string, sinceIso: string): UsageCostRow[] {
+  // Spend limits must count rows still in the log write batch (step-11 fix 3).
+  flushLogWriteBatchSync("getApiKeySpendRows");
   const db = getDbInstance();
   return db
     .prepare(

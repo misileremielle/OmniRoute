@@ -62,6 +62,7 @@ export { isNativeSqliteLoadError, isSqliteDriverUnavailableError };
 import {
   ensureProviderConnectionsColumns,
   dropPrefixDuplicateIndexes,
+  dropUnusedLogIndexes,
   ensureUsageHistoryAccountIndex,
   ensureUsageHistoryColumns,
   ensureCallLogsColumns,
@@ -69,6 +70,7 @@ import {
   quoteIdentifier,
   getTableColumns,
 } from "./schemaColumns";
+import { flushLogWriteBatchSync } from "../usage/logWriteBatch";
 
 type SqliteDatabase = SqliteAdapter;
 type JsonRecord = Record<string, unknown>;
@@ -345,7 +347,6 @@ const SCHEMA_SQL = `
     error_code TEXT,
     timestamp TEXT NOT NULL
   );
-  CREATE INDEX IF NOT EXISTS idx_uh_model ON usage_history(model);
   CREATE INDEX IF NOT EXISTS idx_uh_connection_timestamp ON usage_history(connection_id, timestamp);
 
   CREATE TABLE IF NOT EXISTS call_logs (
@@ -390,7 +391,6 @@ const SCHEMA_SQL = `
   );
   CREATE INDEX IF NOT EXISTS idx_cl_timestamp ON call_logs(timestamp);
   CREATE INDEX IF NOT EXISTS idx_cl_status ON call_logs(status);
-  CREATE INDEX IF NOT EXISTS idx_cl_provider_timestamp ON call_logs(provider, timestamp);
   -- idx_cl_request_provider is NOT declared here: SCHEMA_SQL runs before
   -- ensureCallLogsColumns() heals a legacy call_logs table, and a lineage that
   -- predates the request_type column has none yet — the CREATE INDEX would abort
@@ -1043,6 +1043,13 @@ export function getDbInstance(): SqliteDatabase {
     ensureUsageHistoryAccountIndex(memoryDb);
     ensureCallLogsColumns(memoryDb);
     ensureProviderConnectionsColumns(memoryDb);
+    // No migrations run here, so create migration 200's covering index directly: it replaces
+    // idx_cl_provider_timestamp (dropped from SCHEMA_SQL, step-11 fix 3) for the provider
+    // metrics' provider + timestamp seeks.
+    memoryDb.exec(`CREATE INDEX IF NOT EXISTS idx_cl_health_matrix_cover ON call_logs(
+      provider, timestamp, connection_id, model,
+      requested_model, status, duration, id, error_summary
+    )`);
     setDb(memoryDb);
     return memoryDb;
   }
@@ -1339,6 +1346,7 @@ export function getDbInstance(): SqliteDatabase {
     // databases, including recovery from an interrupted migration 127 attempt.
     ensureUsageHistoryAccountIndex(db);
     dropPrefixDuplicateIndexes(db);
+    dropUnusedLogIndexes(db);
 
     applyStoredDatabaseOptimizationSettings(db);
 
@@ -1501,6 +1509,11 @@ export function closeDbInstance(options?: { checkpointMode?: WalCheckpointMode |
   stopWalMaintenance();
   const db = getDb();
   if (!db) return false;
+
+  // Queued log rows are bound to this handle (#12780): commit them before it closes, never into
+  // a replacement database. Their detail files are released, not written (the rows stay
+  // pending here); on shutdown the drain in closeCallLogSaves has already published them.
+  flushLogWriteBatchSync("closeDbInstance", { db, publish: false });
 
   const checkpointMode = options?.checkpointMode ?? "TRUNCATE";
 

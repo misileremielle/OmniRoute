@@ -124,6 +124,65 @@ export function dropPrefixDuplicateIndexes(db: SqliteDatabase) {
   }
 }
 
+// Indexes on the two per-request log tables that no production query seeks with. Each one adds
+// pages to every call_logs or usage_history insert (step-11 fix 3). Old migrations (001, 054, 062,
+// 105, 175, 214) still create them; this runs after migrations on every boot and drops them.
+// `requires`, when set, must exist first, so no lookup is left without an index.
+const UNUSED_LOG_INDEXES: ReadonlyArray<{
+  name: string;
+  requires: string | null;
+  reason: string;
+}> = [
+  {
+    name: "idx_cl_client_session_id",
+    requires: null,
+    reason: "no query filters or sorts call_logs by client_session_id",
+  },
+  {
+    name: "idx_cl_provider_timestamp",
+    requires: "idx_cl_health_matrix_cover",
+    reason: "leftmost prefix of idx_cl_health_matrix_cover (migration 200)",
+  },
+  {
+    name: "idx_uh_service_tier",
+    requires: null,
+    reason: "only read by full-scan GROUP BYs on service_tier, never a seek",
+  },
+  {
+    name: "idx_uh_combo_strategy",
+    requires: null,
+    reason: "only read by a full GROUP BY combo_strategy scan, never a seek",
+  },
+  {
+    name: "idx_uh_endpoint",
+    requires: null,
+    reason: "only read by a full GROUP BY endpoint scan, never a seek",
+  },
+  {
+    name: "idx_uh_model",
+    requires: null,
+    reason: "no query seeks on model first; model filters ride wider provider/connection indexes",
+  },
+];
+
+export function dropUnusedLogIndexes(db: SqliteDatabase) {
+  // One try per index: a failed drop must not keep the others.
+  for (const { name, requires } of UNUSED_LOG_INDEXES) {
+    try {
+      if (requires) {
+        const hasRequired = db
+          .prepare("SELECT 1 FROM sqlite_master WHERE type = 'index' AND name = ?")
+          .get(requires);
+        if (!hasRequired) continue;
+      }
+      db.exec(`DROP INDEX IF EXISTS ${name}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn(`[DB] Failed to drop unused log index ${name}:`, message);
+    }
+  }
+}
+
 export function ensureUsageHistoryAccountIndex(db: SqliteDatabase) {
   try {
     db.exec("CREATE INDEX IF NOT EXISTS idx_uh_account_key ON usage_history(account_key)");
@@ -179,12 +238,10 @@ export function ensureUsageHistoryColumns(db: SqliteDatabase) {
       db.exec("ALTER TABLE usage_history ADD COLUMN service_tier TEXT DEFAULT 'standard'");
       console.log("[DB] Added usage_history.service_tier column");
     }
-    db.exec("CREATE INDEX IF NOT EXISTS idx_uh_service_tier ON usage_history(service_tier)");
     if (!columnNames.has("combo_strategy")) {
       db.exec("ALTER TABLE usage_history ADD COLUMN combo_strategy TEXT DEFAULT 'direct'");
       console.log("[DB] Added usage_history.combo_strategy column");
     }
-    db.exec("CREATE INDEX IF NOT EXISTS idx_uh_combo_strategy ON usage_history(combo_strategy)");
     if (!columnNames.has("account_key")) {
       db.exec("ALTER TABLE usage_history ADD COLUMN account_key TEXT");
       console.log("[DB] Added usage_history.account_key column");
@@ -409,7 +466,6 @@ export function ensureCallLogsColumns(db: SqliteDatabase) {
     );
     db.exec("CREATE INDEX IF NOT EXISTS idx_cl_correlation_id ON call_logs(correlation_id)");
     db.exec("CREATE INDEX IF NOT EXISTS idx_cl_session_tag ON call_logs(session_tag)");
-    db.exec("CREATE INDEX IF NOT EXISTS idx_cl_client_session_id ON call_logs(client_session_id)");
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     console.warn("[DB] Failed to verify call_logs schema:", message);

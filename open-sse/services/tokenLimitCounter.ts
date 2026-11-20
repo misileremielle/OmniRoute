@@ -13,6 +13,7 @@
  */
 
 import { getDbInstance } from "../../src/lib/db/core.ts";
+import { flushLogWriteBatchSync } from "../../src/lib/usage/logWriteBatch.ts";
 import {
   resetWindowIfElapsed,
   getWindowUsage,
@@ -59,6 +60,9 @@ export function seedWindowUsageFromHistory(
       : null;
   const upperClause = upperBound ? " AND timestamp < ?" : "";
   const bounds = upperBound ? [lowerBound, upperBound] : [lowerBound];
+  // Queued log rows count toward the window (step-11 fix 3). Inside recordTokenUsage's
+  // transaction this is skipped; that caller flushes before opening it.
+  flushLogWriteBatchSync("seedWindowUsageFromHistory");
   const db = getDbInstance();
 
   // Canonical billable total = input + output (+ reasoning only when it exceeds output).
@@ -291,6 +295,11 @@ export function recordTokenUsage(
       const now = Date.now();
       const limits = getTokenLimitsForRequest(apiKeyId, provider || "", model || "");
       if (!limits || limits.length === 0) return;
+      // The cold-window seed below reads usage_history inside the transaction, where a flush
+      // cannot run: write queued rows first. Keys with no enabled limit never get here.
+      if (limits.some((limit) => limit.enabled !== false)) {
+        flushLogWriteBatchSync("recordTokenUsage");
+      }
 
       const db = getDbInstance();
       const applied: Array<{ limitId: string; windowStart: string; total: number }> = [];

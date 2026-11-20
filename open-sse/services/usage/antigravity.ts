@@ -22,6 +22,7 @@ import {
 } from "../../config/antigravityModelAliases.ts";
 import { isUserVisibleAgyQuotaModelId } from "../../config/agyModels.ts";
 import { getDbInstance } from "@/lib/db/core";
+import { flushLogWriteBatchSync } from "@/lib/usage/logWriteBatch";
 import {
   applyAntigravityClientProfileHeaders,
   getAntigravityClientProfile,
@@ -117,7 +118,8 @@ const ANTIGRAVITY_LOCAL_USAGE_TOKENS_PER_UNIT = 1000;
 // source of truth in open-sse/config/antigravityModelAliases.ts (imported above), shared
 // with the provider-limits cache sanitizer. (#3821-review LEDGER-5)
 
-function getAntigravityLocalUsageUnits(
+/** Exported for its flush-before-read test (step-11 fix 3); the quota fallback is its only caller. */
+export function getAntigravityLocalUsageUnits(
   provider: "antigravity" | "agy",
   connectionId: string | undefined,
   modelId: string,
@@ -132,6 +134,8 @@ function getAntigravityLocalUsageUnits(
   const windowEnd = new Date(resetMs).toISOString();
 
   try {
+    // The local-usage fallback counts rows still in the log write batch (step-11 fix 3).
+    flushLogWriteBatchSync("antigravityLocalUsage");
     const db = getDbInstance() as unknown as {
       prepare: (sql: string) => { get: (...params: unknown[]) => unknown };
     };

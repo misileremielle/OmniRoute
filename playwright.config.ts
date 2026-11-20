@@ -70,6 +70,15 @@ export default defineConfig({
     command: `${JSON.stringify(process.execPath)} scripts/dev/run-next-playwright.mjs ${playwrightServerMode}`,
     url: webServerReadyUrl,
     reuseExistingServer: !process.env.CI,
+    // `env` replaces the inherited environment, so pass it through. Log batching (step-11 fix 3)
+    // is off: the suites read call_logs/usage_history right after each request. A reused local
+    // server keeps whatever it was started with.
+    env: {
+      ...(Object.fromEntries(
+        Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] != null)
+      ) as Record<string, string>),
+      OMNIROUTE_LOG_BATCH_MS: process.env.OMNIROUTE_LOG_BATCH_MS || "0",
+    },
     timeout: Number.isFinite(playwrightWebServerTimeout) ? playwrightWebServerTimeout : 900_000,
     // Opt-in: Playwright discards the webServer's stdout by default, which hides both the build
     // and the server's own logs when the readiness wait times out (nightly a11y, #16853).

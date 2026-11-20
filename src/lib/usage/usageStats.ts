@@ -8,6 +8,7 @@
  */
 
 import { getDbInstance } from "../db/core";
+import { flushLogWriteBatchSync } from "./logWriteBatch";
 import { getApiKeys } from "../db/apiKeys";
 import { getPendingRequests } from "./usageHistory";
 import { getAccountDisplayName } from "@/lib/display/names";
@@ -252,6 +253,8 @@ export function getMonthlyProviderTokensForConnection(
   connectionId: string
 ): number {
   if (!provider || !connectionId) return 0;
+  // Self-tracked quotas count rows still in the log write batch (step-11 fix 3).
+  flushLogWriteBatchSync("getMonthlyProviderTokensForConnection");
   const db = getDbInstance();
   const now = new Date();
   const monthStartIso = new Date(
@@ -288,6 +291,7 @@ export async function getConnectionSpendUsdSinceAdded(
 ): Promise<{ costUsd: number; requests: number }> {
   if (!provider || !connectionId) return { costUsd: 0, requests: 0 };
 
+  flushLogWriteBatchSync("getConnectionSpendUsdSinceAdded");
   const db = getDbInstance();
   const rows = db
     .prepare(

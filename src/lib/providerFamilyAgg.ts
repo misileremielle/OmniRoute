@@ -5,8 +5,8 @@ import { PROVIDER_CONNECTION_FAMILY_ALIASES } from "@/shared/constants/providers
  *
  * The SQL in `src/lib/db/callLogStats.ts` stays grouped by the raw
  * `call_logs.provider` column so the correlated `lastStatus` /
- * `lastErrorStatus` subqueries keep seeking `idx_cl_provider_timestamp`
- * (migration 175) and the dashboard topology keeps one metrics entry per
+ * `lastErrorStatus` subqueries keep seeking a (provider, timestamp) index
+ * (`idx_cl_health_matrix_cover`, migration 200) and the dashboard topology keeps one metrics entry per
  * member node (e.g. `kimi-coding-apikey`). Family totals are folded here, in
  * JS, over those per-member rows.
  */

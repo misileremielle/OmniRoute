@@ -199,9 +199,9 @@ test("saveCallLog without clientSessionId writes NULL (other call-log writers ar
   assert.equal(row.client_session_id, null);
 });
 
-test("an index on client_session_id exists for per-session lookups", () => {
+test("no index on client_session_id: nothing filters call_logs by it (step-11 fix 3)", () => {
   const indexes = coreDb.getDbInstance().prepare("PRAGMA index_list(call_logs)").all() as Array<{
     name: string;
   }>;
-  assert.ok(indexes.some((ix) => ix.name === "idx_cl_client_session_id"));
+  assert.ok(!indexes.some((ix) => ix.name === "idx_cl_client_session_id"));
 });

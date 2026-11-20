@@ -41,9 +41,11 @@ import { shouldPersistToDisk } from "./migrations";
 import {
   attemptWrite,
   isWriteLockError,
+  queueUsageWrite,
   scheduleWriteRetry,
   type UsageWriteOptions,
 } from "./usageWriteRetry";
+import { isLogBatchingActive } from "./logWriteBatch";
 import { getCallLogApiKeyContext } from "./callLogApiKeyContext";
 
 export type PendingRequestMetadata = {
@@ -990,6 +992,11 @@ export async function saveRequestUsage(entry: UsageEntry, options: SaveRequestUs
         serviceTier
       );
       writeOptions = { ...options, agentSession };
+    }
+    // Batched: resolves once the row is queued, as quickly as the direct write below.
+    if (isLogBatchingActive()) {
+      queueUsageWrite(frozenEntry, writeOptions);
+      return;
     }
     attemptWrite(frozenEntry, writeOptions);
   } catch (error) {

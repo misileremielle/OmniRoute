@@ -1,4 +1,5 @@
 import { getDbInstance } from "@/lib/db/core";
+import { flushLogWriteBatchSync } from "@/lib/usage/logWriteBatch";
 import {
   advanceTeamBudgetWindow,
   getActiveBillingTeamForApiKey,
@@ -119,6 +120,8 @@ async function getCommittedTeamEstimatedListCostUsd(
   windowStartIso: string,
   resetAtIso: string
 ): Promise<{ estimatedListCostUsd: number; hasUnpricedUsage: boolean }> {
+  // Team limits must count rows still in the log write batch (step-11 fix 3).
+  flushLogWriteBatchSync("getCommittedTeamEstimatedListCostUsd");
   const db = getDbInstance();
   const rawRows = db
     .prepare(

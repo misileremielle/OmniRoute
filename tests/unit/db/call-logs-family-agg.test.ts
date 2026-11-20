@@ -3,7 +3,7 @@
  * connection family (e.g. kimi-coding + kimi-coding-apikey) collapse into a
  * single canonical group, while /api/provider-metrics keeps one row per member
  * (topology nodes) plus folded `familyMetrics`, and its correlated last-status
- * subqueries keep seeking idx_cl_provider_timestamp. DB handles are released in
+ * subqueries keep seeking idx_cl_health_matrix_cover. DB handles are released in
  * test.after to prevent Node native test runner from hanging.
  */
 import test from "node:test";

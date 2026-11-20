@@ -85,7 +85,7 @@ test("error_type NULL splits into pre_migration vs unclassified by timestamp", (
   assert.equal(byType.get("unclassified"), 1);
 });
 
-test("migration 175 creates provider GROUP BY indexes used by search stats", () => {
+test("provider GROUP BY indexes used by search stats exist after boot", () => {
   const db = core.getDbInstance();
 
   const names = (
@@ -93,9 +93,15 @@ test("migration 175 creates provider GROUP BY indexes used by search stats", () 
       name: string;
     }>
   ).map((r) => r.name);
+  // Migration 175's idx_cl_provider_timestamp is dropped at boot (step-11 fix 3): it is a
+  // leftmost prefix of idx_cl_health_matrix_cover, which serves the same seeks.
   assert.ok(
-    names.includes("idx_cl_provider_timestamp"),
-    "idx_cl_provider_timestamp must exist after migrations"
+    !names.includes("idx_cl_provider_timestamp"),
+    "idx_cl_provider_timestamp is dropped at boot"
+  );
+  assert.ok(
+    names.includes("idx_cl_health_matrix_cover"),
+    "idx_cl_health_matrix_cover must exist after migrations"
   );
   assert.ok(
     names.includes("idx_cl_request_provider"),

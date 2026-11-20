@@ -11,6 +11,7 @@ import { rollupUsageHistoryBeforeDate } from "@/lib/usage/aggregateHistory";
 import { purgeCallLogArtifactDirectory } from "@/lib/usage/callLogArtifacts";
 
 import { DATA_DIR, DB_BACKUPS_DIR, getDbInstance } from "./core";
+import { flushLogWriteBatchAndSettle, flushLogWriteBatchSync } from "../usage/logWriteBatch";
 import { removeStaleSnapshotTemps } from "./backupRetention";
 import { getUserDatabaseSettings } from "./databaseSettings";
 import { maintainSqlitePlannerStats } from "./sqlitePlannerStats";
@@ -572,7 +573,18 @@ export async function purgeQuotaSnapshots(): Promise<CleanupResult> {
 /**
  * Purge ALL call_logs immediately (no retention check).
  */
-export async function purgeCallLogs(): Promise<CleanupResult> {
+export async function purgeCallLogs(
+  options: { settleTimeoutMs?: number } = {}
+): Promise<CleanupResult> {
+  // Queued rows would otherwise be written after the purge and reappear (step-11 fix 3). Wait
+  // for their detail-file writes too, or the worker could recreate files in the purged folder.
+  // If they do not settle in time, purge nothing and throw: deleting now could leave files the
+  // worker writes afterwards. Throw, not result.errors: the purge route answers 200 on errors,
+  // and the dashboard would show it as a successful purge of 0 rows.
+  if (!(await flushLogWriteBatchAndSettle("purgeCallLogs", options.settleTimeoutMs))) {
+    console.error("[Cleanup] Call-log purge skipped: queued call-log writes did not settle.");
+    throw new Error("Queued call-log writes did not settle; nothing was purged");
+  }
   const db = getDbInstance();
   const result: CleanupResult = { deleted: 0, deletedArtifacts: 0, errors: 0 };
 
@@ -773,6 +785,8 @@ export async function resetUsageHistory(period: string): Promise<ResetUsageHisto
     throw new Error(`Invalid reset period: ${period}`);
   }
 
+  // As purgeCallLogs: queued usage rows must not reappear after the reset (step-11 fix 3).
+  flushLogWriteBatchSync("resetUsageHistory");
   const db = getDbInstance();
   ensureCompressionRunTelemetryTable();
   const result: ResetUsageHistoryResult = {

@@ -13,6 +13,7 @@ import {
 
 import { isCommonChatGptWebRetiredProviderId } from "@/shared/constants/chatgptWebRetirement";
 import { getDbInstance, rowToCamel, cleanNulls } from "./core";
+import { flushLogWriteBatchSync } from "../usage/logWriteBatch";
 import { backupDbFile } from "./backup";
 import { encryptConnectionFields, decryptConnectionFields } from "./encryption";
 import { createLazyRowProxy } from "./providers/lazyConnectionView";
@@ -647,6 +648,9 @@ export async function createProviderConnection(data: JsonRecord) {
         persistence[field] = rawExisting[field];
       }
     }
+    // Reconciliation rewrites usage_history identity inside this transaction, where queued log
+    // rows cannot be flushed: write them first so none commits later with the old identity.
+    if (promotedCodexIdentity) flushLogWriteBatchSync("createProviderConnection");
     db.transaction(() => {
       if (promotedCodexIdentity) {
         reconcileCodexUsageHistory(db, {
@@ -1073,6 +1077,8 @@ function buildMergedConnectionUpdate(
   return merged;
 }
 
+const USAGE_IDENTITY_FIELDS = ["provider", "authType", "email", "providerSpecificData"];
+
 export async function updateProviderConnection(
   id: string,
   data: JsonRecord,
@@ -1085,6 +1091,12 @@ export async function updateProviderConnection(
   // to prevent -- and re-checking the merged value would spend a bcrypt round
   // on every unrelated field edit.
   await assertApiKeyIsNotManagementPassword(data.apiKey);
+  // Only these fields feed the usage account identity (resolveUsageAccountIdentity), so only
+  // they can make the reconciliation below rewrite usage_history. Write queued log rows first:
+  // the transaction cannot flush, and a row committed later would keep the old identity.
+  if (USAGE_IDENTITY_FIELDS.some((field) => Object.hasOwn(data, field))) {
+    flushLogWriteBatchSync("updateProviderConnection");
+  }
   // Read only after asynchronous validation, inside the write transaction.
   // Otherwise a metadata update can snapshot old credentials, yield to a rotation,
   // and then write the consumed refresh token back over its replacement.
