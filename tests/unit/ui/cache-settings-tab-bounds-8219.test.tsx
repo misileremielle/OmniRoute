@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CacheSettingsTab from "@/app/(dashboard)/dashboard/settings/components/CacheSettingsTab";
 
 // Regression coverage for #8219: CacheSettingsTab's client-side min/max TTL
-// bounds (MIN_TTL_MS=100, MAX_TTL_MS=60000) gate the Save button and surface
+// bounds (MIN_TTL_MS=100, MAX_TTL_MS=604800000, 7 days) gate the Save button and surface
 // a validation message. This test proves those bounds actually work end to
 // end against the (now-fixed) /api/settings/cache-config route.
 
@@ -125,17 +125,33 @@ describe("CacheSettingsTab TTL bounds", () => {
     expect(message?.getAttribute("role")).toBe("alert");
   });
 
-  it("disables Save and shows an error above the maximum bound (60000ms)", async () => {
+  it("disables Save and shows an error above the maximum bound (7 days)", async () => {
     const container = await render();
     await waitFor(() => getInput(container).value === "1500", "initial TTL to load");
 
-    await setInputValue(container, "70000");
+    await setInputValue(container, "604800001");
     await waitFor(
       () => container.textContent?.includes("modelCatalogTtlMaximumError") ?? false,
       "maximum bound error to render"
     );
 
     expect(getSaveButton(container).disabled).toBe(true);
+  });
+
+  it("falls back to the 24 h refresh interval when the server reports none", async () => {
+    fetchMock.mockImplementation(async () => new Response(JSON.stringify({}), { status: 200 }));
+    const container = await render();
+    await waitFor(() => getInput(container).value === "86400000", "24 h fallback to show");
+    expect(getSaveButton(container).disabled).toBe(true);
+  });
+
+  it("accepts exactly the 7-day maximum", async () => {
+    const container = await render();
+    await waitFor(() => getInput(container).value === "1500", "initial TTL to load");
+
+    await setInputValue(container, "604800000");
+    await waitFor(() => !getSaveButton(container).disabled, "Save to become enabled");
+    expect(container.textContent?.includes("modelCatalogTtlMaximumError")).toBe(false);
   });
 
   it("enables Save for an in-bounds value and PUTs modelCatalogCacheTtlMs", async () => {

@@ -40,6 +40,8 @@ export type CachedCatalog = {
   headers: Record<string, string>;
   status: number;
   expiresAt: number;
+  /** Catalog generation (`db:copilot`) the entry was built at; absent on test-seeded entries. */
+  generation?: string;
 };
 
 /** Payload shape returned by the builder the caller injects. */
@@ -48,7 +50,16 @@ export type CatalogPayload = {
   headers: Record<string, string>;
   status: number;
   cacheTTL: number;
+  /**
+   * Set by a build whose own write (the OpenRouter capability upsert) moved the catalog
+   * generation from `from` to `to`, and which then rebuilt on the new state. See
+   * `registerCatalogSelfWrite()`; `storePayload()` adopts the body under `to`.
+   */
+  adopt?: { from: string; to: string };
 };
+
+/** Handed to every builder run: the generation it launched at, and its identity. */
+export type CatalogBuildContext = { launchGeneration: string; buildId: number };
 
 /**
  * A client with a short discovery timeout (Claude Code allows 3 s) must never
@@ -56,8 +67,18 @@ export type CatalogPayload = {
  * immediately for up to this long while a background refresh repopulates it.
  * Bounded so a refresh that keeps failing cannot pin an old catalog forever —
  * past this window callers fall back to waiting, same as a cold cache.
+ *
+ * 24 h (was 30 s): every write that feeds the catalog already drops it through the
+ * catalog generation, so an expired entry differs from a fresh build only by what no
+ * write reports (another process, the 30-day synced-list freshness, the OpenRouter file).
  */
-export const CATALOG_STALE_WHILE_REVALIDATE_MS = 30_000;
+export const CATALOG_STALE_WHILE_REVALIDATE_MS = 24 * 60 * 60 * 1000;
+
+/** A non-200 build result is cached at most this long, and never replaces a kept 200. */
+export const CATALOG_ERROR_TTL_MS = 60_000;
+
+/** After a failed background refresh, no new one starts for the same key for this long. */
+export const CATALOG_REFRESH_FAILURE_BACKOFF_MS = 60_000;
 
 /**
  * Schedules the stale-while-revalidate rebuild. Injected so the App Router route can
@@ -109,8 +130,8 @@ export type CatalogCacheOptions = {
    *
    * Deliberately NOT the module-level policy accessor #9199 removed: there is no
    * setter, no module state, and no production caller passes it, so the bound stays
-   * fixed at 30 s for every real request and a failing refresh still cannot pin an old
-   * catalog forever. It exists so a test can hold an entry in the stale branch while it
+   * fixed at `CATALOG_STALE_WHILE_REVALIDATE_MS` for every real request and a failing
+   * refresh still cannot pin an old catalog forever. It exists so a test can hold an entry in the stale branch while it
    * measures when the rebuild starts, instead of racing the real window.
    */
   getStaleWhileRevalidateMs?: () => number;
@@ -119,7 +140,9 @@ export type CatalogCacheOptions = {
 };
 
 /**
- * Fallback memoization window; overridden by `settings.cache.modelCatalogCacheTtlMs`.
+ * Background refresh interval; overridden by `settings.cache.modelCatalogCacheTtlMs`.
+ * After it, a cached 200 is still served at once while a background refresh runs (see
+ * `CATALOG_STALE_WHILE_REVALIDATE_MS`).
  *
  * This does NOT govern post-write freshness — `invalidateDbCache()` bumps
  * `modelCatalogCacheVersion` on every settings/connections/combos/pricing write and
@@ -136,11 +159,11 @@ export type CatalogCacheOptions = {
  * the event loop so even the "served immediately" stale body only reaches the client
  * once the rebuild finishes. Net effect: ~50 s on essentially every call.
  *
- * Held at 60 s to match the ceiling the settings schema already allows for the override
- * (`settingsSchemas.ts`, `.max(60000)`), so the default can never exceed what an
- * operator is permitted to configure.
+ * 24 h (was 60 s): writes drop the catalog at once, so the interval only bounds how late
+ * an unreported change shows. The settings schema allows up to 7 days
+ * (`settingsSchemas.ts`), so the default stays within what an operator may configure.
  */
-export const CATALOG_CACHE_TTL_MS_DEFAULT = 60_000;
+export const CATALOG_CACHE_TTL_MS_DEFAULT = 24 * 60 * 60 * 1000;
 
 /** Cold-path wait bound for a coalesced catalog rebuild (#12627). Override with CATALOG_BUILD_TIMEOUT_MS. */
 export const CATALOG_BUILD_TIMEOUT_MS_DEFAULT = 8_000;
@@ -167,6 +190,11 @@ class BoundedCatalogCache {
     this.items.delete(key);
     this.items.set(key, value);
     return value.entry;
+  }
+
+  /** Reads without touching the LRU order. */
+  peek(key: string): CachedCatalog | undefined {
+    return this.items.get(key)?.entry;
   }
 
   set(key: string, entry: CachedCatalog): void {
@@ -268,6 +296,7 @@ const catalogCache = new BoundedCatalogCache();
  */
 type InFlightBuild = {
   generation: string;
+  buildId: number;
   promise: Promise<CachedCatalog>;
   lastKeptAt?: number;
   timeoutCount?: number;
@@ -301,13 +330,98 @@ function buildCatalogCacheKey(request: Request, catalogSettings?: CatalogCacheOp
 function getModelCatalogCacheVersion(): string {
   return `${getDatabaseCatalogVersion()}:${getCopilotRejectionCatalogVersion()}`;
 }
+
+/** The combined catalog generation (`db:copilot`) the cache keys its state on. */
+export function getCatalogCacheGeneration(): string {
+  return getModelCatalogCacheVersion();
+}
+
 let lastSeenCatalogCacheVersion = getModelCatalogCacheVersion();
+
+let _nextBuildId = 0;
+
+/**
+ * Generation moves a build caused itself (the OpenRouter capability upsert inside the
+ * builder), keyed by build identity: several builds for different keys can run at once.
+ * While one is pending, the move from `from` to `to` is not treated as a write, so the
+ * kept catalogs stay served instead of every caller starting a cold build.
+ */
+const pendingSelfWrites = new Map<number, { from: string; to: string }>();
+
+/** Per cache key: when its last background refresh failed (backoff, see storePayload). */
+const refreshFailedAt = new Map<string, number>();
+
+/**
+ * Called by the builder right after its own write, synchronously, with the generation
+ * read just before (`before`) and just after (`after`) it. Registers the move only when the
+ * build launched at `before` (no other write happened first) and has not registered one
+ * yet. Returns true when registered; the builder must then rebuild and return `adopt`.
+ */
+export function registerCatalogSelfWrite(
+  ctx: CatalogBuildContext | undefined,
+  before: string,
+  after: string
+): boolean {
+  if (!ctx || before === after || ctx.launchGeneration !== before) return false;
+  if (pendingSelfWrites.has(ctx.buildId)) return false;
+  pendingSelfWrites.set(ctx.buildId, { from: before, to: after });
+  return true;
+}
+
+function isPendingSelfWriteMove(from: string, to: string): boolean {
+  for (const pending of pendingSelfWrites.values()) {
+    if (pending.from === from && pending.to === to) return true;
+  }
+  return false;
+}
+
+/**
+ * Marks every entry not built at `generation` expired now, so its next call is served the
+ * kept body at once with a background refresh (the stale path) instead of a cold build.
+ * Entries already expired keep their own time. Copies, since entries are shared with
+ * catalogLastGood.
+ */
+function markEntriesExpiredExcept(generation: string): void {
+  const now = Date.now();
+  for (const [key, entry] of [...catalogCache.entries()]) {
+    if (entry.generation === generation || entry.expiresAt <= now) continue;
+    catalogCache.set(key, { ...entry, expiresAt: now });
+  }
+}
+
+/**
+ * A build that moved the generation itself ended without adopting (non-200, rejected, or
+ * no rebuild): accept its write as the new generation and keep the kept catalogs served
+ * through the stale path. Does nothing if another write moved the generation meanwhile.
+ */
+function settleOwnSelfWrite(pending: { from: string; to: string }): void {
+  if (
+    lastSeenCatalogCacheVersion === pending.from &&
+    getModelCatalogCacheVersion() === pending.to
+  ) {
+    lastSeenCatalogCacheVersion = pending.to;
+    markEntriesExpiredExcept(pending.to);
+  }
+}
+
+function onBuildRejected(buildId: number): void {
+  const pending = pendingSelfWrites.get(buildId);
+  pendingSelfWrites.delete(buildId);
+  if (pending) settleOwnSelfWrite(pending);
+}
+
 function dropCatalogCacheIfStateChanged(): void {
   const currentVersion = getModelCatalogCacheVersion();
   if (currentVersion === lastSeenCatalogCacheVersion) return;
+  // A build's own pending write is not a change to drop for: it settles in storePayload
+  // or onBuildRejected.
+  if (isPendingSelfWriteMove(lastSeenCatalogCacheVersion, currentVersion)) return;
   lastSeenCatalogCacheVersion = currentVersion;
   catalogCache.clear();
   catalogLastGood.clear();
+  // Pending moves from older generations can no longer be adopted.
+  pendingSelfWrites.clear();
+  refreshFailedAt.clear();
   // Deliberately NOT clearing catalogInFlight: an in-flight build bound to the
   // previous generation is left to finish for its original caller, but the
   // generation check in the join path (below) keeps new requests from joining
@@ -346,20 +460,64 @@ export function mergeCatalogHeaders(
 function storePayload(
   cacheKey: string,
   payload: CatalogPayload,
-  buildGeneration: string
+  buildGeneration: string,
+  buildId: number
 ): CachedCatalog {
+  const ok = payload.status === 200;
+  const current = getModelCatalogCacheVersion();
+  const pending = pendingSelfWrites.get(buildId);
+  pendingSelfWrites.delete(buildId);
+  let generation = buildGeneration;
+  let adopted = false;
+  if (pending) {
+    const adopt = payload.adopt;
+    if (
+      ok &&
+      adopt?.from === pending.from &&
+      adopt.to === pending.to &&
+      buildGeneration === pending.from &&
+      current === pending.to
+    ) {
+      generation = pending.to;
+      adopted = true;
+    } else {
+      settleOwnSelfWrite(pending);
+    }
+  }
   const entry: CachedCatalog = {
     body: payload.body,
     headers: payload.headers,
     status: payload.status,
-    expiresAt: Date.now() + payload.cacheTTL,
+    // An error is never kept for the full refresh interval.
+    expiresAt:
+      Date.now() + (ok ? payload.cacheTTL : Math.min(payload.cacheTTL, CATALOG_ERROR_TTL_MS)),
+    generation,
   };
-  if (buildGeneration === getModelCatalogCacheVersion()) {
-    catalogCache.set(cacheKey, entry);
-    if (entry.status === 200) catalogLastGood.set(cacheKey, entry);
+  // A failed result while a 200 is kept: the kept catalog stays served (stale path), and no
+  // new refresh for this key starts before the backoff. Recorded before the orphan check, so
+  // a failure that also settled its own self-write (generation left at `from`) still backs off.
+  const kept = ok ? undefined : catalogCache.peek(cacheKey);
+  const keptOk = kept?.status === 200;
+  if (!ok && keptOk) {
+    refreshFailedAt.set(cacheKey, Date.now());
+    console.warn(
+      `[catalog] Refresh for key "${cacheKey}" returned status ${payload.status}; keeping the previous catalog`
+    );
   }
   // Cross-generation orphan: return entry to its original caller unchanged,
   // persist neither cache nor lastGood.
+  if (generation !== current) return entry;
+  if (adopted) {
+    lastSeenCatalogCacheVersion = current;
+    markEntriesExpiredExcept(current);
+  }
+  if (!ok) {
+    if (!keptOk) catalogCache.set(cacheKey, entry);
+    return entry;
+  }
+  refreshFailedAt.delete(cacheKey);
+  catalogCache.set(cacheKey, entry);
+  catalogLastGood.set(cacheKey, entry);
   return entry;
 }
 
@@ -384,18 +542,28 @@ function storePayload(
 function startBackgroundRefresh(
   cacheKey: string,
   request: Request,
-  buildPayload: (request: Request) => Promise<CatalogPayload>,
+  buildPayload: CatalogBuilder,
   schedule: BackgroundRefreshScheduler
 ): void {
   if (catalogInFlight.has(cacheKey)) return; // a refresh for this key is already running
+  const failedAt = refreshFailedAt.get(cacheKey);
+  if (failedAt !== undefined && Date.now() - failedAt < CATALOG_REFRESH_FAILURE_BACKOFF_MS) return;
 
   const generation = getModelCatalogCacheVersion();
+  const buildId = ++_nextBuildId;
   const refreshPromise: Promise<CachedCatalog> = new Promise((resolve, reject) => {
     schedule(() =>
-      runBuilder(buildPayload, request)
-        .then((payload) => {
-          resolve(storePayload(cacheKey, payload, generation));
-        })
+      runBuilder(buildPayload, request, { launchGeneration: generation, buildId })
+        .then(
+          (payload) => {
+            resolve(storePayload(cacheKey, payload, generation, buildId));
+          },
+          (err) => {
+            refreshFailedAt.set(cacheKey, Date.now());
+            onBuildRejected(buildId);
+            throw err;
+          }
+        )
         .catch((err) => {
           console.error(
             `[catalog] Background stale-while-revalidate refresh failed for key "${cacheKey}":`,
@@ -412,6 +580,7 @@ function startBackgroundRefresh(
 
   catalogInFlight.set(cacheKey, {
     generation,
+    buildId,
     promise: refreshPromise,
     lastKeptAt: Date.now(),
     timeoutCount: 0,
@@ -424,12 +593,19 @@ function startBackgroundRefresh(
     });
 }
 
+/** The injected builder: gets the request and its build context. */
+export type CatalogBuilder = (
+  request: Request,
+  ctx: CatalogBuildContext
+) => Promise<CatalogPayload>;
+
 function runBuilder(
-  buildPayload: (request: Request) => Promise<CatalogPayload>,
-  request: Request
+  buildPayload: CatalogBuilder,
+  request: Request,
+  ctx: CatalogBuildContext
 ): Promise<CatalogPayload> {
   _catalogBuilderRuns++;
-  return buildPayload(request);
+  return buildPayload(request, ctx);
 }
 
 async function awaitCatalogInFlight(
@@ -505,7 +681,7 @@ async function awaitCatalogInFlight(
 export async function resolveCachedCatalogResponse(
   request: Request,
   headerSources: { corsHeaders: Record<string, string>; diagnosticHeaders: Record<string, string> },
-  buildPayload: (request: Request) => Promise<CatalogPayload>,
+  buildPayload: CatalogBuilder,
   catalogSettings?: CatalogCacheOptions
 ): Promise<Response> {
   const { corsHeaders, diagnosticHeaders } = headerSources;
@@ -556,20 +732,33 @@ export async function resolveCachedCatalogResponse(
   const existing = inflight;
   const joinable =
     !!existing &&
-    existing.generation === currentGeneration &&
+    // A build whose own pending write moved the generation is current in all but name.
+    (existing.generation === currentGeneration ||
+      pendingSelfWrites.get(existing.buildId)?.to === currentGeneration) &&
     Date.now() - (existing.lastKeptAt ?? 0) <= 3 * boundMs &&
     (existing.timeoutCount ?? 0) < 3;
   if (!joinable) {
     const generation = currentGeneration;
-    const promise = runBuilder(buildPayload, request).then((payload) =>
-      storePayload(cacheKey, payload, generation)
+    const buildId = ++_nextBuildId;
+    const promise = runBuilder(buildPayload, request, {
+      launchGeneration: generation,
+      buildId,
+    }).then(
+      (payload) => storePayload(cacheKey, payload, generation, buildId),
+      (err) => {
+        onBuildRejected(buildId);
+        throw err;
+      }
     );
-    inflight = { generation, promise, lastKeptAt: Date.now(), timeoutCount: 0 };
+    inflight = { generation, buildId, promise, lastKeptAt: Date.now(), timeoutCount: 0 };
     catalogInFlight.set(cacheKey, inflight);
-    promise.catch(() => {});
-    promise.finally(() => {
-      if (catalogInFlight.get(cacheKey)?.promise === promise) catalogInFlight.delete(cacheKey);
-    });
+    // `finally` returns a new promise that rejects with the build; handle it too, or a
+    // rejected cold build raises an unhandledRejection.
+    promise
+      .finally(() => {
+        if (catalogInFlight.get(cacheKey)?.promise === promise) catalogInFlight.delete(cacheKey);
+      })
+      .catch(() => {});
   }
 
   return awaitCatalogInFlight(cacheKey, inflight, corsHeaders, diagnosticHeaders);
@@ -584,7 +773,19 @@ export function __resetCatalogBuilderRunsForTest(): void {
   catalogCache.clear();
   catalogInFlight.clear();
   catalogLastGood.clear();
+  pendingSelfWrites.clear();
+  refreshFailedAt.clear();
   lastSeenCatalogCacheVersion = getModelCatalogCacheVersion();
+}
+
+/** How many builds have a self-write pending (see `registerCatalogSelfWrite`). */
+export function __getPendingSelfWriteCountForTest(): number {
+  return pendingSelfWrites.size;
+}
+
+/** Reads the entry a request would use, without touching the LRU order. */
+export function __peekCatalogCacheEntryForTest(request: Request): CachedCatalog | undefined {
+  return catalogCache.peek(buildCatalogCacheKey(request));
 }
 
 /** Retained-string accounting only; successful bodies may be shared across maps. */
@@ -641,6 +842,7 @@ export function __forceCatalogInFlightRejectionForTest(request: Request, error: 
   // generation would be skipped as pre-write state and never awaited).
   catalogInFlight.set(buildCatalogCacheKey(request), {
     generation: getModelCatalogCacheVersion(),
+    buildId: ++_nextBuildId,
     promise: rejected,
     lastKeptAt: Date.now(),
     timeoutCount: 0,

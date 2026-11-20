@@ -43,8 +43,8 @@ test("catalog.ts re-exports only what catalogCache actually exports (#9199)", as
   const catalog = await import("@/app/api/v1/models/catalog");
   const catalogCache = await import("@/app/api/v1/models/catalogCache");
 
-  assert.equal(catalogCache.CATALOG_STALE_WHILE_REVALIDATE_MS, 30_000);
-  assert.equal(catalog.CATALOG_STALE_WHILE_REVALIDATE_MS, 30_000);
+  assert.equal(catalogCache.CATALOG_STALE_WHILE_REVALIDATE_MS, 24 * 60 * 60 * 1000);
+  assert.equal(catalog.CATALOG_STALE_WHILE_REVALIDATE_MS, 24 * 60 * 60 * 1000);
 
   // The accessor/policy trio must stay gone — re-adding it would resurrect the
   // unbounded window #9199 removed (a failing refresh could pin an old catalog forever).

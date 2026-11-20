@@ -10,6 +10,8 @@ const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-12627-"))
 process.env.DATA_DIR = TEST_DATA_DIR;
 
 const catalogCache = await import("../../src/app/api/v1/models/catalogCache.ts");
+/** Expired past the stale-serve window, so callers wait for a build again. */
+const PAST_GRACE_MS = catalogCache.CATALOG_STALE_WHILE_REVALIDATE_MS + 60_000;
 const { invalidateModelCatalogCache } = await import("../../src/lib/db/readCache.ts");
 
 function request() {
@@ -52,7 +54,7 @@ test("#12627 timeout serves last-good 200 when a prior build succeeded", async (
     async () => payload("good")
   );
   assert.equal(await first.text(), "good");
-  catalogCache.__expireCatalogCacheForTest(60_000);
+  catalogCache.__expireCatalogCacheForTest(PAST_GRACE_MS);
 
   const second = await catalogCache.resolveCachedCatalogResponse(
     request(),

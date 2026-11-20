@@ -6592,7 +6592,7 @@
     "modelCatalogTtlMinimumError": "Minimum is {min} ms",
     "modelCatalogTtlMaximumError": "Maximum is {max} ms",
     "modelCatalogCacheTtl": "Model Catalog Cache TTL",
-    "modelCatalogCacheTtlDescription": "How long model catalog responses are cached before refreshing",
+    "modelCatalogCacheTtlDescription": "How often the model catalog refreshes in the background. Saved changes refresh it at once.",
     "modelCatalogCacheTtlLabel": "Model catalog cache TTL in milliseconds",
     "modelCatalogCacheTtlSaving": "Saving...",
     "modelCatalogCacheTtlSave": "Save",

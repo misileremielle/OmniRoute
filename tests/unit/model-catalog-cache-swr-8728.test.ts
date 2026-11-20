@@ -59,8 +59,9 @@ test.after(async () => {
 
 test("the SWR window is a bounded constant, not an unbounded accessor", () => {
   // #9199 replaced the injectable POSITIVE_INFINITY accessor with this bound so a
-  // refresh that keeps failing cannot pin an old catalog forever.
-  assert.equal(catalogCache.CATALOG_STALE_WHILE_REVALIDATE_MS, 30_000);
+  // refresh that keeps failing cannot pin an old catalog forever. 24 h since the
+  // model-list keep change (writes drop the catalog at once).
+  assert.equal(catalogCache.CATALOG_STALE_WHILE_REVALIDATE_MS, 24 * 60 * 60 * 1000);
   assert.ok(Number.isFinite(catalogCache.CATALOG_STALE_WHILE_REVALIDATE_MS));
 });
 

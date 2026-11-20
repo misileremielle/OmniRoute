@@ -164,8 +164,12 @@ export { getCustomVisionCapabilityFields };
 // documented behavior of this endpoint.
 import {
   CATALOG_CACHE_TTL_MS_DEFAULT,
+  getCatalogCacheGeneration,
+  registerCatalogSelfWrite,
   resolveCachedCatalogResponse,
   type BackgroundRefreshScheduler,
+  type CatalogBuildContext,
+  type CatalogPayload,
 } from "./catalogCache";
 
 export {
@@ -201,6 +205,11 @@ type CatalogBuildFlags = {
   revealHidden?: boolean;
   /** Advertise only combos (`settings.exposeCombosOnly`). */
   combosOnly?: boolean;
+  /**
+   * This run's build context, and the generation move its own OpenRouter capability
+   * upsert caused (set by the builder when `registerCatalogSelfWrite()` accepts it).
+   */
+  build?: { ctx: CatalogBuildContext; selfWrite?: { from: string; to: string } };
 };
 
 const BUILTIN_AUTO_YIELD_INTERVAL = 2;
@@ -267,7 +276,7 @@ export async function getUnifiedModelsResponse(
     return await resolveCachedCatalogResponse(
       request,
       { corsHeaders, diagnosticHeaders },
-      (req) => buildCatalogPayload(req, buildFlags),
+      (req, ctx) => buildCatalogPayload(req, buildFlags, ctx),
       {
         // #10831: a disabled router hides auto/* just as hideAutoCombos does, so
         // the two collapse into one cache dimension — the resulting catalogs are
@@ -297,9 +306,21 @@ export async function getUnifiedModelsResponse(
 
 async function buildCatalogPayload(
   request: Request,
-  flags: CatalogBuildFlags = {}
-): Promise<{ body: string; headers: Record<string, string>; status: number; cacheTTL: number }> {
-  const built = await buildUnifiedModelsResponseCore(request, {}, flags);
+  flags: CatalogBuildFlags = {},
+  ctx?: CatalogBuildContext
+): Promise<CatalogPayload> {
+  const build: CatalogBuildFlags["build"] = ctx ? { ctx } : undefined;
+  let built = await buildUnifiedModelsResponseCore(request, {}, { ...flags, build });
+  // This run's own OpenRouter capability upsert moved the catalog generation, so its body
+  // predates the stored capabilities. Build once more on the new state (the upsert is then
+  // a no-op) and hand that body back for catalogCache to adopt under the new generation.
+  // A second pass that changes data again returns without `adopt` (no third pass); the
+  // cache then treats the move as a write and clears, as before this change.
+  let adopt = build?.selfWrite && built.status === 200 ? build.selfWrite : undefined;
+  if (adopt) {
+    built = await buildUnifiedModelsResponseCore(request, {}, { ...flags, build: undefined });
+    if (getCatalogCacheGeneration() !== adopt.to) adopt = undefined;
+  }
   const body = await built.text();
   const headers: Record<string, string> = {};
   built.headers.forEach((value, key) => {
@@ -317,7 +338,7 @@ async function buildCatalogPayload(
   } catch {
     // Swallow — use default TTL on DB error
   }
-  return { body, headers, status: built.status, cacheTTL };
+  return { body, headers, status: built.status, cacheTTL, ...(adopt ? { adopt } : {}) };
 }
 
 /**
@@ -1574,7 +1595,18 @@ async function buildUnifiedModelsResponseCore(
           );
           if (capEntry) openRouterCaps[openRouterModel.id] = capEntry;
         }
+        // The upsert bumps the catalog generation when capabilities changed. Read it on both
+        // sides, synchronously, so catalogCache can tell this build's own move from a write.
+        const generationBeforeUpsert = getCatalogCacheGeneration();
         upsertSyncedCapabilities("openrouter", openRouterCaps);
+        const generationAfterUpsert = getCatalogCacheGeneration();
+        if (
+          flags.build &&
+          !flags.build.selfWrite &&
+          registerCatalogSelfWrite(flags.build.ctx, generationBeforeUpsert, generationAfterUpsert)
+        ) {
+          flags.build.selfWrite = { from: generationBeforeUpsert, to: generationAfterUpsert };
+        }
       } catch (err) {
         console.error("[catalog] Error loading OpenRouter catalog:", err);
       }

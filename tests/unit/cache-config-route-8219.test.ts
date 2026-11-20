@@ -52,6 +52,17 @@ test("cache-config route resolves and modelCatalogCacheTtlMs round-trips", async
 
     assert.equal(response.status, 200);
     assert.equal(typeof body.modelCatalogCacheTtlMs, "number");
+    // Background refresh interval of the model catalog: 24 h by default.
+    assert.equal(body.modelCatalogCacheTtlMs, 86_400_000);
+  });
+
+  await t.test("PUT accepts the 7-day maximum refresh interval", async () => {
+    const putResponse = await cacheConfigRoute.PUT(
+      makeJsonRequest("PUT", { modelCatalogCacheTtlMs: 604_800_000 }) as never
+    );
+    assert.equal(putResponse.status, 200);
+    const getBody = await (await cacheConfigRoute.GET(makeJsonRequest("GET") as never)).json();
+    assert.equal(getBody.modelCatalogCacheTtlMs, 604_800_000);
   });
 
   await t.test("PUT resolves without crashing and persists the new TTL", async () => {
