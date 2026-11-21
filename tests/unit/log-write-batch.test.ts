@@ -708,6 +708,38 @@ test("waitForCallLogSaves covers queued rows and their detail files", async () =
   );
 });
 
+test("waitForCallLogSaves covers a save still building its row when the wait starts", async () => {
+  // Fire and forget, as the connection test does: the row is queued only after the wait's
+  // first flush has run.
+  void callLogs.saveCallLog(callLogEntry("wait-unawaited-1"));
+  assert.equal(batch.getQueuedLogWriteCount(), 0, "not queued yet when the wait starts");
+  assert.equal(await callLogs.waitForCallLogSaves(5000), true);
+  assert.equal(batch.getQueuedLogWriteCount(), 0, "nothing left queued");
+  assert.equal(
+    count(
+      "SELECT COUNT(*) AS n FROM call_logs WHERE id = 'wait-unawaited-1' AND detail_state = 'ready'"
+    ),
+    1,
+    "written and published before the wait returns"
+  );
+});
+
+test("waitForCallLogSaves covers a row queued while an earlier row's detail is written", async () => {
+  // A is queued when the wait starts; B is still building and queues while A's detail file is
+  // written, so the wait's inner flush commits B outside the work it first waited for.
+  await callLogs.saveCallLog(callLogEntry("wait-overlap-a"));
+  assert.equal(batch.getQueuedLogWriteCount(), 1, "A queued when the wait starts");
+  void callLogs.saveCallLog(callLogEntry("wait-overlap-b"));
+  assert.equal(await callLogs.waitForCallLogSaves(5000), true);
+  assert.equal(
+    count(
+      "SELECT COUNT(*) AS n FROM call_logs WHERE id IN ('wait-overlap-a', 'wait-overlap-b') AND detail_state = 'ready'"
+    ),
+    2,
+    "both rows written and published before the wait returns"
+  );
+});
+
 test("shutdown drains the queue; later rows are written at once", async () => {
   await usageHistory.saveRequestUsage(usageEntry("before-shutdown"));
   await callLogs.closeCallLogSaves(2000);

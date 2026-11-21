@@ -67,6 +67,7 @@ import {
 import {
   drainLogWriteBatch,
   flushLogWriteBatchAndSettle,
+  getInFlightLogWriteCount,
   isLogBatchingActive,
   queueLogWrite,
 } from "./logWriteBatch";
@@ -1055,9 +1056,17 @@ export function saveUpstreamHttpAttempt(entry: {
 export async function waitForCallLogSaves(timeoutMs: number): Promise<boolean> {
   const deadline = Date.now() + Math.max(0, timeoutMs);
   // Batched rows (step-11 fix 3) count as pending saves: write them and wait for their detail
-  // files, within the same budget.
-  if (!(await flushLogWriteBatchAndSettle("waitForCallLogSaves", timeoutMs))) return false;
-  while (pendingCallLogSaves.size > 0) {
+  // files, within the same budget. A save still building its row when the wait starts only
+  // queues it when it finishes, and the settle step's own flush can commit such a row without
+  // waiting for its detail file. So repeat until no save is building and no batched row is in
+  // flight.
+  for (;;) {
+    const budgetMs = Math.max(0, deadline - Date.now());
+    if (!(await flushLogWriteBatchAndSettle("waitForCallLogSaves", budgetMs))) return false;
+    if (pendingCallLogSaves.size === 0) {
+      if (getInFlightLogWriteCount() === 0) return true;
+      continue;
+    }
     const remainingMs = deadline - Date.now();
     if (remainingMs <= 0) return false;
 
@@ -1072,7 +1081,6 @@ export async function waitForCallLogSaves(timeoutMs: number): Promise<boolean> {
     if (timeout) clearTimeout(timeout);
     if (!settled) return false;
   }
-  return true;
 }
 
 export async function closeCallLogSaves(timeoutMs = 2_000): Promise<void> {

@@ -158,6 +158,11 @@ export function getQueuedLogWriteCount(): number {
   return state.queue.length;
 }
 
+/** Number of rows queued or committed whose after-commit steps have not finished. */
+export function getInFlightLogWriteCount(): number {
+  return state.inFlight.size;
+}
+
 export function getLogWriteBatchStats(): Readonly<BatchState["stats"]> {
   return { ...state.stats };
 }
