@@ -61,6 +61,77 @@ test("vm-session: A2 writes step wired after m10, copied into arms, bounded", ()
   );
 });
 
+test("vm-session: writes_retry retries a pair run's write run once, only for a paced-only fault", (t) => {
+  assert.match(SCRIPT, /^\s+writes "\$1" "\$2"[^\n]*\n\s+writes_retry "\$1" "\$2"$/m);
+  assert.match(fn("writes"), /^\s+local label="\$1-writes\$\{3:-\}" dir="\$2"/m);
+  assert.match(SCRIPT, /^WRITES_RETRY_STATUS="invalid\(D:paced-status,L:ok\)"$/m);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-vm-retry-"));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const runs = path.join(dir, "runs.tsv");
+  const row = (label: string, status: string, attempt = 1) =>
+    [
+      label,
+      "writes",
+      "arm-b",
+      "t0",
+      status === "started" ? "-" : "t1",
+      "0.1",
+      status,
+      attempt,
+    ].join("\t");
+  const paced = "invalid(D:paced-status,L:ok)";
+  fs.writeFileSync(
+    runs,
+    [
+      "label\tkind\tarm\tstarted\tended\tload1\tstatus\tattempt",
+      row("probe-p1-b-writes", "started"),
+      row("probe-p1-b-writes", paced),
+      row("probe-p2-a-writes", "started"),
+      row("probe-p2-a-writes", "invalid(D:paced-status,L:counter-check)"),
+      row("probe-p2-b-writes", "started"),
+      row("probe-p2-b-writes", "ok"),
+      row("probe-p3-a-writes", "started"), // interrupted: no ending yet
+      row("probe-p3-b-writes", "started"),
+      row("probe-p3-b-writes", "invalid(D:paced-status,L:paced-status)"),
+      row("noise-probe-1-writes", "started"),
+      row("noise-probe-1-writes", paced),
+      row("probe-r1-writes", "started"),
+      row("probe-r1-writes", paced),
+      row("probe-p10-a-writes", "started"),
+      row("probe-p10-a-writes", paced),
+    ].join("\n") + "\n"
+  );
+  const labels = [
+    "probe-p1-b",
+    "probe-p2-a",
+    "probe-p2-b",
+    "probe-p3-a",
+    "probe-p3-b",
+    "noise-probe-1",
+    "probe-r1",
+    "probe-p10-a",
+    "probe-p1-c",
+  ];
+  const out = bash(
+    [
+      'say() { echo "SAY $*"; }',
+      'writes() { echo "WRITES $1 $2 $3"; }',
+      SCRIPT.match(/^WRITES_RETRY_STATUS=.*$/m)?.[0] ?? "",
+      fn("writes_retry"),
+      ...labels.map((l) => `writes_retry ${l} /arm`),
+    ].join("\n"),
+    { RUNS: runs }
+  );
+  assert.deepEqual(
+    out
+      .trim()
+      .split("\n")
+      .filter((l) => l.startsWith("WRITES ")),
+    ["WRITES probe-p1-b /arm -retry", "WRITES probe-p10-a /arm -retry"]
+  );
+  assert.match(out, /^SAY probe-p1-b-writes: invalid\(D:paced-status,L:ok\), one retry$/m);
+});
+
 test("vm-session: keep_attempt moves an attempt's files aside, never overwrites, never deletes", (t) => {
   const out = fs.mkdtempSync(path.join(os.tmpdir(), "perf-vm-keep-"));
   t.after(() => fs.rmSync(out, { recursive: true, force: true }));

@@ -814,7 +814,44 @@ export function counterCheck(dir: string): { wrote: number; seen: number | null;
   return { wrote: COUNTER_CHECK_BYTES, seen, ok: seen !== null && seen >= COUNTER_CHECK_BYTES };
 }
 
-async function chat(baseUrl: string, stream: boolean): Promise<number | null> {
+/** One chat request's outcome, kept for every request so a failed window says which and why. */
+export type ChatOutcome = {
+  stream: boolean;
+  /** Start time, ISO, to line up with the server log. */
+  at: string;
+  ms: number;
+  status: number | null;
+  /** Set when no reply arrived: error name, message and cause code (no stack). */
+  error: string | null;
+  /** First 300 characters of a non-200 reply's body. */
+  body: string | null;
+};
+
+const OUTCOME_TEXT_MAX = 300;
+
+/** `Name: message (cause CODE: message)`, one line, at most 300 characters. */
+export function describeRequestError(error: unknown): string {
+  const part = (value: unknown): string => {
+    if (!value || typeof value !== "object") return String(value);
+    const e = value as { name?: unknown; code?: unknown; message?: unknown };
+    const head = [e.name, e.code].filter((v) => typeof v === "string" && v).join(" ");
+    const message = typeof e.message === "string" ? e.message : "";
+    return [head, message].filter(Boolean).join(": ");
+  };
+  const cause = (error as { cause?: unknown } | null)?.cause;
+  const text = cause ? `${part(error)} (cause ${part(cause)})` : part(error);
+  return text.replace(/\s+/g, " ").slice(0, OUTCOME_TEXT_MAX);
+}
+
+/** One probe chat request; its outcome goes to `outcomes` when given. Exported for its test. */
+export async function chat(
+  baseUrl: string,
+  stream: boolean,
+  outcomes?: ChatOutcome[]
+): Promise<number | null> {
+  const at = new Date().toISOString();
+  const started = performance.now();
+  const outcome: ChatOutcome = { stream, at, ms: 0, status: null, error: null, body: null };
   try {
     const res = await fetch(`${baseUrl}/api/v1/chat/completions`, {
       method: "POST",
@@ -826,10 +863,16 @@ async function chat(baseUrl: string, stream: boolean): Promise<number | null> {
       }),
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
-    await res.arrayBuffer();
+    outcome.status = res.status;
+    if (res.status === 200) await res.arrayBuffer();
+    else outcome.body = (await res.text()).slice(0, OUTCOME_TEXT_MAX);
     return res.status;
-  } catch {
+  } catch (error) {
+    outcome.error = describeRequestError(error);
     return null;
+  } finally {
+    outcome.ms = Math.round(performance.now() - started);
+    outcomes?.push(outcome);
   }
 }
 
@@ -935,6 +978,8 @@ export interface SettingReport {
   m13: number | null;
   /** Paced-window bytes; null when that window is invalid (the others can still be valid). */
   m12c: number | null;
+  /** Every chat request's outcome per phase, kept on failure too (reported only). */
+  outcomes: { warmup: ChatOutcome[]; request: ChatOutcome[]; paced: ChatOutcome[] };
   /** True when the folder was left for the driver's sweep because a process still used it. */
   kept?: boolean;
   valid: boolean;
@@ -1105,11 +1150,12 @@ async function runSetting(
     tracker.scan();
     timer = setInterval(() => tracker.scan(), SAMPLE_INTERVAL_MS);
 
+    const outcomes = report.outcomes;
     for (let i = 0; i < WARMUP_EACH; i++) {
-      if ((await chat(baseUrl, false)) !== 200) return fail("warmup-status");
+      if ((await chat(baseUrl, false, outcomes.warmup)) !== 200) return fail("warmup-status");
     }
     for (let i = 0; i < WARMUP_EACH; i++) {
-      if ((await chat(baseUrl, true)) !== 200) return fail("warmup-status");
+      if ((await chat(baseUrl, true, outcomes.warmup)) !== 200) return fail("warmup-status");
     }
     if (!(await waitArtifacts(() => listArtifacts(dir).length, WARMUP_ARTIFACTS))) {
       return fail("warmup-artifacts");
@@ -1153,10 +1199,10 @@ async function runSetting(
     // Request window: 10 plain then 10 streamed, back to back.
     const measured = await measureWindow(async () => {
       for (let i = 0; i < REQUESTS_EACH; i++) {
-        if ((await chat(baseUrl, false)) !== 200) return false;
+        if ((await chat(baseUrl, false, outcomes.request)) !== 200) return false;
       }
       for (let i = 0; i < REQUESTS_EACH; i++) {
-        if ((await chat(baseUrl, true)) !== 200) return false;
+        if ((await chat(baseUrl, true, outcomes.request)) !== 200) return false;
       }
       return true;
     });
@@ -1205,7 +1251,7 @@ async function runSetting(
         const wait = at - Date.now();
         if (wait > 0) await sleep(wait);
         latenessMs.push(Math.max(0, Date.now() - (t0 + i * PACED_INTERVAL_MS)));
-        const status = await chat(baseUrl, i >= REQUESTS_EACH);
+        const status = await chat(baseUrl, i >= REQUESTS_EACH, outcomes.paced);
         prevEnd = Date.now();
         if (status !== 200) return false;
       }
@@ -1323,6 +1369,7 @@ export async function runWrites(args: WritesArgs): Promise<WritesReport> {
     m12: null,
     m13: null,
     m12c: null,
+    outcomes: { warmup: [], request: [], paced: [] },
     valid: false,
     invalidReason: null,
   });

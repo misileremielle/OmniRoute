@@ -11,12 +11,14 @@ import {
   SETTLE_MAX_MS,
   WAL_PASSIVE_INTERVAL_OFF_MS,
   artifactTime,
+  chat,
   checkpointComplete,
   checkpointInWindow,
   checkpointOnce,
   checkpointWithRetry,
   countWindowRows,
   dbReading,
+  describeRequestError,
   pacedInvalidReason,
   pacedStart,
   parseVmRssKb,
@@ -34,6 +36,7 @@ import {
   stopAndRemove,
   windowArtifacts,
   windowDelta,
+  type ChatOutcome,
   type CheckpointAttempt,
   type DbReading,
   type ProcEntry,
@@ -43,6 +46,73 @@ import {
   type Tracked,
 } from "../../scripts/perf/write-bytes-probe.ts";
 import { DatabaseSync } from "node:sqlite";
+import http from "node:http";
+import type { AddressInfo } from "node:net";
+
+test("describeRequestError gives name, code and cause on one line, capped", () => {
+  const cause = Object.assign(new Error("other side closed"), {
+    name: "SocketError",
+    code: "UND_ERR_SOCKET",
+  });
+  const error = new TypeError("fetch failed", { cause });
+  assert.equal(
+    describeRequestError(error),
+    "TypeError: fetch failed (cause SocketError UND_ERR_SOCKET: other side closed)"
+  );
+  const timeout = Object.assign(new Error("The operation was aborted\n due to timeout"), {
+    name: "TimeoutError",
+  });
+  assert.equal(
+    describeRequestError(timeout),
+    "TimeoutError: The operation was aborted due to timeout"
+  );
+  assert.equal(describeRequestError("x".repeat(400)).length, 300);
+  assert.equal(describeRequestError(null), "null");
+});
+
+test("chat records status, body and time for each request, and the error when none arrives", async () => {
+  let replies = 0;
+  const server = http.createServer((req, res) => {
+    req.resume();
+    req.on("end", () => {
+      replies++;
+      if (replies === 1) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end("{}");
+      } else if (replies === 2) {
+        res.writeHead(502, { "Content-Type": "text/plain" });
+        res.end("b".repeat(500));
+      } else {
+        req.socket.destroy();
+      }
+    });
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  const outcomes: ChatOutcome[] = [];
+  try {
+    assert.equal(await chat(baseUrl, false, outcomes), 200);
+    assert.equal(await chat(baseUrl, true, outcomes), 502);
+    assert.equal(await chat(baseUrl, false, outcomes), null);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+  assert.equal(outcomes.length, 3);
+  assert.deepEqual(
+    outcomes.map((o) => [o.stream, o.status, o.body?.length ?? null, o.error === null]),
+    [
+      [false, 200, null, true],
+      [true, 502, 300, true],
+      [false, null, null, false],
+    ]
+  );
+  assert.match(outcomes[2].error as string, /^TypeError: fetch failed \(cause /);
+  for (const o of outcomes) {
+    assert.ok(Number.isInteger(o.ms) && o.ms >= 0, "elapsed ms");
+    assert.ok(!Number.isNaN(Date.parse(o.at)), "start time");
+  }
+});
 
 const ARGS = [
   "--root",

@@ -482,12 +482,13 @@ m10() {
 }
 
 # ── A2: one write run, settings D then L (M12/M13) ────────────────────────────────────────
-# writes <probe-label> <arm-dir>: label <probe-label>-writes in runs.tsv (kind writes). Same
-# rules as m10: skipped once ended, invalid(interrupted) after two starts, no load gate (the
-# probe marks load >= 2.0 invalid), never rerun, both folders swept with m10-sweep.mjs.
-# Status is ok only when both settings are valid; otherwise invalid(D:<reason>,L:<reason>).
+# writes <probe-label> <arm-dir> [suffix]: label <probe-label>-writes<suffix> in runs.tsv (kind
+# writes). Same rules as m10: skipped once ended, invalid(interrupted) after two starts, no load
+# gate (the probe marks load >= 2.0 invalid), both folders swept with m10-sweep.mjs. Never
+# rerun, except writes_retry's one retry. Status is ok only when both settings are valid;
+# otherwise invalid(D:<reason>,L:<reason>).
 writes() {
-  local label="$1-writes" dir="$2" n attempt rc=0 status started load since token reason s
+  local label="$1-writes${3:-}" dir="$2" n attempt rc=0 status started load since token reason s
   if ended_any "$label"; then say "skip $label (recorded)"; return 0; fi
   n="$(attempts_of "$label")"
   if [[ "$n" -ge 2 ]]; then
@@ -543,6 +544,20 @@ writes() {
   return 0
 }
 
+# Fix-3 rerun addendum (Proxy, 2026-11-21): a pair run (probe-p<k>-<a|b>) whose write run's only
+# fault is the paced window gets one retry, label <probe-label>-writes-retry; the comparison then
+# takes every write metric of that run from the retry. At most 6 (one per pair run). Noise and
+# step-10 runs, and any other fault, are never retried. Works on resume: it reads runs.tsv.
+WRITES_RETRY_STATUS="invalid(D:paced-status,L:ok)"
+writes_retry() {  # writes_retry <probe-label> <arm-dir>
+  [[ "$1" =~ ^probe-p[0-9]+-[ab]$ ]] || return 0
+  local first
+  first="$(awk -F'\t' -v l="$1-writes" '$1 == l && $7 != "started" { s = $7 } END { print s }' "$RUNS")"
+  [[ "$first" == "$WRITES_RETRY_STATUS" ]] || return 0
+  say "$1-writes: $first, one retry"
+  writes "$1" "$2" -retry
+}
+
 NB=(bash "$DRIVER_DIR/netblock-run.sh" --)
 
 build()  { measure "$1" build "$2" "$TO_BUILD" "$OUT/$1.json" -- node scripts/perf/time-build.mjs --root . --out "$OUT/$1.json"; }
@@ -555,6 +570,7 @@ probe()  { local idle=(); [[ "${3:-0}" -gt 0 ]] && idle=(--idle-check-seconds "$
              --out "$OUT/$1.json" --counters-out "$OUT/$1.counters" "${idle[@]}"
            m10 "$1" "$2"   # measure returned: this label's counted attempt is ok
            writes "$1" "$2"   # A2, after A1's step
+           writes_retry "$1" "$2"
            if [[ "${3:-0}" -gt 0 ]]; then   # idle check: reported and flagged, never a gate (plan)
              node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
                const z = r.metrics?.idleCheck?.allZero;
