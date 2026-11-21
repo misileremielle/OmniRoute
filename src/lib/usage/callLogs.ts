@@ -59,7 +59,18 @@ import {
   type CallLogArtifact,
   type CallLogDetailState,
 } from "./callLogArtifacts";
-import { closeCallLogArtifactWriter, writeCallArtifactAsync } from "./callLogArtifactWriter";
+import {
+  closeCallLogArtifactWriter,
+  holdCallArtifact,
+  writeCallArtifactAsync,
+} from "./callLogArtifactWriter";
+import {
+  drainLogWriteBatch,
+  flushLogWriteBatchAndSettle,
+  getInFlightLogWriteCount,
+  isLogBatchingActive,
+  queueLogWrite,
+} from "./logWriteBatch";
 import { isWriteLockError, scheduleWriteRetry } from "./usageWriteRetry";
 import {
   toNumber,
@@ -499,13 +510,68 @@ function mapSummaryRow(row: CallLogSummaryRow) {
   };
 }
 
+/**
+ * Log batching (step-11 fix 3): queue the row; it is committed with up to 200 others. The detail
+ * file is serialized now in the artifact worker and held there until the commit. Only the
+ * values the after-commit steps need are kept: never `entry` or the artifact object, whose raw
+ * bodies can reach the request size limit.
+ */
+function queueCallLogRow(prepared: PreparedCallLogRow, entry: any, metadataOnly: boolean): void {
+  const pendingRequestId = entry?.pendingRequestId;
+  const pendingRequestGeneration = entry?.pendingRequestGeneration;
+  const responseId =
+    !metadataOnly && typeof entry?.responseId === "string" && entry.responseId.length > 0
+      ? (entry.responseId as string)
+      : null;
+  const buildDetail = prepared.buildDetailArtifact;
+  prepared.buildDetailArtifact = null;
+  // Today's publish-time disk check, now before the serialize job: no room, no held file.
+  const artifactKey =
+    buildDetail && hasRoomForCallLogArtifact() ? holdCallArtifact(buildDetail()) : null;
+  const { db } = prepared;
+  const rowId = () => String(prepared.logEntry.id);
+  const clearBridge = () => {
+    if (responseId) clearPendingContinuationState(responseId);
+  };
+
+  void queueLogWrite({
+    db,
+    write: () => insertCallLogRow(prepared, false),
+    artifact: buildDetail ? { key: artifactKey, rowId } : undefined,
+    committed: () => markRequestPersistedById(pendingRequestId, pendingRequestGeneration, rowId()),
+    published: (result) => {
+      const id = rowId();
+      try {
+        if (result) publishPendingCallLogDetail(db, id, result);
+      } finally {
+        failPendingCallLogDetail(db, id);
+      }
+    },
+    // The bridge serves `previous_response_id` until the row is ready, so it clears last.
+    settled: () => {
+      clearBridge();
+      scheduleCallLogRotation();
+    },
+    failed: (error) => logCallLogSaveFailure(error),
+  });
+  // The row (with its resilience summary) is queued: reset here, in this request's own async
+  // context. Inside a flush it would reset whatever request the timer or reader belongs to.
+  if (!metadataOnly) resetResilienceActions();
+}
+
 async function saveCallLogOperation(entry: any, metadataOnly = false): Promise<void> {
+  let queued = false;
   try {
     let prepared: PreparedCallLogRow;
     try {
       prepared = await buildCallLogRow(entry, metadataOnly);
     } catch (error) {
       logCallLogSaveFailure(error);
+      return;
+    }
+    if (isLogBatchingActive() && !callLogSavesClosing) {
+      queueCallLogRow(prepared, entry, metadataOnly);
+      queued = true;
       return;
     }
     let inserted = false;
@@ -541,8 +607,14 @@ async function saveCallLogOperation(entry: any, metadataOnly = false): Promise<v
     }
   } finally {
     // Clear a temporary continuation even if the row or artifact cannot be written.
-    // Metadata-only summaries must not invalidate a full response's bridge.
-    if (!metadataOnly && typeof entry?.responseId === "string" && entry.responseId.length > 0) {
+    // Metadata-only summaries must not invalidate a full response's bridge. A queued row
+    // clears it after its publish instead (queueCallLogRow).
+    if (
+      !queued &&
+      !metadataOnly &&
+      typeof entry?.responseId === "string" &&
+      entry.responseId.length > 0
+    ) {
       clearPendingContinuationState(entry.responseId);
     }
   }
@@ -855,7 +927,7 @@ async function buildCallLogRow(entry: any, metadataOnly = false): Promise<Prepar
   };
 }
 
-function insertCallLogRow(prepared: PreparedCallLogRow): void {
+function insertCallLogRow(prepared: PreparedCallLogRow, resetResilience = true): void {
   const { db, logEntry, insertParams, hasResilienceColumn } = prepared;
   // Optional column (migration 191) — only fixed identifiers are spliced in.
   const resilienceCol = hasResilienceColumn ? ", resilience_actions" : "";
@@ -913,7 +985,8 @@ function insertCallLogRow(prepared: PreparedCallLogRow): void {
   // sink note: the sink is the unique consumer — reset only after a successful
   // INSERT, so a failed write (or a second persistence of the same
   // attempt) keeps the summary instead of silently writing NULL.
-  if (!prepared.metadataOnly) resetResilienceActions();
+  // A batched row resets at queue time instead (queueCallLogRow).
+  if (resetResilience && !prepared.metadataOnly) resetResilienceActions();
 }
 
 /** Write the inserted row's artifact and publish it, or make the row terminal missing. */
@@ -982,7 +1055,18 @@ export function saveUpstreamHttpAttempt(entry: {
 
 export async function waitForCallLogSaves(timeoutMs: number): Promise<boolean> {
   const deadline = Date.now() + Math.max(0, timeoutMs);
-  while (pendingCallLogSaves.size > 0) {
+  // Batched rows (step-11 fix 3) count as pending saves: write them and wait for their detail
+  // files, within the same budget. A save still building its row when the wait starts only
+  // queues it when it finishes, and the settle step's own flush can commit such a row without
+  // waiting for its detail file. So repeat until no save is building and no batched row is in
+  // flight.
+  for (;;) {
+    const budgetMs = Math.max(0, deadline - Date.now());
+    if (!(await flushLogWriteBatchAndSettle("waitForCallLogSaves", budgetMs))) return false;
+    if (pendingCallLogSaves.size === 0) {
+      if (getInFlightLogWriteCount() === 0) return true;
+      continue;
+    }
     const remainingMs = deadline - Date.now();
     if (remainingMs <= 0) return false;
 
@@ -997,12 +1081,15 @@ export async function waitForCallLogSaves(timeoutMs: number): Promise<boolean> {
     if (timeout) clearTimeout(timeout);
     if (!settled) return false;
   }
-  return true;
 }
 
 export async function closeCallLogSaves(timeoutMs = 2_000): Promise<void> {
   callLogSavesClosing = true;
-  const drained = await waitForCallLogSaves(timeoutMs);
+  // Batched rows first: their detail files are written by the artifact worker closed below.
+  // Rows whose after-commit steps miss the budget stay pending until the expiry sweep.
+  const started = Date.now();
+  await drainLogWriteBatch(timeoutMs);
+  const drained = await waitForCallLogSaves(Math.max(0, timeoutMs - (Date.now() - started)));
   if (!drained) {
     await closeCallLogArtifactWriter(0);
   }

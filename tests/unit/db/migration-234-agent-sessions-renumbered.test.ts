@@ -102,8 +102,9 @@ const HISTORICAL_BUILDS = [
     sessions: "214",
     usage: "215",
     upstream: ["call_logs_client_session_id", "team_cost_centers"],
+    // The boot drops idx_cl_client_session_id (step-11 fix 3), so it may already be gone.
     undo: `
-      DROP INDEX idx_cl_client_session_id;
+      DROP INDEX IF EXISTS idx_cl_client_session_id;
       ALTER TABLE call_logs DROP COLUMN client_session_id;
       DROP INDEX idx_usage_history_billing_team_time;
     `,

@@ -20,6 +20,8 @@ import { getSyncedCapability } from "@/lib/modelsDevSync";
 import { knownReasoningEffortTiers, MODELS_DEV_PROVIDER_MAP } from "@/lib/modelsDevSync/transform";
 import { isModelsDevEffortTiersEnabled } from "@/shared/utils/featureFlags";
 import { getModelContextOverride } from "@/lib/db/modelContextOverrides";
+import { getDbInstance } from "@/lib/db/core";
+import { getModelCatalogCacheVersion } from "@/lib/db/readCache";
 import {
   getModelCapabilityOverride,
   getReasoningEffortsOverride,
@@ -880,8 +882,90 @@ function resolveSyncedEffortTierFallback(
   return isModelsDevEffortTiersEnabled() ? knownReasoningEffortTiers(syncedEfforts) : null;
 }
 
+// A chat request resolves the same model about 9 times (context manager, vision
+// bridge, chat core, thinking budget, translator), and each resolution without a
+// snapshot reads ~11 rows from model_capabilities, the override tables and the
+// customModels namespace: about 97 of the 147 SQLite statements a plain request ran
+// (2026-11-19 trace). Memoize the snapshot-free resolution like
+// getHiddenModelsByProvider() does: keyed by the DB instance and the model-catalog
+// version that every capability, override, custom-model, compat, synced-model,
+// provider-node and feature-flag writer bumps, with a short TTL as a backstop for
+// writes made by another process.
+const RESOLVED_CAPABILITIES_CACHE_TTL_MS = 10_000;
+const RESOLVED_CAPABILITIES_CACHE_MAX_ENTRIES = 1_000;
+let resolvedCapabilitiesCache: {
+  db: unknown;
+  version: number;
+  expiresAt: number;
+  byKey: Map<string, ResolvedModelCapabilities>;
+} | null = null;
+
+/** JSON array key: no delimiter, so ids containing any character cannot collide (#9199). */
+function resolvedCapabilitiesCacheKey(input: CapabilityInput, persistedOverrides: boolean) {
+  return typeof input === "string"
+    ? JSON.stringify([persistedOverrides, input])
+    : JSON.stringify([persistedOverrides, input?.provider ?? null, input?.model ?? null]);
+}
+
+/** Copy with fresh arrays, so a caller that edits its result cannot change the memo. */
+function copyResolvedCapabilities(value: ResolvedModelCapabilities): ResolvedModelCapabilities {
+  return {
+    ...value,
+    supportedThinkingEfforts: value.supportedThinkingEfforts
+      ? [...value.supportedThinkingEfforts]
+      : value.supportedThinkingEfforts,
+    modalitiesInput: [...value.modalitiesInput],
+    modalitiesOutput: [...value.modalitiesOutput],
+  };
+}
+
+/** Drop the memo (tests that write rows without a version-bumping writer). */
+export function resetResolvedModelCapabilitiesCache(): void {
+  resolvedCapabilitiesCache = null;
+}
+
 /** Resolve model capabilities with executor transport limits ahead of advertised catalog claims. */
 export function getResolvedModelCapabilities(
+  input: CapabilityInput,
+  options?: ResolveModelCapabilitiesOptions,
+  snapshot?: ModelCapabilityResolutionSnapshot | null
+): ResolvedModelCapabilities {
+  // A snapshot already resolves from memory, and a limitSources collector must be
+  // filled by a real resolution, so both skip the memo.
+  if (snapshot || options?.limitSources) {
+    return computeResolvedModelCapabilities(input, options, snapshot);
+  }
+  const db = getDbInstance();
+  const version = getModelCatalogCacheVersion();
+  const now = Date.now();
+  if (
+    !resolvedCapabilitiesCache ||
+    resolvedCapabilitiesCache.db !== db ||
+    resolvedCapabilitiesCache.version !== version ||
+    resolvedCapabilitiesCache.expiresAt <= now
+  ) {
+    resolvedCapabilitiesCache = {
+      db,
+      version,
+      expiresAt: now + RESOLVED_CAPABILITIES_CACHE_TTL_MS,
+      byKey: new Map(),
+    };
+  }
+  const key = resolvedCapabilitiesCacheKey(input, options?.persistedOverrides !== false);
+  let value = resolvedCapabilitiesCache.byKey.get(key);
+  if (!value) {
+    value = computeResolvedModelCapabilities(input, options, null);
+    const cache = resolvedCapabilitiesCache;
+    // Store only into the generation the result was computed in.
+    if (cache.version === getModelCatalogCacheVersion()) {
+      if (cache.byKey.size >= RESOLVED_CAPABILITIES_CACHE_MAX_ENTRIES) cache.byKey.clear();
+      cache.byKey.set(key, value);
+    }
+  }
+  return copyResolvedCapabilities(value);
+}
+
+function computeResolvedModelCapabilities(
   input: CapabilityInput,
   options?: ResolveModelCapabilitiesOptions,
   snapshot?: ModelCapabilityResolutionSnapshot | null

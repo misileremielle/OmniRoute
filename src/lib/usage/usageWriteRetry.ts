@@ -24,6 +24,7 @@ import {
 import { normalizeServiceTier } from "./usageHistory/helpers";
 import { readReportedCost } from "./creditMeteredProviders";
 import { emitUsageRecorded } from "./usageEvents";
+import { queueLogWrite } from "./logWriteBatch";
 import {
   getLoggedInputTokens,
   getLoggedOutputTokens,
@@ -107,6 +108,36 @@ export function attemptWrite(entry: UsageEntry, options: UsageWriteOptions = {})
   if (inserted) {
     emitUsageRecorded(entry.provider, entry.connectionId);
   }
+}
+
+/**
+ * Log batching (step-11 fix 3): prepare the row now (identity, billing team, timestamp) and
+ * queue it; it is inserted inside the batch's one transaction. No `db.transaction()` here: in a
+ * flush it would nest as a SAVEPOINT pair per row. The duplicate check runs inside the flush,
+ * so a duplicate queued in the same batch is found. A lock is handled by the batch (one retry
+ * for the whole batch); any other failure is logged as today.
+ */
+export function queueUsageWrite(entry: UsageEntry, options: UsageWriteOptions = {}): void {
+  const db = getDbInstance();
+  const prepared = prepareEntry(db, entry, options.agentSession ?? null);
+  const deduplicate = options.deduplicate !== false;
+  let inserted = false;
+  void queueLogWrite({
+    db,
+    write: () => {
+      inserted = false;
+      if (!deduplicate) {
+        insertEntry(db, prepared);
+        inserted = true;
+        return;
+      }
+      inserted = insertUnlessDuplicate(db, prepared);
+    },
+    committed: () => {
+      if (inserted) emitUsageRecorded(entry.provider, entry.connectionId);
+    },
+    failed: (error) => console.error("Failed to save usage stats:", error),
+  });
 }
 
 type PreparedEntry = {

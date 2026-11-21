@@ -65,6 +65,9 @@ async function main() {
     HOST: process.env.HOST || "127.0.0.1",
     OMNIROUTE_DISABLE_BACKGROUND_SERVICES:
       process.env.OMNIROUTE_DISABLE_BACKGROUND_SERVICES || "true",
+    // Write call_logs/usage_history rows at once: the suites read them right after each
+    // request (log batching, step-11 fix 3, would delay them by up to 5 s).
+    OMNIROUTE_LOG_BATCH_MS: process.env.OMNIROUTE_LOG_BATCH_MS || "0",
   };
 
   if (!(await isServerReady())) {

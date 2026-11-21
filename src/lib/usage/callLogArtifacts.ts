@@ -286,7 +286,11 @@ function buildSizeLimitStages(artifact: CallLogArtifact): Array<() => unknown> {
   ];
 }
 
-function serializeArtifactForStorage(artifact: CallLogArtifact): string {
+/**
+ * Serialized form of an artifact as it will be stored: pretty-printed with CHAT_DEBUG_FILE,
+ * otherwise compact and walked down the size ladder until it fits its byte budget.
+ */
+export function serializeArtifactForStorage(artifact: CallLogArtifact): string {
   // Debug mode: write full untruncated payload
   if (isChatDebugFileEnabled()) {
     return JSON.stringify(artifact, null, 2);
@@ -362,9 +366,40 @@ export function hasRoomForCallLogArtifact(): boolean {
   }
 }
 
+/**
+ * Re-serializes a stored artifact string after its row's id changed (#14451 id collision).
+ * The full, truncated and minimal forms carry `summary.id`; the last-resort form has no
+ * summary and no id, so it is returned unchanged. The result goes through the same
+ * formatting and size ladder as the original, so a longer id that no longer fits steps down.
+ */
+export function reserializeArtifactWithId(serialized: string, id: string): string {
+  const parsed = JSON.parse(serialized) as Record<string, unknown>;
+  const summary = parsed.summary;
+  if (!summary || typeof summary !== "object") return serialized;
+  (summary as Record<string, unknown>).id = id;
+  return serializeArtifactForStorage(parsed as unknown as CallLogArtifact);
+}
+
 export function writeCallArtifact(
   artifact: CallLogArtifact,
   relativePath = buildArtifactRelativePath(artifact.summary.timestamp, artifact.summary.id)
+): CallLogArtifactWriteResult | null {
+  const logsDir = getCallLogsDir();
+  if (!logsDir || isBuildPhase) return null;
+  let serialized: string;
+  try {
+    serialized = serializeArtifactForStorage(artifact);
+  } catch (error) {
+    console.error("[callLogs] Failed to write request artifact:", (error as Error).message);
+    return null;
+  }
+  return writeSerializedCallArtifact(serialized, relativePath);
+}
+
+/** Writes an already serialized artifact atomically (temp file + rename) under call_logs. */
+export function writeSerializedCallArtifact(
+  serialized: string,
+  relativePath: string
 ): CallLogArtifactWriteResult | null {
   const logsDir = getCallLogsDir();
   if (!logsDir || isBuildPhase) return null;
@@ -373,7 +408,6 @@ export function writeCallArtifact(
   const tmpPath = `${absPath}.${process.pid}.${Date.now()}.tmp`;
 
   try {
-    const serialized = serializeArtifactForStorage(artifact);
     const sizeBytes = Buffer.byteLength(serialized);
     // Keep the legacy field name for storage compatibility, but use a non-cryptographic checksum
     // so artifact bookkeeping is not treated as password hashing by static analysis.

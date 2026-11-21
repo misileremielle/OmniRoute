@@ -19,6 +19,7 @@ export interface BunSqliteDatabaseLike {
     immediate?: (...args: unknown[]) => T;
   };
   close(): void;
+  readonly inTransaction?: boolean;
 }
 
 function normalizeRunResult(result: {
@@ -68,6 +69,10 @@ export function createBunSqliteAdapter(db: BunSqliteDatabaseLike, filePath: stri
 
     get open() {
       return isOpen;
+    },
+
+    get inTransaction() {
+      return db.inTransaction;
     },
 
     get name() {

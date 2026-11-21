@@ -8,6 +8,8 @@ import { createTempDataDir } from "../_setup/tempDataDir.ts";
 
 const { cleanup } = createTempDataDir("omniroute-catalog-bounds-");
 const cache = await import("../../src/app/api/v1/models/catalogCache.ts");
+/** Expired past the stale-serve window, so callers wait for a build again. */
+const PAST_GRACE_MS = cache.CATALOG_STALE_WHILE_REVALIDATE_MS + 60_000;
 const readCache = await import("../../src/lib/db/readCache.ts");
 
 const headers = { corsHeaders: {}, diagnosticHeaders: {} };
@@ -60,7 +62,7 @@ async function timeoutResponse(after: string) {
 
 test("retention regression: last-good evicts after 64 distinct unknown cursors", async () => {
   for (let i = 0; i < 65; i++) await resolve(`unknown-${i}`);
-  cache.__expireCatalogCacheForTest(60_000);
+  cache.__expireCatalogCacheForTest(PAST_GRACE_MS);
   assert.equal((await timeoutResponse("unknown-0")).status, 503);
 });
 
@@ -73,7 +75,7 @@ test("retention regression: response cache evicts when retained strings exceed 1
 test("retention regression: last-good evicts when retained strings exceed 16 MiB", async () => {
   const body = "界".repeat(3 * 1024 * 1024);
   for (let i = 0; i < 3; i++) await resolve(`bytes-${i}`, body);
-  cache.__expireCatalogCacheForTest(60_000);
+  cache.__expireCatalogCacheForTest(PAST_GRACE_MS);
   assert.equal((await timeoutResponse("bytes-0")).status, 503);
 });
 
@@ -84,7 +86,7 @@ test("both maps enforce cardinality and retain recently read entries", async () 
   assertBounded();
   assert.deepEqual(cache.__getCatalogCacheStatsForTest().cache.entries, 64);
   assert.deepEqual(cache.__getCatalogCacheStatsForTest().lastGood.entries, 64);
-  cache.__expireCatalogCacheForTest(60_000);
+  cache.__expireCatalogCacheForTest(PAST_GRACE_MS);
   const retained = await timeoutResponse("cursor-0");
   assert.equal(await retained.text(), "cursor-0");
   assert.equal(retained.headers.get("x-omniroute-catalog"), "last-good");
@@ -101,7 +103,7 @@ test("large UTF-16 bodies hit the byte budget before the entry cap", async () =>
   const stats = cache.__getCatalogCacheStatsForTest();
   assert.equal(stats.cache.entries, 2);
   assert.equal(stats.lastGood.entries, 2);
-  cache.__expireCatalogCacheForTest(60_000);
+  cache.__expireCatalogCacheForTest(PAST_GRACE_MS);
   const evicted = await timeoutResponse("large-0");
   assert.equal(evicted.status, 503);
   assert.equal(await resolve("large-0", "rebuilt"), "completed-after-timeout");
@@ -139,7 +141,8 @@ test("oversized successful payloads return normally without cache admission", as
 test("unrelated accesses prune expired response entries but preserve timeout last-good", async (t) => {
   t.mock.timers.enable({ apis: ["Date"] });
   await resolve("old", "last-success");
-  t.mock.timers.tick(90_001);
+  // Past the fixture's 60 s lifetime plus the stale-serve window.
+  t.mock.timers.tick(60_000 + cache.CATALOG_STALE_WHILE_REVALIDATE_MS + 1);
   await resolve("new");
   assert.equal(cache.__getCatalogCacheStatsForTest().cache.entries, 1);
   assert.equal(cache.__getCatalogCacheStatsForTest().lastGood.entries, 2);
@@ -177,7 +180,7 @@ test("SWR remains eligible until its window ends, and expired errors are pruned"
 
 test("replacement, expiration and generation invalidation reset accounting", async () => {
   await resolve("replace", "x".repeat(1024));
-  cache.__expireCatalogCacheForTest(60_000);
+  cache.__expireCatalogCacheForTest(PAST_GRACE_MS);
   await resolve("replace", "small");
   const stats = cache.__getCatalogCacheStatsForTest();
   assert.equal(stats.cache.entries, 1);
@@ -279,7 +282,7 @@ for (const oversizedPart of ["body", "headers"] as const) {
     const key = `oversized-refresh-${oversizedPart}`;
     assert.equal(await resolve(key, "prior-last-good"), "prior-last-good");
     const prior = cache.__getCatalogCacheStatsForTest().lastGood;
-    cache.__expireCatalogCacheForTest(60_000);
+    cache.__expireCatalogCacheForTest(PAST_GRACE_MS);
     const huge = "x".repeat(9 * 1024 * 1024);
     const replacement: CatalogPayload = {
       ...payload(oversizedPart === "body" ? huge : "new-large-header"),

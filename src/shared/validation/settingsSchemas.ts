@@ -734,7 +734,8 @@ export const databaseSettingsSchema = z
       promptCacheEnabled: z.boolean(),
       promptCacheStrategy: z.literal("auto").or(z.literal("system-only")).or(z.literal("manual")),
       alwaysPreserveClientCache: z.literal("auto").or(z.literal("always")).or(z.literal("never")),
-      modelCatalogCacheTtlMs: z.number().int().min(500).max(60000),
+      // Background refresh interval of the /v1/models catalog, up to 7 days.
+      modelCatalogCacheTtlMs: z.number().int().min(500).max(604_800_000),
     }),
 
     // Retention settings

@@ -1,4 +1,5 @@
 import type { ApiKeyUsageSlice } from "@/lib/db/apiKeyUsageSlices";
+import { flushLogWriteBatchSync } from "./logWriteBatch";
 import { hasSelfAccountQuotaScope, hasSelfUsageScope } from "@/shared/constants/selfServiceScopes";
 
 import {
@@ -370,6 +371,9 @@ export async function buildApiKeySelfServiceStatus(
   const cost = buildCostStatus(summary, now);
   const costPeriodStartAt =
     cost.periodStartAt ?? new Date(getCurrentMonthWindow(now).periodStartAt).toISOString();
+  // /v1/me/status totals and limit windows (aggregateTokens, buildUsageWindowSummary below)
+  // count rows still in the log write batch (step-11 fix 3).
+  flushLogWriteBatchSync("apiKeySelfServiceStatus");
   const db = resolvedDeps.getDbInstance() as DbLike;
   const tokens = aggregateTokens(db, metadata.id, costPeriodStartAt);
   const daily = buildUsageWindowSummary(

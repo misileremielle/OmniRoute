@@ -1,6 +1,8 @@
 // call_logs.client_session_id is a nullable additive column with an index. Fresh databases
 // and upgrades from the prior schema both receive it, and a database where
 // ensureCallLogsColumns() already added the column at boot still records the migration.
+// The boot later drops the index (dropUnusedLogIndexes, step-11 fix 3); this file tests only
+// the migration, which stays as it was.
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

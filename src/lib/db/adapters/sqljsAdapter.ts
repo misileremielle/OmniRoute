@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import * as nodeModule from "node:module";
+import { probeOpenTransaction } from "./transactionProbe";
 import type { SqliteAdapter, PreparedStatement, RunResult } from "./types";
 
 const SAVE_DEBOUNCE_MS = 100;
@@ -232,6 +233,10 @@ export async function createSqlJsAdapter(filePath: string): Promise<SqliteAdapte
   let dirty = false;
   let saveTimer: ReturnType<typeof setTimeout> | null = null;
   let _isOpen = true;
+  // transaction() and immediate() go through runSavepoint; this depth answers for them cheaply.
+  // A raw `BEGIN` run through exec() bypasses it, and sql.js exposes no autocommit flag, so
+  // inTransaction probes SQLite when the depth is zero.
+  let savepointDepth = 0;
 
   /**
    * Writes the whole database image out atomically: temp file in the SAME
@@ -310,6 +315,7 @@ export async function createSqlJsAdapter(filePath: string): Promise<SqliteAdapte
   function runSavepoint<T>(fn: (...args: unknown[]) => T, ...args: unknown[]): T {
     const sp = `sp_${Math.random().toString(36).slice(2)}`;
     db.run(`SAVEPOINT "${sp}"`);
+    savepointDepth += 1;
     try {
       const result = fn(...args);
       db.run(`RELEASE "${sp}"`);
@@ -321,6 +327,8 @@ export async function createSqlJsAdapter(filePath: string): Promise<SqliteAdapte
         db.run(`RELEASE "${sp}"`);
       } catch {}
       throw err;
+    } finally {
+      savepointDepth -= 1;
     }
   }
 
@@ -409,6 +417,11 @@ export async function createSqlJsAdapter(filePath: string): Promise<SqliteAdapte
 
     get open() {
       return _isOpen;
+    },
+
+    get inTransaction() {
+      if (savepointDepth > 0) return true;
+      return probeOpenTransaction((sql) => db.run(sql));
     },
 
     get name() {

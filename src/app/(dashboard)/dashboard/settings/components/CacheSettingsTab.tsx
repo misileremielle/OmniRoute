@@ -44,9 +44,10 @@ interface CacheConfigResponse {
   [key: string]: unknown;
 }
 
-const DEFAULT_TTL_MS = 1500;
+// Background refresh interval of the model catalog: default 24 h, up to 7 days.
+const DEFAULT_TTL_MS = 86_400_000;
 const MIN_TTL_MS = 100;
-const MAX_TTL_MS = 60000;
+const MAX_TTL_MS = 604_800_000;
 
 export default function CacheSettingsTab() {
   const t = useTranslations("settings");

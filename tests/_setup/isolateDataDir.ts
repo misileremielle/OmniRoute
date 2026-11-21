@@ -99,6 +99,11 @@ process.env.ADOBE_FIREFLY_BROWSER_REFRESH ||= "0";
 // the real MITM path call addDNSEntries(); this env var makes it a no-op.
 process.env.OMNIROUTE_SKIP_DNS_WRITE = "1";
 
+// Log batching guard (step-11 fix 3): servers spawned by tests inherit this, so they write
+// call_logs/usage_history rows at once, as the tests' assertions expect. The test process
+// itself already defaults to 0 (isAutomatedTestProcess). ??= so a test can opt in.
+process.env.OMNIROUTE_LOG_BATCH_MS ??= "0";
+
 // Host-shell API key isolation: readJinaEnvApiKey() (src/lib/providers/jina.ts) falls
 // back to process.env.JINA_AI_API_KEY / JINA_API_KEY when no DB connection exists. If
 // the developer's host shell exports JINA_API_KEY, unconfigured search and web-fetch

@@ -6,6 +6,7 @@
  */
 
 import { getDbInstance } from "../db/core";
+import { flushLogWriteBatchSync } from "./logWriteBatch";
 import { getUserDatabaseSettings } from "../db/databaseSettings";
 import { calculateCost } from "./costCalculator";
 
@@ -145,6 +146,9 @@ export async function rollupHourlyQuota(
  * @returns Aggregation result with counts
  */
 export async function rollupUsageHistoryBeforeDate(beforeDate: string): Promise<AggregationResult> {
+  // The daily, monthly and team rollups below read usage_history: write queued rows first
+  // (step-11 fix 3), before any transaction opens.
+  flushLogWriteBatchSync("rollupUsageHistoryBeforeDate");
   const db = getDbInstance();
 
   const result: AggregationResult = {
