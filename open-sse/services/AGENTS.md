@@ -9,7 +9,7 @@ Live count: `ls open-sse/services/*.ts | wc -l` (currently 293). More including 
 ## Combo Routing Engine
 
 - **`combo.ts`** — Entry point for multi-model routing. **`handleComboChat()`** iterates through targets in order until success or all fail. **`resolveComboTargets()`** expands combo config into ordered `ResolvedComboTarget[]` (provider + model + account + credentials).
-- **Strategies**: the public set is `ROUTING_STRATEGY_VALUES` in `src/shared/constants/routingStrategies.ts` (one row each in the strategy table of `docs/routing/AUTO-COMBO.md`; count with `npm run facts -- --key=routingStrategies`). (`quota-share` is deliberately internal — see `INTERNAL_ROUTING_STRATEGY_VALUES`.)
+- **Strategies**: the public set is `ROUTING_STRATEGY_VALUES` in `src/shared/constants/routingStrategies.ts` (one row each in the strategy table of `docs/routing/AUTO-COMBO.md`; count with `pnpm run facts -- --key=routingStrategies`). (`quota-share` is deliberately internal — see `INTERNAL_ROUTING_STRATEGY_VALUES`.)
 - Each target calls **`handleSingleModel()`** which wraps `handleChatCore()` with per-target error handling and circuit breaker checks.
 
 ## Key Services

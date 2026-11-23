@@ -42,7 +42,7 @@ Running tests: see [Testing](#testing) below (run the most focused test for chan
 
 Monorepo: `src/` (Next.js 16 app), `open-sse/` (streaming engine workspace), `tests/`, `bin/` (CLI entry point).
 
-Counts (providers, migrations, MCP tools and scopes, routing strategies, scoring factors, mode packs) are derived values: read them with `npm run facts` (one value: `npm run facts -- --key=providers`), never from prose. Feature PRs do not write them; `npm run release:refresh-derived` rewrites the docs at release.
+Counts (providers, migrations, MCP tools and scopes, routing strategies, scoring factors, mode packs) are derived values: read them with `pnpm run facts` (one value: `pnpm run facts -- --key=providers`), never from prose. Feature PRs do not write them; `pnpm run release:refresh-derived` rewrites the docs at release.
 
 ---
 
@@ -172,9 +172,8 @@ Documentation must describe verified behavior, not plausible behavior.
    `path/to/file.ts:line` to an invented signature.
 4. Run `pnpm run check:docs-all` for edits under `docs/`; it includes the fabricated-docs
    validation.
-5. Edit only the English source. Never commit `docs/i18n/**` mirrors, `llm.txt` mirrors or
-   `.i18n-state.json` in a feature PR: the translation wave (`/i18n-waves`, `docs/i18n-*`
-   branches) and the release rewrite them (`docs/guides/I18N.md`).
+5. Edit only the English source. The fork removed the `docs/i18n/**` mirrors and their
+   translation scripts (`docs/ops/FORK_IDENTITY.md`); do not add them back.
 
 ---
 
