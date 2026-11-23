@@ -119,6 +119,7 @@ export async function POST(request) {
         apiType: node.apiType,
         chatPath: node.chatPath,
         modelsPath: node.modelsPath,
+        ...(node.customJsonConfig ? { customJson: node.customJsonConfig } : {}),
       };
     }
 

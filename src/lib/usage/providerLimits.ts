@@ -1,5 +1,6 @@
 import { syncCodexQuotaObservation } from "@/lib/db/providers/codexAccountRecovery";
 import { syncCodexWorkspaceInfoIfNeeded } from "@/lib/usage/codexWorkspaceSync";
+import { syncCodexPlanFromUsage } from "@/lib/usage/codexPlanSync";
 import { isCompleteUsageReading } from "@/lib/usage/usageReading";
 import {
   captureCodexConnectionFence,
@@ -90,6 +91,7 @@ const PROVIDER_LIMITS_APIKEY_PROVIDERS = new Set([
   "ollama-cloud",
   "minimax",
   "minimax-cn",
+  "mistral",
   "nanogpt",
   "apmix",
   "deepseek",
@@ -1196,6 +1198,10 @@ async function fetchLiveProviderLimitsWithOptions(
         connection.providerSpecificData
       );
       if (data) connection = { ...connection, providerSpecificData: data };
+      connection = await syncCodexPlanFromUsage(connection, result.usage, (id, fields) => {
+        assertCodexOperationCurrent(connectionId);
+        return mergeConnectionProviderSpecificData(id, fields);
+      });
     }
     if (isRecord(result.usage.quotas)) {
       setQuotaCache(

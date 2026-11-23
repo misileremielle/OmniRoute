@@ -1,6 +1,6 @@
 export { isPassiveCodex } from "@omniroute/open-sse/services/tokenRefresh/passiveCodex.ts";
 import { PROVIDER_ERROR_TYPES } from "@omniroute/open-sse/services/errorClassifier.ts";
-import { isCreditsExhausted } from "@omniroute/open-sse/services/accountFallback.ts";
+import { isCreditsExhaustedForStatus } from "@omniroute/open-sse/services/accountFallback/creditsExhaustedForStatus.ts";
 import { takeMistralAmbiguous401SoftStrike } from "@omniroute/open-sse/services/accountFallback/mistralAmbiguousAuth.ts";
 
 // #12242 (402 variant of #3027): a bare 402 on a passthrough/gateway
@@ -26,11 +26,12 @@ export function shouldParkCreditsExhausted(
   status: number,
   result: { permanent?: boolean; creditsExhausted?: boolean },
   isPerModelQuotaProvider: boolean,
-  errorText: string
+  errorText: string,
+  provider: string | null = null
 ): boolean {
   return (
     isConnectionWideCreditsExhausted(status, result, isPerModelQuotaProvider) ||
-    (!isPerModelQuotaProvider && isCreditsExhausted(errorText))
+    (!isPerModelQuotaProvider && isCreditsExhaustedForStatus(status, provider, errorText))
   );
 }
 
@@ -73,12 +74,12 @@ export function resolveTerminalConnectionStatus(
   status: number,
   result: { permanent?: boolean; creditsExhausted?: boolean; ambiguousAuth?: boolean },
   providerErrorType: string | null = null,
-  _provider: string | null = null,
+  provider: string | null = null,
   isPerModelQuotaProvider = false,
   errorText: string = "",
   connectionId: string | null = null
 ): string | null {
-  if (shouldParkCreditsExhausted(status, result, isPerModelQuotaProvider, errorText)) {
+  if (shouldParkCreditsExhausted(status, result, isPerModelQuotaProvider, errorText, provider)) {
     return "credits_exhausted";
   }
   if (isNonTerminalProviderError(providerErrorType)) {

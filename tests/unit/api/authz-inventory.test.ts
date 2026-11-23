@@ -72,8 +72,8 @@ test("AC-1: GET returns 5 tiers with prefixes + bypass state envelope", async ()
   const localOnly = body.tiers.find((t) => t.name === "LOCAL_ONLY");
   assert.ok(localOnly);
   assert.ok(localOnly!.prefixes.includes("/api/services/"));
-  // The compile-time bypass list is empty since the MCP server was removed.
-  assert.equal(localOnly!.bypassable, false);
+  // The compile-time bypass list carries the read-only /api/resilience/connections (KEA-9357).
+  assert.equal(localOnly!.bypassable, true);
 
   const alwaysProtected = body.tiers.find((t) => t.name === "ALWAYS_PROTECTED");
   assert.ok(alwaysProtected);
@@ -112,9 +112,9 @@ test("AC-2: bypassEnabled + bypassPrefixes reflect getSettings() (defaults)", as
     bypassEnabled: boolean;
     bypassPrefixes: string[];
   };
-  // Default snapshot: kill-switch ON, no bypassable prefix.
+  // Default snapshot: kill-switch ON, the read-only /api/resilience/connections (KEA-9357).
   assert.equal(body.bypassEnabled, true);
-  assert.deepEqual(body.bypassPrefixes, []);
+  assert.deepEqual(body.bypassPrefixes, ["/api/resilience/connections"]);
 });
 
 test("AC-2: bypassEnabled flips after settings mutation", async () => {

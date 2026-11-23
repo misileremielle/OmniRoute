@@ -134,7 +134,10 @@ test("provider-keyed config rows for removed ids are deleted", () => {
 
 test("the web-cookie removal migration lists the removed ids but not the kept Poe gateway", () => {
   const sql = fs.readFileSync(
-    path.join(process.cwd(), "src/lib/db/migrations/240_remove_web_cookie_providers.sql"),
+    path.join(
+      process.cwd(),
+      "src/lib/db/migrations/20261114000240_remove_web_cookie_providers.sql"
+    ),
     "utf8"
   );
   for (const id of ["chatgpt-web", "grok-web", "claude-web", "chatplayground", "uc"]) {

@@ -1,6 +1,7 @@
 {
   "_comment": "Allowlist anti-slopsquatting (check-deps.mjs). Toda dep nova exige adicao EXPLICITA aqui apos verificar que e legitima.",
   "_justifications": {
+    "@bcoe/v8-coverage": "V8 coverage report utilities (bcoe/v8-coverage), pinned at 1.0.2 for the development-only shard aggregation in PR #20515. The npm tarball and SHA-512 integrity match the existing transitive c8 dependency on both base branches.",
     "@fontsource/ibm-plex-mono": "Self-hosted Keak type ramp for the vendored CI UI Kit (fontsource, OFL fonts; same no-CDN reasoning as Material Symbols #3695). KEA-7886 — CI UI Kit runtime dependency.",
     "@fontsource/instrument-serif": "Self-hosted Keak type ramp for the vendored CI UI Kit (fontsource, OFL fonts; same no-CDN reasoning as Material Symbols #3695). KEA-7886 — CI UI Kit runtime dependency.",
     "@fontsource/inter": "Self-hosted Keak type ramp for the vendored CI UI Kit (fontsource, OFL fonts; same no-CDN reasoning as Material Symbols #3695). KEA-7886 — CI UI Kit runtime dependency.",

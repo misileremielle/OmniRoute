@@ -29,7 +29,7 @@ Running tests: see [Testing](#testing) below (run the most focused test for chan
 
 ## Project at a Glance
 
-**OmniRoute** — unified AI proxy/router. One endpoint, 223 LLM providers, auto-fallback.
+**OmniRoute** — unified AI proxy/router. One endpoint, hundreds of LLM providers, auto-fallback (live counts: `pnpm run facts`).
 
 - API Routes — `src/app/api/v1/` (Next.js App Router entry points)
 - Handlers — `open-sse/handlers/` (request processing: chat, embeddings, etc)
@@ -37,10 +37,12 @@ Running tests: see [Testing](#testing) below (run the most focused test for chan
 - Translators — `open-sse/translator/` (format conversion OpenAI↔Claude↔Gemini)
 - Transformer — `open-sse/transformer/` (Responses API ↔ Chat Completions)
 - Services — `open-sse/services/` (combo routing, rate limits, caching, etc)
-- Database — `src/lib/db/` (SQLite domain modules, 245 migrations)
+- Database — `src/lib/db/` (SQLite domain modules, versioned migrations)
 - Domain/Policy — `src/domain/` (policy engine, cost rules, fallback logic)
 
 Monorepo: `src/` (Next.js 16 app), `open-sse/` (streaming engine workspace), `tests/`, `bin/` (CLI entry point).
+
+Counts (providers, migrations, MCP tools and scopes, routing strategies, scoring factors, mode packs) are derived values: read them with `npm run facts` (one value: `npm run facts -- --key=providers`), never from prose. Feature PRs do not write them; `npm run release:refresh-derived` rewrites the docs at release.
 
 ---
 
@@ -60,7 +62,7 @@ Client → /v1/chat/completions (Next.js route)
 
 API routes follow a consistent pattern: `Route → CORS preflight → Zod body validation → Optional auth (extractApiKey/isValidApiKey) → API key policy enforcement → Handler delegation (open-sse)`. No global Next.js middleware — interception is route-specific.
 
-**Combo routing** (`open-sse/services/combo.ts`): 21 public strategies (priority, weighted, fill-first, round-robin, p2c, random, least-used, cost-optimized, reset-aware, reset-window, expiry-first, headroom, quota-weighted, strict-random, auto, lkgp, context-optimized, cache-optimized, context-relay, fusion, pipeline). Each target calls `handleSingleModel()` (wraps `handleChatCore()` with per-target error handling + circuit breaker checks); the `fusion` strategy instead fans out to a panel of models in parallel and a judge model synthesizes one final answer (`open-sse/services/fusion.ts`). 16-factor Auto-Combo scoring + full strategy table: `docs/routing/AUTO-COMBO.md`; the 3 resilience layers: `docs/architecture/RESILIENCE_GUIDE.md`.
+**Combo routing** (`open-sse/services/combo.ts`): the public strategies are `ROUTING_STRATEGY_VALUES` in `src/shared/constants/routingStrategies.ts` (`quota-share` is internal). Each target calls `handleSingleModel()` (wraps `handleChatCore()` with per-target error handling + circuit breaker checks); the `fusion` strategy instead fans out to a panel of models in parallel and a judge model synthesizes one final answer (`open-sse/services/fusion.ts`). Auto-Combo scoring (`DEFAULT_WEIGHTS` in `open-sse/services/autoCombo/scoring.ts`) + full strategy table: `docs/routing/AUTO-COMBO.md`; the 3 resilience layers: `docs/architecture/RESILIENCE_GUIDE.md`.
 
 ---
 
@@ -170,6 +172,9 @@ Documentation must describe verified behavior, not plausible behavior.
    `path/to/file.ts:line` to an invented signature.
 4. Run `pnpm run check:docs-all` for edits under `docs/`; it includes the fabricated-docs
    validation.
+5. Edit only the English source. Never commit `docs/i18n/**` mirrors, `llm.txt` mirrors or
+   `.i18n-state.json` in a feature PR: the translation wave (`/i18n-waves`, `docs/i18n-*`
+   branches) and the release rewrite them (`docs/guides/I18N.md`).
 
 ---
 
@@ -191,7 +196,7 @@ Full step-by-step recipes: [`docs/architecture/MODIFICATION_SCENARIOS.md`](docs/
 For any non-trivial change, read the matching deep-dive first:
 
 - Repo navigation — `docs/architecture/REPOSITORY_MAP.md` · Architecture — `docs/architecture/ARCHITECTURE.md` · Engineering reference — `docs/architecture/CODEBASE_DOCUMENTATION.md`
-- Auto-Combo (16-factor scoring, 21 strategies) — `docs/routing/AUTO-COMBO.md` · Reasoning replay — `docs/routing/REASONING_REPLAY.md`
+- Auto-Combo (scoring factors, strategy table) — `docs/routing/AUTO-COMBO.md` · Reasoning replay — `docs/routing/REASONING_REPLAY.md`
 - Resilience (3 mechanisms + debugging) — `docs/architecture/RESILIENCE_GUIDE.md`
 - Modification recipes — `docs/architecture/MODIFICATION_SCENARIOS.md`
 - Guardrails (PII / injection / vision) — `docs/security/GUARDRAILS.md` · Public upstream credentials (Gemini/etc.) — `docs/security/PUBLIC_CREDS.md` · Error message sanitization — `docs/security/ERROR_SANITIZATION.md` · Compliance / audit — `docs/security/COMPLIANCE.md` · Stealth (TLS / fingerprint) — `docs/security/STEALTH_GUIDE.md`
@@ -316,9 +321,31 @@ Steps + baseline-freeze check: `docs/ops/WORKTREE_ISOLATION.md` → "Sync-back l
 
 ---
 
+## Fork identity (read before any upstream merge)
+
+This checkout is `misileremielle/omniroute`, a slimmed fork of `cheaper-inference/OmniRoute`.
+[`docs/ops/FORK_IDENTITY.md`](docs/ops/FORK_IDENTITY.md) is the record of what the fork
+removes, what it adds, and the step-by-step procedure for merging the next upstream
+`release/vX.Y.Z`. Short form:
+
+- A feature or provider the fork removed stays removed. In a merge, "deleted by us, modified
+  by them" is resolved by deleting, and files upstream adds inside a removed area are deleted
+  too. Removed providers: `config/fork-removed-providers.json` and
+  `docs/reference/REMOVED_PROVIDERS.md`.
+- Keep the fork's packaging: pnpm (never npm/npx in scripts, hooks or workflows) and the
+  `ghcr.io/misileremielle/omniroute` image.
+- `.github/workflows/ci.yml`, `docker-publish.yml` and `.mergify.yml` are the fork's own.
+- New migrations are timestamp-named (`pnpm run db:new-migration -- <name>`); never add a
+  three-digit migration file.
+- This file and `llm.txt` carry no derived counts; `pnpm run facts` prints the live ones.
+- When a merge changes what the fork removes or adds, update `docs/ops/FORK_IDENTITY.md` in
+  the same commit and add a row to its sync history.
+
+---
+
 ## Upstream contributions
 
-This checkout is the canonical `cheaper-inference/OmniRoute` repository (formerly `diegosouzapw/OmniRoute`; the old name redirects). Keep fork-only deployment and personal automation changes out of upstream PRs. Start upstream work from the active upstream default branch, not `main` (`git fetch upstream && git switch -c <branch-name> upstream/<default-branch>`), target that same release branch in the PR, stage only the intended files, run the focused checks, and use a Conventional Commit message (for example, `docs: slim AGENTS.md`).
+Upstream is the canonical `cheaper-inference/OmniRoute` repository (formerly `diegosouzapw/OmniRoute`; the old name redirects); the `upstream` remote points at it. Keep fork-only deployment and personal automation changes out of upstream PRs. Start upstream work from the active upstream default branch, not `main` (`git fetch upstream && git switch -c <branch-name> upstream/<default-branch>`), target that same release branch in the PR, stage only the intended files, run the focused checks, and use a Conventional Commit message (for example, `docs: slim AGENTS.md`).
 
 ---
 

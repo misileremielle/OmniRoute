@@ -6,6 +6,7 @@ import Icon from "@/shared/components/Icon";
 import Link from "next/link";
 import { PageHeader } from "@omniroute/ui-kit/page-header";
 import ProviderIcon from "@/shared/components/ProviderIcon";
+import { flowColorAlpha } from "@/shared/components/flow/edgeStyles";
 import { getHeaderIconProviderId } from "../providerPageHelpers";
 import type { ProviderMessageTranslator } from "../providerPageHelpers";
 import type { ProviderNotice } from "@/lib/providers/catalog";
@@ -40,6 +41,9 @@ export default function ProviderPageHeader({
   isAnthropicProtocolCompatible,
   t,
 }: ProviderPageHeaderProps) {
+  // The brand colour as an 8% tint behind the icon; no tint when the catalog has no colour.
+  const brandTint = providerInfo.color ? flowColorAlpha(providerInfo.color, 8) : undefined;
+
   // Resolve the API-key registration link: prefer apiKeyUrl, fall back to
   // signupUrl, hide when neither is set (#9270).
   const noticeUrl = providerInfo.notice?.apiKeyUrl || providerInfo.notice?.signupUrl;
@@ -72,7 +76,7 @@ export default function ProviderPageHeader({
           {/* The brand colour is only a tint behind the icon; text uses neutral/primary tokens. */}
           <span
             className="inline-flex items-center justify-center rounded-lg"
-            style={{ backgroundColor: `${providerInfo.color}15` }}
+            style={{ backgroundColor: brandTint }}
           >
             <ProviderIcon
               providerId={getHeaderIconProviderId(

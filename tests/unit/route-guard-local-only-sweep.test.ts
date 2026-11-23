@@ -201,10 +201,18 @@ test("every in-scope route is classified MANAGEMENT, the route class whose polic
 });
 
 test("the manage-scope carve-out can never cover the subprocess-spawning roots", () => {
-  // No prefix is bypassable by default; /api/services/
-  // are in the compile-time spawn-capable deny-list, which the settings schema and
-  // isLocalOnlyBypassableByManageScope() both enforce.
-  assert.deepEqual([...LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES], []);
+  // Only the read-only /api/resilience/connections (KEA-9357, spawns nothing) is
+  // bypassable by default; /api/services/ is in the compile-time spawn-capable
+  // deny-list, which the settings schema and isLocalOnlyBypassableByManageScope()
+  // both enforce.
+  assert.deepEqual([...LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES], ["/api/resilience/connections"]);
+  for (const prefix of LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES) {
+    assert.equal(
+      SPAWN_CAPABLE_PREFIXES.some((spawn) => prefix === spawn || prefix.startsWith(spawn)),
+      false,
+      `${prefix} is spawn-capable and must not be bypassable by default`
+    );
+  }
   for (const prefix of ["/api/services/"]) {
     assert.ok(SPAWN_CAPABLE_PREFIXES.includes(prefix), `${prefix} missing from deny-list`);
   }

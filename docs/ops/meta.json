@@ -24,6 +24,7 @@
     "COVERAGE_PLAN",
     "LTS_GO_NO_GO",
     "WORKTREE_ISOLATION",
+    "FORK_IDENTITY",
     "HARD_RULES_DETAIL"
   ]
 }

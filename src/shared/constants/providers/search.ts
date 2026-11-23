@@ -148,6 +148,19 @@ export const SEARCH_PROVIDERS = {
     website: "https://kagi.com/api/docs",
     authHint: "Bearer API key from kagi.com/api/keys",
   },
+  "keenable-search": {
+    id: "keenable-search",
+    alias: "keenable",
+    name: "Keenable Search",
+    icon: "travel_explore",
+    color: "#005CFF",
+    textIcon: "KE",
+    website: "https://keenable.ai",
+    hasFree: true,
+    authHint:
+      "API key optional (keen_...) - keyless works at 10 req/s and 1000 req/hour per IP; a key from keenable.ai lifts the limits",
+    serviceKinds: ["webSearch", "webFetch"],
+  },
   "linkup-search": {
     id: "linkup-search",
     serviceKinds: ["webSearch"],

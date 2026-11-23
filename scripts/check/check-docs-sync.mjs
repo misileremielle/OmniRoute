@@ -1,7 +1,32 @@
 #!/usr/bin/env node
+// Documentation version sync. Two gate modes (scripts/check/lib/gateMode.mjs; plan "derived
+// numbers and texts resolved only at release", 2026-11-13):
+//
+//   release — every check below, strict (push, schedule, the release PR, any local run).
+//   pr      — the checks a feature PR can break in its own sources: package.json vs
+//             docs/openapi.yaml version, the root CHANGELOG headings, superseded docs. The two
+//             translation-mirror checks (docs/i18n/<locale>/llm.txt copies and the translated
+//             CHANGELOG.md sections) are skipped with a reason: feature PRs never write
+//             docs/i18n/**; the translation wave (scripts/i18n/sync-llm-mirrors.mjs) and the
+//             release (npm run release:sync-changelog-i18n) do. Two exceptions keep a mirror
+//             edit visible: a change that writes the mirrors (writer branch, or its own diff
+//             when the base resolves) is judged strictly, and the llm.txt mirrors must always
+//             agree with each other or with the root (a hand edit to one of them fails even
+//             in a depth-1 checkout).
+//
+// The pre-commit hook passes --mode=pr: a commit is judged on what it does, not on mirrors the
+// base left stale.
 
 import fs from "node:fs";
 import path from "node:path";
+import { categoryOf, loadFamilies, matchesAny } from "./check-pr-derived-paths.mjs";
+import {
+  describeGateMode,
+  listChangedFiles,
+  resolveGateModeInfo,
+  resolveHeadBranch,
+  resolvePrDiffBase,
+} from "./lib/gateMode.mjs";
 
 const cwd = process.cwd();
 const packageJsonPath = path.resolve(cwd, "package.json");
@@ -54,6 +79,52 @@ function isSemver(value) {
 }
 
 let hasFailure = false;
+
+let gateMode;
+try {
+  gateMode = resolveGateModeInfo({ argv: process.argv, env: process.env });
+} catch (error) {
+  console.error(`[docs-sync] FAIL - ${error instanceof Error ? error.message : String(error)}`);
+  process.exit(1);
+}
+console.log(`[docs-sync] ${describeGateMode(gateMode)}`);
+const STRICT_ELSEWHERE =
+  "the strict check runs in release mode (the release PR, pushes to main, local runs)";
+
+const LLM_MIRROR = /^docs\/i18n\/[^/]+\/llm\.txt$/;
+const CHANGELOG_MIRROR = /^docs\/i18n\/[^/]+\/CHANGELOG\.md$/;
+
+/**
+ * PR mode only. A change that writes translation mirrors is judged on them: a head branch that is a
+ * declared writer of the docs/i18n family (config/quality/derived-paths/*.json — the translation
+ * wave) runs both mirror checks strictly; any other change runs a mirror check strictly when its
+ * own diff touches those mirrors (diff base unresolvable, e.g. a depth-1 CI checkout → skipped).
+ * @returns {{ llm: string | null, changelog: string | null }} reason to run strictly, or null
+ */
+function prMirrorScope() {
+  const branch = resolveHeadBranch({ env: process.env, cwd });
+  const writer = loadFamilies(cwd).find(
+    (family) =>
+      branch &&
+      matchesAny(branch, family.writers) &&
+      categoryOf("docs/i18n/xx/llm.txt", family) !== null
+  );
+  if (writer) {
+    const reason = `head ${branch} writes translation mirrors (${writer.source})`;
+    return { llm: reason, changelog: reason };
+  }
+  const base = resolvePrDiffBase({ env: process.env, cwd });
+  if (!base) return { llm: null, changelog: null };
+  const files = listChangedFiles(base.sha, { cwd, includeWorktree: !process.env.GITHUB_ACTIONS });
+  return {
+    llm: files.some((file) => LLM_MIRROR.test(file))
+      ? "the change edits docs/i18n/<locale>/llm.txt"
+      : null,
+    changelog: files.some((file) => CHANGELOG_MIRROR.test(file))
+      ? "the change edits docs/i18n/<locale>/CHANGELOG.md"
+      : null,
+  };
+}
 
 function fail(message) {
   hasFailure = true;

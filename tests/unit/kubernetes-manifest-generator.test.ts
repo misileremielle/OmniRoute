@@ -216,3 +216,28 @@ test("generated ConfigMap keys match the committed ConfigMap", () => {
     "the dashboard would ship a different env surface than the committed manifests"
   );
 });
+
+// Fork: the default image is this fork's GHCR repository; the Helm chart and the static
+// base manifest point at the same name, so the three ways to deploy agree.
+test("default image is ghcr.io/misileremielle/omniroute in the generator, the Helm chart and the base manifest", () => {
+  for (const target of ["local", "vps"] as const) {
+    const spec = defaultSpec(target);
+    assert.equal(spec.image.repository, "ghcr.io/misileremielle/omniroute");
+    const deployment = ofKind(docsFor(spec), "Deployment") as {
+      spec?: { template?: { spec?: { containers?: { image?: string }[] } } };
+    };
+    assert.equal(
+      deployment.spec?.template?.spec?.containers?.[0]?.image,
+      `ghcr.io/misileremielle/omniroute:${spec.image.tag}`
+    );
+  }
+  const values = yamlLoad(
+    fs.readFileSync(path.join(REPO_ROOT, "deploy/helm/omniroute/values.yaml"), "utf8")
+  ) as { image?: { repository?: string } };
+  assert.equal(values.image?.repository, "ghcr.io/misileremielle/omniroute");
+  const base = fs.readFileSync(
+    path.join(REPO_ROOT, "deploy/kubernetes/base/deployment.yaml"),
+    "utf8"
+  );
+  assert.match(base, /image: ghcr\.io\/misileremielle\/omniroute:latest/);
+});

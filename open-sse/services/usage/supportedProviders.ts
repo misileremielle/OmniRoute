@@ -39,6 +39,7 @@ export const USAGE_SUPPORTED_PROVIDERS: readonly string[] = [
   "ollama-cloud",
   "minimax",
   "minimax-cn",
+  "mistral",
   "clinepass",
   "nanogpt",
   // Apmix (apmix.ai) — monthly weighted-token allowance + self-set daily/weekly caps

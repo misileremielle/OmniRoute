@@ -73,7 +73,11 @@ screens may use the code roles, so a label is never set in the mono face; each f
 staleness test asserts it) — 500 KB is the hard cap for any README image (the SVG studio
 validator's rule). Workflow: change the
 generator (or the data it reads), run `npm run docs:readme-diagrams`, commit the generator and
-the SVG together; a stale SVG fails the `test-unit` job.
+the SVG together. A stale SVG fails in release mode (the `test-unit` byte-compare tests on a push,
+the release PR, Release-Green and nightly). In a feature PR, `npm run check:generated-artifacts`
+(full-history job) judges an SVG the PR edits; drift the base accumulated since the last refresh
+is left to the release refresh (`docs/architecture/QUALITY_GATES.md` → "Generated files and
+derived baselines").
 
 ## How to update
 

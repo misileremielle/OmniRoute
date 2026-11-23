@@ -83,7 +83,9 @@ describe("feature-flags-settings count update", () => {
     // masker and the prompt-injection guard drops a further five flags, taking
     // it to 108; removing the CLI configurators drops the two profile auto-sync
     // flags, taking it to 106.
-    assert.equal(FEATURE_FLAG_DEFINITIONS.length, 106);
+    // Upstream v3.8.55 sync adds the two System One backend flags, COMBO_JEV_STRATEGY_ENABLED
+    // and COMBO_DECISION_ROUTER_ENABLED: 110.
+    assert.equal(FEATURE_FLAG_DEFINITIONS.length, 110);
     // COMPRESSION_CACHE_AUTOMATIC_PREFIX_ESTIMATE (#17114, default off) to 114.
     // CURSOR_GROK_47_DROP_MAX_EFFORT (#17386, default off) to 112.
     // UNPRICED_USAGE_BUDGET_POLICY (#14604, default fail_closed) to 113.

@@ -123,6 +123,7 @@ export function buildClaudeCodeBridgeBody({
     preserveCacheControl,
     preserveClaudeMessages: sourceFormat === FORMATS.CLAUDE && isClaudeCodeSemanticPassthrough,
     summarizeThinking: ccRequestDefaults.summarizeThinking === true,
+    reasoningCacheScope,
   });
   log?.debug?.("FORMAT", "claude-code-compatible bridge enabled");
 

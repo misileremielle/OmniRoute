@@ -1,19 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  __resetSpawnSyncForTest,
-  __setSpawnSyncForTest,
-  buildChecks,
-  tallyDrift,
-} from "../../scripts/check/check-docs-counts-sync.mjs";
+import { buildChecks, tallyDrift } from "../../scripts/check/check-docs-counts-sync.mjs";
+import { loadFactsSnapshot } from "../../scripts/release/facts.mjs";
 
-// Isolate provider prose validation from the unrelated runtime-facts subprocess.
-__setSpawnSyncForTest(() => ({ status: 1, stdout: "" }));
-const checks = buildChecks();
+// Provider prose validation runs on the committed facts snapshot: it is deterministic between
+// releases and keeps the test off the runtime-facts subprocess, which these asserts never need.
+const facts = loadFactsSnapshot();
+assert.ok(
+  facts,
+  "docs/reference/derived-facts.json is missing — run npm run release:refresh-derived"
+);
+const checks = buildChecks({ facts });
 const check = checks.find((entry) => entry.label === "Provider count");
-__resetSpawnSyncForTest();
 assert.ok(check);
 const expected = check.actual;
+// Fork: the slimmed catalog carries far fewer providers than upstream (300+).
+assert.ok(Number(expected) >= 100, `implausible provider total from the snapshot: ${expected}`);
 const evaluate = (content) => tallyDrift([{ ...check, files: ["README.md"] }], () => content);
 
 for (const stale of [
@@ -42,6 +44,22 @@ test("checks all reported documentation and skill surfaces", () => {
       checks.some((entry) => entry.docKey === "providers" && entry.files.includes(file)),
       `provider-count gate must cover ${file}`
     );
+  }
+  // The skill surfaces are agent-instruction files (plan 2026-11-13, phase 2): they carry no
+  // provider count at all, and a STRICT invariant fails one that comes back.
+  for (const file of [
+    // Fork: no generated agent skills; the instruction surfaces are these two files.
+    "AGENTS.md",
+    "llm.txt",
+  ]) {
+    const guard = checks.find(
+      (entry) =>
+        entry.label.startsWith("No derived counts (agent-instruction file ") &&
+        entry.files.includes(file)
+    );
+    assert.ok(guard, `the instruction-surface invariant must cover ${file}`);
+    assert.equal(guard.strict, true);
+    assert.equal(guard.validate(`across 393 providers`).ok, false, `${file}: a count must fail`);
   }
 });
 

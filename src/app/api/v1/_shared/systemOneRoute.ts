@@ -7,7 +7,11 @@ import {
   handleSystemOneProxy,
   type SystemOneCredentials,
 } from "@omniroute/open-sse/handlers/systemOne.ts";
-import { resolveSystemOneTarget } from "@omniroute/open-sse/config/systemOneRegistry.ts";
+import {
+  resolveSystemOneTarget,
+  type SystemOneCompatibleNode,
+  type SystemOneTarget,
+} from "@omniroute/open-sse/config/systemOneRegistry.ts";
 import {
   getProviderCredentialsWithQuotaPreflight,
   clearRecoveredProviderState,
@@ -15,7 +19,7 @@ import {
 import { getCachedProviderNodes } from "@/lib/db/readCache";
 import { CORS_HEADERS } from "@omniroute/open-sse/utils/cors.ts";
 import { decodeSystemOneRequest, isSystemOneDecodeFailure } from "./systemOneRequest";
-import { errorResponse } from "@omniroute/open-sse/utils/error.ts";
+import { errorResponse, sanitizeErrorMessage } from "@omniroute/open-sse/utils/error.ts";
 import { HTTP_STATUS } from "@omniroute/open-sse/config/constants.ts";
 import { enforceApiKeyPolicy } from "@/shared/utils/apiKeyPolicy";
 import {
@@ -30,6 +34,11 @@ import {
   rateLimitedProviderResponse,
 } from "@/app/api/v1/_shared/rateLimit";
 import { getSpecialtyModelsResponse } from "@/app/api/v1/_shared/specialtyCatalog";
+import { buildOllamaSystemOneUrl } from "@/app/api/v1/_shared/systemOneOllamaUrl";
+import {
+  isSystemOneCloudflareBackendEnabled,
+  isSystemOneOllamaLocalBackendEnabled,
+} from "@/shared/utils/featureFlags";
 
 function optionsResponse() {
   return new Response(null, {
@@ -48,6 +57,74 @@ export function systemOneModelsGet(pathname: string) {
       const endpoints = model.supported_endpoints;
       return Array.isArray(endpoints) && endpoints.includes("decisions");
     });
+}
+
+/**
+ * Decisions backend for the request model, or the 400 to return: unknown model,
+ * or a Cloudflare (#16676) / local Ollama (#14667) model while that backend's
+ * default-off flag is off.
+ */
+function resolveEnabledTarget(
+  model: string | undefined,
+  customNodes: readonly SystemOneCompatibleNode[]
+): { target: SystemOneTarget } | { rejection: Response } {
+  const target = resolveSystemOneTarget(model, customNodes);
+  if (!target) {
+    return {
+      rejection: errorResponse(
+        HTTP_STATUS.BAD_REQUEST,
+        `Unknown decisions model: ${model ?? "(missing)"}. Use "typesafe/<model>", ` +
+          `a bare jev-* alias, "openrouter/<vendor>/<model>" for OpenRouter-hosted decisions models, ` +
+          `"cloudflare-ai/<jev|clef|clef-flash>" for Cloudflare Workers AI ` +
+          `(needs the SYSTEMONE_CLOUDFLARE_BACKEND_ENABLED feature flag), ` +
+          `"ollama-local/<model>" for a local Ollama ` +
+          `(needs the SYSTEMONE_OLLAMA_LOCAL_BACKEND_ENABLED feature flag), ` +
+          `or "<prefix>/<model>" for a System One-compatible endpoint you added.`
+      ),
+    };
+  }
+  if (target.backend === "cloudflare" && !isSystemOneCloudflareBackendEnabled()) {
+    return {
+      rejection: errorResponse(
+        HTTP_STATUS.BAD_REQUEST,
+        `Decisions model ${model} needs the Cloudflare Workers AI backend, which is off. ` +
+          `Enable the SYSTEMONE_CLOUDFLARE_BACKEND_ENABLED feature flag to use it.`
+      ),
+    };
+  }
+  if (target.backend === "ollama-local" && !isSystemOneOllamaLocalBackendEnabled()) {
+    return {
+      rejection: errorResponse(
+        HTTP_STATUS.BAD_REQUEST,
+        `Decisions model ${model} needs the local Ollama backend, which is off. ` +
+          `Enable the SYSTEMONE_OLLAMA_LOCAL_BACKEND_ENABLED feature flag to use it.`
+      ),
+    };
+  }
+  return { target };
+}
+
+/**
+ * Backends whose URL depends on the selected connection: `ollama-local` (#14667) posts
+ * to that connection's base URL, never to a request field.
+ */
+function bindConnectionUrl(
+  target: SystemOneTarget,
+  credentials: SystemOneCredentials
+): { target: SystemOneTarget } | { rejection: Response } {
+  if (target.backend !== "ollama-local") return { target };
+  try {
+    const upstreamUrl = buildOllamaSystemOneUrl(credentials.providerSpecificData?.baseUrl);
+    return { target: { ...target, upstreamUrl } };
+  } catch (err) {
+    const raw = err instanceof Error ? err.message : String(err);
+    return {
+      rejection: errorResponse(
+        HTTP_STATUS.BAD_REQUEST,
+        `Invalid ollama-local base URL: ${sanitizeErrorMessage(raw)}`
+      ),
+    };
+  }
 }
 
 /** Operator-added System One-compatible endpoints (custom `<prefix>/<model>` routing). */
@@ -108,15 +185,9 @@ async function postHandler(request: Request, _context?: unknown): Promise<Respon
   const body = validation.data;
   const model = typeof body.model === "string" ? body.model.trim() : undefined;
 
-  const target = resolveSystemOneTarget(model, await loadSystemOneCompatibleNodes());
-  if (!target) {
-    return errorResponse(
-      HTTP_STATUS.BAD_REQUEST,
-      `Unknown decisions model: ${model ?? "(missing)"}. Use "typesafe/<model>", ` +
-        `a bare jev-* alias, "openrouter/<vendor>/<model>" for OpenRouter-hosted decisions ` +
-        `models, or "<prefix>/<model>" for a System One-compatible endpoint you added.`
-    );
-  }
+  const resolved = resolveEnabledTarget(model, await loadSystemOneCompatibleNodes());
+  if ("rejection" in resolved) return resolved.rejection;
+  const { target } = resolved;
 
   const policy = await enforceApiKeyPolicy(request, model ?? target.upstreamModel);
   if (policy.rejection) return policy.rejection;
@@ -144,14 +215,17 @@ async function postHandler(request: Request, _context?: unknown): Promise<Respon
     return rateLimitedProviderResponse(target.provider, credentials);
   }
 
+  // The key-scope-blocked and all-rate-limited sentinels were refused above;
+  // what is left is a real credential record.
+  const bound = bindConnectionUrl(target, credentials as SystemOneCredentials);
+  if ("rejection" in bound) return bound.rejection;
+
   const response = await handleSystemOneProxy({
     path: new URL(request.url).pathname,
-    target,
+    target: bound.target,
     // Forward what the client sent, not the schema's normalized copy (the
     // schema trims strings; a drop-in System One proxy must not alter `state`).
     body: rawBody as typeof body,
-    // The key-scope-blocked and all-rate-limited sentinels were refused above;
-    // what is left is a real credential record.
     credentials: credentials as SystemOneCredentials,
     assetParts: decoded.assetParts,
     requestedModel: model ?? null,

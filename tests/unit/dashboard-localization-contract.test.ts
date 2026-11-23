@@ -124,7 +124,9 @@ test("CLI cards use packaged brand icons whenever an asset exists", () => {
 });
 
 test("settings breadcrumbs use localized labels", () => {
-  const breadcrumbs = readSource("src/shared/components/Breadcrumbs.tsx");
+  // The segment → label-key map moved out of the component (pure rules, checked against the
+  // route tree by tests/unit/breadcrumb-trail-routes.test.ts).
+  const breadcrumbs = readSource("src/shared/utils/breadcrumbTrail.ts");
   assert.match(breadcrumbs, /general: "general"/);
   assert.match(breadcrumbs, /"feature-flags": "featureFlags"/);
 });

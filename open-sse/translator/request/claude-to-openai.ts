@@ -151,6 +151,11 @@ function resolveOpenAIServiceTier(tier: unknown, credentials: unknown): string |
 // Convert Claude request to OpenAI format
 /** Translate Claude requests and their tool/media history to the OpenAI request format. */
 export function claudeToOpenAIRequest(model, body, stream, credentials: unknown = null) {
+  const routedProvider =
+    credentials && typeof credentials === "object" ? (credentials as JsonRecord)._provider : null;
+  // OpenRouter documents `cache_control` on tool objects and on a lone text part. The other
+  // preserve providers (DashScope, Xiaomi) keep their existing shape: no change for them here.
+  const openRouterMarkers = routedProvider === "openrouter";
   // #2069 — when the routed provider honors OpenAI-format cache_control breakpoints
   // (DashScope/alibaba, etc.) and the upstream caller requested preservation, keep
   // the client's cache_control markers on system + message text blocks instead of
@@ -254,7 +259,7 @@ export function claudeToOpenAIRequest(model, body, stream, credentials: unknown 
   if (body.messages && Array.isArray(body.messages)) {
     for (let i = 0; i < body.messages.length; i++) {
       const msg = body.messages[i];
-      const converted = convertClaudeMessage(msg, preserveCacheControl);
+      const converted = convertClaudeMessage(msg, preserveCacheControl, openRouterMarkers);
       if (converted) {
         // Claude Code hook contexts (SessionStart/PreToolUse) arrive as
         // role:"system" mid-array — strictly valid for the Anthropic Messages
@@ -349,6 +354,9 @@ export function claudeToOpenAIRequest(model, body, stream, credentials: unknown 
             // carry over; omitted stays omitted (non-strict on Chat).
             ...chatStrictFrom(record),
           },
+          ...(preserveCacheControl && openRouterMarkers && record.cache_control !== undefined
+            ? { cache_control: record.cache_control }
+            : {}),
         };
       })
       .filter((tool): tool is JsonRecord => Boolean(tool));
@@ -546,9 +554,17 @@ function buildOmittedBlocksNotice(types: string[]): string {
   return [...safe].map((t) => `[${t} block omitted: not supported on this route]`).join("\n");
 }
 
+// One plain text part collapses to a string. With `keepMarked`, a part that carries a cache_control
+// marker keeps its array form, or the breakpoint is lost (the last user turn of a Claude Code
+// request is one).
+function textOrParts(parts: JsonRecord[], keepMarked: boolean) {
+  const single = parts.length === 1 && parts[0].type === "text";
+  return single && !(keepMarked && parts[0].cache_control !== undefined) ? parts[0].text : parts;
+}
+
 // Convert single Claude message - returns single message or array of messages
 /** Convert Claude message blocks while retaining tools and typed attachments. */
-function convertClaudeMessage(msg, preserveCacheControl = false) {
+function convertClaudeMessage(msg, preserveCacheControl = false, openRouterMarkers = false) {
   // Preserve system role for mid-conversation system turns (#6954).
   // Previously any role that wasn't "user" or "tool" was mapped to "assistant",
   // which misattributed system messages as assistant output.
@@ -707,8 +723,7 @@ function convertClaudeMessage(msg, preserveCacheControl = false) {
     // If has tool results, return array of tool messages
     if (toolResults.length > 0) {
       if (parts.length > 0) {
-        const textContent = parts.length === 1 && parts[0].type === "text" ? parts[0].text : parts;
-        return [...toolResults, { role: "user", content: textContent }];
+        return [...toolResults, { role: "user", content: textOrParts(parts, openRouterMarkers) }];
       }
       return toolResults;
     }
@@ -717,7 +732,7 @@ function convertClaudeMessage(msg, preserveCacheControl = false) {
     if (toolCalls.length > 0) {
       const result: JsonRecord = { role: "assistant" };
       if (parts.length > 0) {
-        result.content = parts.length === 1 && parts[0].type === "text" ? parts[0].text : parts;
+        result.content = textOrParts(parts, openRouterMarkers);
       }
       result.tool_calls = toolCalls;
       if (reasoningContent !== null) {
@@ -730,7 +745,7 @@ function convertClaudeMessage(msg, preserveCacheControl = false) {
     if (parts.length > 0) {
       const result: JsonRecord = {
         role,
-        content: parts.length === 1 && parts[0].type === "text" ? parts[0].text : parts,
+        content: textOrParts(parts, openRouterMarkers),
       };
       if (reasoningContent !== null && role === "assistant") {
         result.reasoning_content = reasoningContent;

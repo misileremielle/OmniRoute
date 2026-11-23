@@ -15,6 +15,45 @@ export const RENAMED_MIGRATION_COMPATIBILITY = [
     toVersion: "025",
     toName: "call_logs_summary_storage",
   },
+  // #20054 builds ran its two evidence migrations as 238/239 (earlier heads) and then
+  // 239/240; all four slots are canonical base migrations now. Move those rows to the
+  // timestamped files so the canonical 238-241 run and the evidence files never re-run.
+  {
+    fromVersion: "238",
+    fromName: "truthful_usage_evidence",
+    toVersion: "20261115112344",
+    toName: "truthful_usage_evidence",
+  },
+  {
+    fromVersion: "239",
+    fromName: "truthful_usage_evidence",
+    toVersion: "20261115112344",
+    toName: "truthful_usage_evidence",
+  },
+  {
+    fromVersion: "239",
+    fromName: "daily_usage_evidence",
+    toVersion: "20261115112345",
+    toName: "daily_usage_evidence",
+  },
+  {
+    fromVersion: "240",
+    fromName: "daily_usage_evidence",
+    toVersion: "20261115112345",
+    toName: "daily_usage_evidence",
+  },
+  {
+    fromVersion: "238",
+    fromName: "call_logs_artifact_overflow_order_index",
+    toVersion: "20261115151606",
+    toName: "call_logs_artifact_overflow_order_index",
+  },
+  {
+    fromVersion: "240",
+    fromName: "skills_unique_owner_name_version",
+    toVersion: "20261115153725",
+    toName: "skills_unique_owner_name_version",
+  },
   {
     // Earlier revisions used 228, 231, 233 or 236; canonical upstream rows stay put.
     // Match the name too: canonical cleanup/cache rows must never be rehomed.
@@ -55,6 +94,65 @@ export const RENAMED_MIGRATION_COMPATIBILITY = [
     fromName: "call_logs_pending_detail_index",
     toVersion: "239",
     toName: "call_logs_pending_detail_index",
+  },
+  // Fork: its first two removal migrations shipped as 240/241 before upstream took those
+  // slots (240_provider_node_custom_json_config, 241_seen_models). Fork databases recorded
+  // them there; move those rows to the timestamped files so the upstream 240/241 run and
+  // the removals never re-run.
+  {
+    fromVersion: "240",
+    fromName: "remove_web_cookie_providers",
+    toVersion: "20261114000240",
+    toName: "remove_web_cookie_providers",
+  },
+  {
+    fromVersion: "241",
+    fromName: "remove_cloud_agent_providers",
+    toVersion: "20261114000241",
+    toName: "remove_cloud_agent_providers",
+  },
+  // Fork: 242-248 moved to timestamps too, because upstream froze the three-digit set at 241.
+  {
+    fromVersion: "242",
+    fromName: "remove_router_gateway_providers",
+    toVersion: "20261114000242",
+    toName: "remove_router_gateway_providers",
+  },
+  {
+    fromVersion: "243",
+    fromName: "remove_context_sources",
+    toVersion: "20261114000243",
+    toName: "remove_context_sources",
+  },
+  {
+    fromVersion: "244",
+    fromName: "remove_ccr_engine",
+    toVersion: "20261114000244",
+    toName: "remove_ccr_engine",
+  },
+  {
+    fromVersion: "245",
+    fromName: "remove_playground_presets",
+    toVersion: "20261114000245",
+    toName: "remove_playground_presets",
+  },
+  {
+    fromVersion: "246",
+    fromName: "remove_batch_api",
+    toVersion: "20261114000246",
+    toName: "remove_batch_api",
+  },
+  {
+    fromVersion: "247",
+    fromName: "remove_pii_settings",
+    toVersion: "20261114000247",
+    toName: "remove_pii_settings",
+  },
+  {
+    fromVersion: "248",
+    fromName: "remove_cli_tool_state",
+    toVersion: "20261114000248",
+    toName: "remove_cli_tool_state",
   },
   {
     fromVersion: "028",
