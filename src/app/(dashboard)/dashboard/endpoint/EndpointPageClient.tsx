@@ -646,9 +646,7 @@ export default function APIPageClient({ machineId }: Readonly<APIPageClientProps
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-3">
             <Icon name="perm_media" className="text-sm text-chart-3" />
-            <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-              {t("embeddings")}
-            </h3>
+            <h3 className="text-xs text-text-muted uppercase">{t("embeddings")}</h3>
             <div className="flex-1 h-px bg-border/50" />
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">

@@ -37,22 +37,6 @@ const ICON_ONLY: Record<string, { count: number; why: string }> = {
     count: 1,
     why: "`tone` of the metric icon chip: <span className={metric.tone}><Icon /></span>",
   },
-  "src/app/(dashboard)/dashboard/translator/components/TranslateFlowDiagram.tsx": {
-    count: 5,
-    why: "COLOR_MAP[color].text is read once, by the node <Icon>",
-  },
-  "src/app/(dashboard)/dashboard/translator/components/advanced/RawJsonPanel.tsx": {
-    count: 5,
-    why: "FORMAT_ACCENT_CLASS colours the source/target format <Icon>",
-  },
-  "src/app/(dashboard)/dashboard/webhooks/components/WebhookCard.tsx": {
-    count: 4,
-    why: "KIND_COLORS colours the webhook kind <Icon>",
-  },
-  "src/app/(dashboard)/dashboard/webhooks/components/shared/IntegrationCard.tsx": {
-    count: 4,
-    why: "KIND_COLORS colours the integration kind <Icon>",
-  },
 };
 
 const isBareChartText = (token: string) =>

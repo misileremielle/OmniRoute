@@ -95,11 +95,6 @@ const LABEL_TITLES: Array<{ file: string; marker: string; reason: string }> = [
     reason: "Show/hide switch: both titles are the action label; disabled only while busy.",
   },
   {
-    file: "src/app/(dashboard)/dashboard/playground/components/CompareColumn.tsx",
-    marker: 't("copiedCode")',
-    reason: "Copy button: copy/copied label; disabled while there is nothing to copy.",
-  },
-  {
     file: "src/app/(dashboard)/dashboard/providers/[id]/components/ConnectionRow.tsx",
     marker: "proxyConfiguredBySource",
     reason: "Proxy badge: onProxy is always passed in production, so it is never disabled there.",
@@ -180,24 +175,7 @@ test("the reasons that used to hide in a disabled title are GuardedAction reason
   // [file, i18n key / text of the reason]: each must now be a `reason`, not a `title`.
   const expected: Array<[string, string]> = [
     ["src/app/(dashboard)/dashboard/HomePageClient.tsx", "autoUpdateError"],
-    ["src/app/(dashboard)/dashboard/batch/FilesListTab.tsx", "batchFileInUseByActiveBatch"],
     ["src/app/(dashboard)/dashboard/compression/studio/CompareView.tsx", "enterJudgeModel"],
-    [
-      "src/app/(dashboard)/dashboard/orchestration/drawer/OrchestrationDrawer.tsx",
-      "repeatUnavailable",
-    ],
-    [
-      "src/app/(dashboard)/dashboard/playground/components/ImprovePromptButton.tsx",
-      "setModelFirst",
-    ],
-    [
-      "src/app/(dashboard)/dashboard/playground/components/tabs/CompareTab.tsx",
-      "maxColumnsReached",
-    ],
-    [
-      "src/app/(dashboard)/dashboard/tools/traffic-inspector/components/CaptureModesToolbar.tsx",
-      "tproxyModeUnavailable",
-    ],
     ["src/app/(dashboard)/dashboard/usage/components/BudgetTab.tsx", "budgetSelectKeysFirst"],
     ["src/app/(dashboard)/dashboard/combos/ComboStepTestButton.tsx", "testStepNotTestable"],
   ];

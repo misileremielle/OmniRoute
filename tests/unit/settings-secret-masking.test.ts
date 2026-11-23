@@ -48,13 +48,9 @@ const SECRETS = {
   qdrantApiKey: "qdrant-api-key-value-7890",
   ngrokAuthToken: "ngrok-authtoken-value-2468",
 } as const;
-// The keys PATCH /api/settings accepts; the others are written by dedicated routes.
-const PATCHABLE = [
-  "oidcClientSecret",
-  "entraGraphClientSecret",
-  "skillsmpApiKey",
-  "cliproxyapi_api_key",
-] as const;
+// The keys PATCH /api/settings accepts; the others are written by dedicated routes. The fork
+// removed the skills marketplace, so skillsmpApiKey is only a legacy stored value it still masks.
+const PATCHABLE = ["oidcClientSecret", "entraGraphClientSecret", "cliproxyapi_api_key"] as const;
 
 test.beforeEach(async () => {
   await settingsDb.updateSettings({ requireLogin: false, setupComplete: true, ...SECRETS });
@@ -108,12 +104,12 @@ test("PATCH with a new value still replaces the secret", async () => {
   const response = await settingsRoute.PATCH(
     await makeManagementSessionRequest("http://localhost/api/settings", {
       method: "PATCH",
-      body: { skillsmpApiKey: "replacement-marketplace-key" },
+      body: { oidcClientSecret: "replacement-oidc-secret" },
     })
   );
   assert.equal(response.status, 200);
   const stored = (await settingsDb.getSettings()) as Record<string, unknown>;
-  assert.equal(stored.skillsmpApiKey, "replacement-marketplace-key");
+  assert.equal(stored.oidcClientSecret, "replacement-oidc-secret");
 });
 
 test("GET /api/version-manager/status does not serialize the service keys", async () => {

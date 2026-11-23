@@ -564,6 +564,10 @@
       "basic-ftp": "^6.2.3"
     },
     "glob": "$glob",
-    "minimatch@>=9.0.0": "^11.0.4"
+    "minimatch@>=9.0.0": "^11.0.4",
+    "mongoose": "^9.11.4",
+    "engine.io": "^6.6.10",
+    "node-forge": "^1.4.3",
+    "jimp": "^1.7.0"
   }
 }

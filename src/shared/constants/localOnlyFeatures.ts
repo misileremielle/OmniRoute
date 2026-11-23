@@ -12,10 +12,7 @@
  */
 export const LOCAL_ONLY_DASHBOARD_PATHS = [
   "/api/resilience/connections",
-  "/api/skills/executions",
   "/api/db/health",
-  "/api/plugins",
-  "/api/tools/traffic-inspector/capture-modes",
   "/api/services/cliproxy/status",
   "/api/services/9router/status",
   "/api/services/mux/status",

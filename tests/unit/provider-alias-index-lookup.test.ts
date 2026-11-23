@@ -13,12 +13,9 @@ const SECTIONS = [
   providers.NOAUTH_PROVIDERS,
   providers.OAUTH_PROVIDERS,
   providers.APIKEY_PROVIDERS,
-  providers.WEB_COOKIE_PROVIDERS,
   providers.LOCAL_PROVIDERS,
   providers.SEARCH_PROVIDERS,
-  providers.AUDIO_ONLY_PROVIDERS,
   providers.UPSTREAM_PROXY_PROVIDERS,
-  providers.CLOUD_AGENT_PROVIDERS,
   providers.SYSTEM_PROVIDERS,
 ] as const;
 
@@ -44,11 +41,6 @@ test("every alias and id resolves to the same provider as the linear scan", () =
     }
   }
   assert.ok(checked > 300, `expected to check the whole catalog, checked ${checked}`);
-});
-
-test("an alias that equals another provider's id keeps the earlier provider (poe)", () => {
-  assert.equal(getProviderByAlias("poe"), referenceLookup("poe"));
-  assert.equal(resolveProviderId("poe"), (referenceLookup("poe") as { id: string }).id);
 });
 
 test("a miss returns null and resolveProviderId returns the input", () => {

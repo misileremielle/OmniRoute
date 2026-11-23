@@ -61,7 +61,6 @@ const GUARDED_EXECUTORS: Record<string, number> = {
   "glm.ts": 0,
   "ninerouter.ts": 1, // healthCheck GET
   "nlpcloud.ts": 0,
-  "oneminai.ts": 0,
 };
 
 const BARE_FETCH = /(^|[^.\w])fetch\(/;

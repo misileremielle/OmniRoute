@@ -9,7 +9,6 @@ test("providers usable without a credential from the registry allow a keyless co
   assert.equal(providerAllowsOptionalApiKey("ovhcloud"), true);
   // The catalog alias must resolve to the same canonical id.
   assert.equal(providerAllowsOptionalApiKey("ovh"), true);
-  assert.equal(providerAllowsOptionalApiKey("kilo-gateway"), true);
   assert.equal(providerAllowsOptionalApiKey("pollinations"), true);
 });
 

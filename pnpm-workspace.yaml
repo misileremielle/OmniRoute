@@ -84,3 +84,11 @@ overrides:
   "rimraf>minimatch@9": "^11.0.4"
   "glob": "$glob"
   "minimatch@>=9.0.0": "^11.0.4"
+  # 2026-11-23: in-range floors past pnpm audit advisories on promptfoo and marked-terminal
+  # dependencies: mongoose GHSA-pcrw-h46h-c93h (critical) + 4 more, engine.io
+  # GHSA-2gc4-cqfq-p2gv, node-forge GHSA-6cv4-p8m7-4r25 + 3 more, and jimp 1.7.0 for
+  # zod GHSA-mrhx-c7xc-m3w5 (jimp 1.6 pins zod 3, which has no patched release).
+  "mongoose": "^9.11.4"
+  "engine.io": "^6.6.10"
+  "node-forge": "^1.4.3"
+  "jimp": "^1.7.0"

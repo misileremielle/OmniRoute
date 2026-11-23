@@ -1,20 +1,15 @@
 /**
- * Remote dashboards (managed instances, tunnels, reverse proxies) could never load two
- * read-only views, because their JSON sat behind the loopback-only tier:
+ * Remote dashboards (managed instances, tunnels, reverse proxies) could never load the
+ * read-only Resilience > Connections view (GET /api/resilience/connections, KEA-9357),
+ * because its JSON sat behind the loopback-only tier. The read spawns nothing: SQLite reads
+ * plus in-memory breaker state.
  *
- *   - Resilience > Connections  -> GET /api/resilience/connections  (KEA-9357)
- *   - Skills > Executions       -> GET /api/skills/executions       (KEA-9359)
+ * /api/resilience/connections stays LOCAL_ONLY and is in the DEFAULT manage-scope bypass list.
+ * A remote caller therefore needs an authenticated dashboard session or a manage-scope key;
+ * an anonymous remote caller still gets 403 LOCAL_ONLY, even when requireLogin=false.
  *
- * Neither read spawns anything: both are SQLite reads plus in-memory breaker state.
- *
- *   - /api/resilience/connections stays LOCAL_ONLY and joins the DEFAULT manage-scope
- *     bypass list, next to /api/mcp/. A remote caller therefore needs an authenticated
- *     dashboard session or a manage-scope key; an anonymous remote caller still gets
- *     403 LOCAL_ONLY, even when requireLogin=false.
- *   - /api/skills/executions is spawn-capable on POST (skillExecutor.execute -> sandbox
- *     container), so it can never be bypassable. Its GET is exempted by exact path and
- *     safe method only, the shape /api/mcp/audit already uses (#13941). POST stays
- *     loopback-only (GHSA-jx89-f37j-pq89).
+ * Fork: upstream's Skills > Executions half (KEA-9359) and the /api/mcp/ bypass entry are
+ * gone with the removed Skills and MCP features (docs/ops/FORK_IDENTITY.md).
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -38,7 +33,6 @@ const { SPAWN_CAPABLE_PREFIXES } =
   await import("../../../src/shared/constants/spawnCapablePrefixes.ts");
 
 const RESILIENCE = "/api/resilience/connections";
-const EXECUTIONS = "/api/skills/executions";
 
 const ORIGINAL_JWT = process.env.JWT_SECRET;
 const ORIGINAL_INITIAL = process.env.INITIAL_PASSWORD;
@@ -106,63 +100,6 @@ async function withLoginRequired() {
   await settingsDb.updateSettings({ requireLogin: true });
 }
 
-// ── GET /api/skills/executions: exact-path, safe-method exemption ───────────
-
-test("skills executions: the read methods are not local-only", () => {
-  for (const method of ["GET", "HEAD", "OPTIONS"]) {
-    assert.equal(routeGuard.isLocalOnlyPath(EXECUTIONS, method), false, method);
-  }
-});
-
-test("skills executions: every write method stays local-only (POST reaches the sandbox spawn)", () => {
-  for (const method of ["POST", "PUT", "PATCH", "DELETE"]) {
-    assert.equal(routeGuard.isLocalOnlyPath(EXECUTIONS, method), true, method);
-  }
-});
-
-test("skills executions: no method argument keeps the conservative classification", () => {
-  assert.equal(routeGuard.isLocalOnlyPath(EXECUTIONS), true);
-});
-
-test("skills executions: the exemption is exact-path only", () => {
-  assert.equal(routeGuard.isLocalOnlyPath(`${EXECUTIONS}/`, "GET"), true);
-  assert.equal(routeGuard.isLocalOnlyPath(`${EXECUTIONS}/exec-1`, "GET"), true);
-  assert.equal(routeGuard.isLocalOnlyPath("/api/skills/install", "GET"), true);
-});
-
-test("skills executions: still spawn-capable, so never reachable through the manage-scope bypass", () => {
-  assert.ok(SPAWN_CAPABLE_PREFIXES.includes(EXECUTIONS));
-  assert.equal(routeGuard.isLocalOnlyBypassableByManageScope(EXECUTIONS), false);
-});
-
-test("skills executions: a remote dashboard session can list executions", async () => {
-  await withLoginRequired();
-  const policy = await loadPolicy();
-  const cookie = await dashboardCookieHeader();
-  const out = await policy.evaluate(remoteCtx(new Headers({ cookie }), "GET", EXECUTIONS));
-  assert.equal(out.allow, true);
-});
-
-test("skills executions: a remote caller without a session is rejected for missing auth, not served", async () => {
-  await withLoginRequired();
-  const policy = await loadPolicy();
-  const out = await policy.evaluate(remoteCtx(new Headers(), "GET", EXECUTIONS));
-  assert.equal(out.allow, false);
-  if (!out.allow) assert.equal(out.status, 401);
-});
-
-test("skills executions: a remote dashboard session still cannot run a skill", async () => {
-  await withLoginRequired();
-  const policy = await loadPolicy();
-  const cookie = await dashboardCookieHeader();
-  const out = await policy.evaluate(remoteCtx(new Headers({ cookie }), "POST", EXECUTIONS));
-  assert.equal(out.allow, false);
-  if (!out.allow) {
-    assert.equal(out.status, 403);
-    assert.equal(out.code, "LOCAL_ONLY");
-  }
-});
-
 // ── GET /api/resilience/connections: default manage-scope bypass ────────────
 
 test("resilience connections: stays in the local-only tier for every method", () => {
@@ -182,7 +119,7 @@ test("resilience connections: is in the default bypass list in all three places 
   const settings = (await settingsDb.getSettings()) as Record<string, unknown>;
   const storedDefault = settings.localOnlyManageScopeBypassPrefixes;
 
-  assert.deepEqual(compileTime, ["/api/mcp/", RESILIENCE]);
+  assert.deepEqual(compileTime, [RESILIENCE]);
   assert.deepEqual(runtimeDefault, compileTime, "runtime default snapshot drifted");
   assert.deepEqual(storedDefault, compileTime, "settings default drifted");
 });

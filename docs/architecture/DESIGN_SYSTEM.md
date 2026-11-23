@@ -178,8 +178,7 @@ lastUpdated: 2026-11-03
 
 1. Open the page with the kit `PageHeader` (`@omniroute/ui-kit/page-header`, `compact` inside the
    dashboard) — title, description and `actions`. The shell header then drops its own title, and it
-   is hidden below 1024 px, so a route without a `PageHeader` has no title on a phone
-   (`tests/unit/dashboard-page-header-coverage.test.ts`). A path segment that has no page of its own
+   is hidden below 1024 px, so a route without a `PageHeader` has no title on a phone. A path segment that has no page of its own
    goes into `ROUTE_PREFIXES_WITHOUT_PAGE` in `src/shared/utils/breadcrumbTrail.ts`, so its crumb is
    text and not a dead link (`tests/unit/breadcrumb-trail-routes.test.ts`).
 2. Build controls from `@/shared/components` (the adapters) and use kit components by subpath where no

@@ -8,7 +8,8 @@ title: Relay integration queue
 > longer defines a queue and refuses the Mergify commands that merge or rewrite a pull request.
 > Release PRs are merged by hand under the repository ruleset "Require green gates on the active
 > release" (`Gate / CI` + `Gate / Quality`) until omni-queue runs in live mode, and through
-> omni-queue after that ([OMNI_QUEUE.md](./OMNI_QUEUE.md)). The `relay-integration` rule described below was removed with it.
+> omni-queue after that (upstream only: this fork does not carry omni-queue, see
+> [FORK_IDENTITY.md](./FORK_IDENTITY.md)). The `relay-integration` rule described below was removed with it.
 
 The opt-in `relay-integration` rule in `.mergify.yml` handles one precomposed,
 owner-reviewed PR. It does not enable Mergify batching, change a subscription,

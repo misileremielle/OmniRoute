@@ -406,13 +406,8 @@ For each request flowing through `src/sse/handlers/chat.ts` and
 4. **Non-streaming only:** after the response is assembled,
    `guardrailRegistry.runPostCallHooks(...)` runs the same chain on the
    response. `block: true` here drops the upstream response and returns HTTP 400. Streamed responses skip this step entirely.
-5. **Reversible vault only:** when the request minted tokens, `handleChat`
-   restores them on the 2xx response it returns, after the post-call hooks and
-   the streaming PII transform, so `PII_RESPONSE_SANITIZATION` sees tokens and
-   model-generated PII, never a restored original.
-
-Guardrails that throw are recorded with `error: <message>` and logged via
-`logger.warn`, but the chain continues — fail-open by design.
+   Guardrails that throw are recorded with `error: <message>` and logged via
+   `logger.warn`, but the chain continues — fail-open by design.
 
 ## Coverage and limits
 

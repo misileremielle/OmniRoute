@@ -87,7 +87,8 @@ const sampleSegments = (trail: string[]) =>
 const toHref = (segments: string[]) => "/" + segments.join("/");
 
 test("the route tree is read (sanity)", () => {
-  assert.ok(prefixes.length >= 120, `only ${prefixes.length} route prefixes found`);
+  // The fork's dashboard is smaller than upstream's (85 prefixes on 2026-11-23).
+  assert.ok(prefixes.length >= 80, `only ${prefixes.length} route prefixes found`);
   assert.equal(resolvesToPage(tree, ["dashboard", "providers", "anything"]), true);
   assert.equal(resolvesToPage(tree, ["dashboard", "resilience"]), false);
 });
@@ -179,8 +180,8 @@ test("every static route segment has a label that exists in en.json", () => {
 });
 
 test("a route with a sidebar entry and no breadcrumb key shows the sidebar label", () => {
-  assert.deepEqual(breadcrumbLabelRefs("log-export", "/dashboard/log-export"), [
-    { namespace: "sidebar", key: "logExport" },
+  assert.deepEqual(breadcrumbLabelRefs("conversations", "/dashboard/conversations"), [
+    { namespace: "sidebar", key: "conversations" },
   ]);
   // The same segment under two parents takes the label of its own route.
   assert.deepEqual(breadcrumbLabelRefs("proxy", "/dashboard/system/proxy"), [

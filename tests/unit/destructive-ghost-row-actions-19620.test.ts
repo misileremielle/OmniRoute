@@ -85,19 +85,9 @@ const NOT_DESTRUCTIVE: Array<{ file: string; marker: string; reason: string }> =
     reason: "Test button: error ink is the last test result.",
   },
   {
-    file: "src/app/(dashboard)/dashboard/radar/RadarCatalogTable.tsx",
-    marker: "setTombstone(",
-    reason: "Hide model is a reversible visibility toggle.",
-  },
-  {
     file: "src/app/(dashboard)/dashboard/usage/components/ProviderLimits/parts/QuotaCardHeader.tsx",
     marker: "onToggleActive(",
     reason: "Toggle: error ink marks an inactive quota.",
-  },
-  {
-    file: "src/shared/components/NoAuthAccountCard.tsx",
-    marker: "openProxyConfig(",
-    reason: "Proxy shield: error ink marks an empty pool.",
   },
   {
     file: "src/app/(dashboard)/dashboard/api-manager/[id]/access/tabs/ModelsTab.tsx",
@@ -140,28 +130,6 @@ const HOVER_ONLY_KEPT: Array<{ file: string; marker: string; reason: string }> =
     marker,
     reason: "16px x on a key-policy chip.",
   })),
-  ...(
-    [
-      ["AntigravityToolCard.tsx", 'handleModelMappingChange(model.alias, "")'],
-      ["ClaudeToolCard.tsx", 'onModelMappingChange(model.alias, "")'],
-      ["CodexToolCard.tsx", 'setSelectedModel("")'],
-      ["CodexToolCard.tsx", "delete next[defaultModel]"],
-      ["DefaultToolCard.tsx", "handleModelValuesChange([])"],
-      ["DroidToolCard.tsx", "removeModel(id)"],
-      ["GrokBuildToolCard.tsx", 'setModel("")'],
-      ["GrokBuildToolCard.tsx", "[type]: undefined"],
-      ["OpenClawToolCard.tsx", 'setSelectedModel("")'],
-    ] as const
-  ).map(([name, marker]) => ({
-    file: `src/app/(dashboard)/dashboard/cli-code/components/${name}`,
-    marker,
-    reason: "x that clears a model field next to its input (unsaved form value).",
-  })),
-  {
-    file: "src/app/(dashboard)/dashboard/batch/components/UploadFileModal.tsx",
-    marker: "setFile(null)",
-    reason: "Clears the file picked in the upload form.",
-  },
   {
     file: "src/app/(dashboard)/dashboard/combos/ResponseValidationEditor.tsx",
     marker: "rv-predicate-remove",
@@ -186,26 +154,6 @@ const HOVER_ONLY_KEPT: Array<{ file: string; marker: string; reason: string }> =
     file: "src/app/(dashboard)/dashboard/costs/quota-share/components/PoolWizard.tsx",
     marker: "removeAllocation(a.apiKeyId)",
     reason: "24px x that drops a key line of the wizard form.",
-  },
-  {
-    file: "src/app/(dashboard)/dashboard/omni-skills/components/SkillInspectorPane.tsx",
-    marker: "onUninstall(skill.id)",
-    reason: "Outline button that already draws error ink at rest (inspector footer).",
-  },
-  {
-    file: "src/app/(dashboard)/dashboard/playground/components/CompareColumn.tsx",
-    marker: "onRemove(id)",
-    reason: "x that closes a compare column, next to its copy icon.",
-  },
-  {
-    file: "src/app/(dashboard)/dashboard/playground/components/tabs/ApiTab.tsx",
-    marker: "setUploadedImages([])",
-    reason: "Small text button that clears the images attached to the request form.",
-  },
-  {
-    file: "src/app/(dashboard)/dashboard/playground/components/tabs/ChatTab.tsx",
-    marker: "onClick={handleClear}",
-    reason: "Toolbar icon beside Regenerate that resets the local chat, not an item row.",
   },
   {
     file: "src/app/(dashboard)/dashboard/providers/[id]/components/ModelCompatPopover.tsx",
@@ -305,9 +253,7 @@ test("the destructive row actions from the #19620 list use destructive-ghost", (
       "src/app/(dashboard)/dashboard/api-manager/ApiManagerPageClient.tsx",
       "handleDeleteKey(key.id)",
     ],
-    ["src/app/(dashboard)/dashboard/tokens/page.tsx", "handleRevokeInvite(inv.id)"],
     ["src/app/(dashboard)/dashboard/relay/RelayProxyClient.tsx", "deleteToken(token.id)"],
-    ["src/app/(dashboard)/dashboard/webhooks/components/WebhookCard.tsx", "onDelete(webhook)"],
     [
       "src/app/(dashboard)/dashboard/providers/[id]/components/ConnectionRow.tsx",
       "onClick={onDelete}",
@@ -316,14 +262,7 @@ test("the destructive row actions from the #19620 list use destructive-ghost", (
       "src/app/(dashboard)/dashboard/cache/components/CacheEntriesTab.tsx",
       "handleDelete(entry.signature)",
     ],
-    ["src/app/(dashboard)/dashboard/acp-agents/page.tsx", "handleRemoveAgent(agent.id)"],
     // Decision 1 (2026-11-14): hover-only red row/card deletes, checked in the browser.
-    ["src/app/(dashboard)/dashboard/batch/BatchListTab.tsx", "setDeletingId(batch.id)"],
-    ["src/app/(dashboard)/dashboard/batch/FilesListTab.tsx", "handleDeleteFile(file)"],
-    [
-      "src/app/(dashboard)/dashboard/cli-code/components/CodexToolCard.tsx",
-      "handleDeleteProfile(p.id)",
-    ],
     [
       "src/app/(dashboard)/dashboard/costs/quota-share/QuotaSharePageClient.tsx",
       "handleDeleteGroup()",
@@ -336,9 +275,6 @@ test("the destructive row actions from the #19620 list use destructive-ghost", (
       "src/app/(dashboard)/dashboard/costs/quota-share/components/PoolSchedulesCard.tsx",
       "setRows((prev) => prev.filter((_, i) => i !== index))",
     ],
-    ["src/app/(dashboard)/dashboard/playground/components/PresetPicker.tsx", "remove(preset.id)"],
-    ["src/app/(dashboard)/dashboard/playground/components/ToolsBuilder.tsx", "remove(idx)"],
-    ["src/shared/components/NoAuthAccountCard.tsx", "handleRemoveAccount(id)"],
   ];
   for (const [file, marker] of expected) {
     const source = fs.readFileSync(path.join(ROOT, file), "utf8");

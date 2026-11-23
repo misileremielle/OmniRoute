@@ -2,8 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
-// The safety-net redirect rebuilds the options for each combo target, and the connection
-// reasoning stage runs after an OAuth session slot is taken. Both must keep the slot and the
+// The safety-net redirect rebuilds the options for each combo target and must keep the
 // target's own connection scope. Structural checks, like chat-safetynet-pin.test.ts: the
 // handler needs the full pipeline to run, and these are error-path branches.
 
@@ -24,7 +23,5 @@ test("safety-net redirect keeps the combo target's connection pin and allow-list
   assert.doesNotMatch(redirect, /allowedConnectionIds:\s*null/);
 });
 
-test("a throwing connection reasoning rule releases the OAuth session slot", () => {
-  const stage = block("await applyConnectionReasoningRule({", "if (connectionRouting.response)");
-  assert.match(stage, /releaseOAuthSession\(\)/);
-});
+// Fork: upstream's "throwing connection reasoning rule releases the OAuth session slot" case
+// is gone with the removed reasoning routing rules (docs/ops/FORK_IDENTITY.md).

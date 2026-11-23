@@ -64,16 +64,10 @@ describe("resolveDashboardLocalAccess (server)", () => {
     const access = resolveDashboardLocalAccess(pageHeaders("remote"));
 
     assert.equal(access.locality, "remote");
-    // Paths no configuration opens to a remote session. The two plain reads
-    // (/api/resilience/connections, /api/skills/executions) are left out on purpose: whether
-    // a remote session may run them is the guard's decision (a GET exemption or the
-    // manage-scope bypass), covered by the two tests below.
-    for (const path of [
-      "/api/db/health",
-      "/api/plugins",
-      "/api/tools/traffic-inspector/capture-modes",
-      "/api/services/mux/status",
-    ]) {
+    // Paths no configuration opens to a remote session. The plain read
+    // /api/resilience/connections is left out on purpose: whether a remote session may run
+    // it is the guard's decision (the manage-scope bypass), covered by the test below.
+    for (const path of ["/api/db/health", "/api/services/mux/status"]) {
       assert.ok(access.remoteBlockedPaths.includes(path), `${path} must be reported as blocked`);
     }
   });

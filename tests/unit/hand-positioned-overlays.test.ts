@@ -119,11 +119,6 @@ test("no popover, menu or tooltip is positioned by hand", () => {
 test("the overlays of defect 16 use the kit", () => {
   const D = "src/app/(dashboard)/dashboard";
   const expected: Array<[file: string, kitImport: string]> = [
-    [`${D}/cli-code/components/ClaudeCcDiscoveryInfoButton.tsx`, "@omniroute/ui-kit/popover"],
-    [
-      `${D}/tools/traffic-inspector/components/session/SessionPicker.tsx`,
-      "@omniroute/ui-kit/popover",
-    ],
     ["src/shared/components/analytics/CustomRangePicker.tsx", "@omniroute/ui-kit/popover"],
     [`${D}/settings/components/ComboDefaultsTab.tsx`, "@omniroute/ui-kit/searchable-select"],
     [`${D}/settings/components/FeatureFlagCard.tsx`, "@/shared/components/Tooltip"],

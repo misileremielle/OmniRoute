@@ -87,9 +87,7 @@ describe("Breadcrumbs: no link to a route prefix without a page", () => {
 
 describe("Breadcrumbs: segments are translated", () => {
   it.each([
-    ["/dashboard/log-export", en.sidebar.logExport, "Log-export"],
     ["/dashboard/conversations", en.sidebar.conversations, null],
-    ["/dashboard/omni-skills", en.sidebar.omniSkills, "Omni-skills"],
     ["/dashboard/settings/modality-bridge", en.sidebar.settingsModalityBridge, "Modality-bridge"],
     ["/dashboard/logs/timeline", en.sidebar.logsTimeline, null],
     ["/dashboard/radar/offers", en.breadcrumbs.offers, null],

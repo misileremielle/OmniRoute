@@ -28,8 +28,6 @@ const MAX_LEVELS_UP = 3;
 
 /** Files whose percentage-sized elements are not progress bars. */
 const EXCEPTIONS: Record<string, string> = {
-  "src/app/(dashboard)/dashboard/agent-skills/components/SkillPreviewPane.tsx":
-    "skeleton text lines of varying width while the preview loads",
   "src/shared/components/NavigationProgress.tsx":
     "2 px route-loading strip fixed to the top of the viewport, not a content meter",
   "src/shared/components/RequestTimeline.tsx":

@@ -42,9 +42,11 @@ test("capability matching uses registries rather than a model name containing se
   assert.equal(targetSupportsEndpoint("jina-reader/fetch", "chat"), false);
   assert.equal(targetSupportsEndpoint("unknown-compatible/custom", "chat"), true);
   assert.equal(targetSupportsEndpoint("toString/web", "search"), false);
-  assert.equal(targetSupportsEndpoint("elevenlabs/music_v1", "music"), true);
-  assert.equal(targetSupportsEndpoint("elevenlabs/music_v1", "chat"), false);
-  assert.equal(targetSupportsEndpoint("elevenlabs/not-a-music-model", "music"), false);
+  // Fork: the music handler is removed, so OCR is the media endpoint with a catalog.
+  assert.equal(targetSupportsEndpoint("elevenlabs/music_v1", "music"), false);
+  assert.equal(targetSupportsEndpoint("mistral/mistral-ocr-latest", "ocr"), true);
+  assert.equal(targetSupportsEndpoint("mistral/mistral-ocr-latest", "chat"), false);
+  assert.equal(targetSupportsEndpoint("mistral/not-an-ocr-model", "ocr"), false);
   assert.equal(targetSupportsEndpoint("vertex/gemini-2.5-flash", "chat"), true);
   assert.equal(targetSupportsEndpoint("vertex/gemini-2.5-pro", "chat"), true);
   assert.equal(targetSupportsEndpoint("codex/gpt-5.6-sol", "chat"), true);
@@ -95,9 +97,9 @@ test("a capability route overrides the legacy chat plan without mutating the com
     models: ["openai/gpt-4o"],
     config: { maxRetries: 1 },
     routes: {
-      music: {
+      ocr: {
         strategy: "round-robin",
-        models: ["elevenlabs/music_v1", "suno/chirp-v4"],
+        models: ["mistral/mistral-ocr-latest", "azure-document-intelligence/prebuilt-read"],
         config: { maxRetries: 0 },
       },
     },
@@ -105,19 +107,19 @@ test("a capability route overrides the legacy chat plan without mutating the com
   const snapshot = JSON.stringify(combo);
 
   const chat = projectComboForEndpoint(combo, [combo], "chat");
-  const music = projectComboForEndpoint(combo, [combo], "music");
+  const ocr = projectComboForEndpoint(combo, [combo], "ocr");
 
   assert.equal(chat.combo.strategy, "priority");
   assert.deepEqual(
     chat.combo.models.map((step) => step.model),
     ["openai/gpt-4o"]
   );
-  assert.equal(music.combo.strategy, "round-robin");
+  assert.equal(ocr.combo.strategy, "round-robin");
   assert.deepEqual(
-    music.combo.models.map((step) => step.model),
-    ["elevenlabs/music_v1", "suno/chirp-v4"]
+    ocr.combo.models.map((step) => step.model),
+    ["mistral/mistral-ocr-latest", "azure-document-intelligence/prebuilt-read"]
   );
-  assert.deepEqual(music.combo.config, { maxRetries: 0 });
+  assert.deepEqual(ocr.combo.config, { maxRetries: 0 });
   assert.equal(JSON.stringify(combo), snapshot);
 });
 

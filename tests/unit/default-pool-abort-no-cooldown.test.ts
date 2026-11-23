@@ -22,12 +22,13 @@ test.after(() => {
 
 type PoolLike = { rate429count: number; getStats: () => { cooldown?: number; active?: number } };
 
-// llm7 is a registry provider with a session pool: DefaultExecutor builds the pool itself.
+// duckduckgo-web is the fork's only registry provider with a session pool (upstream used llm7,
+// which the fork removed). DefaultExecutor builds the pool from the registry entry itself.
 async function runWithFetchError(makeError: () => Error): Promise<{
   pool: PoolLike;
   before: number;
 }> {
-  const executor = new DefaultExecutor("llm7") as unknown as {
+  const executor = new DefaultExecutor("duckduckgo-web") as unknown as {
     execute: (input: unknown) => Promise<unknown>;
     getPool: () => PoolLike;
   };
@@ -40,7 +41,7 @@ async function runWithFetchError(makeError: () => Error): Promise<{
   try {
     await assert.rejects(() =>
       executor.execute({
-        model: "gpt-4o-mini-2024-07-18",
+        model: "gpt-5.4-mini",
         body: { messages: [{ role: "user", content: "hi" }] },
         stream: false,
         credentials: { apiKey: "unit-test-key" },

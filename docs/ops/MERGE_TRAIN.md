@@ -8,7 +8,8 @@ title: Merge Queue & Manual Merge-Train Runbook
 > longer defines a queue and refuses the Mergify commands that merge or rewrite a pull request.
 > Release PRs are merged by hand under the repository ruleset "Require green gates on the active
 > release" (`Gate / CI` + `Gate / Quality`) until omni-queue runs in live mode, and through
-> omni-queue after that ([OMNI_QUEUE.md](./OMNI_QUEUE.md)). The Mergify sections below describe the queue as it was.
+> omni-queue after that (upstream only: this fork does not carry omni-queue, see
+> [FORK_IDENTITY.md](./FORK_IDENTITY.md)). The Mergify sections below describe the queue as it was.
 
 Since v3.8.49 (WS3.2/WS3.4 of the quality/velocity plan) the default merge path for
 reviewed PRs into `release/vX.Y.Z` is the **Mergify merge queue** (`.mergify.yml`);

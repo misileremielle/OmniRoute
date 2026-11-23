@@ -46,9 +46,9 @@ const CARD_TAGS = new Set(["Card"]);
 const FRAMED_ON_PURPOSE: Record<string, string> = {
   // A table written in markdown is content inside prose (a chat bubble, a model answer). It is
   // drawn wherever that prose is shown, bordered box or not, and needs its own outline to read
-  // as a table in the middle of the text.
-  "src/app/(dashboard)/dashboard/playground/components/MarkdownMessage.tsx":
-    "markdown table inside prose",
+  // as a table in the middle of the text. (The fork removed the Playground and moved this
+  // component to src/shared/components/.)
+  "src/shared/components/MarkdownMessage.tsx": "markdown table inside prose",
 };
 
 function listTsx(dir: string, out: string[] = []): string[] {

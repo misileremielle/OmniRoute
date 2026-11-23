@@ -51,7 +51,8 @@ separate administrative change; adding these jobs does not itself protect a bran
 > longer defines a queue and refuses the Mergify commands that merge or rewrite a pull request.
 > Release PRs are merged by hand under the repository ruleset "Require green gates on the active
 > release" (`Gate / CI` + `Gate / Quality`) until omni-queue runs in live mode, and through
-> omni-queue after that ([OMNI_QUEUE.md](../ops/OMNI_QUEUE.md)). The workflow handling of Mergify drafts described below is still in `ci.yml` and `quality.yml`, but no Mergify draft is opened any more.
+> omni-queue after that (upstream only: this fork does not carry omni-queue, see
+> [FORK_IDENTITY.md](../ops/FORK_IDENTITY.md)). The workflow handling of Mergify drafts described below is still in `ci.yml` and `quality.yml`, but no Mergify draft is opened any more.
 
 The `queue` label sends a PR to the Mergify queue (`.mergify.yml`). Mergify opens a draft PR on
 a `mergify/merge-queue/` branch, CI runs the full selection there, and the original PR merges
@@ -275,23 +276,8 @@ then `OMNIROUTE_GATE_MODE`, then the Actions event; a local run is `release`):
   would block every later commit on that base until the wave ran. The same rule holds for any
   mode-aware gate a Husky hook runs: the hook passes `--mode=pr`, and the strict verdict stays
   with the release-mode runs (the release PR, pushes to `main`, a plain local run).
-- Mirror-content unit tests (`tests/_helpers/mirrorFreshness.ts`: `cycle-docs-mirror-contract`,
-  `resilience-pre-dispatch-docs-mirrors`, `cli-env-quality-docs-mirrors`,
-  `docs/*-locales`) — release mode asserts every locale. PR mode asserts only the mirrors that are
-  current with the English source according to `.i18n-state.json` (whole-file hash, or the recorded
-  section hash of the section the test pins) and skips the stale ones with a reason. The
-  `target_hash` provenance checks run for every locale in both modes. Freshness is per `## `
-  section, the unit `run-translation.mjs` hashes; a long section (the gate inventory of this file
-  is about half of it) means any edit in it leaves those mirrors stale, and their PR-mode
-  assertions skip until the next wave. An anchor the English source no longer contains falls back
-  to the whole-file comparison.
 - `i18n translation drift` — advisory on PRs, strict on push, nightly and the release cut, so a
   stale mirror cannot ship in a release.
-
-`scripts/i18n/sync-llm-mirrors.mjs` (also exported as `syncLlmMirrors()`, with `--dry-run`)
-rewrites the `llm.txt` mirrors; the release refresh, the translation wave and the scheduled
-`i18n-mirror-refresh.yml` run it (the refresh detects stale `llm.txt` mirrors with a dry run, since
-the drift report does not list them, and syncs them before `check:docs-all`).
 
 The twelve README SVGs under `docs/diagrams/` are generated (`scripts/docs/gen-readme-<name>.mjs`;
 `npm run docs:readme-diagrams` regenerates all of them). Each has a byte-compare unit test
@@ -336,7 +322,7 @@ What `check:docs-counts` (`scripts/check/check-docs-counts-sync.mjs`) fails in e
 
 The agent-instruction files carry **no** derived count at all: `AGENTS.md`, `llm.txt` (and its
 `docs/i18n/*/llm.txt` copies), the bs `AGENTS.md` fork, `open-sse/services/AGENTS.md`,
-`src/shared/constants/agentSkills.ts`, `skills/README.md` and every `skills/*/SKILL.md` point to the
+`skills/README.md` and every `skills/*/SKILL.md` point to the
 source (for example `ROUTING_STRATEGY_VALUES` in `src/shared/constants/routingStrategies.ts`) and to
 `npm run facts` instead. The invariant "No derived counts (agent-instruction file …)" fails a count
 there (providers, migrations, MCP tools and scopes, routing strategies, scoring factors, mode packs)
@@ -600,7 +586,7 @@ count exceeds the larger of `metrics.boundaryOpenSseToSrc` and the count on the 
 above the ceiling is reported (`base drift herdado`) but never reds an innocent PR; push → main
 keeps the absolute ceiling, and an unresolvable base SHA falls back to it with a warning.
 
-An omni-queue candidate (a push to `omni-queue/**`, see [OMNI_QUEUE.md](../ops/OMNI_QUEUE.md))
+An omni-queue candidate (upstream only; a push to `omni-queue/**`)
 gets the same treatment as a pull request: both workflows pass the candidate base
 (`needs.changes.outputs.candidateBase`) as `--base-ref`, and `check:ts7-diagnostics-ratchet` runs
 against it too. For the two new-code gates the comparison base is that SHA itself, not the first
@@ -729,7 +715,7 @@ file of a family in `config/quality/derived-paths/`:
 
 Writers (`release/v*`, `chore/derived-*`, and `chore/bank-ratchet-*` for baselines) are exempt; so is
 a PR that changes only one family plus its companions (for `generated`: the generator scripts, their
-tests, the agent-skill inputs — `src/shared/constants/agentSkills.ts`, the hand-written `skills/**`
+tests, the agent-skill inputs — the hand-written `skills/**`
 docs, `docs/openapi.yaml` — and `changelog.d/**`), e.g. a hero layout change with its regenerated SVG,
 or a skills fix whose test reads the regenerated `SKILL.md` files. A `SKILL.md` with a
 hand-written `<!-- skill:custom-start -->` block is not in the family: its custom block stays
