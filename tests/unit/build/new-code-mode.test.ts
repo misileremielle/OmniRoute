@@ -11,9 +11,9 @@ import {
   diffNewCode,
   filterScope,
   newDeadSymbols,
-  perFileRuleCounts,
   resolveMergeBase,
 } from "../../../scripts/check/newCodeMode.mjs";
+import { perFileRuleCounts } from "../../../scripts/quality/oxlint-report.mjs";
 
 /**
  * Build a temp repo shaped like GitHub's PR checkout (refs/pull/N/merge):
@@ -192,25 +192,27 @@ test("filterScope can exclude first-party vendored source from authorship ratche
   assert.deepEqual(files, ["open-sse/executors/chatgpt-web-codex.ts"]);
 });
 
-test("perFileRuleCounts counts only the requested rules and relativizes absolute paths", () => {
-  const report = [
-    {
-      filePath: "/repo/src/a.ts",
-      messages: [
-        { ruleId: "complexity" },
-        { ruleId: "max-lines-per-function" },
-        { ruleId: "no-unused-vars" },
-      ],
-    },
-    { filePath: "/repo/src/b.ts", messages: [{ ruleId: "sonarjs/cognitive-complexity" }] },
-    { filePath: "src/c.ts", messages: [] },
-  ];
-  const cyc = perFileRuleCounts(report, new Set(["complexity", "max-lines-per-function"]), "/repo");
+test("perFileRuleCounts counts only the requested rules, keyed by the cwd-relative path", () => {
+  // Oxlint reports paths relative to its cwd, so the HEAD and base-worktree reports share keys
+  // without any path rewriting. A file without findings is absent (diffNewCode reads it as 0).
+  const report = {
+    number_of_files: 3,
+    diagnostics: [
+      { code: "eslint(complexity)", filename: "src/a.ts" },
+      { code: "eslint(max-lines-per-function)", filename: "src/a.ts" },
+      { code: "eslint(no-unused-vars)", filename: "src/a.ts" },
+      { code: "complexity(complexity)", filename: "src/b.ts" },
+      // Suppression summaries carry neither a rule code nor a file name.
+      { message: "There are new violations not covered by the suppressions file.", filename: "" },
+    ],
+  };
+  const cyc = perFileRuleCounts(report, new Set(["complexity", "max-lines-per-function"]));
   assert.equal(cyc.get("src/a.ts"), 2);
-  assert.equal(cyc.get("src/b.ts"), 0);
-  assert.equal(cyc.get("src/c.ts"), 0);
-  const cog = perFileRuleCounts(report, new Set(["sonarjs/cognitive-complexity"]), "/repo");
+  assert.equal(cyc.get("src/b.ts"), undefined);
+  assert.equal(cyc.size, 1);
+  const cog = perFileRuleCounts(report, new Set(["complexity/complexity"]));
   assert.equal(cog.get("src/b.ts"), 1);
+  assert.equal(cog.size, 1);
 });
 
 test("diffNewCode flags only changed files that grew; new files count from zero", () => {
@@ -269,51 +271,4 @@ test("newDeadSymbols reports only symbols that are new on HEAD, in touched files
     "src/other.ts:orphaned",
   ]);
   assert.deepEqual(newDeadSymbols(base, head, ["src/a.ts"]), []);
-});
-
-test("perFileRuleCounts normalizes symlinked cwd so canonical paths match (#14744)", () => {
-  const realBase = fs.realpathSync(os.tmpdir());
-  const realDir = fs.mkdtempSync(path.join(realBase, "omni-test-real-"));
-  const symDir = path.join(
-    realBase,
-    `omni-test-symlink-${Date.now()}-${Math.random().toString(36).slice(2)}`
-  );
-  fs.symlinkSync(realDir, symDir, "dir");
-
-  const report = [
-    {
-      filePath: path.join(realDir, "open-sse/executors/commandCode.ts"),
-      messages: [{ ruleId: "complexity" }, { ruleId: "max-lines-per-function" }],
-    },
-    {
-      filePath: "src/relative.ts",
-      messages: [{ ruleId: "complexity" }],
-    },
-  ];
-
-  try {
-    const counts = perFileRuleCounts(
-      report,
-      new Set(["complexity", "max-lines-per-function"]),
-      symDir
-    );
-    assert.equal(counts.size, 2);
-    assert.equal(counts.get("open-sse/executors/commandCode.ts"), 2);
-    assert.equal(counts.get("src/relative.ts"), 1);
-
-    // Fallback when cwd does not exist on disk
-    const fallbackCounts = perFileRuleCounts(
-      [{ filePath: "/nonexistent/repo/src/a.ts", messages: [{ ruleId: "complexity" }] }],
-      new Set(["complexity"]),
-      "/nonexistent/repo"
-    );
-    assert.equal(fallbackCounts.get("src/a.ts"), 1);
-  } finally {
-    try {
-      fs.unlinkSync(symDir);
-    } catch {}
-    try {
-      fs.rmSync(realDir, { recursive: true, force: true });
-    } catch {}
-  }
 });

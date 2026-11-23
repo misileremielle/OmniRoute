@@ -6,42 +6,43 @@ import {
 } from "../../scripts/check/check-cognitive-complexity.mjs";
 
 // The .mjs module has no .d.ts; type the exported functions locally.
-type EslintReport = Array<{ messages: Array<{ ruleId: string }> }>;
+type LintReport = { number_of_files: number; diagnostics: Array<{ code: string }> };
 type CogComplexityVerdict = { regressed: boolean; improved: boolean };
 
-const count = countCognitiveViolations as (report: EslintReport) => number;
+const count = countCognitiveViolations as (report: LintReport) => number;
 const evaluate = evaluateCognitiveComplexity as (
   current: number,
   baseline: number
 ) => CogComplexityVerdict;
 
+const report = (...codes: string[]): LintReport => ({
+  number_of_files: 2,
+  diagnostics: codes.map((code) => ({ code })),
+});
+
 // --- countCognitiveViolations tests ---
 
 test("countCognitiveViolations: empty report returns 0", () => {
-  assert.equal(count([]), 0);
+  assert.equal(count(report()), 0);
 });
 
-test("countCognitiveViolations: counts sonarjs/cognitive-complexity messages", () => {
-  const report: EslintReport = [
-    {
-      messages: [
-        { ruleId: "sonarjs/cognitive-complexity" },
-        { ruleId: "no-unused-vars" }, // should not count
-      ],
-    },
-    {
-      messages: [
-        { ruleId: "sonarjs/cognitive-complexity" },
-        { ruleId: "sonarjs/cognitive-complexity" },
-      ],
-    },
-  ];
-  assert.equal(count(report), 3);
+test("countCognitiveViolations: counts oxlint-plugin-complexity findings", () => {
+  assert.equal(
+    count(
+      report(
+        "complexity(complexity)",
+        "eslint(no-unused-vars)", // should not count
+        "complexity(complexity)",
+        "complexity(complexity)"
+      )
+    ),
+    3
+  );
 });
 
 test("countCognitiveViolations: no matching rules returns 0", () => {
-  const report: EslintReport = [{ messages: [{ ruleId: "no-eval" }, { ruleId: "no-console" }] }];
-  assert.equal(count(report), 0);
+  // `eslint(complexity)` is Oxlint core's cyclomatic rule, counted by the other ratchet.
+  assert.equal(count(report("eslint(no-eval)", "eslint(no-console)", "eslint(complexity)")), 0);
 });
 
 // --- evaluateCognitiveComplexity tests ---

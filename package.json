@@ -126,8 +126,8 @@
     "start": "node scripts/dev/run-next.mjs start",
     "start:fast": "cross-env OMNIROUTE_SKIP_STANDALONE=1 node scripts/dev/run-next.mjs start",
     "homolog": "node scripts/homolog/run.mjs",
-    "lint": "eslint . --cache --cache-location .eslintcache --suppressions-location config/quality/eslint-suppressions.json",
-    "lint:json": "node scripts/quality/run-eslint-json.mjs",
+    "lint": "oxlint .",
+    "lint:json": "node scripts/quality/run-oxlint-json.mjs",
     "lint:md": "pnpm dlx markdownlint-cli2 \"docs/**/*.md\" \"*.md\" \"!docs/research\"",
     "lint:prose": "vale docs",
     "mcp:markitdown": "node scripts/integrations/launch-markitdown-mcp.mjs",
@@ -430,7 +430,6 @@
     "@axe-core/playwright": "^4.14.0",
     "@bcoe/v8-coverage": "1.0.2",
     "@cyclonedx/cyclonedx-npm": "6.0.1",
-    "@eslint/compat": "^2.1.1",
     "@formatjs/icu-messageformat-parser": "3.5.22",
     "@playwright/test": "1.65.0",
     "@size-limit/file": "^14.3.0",
@@ -459,11 +458,6 @@
     "ctrf": "^0.5.0",
     "dpdm": "^4.3.0",
     "esbuild": "0.28.2",
-    "eslint": "^10.14.0",
-    "eslint-config-next": "16.4.6",
-    "eslint-plugin-react-hooks": "7.1.1",
-    "eslint-plugin-sonarjs": "^4.1.0",
-    "espree": "^11.2.0",
     "fast-check": "^4.10.0",
     "fontverter": "2.0.0",
     "glob": "^14.0.4",
@@ -480,6 +474,9 @@
     "lint-staged": "^17.5.1",
     "node-loader": "^2.1.0",
     "opencode-ai": "1.19.5",
+    "oxlint": "1.94.0",
+    "oxlint-plugin-complexity": "4.1.0",
+    "oxlint-plugin-eslint": "1.94.0",
     "playwright-ctrf-json-reporter": "^0.2.0",
     "prettier": "^3.9.10",
     "promptfoo": "0.125.1",
@@ -489,7 +486,6 @@
     "tailwindcss": "^4.3.5",
     "type-coverage": "^2.31.2",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.72.1",
     "use-intl": "4.14.9",
     "vite": "^8.3.6",
     "vitest": "^5.1.0",
@@ -498,7 +494,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs}": [
       "prettier --write",
-      "eslint --fix --no-error-on-unmatched-pattern --no-warn-ignored --suppressions-location config/quality/eslint-suppressions.json"
+      "oxlint --no-error-on-unmatched-pattern"
     ],
     "*.{json,md,yml,yaml,css}": [
       "prettier --write"
@@ -508,7 +504,6 @@
     "browserslist": "^4.28.8",
     "joi": "^18.2.9",
     "onnxruntime-node": "1.30.0",
-    "eslint-plugin-react-hooks": "7.1.1",
     "fast-xml-parser": "^5.12.0",
     "sharp": "^0.35.5",
     "postcss": "^8.5.18",
@@ -553,9 +548,6 @@
     },
     "@apidevtools/json-schema-ref-parser": {
       "js-yaml": "^5.5.0"
-    },
-    "@eslint/eslintrc": {
-      "js-yaml": "^4.3.1"
     },
     "xmlbuilder2": {
       "js-yaml": "^4.3.1"

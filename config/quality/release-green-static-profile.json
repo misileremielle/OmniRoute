@@ -446,7 +446,7 @@
       "job": "lint",
       "args": ["run", "lint:json"],
       "kind": "hard",
-      "command": "node scripts/quality/run-eslint-json.mjs"
+      "command": "node scripts/quality/run-oxlint-json.mjs"
     },
     {
       "id": "quality:collect",

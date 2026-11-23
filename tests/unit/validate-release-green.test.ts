@@ -6,9 +6,7 @@ import assert from "node:assert/strict";
 const mod = await import("../../scripts/quality/validate-release-green.mjs");
 const {
   firstFailureLine,
-  eslintCounts,
-  evaluateEslintRun,
-  parseEslintJson,
+  evaluateLintRun,
   parseCognitiveCount,
   isDrift,
   computeVerdict,
@@ -18,7 +16,7 @@ const {
   fullCiTimeoutFor,
   curatedEquivalentId,
   fullCiKindFor,
-  ESLINT_TIMEOUT_MS,
+  LINT_TIMEOUT_MS,
   unitShardCountFromCi,
   shardCountFromCi,
   hostedSuiteNames,
@@ -34,15 +32,81 @@ const extract = extractCiGates as (
   opts?: { jobs?: string[]; skip?: Set<string>; envMap?: Record<string, Record<string, string>> }
 ) => { id: string; job: string; args: string[]; env?: Record<string, string> }[];
 
-test("eslintCounts sums errors + warnings across files", () => {
-  const parsed = [{ errorCount: 2, warningCount: 5 }, { errorCount: 0, warningCount: 3 }, {}];
-  assert.deepEqual(eslintCounts(parsed), { errors: 2, warnings: 8 });
+// Oxlint `-f json` report: findings carry `<plugin>(<rule>)` codes; the two summaries about
+// oxlint-suppressions.json carry neither a code nor a file name.
+const finding = (severity: "error" | "warning") => ({
+  code: "eslint(no-unused-vars)",
+  severity,
+  message: "finding",
+  filename: "src/a.ts",
+});
+const STALE = {
+  message: "There are suppressions that do not occur anymore.",
+  severity: "error",
+  filename: "",
+};
+const UNCOVERED = {
+  message: "There are new violations not covered by the suppressions file.",
+  severity: "error",
+  filename: "",
+};
+const lintOut = (diagnostics: object[], files = 3) =>
+  JSON.stringify({ diagnostics, number_of_files: files });
+
+test("evaluateLintRun splits one report into errors (hard) and warnings (drift)", () => {
+  const out = lintOut([finding("error"), finding("error"), finding("warning"), UNCOVERED]);
+  const results = evaluateLintRun({ code: 1, out }, 0);
+  assert.deepEqual(
+    results.map((r: { id: string; kind: string; ok: boolean; detail: string }) => [
+      r.id,
+      r.kind,
+      r.ok,
+      r.detail,
+    ]),
+    [
+      // The "uncovered" summary repeats the findings; it is not a third error.
+      ["lint-errors", "hard", false, "2 error(s)"],
+      ["eslint-warnings", "drift", false, "1 vs baseline 0 (+1 drift → rebaseline at release)"],
+    ]
+  );
+  assert.equal(computeVerdict(results).releaseGreen, false);
 });
 
-test("ESLint JSON with zero findings cannot hide a failed process", () => {
-  const results = evaluateEslintRun({ code: 42, out: '[{"errorCount":0,"warningCount":0}]' }, 0);
-  assert.equal(computeVerdict(results).releaseGreen, false);
-  assert.match(results[0].detail, /42/);
+test("a stale suppression alone does not make the lint gate red", () => {
+  // Oxlint exits non-zero for a frozen violation that was fixed without pruning. That is
+  // release-time housekeeping (#7837, #11600), so the verdict comes from the report.
+  for (const code of [1, 2]) {
+    const results = evaluateLintRun({ code, out: lintOut([STALE]) }, 0);
+    assert.equal(computeVerdict(results).releaseGreen, true, `exit ${code}`);
+    assert.equal(results.find((r: { id: string }) => r.id === "lint-errors").detail, "0 error(s)");
+  }
+});
+
+test("a clean Oxlint report cannot hide a failed process", () => {
+  // Non-zero exit with nothing in the report that explains it is a tool failure.
+  const unexplained = evaluateLintRun({ code: 1, out: lintOut([]) }, 0);
+  assert.equal(computeVerdict(unexplained).releaseGreen, false);
+  const crashed = evaluateLintRun({ code: 42, out: lintOut([STALE]) }, 0);
+  assert.equal(computeVerdict(crashed).releaseGreen, false);
+  assert.match(crashed[0].detail, /42/);
+});
+
+test("an exit 0 without a complete report is not a pass", () => {
+  for (const out of ["", "no json here", lintOut([], 0)]) {
+    const results = evaluateLintRun({ code: 0, out }, 0);
+    assert.equal(computeVerdict(results).releaseGreen, false);
+    assert.match(results[0].detail, /no valid JSON report/);
+  }
+});
+
+test("evaluateLintRun reads the report with text around it", () => {
+  const out = `pnpm warn something\n${lintOut([finding("warning")])}\ntrailing stderr text\n`;
+  const results = evaluateLintRun({ code: 0, out }, 5);
+  assert.equal(computeVerdict(results).releaseGreen, true);
+  assert.equal(
+    results.find((r: { id: string }) => r.id === "eslint-warnings").detail,
+    "1 vs baseline 5"
+  );
 });
 
 test("timeout diagnostics retain partial stdout and stderr", () => {
@@ -55,41 +119,20 @@ test("timeout diagnostics retain partial stdout and stderr", () => {
   assert.match(result.out, /worker diagnostic/);
 });
 
-test("parseEslintJson tolerates a leading non-JSON banner", () => {
-  const out = 'npm warn something\n[{"errorCount":0,"warningCount":1}]';
-  assert.deepEqual(parseEslintJson(out), [{ errorCount: 0, warningCount: 1 }]);
-  assert.equal(parseEslintJson("no json here"), null);
-});
+test("evaluateLintRun preserves a timeout instead of misreporting invalid JSON", () => {
+  const timedOut = classifyRunError({ killed: true, code: "ETIMEDOUT" }, LINT_TIMEOUT_MS);
 
-test("parseEslintJson tolerates ESLint's trailing unpruned-suppressions stderr sentence (#7837)", () => {
-  // ESLint 9.x's `--suppressions-location` feature prints the valid `--format json` report to
-  // stdout first, then — if the suppressions file has stale/"unpruned" entries — appends this
-  // exact sentence to stderr and exits 2. The gate concatenates stdout+stderr, so
-  // parseEslintJson() must recover the JSON report even with this trailing text glued on.
-  const eslintJsonReport = JSON.stringify([
-    { filePath: "open-sse/executors/example.ts", errorCount: 0, warningCount: 0, messages: [] },
-  ]);
-  const stderrTail =
-    "There are suppressions left that do not occur anymore. Consider re-running the command with `--prune-suppressions`.\n";
-  assert.deepEqual(parseEslintJson(eslintJsonReport + stderrTail), [
-    { filePath: "open-sse/executors/example.ts", errorCount: 0, warningCount: 0, messages: [] },
-  ]);
-});
-
-test("evaluateEslintRun preserves an ESLint timeout instead of misreporting invalid JSON", () => {
-  const timedOut = classifyRunError({ killed: true, code: "ETIMEDOUT" }, 30 * 60 * 1000);
-
-  assert.deepEqual(evaluateEslintRun(timedOut, 0), [
+  assert.deepEqual(evaluateLintRun(timedOut, 0), [
     {
       id: "lint",
-      label: "ESLint",
+      label: "Oxlint",
       kind: "hard",
       ok: false,
       detail:
-        "gate exceeded its 1800s ceiling and was killed — treat as a hung/failed gate (e.g. an unreleased DB handle in the unit suite); does NOT pass",
+        "gate exceeded its 600s ceiling and was killed — treat as a hung/failed gate (e.g. an unreleased DB handle in the unit suite); does NOT pass",
     },
   ]);
-  assert.equal(ESLINT_TIMEOUT_MS, 60 * 60 * 1000, "cold release lint needs >30m headroom");
+  assert.equal(LINT_TIMEOUT_MS, 10 * 60 * 1000, "a hang must surface, not block the pre-flight");
 });
 
 test("parseCognitiveCount reads the gate's count (en + pt)", () => {
@@ -105,7 +148,7 @@ test("parseCognitiveCount reads the gate's count (en + pt)", () => {
 });
 
 test("parseCognitiveCount ignores the cyclomatic count in the combined ratchets output (#7009)", () => {
-  // `check:complexity-ratchets` runs ONE shared ESLint walk and prints BOTH ratchets.
+  // `check:complexity-ratchets` runs ONE shared Oxlint walk and prints BOTH ratchets.
   // The cyclomatic "N violações" summary is emitted FIRST, so a bare `\\d+ violações`
   // regex captured 2056 (cyclomatic) instead of 890 (cognitive) — a phantom drift in
   // every pre-flight report. Prefer the unambiguous machine-readable `cognitiveComplexity=N`.

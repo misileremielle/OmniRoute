@@ -445,12 +445,12 @@
     },
     {
       "name": "lint",
-      "command": "eslint . --cache --cache-location .eslintcache --suppressions-location config/quality/eslint-suppressions.json",
+      "command": "oxlint .",
       "disposition": "separately-invoked"
     },
     {
       "name": "lint:json",
-      "command": "node scripts/quality/run-eslint-json.mjs",
+      "command": "node scripts/quality/run-oxlint-json.mjs",
       "disposition": "separately-invoked"
     },
     {

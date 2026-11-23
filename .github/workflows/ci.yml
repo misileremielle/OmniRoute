@@ -143,29 +143,17 @@ jobs:
           cache: ${{ github.event_name == 'pull_request' }}
       - run: pnpm run check:node-runtime
       - run: pnpm run audit:deps
-      - name: Restore ESLint file cache
-        if: github.event_name == 'pull_request'
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
-        with:
-          path: |
-            .eslintcache
-            .eslintcache-complexity
-          key: eslint-${{ runner.os }}-${{ hashFiles('eslint.config.mjs', 'eslint.complexity-ratchets.config.mjs', 'config/quality/eslint-suppressions.json', 'pnpm-lock.yaml') }}
-          # No restore-keys fallback on purpose (#11600, P-II.1 of the v3.8.50 postmortem): a
-          # cache built under a different suppressions file / lint config / lockfile reports
-          # stale per-file verdicts, which is exactly how 215 pre-existing errors stayed
-          # invisible for a whole cycle. Exact key or a cold full lint (~13 min) — never a
-          # partial cache from another configuration.
-      # Single ESLint inventory (JSON) — quality-gate reuses the artifact instead of
-      # a second cold full-tree pass for eslintWarnings ratchet counts.
-      - name: ESLint (JSON report)
+      # Single Oxlint inventory (JSON) — quality-gate reuses the artifact instead of
+      # a second full-tree pass for the eslintWarnings ratchet counts. Oxlint keeps no
+      # file cache, so there is nothing to restore before it.
+      - name: Oxlint (JSON report)
         run: pnpm run lint:json
-      - name: Upload ESLint results
+      - name: Upload lint results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: eslint-results
-          path: .artifacts/eslint-results.json
+          name: lint-results
+          path: .artifacts/oxlint-results.json
           if-no-files-found: warn
           retention-days: 7
       - run: pnpm run check:cycles:ratchet
@@ -246,12 +234,12 @@ jobs:
   quality-gate:
     name: Quality Ratchet
     runs-on: ubuntu-latest
-    # needs lint so eslint-results artifact is available (same inventory as the
+    # needs lint so lint-results artifact is available (same inventory as the
     # blocking lint step). Allow lint failure so other ratchets still run.
     needs: [changes, test-coverage, lint]
     # Run even when test-coverage was SKIPPED/FAILED (e.g. a single flaky Coverage
     # Shard breaks the shard→coverage→ratchet chain). The DETERMINISTIC ratchets
-    # (eslint / complexity / cognitive-complexity / duplication / codeql) do NOT need
+    # (lint / complexity / cognitive-complexity / duplication / codeql) do NOT need
     # the coverage artifact and MUST still run so cycle drift is measured on the
     # release PR — otherwise a flake silently skips the whole gate (incident: v3.8.36
     # release PR #4854, where the drift cascade only surfaced post-merge in #5029).
@@ -276,39 +264,30 @@ jobs:
         with:
           # PR acceleration is not release-candidate provenance.
           cache: ${{ github.event_name == 'pull_request' }}
-      - name: Restore ESLint file cache
-        if: github.event_name == 'pull_request'
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
-        with:
-          path: |
-            .eslintcache
-            .eslintcache-complexity
-          key: eslint-${{ runner.os }}-${{ hashFiles('eslint.config.mjs', 'eslint.complexity-ratchets.config.mjs', 'config/quality/eslint-suppressions.json', 'pnpm-lock.yaml') }}
-          # No restore-keys fallback on purpose (#11600, P-II.1 of the v3.8.50 postmortem): a
-          # cache built under a different suppressions file / lint config / lockfile reports
-          # stale per-file verdicts, which is exactly how 215 pre-existing errors stayed
-          # invisible for a whole cycle. Exact key or a cold full lint (~13 min) — never a
-          # partial cache from another configuration.
       # Coverage mergeada (coverage-summary.json) p/ o ratchet de cobertura.
       # continue-on-error: o artifact pode não existir se a job test-coverage foi
       # SKIPPED (shard flaky). Nesse caso collect-metrics pula coverage.* (ausente sem
       # erro) e o ratchet roda com --allow-missing — as métricas determinísticas
-      # (eslint/complexity/cognitive) seguem BLOQUEANTES.
+      # (lint/complexity/cognitive) seguem BLOQUEANTES.
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: coverage-report
           path: coverage/
-      # Prefer lint job's ESLint JSON (one inventory, two consumers).
-      - name: Download ESLint results
+      # Prefer lint job's Oxlint JSON (one inventory, two consumers).
+      - name: Download lint results
         continue-on-error: true
         uses: actions/download-artifact@v8
         with:
-          name: eslint-results
+          name: lint-results
           path: .artifacts/
+      # Use the downloaded report when it is there; without it (lint job crashed before the
+      # upload) quality:collect runs its own Oxlint walk.
       - run: pnpm run quality:collect
+        env:
+          LINT_RESULTS_JSON: ${{ hashFiles('.artifacts/oxlint-results.json') != '' && '.artifacts/oxlint-results.json' || '' }}
       # Catraca: falha se qualquer métrica regredir vs quality-baseline.json (commitado).
-      # Hoje: contagem de warnings do ESLint. Fase 4 estende com cobertura (lida do
+      # Hoje: contagem de warnings do lint (Oxlint). Fase 4 estende com cobertura (lida do
       # coverage mergeado). Tamanho de arquivo e duplicação têm gates dedicados.
       # --allow-missing: pula métricas do baseline ausentes do collect (coverage.* quando
       # o artifact não veio) em vez de falhar — mantém os gates determinísticos ativos.
@@ -327,7 +306,7 @@ jobs:
       # para não pesar no caminho crítico do lint.
       - name: Duplication ratchet
         run: pnpm run check:duplication
-      # Complexity + cognitive: one ESLint walk, two independent baselines (by ruleId).
+      # Complexity + cognitive: one Oxlint walk, two independent baselines (by rule id).
       - name: Complexity + cognitive ratchets
         run: pnpm run check:complexity-ratchets
       # Fase 7 INT: dead-code, type-coverage promovidos de advisory (quality-extended)

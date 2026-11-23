@@ -20,7 +20,7 @@
 //   node scripts/quality/baseline-headroom.mjs --json out.json --md out.md
 //   node scripts/quality/baseline-headroom.mjs --only deadExports,fileSize
 //   node scripts/quality/baseline-headroom.mjs --strict        # exit 1 on any critical
-// Heavy measurements (knip, tsc, eslint) take a few minutes each; --only keeps it cheap.
+// Heavy measurements (knip, tsc) take a few minutes each; --only keeps it cheap.
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";

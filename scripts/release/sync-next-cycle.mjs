@@ -154,7 +154,7 @@ export function syncBackPrBody({ branch, mainSha, prevVersion, greenGate }) {
     "",
     ...rules.map((r, i) => `${i + 1}. ${r}`),
     "",
-    "Also check that `config/quality/eslint-suppressions.json` and `config/quality/quality-baseline.json` " +
+    "Also check that `oxlint-suppressions.json` and `config/quality/quality-baseline.json` " +
       "carried main's freezes (they merge as ours silently).",
     "",
   ].join("\n");

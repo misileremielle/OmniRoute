@@ -13,7 +13,7 @@ pnpm install --frozen-lockfile # Install deps (auto-generates .env from .env.exa
 pnpm run dev                   # Dev server at http://localhost:20128
 pnpm run build                 # Production build (Next.js 16 standalone)
 pnpm run build:release         # Release build
-pnpm run lint                  # ESLint (0 errors expected; warnings are pre-existing)
+pnpm run lint                  # Oxlint (0 errors expected; frozen debt is in oxlint-suppressions.json)
 pnpm run typecheck:core        # TypeScript check (should be clean)
 pnpm run typecheck:noimplicit:core # Strict check (no implicit any)
 pnpm run test:coverage         # Unit tests + coverage gate (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60)
@@ -104,7 +104,7 @@ Read the nearest `AGENTS.md` and the linked deep-dive before making a non-trivia
 
 **The project root MUST ONLY contain:**
 
-- Configuration files (`vitest.config.ts`, `next.config.mjs`, `eslint.config.mjs`, `tsconfig*.json`, `playwright.config.ts`, `prettier.config.mjs`, `postcss.config.mjs`, `sonar-project.properties`, `fly.toml`, `docker-compose*.yml`, `Dockerfile`)
+- Configuration files (`vitest.config.ts`, `next.config.mjs`, `.oxlintrc.json`, `oxlint.complexity.json`, `oxlint-suppressions.json`, `tsconfig*.json`, `playwright.config.ts`, `prettier.config.mjs`, `postcss.config.mjs`, `sonar-project.properties`, `fly.toml`, `docker-compose*.yml`, `Dockerfile`)
 - Dependency files (`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`)
 - Documentation files (`README.md`, `CHANGELOG.md`, `ROADMAP.md`, `LICENSE`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `llm.txt`)
 - CI/CD files and ignore definitions (`.gitignore`, `.dockerignore`, `.npmignore`, `.npmrc`, `.node-version`, `.nvmrc`, `.env.example`)
@@ -129,7 +129,7 @@ When creating _any_ validation tests or one-off logic scripts, default to `scrip
 - **2 spaces**, semicolons, double quotes, 100 char width, es5 trailing commas (enforced by lint-staged via Prettier) — run Prettier on changed files
 - **Imports**: external → internal (`@/`, `@omniroute/open-sse`) → relative
 - **Naming**: files=camelCase/kebab, components=PascalCase, constants=UPPER_SNAKE
-- **ESLint**: `no-eval`, `no-implied-eval`, `no-new-func` = error everywhere; `no-explicit-any` = **error** in `open-sse/` and `tests/` (since #6218 — pre-existing violations are frozen in `config/quality/eslint-suppressions.json`, new ones must be fixed; `pnpm run lint` applies the suppressions and is what CI runs)
+- **Oxlint** (the fork does not use ESLint — `docs/ops/FORK_IDENTITY.md` → "Linting"): `no-eval`, `no-implied-eval`, `no-new-func` = error everywhere; `no-explicit-any` = **error** in `open-sse/` and `tests/` (since #6218 — pre-existing violations are frozen in `oxlint-suppressions.json` at the repo root, new ones must be fixed; `pnpm run lint` applies the suppressions). Existing `eslint-disable` comments keep working; one for `no-restricted-syntax` must also name `eslint-js/no-restricted-syntax`.
 - **TypeScript**: `strict: false`, target ES2022, module esnext, resolution bundler. Prefer explicit types.
 
 ### Database
@@ -371,7 +371,7 @@ OmniRoute has **~90 quality-gate scripts** (`scripts/check/` + `scripts/quality/
 
 - Gates in jobs `lint` + `docs-sync-strict`: pass/fail policy gates —
   fix the violation or add an allowlist entry with a justification comment + tracking issue.
-- Gates in job `quality-gate`: ratchet — metrics (ESLint warnings, code coverage, duplication,
+- Gates in job `quality-gate`: ratchet — metrics (lint warnings, code coverage, duplication,
   complexity) must not regress vs `quality-baseline.json`. Update via
   `pnpm run quality:ratchet --update` when a metric genuinely improves.
 - Job `test-vitest` runs `pnpm run test:vitest` (autoCombo, combo, cache) — blocking.

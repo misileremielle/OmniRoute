@@ -50,7 +50,7 @@ Reproduces release-equivalent validation against the current working tree and cl
 
 - **HARD** (typecheck, lint errors, unit, vitest, db-rules, public-creds, optional
   `package-artifact`) → **real defect**; `exit 1`. Fixed on the source branch (TDD, Rule #17).
-- **DRIFT** (eslint **warnings**, cognitive-complexity, file-size) → ratchet drift accumulated in
+- **DRIFT** (lint **warnings**, cognitive-complexity, file-size) → ratchet drift accumulated in
   the cycle, **not the contributor's fault**; it is only reported and **rebaselined by the maintainer at
   release**. Drift **never** changes the exit code — so it never blocks anyone.
 

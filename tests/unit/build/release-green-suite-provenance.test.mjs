@@ -41,7 +41,7 @@ function observe(mutate = () => {}, { extra = false, workflow = workflowSha } = 
     for (const file of [
       "validate-release-green.mjs",
       "gate-process.mjs",
-      "eslint-measurement.mjs",
+      "oxlint-report.mjs",
       "release-green-static-profile.mjs",
     ])
       copyFileSync(join(root, "scripts/quality", file), join(dir, "scripts/quality", file));
@@ -67,9 +67,12 @@ function observe(mutate = () => {}, { extra = false, workflow = workflowSha } = 
     const executable = (name, body) =>
       writeFileSync(join(dir, "bin", name), `#!${process.execPath}\n${body}`, { mode: 0o755 });
     executable("git", `console.log("${sha}");`);
-    executable(
-      "npx",
-      'console.log(JSON.stringify([{filePath:"fixture.ts",errorCount:0,warningCount:0}]));'
+    // The validator runs the repository's own Oxlint binary, never one from PATH.
+    mkdirSync(join(dir, "node_modules/.bin"), { recursive: true });
+    writeFileSync(
+      join(dir, "node_modules/.bin/oxlint"),
+      `#!${process.execPath}\nconsole.log(JSON.stringify({diagnostics:[],number_of_files:1}));`,
+      { mode: 0o755 }
     );
     executable(
       "pnpm",

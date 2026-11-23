@@ -119,7 +119,7 @@ Landing the PR:
    (551 conflicts on the v3.8.50 → v3.8.51 sync before the two-step merge).
 2. The required gates must be green on the PR head before landing.
 3. After landing, `git merge-base --is-ancestor origin/main origin/release/vX+1` must be true —
-   and check that `config/quality/eslint-suppressions.json` / `quality-baseline.json` carried
+   and check that `oxlint-suppressions.json` / `quality-baseline.json` carried
    main's freezes (they merge as "ours" silently).
 
 A sync-back done by hand follows the same path: merge `origin/main` on a side branch, open a PR

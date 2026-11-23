@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 // scripts/check/check-complexity.mjs
 // Catraca de complexidade de código (cyclomatic + max-lines-per-function).
-// Shares one ESLint walk with cognitive-complexity via complexityEslintReport.mjs
-// / eslint.complexity-ratchets.config.mjs. Counts by ruleId so cognitive
+// Shares one Oxlint walk with cognitive-complexity via complexityLintReport.mjs
+// / oxlint.complexity.json. Counts by rule id so cognitive
 // violations never inflate this baseline.
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import {
-  ESLINT_ARGS,
+  LINT_ARGS,
   countComplexityViolations,
-  getComplexityEslintReport,
-} from "./complexityEslintReport.mjs";
+  getComplexityLintReport,
+} from "./complexityLintReport.mjs";
 
 const ROOT = process.cwd();
 const BASELINE_PATH = path.resolve(
@@ -22,7 +22,7 @@ const BASELINE_PATH = path.resolve(
 const UPDATE = process.argv.includes("--update");
 
 // Re-export for tests that lock scan scope (src+open-sse+bin).
-export { ESLINT_ARGS };
+export { LINT_ARGS };
 
 /** Avalia a contagem atual de violações contra o baseline. */
 export function evaluateComplexity(current, baseline) {
@@ -33,7 +33,7 @@ export function evaluateComplexity(current, baseline) {
 }
 
 function measureComplexityCount() {
-  return countComplexityViolations(getComplexityEslintReport());
+  return countComplexityViolations(getComplexityLintReport());
 }
 
 function main() {

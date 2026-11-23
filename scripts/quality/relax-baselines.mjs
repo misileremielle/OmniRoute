@@ -102,7 +102,8 @@ function relaxQualityBaseline(json, { pct = PCT, suppressedCount = 0 } = {}) {
 
 const suppressedCount = (() => {
   try {
-    const sup = read("eslint-suppressions.json");
+    // Oxlint reads its bulk suppressions from the repo root only.
+    const sup = JSON.parse(fs.readFileSync(path.join(ROOT, "oxlint-suppressions.json"), "utf8"));
     let n = 0;
     for (const rules of Object.values(sup)) for (const r of Object.values(rules)) n += r.count || 0;
     return n;

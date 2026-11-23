@@ -362,6 +362,9 @@ const SKIP_DOC_FILES = new Set([
   // Forward-looking coverage plan: a `- [ ]` checklist of test targets and helper
   // components to be created. Same rationale as the design/plan docs above.
   "docs/ops/COVERAGE_PLAN.md",
+  // Names, on purpose, what the fork does NOT have: removed feature flags and the upstream
+  // ESLint files/env vars a merge brings back. Every such name would read as a fabricated claim.
+  "docs/ops/FORK_IDENTITY.md",
 ]);
 
 // ── File discovery ─────────────────────────────────────────────────────────

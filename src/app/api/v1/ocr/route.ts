@@ -38,7 +38,7 @@ export { resolveVertexOcrAccessToken };
  * top-level baseUrl always wins (kept for tests/callers that pass it directly). The
  * vertex-deepseek-ocr project/location resolution itself lives in the open-sse handler
  * (resolveVertexOcrBaseUrl) — routes may not import executor implementations directly (see
- * EXECUTOR_IMPORT_RESTRICTION in eslint.config.mjs).
+ * the executor `no-restricted-imports` pattern in .oxlintrc.json).
  */
 export function resolveOcrCredentials<
   T extends {

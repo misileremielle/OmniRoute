@@ -31,7 +31,7 @@ without inventing new modules.
 | Database      | **SQLite** via `better-sqlite3` (singleton, WAL journaling)                                                              |
 | Tests         | **Node native test runner** (unit/integration), **Vitest** (MCP, autoCombo, cache), **Playwright** (e2e + protocols-e2e) |
 | Build         | Next.js standalone via `scripts/build/build-next-isolated.mjs`                                                           |
-| Lint/format   | ESLint flat config + Prettier (`lint-staged` via Husky pre-commit)                                                       |
+| Lint/format   | Oxlint (`.oxlintrc.json`) + Prettier (`lint-staged` via Husky pre-commit)                                                |
 | Module system | ESM everywhere (`"type": "module"`)                                                                                      |
 | Dashboard UI  | **Tailwind CSS 4** + the vendored **Keak CI UI Kit** (`packages/ui-kit`), Lucide icons — see `DESIGN_SYSTEM.md`          |
 | Workspaces    | npm workspaces — `open-sse`, `packages/browser-pool`, `packages/ui-kit`                                                  |
@@ -741,8 +741,8 @@ See [RESILIENCE_GUIDE.md](./RESILIENCE_GUIDE.md) and the dedicated section in
 - **Imports**: external → internal (`@/`, `@omniroute/open-sse`) → relative.
 - **Naming**: files `camelCase` or `kebab-case`, components `PascalCase`,
   constants `UPPER_SNAKE`.
-- **ESLint**: `no-eval`, `no-implied-eval`, `no-new-func` = `error` everywhere;
-  `no-explicit-any` = `warn` in `open-sse/` and `tests/`, error elsewhere.
+- **Oxlint**: `no-eval`, `no-implied-eval`, `no-new-func` = `error` everywhere;
+  `no-explicit-any` = `error` in `open-sse/` and `tests/`.
 - **TypeScript**: `strict: false` (legacy posture). Prefer explicit types over
   inference for cross-module boundaries.
 - **Database**: never write raw SQL in routes or handlers — always go through

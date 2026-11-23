@@ -23,7 +23,7 @@ build: ## Production build (Next.js 16 standalone)
 build-release: ## Release build
 	npm run build:release
 
-lint: ## ESLint (0 errors expected)
+lint: ## Oxlint (0 errors expected)
 	npm run lint
 
 typecheck: ## TypeScript check (core)

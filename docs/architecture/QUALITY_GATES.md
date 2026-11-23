@@ -122,7 +122,7 @@ The unit suite and vitest run only in CI (`Unit Tests (N/8)` and `Vitest`).
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | -------------------- |
 | `Docs Gates (fast-path)`                         | Docs/code PRs; API docs refs and docs-all                                                                        | Yes                  |
 | `Fast Quality Gates`                             | Code PRs; static checks, typecheck, dashboard typecheck, impacted unit tests, forgotten sibling tests (advisory) |
-| `No new ESLint warnings`                         | Code PRs; suppressions-aware lint guard                                                                          | Yes, including forks |
+| `No new lint warnings`                           | Code PRs; suppressions-aware lint guard                                                                          | Yes, including forks |
 | `Merge integrity (changelog + generated skills)` | Non-draft PRs; changelog and generated skill sync                                                                | Yes, including forks |
 
 #### Forgotten sibling tests report
@@ -201,11 +201,11 @@ Runs after `test-coverage`. Blocks merge on failure.
 
 | Script                       | Validates                                                                                                                                                   | Blocking                  |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `quality:collect`            | Emits `quality-metrics.json` (ESLint warning count, coverage from merged shard report)                                                                      | Yes (upstream of ratchet) |
-| `quality:ratchet`            | Each metric in `quality-baseline.json` has not regressed (ESLint warnings ≤ baseline; coverage ≥ baseline)                                                  | Yes                       |
+| `quality:collect`            | Emits `quality-metrics.json` (lint warning count, coverage from merged shard report)                                                                        | Yes (upstream of ratchet) |
+| `quality:ratchet`            | Each metric in `quality-baseline.json` has not regressed (lint warnings ≤ baseline; coverage ≥ baseline)                                                    | Yes                       |
 | `check:duplication`          | Code duplication (jscpd@5) does not exceed baseline in `quality-baseline.json`                                                                              | Yes                       |
-| `check:complexity`           | File-level cyclomatic complexity does not exceed the cap (core ESLint `complexity` + `max-lines-per-function`)                                              | Yes                       |
-| `check:cognitive-complexity` | Cognitive complexity ratchet (`eslint-plugin-sonarjs`) — separate ESLint pass; CI runs both merged as the single `check:complexity-ratchets` step           | Yes                       |
+| `check:complexity`           | File-level cyclomatic complexity does not exceed the cap (Oxlint core `complexity` + `max-lines-per-function`)                                              | Yes                       |
+| `check:cognitive-complexity` | Cognitive complexity ratchet (`oxlint-plugin-complexity`) — same Oxlint walk; CI runs both as the single `check:complexity-ratchets` step                   | Yes                       |
 | `check:dead-code`            | Unused exports / files ratchet (knip) does not regress vs baseline                                                                                          | Yes                       |
 | `check:compression-budget`   | Compression benchmark budget — per-engine token-savings floors must not regress                                                                             | Yes                       |
 | `check:type-coverage`        | Percent-typed ratchet (`type-coverage`) does not regress; largely subsumes `typecheck:noimplicit:core`                                                      | Yes                       |
@@ -555,7 +555,7 @@ auditable pass, and the phase is declared in `config/quality/quality-baseline.js
 | `--require-tighten` becomes advisory while `_policy.requireTighten === false`                                                                                                                 | `scripts/quality/check-quality-ratchet.mjs`                                                            |
 | nightly `bank-ratchet-shrinks` pauses (it would bank the measured shrink and undo the headroom)                                                                                               | `.github/workflows/nightly-release-green.yml`                                                          |
 
-Allowlists (`eslint-suppressions.json`, `test-masking-allowlist.json`, `test-discovery-baseline.json`,
+Allowlists (`oxlint-suppressions.json`, `test-masking-allowlist.json`, `test-discovery-baseline.json`,
 …) are **not** budgets and were not touched. Pass/fail policy gates (secrets, SQL rules,
 docs/env contract, i18n parity, unit tests) are unchanged — a red test is still a red test.
 
@@ -579,7 +579,7 @@ On `pull_request` events `quality.yml` passes `--base-ref <PR base SHA>` to `che
 `check:complexity-ratchets` and `check:dead-code`. For `check:complexity-ratchets` and
 `check:dead-code` the gate compares HEAD with the merge-base **restricted to the files the PR
 touched** (`scripts/check/newCodeMode.mjs`: the merge-base is materialized in a throwaway
-`git worktree`, ESLint/knip run there and on HEAD, the per-file counts are diffed):
+`git worktree`, Oxlint/knip run there and on HEAD, the per-file counts are diffed):
 
 - **blocking** — the PR added cyclomatic/cognitive violations or dead exports in files it changed
   (`complexityNewCode=`, `cognitiveComplexityNewCode=`, `deadExportsNewCode=` in the log);
@@ -629,13 +629,13 @@ beyond its epsilon fails the build.
 
 Current tracked metrics:
 
-| Metric                | Direction | Meaning                            |
-| --------------------- | --------- | ---------------------------------- |
-| `eslintWarnings`      | `down`    | ESLint warning count must not grow |
-| `coverage.statements` | `up`      | Statement coverage must not fall   |
-| `coverage.lines`      | `up`      | Line coverage must not fall        |
-| `coverage.functions`  | `up`      | Function coverage must not fall    |
-| `coverage.branches`   | `up`      | Branch coverage must not fall      |
+| Metric                | Direction | Meaning                          |
+| --------------------- | --------- | -------------------------------- |
+| `eslintWarnings`      | `down`    | Lint warning count must not grow |
+| `coverage.statements` | `up`      | Statement coverage must not fall |
+| `coverage.lines`      | `up`      | Line coverage must not fall      |
+| `coverage.functions`  | `up`      | Function coverage must not fall  |
+| `coverage.branches`   | `up`      | Branch coverage must not fall    |
 
 To update the baseline after a genuine improvement:
 
@@ -701,7 +701,7 @@ recalibrate against our own measurements.
 
 ## Release-Level Ratchet Drift (WS5.5, v3.8.49)
 
-When a ratchet (file-size, complexity, eslint warnings) regresses on the PURE release
+When a ratchet (file-size, complexity, lint warnings) regresses on the PURE release
 tip — i.e. the COMBINATION of merges regressed it, and no single PR reproduces the
 regression on its own branch — the fix belongs to the **release captain, once, on the
 release branch**: prefer extraction/refactor; rebaseline only with the documented
@@ -765,8 +765,8 @@ counts gate and follows that gate's own modes.
 Not in a family, on purpose: policy files decided by people (`gate-manifest.json`, the allowlists,
 `admission-policy.json`, `provider-assets-provenance.jsonl`, `model-lifecycle.json`) and ceilings a
 feature PR may have to edit together with code (`quality-baseline.json` metric entries, the
-typecheck/file-size/complexity baselines, `eslint-suppressions.json` — pruned by the pre-commit
-ESLint run when a PR fixes a frozen violation). `src/i18n/routeNamespaces.generated.json` is also
+typecheck/file-size/complexity baselines, `oxlint-suppressions.json` — pruned with
+`pnpm exec oxlint --prune-suppressions .` when a PR fixes a frozen violation). `src/i18n/routeNamespaces.generated.json` is also
 generated but stays in feature PRs: the app imports it at run time, so it cannot wait for a refresh.
 
 ## Banking Ratchet Shrinks — the downward direction (#8584)
@@ -794,7 +794,7 @@ decomposition into a growth allowance for whoever edits the file next.
 
 Banking is batched rather than per-push because it has no latency requirement (a shrink
 banked within 8h is fine) while a per-merge run would rebuild the PR branch repeatedly
-during merge campaigns and pay for a full ESLint walk each time. Detection stays on
+during merge campaigns and pay for a full lint walk each time. Detection stays on
 push (`release-green`); only banking is batched.
 
 ### The safety verifier
@@ -843,7 +843,7 @@ allowlist is a false sense of quality.
    as the code is correct.
 3. **If the violation is pre-existing** (i.e., you did not introduce it but the gate now
    covers it): add an allowlist entry with a justification comment and a tracking issue.
-4. **If the gate is a ratchet** (coverage, ESLint warnings, duplication, complexity):
+4. **If the gate is a ratchet** (coverage, lint warnings, duplication, complexity):
    your change made the metric worse. Fix the underlying issue, or (rarely) run
    `npm run quality:ratchet -- --update` if the change is intentional and the metric
    degradation is acceptable — but document why in the PR description.
@@ -902,7 +902,7 @@ several "obvious" merges turned out to hide debt and are **not** clean drop-ins.
 - **`check:docs-sync` runs twice** — standalone in the `lint` job and again inside `check:docs-all` (`docs-sync-strict`) and the husky pre-commit hook. ✅ **DONE** — standalone `lint` invocation removed.
 - **CVE scanning** — ❌ **NOT a clean merge.** `audit:deps` blocks critical advisories and incomplete audits across all five lockfiles, while reporting high advisories as warnings under the current policy; `check:vuln-ratchet` (osv) only fails on a _regression_ vs the checked-in baseline and rejects missing measurements when required. Different semantics — dropping `audit:deps` would lose the absolute critical gate and the independent package audit receipts. Keep both.
 - **Cycle detection** — ✅ **DONE** (#15159 G-01/G-02). The old text here called `check:cycles` "the green, curated" gate and justified keeping it blocking because `check:circular-deps` (dpdm) reported 91 cycles. That green was a **false green**: `check:cycles` scanned 5 subdirectories (450 files), matched only static `import|export … from`, and dropped every `@/` and `@omniroute/open-sse/` specifier, so it could not see the dynamic-import + alias cycles that dominated the repo. Fixed: the gate now walks `src` + `open-sse` (5023 files), collects specifiers from the TypeScript AST (so `import("…")` counts and type-position `typeof import("…")` does not), and resolves tsconfig `paths`. It finds **14** cycles, not 0. Because 14 pre-existing cycles cannot be fixed in a gate PR, `check:cycles` is now a **ratchet** (`--ratchet`, ceiling `metrics.cycles.value = 14` in `quality-baseline.json`, `direction: down`) — it blocks any _regression_ and the count can only fall. CI runs `npm run check:cycles:ratchet`. Burn-down rides with **A-01**. `check:circular-deps` (dpdm) stays advisory as the broader second opinion.
-- **Complexity** — ✅ **DONE** (`check:complexity-ratchets` / `eslint.complexity-ratchets.config.mjs`): one ESLint walk, counts by ruleId so cyclomatic+max-lines and cognitive baselines stay independent; individual `check:complexity` / `check:cognitive-complexity` remain for local `--update`.
+- **Complexity** — ✅ **DONE** (`check:complexity-ratchets` / `oxlint.complexity.json`): one Oxlint walk, counts by rule id so cyclomatic+max-lines and cognitive baselines stay independent; individual `check:complexity` / `check:cognitive-complexity` remain for local `--update`.
 - **`/api` anti-hallucination** — ✅ **DONE** (`check:api-docs-refs` + `scripts/check/lib/apiRoutes.mjs`): one FS inventory of `src/app/api`, openapi-routes + docs-symbols still report independently; individuals remain for local runs.
 - **`check:node-runtime` runs in 11 jobs** — ⚠️ **low ROI.** Each is a separate runner and the check is <1s; total savings ~10s, against losing a cheap per-job guard. Not worth the churn.
 - **`typecheck:noimplicit:core` on CI lint** — ✅ **removed from lint job** (was advisory `continue-on-error`); blocking type surface is `typecheck:core` + `check:type-coverage`. Local script retained.

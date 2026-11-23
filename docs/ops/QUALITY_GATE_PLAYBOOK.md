@@ -101,7 +101,7 @@ to replicate on any stack.
 
 ### 1. Style & formatting (deterministic, fast)
 
-- **OmniRoute:** Prettier + ESLint via lint-staged (pre-commit), 2-spaces/double-quotes/100col.
+- **OmniRoute:** Prettier + Oxlint via lint-staged (pre-commit), 2-spaces/double-quotes/100col.
 - **Generic:** one auto-fixable formatter + one linter, running in pre-commit on staged files.
 
 ### 2. Types
@@ -121,7 +121,7 @@ to replicate on any stack.
 
 ### 5. Complexity & code health (ratchets)
 
-- **OmniRoute:** ESLint-warnings (3769↓), jscpd duplication (5.72%↓), cyclomatic+max-lines complexity (1800↓), cognitive complexity sonarjs (753↓), dead-code/unused-exports knip (339↓), per-file file-size (frozen, shrink-only), circular-deps (custom Tarjan, blocking).
+- **OmniRoute:** lint warnings (3769↓), jscpd duplication (5.72%↓), cyclomatic+max-lines complexity (1800↓), cognitive complexity (753↓), dead-code/unused-exports knip (339↓), per-file file-size (frozen, shrink-only), circular-deps (custom Tarjan, blocking).
 - **Generic:** ratchet every health metric (warnings, duplication, cyclomatic **and** cognitive complexity, dead code, file size, import cycles). Direction always "don't regress".
 
 ### 6. Static security (SAST + secrets)

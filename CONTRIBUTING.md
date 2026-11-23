@@ -267,10 +267,10 @@ Current test status: **122 unit test files** covering:
 
 ## Code Style
 
-- **ESLint** — Run `npm run lint` before committing
+- **Oxlint** — Run `pnpm run lint` before committing
 - **Prettier** — Auto-formatted via `lint-staged` on commit (2 spaces, semicolons, double quotes, 100 char width, es5 trailing commas)
 - **TypeScript** — All `src/` code uses `.ts`/`.tsx`; `open-sse/` uses `.ts`/`.js`; document with TSDoc (`@param`, `@returns`, `@throws`)
-- **No `eval()`** — ESLint enforces `no-eval`, `no-implied-eval`, `no-new-func`
+- **No `eval()`** — Oxlint enforces `no-eval`, `no-implied-eval`, `no-new-func`
 - **Zod validation** — Use Zod v4 schemas for all API input validation
 - **Naming**: Files = camelCase/kebab-case, components = PascalCase, constants = UPPER_SNAKE
 

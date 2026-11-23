@@ -49,13 +49,20 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { load as parseYaml } from "js-yaml";
 import { runGateProcess } from "./gate-process.mjs";
-import { eslintMeasurementCounts } from "./eslint-measurement.mjs";
+import {
+  lintMeasurementCounts,
+  oxlintBin,
+  parseOxlintJson,
+  withoutSuppressionSummaries,
+} from "./oxlint-report.mjs";
 import { loadFullCiProfile, staticGateOutcome } from "./release-green-static-profile.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..", "..");
 const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
-export const ESLINT_TIMEOUT_MS = 60 * 60 * 1000;
+// Oxlint walks the whole tree in well under a minute; the ceiling only turns a hang into a
+// visible failure.
+export const LINT_TIMEOUT_MS = 10 * 60 * 1000;
 
 // Convenient per-gate summaries. The supervisor additionally persists immutable,
 // incremental command logs and receipts under commands/; these are required evidence.
@@ -115,123 +122,47 @@ export function firstFailureLine(out) {
   return (hit || lines[lines.length - 1] || "failed").slice(0, 200);
 }
 
-/** Sum {errorCount,warningCount} across an eslint --format json result array. */
-export function eslintCounts(parsed) {
-  let errors = 0;
-  let warnings = 0;
-  for (const f of parsed || []) {
-    errors += f.errorCount || 0;
-    warnings += f.warningCount || 0;
-  }
-  return { errors, warnings };
-}
-
 /**
- * Parse the eslint JSON array out of mixed stdout (tolerates a leading banner AND trailing
- * non-JSON text, e.g. ESLint 9.x's `--suppressions-location` "unpruned suppressions" stderr
- * sentence glued onto the report when stdout+stderr are concatenated — #7837).
- */
-export function parseEslintJson(out) {
-  const str = String(out || "");
-  const start = str.indexOf("[");
-  if (start < 0) return null;
-  // Fast path: the whole remainder is valid JSON (no trailing text).
-  try {
-    return JSON.parse(str.slice(start));
-  } catch {
-    // fall through to bracket-depth scan below
-  }
-  // Slow path: find the matching closing "]" for the array that starts at `start`, tolerating
-  // any non-JSON text appended after it. Depth-tracks brackets while skipping over string
-  // literals (so a "]" or "[" inside a message string doesn't miscount).
-  let depth = 0;
-  let inString = false;
-  let escaped = false;
-  for (let i = start; i < str.length; i++) {
-    const ch = str[i];
-    if (inString) {
-      if (escaped) {
-        escaped = false;
-      } else if (ch === "\\") {
-        escaped = true;
-      } else if (ch === '"') {
-        inString = false;
-      }
-      continue;
-    }
-    if (ch === '"') {
-      inString = true;
-    } else if (ch === "[") {
-      depth++;
-    } else if (ch === "]") {
-      depth--;
-      if (depth === 0) {
-        try {
-          return JSON.parse(str.slice(start, i + 1));
-        } catch {
-          return null;
-        }
-      }
-    }
-  }
-  return null;
-}
-
-/**
- * Turn one ESLint process result into release-green records.
+ * Turn one Oxlint process result into release-green records.
  *
- * Keep process failures distinct from report parsing failures. In particular, a timed-out
- * ESLint process has no JSON report by definition; collapsing its code-124 diagnostic into
- * "could not parse eslint json" hides the actionable cause and sends maintainers debugging
- * the parser instead of the gate ceiling.
+ * Keep process failures distinct from report parsing failures: a timed-out process has no JSON
+ * report by definition, and reporting it as "no valid JSON" hides the actionable cause.
+ *
+ * Oxlint exits non-zero for errors and also for stale entries in oxlint-suppressions.json. A
+ * stale entry is a frozen violation that was fixed — release-time housekeeping, never a red —
+ * so the verdict comes from the report. Any other non-zero exit is a tool failure.
  */
-export function evaluateEslintRun({ code, out }, warningBaseline) {
-  if (code !== 0) {
-    return [
-      {
-        id: "lint",
-        label: "ESLint",
-        kind: "hard",
-        ok: false,
-        detail:
-          code === 124
-            ? firstFailureLine(out)
-            : `ESLint process exited ${code}: ${firstFailureLine(out)}`,
-      },
-    ];
-  }
-  const parsed = parseEslintJson(out);
+export function evaluateLintRun({ code, out }, warningBaseline) {
+  const failure = (detail) => [{ id: "lint", label: "Oxlint", kind: "hard", ok: false, detail }];
+  if (code === 124) return failure(firstFailureLine(out));
+  const parsed = parseOxlintJson(out);
   let counts;
   try {
-    counts = eslintMeasurementCounts(parsed);
+    counts = lintMeasurementCounts(parsed);
   } catch {
-    return [
-      {
-        id: "lint",
-        label: "ESLint",
-        kind: "hard",
-        ok: false,
-        detail:
-          code === 0
-            ? "ESLint exited successfully but produced no valid JSON report"
-            : firstFailureLine(out),
-      },
-    ];
+    return failure(
+      code === 0
+        ? "Oxlint exited successfully but produced no valid JSON report"
+        : `Oxlint process exited ${code}: ${firstFailureLine(out)}`
+    );
   }
-
   const { errors, warnings } = counts;
+  const explained = errors > 0 || withoutSuppressionSummaries(parsed).stale;
+  if (code !== 0 && !([1, 2].includes(code) && explained)) {
+    return failure(`Oxlint process exited ${code}: ${firstFailureLine(out)}`);
+  }
   const warningDrift = isDrift(warnings, warningBaseline);
   return [
     {
       id: "lint-errors",
-      label: "ESLint errors",
+      label: "Oxlint errors",
       kind: "hard",
       ok: errors === 0,
       detail: `${errors} error(s)`,
     },
     {
       id: "eslint-warnings",
-      label: "ESLint warnings (ratchet)",
+      label: "Oxlint warnings (ratchet)",
       kind: "drift",
       ok: !warningDrift,
       detail:
@@ -247,7 +178,7 @@ export function evaluateEslintRun({ code, out }, warningBaseline) {
 /** Pull the cognitive-complexity violation count from the gate's output. */
 export function parseCognitiveCount(out) {
   const s = String(out || "");
-  // `check:complexity-ratchets` runs ONE shared ESLint walk and prints BOTH ratchets, with the
+  // `check:complexity-ratchets` runs ONE shared Oxlint walk and prints BOTH ratchets, with the
   // cyclomatic "N violações" summary emitted FIRST — so a bare `\d+ violações` regex would grab
   // the cyclomatic count. Prefer the unambiguous machine-readable `cognitiveComplexity=N` line
   // (mirrors the cyclomatic `complexity=N` parse used for cycCurrent below).
@@ -874,53 +805,32 @@ async function main() {
 
   await hardCmd("typecheck", "Typecheck (core)", pnpmCmd, ["run", "typecheck:core"]);
 
-  // ESLint: ONE pass → errors (hard) + warnings (drift)
+  // Oxlint: ONE pass → errors (hard) + warnings (drift)
   {
-    announce("ESLint (errors + warnings — ~15-45min)");
-    // Suppressions-aware, matching `pnpm run lint` (Pacote 4 no-new-warnings): the frozen
-    // pre-existing debt in config/quality/eslint-suppressions.json must not count as
-    // errors here — only NET-NEW violations are release reds. The cold release runner can
-    // exceed 30 minutes as the repository grows, and this pre-flight often runs under load.
-    const lintRun = await run(
-      "npx",
-      [
-        "eslint",
-        ".",
-        "--cache",
-        "--cache-location",
-        ".eslintcache",
-        "--format",
-        "json",
-        "--suppressions-location",
-        "config/quality/eslint-suppressions.json",
-        // An "unpruned" suppression means a previously-frozen violation was legitimately
-        // fixed — release-time housekeeping (same bucket as ratchet drift), never a
-        // contributor-blocking defect. Without this flag ESLint 9.x exits 2 for that
-        // reason alone, which used to mask the real `--format json` report (#7837).
-        "--pass-on-unpruned-suppressions",
-      ],
-      // The cold release runner crossed the old 30-minute ceiling as the repository grew,
-      // then the timeout text was misreported as invalid JSON. Keep a real upper bound, but
-      // leave enough headroom for the same full-tree walk that completes immediately after it
-      // under the complexity config on that runner.
-      { timeout: ESLINT_TIMEOUT_MS, env: withHardGateMode() }
-    );
+    announce("Oxlint (errors + warnings)");
+    // Same walk as `pnpm run lint`: the frozen pre-existing debt in oxlint-suppressions.json
+    // does not count — only NET-NEW violations are release reds. Stale suppressions are
+    // tolerated by evaluateLintRun.
+    const lintRun = await run(oxlintBin(ROOT), ["-f", "json", "."], {
+      timeout: LINT_TIMEOUT_MS,
+      env: withHardGateMode(),
+    });
     const { out } = lintRun;
     saveGateLog("lint", out);
-    for (const result of evaluateEslintRun(lintRun, baselineValue("eslintWarnings"))) {
+    for (const result of evaluateLintRun(lintRun, baselineValue("eslintWarnings"))) {
       record(result);
     }
-    if ([0, 1].includes(lintRun.code) && ["PASS", "FAIL"].includes(lintRun.receipt.outcome)) {
+    if ([0, 1, 2].includes(lintRun.code) && ["PASS", "FAIL"].includes(lintRun.receipt.outcome)) {
       try {
-        const parsed = parseEslintJson(out);
-        eslintMeasurementCounts(parsed);
-        const path = join(LOG_DIR, "commands", `${randomUUID()}.eslint.json`);
+        const parsed = withoutSuppressionSummaries(parseOxlintJson(out)).report;
+        lintMeasurementCounts(parsed);
+        const path = join(LOG_DIR, "commands", `${randomUUID()}.lint.json`);
         writeFileSync(path, `${JSON.stringify(parsed)}\n`, { flag: "wx", mode: 0o600 });
         freshLintReport = path;
       } catch {
         record({
           id: "lint-measurement",
-          label: "Retain the current ESLint measurement",
+          label: "Retain the current lint measurement",
           kind: "hard",
           ok: false,
           detail: "no complete lint report retained for this execution",
@@ -953,9 +863,9 @@ async function main() {
     ["run", "test:migrations:fresh"]
   );
 
-  // Complexity + cognitive (one ESLint walk; both still recorded as drift)
+  // Complexity + cognitive (one Oxlint walk; both still recorded as drift)
   {
-    announce("Complexity + cognitive ratchets (shared ESLint walk)");
+    announce("Complexity + cognitive ratchets (shared Oxlint walk)");
     const result = await run(pnpmCmd, ["run", "check:complexity-ratchets"]);
     saveGateLog("complexity-ratchets", result.out);
     for (const metric of evaluateComplexityRun(result, baselineValue("cognitiveComplexity"))) {
@@ -1321,7 +1231,7 @@ async function main() {
           ok: false,
           evidenceState: "INCOMPLETE",
           detail: collectsMetrics
-            ? "current ESLint measurement unavailable; metrics were not collected"
+            ? "current lint measurement unavailable; metrics were not collected"
             : "current metrics collection incomplete; ratchet was not evaluated",
         });
         continue;
@@ -1330,7 +1240,7 @@ async function main() {
       const hardGate = fullCiKindFor(g.id, results, g.kind) === "hard";
       const gateEnv = {
         ...g.env,
-        ...(collectsMetrics ? { ESLINT_RESULTS_JSON: freshLintReport } : {}),
+        ...(collectsMetrics ? { LINT_RESULTS_JSON: freshLintReport } : {}),
       };
       const { code, out, receipt } = await run(pnpmCmd, g.args, {
         env: hardGate ? withHardGateMode(gateEnv) : gateEnv,

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * One ESLint walk → both complexity ratchets.
+ * One Oxlint walk → both complexity ratchets.
  *
  * Existence reasons (unchanged):
  * - cyclomatic + max-lines vs complexity-baseline.json
@@ -15,19 +15,21 @@ import { pathToFileURL } from "node:url";
 import { evaluateComplexity } from "./check-complexity.mjs";
 import { evaluateCognitiveComplexity } from "./check-cognitive-complexity.mjs";
 import {
+  COGNITIVE_RULES,
+  COMPLEXITY_RULES as CYCLOMATIC_RULES,
   countCognitiveViolations,
   countComplexityViolations,
-  getComplexityEslintReport,
-} from "./complexityEslintReport.mjs";
+  getComplexityLintReport,
+} from "./complexityLintReport.mjs";
 import {
   baseRefArg,
   diffNewCode,
   listChangedFiles,
-  perFileRuleCounts,
   resolveMergeBase,
   withBaseWorktree,
 } from "./newCodeMode.mjs";
-import { runComplexityEslintOn } from "./complexityEslintReport.mjs";
+import { runComplexityLintOn } from "./complexityLintReport.mjs";
+import { perFileRuleCounts } from "../quality/oxlint-report.mjs";
 
 const BASE_REF = baseRefArg();
 const NEW_CODE_SCOPE = {
@@ -37,8 +39,6 @@ const NEW_CODE_SCOPE = {
   // The release-wide full walk still measures vendor complexity against the frozen baseline.
   excludePrefixes: ["open-sse/vendor/"],
 };
-const CYCLOMATIC_RULES = new Set(["complexity", "max-lines-per-function"]);
-const COGNITIVE_RULES = new Set(["sonarjs/cognitive-complexity"]);
 
 /**
  * New-code mode (PR events, `--base-ref <sha>`): blocking only on violations the PR added in
@@ -55,17 +55,17 @@ function mainNewCode() {
     console.log("[complexity-ratchets] OK — no source files changed; nothing to compare.");
     return;
   }
-  const headReport = runComplexityEslintOn(changed, ROOT);
+  const headReport = runComplexityLintOn(changed, ROOT);
   const headCounts = {
-    complexity: perFileRuleCounts(headReport, CYCLOMATIC_RULES, ROOT),
-    cognitive: perFileRuleCounts(headReport, COGNITIVE_RULES, ROOT),
+    complexity: perFileRuleCounts(headReport, CYCLOMATIC_RULES),
+    cognitive: perFileRuleCounts(headReport, COGNITIVE_RULES),
   };
-  // Base paths are absolute inside the throwaway worktree → relativize while it exists.
+  // Oxlint reports paths relative to its cwd, so HEAD and base share keys.
   const baseCounts = withBaseWorktree(mergeBase, (dir) => {
-    const report = runComplexityEslintOn(changed, dir);
+    const report = runComplexityLintOn(changed, dir);
     return {
-      complexity: perFileRuleCounts(report, CYCLOMATIC_RULES, dir),
-      cognitive: perFileRuleCounts(report, COGNITIVE_RULES, dir),
+      complexity: perFileRuleCounts(report, CYCLOMATIC_RULES),
+      cognitive: perFileRuleCounts(report, COGNITIVE_RULES),
     };
   });
   let failed = false;
@@ -116,7 +116,7 @@ function main() {
     process.exit(2);
   }
 
-  const report = getComplexityEslintReport();
+  const report = getComplexityLintReport();
   const complexityCount = countComplexityViolations(report);
   const cognitiveCount = countCognitiveViolations(report);
 

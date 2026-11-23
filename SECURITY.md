@@ -169,7 +169,7 @@ docker run -d \
 - Run `npm audit` regularly (`npm run audit:deps`)
 - Keep dependencies updated
 - The project uses `husky` + `lint-staged` for pre-commit checks (lint-staged + check-docs-sync + check:any-budget:t11)
-- CI pipeline runs ESLint security rules on every push (`no-eval`, `no-implied-eval`, `no-new-func` = error)
+- CI pipeline runs the Oxlint security rules on every push (`no-eval`, `no-implied-eval`, `no-new-func` = error)
 - Provider constants validated at module load via Zod (`src/shared/validation/schemas.ts`)
 - Secure-by-default libraries used: `dompurify` / `isomorphic-dompurify` (XSS), `jose` (JWT), `better-sqlite3` (no SQLi risk via parameterized queries), `bcryptjs` (password hashing)
 
@@ -178,7 +178,7 @@ docker run -d \
 These rules are enforced by tooling and reviewers:
 
 1. **Never commit secrets** — `.env` is gitignored; `.env.example` is the template (no literals, comments only — see PUBLIC_CREDS.md below)
-2. **Never use `eval()`, `new Function()`, or implied eval** — ESLint enforces
+2. **Never use `eval()`, `new Function()`, or implied eval** — Oxlint enforces
 3. **Never bypass Husky hooks** (`--no-verify`, `--no-gpg-sign`) without explicit operator approval
 4. **Never write raw SQL in routes** — always go through `src/lib/db/` (parameterized)
 5. **Always validate inputs with Zod** — `src/shared/validation/schemas.ts`

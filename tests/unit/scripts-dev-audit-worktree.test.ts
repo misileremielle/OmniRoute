@@ -95,7 +95,7 @@ function makeRepo(mutate: (main: string) => void) {
   write(main, "tests/unit/sample.test.ts", TEST_FILE);
   write(
     main,
-    "config/quality/eslint-suppressions.json",
+    "oxlint-suppressions.json",
     JSON.stringify(
       { "src/a.ts": { rule: { count: 1 } }, "src/b.ts": { rule: { count: 3 } } },
       null,
@@ -137,7 +137,7 @@ test("reports every weakening signal of a sloppy worker and exits 1", () => {
     write(main, "tests/unit/sample.test.ts", TEST_FILE.replace("  assert.ok(true);\n", ""));
     write(
       main,
-      "config/quality/eslint-suppressions.json",
+      "oxlint-suppressions.json",
       JSON.stringify(
         {
           "src/a.ts": { rule: { count: 0 } },

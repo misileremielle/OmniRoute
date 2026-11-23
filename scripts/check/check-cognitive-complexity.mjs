@@ -1,14 +1,11 @@
 #!/usr/bin/env node
 // scripts/check/check-cognitive-complexity.mjs
-// Ratchet bloqueante para complexidade cognitiva (sonarjs/cognitive-complexity).
-// Shares ESLint walk with check-complexity via complexityEslintReport.mjs.
+// Ratchet bloqueante para complexidade cognitiva (oxlint-plugin-complexity, cognitive threshold).
+// Shares the Oxlint walk with check-complexity via complexityLintReport.mjs.
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import {
-  countCognitiveViolations,
-  getComplexityEslintReport,
-} from "./complexityEslintReport.mjs";
+import { countCognitiveViolations, getComplexityLintReport } from "./complexityLintReport.mjs";
 
 // Re-export for existing unit tests.
 export { countCognitiveViolations };
@@ -54,7 +51,7 @@ function main() {
   }
   const baselineValue = baselineMetric.value;
 
-  const report = getComplexityEslintReport();
+  const report = getComplexityLintReport();
   const count = countCognitiveViolations(report);
 
   console.log(`cognitiveComplexity=${count}`);

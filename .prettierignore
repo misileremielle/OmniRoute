@@ -38,3 +38,7 @@ packages/ui-kit/src/**
 # pnpm writes pnpm-lock.yaml in its own style (single quotes) on every install, so
 # formatting it with Prettier only produced a whole-file diff on the next install.
 pnpm-lock.yaml
+
+# Written by `oxlint --suppress-all` / `--prune-suppressions`, which is its formatter of record;
+# Prettier would reformat it and the next prune would revert that.
+oxlint-suppressions.json

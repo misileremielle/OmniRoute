@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/quality/collect-metrics.mjs — emite quality-metrics.json
-// Coletores incrementais: Fase 1 traz ESLint warnings + cobertura.
+// Coletores incrementais: Fase 1 traz lint warnings (Oxlint) + cobertura.
 // Fases 3/4 estendem com duplicação (jscpd), tamanho de arquivo e cobertura por módulo.
 // Fase 6A.11: openapiCoverage.pct + i18nUiCoverage.pct (mínimo entre locales).
 // Task 7.9: coverage.<modulo>.lines para ~8 módulos críticos, lidos do
@@ -9,58 +9,37 @@ import fs from "node:fs";
 import { promises as fsAsync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { execFileSync } from "node:child_process";
 import * as yaml from "js-yaml";
-import { eslintMeasurementCounts } from "./eslint-measurement.mjs";
+import {
+  lintMeasurementCounts,
+  oxlintBin,
+  parseOxlintJson,
+  runOxlintJson,
+} from "./oxlint-report.mjs";
 import { lookupMessagePath } from "../i18n/message-lookup.mjs";
 
 const cwd = process.cwd();
 const out = {};
 
-// 1) ESLint: contagem de warnings/errors NOVOS além do baseline congelado.
-// Pacote 4 (plano mestre testes+CI, 2026-07-04): a dívida pré-existente vive em
-// config/quality/eslint-suppressions.json (ESLint bulk suppressions nativo) e é
-// bloqueada no PR que a introduziria (job lint-guard + lint-staged). A métrica do
-// ratchet passa a medir a dívida LÍQUIDA nova — em regime, ~0 — em vez do estoque
-// bruto (que driftava +41/+88 por ciclo e era rebaselinado às cegas na release).
-// O aperto do estoque acontece via --prune-suppressions na release.
-function eslintCounts() {
-  // Prefer a precomputed JSON report (same existence reason as lint job: inventory
-  // of net-new warnings vs suppressions). Avoids a second cold full-tree ESLint
-  // when CI/local already produced the report.
-  const selectedReport = process.env.ESLINT_RESULTS_JSON;
-  let results;
+// 1) Lint (Oxlint): count of NEW warnings/errors beyond the frozen baseline.
+// Pre-existing debt lives in oxlint-suppressions.json (Oxlint bulk suppressions) and a new
+// violation is blocked in the PR that adds it (lint job + lint-staged). The ratchet therefore
+// measures the net-new debt — ~0 in steady state — not the raw stock. The stock is tightened
+// with `oxlint --prune-suppressions` at release. The metric keys keep their historical
+// `eslint*` names so the baseline files stay mergeable with upstream.
+function lintCounts() {
+  // Prefer a precomputed JSON report (lint:json): avoids a second full-tree walk when CI or
+  // a local run already produced it.
+  const selectedReport = process.env.LINT_RESULTS_JSON;
+  let report;
   if (selectedReport) {
     // An explicitly selected receipt is a dependency, never a request for a fallback scan.
-    results = JSON.parse(fs.readFileSync(path.resolve(cwd, selectedReport), "utf8"));
+    report = parseOxlintJson(fs.readFileSync(path.resolve(cwd, selectedReport), "utf8"));
   } else {
-    let stdout;
-    const eslintBin = path.join(
-      cwd,
-      "node_modules",
-      ".bin",
-      process.platform === "win32" ? "eslint.cmd" : "eslint"
-    );
-    const args = [".", "--format", "json", "--cache", "--cache-location", ".eslintcache"];
-    if (fs.existsSync(path.join(cwd, "config/quality/eslint-suppressions.json"))) {
-      args.push("--suppressions-location", "config/quality/eslint-suppressions.json");
-      args.push("--pass-on-unpruned-suppressions");
-    }
-    try {
-      // Prefer local bin (Windows-safe .cmd); shell only when needed for the shim.
-      stdout = execFileSync(eslintBin, args, {
-        encoding: "utf8",
-        maxBuffer: 256 * 1024 * 1024,
-        shell: process.platform === "win32",
-      });
-    } catch (e) {
-      // Exit 1 is a completed policy failure. Tool/setup failures are not zero findings.
-      if (e.status !== 1 || e.signal || !e.stdout?.length) throw e;
-      stdout = e.stdout.toString();
-    }
-    results = JSON.parse(stdout);
+    // Throws when Oxlint is killed or prints no report: a tool failure is not zero findings.
+    report = runOxlintJson(["."], { cwd, bin: oxlintBin(cwd) }).report;
   }
-  const counts = eslintMeasurementCounts(results);
+  const counts = lintMeasurementCounts(report);
   out.eslintWarnings = counts.warnings;
   out.eslintErrors = counts.errors;
 }
@@ -262,9 +241,9 @@ async function i18nUiCoverage() {
 
 // Only run the collection pipeline when this file is executed directly.
 // When imported (e.g. in tests), only the exported pure functions are available
-// without triggering the expensive ESLint + i18n filesystem walks.
+// without triggering the lint + i18n filesystem walks.
 if (import.meta.url === pathToFileURL(process.argv[1] || "").href) {
-  eslintCounts();
+  lintCounts();
   coverage();
   coverageByModule();
   openapiCoverage();

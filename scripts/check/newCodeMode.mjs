@@ -123,37 +123,6 @@ export function withBaseWorktree(sha, fn) {
 }
 
 /**
- * Pure: per-file count of ESLint messages whose ruleId is in `rules`.
- * `filePath` is made relative to `cwd` so HEAD and base reports share keys.
- */
-export function perFileRuleCounts(report, rules, cwd) {
-  let realCwd = cwd;
-  try {
-    realCwd = fs.realpathSync(cwd);
-  } catch {
-    /* fallback to cwd */
-  }
-  const counts = new Map();
-  for (const entry of report || []) {
-    let filePath = entry.filePath;
-    if (path.isAbsolute(filePath)) {
-      try {
-        filePath = fs.realpathSync(filePath);
-      } catch {
-        /* fallback */
-      }
-    }
-    const rel = path.isAbsolute(filePath)
-      ? path.relative(realCwd, filePath).split(path.sep).join("/")
-      : filePath;
-    let n = 0;
-    for (const m of entry.messages || []) if (rules.has(m.ruleId)) n++;
-    counts.set(rel, (counts.get(rel) || 0) + n);
-  }
-  return counts;
-}
-
-/**
  * Pure: which changed files gained violations. A file absent from the base map is new
  * (base = 0). Returns the per-file regressions and the net delta over the changed set.
  */

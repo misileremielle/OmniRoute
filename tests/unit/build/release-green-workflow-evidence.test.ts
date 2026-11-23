@@ -88,7 +88,7 @@ function observe({
       "validate-release-green.mjs",
       "gate-process.mjs",
       "release-green-static-profile.mjs",
-      "eslint-measurement.mjs",
+      "oxlint-report.mjs",
     ]) {
       cpSync(new URL(`scripts/quality/${name}`, root), join(dir, "scripts/quality", name));
     }
@@ -156,12 +156,12 @@ function observe({
         `if (process.argv[3] === "check:complexity-ratchets") console.log("complexity=0\\ncognitiveComplexity=0\\n[complexity] OK — 0 violações (baseline 0)\\n[cognitive-complexity] OK — 0 violações (baseline 0)");\n`,
       { mode: 0o755 }
     );
-    // ESLint is not under test here; emit one complete zero-count measurement record.
-    const lintReport = JSON.stringify([
-      { filePath: "/fixture.ts", errorCount: 0, warningCount: 0 },
-    ]);
+    // Oxlint is not under test here; emit one complete zero-finding report. The validator
+    // runs the repository's own binary (node_modules/.bin/oxlint), never one from PATH.
+    const lintReport = JSON.stringify({ diagnostics: [], number_of_files: 1 });
+    mkdirSync(join(dir, "node_modules/.bin"), { recursive: true });
     writeFileSync(
-      join(bin, "npx"),
+      join(dir, "node_modules/.bin/oxlint"),
       `#!${process.execPath}\nconsole.log(${JSON.stringify(lintReport)});\n`,
       {
         mode: 0o755,

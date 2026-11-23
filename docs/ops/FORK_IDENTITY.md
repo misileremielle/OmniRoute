@@ -56,6 +56,49 @@ they are dropped again.
   fork's own. Upstream changes to them are not merged wholesale; port a new gate by hand
   when it applies (the type-scale ratchet step was ported this way).
 
+## Linting
+
+The fork lints with [Oxlint](https://oxc.rs) and has no ESLint package, config or script.
+Prettier still formats. Upstream keeps ESLint, so every merge brings ESLint files back.
+
+| Upstream (ESLint)                                                       | Fork (Oxlint)                                                               |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `eslint.config.mjs`                                                     | `.oxlintrc.json`                                                            |
+| `config/quality/eslint-suppressions.json`                               | `oxlint-suppressions.json` at the repo root (Oxlint has no location option) |
+| `eslint.complexity.config.mjs`, `eslint.complexity-ratchets.config.mjs` | `oxlint.complexity.json`                                                    |
+| `scripts/quality/run-eslint-json.mjs`, `eslint-measurement.mjs`         | `scripts/quality/run-oxlint-json.mjs`, `scripts/quality/oxlint-report.mjs`  |
+| `scripts/check/complexityEslintReport.mjs`                              | `scripts/check/complexityLintReport.mjs`                                    |
+| `eslint-plugin-sonarjs` (cognitive complexity)                          | `oxlint-plugin-complexity`                                                  |
+| `ESLINT_RESULTS_JSON`, `COMPLEXITY_ESLINT_REPORT`                       | `LINT_RESULTS_JSON`, `COMPLEXITY_LINT_REPORT`                               |
+
+What stays the same: the `lint`, `lint:json`, `check:complexity*` and `quality:*` script
+names, and the metric keys `eslintWarnings` / `eslintErrors` / `cognitiveComplexity` in
+`config/quality/quality-baseline.json` (kept so the baseline files merge).
+
+Things that differ from ESLint and matter in a merge:
+
+- **Frozen debt** is `oxlint-suppressions.json`, written by `pnpm exec oxlint --suppress-all .`
+  and trimmed by `pnpm exec oxlint --prune-suppressions .`. Both flags are hidden from
+  `oxlint --help` upstream and may change, which is one reason the three Oxlint packages are
+  exact pins (`tests/unit/oxlint-version-pinned.test.ts`). An upgrade is its own change that
+  regenerates the file and the complexity baselines.
+- **Stale entries**: `pnpm run lint` and the commit hook fail when a frozen violation was
+  fixed and not pruned. `lint:json`, `quality:collect`, the release-green validator and the
+  complexity ratchets tolerate it (`scripts/quality/oxlint-report.mjs`), as upstream's
+  `--pass-on-unpruned-suppressions` did. The commit hook runs `oxlint` without `--fix`,
+  because `--fix` rewrites the suppressions file silently.
+- **`no-restricted-syntax`** has no native Oxlint rule. It runs from `oxlint-plugin-eslint`
+  under the alias `eslint-js`, so a disable comment must name both:
+  `// eslint-disable-next-line no-restricted-syntax, eslint-js/no-restricted-syntax -- reason`.
+  Other `eslint-disable` comments work unchanged.
+- **Stricter rules**: Oxlint's `no-restricted-imports` also checks dynamic `import()`, and its
+  React Compiler rules and `next/no-html-link-for-pages` report code that ESLint accepts. New
+  upstream code can therefore fail the fork's lint while passing upstream's.
+- **Complexity baselines** (`config/quality/complexity-baseline.json`, `cognitiveComplexity`
+  in `quality-baseline.json`) are Oxlint measurements of the fork's tree, frozen exactly as
+  measured. Upstream's numbers are ESLint/sonarjs measurements of a larger tree and are not
+  comparable; in a conflict keep the fork's value and re-measure.
+
 ## Database migrations
 
 Upstream froze the three-digit migration set at `241` and names new migrations by UTC
@@ -103,11 +146,20 @@ timestamp. The fork's own migrations therefore use timestamps too:
    tests.
 9. **Dependencies**: keep `package.json` scripts on pnpm, sync the overrides with
    `pnpm-workspace.yaml`, run `pnpm install --no-frozen-lockfile` and commit the lockfile.
-10. **Checks**: no conflict markers; run the test files touched by the merge one at a time
-    (`node --import tsx/esm --test <file>`); then the full suites, typecheck and lint on a
-    machine with enough memory (`pnpm run typecheck:core`, `pnpm run lint`,
-    `pnpm run test:unit`, `pnpm run test:vitest`).
-11. Commit the merge in the worktree. Add a row to the history below.
+10. **Lint tooling**: delete the ESLint files upstream brings back (left column of the table
+    in "Linting") and any upstream test written for them; port a rule upstream added to
+    `eslint.config.mjs` into `.oxlintrc.json`; keep ESLint packages out of `package.json`,
+    the overrides, `knip.json`, `config/quality/dependency-allowlist.json` and
+    `.github/dependabot.yml`. Then refreeze and re-measure, and review what changed before
+    committing it:
+    `pnpm exec oxlint --suppress-all .`, `pnpm exec oxlint --prune-suppressions .`,
+    `node scripts/check/check-complexity-ratchets.mjs` (set the two baselines to the measured
+    values when upstream code moved them).
+11. **Checks**: no conflict markers; run the test files touched by the merge one at a time
+    (`node --import tsx/esm --test <file>`); `pnpm run lint` (a full walk takes seconds); then
+    the full suites and typecheck on a machine with enough memory
+    (`pnpm run typecheck:core`, `pnpm run test:unit`, `pnpm run test:vitest`).
+12. Commit the merge in the worktree. Add a row to the history below.
 
 ## Sync history
 
@@ -115,3 +167,4 @@ timestamp. The fork's own migrations therefore use timestamps too:
 | ---------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-11    | `release/v3.8.54` (two syncs) | Merge commit `4a2c8f44eb`                                                                                                                                     |
 | 2026-11-22 | `release/v3.8.55`             | Fork migrations moved to timestamps; docs-counts gate re-ported; `keenable` search/fetch, `custom-json` nodes, `jev` and decision routing taken from upstream |
+| 2026-11-23 | (no upstream change)          | Lint switched from ESLint to Oxlint; lint and complexity baselines regenerated                                                                                |
