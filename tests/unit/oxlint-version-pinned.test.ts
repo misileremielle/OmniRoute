@@ -2,10 +2,10 @@
  * oxlint-version-pinned.test.ts — keep lint policy deterministic.
  *
  * A new Oxlint or lint-plugin release can change diagnostics, so resolving a newer version from
- * unchanged source can produce unrelated lint failures or shift the complexity baselines. The
+ * unchanged source can produce unrelated lint failures. The
  * bulk-suppressions feature the baseline relies on is also still undocumented upstream and may
  * change. Keep the direct declarations exact and aligned with the lockfile; an upgrade is a
- * deliberate change that regenerates oxlint-suppressions.json and the complexity baselines.
+ * deliberate change that regenerates oxlint-suppressions.json.
  */
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 import { importerDependency, readPnpmLock } from "../../scripts/ci/pnpmLock.mjs";
 
 const ROOT = new URL("../../", import.meta.url);
-const PINNED = ["oxlint", "oxlint-plugin-eslint", "oxlint-plugin-complexity"];
+const PINNED = ["oxlint", "oxlint-plugin-eslint"];
 const REMOVED = [
   "eslint",
   "@eslint/compat",

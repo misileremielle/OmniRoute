@@ -25,10 +25,6 @@ updates:
       # Integration in one shot (#7068).
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
-      # jscpd: the fork removed the duplication gate that pinned jscpd@4; the
-      # devDependency is unused until it is removed.
-      - dependency-name: "jscpd"
-        update-types: ["version-update:semver-major"]
       # ioredis is a SOFT/optional dependency loaded through a dynamic import
       # (src/lib/quota/redisQuotaStore.ts — "Redis driver requires ioredis package"),
       # so a breaking major never fails at build or typecheck time: the only consumers
@@ -55,13 +51,12 @@ updates:
       # the same deliberate migration PR. Freezing it keeps the production group PRs
       # (e.g. #12219) from being born red on the pair contract.
       - dependency-name: "onnxruntime-node"
-      # oxlint and its two JS plugins are exact pins checked by a contract test
-      # (tests/unit/oxlint-version-pinned.test.ts): a new release can change diagnostics, the
-      # frozen oxlint-suppressions.json and the complexity baselines. An upgrade is its own PR
+      # oxlint and its JS plugin are exact pins checked by a contract test
+      # (tests/unit/oxlint-version-pinned.test.ts): a new release can change diagnostics and the
+      # frozen oxlint-suppressions.json. An upgrade is its own PR
       # that regenerates them; it must not ride a dependabot group.
       - dependency-name: "oxlint"
       - dependency-name: "oxlint-plugin-eslint"
-      - dependency-name: "oxlint-plugin-complexity"
       # The four entries below came out of the development group #17197 (26 updates),
       # which could not land because these bumps break contracts or need a migration.
       # Each one has to move in its own PR; the rest of the group stays automatic.
