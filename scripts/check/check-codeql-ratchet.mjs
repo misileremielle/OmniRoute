@@ -574,7 +574,7 @@ export function codeqlRunVerdict(runs) {
   // The conclusion must fit the status: null while pending, a known value once completed.
   const inconsistent = records.find((r) =>
     PENDING_RUN_STATUSES.has(r.status)
-      ? r.conclusion !== null && r.conclusion !== undefined
+      ? r.conclusion !== null
       : r.status !== "completed" || !RUN_CONCLUSIONS.has(r.conclusion)
   );
   if (inconsistent) {

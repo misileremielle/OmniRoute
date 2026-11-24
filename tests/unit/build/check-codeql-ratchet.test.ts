@@ -491,6 +491,7 @@ test("codeqlRunVerdict: the newest finished run decides, cancelled and skipped r
   // without a known one.
   for (const bad of [
     { status: "in_progress", conclusion: "failure" },
+    { status: "in_progress" },
     { status: "completed", conclusion: null },
     { status: "completed", conclusion: "mystery" },
   ]) {
