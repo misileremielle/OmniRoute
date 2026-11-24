@@ -10,10 +10,9 @@ const posix = { skip: process.platform === "win32" };
 const releases = [
   ["gitleaks/gitleaks", "v8.30.1"],
   ["google/osv-scanner", "v2.3.8"],
-  ["oasdiff/oasdiff", "v1.19.1"],
 ];
 
-test("full quality scanner downloads use all three explicit auditor versions", posix, () => {
+test("full quality scanner downloads use both explicit auditor versions", posix, () => {
   const commands = readFileSync(installer, "utf8")
     .split("\n")
     .filter((line) => /^\s*(?:[A-Z_]+_VERSION=|gh release download )/.test(line));

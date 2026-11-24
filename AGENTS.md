@@ -16,11 +16,9 @@ pnpm run build:release         # Release build
 pnpm run lint                  # Oxlint (0 errors expected; frozen debt is in oxlint-suppressions.json)
 pnpm run typecheck:core        # TypeScript check (should be clean)
 pnpm run typecheck:noimplicit:core # Strict check (no implicit any)
-pnpm run test:coverage         # Unit tests + coverage gate (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60)
+pnpm run test:coverage         # Unit tests with coverage; fails below 60% (CI only reports coverage, on main)
 pnpm run check                 # lint + test combined
-pnpm run check:cycles          # Detect circular dependencies (advisory — lists the SCCs)
-pnpm run check:cycles:ratchet  # Same scan, blocking above the quality-baseline ceiling
-pnpm run check:docs-all        # Run after changing documentation (includes fabricated-docs validation)
+pnpm run check:docs-sync       # Run after changing documentation (also runs in pre-commit)
 ```
 
 Running tests: see [Testing](#testing) below (run the most focused test for changed code first).
@@ -104,7 +102,7 @@ Read the nearest `AGENTS.md` and the linked deep-dive before making a non-trivia
 
 **The project root MUST ONLY contain:**
 
-- Configuration files (`vitest.config.ts`, `next.config.mjs`, `.oxlintrc.json`, `oxlint.complexity.json`, `oxlint-suppressions.json`, `tsconfig*.json`, `playwright.config.ts`, `prettier.config.mjs`, `postcss.config.mjs`, `sonar-project.properties`, `fly.toml`, `docker-compose*.yml`, `Dockerfile`)
+- Configuration files (`vitest.config.ts`, `next.config.mjs`, `.oxlintrc.json`, `oxlint-suppressions.json`, `tsconfig*.json`, `playwright.config.ts`, `prettier.config.mjs`, `postcss.config.mjs`, `sonar-project.properties`, `fly.toml`, `docker-compose*.yml`, `Dockerfile`)
 - Dependency files (`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`)
 - Documentation files (`README.md`, `CHANGELOG.md`, `ROADMAP.md`, `LICENSE`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `llm.txt`)
 - CI/CD files and ignore definitions (`.gitignore`, `.dockerignore`, `.npmignore`, `.npmrc`, `.node-version`, `.nvmrc`, `.env.example`)
@@ -170,8 +168,8 @@ Documentation must describe verified behavior, not plausible behavior.
    directory-specific count command.
 3. Copy code examples from working usage or run them. Prefer a source link such as
    `path/to/file.ts:line` to an invented signature.
-4. Run `pnpm run check:docs-all` for edits under `docs/`; it includes the fabricated-docs
-   validation.
+4. Run `pnpm run check:docs-sync` for edits under `docs/`. The fork removed the link and
+   fabricated-docs checkers, so steps 1–3 are the only guard against invented names.
 5. Edit only the English source. The fork removed the `docs/i18n/**` mirrors and their
    translation scripts (`docs/ops/FORK_IDENTITY.md`); do not add them back.
 
@@ -203,7 +201,7 @@ For any non-trivial change, read the matching deep-dive first:
 - Authorization pipeline — `docs/architecture/AUTHZ_GUIDE.md`
 - API reference + OpenAPI — `docs/reference/API_REFERENCE.md` + `docs/openapi.yaml` · Provider catalog (auto-generated) — `docs/reference/PROVIDER_REFERENCE.md`
 - Release flow — `docs/ops/RELEASE_CHECKLIST.md` · Worktree protocol — `docs/ops/WORKTREE_ISOLATION.md` · Hard Rules detail — `docs/ops/HARD_RULES_DETAIL.md` · Build warnings + Bun troubleshooting — `docs/ops/BUILD_WARNINGS.md`
-- Embedded services — `docs/frameworks/EMBEDDED-SERVICES.md` · Quality gates (~90 scripts, allowlist policy) — `docs/architecture/QUALITY_GATES.md`
+- Embedded services — `docs/frameworks/EMBEDDED-SERVICES.md` · Quality gates (what CI blocks on) — `docs/architecture/QUALITY_GATES.md`
 
 ---
 
@@ -212,7 +210,7 @@ For any non-trivial change, read the matching deep-dive first:
 - Unit tests — `pnpm run test:unit`; single file (Node native test runner — most tests) — `node --import tsx/esm --test tests/unit/your-file.test.ts`
 - Vitest (autoCombo, combo, cache) — `pnpm run test:vitest`; all suites — `pnpm run test:all`
 - E2E (Playwright) — `pnpm run test:e2e`; Ecosystem — `pnpm run test:ecosystem` (CI job `test-ecosystem`, blocking)
-- Coverage gate — `pnpm run test:coverage` (67.33 / 67.33 / 72.02 / 65.08 — statements/lines/functions/branches, enforced by the blocking ratchet in config/quality/quality-baseline.json; test:coverage itself hardcodes 60); report — `pnpm run coverage:report`
+- Coverage — `pnpm run test:coverage` fails below 60% locally. CI measures coverage only on pushes to `main`, as a report that never blocks; report — `pnpm run coverage:report`
 - Full test matrix: `CONTRIBUTING.md` → "Running Tests"
 
 **PR rule**: If you change production code in `src/`, `open-sse/`, `electron/`, or `bin/`, you must include or update tests in the same PR.
@@ -275,7 +273,7 @@ git push -u origin feat/your-feature
 **Husky hooks**:
 
 - **pre-commit**: lint-staged + `check-docs-sync` + `check:any-budget:t11` + `check:tracked-artifacts`
-- **commit-msg**: `check:ai-attribution` — rejects AI/bot `Co-Authored-By` trailers and AI-generation footers in the message (human co-authors allowed; also in the `quality.yml` fast-gates loop (PR→`release/**`) and a PR-only `ci.yml` lint step (PR→`main`) — #14436)
+- **commit-msg**: `check:ai-attribution` — rejects AI/bot `Co-Authored-By` trailers and AI-generation footers in the message (human co-authors allowed; the fork runs it in the hook only)
 - **pre-push**: intentionally light (PATH/pnpm sanity only) — `any-budget` + `tracked-artifacts` already run on pre-commit and CI still enforces both; re-running them per push was pure double-pay (was Fase 6A.12 full pre-push gate; folded into pre-commit in #6716).
 
 ### Worktree isolation (MANDATORY for every development task)
@@ -303,20 +301,11 @@ Full protocol with commands and incident history:
 
 ### Base-green check (PRs must not be born red)
 
-Before cutting a branch, merging the base into a PR branch, mass-retargeting PRs, or opening a
-PR, check the base tip's `🔴 Release branch not green: <branch>` issue (label `base-red`):
-`gh issue list --repo cheaper-inference/OmniRoute --state open --search "Release branch not green: <base> in:title"`.
-If red: never treat or "fix" the inherited failures in your branch (a base-red fix is its own
-freeze-gated `fix/release-vX.Y.Z-basereds` PR); a PR opened anyway carries
-`⚠️ base-red inherited: #<issue>` in its body. Full procedure: `docs/ops/WORKTREE_ISOLATION.md`.
-
-### Sync-back landings are fast-forward, never squash
-
-A `main → release/vX+1` sync-back lands as the merge commit it already is
-(`git push origin <head>:refs/heads/release/vX+1`), never squashed — a squash drops `main` from
-the release ancestry and the next sync-back re-conflicts on every file (551 on v3.8.50 → v3.8.51).
-After landing, `git merge-base --is-ancestor origin/main origin/release/vX+1` must be true.
-Steps + baseline-freeze check: `docs/ops/WORKTREE_ISOLATION.md` → "Sync-back landings".
+Before cutting a branch, merging the base into a PR branch, or opening a PR, check the CI run for
+the exact base commit: `Gate / CI` must have succeeded with Build, Unit and Vitest actually run.
+Draft and docs-only runs do not count. If red, never treat or "fix" the inherited failures in your
+branch (a base-red fix is its own PR); a PR opened anyway carries `⚠️ base-red inherited` in its
+body. Commands: `docs/ops/WORKTREE_ISOLATION.md` → "Base-green check".
 
 ---
 
@@ -333,7 +322,8 @@ removes, what it adds, and the step-by-step procedure for merging the next upstr
   `docs/reference/REMOVED_PROVIDERS.md`.
 - Keep the fork's packaging: pnpm (never npm/npx in scripts, hooks or workflows) and the
   `ghcr.io/misileremielle/omniroute` image.
-- `.github/workflows/ci.yml`, `docker-publish.yml` and `.mergify.yml` are the fork's own.
+- `.github/workflows/ci.yml` and `docker-publish.yml` are the fork's own; the fork has no
+  merge queue, Mergify, release-green or nightly workflows.
 - New migrations are timestamp-named (`pnpm run db:new-migration -- <name>`); never add a
   three-digit migration file.
 - This file and `llm.txt` carry no derived counts; `pnpm run facts` prints the live ones.
@@ -352,7 +342,7 @@ Upstream is the canonical `cheaper-inference/OmniRoute` repository (formerly `di
 
 - **Runtime**: Node.js ≥22.22.2 <23 || ≥24.0.0 <27, ES Modules — the **only supported** runtime for the published `omniroute` CLI, the server, and the test suites (`node:test` + vitest); `engines.node` is authoritative and end users never need Bun. A **best-effort `bun:sqlite` compatibility path** exists so a global Bun install (`bun install -g omniroute`) can start without `better-sqlite3` (driver adapter + Bun-aware process spawning); it is **not** a supported runtime — no support guarantees — and every Bun-specific runtime change MUST preserve the Node driver/fallback chain and ship a Bun test (`test:bun:db`) or an explicit reason why the path is Node-only.
 - **Package manager (checkout)**: pnpm, pinned in `config/ci/toolchain.json` and `packageManager`; `pnpm-lock.yaml` is the lockfile (there is no `package-lock.json`). `pnpm-workspace.yaml` holds the workspaces, `allowBuilds` (only listed packages run install scripts; `onnxruntime-node` is denied), the dependency `overrides` (mirrored in `package.json` — `tests/unit/build/pnpm-overrides-sync.test.ts` keeps them equal) and `nodeLinker: hoisted`. Keep `hoisted`: with pnpm's isolated layout `scripts/build/assembleStandalone.mjs` produces a standalone bundle that loses `better-sqlite3` (silent `node:sqlite` fallback) and keeps absolute symlinks once moved. A test that imports an undeclared package can still pass under `hoisted` — declare every package a test or script imports. End users still install the published package with `npm install -g omniroute`.
-- **Bun (build/dev script runner + compatibility smoke only)**: Bun `1.4.4` is pinned as an **exact devDependency** (provisioned through the existing `pnpm install` via the lockfile's `@oven/bun-*` platform binaries — no `setup-bun`/ad-hoc install). It executes **only** an allow-listed set of TypeScript gate/generator scripts (replacing `node --import tsx` for startup speed): the CI checks `check:provider-consistency`, `check:compression-budget`, `check:known-symbols`; the non-CI `gen:provider-reference`, `bench:compression`; plus the `test:bun:db` compatibility smoke suite. **Do NOT widen Bun to dependency installation (`pnpm install`), the build (`build:cli*`), `check:pack-artifact`, the supported published runtime, or the main test runners** — those stay on Node. Any new Bun-invoking script must be validated byte-identical against its `node --import tsx` output first. Bun failing (`bun: not found`, or the skipped-`postinstall` placeholder binary): `docs/ops/BUILD_WARNINGS.md` → "Bun script-runner failures".
+- **Bun (build/dev script runner + compatibility smoke only)**: Bun `1.4.4` is pinned as an **exact devDependency** (provisioned through the existing `pnpm install` via the lockfile's `@oven/bun-*` platform binaries — no `setup-bun`/ad-hoc install). It executes **only** an allow-listed set of TypeScript gate/generator scripts (replacing `node --import tsx` for startup speed): the CI checks `check:provider-consistency`, `check:known-symbols`; the non-CI `gen:provider-reference`, `bench:compression`; plus the `test:bun:db` compatibility smoke suite. **Do NOT widen Bun to dependency installation (`pnpm install`), the build (`build:cli*`), `check:pack-artifact`, the supported published runtime, or the main test runners** — those stay on Node. Any new Bun-invoking script must be validated byte-identical against its `node --import tsx` output first. Bun failing (`bun: not found`, or the skipped-`postinstall` placeholder binary): `docs/ops/BUILD_WARNINGS.md` → "Bun script-runner failures".
 - **TypeScript**: 6.0+, target ES2022, module esnext, resolution bundler
 - **Path aliases**: `@/*` → `src/`, `@omniroute/open-sse` → `open-sse/`, `@omniroute/open-sse/*` → `open-sse/*`
 - **Default port**: 20128 (API + dashboard on same port)
@@ -362,22 +352,20 @@ Upstream is the canonical `cheaper-inference/OmniRoute` repository (formerly `di
 
 ---
 
-## Quality Gates & Ratchets
+## Quality Gates
 
-OmniRoute has **~90 quality-gate scripts** (`scripts/check/` + `scripts/quality/`) wired across **9 gate-running jobs** in `.github/workflows/ci.yml`, plus the `quality.yml` fast-gates job (PR→`release/**`) and 5 quality nightly workflows. Full inventory, per-job breakdown, and operational procedures: [`docs/architecture/QUALITY_GATES.md`](docs/architecture/QUALITY_GATES.md).
+CI blocks on correctness only. `Gate / CI` (`.github/workflows/ci.yml`) rolls up: Oxlint and the
+rule guards (`lint`), the three typecheck programs, the security scans (dependency audit,
+lockfile, licenses, gitleaks, OSV, CodeQL ratchet, actionlint + zizmor), the build, unit (8
+shards), vitest and security tests; on `main` and manual runs also the package boot, E2E,
+integration, ecosystem and Bun SQLite suites. Coverage is measured on `main` and never blocks.
+Per-job detail: [`docs/architecture/QUALITY_GATES.md`](docs/architecture/QUALITY_GATES.md).
 
-**Quick reference:**
+The ratchets that remain run from the pre-commit hook (any-budget, type scale) or the security job
+(secrets, OSV, CodeQL, zizmor; baselines in `config/quality/quality-baseline.json`).
 
-- Gates in jobs `lint` + `docs-sync-strict`: pass/fail policy gates —
-  fix the violation or add an allowlist entry with a justification comment + tracking issue.
-- Gates in job `quality-gate`: ratchet — metrics (lint warnings, code coverage, duplication,
-  complexity) must not regress vs `quality-baseline.json`. Update via
-  `pnpm run quality:ratchet --update` when a metric genuinely improves.
-- Job `test-vitest` runs `pnpm run test:vitest` (autoCombo, combo, cache) — blocking.
-  `test:vitest:ui` has been blocking since PR #7127.
-- **Velocity phase (2026-08-30 → v4.0)**: every numeric baseline is loosened by 20% and `--require-tighten` is advisory (`quality-baseline.json` → `_policy`); the nightly `baseline-headroom` job tracks how much of the budget is left in the issue "📈 Baseline headroom". See `docs/architecture/QUALITY_GATES.md` → "Velocity phase".
-
-**Allowlist policy (short form):** fix the cause; use the allowlist only for pre-existing violations you cannot fix in the same PR (comment with justification + issue number). Stale entries are caught by the stale-enforcement added in Fase 6A.3.
+**Allowlist policy (short form):** fix the cause; use an allowlist only for a pre-existing
+violation you cannot fix in the same PR, with a justification comment and an issue number.
 
 ---
 
@@ -396,7 +384,7 @@ is a short form, its complete binding text, rationale and incident history are i
 6. Never silently swallow errors in SSE streams
 7. Always validate inputs with Zod schemas
 8. Always include tests when changing production code
-9. Coverage must not regress below the baseline frozen in `quality-baseline.json` (ratchet); absolute floor is 60% (statements/lines/functions/branches). Update the baseline via `pnpm run quality:ratchet --update` only when coverage genuinely improves. See `docs/architecture/QUALITY_GATES.md`.
+9. Coverage must stay at or above 60% (statements/lines/functions/branches; `pnpm run test:coverage` enforces it locally). CI reports coverage on `main` without blocking, so check it yourself when you change production code. See `docs/architecture/QUALITY_GATES.md`.
 10. Never bypass Husky hooks (`--no-verify`, `--no-gpg-sign`) without explicit operator approval.
 11. Never embed public upstream OAuth client_id/secret or Firebase Web keys as string literals — always go through `resolvePublicCred()` (`open-sse/utils/publicCreds.ts`). See `docs/security/PUBLIC_CREDS.md`.
 12. Never return raw `err.stack` / `err.message` in HTTP / SSE / executor responses — always route through `buildErrorBody()` or `sanitizeErrorMessage()` (`open-sse/utils/error.ts`). See `docs/security/ERROR_SANITIZATION.md`.
@@ -406,7 +394,7 @@ is a short form, its complete binding text, rationale and incident history are i
 16. Never expose routes under `/api/services/` or `/dashboard/providers/services/*/embed/` without `isLocalOnlyPath()` classification in `src/server/authz/routeGuard.ts`. These routes can spawn child processes (`npm install`, `node`). Loopback enforcement happens unconditionally before any auth check — a leaked JWT via tunnel cannot trigger process spawning. See `docs/security/ROUTE_GUARD_TIERS.md`.
 17. Every bug fix must be validated before shipping: a failing-then-passing unit/integration test (TDD) OR a documented live test on the production VPS (192.168.0.15). A fix without either is not merged. See Testing → "Bug fix / issue triage protocol" and `docs/ops/HARD_RULES_DETAIL.md` → Rule 17 for the full decision tree.
 18. Never develop on the shared main checkout. Every development task runs in its own git worktree on its own dedicated branch, and you MUST confirm the base branch with the operator before creating the worktree/branch — never assume `main` or the currently checked-out branch. A `git checkout` in the shared checkout silently destroys other sessions' uncommitted work. Tear down only the worktrees/branches you created (by name, never `fix/*`/`feat/*` wildcards), leave other sessions' worktrees untouched, and end on the branch you started on (the active `release/vX.Y.Z`, never `main`). See Git Workflow → "Worktree isolation" and `docs/ops/WORKTREE_ISOLATION.md`.
-20. **Release-freeze — the FROZEN release branch belongs to the release captain; development does NOT stop (parallel-cycle model, 2026-07-04).** Before merging **any** PR, every campaign workflow **MUST** check `gh issue list --repo cheaper-inference/OmniRoute --label release-freeze --state open`. If active: **NEVER merge into the frozen `release/vX.Y.Z`** — retarget the PR to the **highest** `release/v*` (`gh pr edit <N> --base release/vX+1`, then VERIFY with `gh pr view <N> --json baseRefName` — the edit fails silently) and merge normally; **HOLD only when the highest release/v\* branch IS the frozen one**. **⛔ ONLY `/generate-release` may raise a release-freeze (Phase 0a; lifted at Phase 12c)** — never open, extend, re-open or close one autonomously (any other freeze needs the operator's explicit yes). Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 20.
+20. **Release-freeze — the FROZEN release branch belongs to the release captain; development does NOT stop (parallel-cycle model, 2026-07-04).** _Fork: the fork has no release freezes; this rule applies only to PRs into upstream `cheaper-inference/OmniRoute`, never to fork PRs._ Before merging **any** PR, every campaign workflow **MUST** check `gh issue list --repo cheaper-inference/OmniRoute --label release-freeze --state open`. If active: **NEVER merge into the frozen `release/vX.Y.Z`** — retarget the PR to the **highest** `release/v*` (`gh pr edit <N> --base release/vX+1`, then VERIFY with `gh pr view <N> --json baseRefName` — the edit fails silently) and merge normally; **HOLD only when the highest release/v\* branch IS the frozen one**. **⛔ ONLY `/generate-release` may raise a release-freeze (Phase 0a; lifted at Phase 12c)** — never open, extend, re-open or close one autonomously (any other freeze needs the operator's explicit yes). Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 20.
 21. **Cross-session safety — this repo is worked by MANY parallel sessions/agents at once; never step on another's in-flight work.** Two absolute bans (both recurring incidents):
     - **(a) Never `git stash` / `git stash pop` — ANYWHERE in this repo, including inside an isolated worktree, and including inside any subagent you dispatch.** `git stash` operates on the **shared repository object store**, not the per-worktree working tree — a stash in one session can silently clobber or resurrect another parallel session's uncommitted changes. Compare against a base ref with `git show <ref>:<path>` or `git diff <ref> -- <path>` instead — never stash your tree away to "get it clean". **Put this ban verbatim in the prompt of every subagent that touches git.**
     - **(b) Never merge, push, rebase, or force-push a PR / branch / worktree that another session is actively working** — including a PR whose head is a live fix worktree in `.claude/worktrees/` you did **not** create, even when it shares your `diegosouzapw` identity: **HOLD, let the owning session merge it.** **Before** merging or pushing to any PR you did not create _this_ session, run `git worktree list` and re-check `gh pr view <N> --json state,headRefOid`. (Reinforces Rule #18.)

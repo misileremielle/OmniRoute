@@ -524,15 +524,17 @@ function revParseCommit(cwd, ref) {
 }
 
 /**
- * Lê `--base <ref>` / `--base=<ref>` e `--base-latest-tag` da linha de comando. Opção
- * desconhecida, ou as duas formas de base juntas → erro.
+ * Reads `--base <ref>` / `--base=<ref>`, `--base-latest-tag` and `--no-base` from the command
+ * line. `--no-base` turns the base comparison off, even on a PR event (the fork's CI runs
+ * the static checks only). An unknown option, or more than one base option → error.
  *
  * @param {string[]} argv
- * @returns {{ base: string | null, baseLatestTag: boolean }}
+ * @returns {{ base: string | null, baseLatestTag: boolean, noBase: boolean }}
  */
 export function parseGateArgs(argv) {
   let base = null;
   let baseLatestTag = false;
+  let noBase = false;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--base") {
@@ -545,16 +547,18 @@ export function parseGateArgs(argv) {
       if (!base) throw new Error("--base precisa de uma ref git");
     } else if (arg === "--base-latest-tag") {
       baseLatestTag = true;
+    } else if (arg === "--no-base") {
+      noBase = true;
     } else {
       throw new Error(
-        `opção desconhecida ${arg} (uso: check-migration-numbering [--base <ref> | --base-latest-tag])`
+        `opção desconhecida ${arg} (uso: check-migration-numbering [--base <ref> | --base-latest-tag | --no-base])`
       );
     }
   }
-  if (base && baseLatestTag) {
-    throw new Error("use --base <ref> OU --base-latest-tag, não os dois");
+  if ([Boolean(base), baseLatestTag, noBase].filter(Boolean).length > 1) {
+    throw new Error("use only one of --base <ref>, --base-latest-tag and --no-base");
   }
-  return { base, baseLatestTag };
+  return { base, baseLatestTag, noBase };
 }
 
 /**

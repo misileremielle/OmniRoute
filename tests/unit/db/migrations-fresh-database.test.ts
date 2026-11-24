@@ -4,8 +4,7 @@
 /**
  * Every migration applies to an empty database, in order — `npm run test:migrations:fresh`.
  *
- * Release-Green runs this file (scripts/quality/validate-release-green.mjs →
- * "migrations-fresh"). With timestamped migrations (`YYYYMMDDHHMMSS_description.sql`)
+ * The unit suite runs this file. With timestamped migrations (`YYYYMMDDHHMMSS_description.sql`)
  * two pull requests no longer race for a number, which moves the real risk here: a
  * migration from PR B that depends on a table created by PR A while B carries the
  * EARLIER timestamp. Each PR is green alone; together, on a fresh install, B runs

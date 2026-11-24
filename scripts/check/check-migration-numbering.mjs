@@ -387,11 +387,15 @@ function checkRemovals({ env, removed, baseFiles, headFiles }) {
 /**
  * Comparação com a base. Devolve as linhas de problema (falha) e imprime avisos e notas.
  *
- * @param {{ argvBase: string | null, baseLatestTag: boolean, regularNames: string[],
+ * @param {{ argvBase: string | null, baseLatestTag: boolean, noBase?: boolean, regularNames: string[],
  *   staticProblems: number }} input
  * @returns {string[]}
  */
-function compareWithBase({ argvBase, baseLatestTag, regularNames, staticProblems }) {
+function compareWithBase({ argvBase, baseLatestTag, noBase, regularNames, staticProblems }) {
+  if (noBase) {
+    console.log("[check-migration-numbering] base comparison: off (--no-base)");
+    return [];
+  }
   const env = process.env;
   const base = resolveBaseRef({ cwd, cliBase: argvBase, latestTag: baseLatestTag, env });
   if (base.status === "skipped") {
@@ -654,6 +658,7 @@ function main() {
     ...compareWithBase({
       argvBase: args.base,
       baseLatestTag: args.baseLatestTag,
+      noBase: args.noBase,
       regularNames: filenames,
       staticProblems,
     })

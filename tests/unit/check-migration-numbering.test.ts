@@ -643,3 +643,28 @@ test("gate hints: truncated range says restore (never allowlist); future stamp s
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
+
+test("--no-base parses alone and rejects a second base option", async () => {
+  const { parseGateArgs } = await import("../../scripts/check/lib/migrationBaseDiff.mjs");
+  assert.deepStrictEqual(parseGateArgs(["--no-base"]), {
+    base: null,
+    baseLatestTag: false,
+    noBase: true,
+  });
+  assert.throws(() => parseGateArgs(["--no-base", "--base", "main"]), /only one of/);
+  assert.throws(() => parseGateArgs(["--no-base", "--base-latest-tag"]), /only one of/);
+});
+
+test("--no-base skips the base comparison even on a pull_request event", async () => {
+  const { spawnSync } = await import("node:child_process");
+  const env = { ...process.env, GITHUB_EVENT_NAME: "pull_request" };
+  delete env.MIGRATION_BASE_REF;
+  delete env.GITHUB_BASE_REF;
+  const run = spawnSync(
+    process.execPath,
+    ["scripts/check/check-migration-numbering.mjs", "--no-base"],
+    { encoding: "utf8", env, timeout: 60_000 }
+  );
+  assert.strictEqual(run.status, 0, run.stdout + run.stderr);
+  assert.match(run.stdout, /base comparison: off \(--no-base\)/);
+});

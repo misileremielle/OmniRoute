@@ -163,7 +163,7 @@ FROM deps AS builder
 # validated 2026-07-05 with clean amd64 (12min14s, image smoke-tested:
 # /api/monitoring/health 200) and arm64 (qemu, exit 0, zero panic strings)
 # builds, and Turbopack cut the bare build from 17min to 9min on the same
-# 32-core box. See docs/ops/QUALITY_GATE_PLAYBOOK.md Parte 6.
+# 32-core box.
 #
 # Declared as ARG+ENV, not a bare ENV: a bare ENV shadows any same-named ARG for
 # the rest of the stage, so `--build-arg OMNIROUTE_USE_TURBOPACK=0` was silently

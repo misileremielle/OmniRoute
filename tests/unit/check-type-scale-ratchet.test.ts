@@ -5,8 +5,6 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { load as parseYaml } from "js-yaml";
-
 import {
   compare,
   countViolations,
@@ -100,24 +98,8 @@ test("the live src/ tree stays within the type scale baseline", () => {
   );
 });
 
-// `git commit --no-verify` skips the hook, so the ratchet also runs as a blocking step of the
-// quality-gate job, and the local release-green observer models that step.
-test("CI runs the type scale ratchet as a blocking quality-gate step", () => {
-  const ci = parseYaml(fs.readFileSync(path.join(ROOT, ".github/workflows/ci.yml"), "utf8")) as {
-    jobs: Record<string, { steps: { run?: string; "continue-on-error"?: unknown }[] }>;
-  };
-  const step = ci.jobs["quality-gate"].steps.find(
-    (s) => s.run?.trim() === "pnpm run check:type-scale-ratchet --ratchet"
-  );
-  assert.ok(step, "quality-gate runs check:type-scale-ratchet with --ratchet");
-  assert.notEqual(step["continue-on-error"], true, "blocking, not advisory");
-  const profile = JSON.parse(
-    fs.readFileSync(path.join(ROOT, "config/quality/release-green-static-profile.json"), "utf8")
-  ) as { gates: { id: string; job: string; args: string[]; kind: string }[] };
-  const gate = profile.gates.find((g) => g.id === "check:type-scale-ratchet");
-  assert.deepEqual(gate && { job: gate.job, args: gate.args, kind: gate.kind }, {
-    job: "quality-gate",
-    args: ["run", "check:type-scale-ratchet", "--", "--ratchet"],
-    kind: "hard",
-  });
+// The fork runs the ratchet from the pre-commit hook only (CI blocks on correctness gates).
+test("the pre-commit hook runs the type scale ratchet", () => {
+  const hook = fs.readFileSync(path.join(ROOT, ".husky/pre-commit"), "utf8");
+  assert.match(hook, /^node scripts\/check\/check-type-scale-ratchet\.mjs --ratchet\b/m);
 });

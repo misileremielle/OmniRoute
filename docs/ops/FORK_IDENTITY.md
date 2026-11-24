@@ -53,28 +53,24 @@ they are dropped again.
 - **`kagi-search`** search provider.
 - **Performance work**: batched log writes, the per-handle capabilities-table guard in
   `src/lib/modelsDevSync.ts`, the per-attempt body copy in `prepareUpstreamBody`.
-- **Workflows**: `.github/workflows/ci.yml`, `docker-publish.yml` and `.mergify.yml` are the
-  fork's own. Upstream changes to them are not merged wholesale; port a new gate by hand
-  when it applies (the type-scale ratchet step was ported this way).
+- **Workflows**: `.github/workflows/ci.yml` and `docker-publish.yml` are the fork's own; see
+  "CI and CD" below. Upstream changes to them are not merged wholesale; port a gate by hand
+  only when it checks correctness.
 
 ## Linting
 
 The fork lints with [Oxlint](https://oxc.rs) and has no ESLint package, config or script.
 Prettier still formats. Upstream keeps ESLint, so every merge brings ESLint files back.
 
-| Upstream (ESLint)                                                       | Fork (Oxlint)                                                               |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `eslint.config.mjs`                                                     | `.oxlintrc.json`                                                            |
-| `config/quality/eslint-suppressions.json`                               | `oxlint-suppressions.json` at the repo root (Oxlint has no location option) |
-| `eslint.complexity.config.mjs`, `eslint.complexity-ratchets.config.mjs` | `oxlint.complexity.json`                                                    |
-| `scripts/quality/run-eslint-json.mjs`, `eslint-measurement.mjs`         | `scripts/quality/run-oxlint-json.mjs`, `scripts/quality/oxlint-report.mjs`  |
-| `scripts/check/complexityEslintReport.mjs`                              | `scripts/check/complexityLintReport.mjs`                                    |
-| `eslint-plugin-sonarjs` (cognitive complexity)                          | `oxlint-plugin-complexity`                                                  |
-| `ESLINT_RESULTS_JSON`, `COMPLEXITY_ESLINT_REPORT`                       | `LINT_RESULTS_JSON`, `COMPLEXITY_LINT_REPORT`                               |
+| Upstream (ESLint)                                               | Fork (Oxlint)                                                               |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `eslint.config.mjs`                                             | `.oxlintrc.json`                                                            |
+| `config/quality/eslint-suppressions.json`                       | `oxlint-suppressions.json` at the repo root (Oxlint has no location option) |
+| `scripts/quality/run-eslint-json.mjs`, `eslint-measurement.mjs` | `scripts/quality/oxlint-report.mjs`                                         |
 
-What stays the same: the `lint`, `lint:json`, `check:complexity*` and `quality:*` script
-names, and the metric keys `eslintWarnings` / `eslintErrors` / `cognitiveComplexity` in
-`config/quality/quality-baseline.json` (kept so the baseline files merge).
+The `lint` script name stays. The complexity ratchets, `lint:json` and the `quality:*` metrics
+scripts were removed with the CI slim-down (see "CI and CD"); delete them when a merge brings
+them back.
 
 Things that differ from ESLint and matter in a merge:
 
@@ -82,10 +78,9 @@ Things that differ from ESLint and matter in a merge:
   and trimmed by `pnpm exec oxlint --prune-suppressions .`. Both flags are hidden from
   `oxlint --help` upstream and may change, which is one reason the three Oxlint packages are
   exact pins (`tests/unit/oxlint-version-pinned.test.ts`). An upgrade is its own change that
-  regenerates the file and the complexity baselines.
+  regenerates the file.
 - **Stale entries**: `pnpm run lint` and the commit hook fail when a frozen violation was
-  fixed and not pruned. `lint:json`, `quality:collect`, the release-green validator and the
-  complexity ratchets tolerate it (`scripts/quality/oxlint-report.mjs`), as upstream's
+  fixed and not pruned. `scripts/quality/oxlint-report.mjs` tolerates it, as upstream's
   `--pass-on-unpruned-suppressions` did. The commit hook runs `oxlint` without `--fix`,
   because `--fix` rewrites the suppressions file silently.
 - **`no-restricted-syntax`** has no native Oxlint rule. It runs from `oxlint-plugin-eslint`
@@ -95,10 +90,33 @@ Things that differ from ESLint and matter in a merge:
 - **Stricter rules**: Oxlint's `no-restricted-imports` also checks dynamic `import()`, and its
   React Compiler rules and `next/no-html-link-for-pages` report code that ESLint accepts. New
   upstream code can therefore fail the fork's lint while passing upstream's.
-- **Complexity baselines** (`config/quality/complexity-baseline.json`, `cognitiveComplexity`
-  in `quality-baseline.json`) are Oxlint measurements of the fork's tree, frozen exactly as
-  measured. Upstream's numbers are ESLint/sonarjs measurements of a larger tree and are not
-  comparable; in a conflict keep the fork's value and re-measure.
+
+## CI and CD
+
+The fork blocks only on correctness. Upstream's policy gates, ratchets and release machinery are
+removed, and a merge that brings them back deletes them again.
+
+- **`ci.yml`** runs on pushes to `main`, on pull requests into any base (so stacked PRs get CI)
+  and on manual dispatch. `Gate / CI` rolls up lint (Oxlint plus the rule guards, routing and
+  test-hygiene checks), typecheck, security scans, build, unit (8 shards), vitest and security
+  tests; on `main` and dispatch also package boot, E2E, integration, ecosystem and Bun SQLite.
+  Coverage runs on `main` only, as a report that never blocks. A draft PR gets no gate result.
+- **Security scans** block: dependency audit, lockfile, licenses, gitleaks, OSV, the CodeQL
+  ratchet and `check:workflows` (any actionlint finding fails; zizmor is held to its baseline).
+- **`docker-publish.yml`** runs on GitHub-hosted runners: a push to `main` publishes
+  `:latest`, a published release `v<semver>` publishes `:<semver>` (each with `-web`). Every
+  per-arch image is health-checked and must pass the Trivy CRITICAL gate before a tag points at
+  it. There is no `:next` channel and no promotion of `:latest` from releases.
+- **Removed** (delete them when a merge brings them back): `build.yml`, `quality.yml` and the
+  nightly workflows; `.mergify.yml`, `merge_group` and the merge train; the admission verdict and
+  `config/quality/admission-policy.json`; release-green, `dry-run-lts-cut` and
+  `sync-next-cycle`; the quality ratchet and its metrics collector; the complexity, cycles,
+  duplication, dead-code, file-size, boundary, bundle-size, type-coverage, OpenAPI, doc-link,
+  fabricated-docs, env-doc-sync, test-masking and PR-test-policy gates with their baselines;
+  Blacksmith and VPS runner switches; Trunk, Codecov and Sonar.
+- **Git hooks are unchanged**, so the scripts they run stay: lint-staged, the gate manifest,
+  docs-sync, any-budget, the type-scale ratchet, tracked-artifacts, the UI-kit snapshot and the
+  AI-attribution check.
 
 ## Database migrations
 
@@ -153,12 +171,9 @@ timestamp. The fork's own migrations therefore use timestamps too:
 10. **Lint tooling**: delete the ESLint files upstream brings back (left column of the table
     in "Linting") and any upstream test written for them; port a rule upstream added to
     `eslint.config.mjs` into `.oxlintrc.json`; keep ESLint packages out of `package.json`,
-    the overrides, `knip.json`, `config/quality/dependency-allowlist.json` and
-    `.github/dependabot.yml`. Then refreeze and re-measure, and review what changed before
-    committing it:
-    `pnpm exec oxlint --suppress-all .`, `pnpm exec oxlint --prune-suppressions .`,
-    `node scripts/check/check-complexity-ratchets.mjs` (set the two baselines to the measured
-    values when upstream code moved them).
+    the overrides, `config/quality/dependency-allowlist.json` and `.github/dependabot.yml`.
+    Then refreeze, and review what changed before committing it:
+    `pnpm exec oxlint --suppress-all .`, `pnpm exec oxlint --prune-suppressions .`.
 11. **Checks**: no conflict markers; run the test files touched by the merge one at a time
     (`node --import tsx/esm --test <file>`); `pnpm run lint` (a full walk takes seconds); then
     the full suites and typecheck on a machine with enough memory
@@ -173,3 +188,4 @@ timestamp. The fork's own migrations therefore use timestamps too:
 | 2026-11-22 | `release/v3.8.55`             | Fork migrations moved to timestamps; docs-counts gate re-ported; `keenable` search/fetch, `custom-json` nodes, `jev` and decision routing taken from upstream |
 | 2026-11-23 | (no upstream change)          | Lint switched from ESLint to Oxlint; lint and complexity baselines regenerated                                                                                |
 | 2026-11-23 | (no upstream change)          | English only: non-`en` catalogs, the language switcher, translation tooling and per-locale gates removed                                                      |
+| 2026-11-24 | (no upstream change)          | CI slimmed to correctness gates; policy gates, ratchets, merge queue and release tooling removed; Docker `:latest` owned by `main`                            |

@@ -553,8 +553,7 @@ Recent examples of exactly this flow:
 Headroom is **fully internal** — a pinned vendored `gcf` codec snapshot plus
 OmniRoute's own `smartcrusher` / `toon` / `tabular` layers. There is no live
 upstream to track beyond the vendored copy; updates to `gcf` are refreshed
-manually when the codec changes and re-validated against the compression budget
-gate (`check:compression-budget`).
+manually when the codec changes and re-measured with `pnpm run bench:compression`.
 
 ### Proposing an upstream-inspired improvement
 
@@ -563,7 +562,7 @@ gate (`check:compression-budget`).
    custom engine).
 3. Reference the upstream project in the PR description (attribution), not by
    copying its license-bearing source.
-4. Include tests and confirm the `check:compression-budget` gate still passes.
+4. Include tests and compare `pnpm run bench:compression` before and after.
 
 ---
 

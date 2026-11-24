@@ -11,9 +11,8 @@ lastUpdated: 2026-10-11
 
 > [!IMPORTANT]
 > Every variable documented here must also appear in `.env.example`, and
-> every variable in `.env.example` must appear here. `npm run check:env-doc-sync`
-> enforces this on commit and in CI. To omit a variable on purpose, add it to
-> the allowlist inside `scripts/check/check-env-doc-sync.mjs`.
+> every variable in `.env.example` must appear here. The fork removed the
+> `check:env-doc-sync` checker, so keep the two in step by hand.
 
 ---
 

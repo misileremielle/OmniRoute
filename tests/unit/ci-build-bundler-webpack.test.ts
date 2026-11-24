@@ -9,9 +9,8 @@
  * runners cannot hold it. The backend-only nightlies share the .113 with the light runners,
  * so they stay on webpack (14 GB) - with Turbopack they had not been green since 10-13.
  *
- * Policy: the ci.yml Build uses Turbopack only when it lands on the opt-in self-hosted slot
- * (USE_VPS_RUNNER and USE_VPS_BUILD_RUNNER both 'true') and webpack everywhere else; the
- * nightly build:cli steps always use webpack. Flip a step only with a measurement.
+ * Policy: the fork runs only on GitHub-hosted runners, so the ci.yml Build always uses webpack.
+ * Flip it only with a measurement.
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -43,20 +42,8 @@ function buildSteps(name: string, pattern: RegExp): Array<{ id: string; step: St
   return out;
 }
 
-test("the ci.yml Build job uses Turbopack only on the self-hosted build slot", () => {
+test("the ci.yml Build job uses webpack on the hosted runner", () => {
   const [build] = buildSteps("ci.yml", /^pnpm run build$/m);
   assert.ok(build, "ci.yml build job runs `pnpm run build`");
-  const sw = String(build.step.env?.OMNIROUTE_USE_TURBOPACK);
-  assert.match(sw, /vars\.USE_VPS_BUILD_RUNNER == 'true'/, "Turbopack is tied to the opt-in slot");
-  assert.match(sw, /&& '1' \|\| '0' \}\}$/, "hosted runners (16 GB) fall back to webpack");
-});
-
-test("the manual hosted artifact build avoids Turbopack's OOM footprint (#16169)", () => {
-  const builds = buildSteps("build.yml", /pnpm run build:release/);
-  assert.equal(builds.length, 1, "manual artifact workflow must have exactly one release build");
-
-  const env = builds[0].step.env;
-  assert.equal(String(env?.OMNIROUTE_USE_TURBOPACK), "0");
-  assert.equal(String(env?.NODE_OPTIONS), "--max-old-space-size=10240");
-  assert.equal(String(env?.OMNIROUTE_BUILD_MEMORY_MB), "10240");
+  assert.equal(String(build.step.env?.OMNIROUTE_USE_TURBOPACK), "0");
 });

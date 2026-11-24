@@ -478,27 +478,29 @@ configuration.
 
 ## Image Tags
 
-| Image                              | Tag      | Size   | Description                                          |
-| ---------------------------------- | -------- | ------ | ---------------------------------------------------- |
-| `ghcr.io/misileremielle/omniroute` | `latest` | ~250MB | Highest **published** stable SemVer (not git `main`) |
-| `ghcr.io/misileremielle/omniroute` | `3.8.0`  | ~250MB | Pin this class of tag for GitOps                     |
+| Image                              | Tag      | Size   | Description                      |
+| ---------------------------------- | -------- | ------ | -------------------------------- |
+| `ghcr.io/misileremielle/omniroute` | `latest` | ~250MB | Every push to git `main`         |
+| `ghcr.io/misileremielle/omniroute` | `3.8.0`  | ~250MB | Pin this class of tag for GitOps |
 
 Multi-platform manifest: `linux/amd64` + `linux/arm64` native (Apple Silicon, AWS Graviton, Raspberry Pi). Docker selects the matching architecture automatically; pass `--platform linux/amd64` if you need to force AMD64 emulation on ARM hosts.
 
 ### Release Channels
 
-OmniRoute publishes separate Docker channels for stable releases, active release-branch testing, and development builds.
+The fork publishes two channels from `.github/workflows/docker-publish.yml`. Each image is built for
+both architectures, health-checked and scanned (blocking on fixable CRITICAL CVEs) before any tag
+points at it.
 
-| Channel                         | Source                              | Mutability                  | Recommended use                                                                                                       |
-| ------------------------------- | ----------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `:<version>` / `:<version>-web` | Signed/versioned release            | Immutable                   | Production deployments that pin an exact release                                                                      |
-| `:latest` / `:latest-web`       | Highest **published** stable SemVer | Mutable stable pointer      | Follows stable releases **after** a SemVer publish job — does **not** track `main` or unreleased `release/v*` commits |
-| `:next` / `:next-web`           | Current default `release/v*` branch | Mutable pre-release pointer | Testing fixes that have landed on the active release branch but are not yet in a stable release                       |
-| `:main` / `:main-web`           | `main` branch                       | Mutable development pointer | Development and integration testing only                                                                              |
+| Channel                         | Source                                  | Mutability | Recommended use                                  |
+| ------------------------------- | --------------------------------------- | ---------- | ------------------------------------------------ |
+| `:<version>` / `:<version>-web` | A published GitHub release `v<version>` | Immutable  | Production deployments that pin an exact release |
+| `:latest` / `:latest-web`       | Every push to `main`                    | Mutable    | Following `main`; `main` is its only writer      |
+
+There is no `:next` or `:main` channel: upstream's pre-release channel does not exist in the fork.
 
 #### Browser-backed integrations: the `-web` images
 
-Every channel above doubles as a `-web` tag (`:latest-web`, `:<version>-web`, `:next-web`, `:main-web`), built from the `runner-web` stage — the same image plus Playwright and a Chromium browser. The plain image ships **without** Chromium; `cloudflare-playground` and the Volcano Engine console login need it.
+Every channel above doubles as a `-web` tag (`:latest-web`, `:<version>-web`), built from the `runner-web` stage — the same image plus Playwright and a Chromium browser. The plain image ships **without** Chromium; `cloudflare-playground` and the Volcano Engine console login need it.
 
 The failure is deferred, not startup-time: those providers list their models and show as connected in the dashboard, and only the first request fails with
 
@@ -509,54 +511,32 @@ The failure is deferred, not startup-time: those providers list their models and
 
 If you use those providers, pull the `-web` tag of the channel you are already on — nothing else changes. On an npm/CLI install (no Docker image), the equivalent missing piece is the browser binary: run `npx playwright install chromium` on the host.
 
-#### Using the pre-release channel
+#### Safety and rollback
 
-The `next` channel is rebuilt on every push to the current default `release/v*` branch and is published for both AMD64 and ARM64. Older maintenance branches cannot overwrite it. The channel provides a pullable image for fixes that have merged into the active release branch before the next stable tag is cut.
+`:latest` changes on every push to `main`. Pin a version or a digest where drift matters:
 
 ```bash
-docker pull ghcr.io/misileremielle/omniroute:next
-docker pull ghcr.io/misileremielle/omniroute:next-web
+docker pull ghcr.io/misileremielle/omniroute:latest
+docker image inspect ghcr.io/misileremielle/omniroute:latest --format '{{index .RepoDigests 0}}'
 ```
 
-For Docker Compose, override the image tag used by the selected profile, then pull and recreate the service:
+Before upgrading, back up the OmniRoute data volume or bind-mounted data directory. To roll back,
+point the service at the previous version or digest, then pull and recreate it:
 
 ```yaml
 services:
   omniroute:
-    image: ghcr.io/misileremielle/omniroute:next
+    image: ghcr.io/misileremielle/omniroute:<version> # or @sha256:<digest>
 ```
 
 ```bash
-docker compose pull
-docker compose up -d
+docker compose pull omniroute && docker compose up -d --force-recreate omniroute
 ```
 
-#### Safety and rollback
-
-`next` is a floating pre-release channel. It may change on any push to the active release branch and is **not supported for production use**. Pin the image digest while evaluating a specific build:
-
-```bash
-docker pull ghcr.io/misileremielle/omniroute:next
-docker image inspect ghcr.io/misileremielle/omniroute:next --format '{{index .RepoDigests 0}}'
-```
-
-Before testing, back up the OmniRoute data volume or bind-mounted data directory. To roll back, restore the previously used stable version or digest and recreate the container:
-
-```bash
-docker pull ghcr.io/misileremielle/omniroute:<stable-version>
-docker compose up -d
-```
-
-A release-branch build can never move `latest`; only an eligible stable semantic version may promote the stable pointer. The `next` images retain the release image inspection and blocking CRITICAL-vulnerability gate.
-
-**`latest` is not a currency guarantee for git.** Merged fixes on `main` or on the active `release/v*` branch are **not** in `:latest` until a stable SemVer image is published and the publish job promotes `:latest` (same digest as that SemVer). If `latest` looks frozen while GitHub already shows the fix, pull `:next` to test the release branch or wait for the SemVer tag.
-
-| You want                                                       | Use                                |
-| -------------------------------------------------------------- | ---------------------------------- |
-| GitOps / production that must not drift                        | Pin `:X.Y.Z` (or the image digest) |
-| Follow published stables and accept a recreate on each release | `:latest`                          |
-| Test unreleased `release/v*` commits                           | `:next` (not production)           |
-| Test `main`                                                    | `:main` (not production)           |
+| You want                                | Use                                |
+| --------------------------------------- | ---------------------------------- |
+| GitOps / production that must not drift | Pin `:X.Y.Z` (or the image digest) |
+| Follow `main`                           | `:latest`                          |
 
 ## Dashboard updates in Docker
 

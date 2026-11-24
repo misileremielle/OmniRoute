@@ -92,10 +92,7 @@ OmniRoute/
 | **.npmrc**                                  | npm config (registry, lockfile policy)                                     |
 | **.node-version**                           | Node version pin (used by nvm-compatible tools)                            |
 | **.nvmrc**                                  | Node version pin for nvm                                                   |
-| **oxlint.complexity.json**                  | Oxlint config for the complexity + cognitive-complexity ratchets           |
-| **knip.json**                               | Knip config — unused files/exports/deps (feeds the dead-code gate)         |
 | **stryker.conf.json**                       | Stryker mutation-testing config                                            |
-| **.size-limit.json**                        | size-limit bundle budget config                                            |
 | **promptfooconfig.yaml**                    | promptfoo eval config                                                      |
 | **.gitleaks.toml**                          | gitleaks secret-scan ruleset                                               |
 | **.zizmor.yml**                             | zizmor GitHub-Actions security-lint config                                 |
@@ -106,7 +103,7 @@ OmniRoute/
 
 > **Moved out of the root in v3.8.26 (declutter):**
 >
-> - **→ `config/quality/`:** `quality-baseline.json`, `complexity-baseline.json`, `duplication-baseline.json`, `file-size-baseline.json`, `test-discovery-baseline.json`, `dependency-allowlist.json`, `.license-allowlist.json`, and the generated `quality-metrics.json` (gitignored). See [`## config/`](#config--static-configs--quality-gate-state).
+> - **→ `config/quality/`:** `quality-baseline.json`, `test-discovery-baseline.json`, `dependency-allowlist.json` and `.license-allowlist.json` (the fork later removed the complexity, duplication and file-size baselines). See [`## config/`](#config--static-configs--quality-gate-state).
 
 ---
 
@@ -288,39 +285,35 @@ open-sse/
 
 ## `scripts/` — Build & Check Scripts
 
-| Script                              | Purpose                                                                    |
-| ----------------------------------- | -------------------------------------------------------------------------- |
-| `run-next.mjs`                      | Dev/start runner with env hydration                                        |
-| `build-next-isolated.mjs`           | Standalone build (Next.js 16 standalone)                                   |
-| `prepublish.ts`                     | Package preparation before `npm pack`                                      |
-| `postinstall.mjs`                   | Auto-create `.env` from `.env.example` on first install                    |
-| `sync-env.mjs`                      | Re-sync `.env` keys with `.env.example`                                    |
-| `check-cycles.mjs`                  | Detect circular dependencies                                               |
-| `check-route-validation.mjs`        | Validate all API routes have Zod validation                                |
-| `check-t11-any-budget.mjs`          | Enforce explicit `any` budget per file                                     |
-| `check-docs-sync.mjs`               | Validate docs version sync (existing pre-commit)                           |
-| **`check-env-doc-sync.mjs`**        | NEW: cross-check env vars in code vs `.env.example` vs `ENVIRONMENT.md`    |
-| **`check-docs-counts-sync.mjs`**    | NEW: validate counts (executors, strategies, OAuth, A2A skills) match docs |
-| **`check-deprecated-versions.mjs`** | NEW: flag stale versions/dates in docs                                     |
-| `check-supported-node-runtime.ts`   | Validate current Node version is supported                                 |
-| `check-pr-test-policy.mjs`          | Enforce "tests required" rule on production code changes                   |
-| **`gen-provider-reference.ts`**     | NEW: auto-generate `docs/reference/PROVIDER_REFERENCE.md` from catalog     |
-| `run-playwright-tests.mjs`          | Playwright E2E runner                                                      |
-| `run-protocol-clients-tests.mjs`    | MCP/A2A E2E runner                                                         |
-| `run-ecosystem-tests.mjs`           | Ecosystem (provider integration) tests                                     |
-| `test-report-summary.mjs`           | Generate coverage summary markdown                                         |
-| `native-binary-compat.mjs`          | Validate native deps (`better-sqlite3`) match the runtime Node             |
-| `validate-pack-artifact.ts`         | Validate npm pack output                                                   |
-| `responses-ws-proxy.mjs`            | WebSocket bridge for Codex Responses API                                   |
-| `v1-ws-bridge.mjs`                  | WebSocket bridge for `/api/v1/ws` endpoint                                 |
-| `standalone-server-ws.mjs`          | Standalone WS server runner                                                |
-| `system-info.mjs`                   | Print system/runtime info for support                                      |
-| `healthcheck.mjs`                   | One-shot health check (used by Docker HEALTHCHECK)                         |
-| `uninstall.mjs`                     | Clean uninstall script                                                     |
-| `dev/sync-ui-kit.sh`                | Copy the CI UI Kit `src/` at a pinned commit into `packages/ui-kit/src`    |
-| `check/check-ui-kit-snapshot.mjs`   | Pre-commit gate: `packages/ui-kit/src` matches the pinned upstream commit  |
-| `dev/gen-icon-map.mjs`              | `npm run gen:icon-map` — icon names in use that `ICON_MAP` does not map    |
-| `dev/codemod-material-icons.mjs`    | Rewrite literal Material Symbols spans to `<Icon>` (migration tooling)     |
+| Script                            | Purpose                                                                    |
+| --------------------------------- | -------------------------------------------------------------------------- |
+| `run-next.mjs`                    | Dev/start runner with env hydration                                        |
+| `build-next-isolated.mjs`         | Standalone build (Next.js 16 standalone)                                   |
+| `prepublish.ts`                   | Package preparation before `npm pack`                                      |
+| `postinstall.mjs`                 | Auto-create `.env` from `.env.example` on first install                    |
+| `sync-env.mjs`                    | Re-sync `.env` keys with `.env.example`                                    |
+| `check-route-validation.mjs`      | Validate all API routes have Zod validation                                |
+| `check-t11-any-budget.mjs`        | Enforce explicit `any` budget per file                                     |
+| `check-docs-sync.mjs`             | Validate docs version sync (existing pre-commit)                           |
+| **`check-docs-counts-sync.mjs`**  | NEW: validate counts (executors, strategies, OAuth, A2A skills) match docs |
+| `check-supported-node-runtime.ts` | Validate current Node version is supported                                 |
+| **`gen-provider-reference.ts`**   | NEW: auto-generate `docs/reference/PROVIDER_REFERENCE.md` from catalog     |
+| `run-playwright-tests.mjs`        | Playwright E2E runner                                                      |
+| `run-protocol-clients-tests.mjs`  | MCP/A2A E2E runner                                                         |
+| `run-ecosystem-tests.mjs`         | Ecosystem (provider integration) tests                                     |
+| `test-report-summary.mjs`         | Generate coverage summary markdown                                         |
+| `native-binary-compat.mjs`        | Validate native deps (`better-sqlite3`) match the runtime Node             |
+| `validate-pack-artifact.ts`       | Validate npm pack output                                                   |
+| `responses-ws-proxy.mjs`          | WebSocket bridge for Codex Responses API                                   |
+| `v1-ws-bridge.mjs`                | WebSocket bridge for `/api/v1/ws` endpoint                                 |
+| `standalone-server-ws.mjs`        | Standalone WS server runner                                                |
+| `system-info.mjs`                 | Print system/runtime info for support                                      |
+| `healthcheck.mjs`                 | One-shot health check (used by Docker HEALTHCHECK)                         |
+| `uninstall.mjs`                   | Clean uninstall script                                                     |
+| `dev/sync-ui-kit.sh`              | Copy the CI UI Kit `src/` at a pinned commit into `packages/ui-kit/src`    |
+| `check/check-ui-kit-snapshot.mjs` | Pre-commit gate: `packages/ui-kit/src` matches the pinned upstream commit  |
+| `dev/gen-icon-map.mjs`            | `npm run gen:icon-map` — icon names in use that `ICON_MAP` does not map    |
+| `dev/codemod-material-icons.mjs`  | Rewrite literal Material Symbols spans to `<Icon>` (migration tooling)     |
 
 ---
 
@@ -420,19 +413,15 @@ open-sse/
 Shipped configuration templates plus the committed quality-gate baselines
 (moved here from the repo root in v3.8.26 to keep the root lean).
 
-| Path                                          | Purpose                                                                          |
-| --------------------------------------------- | -------------------------------------------------------------------------------- |
-| `config/i18n.json`                            | Locale list + metadata (`en` only in this fork)                                  |
-| `config/i18n-schema.json`                     | JSON schema validating `i18n.json`                                               |
-| `config/payloadRules.json`                    | Upstream payload sanitization rules                                              |
-| `config/quality/quality-baseline.json`        | Multi-metric ratchet baseline (`scripts/quality/check-quality-ratchet.mjs`)      |
-| `config/quality/complexity-baseline.json`     | Frozen complexity baseline (`check-complexity.mjs`)                              |
-| `config/quality/duplication-baseline.json`    | Frozen jscpd duplication baseline (`check-duplication.mjs`)                      |
-| `config/quality/file-size-baseline.json`      | Frozen per-file size baseline (`check-file-size.mjs`)                            |
-| `config/quality/test-discovery-baseline.json` | Frozen orphan-test baseline (`check-test-discovery.mjs`)                         |
-| `config/quality/dependency-allowlist.json`    | Approved dependencies allowlist (`check-deps.mjs`)                               |
-| `config/quality/.license-allowlist.json`      | SPDX license allowlist (`check-licenses.mjs`)                                    |
-| `config/quality/quality-metrics.json`         | Ephemeral collected metrics (generated by `collect-metrics.mjs`; **gitignored**) |
+| Path                                          | Purpose                                                                       |
+| --------------------------------------------- | ----------------------------------------------------------------------------- |
+| `config/i18n.json`                            | Locale list + metadata (`en` only in this fork)                               |
+| `config/i18n-schema.json`                     | JSON schema validating `i18n.json`                                            |
+| `config/payloadRules.json`                    | Upstream payload sanitization rules                                           |
+| `config/quality/quality-baseline.json`        | Security-scan and type-scale ratchet baselines (secrets, OSV, CodeQL, zizmor) |
+| `config/quality/test-discovery-baseline.json` | Frozen orphan-test baseline (`check-test-discovery.mjs`)                      |
+| `config/quality/dependency-allowlist.json`    | Approved dependencies allowlist (`check-deps.mjs`)                            |
+| `config/quality/.license-allowlist.json`      | SPDX license allowlist (`check-licenses.mjs`)                                 |
 
 ---
 

@@ -86,7 +86,7 @@ allow-listed set of gate/generator scripts. If you install with Bun you may see:
 ### Bun script-runner failures
 
 Bun runs only the allow-listed gate/generator scripts (`check:provider-consistency`,
-`check:compression-budget`, `check:known-symbols`, `gen:provider-reference`,
+`check:known-symbols`, `gen:provider-reference`,
 `bench:compression`) plus the `test:bun:db` smoke suite — see `AGENTS.md` → Environment.
 After pulling the lockfile change, run `pnpm install` so `bun` resolves locally (a stale
 `node_modules` will fail those scripts with `bun: not found`).

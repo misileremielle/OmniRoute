@@ -78,7 +78,7 @@ the edit fails silently) and merge normally. **HOLD only when the highest releas
 the frozen one** (the short window before 0a.0b completes, or a pre-parallel-cycle release) —
 in that case leave the PR ready and open, tell the operator, and resume when the next branch
 appears or the freeze lifts. The just-shipped fixes reach `release/vX+1` via the Phase 5
-sync-back (`scripts/release/sync-next-cycle.mjs`); do not try to sync mid-release.
+sync-back; do not try to sync mid-release.
 
 This is a **coordination signal, not a permission lock**: the release captain and the campaign
 sessions share the `diegosouzapw` identity, so a GitHub branch-protection lock cannot

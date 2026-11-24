@@ -637,10 +637,8 @@ Organized into 6 subfolders by purpose.
   unknown against a reference PR or the base-red issue) and `audit-worktree.sh`
   (dirty files, protected surfaces, removed asserts, suppression counts, leftover
   tmp tsconfigs, PR head vs local HEAD — before a worker's PR is accepted).
-- **`scripts/check/`** — `check-cycles.mjs`, `check-docs-sync.mjs`,
-  `check-docs-counts-sync.mjs`, `check-env-doc-sync.mjs`,
-  `check-deprecated-versions.mjs`, `check-route-validation.mjs`,
-  `check-t11-any-budget.mjs`, `check-pr-test-policy.mjs`,
+- **`scripts/check/`** — `check-docs-sync.mjs`, `check-docs-counts-sync.mjs`,
+  `check-route-validation.mjs`, `check-t11-any-budget.mjs`,
   `check-supported-node-runtime.ts`, `test-report-summary.mjs`.
 - **`scripts/docs/`** — `generate-docs-index.mjs`, `gen-provider-reference.ts`.
 - **`scripts/i18n/`** — `generate-multilang.mjs`, `run-visual-qa.mjs`,

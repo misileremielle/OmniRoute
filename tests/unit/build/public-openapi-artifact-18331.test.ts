@@ -8,7 +8,6 @@ import { fileURLToPath } from "node:url";
 import * as yaml from "js-yaml";
 import { assembleStandalone } from "../../../scripts/build/assembleStandalone.mjs";
 import { writePublicOpenApi } from "../../../scripts/build/publicOpenApi.mjs";
-import { bumpOpenApi } from "../../../scripts/release/dry-run-lts-cut.mjs";
 
 interface Spec {
   info: { version: string };
@@ -119,18 +118,13 @@ test("gen:public-openapi regenerates the committed path from the current directo
   }
 });
 
-test("a cycle bump keeps generating the new version and moves the committed copy too", () => {
+// The fork removed the LTS cut tool (dry-run-lts-cut.mjs) that bumped the committed copy.
+test("a version bump keeps generating the new version", () => {
   const projectRoot = createFixtureProject("3.8.54", "3.8.54");
   try {
     writePublicOpenApi(projectRoot);
     const target = join(projectRoot, "public", "openapi.yaml");
     assert.equal((yaml.load(readFileSync(target, "utf8")) as Spec).info.version, "3.8.54");
-
-    // The committed copy keeps its body through the bump, like docs/openapi.yaml.
-    const committed = readFileSync(new URL("public/openapi.yaml", root), "utf8");
-    const bumped = yaml.load(bumpOpenApi(committed, "9.9.9")) as Spec;
-    assert.equal(bumped.info.version, "9.9.9");
-    assert.deepEqual(bumped.servers, spec.servers);
   } finally {
     rmSync(projectRoot, { recursive: true, force: true });
   }

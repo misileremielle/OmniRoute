@@ -161,5 +161,4 @@ compare URL:
 - [BRANCHING_MODEL.md](./BRANCHING_MODEL.md) — the current parallel-cycle model
 - [CONTRIBUTION_GOLDEN_PATH.md](./CONTRIBUTION_GOLDEN_PATH.md) — focused checks per change type
 - [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md) — pre-ship validation
-- [MERGE_TRAIN.md](./MERGE_TRAIN.md) — merge queue and fallback train
 - [ROADMAP](../../ROADMAP.md) — the 3.8.50 → 4.0 plan

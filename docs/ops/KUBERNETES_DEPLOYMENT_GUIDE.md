@@ -370,9 +370,8 @@ starting its replacement:
 3. The endpoint stays empty until the new pod is Ready — clients hitting the
    ingress in that window get a controller-generated `502`, not OmniRoute JSON.
 
-Drain clients first if you can. `:latest` only moves when a stable release
-promotes it, so it lags merged fixes — pin `:X.Y.Z` or a digest for anything
-you care about.
+Drain clients first if you can. `:latest` moves on every push to `main`, so it
+can change under you — pin `:X.Y.Z` or a digest for anything you care about.
 
 ---
 

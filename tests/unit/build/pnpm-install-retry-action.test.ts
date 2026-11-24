@@ -34,6 +34,15 @@ function runInstall(codes: number[]) {
       return "$code"
     }
     sleep() { printf 'DELAY:%s\\n' "$*"; }
+    # The action bounds each attempt with coreutils timeout; the stub records the limit and
+    # runs the command in this shell so the pnpm stub above still applies. Exit 124 from
+    # the pnpm stub stands for a timed-out attempt.
+    timeout() {
+      while [[ "$1" == -* ]]; do shift; done
+      printf 'TIMEOUT:%s\\n' "$1"
+      shift
+      "$@"
+    }
     ${install.run}
   `,
     ],
@@ -48,8 +57,21 @@ function runInstall(codes: number[]) {
     ...result,
     attempts: result.stdout.split("\n").filter((line) => line.startsWith("ATTEMPT:")),
     delays: result.stdout.split("\n").filter((line) => line.startsWith("DELAY:")),
+    timeouts: result.stdout.split("\n").filter((line) => line.startsWith("TIMEOUT:")),
   };
 }
+
+test("every install attempt runs under the 240-second timeout", () => {
+  const result = runInstall([42, 0]);
+  assert.deepEqual(result.timeouts, ["TIMEOUT:240", "TIMEOUT:240"]);
+});
+
+test("a timed-out attempt (exit 124) is retried", () => {
+  const result = runInstall([124, 0]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.attempts.length, 2);
+  assert.deepEqual(result.delays, ["DELAY:20"]);
+});
 
 test("exhausted pnpm install retries fail the composite with the last install exit", () => {
   const result = runInstall([41, 42, 43]);

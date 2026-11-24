@@ -138,8 +138,7 @@ test("testsOnly: empty change list → false (fail-safe)", () => {
 
 // ── One-CI-policy step 1 (rail 3.8.52, RFC #8084 D1-full) ─────────────────────
 // A second, ADDITIVE classification level: the set of real change *domains*.
-// Nothing consumes it yet — ci.yml / quality.yml only expose it as
-// `outputs.domains` so the future single policy can be measured in parallel.
+// Nothing consumes it: the fork's ci.yml reads only code, i18n and testsOnly.
 // classifyPaths() and the legacy five stdout lines MUST stay byte-identical.
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -326,18 +325,5 @@ for (const [files, legacy, domains] of LEGACY_STDOUT_CASES) {
   test(`regression: stdout keeps the legacy lines byte-identical, then appends domains (${files[0]})`, () => {
     const out = runCli(files);
     assert.equal(out, `${legacy}domains=${domains}\n`);
-  });
-}
-
-// Push / dispatch events skip the classifier and enable every lane; the inline
-// `domains=` literal in both workflows must therefore be the full domain set.
-for (const wf of ["ci.yml"]) {
-  test(`workflow ${wf}: changes job exposes outputs.domains and the push literal is the full set`, () => {
-    const src = fs.readFileSync(path.join(REPO_ROOT, ".github", "workflows", wf), "utf8");
-    assert.match(src, /^ {6}domains: \$\{\{ steps\.classify\.outputs\.domains \}\}$/m);
-    assert.ok(
-      src.includes(`echo "domains=${CHANGE_DOMAINS.join(",")}"`),
-      `${wf} must echo the full domain list for non-PR events`
-    );
   });
 }
