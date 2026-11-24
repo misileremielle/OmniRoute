@@ -140,6 +140,10 @@ export function evaluateCodeqlRatchet(current, baseline) {
  * @returns {string|null} "owner/repo" ou null
  */
 export function detectRepo(ghBin) {
+  // In Actions, GITHUB_REPOSITORY names the repository under test. `gh repo view` follows the
+  // checkout's default remote, which in a fork with an `upstream` remote can be the upstream.
+  const fromEnv = String(process.env.GITHUB_REPOSITORY ?? "").trim();
+  if (/^[\w.-]+\/[\w.-]+$/.test(fromEnv)) return fromEnv;
   try {
     const stdout = execFileSync(
       ghBin,
@@ -371,37 +375,152 @@ export function finishUnmeasured(requireMeasurement, reason) {
 }
 
 /**
- * Counts usable analyses: the API lists an analysis with a non-empty `error` when it
- * failed, so only `error: ""` counts.
+ * Languages default setup analyzes in this repository. Each needs a successful analysis on the
+ * default branch before an alert count means anything: while javascript-typescript (most of the
+ * code) is still running, the actions and python results alone would make an empty list look
+ * like a measured zero.
+ */
+export const REQUIRED_CODEQL_LANGUAGES = ["javascript-typescript", "actions", "python"];
+
+/**
+ * Returns the required languages whose NEWEST analysis on `ref` is missing or failed. An
+ * analysis failed when its `error` is non-empty; its language is the `/language:<name>`
+ * category; newest is the latest `created_at`. A scan still running has no record yet, so the
+ * previous one stands (Proxy's choice: a pending scan must not turn every PR red), but a failed
+ * scan of a newer commit blocks instead of falling back to an older success.
  *
  * @param {unknown} analyses - body of GET /code-scanning/analyses
- * @returns {number}
+ * @param {string} ref - e.g. "refs/heads/main"
+ * @param {string[]} [required]
+ * @returns {string[]}
  */
-export function countUsableAnalyses(analyses) {
-  if (!Array.isArray(analyses)) return 0;
-  return analyses.filter((a) => a && typeof a === "object" && a.error === "").length;
+export function missingCodeqlLanguages(analyses, ref, required = REQUIRED_CODEQL_LANGUAGES) {
+  /** @type {Map<string, {time: number, ok: boolean}>} */
+  const newest = new Map();
+  if (Array.isArray(analyses)) {
+    for (const a of analyses) {
+      if (!a || typeof a !== "object" || a.ref !== ref) continue;
+      const match = /^\/language:(.+)$/.exec(String(a.category ?? ""));
+      if (!match) continue;
+      const parsed = Date.parse(String(a.created_at ?? ""));
+      const time = Number.isNaN(parsed) ? -Infinity : parsed;
+      const seen = newest.get(match[1]);
+      // On equal times a failure wins, so ambiguity fails closed.
+      if (!seen || time > seen.time || (time === seen.time && a.error !== "")) {
+        newest.set(match[1], { time, ok: a.error === "" });
+      }
+    }
+  }
+  return required.filter((language) => !newest.get(language)?.ok);
+}
+
+function apiError(err) {
+  const errMsg = String(err?.stderr ?? err?.message ?? err ?? "");
+  const codeMatch = /HTTP (\d{3})/.exec(errMsg);
+  return { error: `api-error:${codeMatch ? codeMatch[1] : "unknown"}`, message: errMsg };
 }
 
 /**
- * Counts usable CodeQL analyses among the 20 newest (0 vs at least 1 is what matters).
+ * Checks the default branch for a successful analysis of every required language.
+ * The alerts endpoint without `ref` lists the default branch's alerts, so this is the ref the
+ * count is measured on.
  *
- * @returns {number|{error: string, message: string}}
+ * @returns {{ref: string, missing: string[]}|{error: string, message: string}}
  */
-function fetchCodeQLAnalysisCount(ghBin, repo) {
+function checkCodeqlAnalyses(ghBin, repo) {
+  let ref;
+  try {
+    const meta = JSON.parse(
+      execFileSync(ghBin, ["api", `/repos/${repo}`], { encoding: "utf8", timeout: 30_000 })
+    );
+    if (typeof meta?.default_branch !== "string" || !meta.default_branch) {
+      return { error: "no-default-branch", message: "repository has no default_branch" };
+    }
+    ref = `refs/heads/${meta.default_branch}`;
+  } catch (err) {
+    return apiError(err);
+  }
   try {
     const stdout = execFileSync(
       ghBin,
-      ["api", `/repos/${repo}/code-scanning/analyses?tool_name=CodeQL&per_page=20`],
+      [
+        "api",
+        `/repos/${repo}/code-scanning/analyses?tool_name=CodeQL&ref=${encodeURIComponent(ref)}&per_page=100`,
+      ],
       { encoding: "utf8", timeout: 30_000 }
     );
-    return countUsableAnalyses(JSON.parse(stdout));
+    const missing = missingCodeqlLanguages(JSON.parse(stdout), ref);
+    if (missing.length > 0) return { ref, missing };
   } catch (err) {
-    const errMsg = String(err.stderr ?? err.message ?? "");
+    const errMsg = String(err?.stderr ?? err?.message ?? "");
     // GitHub answers 404 "no analysis found" when code scanning never ran.
-    if (/HTTP 404|no analysis found/i.test(errMsg)) return 0;
-    const codeMatch = /HTTP (\d{3})/.exec(errMsg);
-    return { error: `api-error:${codeMatch ? codeMatch[1] : "unknown"}`, message: errMsg };
+    if (/HTTP 404|no analysis found/i.test(errMsg)) {
+      return { ref, missing: [...REQUIRED_CODEQL_LANGUAGES] };
+    }
+    return apiError(err);
   }
+  // A scan that fails before uploading leaves no analysis record, so the workflow run is the
+  // only place that failure shows. codeqlRunVerdict() has the rules: pending runs are passed
+  // over, the newest decisive run must have succeeded.
+  try {
+    const workflows = JSON.parse(
+      execFileSync(ghBin, ["api", `/repos/${repo}/actions/workflows?per_page=100`], {
+        encoding: "utf8",
+        timeout: 30_000,
+      })
+    );
+    const codeql = (workflows?.workflows ?? []).find((w) => w?.path === CODEQL_SETUP_PATH);
+    if (!codeql) {
+      return { error: "no-codeql-workflow", message: `no ${CODEQL_SETUP_PATH} workflow` };
+    }
+    const branch = ref.slice("refs/heads/".length);
+    const runs = JSON.parse(
+      execFileSync(
+        ghBin,
+        [
+          "api",
+          `/repos/${repo}/actions/workflows/${codeql.id}/runs?branch=${encodeURIComponent(branch)}&per_page=20`,
+        ],
+        { encoding: "utf8", timeout: 30_000 }
+      )
+    );
+    const verdict = codeqlRunVerdict(runs?.workflow_runs);
+    if (!verdict.ok) return { ref, missing: [], runFailure: verdict.reason };
+  } catch (err) {
+    return apiError(err);
+  }
+  return { ref, missing: [] };
+}
+
+const CODEQL_SETUP_PATH = "dynamic/github-code-scanning/codeql";
+
+/**
+ * Judges the CodeQL default-setup runs on the branch, newest first. A run still queued or in
+ * progress is passed over (the previous results stand). A cancelled or skipped run is passed
+ * over only when a newer run exists (it was superseded); as the newest run it fails. The first
+ * other finished run decides: success passes, anything else fails.
+ *
+ * @param {unknown} runs - `workflow_runs` from GET /actions/workflows/{id}/runs
+ * @returns {{ok: boolean, reason?: string}}
+ */
+export function codeqlRunVerdict(runs) {
+  if (!Array.isArray(runs)) return { ok: false, reason: "runs response is not an array" };
+  const sorted = runs
+    .filter((r) => r && typeof r === "object")
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+  for (const [index, r] of sorted.entries()) {
+    if (r.status !== "completed") continue;
+    if (["cancelled", "skipped"].includes(r.conclusion)) {
+      if (index === 0) {
+        return { ok: false, reason: `newest CodeQL run ${r.id} was ${r.conclusion}` };
+      }
+      continue;
+    }
+    return r.conclusion === "success"
+      ? { ok: true }
+      : { ok: false, reason: `newest CodeQL run ${r.id} ended ${r.conclusion}` };
+  }
+  return { ok: false, reason: "no finished CodeQL run" };
 }
 
 function main() {
@@ -440,15 +559,23 @@ function main() {
   // Confirm a successful analysis BEFORE reading alerts: read the other way round, an analysis
   // finishing between the two requests would let a pre-analysis empty list pass as zero.
   if (REQUIRE_MEASUREMENT) {
-    const analyses = fetchCodeQLAnalysisCount(ghBin, repo);
-    if (typeof analyses !== "number") {
+    const analyses = checkCodeqlAnalyses(ghBin, repo);
+    if ("error" in analyses) {
       console.log(`codeqlAlerts=SKIP reason=${analyses.error}`);
       finishUnmeasured(true, analyses.error);
       return;
     }
-    if (analyses === 0) {
+    if (analyses.runFailure) {
+      console.log("codeqlAlerts=SKIP reason=codeql-run-failed");
+      finishUnmeasured(true, analyses.runFailure);
+      return;
+    }
+    if (analyses.missing.length > 0) {
       console.log("codeqlAlerts=SKIP reason=no-analysis");
-      finishUnmeasured(true, "no successful CodeQL analysis among the 20 newest");
+      finishUnmeasured(
+        true,
+        `no successful CodeQL analysis on ${analyses.ref} for ${analyses.missing.join(", ")}`
+      );
       return;
     }
   }

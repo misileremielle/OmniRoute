@@ -50,12 +50,20 @@ for an i18n-only change.
   three-digit range) and turns off only the comparison with a base ref.
 - **`check:workflows --ratchet`** fails on any actionlint finding. zizmor findings are held to
   `metrics.zizmorFindings` in `config/quality/quality-baseline.json`.
-- **`check:codeql-ratchet`** counts the repository's open CodeQL alerts against
-  `metrics.codeqlAlerts`. GitHub's default setup (enabled 2026-11-24) analyzes `main` and PRs
-  into `main`; the step does not analyze the revision under test, so a stacked PR's own code is
-  checked only once it reaches a PR into `main`. CI passes `--require-measurement`: the step
-  fails when the API cannot be read, when none of the 20 newest CodeQL analyses succeeded, or
-  when the baseline is missing or invalid, so an empty alert list never counts as zero.
+- **`check:codeql-ratchet`** counts the open CodeQL alerts on `main` against
+  `metrics.codeqlAlerts` (199, measured on the fork 2026-11-24). GitHub's default setup
+  (enabled 2026-11-24) analyzes `main` and PRs into `main`; the step does not analyze the
+  revision under test, so a stacked PR's own code is checked only once it reaches a PR into
+  `main`. CI passes `--require-measurement`, which makes the step fail when:
+  - the API cannot be read or answers an unexpected shape;
+  - the newest `main` analysis of javascript-typescript, actions or python is missing or failed;
+  - the newest decisive CodeQL default-setup run on `main` did not succeed (a scan that fails
+    before uploading shows only there; a running scan is passed over, and a cancelled one only
+    when a newer run exists);
+  - the baseline is missing or invalid.
+
+  A pending scan does not block, so the count can lag the newest `main` commit.
+
 - **`check:secrets`** and **`check:vuln-ratchet`** compare with `metrics.secretFindings` and
   `metrics.vulnCount`.
 

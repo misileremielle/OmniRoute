@@ -16,7 +16,8 @@ import { fileURLToPath } from "node:url";
 import {
   parseCodeQLAlerts,
   evaluateCodeqlRatchet,
-  countUsableAnalyses,
+  missingCodeqlLanguages,
+  codeqlRunVerdict,
 } from "../../../scripts/check/check-codeql-ratchet.mjs";
 
 type RatchetVerdict = { regressed: boolean; improved: boolean };
@@ -345,10 +346,12 @@ function runWithFakeGh(
     alerts,
     analyses,
     baseline = { metrics: { codeqlAlerts: { value: 5 } } },
+    runs = OK_RUNS,
   }: {
     alerts: string;
     analyses: string;
     baseline?: unknown;
+    runs?: string;
   },
   args: string[]
 ) {
@@ -356,6 +359,11 @@ function runWithFakeGh(
   try {
     writeFileSync(join(dir, "alerts.json"), alerts);
     writeFileSync(join(dir, "analyses.json"), analyses);
+    writeFileSync(join(dir, "runs.json"), runs);
+    writeFileSync(
+      join(dir, "workflows.json"),
+      JSON.stringify({ workflows: [{ id: 7, path: "dynamic/github-code-scanning/codeql" }] })
+    );
     const baselinePath = join(dir, "baseline.json");
     writeFileSync(baselinePath, typeof baseline === "string" ? baseline : JSON.stringify(baseline));
     // Answers `gh repo view` and the two `gh api` endpoints from the fixture files.
@@ -366,6 +374,9 @@ function runWithFakeGh(
         'if [ "$1" = repo ]; then echo owner/repo; exit 0; fi',
         'echo "$2" >> "$FAKE_DIR/calls.log"',
         'case "$2" in',
+        '  /repos/owner/repo) echo \'{"default_branch":"main"}\';;',
+        '  */actions/workflows/7/runs*) cat "$FAKE_DIR/runs.json";;',
+        '  */actions/workflows*) cat "$FAKE_DIR/workflows.json";;',
         '  *analyses*) cat "$FAKE_DIR/analyses.json";;',
         '  *alerts*) cat "$FAKE_DIR/alerts.json";;',
         "esac",
@@ -379,7 +390,12 @@ function runWithFakeGh(
       [SCRIPT, "--quiet", "--baseline", baselinePath, ...args],
       {
         encoding: "utf8",
-        env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, FAKE_DIR: dir },
+        env: {
+          ...process.env,
+          PATH: `${dir}:${process.env.PATH}`,
+          FAKE_DIR: dir,
+          GITHUB_REPOSITORY: "owner/repo",
+        },
         timeout: 20_000,
       }
     );
@@ -390,11 +406,133 @@ function runWithFakeGh(
   }
 }
 
-const OK_ANALYSIS = JSON.stringify([{ id: 1, error: "" }]);
+const MAIN = "refs/heads/main";
+const analysis = (language: string, extra: Record<string, unknown> = {}) => ({
+  ref: MAIN,
+  category: `/language:${language}`,
+  error: "",
+  ...extra,
+});
+const run = (id: number, created_at: string, conclusion: string) => ({
+  id,
+  created_at,
+  status: "completed",
+  conclusion,
+});
+const OK_RUNS = JSON.stringify({ workflow_runs: [run(1, "2026-11-24T09:51:30Z", "success")] });
 
-test("countUsableAnalyses counts only analyses without an error", () => {
-  assert.equal(countUsableAnalyses([{ error: "" }, { error: "failed" }, null, {}]), 1);
-  assert.equal(countUsableAnalyses({ message: "no analysis found" }), 0);
+test("codeqlRunVerdict: the newest finished run decides, cancelled and skipped runs do not", () => {
+  assert.deepEqual(codeqlRunVerdict([run(1, "2026-11-24T09:00:00Z", "success")]), { ok: true });
+  assert.equal(
+    codeqlRunVerdict([
+      run(1, "2026-11-24T09:00:00Z", "success"),
+      run(2, "2026-11-24T10:00:00Z", "failure"),
+    ]).ok,
+    false
+  );
+  // The newest run cancelled with nothing newer: the newest scan never succeeded.
+  assert.equal(
+    codeqlRunVerdict([
+      run(2, "2026-11-24T10:00:00Z", "cancelled"),
+      run(1, "2026-11-24T09:00:00Z", "success"),
+    ]).ok,
+    false
+  );
+  // Superseded: a newer run is in progress, so the cancelled one is passed over.
+  assert.equal(
+    codeqlRunVerdict([
+      { id: 3, created_at: "2026-11-24T11:00:00Z", status: "in_progress", conclusion: null },
+      run(2, "2026-11-24T10:00:00Z", "cancelled"),
+      run(1, "2026-11-24T09:00:00Z", "success"),
+    ]).ok,
+    true
+  );
+  assert.equal(codeqlRunVerdict([]).ok, false);
+  assert.equal(codeqlRunVerdict(undefined).ok, false);
+});
+
+const OK_ANALYSIS = JSON.stringify([
+  analysis("javascript-typescript"),
+  analysis("actions"),
+  analysis("python"),
+]);
+
+test("missingCodeqlLanguages needs a successful default-branch analysis per language", () => {
+  const all = ["javascript-typescript", "actions", "python"];
+  assert.deepEqual(missingCodeqlLanguages(JSON.parse(OK_ANALYSIS), MAIN), []);
+  assert.deepEqual(missingCodeqlLanguages({ message: "no analysis found" }, MAIN), all);
+  assert.deepEqual(
+    missingCodeqlLanguages(
+      [
+        analysis("javascript-typescript", { error: "failed" }),
+        analysis("javascript-typescript", { ref: "refs/pull/10/merge" }),
+        analysis("actions"),
+        analysis("python"),
+        null,
+        { error: "" },
+      ],
+      MAIN
+    ),
+    ["javascript-typescript"]
+  );
+});
+
+test("missingCodeqlLanguages judges each language by its newest analysis on the ref", () => {
+  const at = (language: string, created_at: string, error = "") =>
+    analysis(language, { created_at, error });
+  const rest = [analysis("actions"), analysis("python")];
+  // A newer failed scan is not covered by an older success.
+  assert.deepEqual(
+    missingCodeqlLanguages(
+      [
+        at("javascript-typescript", "2026-11-24T09:00:00Z"),
+        at("javascript-typescript", "2026-11-24T10:00:00Z", "failed"),
+        ...rest,
+      ],
+      MAIN
+    ),
+    ["javascript-typescript"]
+  );
+  // A newer success replaces an older failure, whatever order the API lists them in.
+  assert.deepEqual(
+    missingCodeqlLanguages(
+      [
+        at("javascript-typescript", "2026-11-24T10:00:00Z"),
+        at("javascript-typescript", "2026-11-24T09:00:00Z", "failed"),
+        ...rest,
+      ],
+      MAIN
+    ),
+    []
+  );
+});
+
+test("require-measurement: a scan that failed before uploading fails despite older analyses", () => {
+  const runs = JSON.stringify({
+    workflow_runs: [
+      run(2, "2026-11-24T11:00:00Z", "failure"),
+      run(1, "2026-11-24T09:51:30Z", "success"),
+    ],
+  });
+  const result = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS, runs }, [
+    "--require-measurement",
+  ]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /run 2 ended failure/);
+  assert.deepEqual(
+    result.calls.filter((call) => /alerts/.test(call)),
+    []
+  );
+});
+
+test("require-measurement: actions and python alone (JS/TS still running) fail", () => {
+  const fixture = {
+    alerts: "[]",
+    analyses: JSON.stringify([analysis("actions"), analysis("python")]),
+  };
+  const result = runWithFakeGh(fixture, ["--require-measurement"]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /javascript-typescript/);
 });
 
 test("require-measurement: no CodeQL analysis fails, plain mode passes", () => {
@@ -404,7 +542,10 @@ test("require-measurement: no CodeQL analysis fails, plain mode passes", () => {
 });
 
 test("require-measurement: only failed analyses still fail", () => {
-  const fixture = { alerts: "[]", analyses: JSON.stringify([{ id: 1, error: "boom" }]) };
+  const fixture = {
+    alerts: "[]",
+    analyses: JSON.stringify(JSON.parse(OK_ANALYSIS).map((a: object) => ({ ...a, error: "boom" }))),
+  };
   assert.equal(runWithFakeGh(fixture, ["--require-measurement"]).status, 1);
 });
 
@@ -418,9 +559,11 @@ test("require-measurement: the analysis check runs before the alerts are read", 
   const { calls } = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS }, [
     "--require-measurement",
   ]);
-  assert.match(calls[0] ?? "", /\/code-scanning\/analyses\?/);
+  const firstAlerts = calls.findIndex((call) => /\/code-scanning\/alerts\?/.test(call));
+  const analysesAt = calls.findIndex((call) => /\/code-scanning\/analyses\?/.test(call));
+  assert.ok(analysesAt >= 0 && firstAlerts > analysesAt, calls.join());
   assert.ok(
-    calls.slice(1).every((call) => /\/code-scanning\/alerts\?/.test(call)),
+    calls.slice(firstAlerts).every((call) => /\/code-scanning\/alerts\?/.test(call)),
     calls.join()
   );
   assert.ok(calls.length >= 2);

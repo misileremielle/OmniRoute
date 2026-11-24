@@ -154,8 +154,10 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     permissions:
       contents: read
-      # check:codeql-ratchet reads open code-scanning alerts.
+      # check:codeql-ratchet reads open code-scanning alerts and analyses, and the CodeQL
+      # default-setup runs (a scan that fails before uploading shows only there).
       security-events: read
+      actions: read
     steps:
       - uses: actions/checkout@v7
         with:
@@ -181,9 +183,9 @@ jobs:
       - run: pnpm run check:secrets --ratchet
       - run: pnpm run check:vuln-ratchet --ratchet
       - run: pnpm run check:workflows --ratchet
-      # --require-measurement: fail when the API cannot be read or the repository has no CodeQL
-      # analysis, so an empty alert list is never taken as zero alerts. The count covers the
-      # repository's open alerts (default setup scans main), not this revision.
+      # --require-measurement: fail unless main's newest CodeQL scan succeeded for every
+      # language (rules in docs/architecture/QUALITY_GATES.md), so an empty alert list is never
+      # taken as zero alerts. The count covers main's open alerts, not this revision.
       - run: pnpm run check:codeql-ratchet --require-measurement
         env:
           GH_TOKEN: ${{ github.token }}
