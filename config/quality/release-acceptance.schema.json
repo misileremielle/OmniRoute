@@ -14,6 +14,10 @@
   ],
   "properties": {
     "schema_version": { "type": "integer", "const": 1 },
+    "releaseAcceptance": {
+      "const": false,
+      "description": "A supplied-plan verdict is not a full release or promotion certificate."
+    },
     "identity": { "$ref": "#/$defs/identity" },
     "required_gates": {
       "type": "array",

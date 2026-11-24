@@ -10,9 +10,7 @@ import { fileURLToPath } from "node:url";
 
 import { LOCALES } from "../../src/i18n/config";
 
-const MESSAGES_DIR = fileURLToPath(
-  new URL("../../src/i18n/messages", import.meta.url)
-);
+const MESSAGES_DIR = fileURLToPath(new URL("../../src/i18n/messages", import.meta.url));
 
 /**
  * The sentinel marker stamped by `sync-ui-keys.mjs` when a translation key
@@ -59,10 +57,7 @@ test("#12561 all canonical locales define the 7 usage.kilo* keys without untrans
       const usageObj = usage as Record<string, unknown>;
 
       for (const key of KILO_KEYS) {
-        assert.ok(
-          key in usageObj,
-          `Catalog ${file} missing key usage.${key}`
-        );
+        assert.ok(key in usageObj, `Catalog ${file} missing key usage.${key}`);
         const rawVal = usageObj[key];
         assert.equal(
           typeof rawVal,
@@ -70,10 +65,7 @@ test("#12561 all canonical locales define the 7 usage.kilo* keys without untrans
           `Catalog ${file} usage.${key} must be a string, got ${typeof rawVal}`
         );
         const val = rawVal as string;
-        assert.ok(
-          val.trim().length > 0,
-          `Catalog ${file} has empty usage.${key}`
-        );
+        assert.ok(val.trim().length > 0, `Catalog ${file} has empty usage.${key}`);
         assert.ok(
           !val.trim().startsWith(UNTRANSLATED_SENTINEL),
           `Catalog ${file} has untranslated sentinel for usage.${key}: ${val}`
@@ -88,31 +80,4 @@ test("#12561 all canonical locales define the 7 usage.kilo* keys without untrans
       );
     });
   }
-});
-
-test("#12561 pt.json defines featureFlagOmnirouteDisableThinkingLevelVariantsDescription", () => {
-  const ptPath = path.join(MESSAGES_DIR, "pt.json");
-  assert.ok(fs.existsSync(ptPath), `Catalog file missing: ${ptPath}`);
-
-  const pt = readCatalog(ptPath, "pt.json");
-  assert.ok(
-    pt && typeof pt === "object" && !Array.isArray(pt),
-    "pt.json must be a valid object"
-  );
-  const ptObj = pt as Record<string, unknown>;
-
-  const key = "featureFlagOmnirouteDisableThinkingLevelVariantsDescription";
-  assert.ok(key in ptObj, `pt.json missing ${key}`);
-  const rawVal = ptObj[key];
-  assert.equal(
-    typeof rawVal,
-    "string",
-    `pt.json ${key} must be a string, got ${typeof rawVal}`
-  );
-  const val = rawVal as string;
-  assert.ok(val.trim().length > 0, `pt.json has empty ${key}`);
-  assert.ok(
-    !val.trim().startsWith(UNTRANSLATED_SENTINEL),
-    `pt.json has untranslated sentinel for ${key}: ${val}`
-  );
 });

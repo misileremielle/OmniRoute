@@ -231,7 +231,7 @@ npm run test:combo:live:vps:failover     # adds a real cross-provider failover s
 Coverage notes:
 
 - `npm run test:coverage` measures source coverage for the main unit test suite, excludes `tests/**`, and includes `open-sse/**`
-- Pull requests must keep the coverage gate at **60%+** statements/lines/functions/branches
+- Keep coverage at **60%+** statements/lines/functions/branches. CI measures it only on `main`, as a report that does not block a PR, so run `test:coverage` yourself when you change production code
 - If a PR changes production code in `src/`, `open-sse/`, or `bin/`, it must add or update automated tests in the same PR
 - `npm run coverage:report` prints the detailed file-by-file report from the latest coverage run
 - `npm run test:coverage:legacy` preserves the older metric for historical comparison
@@ -241,8 +241,7 @@ Coverage notes:
 
 Before opening a PR, use the
 [Contribution Golden Path](docs/ops/CONTRIBUTION_GOLDEN_PATH.md) to run the focused loop for
-what you changed. The full unit suite (4 CI shards), Vitest, the **60%+** coverage gate, and
-the production build are CI's responsibility — running them locally adds no signal the PR
+what you changed. The full unit suite (8 CI shards), Vitest and the production build are CI's responsibility — running them locally adds no signal the PR
 checks will not already give you, and on smaller machines it can saturate the host (#8084):
 
 - Run the test files that cover your change: `node --import tsx/esm --test tests/unit/<file>.test.ts`
@@ -267,10 +266,10 @@ Current test status: **122 unit test files** covering:
 
 ## Code Style
 
-- **ESLint** — Run `npm run lint` before committing
+- **Oxlint** — Run `pnpm run lint` before committing
 - **Prettier** — Auto-formatted via `lint-staged` on commit (2 spaces, semicolons, double quotes, 100 char width, es5 trailing commas)
 - **TypeScript** — All `src/` code uses `.ts`/`.tsx`; `open-sse/` uses `.ts`/`.js`; document with TSDoc (`@param`, `@returns`, `@throws`)
-- **No `eval()`** — ESLint enforces `no-eval`, `no-implied-eval`, `no-new-func`
+- **No `eval()`** — Oxlint enforces `no-eval`, `no-implied-eval`, `no-new-func`
 - **Zod validation** — Use Zod v4 schemas for all API input validation
 - **Naming**: Files = camelCase/kebab-case, components = PascalCase, constants = UPPER_SNAKE
 
@@ -323,7 +322,7 @@ src/                        # TypeScript (.ts / .tsx)
 ├── middleware/              # Request middleware (promptInjectionGuard)
 ├── shared/
 │   ├── components/         # React components (.tsx)
-│   ├── constants/          # Provider definitions (329), MCP scopes, 21 routing strategies
+│   ├── constants/          # Provider definitions (329), MCP scopes, 22 routing strategies
 │   ├── utils/              # Circuit breaker, sanitizer, auth helpers
 │   └── validation/         # Zod v4 schemas
 └── sse/                    # SSE proxy pipeline

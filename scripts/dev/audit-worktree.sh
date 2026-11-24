@@ -6,7 +6,7 @@
 #
 # Prints, in order: dirty files; commits since the merge-base with the base; `git diff --stat`;
 # protected-surface hits; assertion / test lines removed under tests/; per-file
-# eslint-suppressions.json counts that went UP versus the base; new keys in
+# oxlint-suppressions.json counts that went UP versus the base; new keys in
 # test-masking-allowlist.json; leftover tsconfig.*tmp*.json / scratch files; and, when an open
 # PR exists for the branch, whether its head on GitHub equals the local HEAD.
 #
@@ -138,10 +138,10 @@ while IFS= read -r f; do
 done < <(printf '%s\n' "$CHANGED" | { grep -E '^tests/' || true; })
 section "removed assert/test lines under tests/" "$REMOVED"
 
-# ---- 6. eslint-suppressions.json counts that went up --------------------------------------
+# ---- 6. oxlint-suppressions.json counts that went up --------------------------------------
 # Both versions are parsed with node: base from `git show <merge-base>:<path>` on stdin, head
 # from the working tree. A file or rule missing on one side counts as 0.
-SUPP_PATH="config/quality/eslint-suppressions.json"
+SUPP_PATH="oxlint-suppressions.json"
 SUPP_UP=$({ git show "$MB:$SUPP_PATH" 2>/dev/null || echo '{}'; } | node -e '
   const fs = require("fs");
   const base = JSON.parse(fs.readFileSync(0, "utf8") || "{}");
@@ -156,7 +156,7 @@ SUPP_UP=$({ git show "$MB:$SUPP_PATH" 2>/dev/null || echo '{}'; } | node -e '
     }
     if (up.length) process.stdout.write(`${file}: ${up.join(", ")}\n`);
   }' "$SUPP_PATH")
-section "eslint-suppressions.json counts UP vs base (only DOWN is allowed)" "$SUPP_UP"
+section "oxlint-suppressions.json counts UP vs base (only DOWN is allowed)" "$SUPP_UP"
 
 # ---- 7. new test-masking-allowlist.json keys ----------------------------------------------
 ALLOW_PATH="config/quality/test-masking-allowlist.json"

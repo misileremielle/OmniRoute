@@ -89,7 +89,7 @@ async function flush() {
 describe("ModelSelectModal hidden-model filtering (#7156)", () => {
   it("does not list a custom model explicitly flagged isHidden:true", async () => {
     mockModels = {
-      requesty: [
+      openrouter: [
         { id: "visible-model-1", name: "Visible Model", source: "imported" },
         { id: "hidden-model-1", name: "Hidden Model", source: "imported", isHidden: true },
       ],
@@ -98,7 +98,7 @@ describe("ModelSelectModal hidden-model filtering (#7156)", () => {
       isOpen: true,
       onClose: vi.fn(),
       onSelect: vi.fn(),
-      activeProviders: [{ provider: "requesty", id: "conn-1" }],
+      activeProviders: [{ provider: "openrouter", id: "conn-1" }],
       modelAliases: {},
       title: "Add model to combo",
     });
@@ -126,15 +126,15 @@ describe("ModelSelectModal unified hidden-model filtering (#9203)", () => {
   });
 
   it("hides a hidden passthrough alias model", async () => {
-    mockHidden = { requesty: ["alias-hidden"] };
+    mockHidden = { openrouter: ["alias-hidden"] };
     const el = await render({
       isOpen: true,
       onClose: vi.fn(),
       onSelect: vi.fn(),
-      activeProviders: [{ provider: "requesty", id: "conn-1" }],
+      activeProviders: [{ provider: "openrouter", id: "conn-1" }],
       modelAliases: {
-        "Visible Alias": "requesty/alias-visible",
-        "Hidden Alias": "requesty/alias-hidden",
+        "Visible Alias": "openrouter/alias-visible",
+        "Hidden Alias": "openrouter/alias-hidden",
       },
       title: "Add model to combo",
     });
@@ -206,12 +206,12 @@ describe("ModelSelectModal unified hidden-model filtering (#9203)", () => {
 
   it("keeps models visible when the API omits hiddenModelsByProvider", async () => {
     // mockHidden is empty object — simulates an older/unchanged API response.
-    mockModels = { requesty: [{ id: "m1", name: "Model One", source: "imported" }] };
+    mockModels = { openrouter: [{ id: "m1", name: "Model One", source: "imported" }] };
     const el = await render({
       isOpen: true,
       onClose: vi.fn(),
       onSelect: vi.fn(),
-      activeProviders: [{ provider: "requesty", id: "conn-1" }],
+      activeProviders: [{ provider: "openrouter", id: "conn-1" }],
       modelAliases: {},
       title: "Add model to combo",
     });
@@ -232,9 +232,9 @@ describe("ModelSelectModal unified hidden-model filtering (#9203)", () => {
         if (url.includes("/api/provider-models")) {
           return new Response(
             JSON.stringify({
-              models: { requesty: [{ id: "m1", name: "Model One", source: "imported" }] },
+              models: { openrouter: [{ id: "m1", name: "Model One", source: "imported" }] },
               modelCompatOverrides: [],
-              hiddenModelsByProvider: { requesty: "not-an-array" },
+              hiddenModelsByProvider: { openrouter: "not-an-array" },
             }),
             { status: 200 }
           );
@@ -246,7 +246,7 @@ describe("ModelSelectModal unified hidden-model filtering (#9203)", () => {
       isOpen: true,
       onClose: vi.fn(),
       onSelect: vi.fn(),
-      activeProviders: [{ provider: "requesty", id: "conn-1" }],
+      activeProviders: [{ provider: "openrouter", id: "conn-1" }],
       modelAliases: {},
       title: "Add model to combo",
     });
@@ -256,23 +256,23 @@ describe("ModelSelectModal unified hidden-model filtering (#9203)", () => {
 
   it("scopes hidden models per provider (same id visible under another provider)", async () => {
     mockModels = {
-      requesty: [{ id: "shared-model", name: "Requesty Shared", source: "imported" }],
+      openrouter: [{ id: "shared-model", name: "OpenRouter Shared", source: "imported" }],
       "openai-compatible-demo": [{ id: "shared-model", name: "Demo Shared", source: "manual" }],
     };
-    mockHidden = { requesty: ["shared-model"] };
+    mockHidden = { openrouter: ["shared-model"] };
     const el = await render({
       isOpen: true,
       onClose: vi.fn(),
       onSelect: vi.fn(),
       activeProviders: [
-        { provider: "requesty", id: "conn-1" },
+        { provider: "openrouter", id: "conn-1" },
         { provider: "openai-compatible-demo", id: "conn-demo" },
       ],
       modelAliases: {},
       title: "Add model to combo",
     });
     await flush();
-    expect(el.textContent).not.toContain("Requesty Shared");
+    expect(el.textContent).not.toContain("OpenRouter Shared");
     expect(el.textContent).toContain("Demo Shared");
   });
 });

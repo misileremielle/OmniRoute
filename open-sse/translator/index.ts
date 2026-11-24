@@ -7,6 +7,7 @@ import {
 } from "./helpers/toolCallHelper.ts";
 import {
   NON_ANTHROPIC_THINKING_PLACEHOLDER,
+  enforceCacheControlBlockLimit,
   prepareClaudeRequest,
 } from "./helpers/claudeHelper.ts";
 import { filterToOpenAIFormat } from "./helpers/openaiHelper.ts";
@@ -37,9 +38,11 @@ import { getResolvedModelCapabilities, supportsReasoning } from "../services/mod
 import { normalizeRoles, resolvePreserveDeveloperRole } from "../services/roleNormalizer.ts";
 import { hoistLeadingSystemMessage } from "./helpers/strictSystemHoist.ts";
 import { acceptsInlineToolAdditions, hoistToolAdditions } from "./helpers/claudeDeferredTools.ts";
+import { ownMessages } from "./helpers/callerMessages.ts";
 import { isStrictResponsesToolHistoryEnabled } from "./helpers/responsesToolHistory.ts";
 import {
   buildAssistantMessageCacheKey,
+  buildToolCallCacheKey,
   lookupReasoning,
   recordReplay,
   requiresReasoningReplay,
@@ -284,7 +287,7 @@ function replayOpenAIReasoningMessage(
       : null;
   const cacheKey = hasToolCalls
     ? typeof firstToolCall?.id === "string"
-      ? firstToolCall.id
+      ? buildToolCallCacheKey(options.reasoningCacheScope, firstToolCall.id)
       : ""
     : buildAssistantMessageCacheKey(options.reasoningCacheScope, messages, messageIndex);
   if (cacheKey) {
@@ -377,6 +380,8 @@ export function translateRequest(
     /** UA-detected GitHub Copilot client. Forwarded to translators via the
      *  transient `_copilotClient` credential flag (see openai-responses → openai). */
     copilotClient?: boolean;
+    /** Per-conversation key for the Antigravity upstream sessionId (prompt-cache scope). */
+    antigravitySessionKey?: string | null;
   }
 ) {
   // Only Anthropic holds message-thread state. A `thread` delta (the message-threads beta) omits
@@ -398,9 +403,8 @@ export function translateRequest(
   const hoistDeferredTools =
     sourceFormat === FORMATS.CLAUDE &&
     !(targetFormat === FORMATS.CLAUDE && acceptsInlineToolAdditions(provider));
-  let result = normalizeReasoningRequest(
-    hoistDeferredTools ? hoistToolAdditions(body) : body,
-    provider
+  let result = ownMessages(
+    normalizeReasoningRequest(hoistDeferredTools ? hoistToolAdditions(body) : body, provider)
   );
   const use9CharId = options?.normalizeToolCallId === true;
   const preserveDeveloperRole = options?.preserveDeveloperRole;
@@ -558,10 +562,12 @@ export function translateRequest(
       // thoughtSignature on tool-use history (#8979 / #2504 parity with the hub path).
       const hasNs = options?.signatureNamespace != null;
       const hasProvider = provider != null;
+      const agySessionKey = options?.antigravitySessionKey || null;
       const directCredentials =
-        hasNs || hasProvider
+        hasNs || hasProvider || agySessionKey
           ? {
               ...(credentials && typeof credentials === "object" ? credentials : {}),
+              ...(agySessionKey ? { _antigravitySessionKey: agySessionKey } : {}),
               ...(hasProvider ? { _provider: provider } : {}),
               ...(hasNs
                 ? {
@@ -590,7 +596,7 @@ export function translateRequest(
           // stripped.
           const preserveCacheControl =
             options?.preserveCacheControl === true &&
-            providerHonorsOpenAIFormatCacheControl(provider, connectionCacheOverride);
+            providerHonorsOpenAIFormatCacheControl(provider, connectionCacheOverride, model);
           // Routed provider id lets claudeToOpenAIRequest keep service_tier only for
           // targets that accept it.
           const hasStep1Provider = provider != null;
@@ -670,10 +676,12 @@ export function translateRequest(
           const hasPreCompression = options?.preCompressionBody != null;
           const hasCopilot = options?.copilotClient === true;
           const hasProvider = provider != null;
+          const agySessionKey = options?.antigravitySessionKey || null;
           const translationCredentials =
-            hasNs || hasPreCompression || hasCopilot || hasProvider
+            hasNs || hasPreCompression || hasCopilot || hasProvider || agySessionKey
               ? {
                   ...(credentials && typeof credentials === "object" ? credentials : {}),
+                  ...(agySessionKey ? { _antigravitySessionKey: agySessionKey } : {}),
                   ...(hasNs
                     ? {
                         _signatureNamespace: scopeGeminiThoughtSignatureNamespace(
@@ -725,10 +733,11 @@ export function translateRequest(
     // #2069 — preserve client cache_control breakpoints only for providers that
     // honor explicit OpenAI-format markers (DashScope/alibaba, Xiaomi MiMo) when
     // requested upstream; generic/implicit-cache OpenAI providers stay stripped.
+    const preserveOpenAICacheControl =
+      options?.preserveCacheControl === true &&
+      providerHonorsOpenAIFormatCacheControl(provider, connectionCacheOverride, model);
     result = filterToOpenAIFormat(result, {
-      preserveCacheControl:
-        options?.preserveCacheControl === true &&
-        providerHonorsOpenAIFormatCacheControl(provider, connectionCacheOverride),
+      preserveCacheControl: preserveOpenAICacheControl,
       preservePromptCacheBreakpoint: providerAcceptsPromptCacheBreakpoint(provider),
       // #4849 regression guard: keep client reasoning_content for replay providers.
       preserveReasoningContent: isReasoner,
@@ -740,6 +749,11 @@ export function translateRequest(
       // Same decision normalizeRoles made above — never undo it here.
       preserveDeveloperRole: resolvePreserveDeveloperRole(preserveDeveloperRole, provider),
     });
+    // OpenRouter relays explicit breakpoints to Anthropic, which allows 4 at most. The Claude
+    // path enforces this in prepareClaudeRequest; this OpenAI-format path had no cap.
+    if (preserveOpenAICacheControl && normalizedProvider === "openrouter") {
+      enforceCacheControlBlockLimit(result);
+    }
   }
 
   // Final step: prepare request for Claude format endpoints
@@ -755,6 +769,7 @@ export function translateRequest(
     const preserveCache = isClaudePassthrough || options?.preserveCacheControl === true;
     result = prepareClaudeRequest(result, provider, preserveCache, model, {
       fallbackToHeuristicWhenNoMarkers: true,
+      reasoningCacheScope: options?.reasoningCacheScope,
     });
   }
 
@@ -896,7 +911,9 @@ export function translateRequest(
         // Client reasoning wins above. Otherwise try authentic replay before
         // retaining Kimi Code's empty protocol marker as the final fallback.
         if (firstToolUseId) {
-          const cached = lookupReasoning(firstToolUseId);
+          const cached = lookupReasoning(
+            buildToolCallCacheKey(options?.reasoningCacheScope, firstToolUseId)
+          );
           if (cached) {
             if (thinkingBlock) {
               thinkingBlock.type = "thinking";

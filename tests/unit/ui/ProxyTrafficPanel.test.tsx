@@ -3,9 +3,7 @@ import { act, cleanup, fireEvent, render, screen, within } from "@testing-librar
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, expect, it, vi } from "vitest";
 import ProxyTrafficPanel from "../../../src/app/(dashboard)/dashboard/settings/components/proxy/ProxyTrafficPanel";
-import { deepMergeFallback } from "../../../src/i18n/request";
 import en from "../../../src/i18n/messages/en.json";
-import de from "../../../src/i18n/messages/de.json";
 
 vi.unmock("next-intl");
 
@@ -45,19 +43,12 @@ afterEach(() => {
 });
 
 it(
-  "real EN and deep-merged DE providers show separate route totals and refresh/error states",
+  "the EN provider shows separate route totals and refresh/error states",
   { timeout: 10000 },
   async () => {
     vi.stubGlobal("fetch", fetchMock);
-    for (const [locale, messages] of [
-      ["en", en],
-      ["de", deepMergeFallback(structuredClone(de), en)],
-    ] as const) {
+    for (const [locale, messages] of [["en", en]] as const) {
       const labels = messages.settings.proxyTraffic;
-      if (locale === "de") {
-        expect(labels.title).toBe(de.settings.proxyTraffic.title);
-        expect(labels.title).not.toBe(en.settings.proxyTraffic.title);
-      }
       let resolve!: (value: Response) => void;
       const pending = new Promise<Response>((r) => {
         resolve = r;

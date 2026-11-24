@@ -20,14 +20,14 @@
 //
 // Exit codes:
 //   0  — completed measurement; no blocking finding / no ratchet regression
-//   1  — gate failure: --strict + any finding, OR --ratchet + zizmorFindings
-//        regression (measured > baseline), or incomplete execution
+//   1  — gate failure: --strict + any finding, OR --ratchet + any actionlint finding
+//        or a zizmorFindings regression (measured > baseline), or incomplete execution
 //
 // Ratchet mode (--ratchet): reads metrics.zizmorFindings.value from
 // config/quality/quality-baseline.json and rejects a MEASURED zizmor count that
 // is GREATER than the baseline (real regression, direction:down).
-// ONLY zizmorFindings is ratcheted; actionlint findings are REPORTED but NOT
-// ratcheted (use the separate --strict all-or-nothing flag for those). Missing
+// actionlint findings are correctness errors, so --ratchet blocks on any of them (the fork
+// keeps actionlint at zero); only zizmorFindings is held to a baseline. Missing
 // measurement blocks acceptance without being attributed to contributor code.
 //
 // Usage:
@@ -525,16 +525,21 @@ function main() {
     process.exit(1);
   }
 
-  // ── ratchet (zizmorFindings only, direction:down) ──────────────────────────
+  // ── ratchet: actionlint must be clean; zizmorFindings direction:down ────────
   // Prerequisites and report validity were verified before emitting metrics.
+  if (RATCHET && actionlintCount > 0) {
+    console.error(
+      `\n[check-workflows] FAIL — ${actionlintCount} actionlint finding(s). Workflow correctness errors block.`
+    );
+    process.exit(1);
+  }
   if (RATCHET) {
     const { regressed } = evaluateZizmorRatchet(zizmorCount, baselineValue);
     if (regressed) {
       console.error(
         `\n[check-workflows] REGRESSION — ${zizmorCount} zizmor finding(s) > baseline ${baselineValue}.\n` +
           "  → Fix the new workflow finding(s), or re-baseline metrics.zizmorFindings in\n" +
-          "    config/quality/quality-baseline.json if the rise is a legitimate, justified drift.\n" +
-          "  (actionlint findings are reported, not ratcheted — use --strict for those.)"
+          "    config/quality/quality-baseline.json if the rise is a legitimate, justified drift."
       );
       process.exit(1);
     }
@@ -549,7 +554,7 @@ function main() {
   if (total > 0 && !QUIET) {
     console.log(
       `[check-workflows] ADVISORY — ${total} finding(s) detected. ` +
-        "Pass --strict to block on any finding, or --ratchet to block on a zizmor regression."
+        "Pass --strict to block on any finding, or --ratchet to block on actionlint findings and a zizmor regression."
     );
   }
 

@@ -41,9 +41,11 @@ test("isLocalOnlyPath: /api/db/health is local-only (forks native diagnostics, #
   assert.equal(isLocalOnlyPath("/api/db/health"), true);
 });
 
-test("isLocalOnlyBypassableByManageScope: no prefix is bypassable by default", () => {
+test("isLocalOnlyBypassableByManageScope: only /api/resilience/connections is bypassable by default", () => {
+  // The fork removed MCP, so upstream's default /api/mcp/ entry is gone; the read-only
+  // resilience view keeps upstream's default bypass (KEA-9357).
   assert.equal(isLocalOnlyBypassableByManageScope("/api/mcp/stream"), false);
-  assert.equal(isLocalOnlyBypassableByManageScope("/api/resilience/connections"), false);
+  assert.equal(isLocalOnlyBypassableByManageScope("/api/resilience/connections"), true);
 });
 
 test("isLocalOnlyBypassableByManageScope: /api/services/cliproxy/* is NOT bypassable", () => {

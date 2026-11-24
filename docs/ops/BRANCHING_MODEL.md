@@ -54,14 +54,11 @@ opened. That **does not stop development**:
 - Open PRs that still target the frozen branch should be **retargeted** to the
   active (highest) `release/v*` branch.
 
-Check for an open freeze before assuming the branch you want is mergeable:
+Upstream announces a freeze with a `release-freeze` issue in its own repository. The fork has no
+release freezes, so an upstream freeze never holds or retargets a fork PR.
 
-```bash
-gh issue list --repo diegosouzapw/OmniRoute --label release-freeze --state open
-```
-
-Merge mechanics (owner `queue` label → Mergify) are documented in
-[MERGE_TRAIN.md](./MERGE_TRAIN.md).
+> **Fork:** there is no merge queue, Mergify or omni-queue, and no ruleset on `main`. A PR merges
+> by hand once its `Gate / CI` check is green (see [FORK_IDENTITY.md](./FORK_IDENTITY.md)).
 
 ## Why both a branch and a tag?
 
@@ -78,5 +75,3 @@ release PR to finish.
 
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) — setup, tests, PR checklist
 - [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md) — pre-ship validation
-- [MERGE_TRAIN.md](./MERGE_TRAIN.md) — merge queue and fallback train
-- [RELEASE_GREEN.md](./RELEASE_GREEN.md) — keeping the release tip green

@@ -4,7 +4,6 @@ import { afterEach, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import en from "../../src/i18n/messages/en.json";
-import zh from "../../src/i18n/messages/zh-CN.json";
 import QuotaHealthOverview from "@/app/(dashboard)/dashboard/usage/components/ProviderLimits/QuotaHealthOverview";
 import { buildHealthAccount } from "@/app/(dashboard)/dashboard/usage/components/ProviderLimits/healthOverview";
 import type { ConnectionQuotaAvailability } from "@/lib/usage/availabilityTypes";
@@ -13,10 +12,10 @@ vi.unmock("next-intl");
 afterEach(cleanup);
 
 for (const provider of ["antigravity", "agy"])
-  for (const locale of ["en", "zh-CN"]) {
+  for (const locale of ["en"]) {
     it(`${provider} ${locale} shows a partial cap and the cooling family on hover without quota groups`, () => {
       const now = Date.now();
-      const messages = locale === "en" ? en : zh;
+      const messages = en;
       const until = new Date(now + 600_000).toISOString();
       const connection = { id: "synthetic-family", provider, isActive: true };
       const usage = {

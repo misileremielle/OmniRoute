@@ -34,10 +34,11 @@ test("providers page mounts the leftover banner", () => {
 // from 2020 to 2010 lines; the freeze is re-pinned at the measured size.
 // KEA-7886 P8 (#18144): section-header dots moved to <CategoryDot category=…>, shrinking it
 // again from 2010 to 1989 lines; re-pinned at the measured size.
-// The fork's web-cookie and router/gateway removals shrank it from 1910 to 1771 lines.
-test("providers page stays frozen at 1771 lines", () => {
+// The fork's web-cookie and router/gateway removals shrank it from 1910 to 1771 lines; the
+// 2026-11-15 UI review (two headings lost dead typography classes) to 1767.
+test("providers page stays frozen at 1767 lines", () => {
   const lines = fs.readFileSync(pagePath, "utf8").split("\n").length;
-  assert.equal(lines, 1771);
+  assert.equal(lines, 1767);
 });
 
 test("purge surfaces notify.error when POST is not ok", () => {

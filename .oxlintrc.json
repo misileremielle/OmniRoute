@@ -1,0 +1,269 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["nextjs"],
+  "categories": {
+    "correctness": "off"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    ".build/**",
+    "src/.next/**",
+    "dist/**",
+    "coverage/**",
+    "scripts/**",
+    "bin/**",
+    "node_modules/**",
+    ".worktrees/**",
+    ".claude/**",
+    ".omnivscodeagent/**",
+    "_tasks/**",
+    "_artifacts/**",
+    ".agents/**",
+    "vscode-extension/**",
+    "packages/ui-kit/**",
+    "_references/**",
+    "_mono_repo/**",
+    "_cache/**",
+    "_trash/**",
+    "review/**",
+    "docs/**",
+    "open-sse/mcp-server/dist/**",
+    "playwright-report/**",
+    "test-results/**",
+    "app/**",
+    "app.__qa_backup/**",
+    "clipr/**"
+  ],
+  "rules": {
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "prop-types",
+            "message": "PropTypes are deprecated. Use TypeScript types/interfaces instead."
+          }
+        ],
+        "patterns": [
+          {
+            "regex": "^(?:@/lib/localDb(?:\\.ts)?|(?:\\.\\.?/)+(?:lib/)?localDb(?:\\.ts)?)$",
+            "message": "The localDb compatibility barrel is restricted — import the owning domain module from `@/lib/db/` instead."
+          }
+        ]
+      }
+    ],
+    "nextjs/google-font-display": "warn",
+    "nextjs/google-font-preconnect": "warn",
+    "nextjs/next-script-for-ga": "warn",
+    "nextjs/no-async-client-component": "warn",
+    "nextjs/no-before-interactive-script-outside-document": "warn",
+    "nextjs/no-css-tags": "warn",
+    "nextjs/no-head-element": "warn",
+    "nextjs/no-html-link-for-pages": "error",
+    "nextjs/no-img-element": "warn",
+    "nextjs/no-page-custom-font": "warn",
+    "nextjs/no-styled-jsx-in-document": "warn",
+    "nextjs/no-sync-scripts": "error",
+    "nextjs/no-title-in-document-head": "warn",
+    "nextjs/no-typos": "warn",
+    "nextjs/no-unwanted-polyfillio": "warn",
+    "nextjs/inline-script-id": "error",
+    "nextjs/no-assign-module-variable": "error",
+    "nextjs/no-document-import-in-page": "error",
+    "nextjs/no-duplicate-head": "error",
+    "nextjs/no-head-import-in-document": "error",
+    "nextjs/no-script-component-in-head": "error"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{js,jsx,mjs,ts,tsx,mts,cts}"],
+      "rules": {
+        "react/display-name": "error",
+        "react/jsx-key": "error",
+        "react/jsx-no-comment-textnodes": "error",
+        "react/jsx-no-duplicate-props": "error",
+        "react/jsx-no-target-blank": "off",
+        "react/jsx-no-undef": "error",
+        "react/no-children-prop": "error",
+        "react/no-danger-with-children": "error",
+        "react/no-direct-mutation-state": "error",
+        "react/no-find-dom-node": "error",
+        "react/no-is-mounted": "error",
+        "react/no-render-return-value": "error",
+        "react/no-string-refs": "error",
+        "react/no-unescaped-entities": "error",
+        "react/no-unknown-property": "off",
+        "react/no-unsafe": "off",
+        "react/react-in-jsx-scope": "off",
+        "import/no-anonymous-default-export": "warn",
+        "jsx-a11y/alt-text": [
+          "warn",
+          {
+            "elements": ["img"],
+            "img": ["Image"]
+          }
+        ],
+        "jsx-a11y/aria-props": "warn",
+        "jsx-a11y/aria-proptypes": "warn",
+        "jsx-a11y/aria-unsupported-elements": "warn",
+        "jsx-a11y/role-has-required-aria-props": "warn",
+        "jsx-a11y/role-supports-aria-props": "warn",
+        "react/rules-of-hooks": "error",
+        "react/exhaustive-deps": "warn",
+        "react/static-components": "error",
+        "react/use-memo": "error",
+        "react/preserve-manual-memoization": "error",
+        "react/incompatible-library": "warn",
+        "react/immutability": "error",
+        "react/globals": "error",
+        "react/refs": "error",
+        "react/set-state-in-effect": "error",
+        "react/error-boundaries": "error",
+        "react/purity": "error",
+        "react/set-state-in-render": "error",
+        "react/unsupported-syntax": "warn"
+      },
+      "plugins": ["react", "import", "jsx-a11y"],
+      "env": {
+        "node": true
+      }
+    },
+    {
+      "files": ["src/**/*.{ts,tsx,js,jsx}"],
+      "rules": {
+        "import/no-anonymous-default-export": "error",
+        "nextjs/no-img-element": "error",
+        "react/exhaustive-deps": "error"
+      },
+      "plugins": ["react", "import"]
+    },
+    {
+      "files": ["src/lib/db/**/*.{ts,tsx,js,jsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "prop-types",
+                "message": "PropTypes are deprecated. Use TypeScript types/interfaces instead."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app/**/*.{ts,tsx,js,jsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "prop-types",
+                "message": "PropTypes are deprecated. Use TypeScript types/interfaces instead."
+              }
+            ],
+            "patterns": [
+              {
+                "regex": "^(?:@/lib/localDb(?:\\.ts)?|(?:\\.\\.?/)+(?:lib/)?localDb(?:\\.ts)?)$",
+                "message": "The localDb compatibility barrel is restricted — import the owning domain module from `@/lib/db/` instead."
+              },
+              {
+                "regex": "^(?:@omniroute/)?open-sse/executors(?:/|$)",
+                "message": "Executor implementations must stay behind an open-sse handler or service boundary."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["open-sse/**/*.ts", "tests/**/*.ts"],
+      "rules": {
+        "nextjs/no-assign-module-variable": "off",
+        "react/rules-of-hooks": "off",
+        "typescript/no-explicit-any": "error"
+      },
+      "plugins": ["typescript", "react"]
+    },
+    {
+      "files": ["tests/**/*.mjs"],
+      "rules": {
+        "nextjs/no-assign-module-variable": "off",
+        "react/rules-of-hooks": "off"
+      },
+      "plugins": ["react"]
+    },
+    {
+      "files": ["src/**/*.{ts,tsx,js,jsx}", "open-sse/**/*.ts", "tests/**/*.{ts,tsx,mjs}"],
+      "rules": {
+        "no-unused-vars": [
+          "error",
+          {
+            "args": "all",
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "caughtErrors": "all",
+            "caughtErrorsIgnorePattern": "^_",
+            "destructuredArrayIgnorePattern": "^_",
+            "ignoreRestSiblings": true
+          }
+        ]
+      },
+      "plugins": ["typescript"]
+    },
+    {
+      "files": ["src/**/*.ts", "open-sse/**/*.ts"],
+      "rules": {
+        "eslint-js/no-restricted-syntax": [
+          "error",
+          {
+            "selector": "FunctionDeclaration[id.name='toNumber'], VariableDeclarator[id.name='toNumber']",
+            "message": "New local `toNumber` definitions are barred — import `toNumber` from `@/shared/utils/numeric` (src) or `open-sse/utils/numeric.ts` (engine) instead (#7879). See that module's JSDoc for the canonical coercion shape and the `toNumberOrNull`/`toNumberArray` variants."
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app/**/*.{ts,tsx}", "src/components/**/*.{ts,tsx}"],
+      "rules": {
+        "eslint-js/no-restricted-syntax": [
+          "error",
+          {
+            "selector": "CallExpression[callee.property.name='includes'][callee.object.callee.property.name='toLowerCase']",
+            "message": "Türkçe-güvenli arama için matchesSearch() kullan (@/shared/utils/turkishText). Ham toLowerCase().includes() İ/ı karakterlerini bozar."
+          },
+          {
+            "selector": "FunctionDeclaration[id.name='toNumber'], VariableDeclarator[id.name='toNumber']",
+            "message": "New local `toNumber` definitions are barred — import `toNumber` from `@/shared/utils/numeric` (src) or `open-sse/utils/numeric.ts` (engine) instead (#7879). See that module's JSDoc for the canonical coercion shape and the `toNumberOrNull`/`toNumberArray` variants."
+          }
+        ]
+      }
+    },
+    {
+      "files": ["open-sse/utils/numeric.ts"],
+      "rules": {
+        "eslint-js/no-restricted-syntax": "off"
+      }
+    }
+  ],
+  "jsPlugins": [
+    {
+      "name": "eslint-js",
+      "specifier": "oxlint-plugin-eslint"
+    }
+  ]
+}

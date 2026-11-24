@@ -2,21 +2,19 @@
 # Resolve the Docker tag/channel for a docker-publish workflow event.
 #
 # Usage:
-#   resolve-docker-publish-version.sh EVENT_NAME REF_TYPE REF_NAME [INPUT_VERSION] [DEFAULT_BRANCH]
+#   resolve-docker-publish-version.sh EVENT_NAME REF_TYPE REF_NAME
 #
 # Outputs exactly one safe tag string:
 # - push tag: tag without a leading v
 # - workflow_dispatch: same as a push of the selected ref
 # - push main: latest
-# - push to the current default release/v* branch: next
 # - release: release tag without a leading v
+# Any other branch fails: the fork publishes no :next channel.
 set -euo pipefail
 
 EVENT_NAME="${1:?event name required}"
 REF_TYPE="${2:-}"
 REF_NAME="${3:-}"
-INPUT_VERSION="${4:-}"
-DEFAULT_BRANCH="${5:-}"
 
 case "$EVENT_NAME" in
   push | workflow_dispatch)
@@ -26,13 +24,6 @@ case "$EVENT_NAME" in
       case "$REF_NAME" in
         main)
           VERSION="latest"
-          ;;
-        release/v*)
-          if [ -z "$DEFAULT_BRANCH" ] || [ "$REF_NAME" != "$DEFAULT_BRANCH" ]; then
-            VERSION="skip"
-          else
-            VERSION="next"
-          fi
           ;;
         *)
           echo "Unsupported Docker publish branch: $REF_NAME" >&2

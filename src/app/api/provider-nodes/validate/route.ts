@@ -13,6 +13,7 @@ import { getProviderValidationGuard } from "@/shared/network/outboundUrlGuardPol
 import { isCcCompatibleProviderEnabled } from "@/shared/utils/featureFlags";
 import { providerNodeValidateSchema } from "@/shared/validation/schemas";
 import { isValidationFailure, validateBody } from "@/shared/validation/helpers";
+import { probeCustomJsonEndpoint, resolveCustomJsonNodeConfig } from "../customJsonNode";
 
 // Matches a base URL whose host is localhost / 127.0.0.1 (with an optional port).
 const LOCALHOST_BASE_URL_RE = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(?:[/?#]|$)/i;
@@ -154,16 +155,8 @@ export async function POST(request) {
     if (isValidationFailure(validation)) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
-    const {
-      baseUrl,
-      apiKey,
-      type,
-      compatMode,
-      apiType: _apiType,
-      chatPath,
-      modelsPath,
-      modelId,
-    } = validation.data;
+    const { baseUrl, apiKey, type, compatMode, apiType, chatPath, modelsPath, modelId } =
+      validation.data;
     const trimmedModelId = typeof modelId === "string" ? modelId.trim() : "";
 
     // System One (Jev) compatible validation: one tiny decision on POST /v1/systemone.
@@ -187,6 +180,21 @@ export async function POST(request) {
         warning: (result as { warning?: string }).warning || null,
         method: result.method || null,
       });
+    }
+
+    // Custom JSON API node: an explicit test sends ONE real business request.
+    if (apiType === "custom-json" && type !== "anthropic-compatible") {
+      const resolved = resolveCustomJsonNodeConfig(apiType, validation.data.customJson, baseUrl);
+      if (resolved.error) return resolved.error;
+      return NextResponse.json(
+        await probeCustomJsonEndpoint({
+          baseUrl,
+          apiKey,
+          config: resolved.config,
+          customHeaders: validation.data.customHeaders,
+          modelId: trimmedModelId,
+        })
+      );
     }
 
     // Anthropic Compatible Validation

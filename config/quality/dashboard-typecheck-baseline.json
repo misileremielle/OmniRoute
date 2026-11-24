@@ -1,7 +1,4 @@
 {
-  "src/app/(dashboard)/dashboard/HomePageClient.tsx": {
-    "TS2339": 7
-  },
   "src/app/(dashboard)/dashboard/cache/__tests__/CachePage.test.tsx": {
     "TS1117": 1
   },
@@ -40,13 +37,7 @@
     "TS2339": 4,
     "TS2345": 2
   },
-  "src/app/(dashboard)/dashboard/providers/providerPageUtils.ts": {
-    "TS2345": 1
-  },
   "src/app/(dashboard)/dashboard/quota/page.tsx": {
-    "TS2339": 4
-  },
-  "src/app/(dashboard)/dashboard/settings/components/AppearanceTab.tsx": {
     "TS2339": 4
   },
   "src/app/(dashboard)/dashboard/usage/components/ProviderLimits/index.tsx": {
@@ -58,15 +49,5 @@
   "src/lib/services/htmlRewriter.ts": {
     "TS2322": 2,
     "TS2345": 2
-  },
-  "src/shared/components/OAuthModal.tsx": {
-    "TS2769": 2,
-    "TS2345": 3
-  },
-  "src/shared/components/analytics/charts.tsx": {
-    "TS2345": 1
-  },
-  "src/shared/components/analytics/rechartsDonuts.tsx": {
-    "TS2739": 2
   }
 }

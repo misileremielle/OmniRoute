@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: OmniRoute API
-  version: 3.8.54
+  version: 3.8.55
   description: |
     OmniRoute is a local-first AI API proxy router. It provides an OpenAI-compatible
     endpoint that routes requests to multiple AI providers with load balancing,
@@ -357,6 +357,9 @@ paths:
         `xquik_search` resolve to the same provider.
         AnySearch (`anysearch-search`, aliases `anysearch` / `anysearch_search`)
         provides free fallback-only web search.
+        Alternatively, set `model` to a saved priority/fill-first combo name.
+        Only search-capable targets are attempted, in configured order.
+        `model` and `provider` are mutually exclusive.
         Codex Web Search (`codex-search`, alias `codex_search`) reuses connected
         Codex (ChatGPT) accounts. Name it explicitly to use it; automatic selection
         (a credentialed last resort before keyless search) needs the
@@ -378,6 +381,12 @@ paths:
                   type: string
                   minLength: 1
                   maxLength: 500
+                model:
+                  type: string
+                  minLength: 1
+                  maxLength: 300
+                  description: Saved priority/fill-first combo name; mutually exclusive with provider.
+                  examples: [shared-free]
                 provider:
                   type: string
                   minLength: 1
@@ -1226,7 +1235,7 @@ paths:
           description: Invalid `withLimits` value
 
   /api/models/alias:
-    post:
+    put:
       tags: [Models]
       summary: Create or update a model alias
       requestBody:
@@ -1481,7 +1490,10 @@ paths:
         Optional `providerIdSuffix` (letters, digits, `-`, `_`, `.`; max 64; must start with a
         letter or digit) replaces the random UUID in the generated node id
         (`openai-compatible-<apiType>-<suffix>`, `anthropic-compatible-<suffix>`,
-        `anthropic-compatible-cc-<suffix>`). Blank keeps the UUID.
+        `anthropic-compatible-cc-<suffix>`). Blank keeps the UUID. For an openai-compatible
+        node, `apiType: "custom-json"` with a `customJson` object (request template, response
+        path, method, auth mode) calls an arbitrary JSON endpoint; see
+        `docs/guides/CUSTOM_JSON_API.md`.
       responses:
         "201":
           description: Created node
@@ -1491,9 +1503,10 @@ paths:
           description: A provider node with the resulting id already exists
 
   /api/provider-nodes/{id}:
-    patch:
+    put:
       tags: [Provider Nodes]
       summary: Update provider node
+      description: Accepts `apiType` and `customJson` for custom JSON API nodes (see POST).
       parameters:
         - $ref: "#/components/parameters/ResourceId"
       responses:
@@ -1512,6 +1525,9 @@ paths:
     post:
       tags: [Provider Nodes]
       summary: Validate a provider node
+      description: >-
+        With `apiType: "custom-json"` and `customJson`, sends exactly one real request to the
+        business endpoint and answers with its status only, never the upstream body.
       responses:
         "200":
           description: Validation result
@@ -2325,6 +2341,86 @@ paths:
         "404":
           description: Combo not found
 
+  /api/combos/decision-preview:
+    post:
+      tags: [Combos]
+      summary: Preview the decision router menu and optionally test one decision
+      description: >-
+        Builds the menu (unique model ids of the given steps, in order) and the generated
+        cost-rank descriptions that the `decision` auto-router sends at request time. With
+        `prompt`, also runs one decision with the unsaved `decision` block; that call only
+        happens while the `COMBO_DECISION_ROUTER_ENABLED` feature flag is on (otherwise
+        `test.status` is `skipped` with reason `disabled`) and may bill the decider. A
+        `combo-model` decider is skipped (`live_request_only`). Requires management auth.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [models]
+              properties:
+                models:
+                  type: array
+                  maxItems: 200
+                  items:
+                    type: string
+                    minLength: 1
+                    maxLength: 300
+                  description: Combo step model strings (`provider/model`).
+                prompt:
+                  type: string
+                  minLength: 1
+                  maxLength: 8000
+                decision:
+                  type: object
+                  additionalProperties: false
+                  required: [decider]
+                  properties:
+                    decider:
+                      type: string
+                      enum: [systemone, http, combo-model]
+                    model:
+                      type: string
+                      maxLength: 200
+                    baseUrl:
+                      type: string
+                      maxLength: 500
+                      description: http(s) URL without credentials, query or fragment.
+                    connectionId:
+                      type: string
+                      maxLength: 200
+                    wire:
+                      type: string
+                      enum: [systemone, openai-chat]
+                    timeoutMs:
+                      type: integer
+                      minimum: 100
+                      maximum: 5000
+                    minConfidence:
+                      type: number
+                      minimum: 0
+                      maximum: 1
+                    descriptions:
+                      type: object
+                      maxProperties: 50
+                      additionalProperties:
+                        type: string
+                        maxLength: 1000
+      responses:
+        "200":
+          description: >-
+            `menu` and `generated`; with a prompt also `test` (`status`: `selected`, `skipped`
+            or `failed`, plus a log-safe `reason`, or `choice`, `confidence`, `probabilities`,
+            `backendModel` and `latencyMs`).
+        "400":
+          description: Invalid JSON or body (an `apiKey` field is rejected)
+        "401":
+          description: Management authentication required
+        "500":
+          description: Sanitized error
+
   /api/settings:
     get:
       tags: [Settings]
@@ -2772,7 +2868,7 @@ paths:
       responses:
         "200":
           description: Current proxy settings
-    patch:
+    put:
       tags: [Settings]
       summary: Update proxy settings
       responses:
@@ -6068,6 +6164,7 @@ paths:
         "200":
           description: Backup list
     post:
+      x-agent-skill-excluded: true
       tags: [System]
       summary: Restore a database backup by id
       description: >-
@@ -6258,9 +6355,11 @@ paths:
       tags: [System]
       summary: Inspect connection resilience state
       description: >-
-        Local-only operational view of per-connection cooldowns, provider circuit
-        breakers, model lockouts, and recent breaker transitions. Credential columns
-        are excluded by an explicit database whitelist.
+        Operational view of per-connection cooldowns, provider circuit breakers,
+        model lockouts, and recent breaker transitions. Local-only for anonymous
+        callers; a remote caller needs an authenticated dashboard session or a
+        manage-scope key (default manage-scope bypass). Credential columns are
+        excluded by an explicit database whitelist.
       x-internal: true
       parameters:
         - name: windowMs
@@ -6498,7 +6597,7 @@ paths:
     get:
       tags: [System]
       summary: Get Modality Bridge telemetry
-      description: In-memory per-modality bridge counters (attempts, successes, bridged, cacheHits, failures, totalLatencyMs, latencySamples, averageLatencyMs, lastUsedAt). The bridged field is the backward-compatible success count. Latency averages include sampled operations only; an unsampled Vision or Audio operation does not fabricate a zero-millisecond sample. Counters reset on process restart.
+      description: In-memory per-modality bridge counters (attempts, successes, bridged, cacheHits, failures, totalLatencyMs, latencySamples, averageLatencyMs, lastUsedAt). The bridged field is the backward-compatible success count. Latency averages include sampled operations only; an unsampled Vision or Audio operation does not fabricate a zero-millisecond sample. Counters reset on process restart. The video drilldown snapshot exposes only effective consent and aggregate retained entries/bytes, never handles or media. Video promotion reports the configured model and per-policy status; the current settings-only snapshot cannot verify a provider revision and candidate SHA, so contextVerified is false and both policies remain hold. Enabling a bridge is not promotion evidence.
       security:
         - ManagementSessionAuth: []
       responses:
@@ -6506,7 +6605,6 @@ paths:
           description: Vision bridge stats
         "401":
           description: Unauthorized
-
   /api/cache/stats:
     get:
       tags: [System]
@@ -7336,6 +7434,12 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
   /api/{omnirouteApiCatchAll}:
+    parameters:
+      - name: omnirouteApiCatchAll
+        in: path
+        required: true
+        schema:
+          type: string
     delete:
       tags:
         - OmnirouteApiCatchAll
@@ -7472,6 +7576,12 @@ paths:
         "200":
           description: OK
   /api/codex/connect/{token}:
+    parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - Codex
@@ -7589,6 +7699,8 @@ paths:
         "200":
           description: OK
   /api/context/combos/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Context
@@ -7611,6 +7723,8 @@ paths:
         "200":
           description: OK
   /api/context/combos/{id}/assignments:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Context
@@ -7672,6 +7786,8 @@ paths:
         "200":
           description: OK
   /api/conversations/{id}/tree:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Conversations
@@ -7689,6 +7805,12 @@ paths:
         "200":
           description: OK
   /api/cursor-cli/{path}:
+    parameters:
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - Cursor cli
@@ -7732,6 +7854,7 @@ paths:
             and `oma_` access tokens get 403.
   /api/db-backups/import:
     post:
+      x-agent-skill-excluded: true
       tags:
         - Db backups
       summary: "POST db backups › import"
@@ -7797,6 +7920,13 @@ paths:
         "200":
           description: OK
   /api/discovery/results/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
     delete:
       tags:
         - Discovery
@@ -7823,6 +7953,13 @@ paths:
         "200":
           description: OK
   /api/discovery/verify/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
     post:
       tags:
         - Discovery
@@ -7856,6 +7993,12 @@ paths:
         "200":
           description: OK
   /api/evals/suites/{suiteId}:
+    parameters:
+      - name: suiteId
+        in: path
+        required: true
+        schema:
+          type: string
     delete:
       tags:
         - Evals
@@ -8069,6 +8212,8 @@ paths:
         "200":
           description: OK
   /api/keys/{id}/regenerate:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Keys
@@ -8076,7 +8221,11 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
   /api/keys/{id}/reveal:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Keys
@@ -8084,7 +8233,11 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
   /api/keys/{id}/usage-limits:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Keys
@@ -8092,6 +8245,8 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
   /api/keys/{id}/self-service:
     get:
       tags:
@@ -8187,14 +8342,37 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
     post:
       tags:
         - Keys
       summary: "POST keys › groups"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  pattern: '\S'
+                description:
+                  type: string
+                  default: ""
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Group created
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
   /api/keys/groups/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Keys
@@ -8202,6 +8380,8 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
     get:
       tags:
         - Keys
@@ -8209,6 +8389,8 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
     put:
       tags:
         - Keys
@@ -8222,7 +8404,11 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
   /api/keys/groups/{id}/keys:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Keys
@@ -8230,6 +8416,8 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
     get:
       tags:
         - Keys
@@ -8237,6 +8425,8 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
     post:
       tags:
         - Keys
@@ -8244,7 +8434,11 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
   /api/keys/groups/{id}/permissions:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Keys
@@ -8252,6 +8446,8 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
     get:
       tags:
         - Keys
@@ -8259,6 +8455,8 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
     post:
       tags:
         - Keys
@@ -8266,6 +8464,8 @@ paths:
       responses:
         "200":
           description: OK
+        "401":
+          $ref: "#/components/responses/ManagementAuthenticationRequired"
   /api/local/redis/start:
     post:
       tags:
@@ -8294,6 +8494,8 @@ paths:
         "200":
           description: OK
   /api/logs/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Logs
@@ -8435,6 +8637,12 @@ paths:
         "200":
           description: OK
   /api/middleware/hooks/{name}:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
     delete:
       tags:
         - Middleware
@@ -8497,6 +8705,8 @@ paths:
         "200":
           description: OK
   /api/model-combo-mappings/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Model combo mappings
@@ -8551,6 +8761,12 @@ paths:
         "200":
           description: OK
   /api/oauth/{provider}/paste-credentials:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema:
+          type: string
     post:
       tags:
         - Oauth
@@ -8808,6 +9024,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/cc-alias:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Providers
@@ -8823,6 +9041,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/claude-auth/apply-local:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Providers
@@ -8832,6 +9052,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/claude-auth/export:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Providers
@@ -8841,6 +9063,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/codex-auth/apply-local:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Providers
@@ -8850,6 +9074,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/codex-auth/export:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Providers
@@ -8859,6 +9085,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/interception-rules:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Providers
@@ -8881,6 +9109,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/param-filters:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Providers
@@ -8903,6 +9133,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/refresh:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Providers
@@ -8911,6 +9143,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/refresh-cursor:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Providers
@@ -8920,6 +9154,8 @@ paths:
         "200":
           description: OK
   /api/providers/{id}/sync-models:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Providers
@@ -9067,6 +9303,12 @@ paths:
         "200":
           description: OK
   /api/providers/volcengine-plan/connect/{sessionId}/cancel:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
     post:
       tags:
         - Providers
@@ -9076,6 +9318,12 @@ paths:
         "200":
           description: OK
   /api/providers/volcengine-plan/connect/{sessionId}/code:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
     post:
       tags:
         - Providers
@@ -9085,6 +9333,12 @@ paths:
         "200":
           description: OK
   /api/providers/volcengine-plan/connect/{sessionId}/identity:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
     post:
       tags:
         - Providers
@@ -9094,6 +9348,12 @@ paths:
         "200":
           description: OK
   /api/providers/volcengine-plan/connect/{sessionId}/resend:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
     post:
       tags:
         - Providers
@@ -9103,6 +9363,12 @@ paths:
         "200":
           description: OK
   /api/providers/volcengine-plan/connect/{sessionId}/status:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - Providers
@@ -9159,6 +9425,8 @@ paths:
         "200":
           description: OK
   /api/quota/groups/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Quota
@@ -9174,6 +9442,8 @@ paths:
         "200":
           description: OK
   /api/quota/keys/{id}/models:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Quota
@@ -9182,6 +9452,8 @@ paths:
         "200":
           description: OK
   /api/quota/pools/{id}/log:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Quota
@@ -9207,6 +9479,8 @@ paths:
         "200":
           description: OK
   /api/relay/tokens/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Relay
@@ -9271,6 +9545,12 @@ paths:
         "400":
           description: Neither connectionIds nor all was provided
   /api/routing/decisions/{requestId}:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - Routing
@@ -9339,6 +9619,12 @@ paths:
         "200":
           description: OK
   /api/session-pools/{provider}:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - Session pools
@@ -9581,6 +9867,8 @@ paths:
         "200":
           description: OK
   /api/settings/free-proxies/{id}/add-to-pool:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - Settings
@@ -9738,6 +10026,13 @@ paths:
         "200":
           description: OK
   /api/settings/proxies/{id}/repair-relay:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
     post:
       tags:
         - Settings
@@ -10188,6 +10483,8 @@ paths:
         "200":
           description: OK
   /api/sync/tokens/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - Sync
@@ -10352,6 +10649,12 @@ paths:
         "200":
           description: OK
   /api/upstream-proxy/{providerId}:
+    parameters:
+      - name: providerId
+        in: path
+        required: true
+        schema:
+          type: string
     delete:
       tags:
         - Upstream proxy
@@ -10437,6 +10740,13 @@ paths:
         "200":
           description: OK
   /api/usage/combo-trace/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^combo-"
     get:
       tags:
         - Usage
@@ -10492,6 +10802,8 @@ paths:
         "200":
           description: OK
   /api/usage/route-explain/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - Usage
@@ -10538,6 +10850,12 @@ paths:
         "200":
           description: OK
   /api/v1/{omnirouteCatchAll}:
+    parameters:
+      - name: omnirouteCatchAll
+        in: path
+        required: true
+        schema:
+          type: string
     delete:
       tags:
         - V1 OmnirouteCatchAll
@@ -10574,6 +10892,8 @@ paths:
         "200":
           description: OK
   /api/v1/accounts/{id}/limits:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     get:
       tags:
         - V1 Accounts
@@ -10613,6 +10933,15 @@ paths:
         "200":
           description: OK
   /api/v1/auto-combo/{channel}/candidates:
+    parameters:
+      - name: channel
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: "^[a-zA-Z0-9:_-]+$"
     get:
       tags:
         - V1 Auto-combo
@@ -10871,6 +11200,12 @@ paths:
         "404":
           description: Session not found
   /api/v1/models/{model}:
+    parameters:
+      - name: model
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - V1 Models
@@ -10887,6 +11222,12 @@ paths:
         "200":
           description: OK
   /api/v1/providers/{provider}/limits:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - V1 Providers
@@ -11014,6 +11355,8 @@ paths:
         "403":
           $ref: "#/components/responses/ManagementInvalidToken"
   /api/v1/registered-keys/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     delete:
       tags:
         - V1 Registered-keys
@@ -11049,6 +11392,8 @@ paths:
         "403":
           $ref: "#/components/responses/ManagementInvalidToken"
   /api/v1/registered-keys/{id}/revoke:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
     post:
       tags:
         - V1 Registered-keys
@@ -11083,6 +11428,12 @@ paths:
         "200":
           description: OK
   /api/v1/responses/{path}:
+    parameters:
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
     post:
       tags:
         - V1 Responses
@@ -11114,8 +11465,12 @@ paths:
         One `state` plus typed `questions` (`noul` / `choice` / `score`); the
         backend is selected by the model id — `typesafe/jev-*` or a bare
         `jev-*` alias routes natively to api.typesafe.ai, `openrouter/<vendor>/
-        <model>` routes to OpenRouter's alpha decisions endpoint. Answers,
-        probabilities and usage (tokens, cost) pass through untouched.
+        <model>` routes to OpenRouter's alpha decisions endpoint, and
+        `cloudflare-ai/<jev|clef|clef-flash>` (alias `cf/`) runs on Cloudflare
+        Workers AI through the existing `cloudflare-ai` connection (Jev draws AI
+        Gateway credits, Clef draws Workers AI neurons; opt-in through the
+        `SYSTEMONE_CLOUDFLARE_BACKEND_ENABLED` feature flag, default off).
+        Answers, probabilities and usage (tokens, cost) pass through untouched.
       security:
         - BearerAuth: []
       requestBody:
@@ -11155,6 +11510,56 @@ paths:
       tags:
         - V1 Web
       summary: "POST web › fetch"
+      description: >-
+        Fetch a URL with an explicit provider, native automatic selection, or a saved
+        priority/fill-first combo in `model`. Mixed combos skip targets without a
+        fetch executor. `model` and `provider` are mutually exclusive.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url:
+                  type: string
+                  format: uri
+                model:
+                  type: string
+                  minLength: 1
+                  maxLength: 300
+                  description: Saved priority/fill-first combo name; mutually exclusive with provider.
+                  examples: [shared-free]
+                provider:
+                  type: string
+                  enum:
+                    [
+                      firecrawl,
+                      jina-reader,
+                      tavily-search,
+                      tinyfish,
+                      context7,
+                      nimble-search,
+                      anysearch-search,
+                      parallel-search,
+                    ]
+                format:
+                  type: string
+                  enum: [markdown, html, links, screenshot]
+                  default: markdown
+                depth:
+                  type: integer
+                  enum: [0, 1, 2]
+                  default: 0
+                wait_for_selector:
+                  type: string
+                  maxLength: 256
+                include_metadata:
+                  type: boolean
+                  default: false
       responses:
         "200":
           description: OK
@@ -13166,6 +13571,27 @@ components:
             - context-optimized
             - fusion
           default: priority
+        routes:
+          type: object
+          description: >-
+            Optional endpoint-specific routing plans. The legacy top-level models, strategy and
+            config remain the Chat plan. A named route overrides them only for its capability.
+          additionalProperties: false
+          properties:
+            chat: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            search: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            web-fetch: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            embeddings: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            rerank: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            images: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            image-edits: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            videos: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            music: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            ocr: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            audio-speech: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            audio-transcriptions: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            audio-translations: { $ref: "#/components/schemas/ComboCapabilityRoute" }
+            audio-generation: { $ref: "#/components/schemas/ComboCapabilityRoute" }
         universal_handoff:
           type: object
           nullable: true
@@ -13183,3 +13609,26 @@ components:
             ttlMinutes: { type: integer, minimum: 1, maximum: 10080 }
             preserveSystemPrompt: { type: boolean }
             relayMode: { type: string, enum: [schema-locked, standard] }
+
+    ComboCapabilityRoute:
+      type: object
+      required: [models]
+      additionalProperties: false
+      properties:
+        models:
+          type: array
+          minItems: 1
+          items:
+            oneOf:
+              - type: string
+                description: "provider/model reference"
+              - type: object
+                additionalProperties: true
+        strategy:
+          type: string
+          enum:
+            [priority, fill-first, round-robin, weighted, random, strict-random, least-used, p2c]
+          default: priority
+        config:
+          type: object
+          additionalProperties: true

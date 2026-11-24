@@ -341,7 +341,7 @@ export function clearModelsDevPricing(): void {
  */
 // Handles that already ran the DDL below. Capability lookups run this on the request path
 // (dozens of times per proxied request); the table cannot disappear from an open handle, so
-// one CREATE TABLE IF NOT EXISTS per handle is enough. A reset or new handle runs it again.
+// running the CREATE TABLE once per handle is enough. A reset or new handle runs it again.
 const capabilitiesTableReady = new WeakSet<object>();
 
 export function ensureCapabilitiesTable(): void {
@@ -501,6 +501,12 @@ function lookupSyncedCapabilityWithFallbacks(
   return null;
 }
 
+const CAPABILITY_MEMO_MAX = 4096;
+const lookupMemo = new Map<string, ModelCapabilityEntry | null>();
+let memoDb: unknown = null;
+let memoVersion = -1;
+let tableEnsuredDb: unknown = null;
+
 export function getSyncedCapability(
   provider: string,
   modelId: string,
@@ -520,17 +526,36 @@ export function getSyncedCapability(
     );
   }
 
-  // Cold path: hit SQLite. Prepare the statement once, reuse for every alias.
+  // Cold path: hit SQLite once per (provider, model), misses included. Every capability
+  // write calls invalidateDbCache("model-capabilities"), which moves the catalog version.
   const db = getDbInstance();
-  ensureCapabilitiesTable();
+  const version = getModelCatalogCacheVersion();
+  if (memoDb !== db || memoVersion !== version) {
+    lookupMemo.clear();
+    memoDb = db;
+    memoVersion = version;
+  }
+  const memoKey = `${provider}\0${modelId}`;
+  const memoized = lookupMemo.get(memoKey);
+  if (memoized !== undefined) return memoized;
+
+  if (tableEnsuredDb !== db) {
+    ensureCapabilitiesTable();
+    tableEnsuredDb = db;
+  }
+  // Prepare the statement once, reuse for every alias.
   const stmt = db.prepare(
     "SELECT * FROM model_capabilities WHERE provider = ? AND model_id = ? LIMIT 1"
   );
-  return lookupSyncedCapabilityWithFallbacks(provider, (p) => {
+  const found = lookupSyncedCapabilityWithFallbacks(provider, (p) => {
     const row = stmt.get(p, modelId);
     if (!row) return null;
     return mapCapabilityRecord(toRecord(row));
   });
+  // Model names come from request bodies: bound the memo (drop it whole when full).
+  if (lookupMemo.size >= CAPABILITY_MEMO_MAX) lookupMemo.clear();
+  lookupMemo.set(memoKey, found);
+  return found;
 }
 
 /**

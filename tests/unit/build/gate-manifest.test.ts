@@ -92,7 +92,7 @@ test("the committed inventory covers current scripts without command drift", () 
   assert.deepEqual(validateManifest(manifest, scripts), []);
   const full = resolveProfile(manifest, scripts, "quality-scan");
   const fast = resolveProfile(manifest, scripts, "quality-scan-fast");
-  assert.ok(full.length > fast.length);
+  assert.ok(full.length >= fast.length);
   assert.ok(fast.every((gate) => full.some((other) => other.name === gate.name)));
   assert.ok(full.some((gate) => gate.name === "check:gate-manifest"));
 });
@@ -115,126 +115,38 @@ test("real aggregator list mode uses the manifest without running any gate", () 
   }
 });
 
-test("the static scan uses the same frozen cycle ratchet as CI", () => {
+test("every static scan alias resolves to a package script", () => {
   const manifest = JSON.parse(readFileSync("config/quality/gate-manifest.json", "utf8"));
   const { scripts } = JSON.parse(readFileSync("package.json", "utf8"));
-  const full = resolveProfile(manifest, scripts, "quality-scan");
-  assert.ok(full.some((gate) => gate.name === "check:cycles:ratchet"));
-  assert.equal(
-    full.some((gate) => gate.name === "check:cycles"),
-    false
-  );
-  assert.match(readFileSync(".github/workflows/ci.yml", "utf8"), /npm run check:cycles:ratchet/);
-  assert.equal(scripts["check:cycles:ratchet"], "node scripts/check/check-cycles.mjs --ratchet");
+  for (const profile of ["quality-scan", "quality-scan-fast"]) {
+    const gates = resolveProfile(manifest, scripts, profile);
+    assert.ok(gates.length > 0, profile);
+    for (const gate of gates) assert.ok(scripts[gate.name], `${profile}: ${gate.name}`);
+  }
 });
 
-function admissionFixture(domains: unknown = ["provider"]) {
-  return {
-    schemaVersion: 1,
-    profiles: Object.fromEntries(
-      ["ci", "quality"].map((profile) => [
-        profile,
-        {
-          checkName: `Gate / ${profile}`,
-          jobs: { sample: { when: "code", disposition: "required", domains } },
-        },
-      ])
-    ),
-  };
-}
-
-function linkedFixture(t: TestContext, policy: unknown = admissionFixture()) {
-  const root = mkdtempSync(join(tmpdir(), "gate-domains-16075-"));
+function writeFixture(t: TestContext) {
+  const root = mkdtempSync(join(tmpdir(), "gate-manifest-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const { scripts, manifest } = fixture();
-  const linkedManifest = { ...manifest, admissionPolicy: "config/quality/admission-policy.json" };
   mkdirSync(join(root, "config/quality"), { recursive: true });
   writeFileSync(join(root, "package.json"), JSON.stringify({ scripts }));
-  writeFileSync(join(root, "config/quality/gate-manifest.json"), JSON.stringify(linkedManifest));
-  const policyPath = join(root, linkedManifest.admissionPolicy);
-  writeFileSync(policyPath, JSON.stringify(policy));
-  return { root, policyPath, manifest: linkedManifest, scripts };
+  writeFileSync(join(root, "config/quality/gate-manifest.json"), JSON.stringify(manifest));
+  return { root, manifest, scripts };
 }
 
-test("linked admission domains preserve the readManifest return contract", (t) => {
-  const { root, manifest, scripts } = linkedFixture(t);
+test("readManifest returns the manifest and package scripts", (t) => {
+  const { root, manifest, scripts } = writeFixture(t);
   assert.deepEqual(readManifest(root), { manifest, scripts });
 });
 
-for (const [label, domains] of [
-  ["missing", undefined],
-  ["empty", []],
-  ["unknown", ["catalog", "imaginary"]],
-  ["duplicate", ["provider", "provider"]],
-  ["not an array", "provider"],
-  ["not a domain string", [null]],
-] as const) {
-  test(`linked admission rejects ${label} domains before accepting an inventory`, (t) => {
-    const policy = admissionFixture();
-    policy.profiles.ci.jobs.sample.domains = domains;
-    const { root } = linkedFixture(t, policy);
-    assert.throws(() => readManifest(root), /domains.*ci\/sample/);
-  });
-}
-
-for (const [label, policy] of [
-  ["unsupported schema", { ...admissionFixture(), schemaVersion: 2 }],
-  ["missing profiles", { schemaVersion: 1 }],
-  ["missing quality", { schemaVersion: 1, profiles: { ci: admissionFixture().profiles.ci } }],
-  [
-    "unknown profile",
-    { schemaVersion: 1, profiles: { ...admissionFixture().profiles, extra: {} } },
-  ],
-  [
-    "empty jobs",
-    { schemaVersion: 1, profiles: { ...admissionFixture().profiles, ci: { jobs: {} } } },
-  ],
-  [
-    "array jobs",
-    { schemaVersion: 1, profiles: { ...admissionFixture().profiles, ci: { jobs: [] } } },
-  ],
-] as const) {
-  test(`linked admission rejects ${label}`, (t) => {
-    const { root } = linkedFixture(t, policy);
-    assert.throws(() => readManifest(root), /admission/);
-  });
-}
-
-test("linked admission validates the quality profile as well as CI", (t) => {
-  const policy = admissionFixture();
-  policy.profiles.quality.jobs.sample.domains = [];
-  const { root } = linkedFixture(t, policy);
-  assert.throws(() => readManifest(root), /domains.*quality\/sample/);
-});
-
-test("linked admission rejects absent or malformed policy files", (t) => {
-  const { root, policyPath } = linkedFixture(t);
-  writeFileSync(policyPath, "{invalid JSON");
-  assert.throws(() => readManifest(root), SyntaxError);
-  rmSync(policyPath);
-  assert.throws(() => readManifest(root), /ENOENT/);
-});
-
-test("admission references cannot bypass the declared repository policy", (t) => {
-  const { root, manifest } = linkedFixture(t);
-  for (const admissionPolicy of [undefined, "", "../outside.json", "/tmp/outside.json"]) {
-    writeFileSync(
-      join(root, "config/quality/gate-manifest.json"),
-      JSON.stringify({ ...manifest, admissionPolicy })
-    );
-    assert.throws(() => readManifest(root), /admission policy reference/);
-  }
-});
-
-test("inventory CLI validates domains without node_modules before npm ci", (t) => {
-  const { root, policyPath } = linkedFixture(t);
+test("inventory CLI validates the manifest without node_modules before install", (t) => {
+  const { root } = writeFixture(t);
   mkdirSync(join(root, "scripts/quality"), { recursive: true });
-  for (const name of ["gate-manifest.mjs", "classify-pr-changes.mjs"]) {
-    copyFileSync(
-      new URL(`../../../scripts/quality/${name}`, import.meta.url),
-      join(root, "scripts/quality", name)
-    );
-  }
+  copyFileSync(
+    new URL("../../../scripts/quality/gate-manifest.mjs", import.meta.url),
+    join(root, "scripts/quality/gate-manifest.mjs")
+  );
   assert.equal(existsSync(join(root, "node_modules")), false);
   const invoke = () =>
     spawnSync(process.execPath, ["scripts/quality/gate-manifest.mjs"], {
@@ -250,8 +162,7 @@ test("inventory CLI validates domains without node_modules before npm ci", (t) =
     profiles: { scan: 1 },
     releaseAcceptance: false,
   });
-  writeFileSync(policyPath, JSON.stringify(admissionFixture(["imaginary"])));
+  writeFileSync(join(root, "package.json"), JSON.stringify({ scripts: {} }));
   const invalid = invoke();
   assert.equal(invalid.status, 1, invalid.stderr);
-  assert.match(invalid.stderr, /domains/);
 });

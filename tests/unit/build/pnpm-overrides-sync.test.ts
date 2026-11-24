@@ -25,11 +25,6 @@ function flatten(overrides: Record<string, unknown>, parent = ""): Map<string, s
 
 test("package.json and pnpm-workspace.yaml pin the same overrides", () => {
   const npmStyle = flatten(pkg.overrides);
-  // npm scopes these by parent; pnpm selectors allow one parent, so both become minimatch@9.
-  npmStyle.delete("minimatch>brace-expansion");
-  npmStyle.delete("minimatch@9>brace-expansion");
-  npmStyle.set("minimatch@9>brace-expansion", "^2.1.4");
-
   assert.deepEqual(
     Object.fromEntries([...npmStyle].sort()),
     Object.fromEntries(Object.entries(workspace.overrides).sort())

@@ -4,10 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import en from "@/i18n/messages/en.json";
-import fa from "@/i18n/messages/fa.json";
 import GlobalConfigTab from "@/app/(dashboard)/dashboard/settings/components/proxy/GlobalConfigTab";
 
-const locale = vi.hoisted(() => ({ current: "en" as "en" | "fa" }));
+const locale = vi.hoisted(() => ({ current: "en" as const }));
 vi.mock("next-intl", async () => {
   const { createTranslator } = await import("use-intl/core");
   return {
@@ -15,7 +14,7 @@ vi.mock("next-intl", async () => {
     useTranslations: (namespace: string) =>
       createTranslator({
         locale: locale.current,
-        messages: locale.current === "fa" ? fa : en,
+        messages: en,
         namespace,
       }),
   };
@@ -69,7 +68,7 @@ let patchReply: (init: RequestInit) => Promise<Response>;
 let loadReply: () => Promise<Response>;
 const control = () =>
   screen.getByRole("switch", {
-    name: (locale.current === "fa" ? fa : en).settings.defaultNewConnectionProxyEnabled,
+    name: en.settings.defaultNewConnectionProxyEnabled,
   });
 
 beforeEach(() => {
@@ -298,11 +297,11 @@ describe("new connection proxy preference", () => {
     }
   });
 
-  for (const language of ["en", "fa"] as const) {
+  for (const language of ["en"] as const) {
     it(`has a translated accessible name and keyboard activation in ${language}`, async () => {
       locale.current = language;
       const view = render(
-        <div dir={language === "fa" ? "rtl" : "ltr"}>
+        <div dir="ltr">
           <GlobalConfigTab />
         </div>
       );
@@ -312,7 +311,7 @@ describe("new connection proxy preference", () => {
       await user.keyboard(" ");
       await waitFor(() => expect(control().getAttribute("aria-checked")).toBe("true"));
       expect(view.container.textContent).toContain(
-        (language === "fa" ? fa : en).settings.defaultNewConnectionProxyEnabledDesc
+        en.settings.defaultNewConnectionProxyEnabledDesc
       );
     });
   }

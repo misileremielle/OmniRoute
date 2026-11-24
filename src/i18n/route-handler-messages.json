@@ -1,0 +1,10 @@
+{
+  "en": {
+    "auth": {
+      "traeAuthorizationSuccess": "Trae authorization ✓",
+      "traeAuthorizationFailed": "Trae authorization failed",
+      "closeAuthorizationWindow": "You can close this window.",
+      "returnToDashboard": "Return to the dashboard."
+    }
+  }
+}

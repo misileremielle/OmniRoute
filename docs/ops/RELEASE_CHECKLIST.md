@@ -8,10 +8,11 @@ lastUpdated: 2026-10-10
 
 > **Last updated:** 2026-08-28 — v3.8.51
 > Streamlined release flow that leverages Claude Code skills for automation.
->
-> **Keep the queue/branch green between releases:** see [RELEASE_GREEN.md](./RELEASE_GREEN.md)
-> (`/green-prs` family + `npm run check:release-green` + `/babysit` + nightly). Running
-> this periodically — and especially **before** this checklist — makes the release PR start green.
+
+> **Fork (misileremielle/omniroute):** a release here is a GitHub release `v<semver>`; publishing
+> it runs `.github/workflows/docker-publish.yml`, which builds, smoke-tests and scans the images
+> and tags `ghcr.io/misileremielle/omniroute:<version>` (+ `-web`). The fork has no npm publish
+> workflow, so the npm, Trusted Publishing and deploy steps below are upstream's and do not run here.
 
 ## TL;DR
 
@@ -77,16 +78,13 @@ directly from anywhere — CI can only stage; only the owner's 2FA releases.
 
 **Broken-artifact playbook (unchanged):** `npm deprecate omniroute@<bad> "<reason> — use <fixed>"`
 as the default reflex (minutes, reversible); `npm unpublish` only inside the 72h/no-dependents
-window and never as the first move. Docker: never rewrite a version tag — rollback is
-repointing `latest` to the last good digest.
+window and never as the first move. Docker: never rewrite a version tag, and never repoint `:latest` by hand (`main`
+owns it) — roll a deployment back by pinning its service to the last good `X.Y.Z` or digest
+([Docker guide](../guides/DOCKER_GUIDE.md#safety-and-rollback)).
 
-**GHCR `latest` (required on every stable SemVer publish):** the
-`docker-publish` workflow must tag **both** `X.Y.Z` and, when
-`should-promote-latest.sh` agrees this is the highest stable SemVer, `:latest`
-with the **same digest**. After the job: the GHCR `latest` digest equals the new
-SemVer digest. Do not leave `:latest` on an older
-build while release notes talk about fixes that only exist on git. Compose
-quickstarts use `:latest`; GitOps should keep pinning `X.Y.Z`. See
+**GHCR tags (fork):** a published release tags only `X.Y.Z` (+ `-web`); `:latest` belongs to
+`main`, which republishes it on every push. Compose quickstarts use `:latest`; GitOps should
+keep pinning `X.Y.Z`. See
 [Docker release channels](../guides/DOCKER_GUIDE.md#release-channels) and #10317.
 
 ## Hotfix Fast-Lane (label `hotfix`)
@@ -137,7 +135,6 @@ matrix automatically, without any label.
 - [ ] `npm run lint` — 0 errors (warnings are pre-existing)
 - [ ] `npm run typecheck:core` — clean
 - [ ] `npm run typecheck:noimplicit:core` — clean (strict)
-- [ ] `npm run check:cycles:ratchet` — within the frozen `metrics.cycles` ceiling (bare `check:cycles` exits 1 on any cycle, #15281)
 - [ ] `npm run check:any-budget:t11` — within budget
 - [ ] `npm run check:route-validation:t06` — clean
 - [ ] `npm run check:node-runtime` — supported runtime floor met (`>=22.22.2 <23`, `>=24.0.0 <27`, per `SUPPORTED_NODE_RANGE` in `src/shared/utils/nodeRuntimeSupport.ts`; aligned with `package.json` `engines`)
@@ -148,7 +145,7 @@ matrix automatically, without any label.
 - [ ] `npm run test:vitest` — pass (MCP server, autoCombo, cache)
 - [ ] `npm run test:coverage` — gate 60/60/60/60 satisfied (statements/lines/functions/branches)
 - [ ] `npm run test:integration` — pass (if changes touch DB / handlers)
-- [ ] `npm run test:combo:matrix` — pass (combo strategy matrix: proves all 21 public routing strategies' selection decisions deterministically; run when touching combo routing, strategy resolution, or fallback logic)
+- [ ] `npm run test:combo:matrix` — pass (combo strategy matrix: proves all 22 public routing strategies' selection decisions deterministically; run when touching combo routing, strategy resolution, or fallback logic)
 - [ ] `RUN_COMBO_LIVE=1 npm run test:combo:live` — **optional/manual** (gated real-upstream smoke; sources a read-only DB snapshot from VPS `root@192.168.0.15`; hits real providers, costs credits; never runs in CI; skips cleanly without the gate)
 - [ ] `npm run test:combo:live:vps` — **optional/manual** (Phase-3 VPS live smoke: 7 HTTP scenarios against the live `.15` server via plain Node ESM; requires `ssh root@192.168.0.15`; creates/deletes only `__live_test__*` combos; hits real providers; never runs in CI)
 - [ ] `npm run test:e2e` — pass (UI changes)
@@ -177,9 +174,6 @@ Breaking changes: add `BREAKING CHANGE:` footer or `!` after the scope (e.g. `fe
 ### Documentation
 
 - [ ] `npm run check:docs-sync` passes (auto-run by pre-commit)
-- [ ] `npm run check:docs-all` passes (umbrella: docs-sync + docs-counts + env-doc-sync + deprecated-versions + doc-links)
-- [ ] `npm run check:env-doc-sync` exits 0 — code ↔ `.env.example` ↔ `docs/reference/ENVIRONMENT.md` env contract is intact
-- [ ] `npm run check:doc-links` exits 0 — no broken internal markdown references after restructuring
 - [ ] `docs/architecture/ARCHITECTURE.md` reviewed for storage/runtime drift
 - [ ] `docs/guides/TROUBLESHOOTING.md` reviewed for env var and operational drift
 - [ ] If `.env.example` changed: `docs/reference/ENVIRONMENT.md` updated
@@ -190,9 +184,7 @@ Breaking changes: add `BREAKING CHANGE:` footer or `!` after the scope (e.g. `fe
 
 ### i18n
 
-- [ ] `npm run i18n:check-ui-coverage` exits 0 — every UI locale at or above the 80% coverage floor
-- [ ] `npm run i18n:sync-ui:dry` reports 0 missing keys across all 66 target locales (every locale except the `en` source)
-- [ ] Translation contributions can be deferred to next release if minor (track in CHANGELOG)
+- [ ] `pnpm run check:ui-icu` and `pnpm run check:cli-i18n` exit 0 (the fork ships English only)
 
 ### Database Migrations
 
@@ -355,113 +347,10 @@ Before shipping any v3.8.x release, verify these additional items:
 
 ---
 
-## 3.9.0 LTS cut (rehearsed in 3.8.58)
+## 3.9.0 LTS cut
 
-After v3.8.59 the next version is 3.9.0, and its tip becomes two long-lived branches:
-`stable/v3` (the v3 LTS line, npm `latest`) and `develop` (v4, bumped to 4.0.0, npm
-`nightly`). The branch/channel model, forward-port and labels are in
-[RELEASE_STRATEGY.md](./RELEASE_STRATEGY.md); the plan is in the [ROADMAP](../../ROADMAP.md) (Phase 3). The cut runs once;
-3.8.58 rehearses it end to end on a fork, and 3.8.59 closes with the
-[GO/NO-GO checklist](./LTS_GO_NO_GO.md).
-
-### Dry-run (read-only, safe any time)
-
-```bash
-npm run release:dry-run-lts-cut                       # the real cut: 3.9.0 from HEAD, previous tag v3.8.59
-npm run release:dry-run-lts-cut -- --from <3.9.0-tip> # pin the source commit
-```
-
-`scripts/release/dry-run-lts-cut.mjs` executes nothing: it reads git and `gh` and prints the
-whole sequence — preconditions (source resolves, the source repository has full history —
-a shallow clone cannot push `stable/v3`, the receiving side rejects the pack at the first
-grafted parent, so cut from a full clone or `git fetch --unshallow origin` first — previous
-tag exists, `package.json` is the target version, a `release-freeze` issue is open, no open
-`Release branch not green` issue
-on an existing release branch — a branch that does not exist reports `?` unknown, never
-green — the Mergify `release` queue is configured (G11: `queue_rules`, `checks_timeout`,
-label `queue`), the `release/*` ruleset still blocks deletion and force-push, and
-`stable/v3` and `develop` do not exist yet), the two branch steps, which dormant-workflow
-triggers and `if:` conditions turn true (and which stay gated by a repository variable or
-pinned to the canonical repository), the expected dist-tags (`latest` → 3.9.0, `next` and
-`nightly` empty) and the rollback. Exit `0` = `RESULT: READY`, `1` = a blocking precondition
-failed (`✗`), `2` = usage error. `--advisory <id,...>` downgrades a check to a warning (`!`)
-without hiding it.
-
-Run the real cut's dry-run while the 3.9.0 release freeze is still open — the branches are
-created after the tag and before Phase 12c lifts the freeze.
-
-### 3.8.58 rehearsal (fork only)
-
-```bash
-# 1. Dry-run on the current tip with rehearsal parameters
-npm run release:dry-run-lts-cut -- --target-version 3.8.58 --previous-tag v3.8.57 \
-  --advisory freeze,base-green
-
-# 2. Execute against a FORK remote (origin, or any remote whose URL is the canonical
-#    repository, is refused; every step asks for confirmation on the terminal)
-git remote add rehearsal https://github.com/<you>/OmniRoute.git
-node scripts/release/dry-run-lts-cut.mjs --execute --remote rehearsal \
-  --target-version 3.8.58 --previous-tag v3.8.57 --advisory freeze,base-green
-
-# 3. Exercise the dormant workflows in the fork (workflow_dispatch where the dry-run
-#    reports a canonical-repository pin), then roll back
-node scripts/release/dry-run-lts-cut.mjs --execute --rollback --remote rehearsal \
-  --target-version 3.8.58 --previous-tag v3.8.57 --advisory freeze,base-green
-```
-
-The develop bump commit is built with git plumbing (no working tree is touched) and bumps
-the same files as a cycle-open commit: `package.json`, `open-sse/package.json` and the
-two `openapi.yaml` copies (`pnpm-lock.yaml` records no workspace versions). The `[4.0.0]`
-CHANGELOG section and its i18n mirrors are opened on `develop` afterwards, before its first
-PR. The script never changes npm dist-tags — rehearse those on a scratch package.
-
-### PR preview artifact (build once, promote the same bytes)
-
-`.github/workflows/preview-artifact.yml` builds one production tarball from a PR head and
-validates that exact build (#8084 slice (a)). Same-repository PRs only; nothing is published.
-
-```bash
-gh workflow run preview-artifact.yml -f pr_number=<N>   # or add the `preview-artifact` label
-gh run download <run-id> --name preview-artifact-pr<N>-<sha7> --dir preview
-cd preview && sha256sum -c SHA256SUMS
-gh attestation verify omniroute-*.tgz --repo diegosouzapw/OmniRoute
-npm install -g ./omniroute-*.tgz                          # preview install
-```
-
-The run does `pnpm install --frozen-lockfile`, `pnpm run build:release`, `pnpm run check:pack-artifact`, packs the
-tarball, runs `pnpm run check:pack-boot` (fake secrets, ephemeral data dir), re-packs and
-fails unless the digest is identical, then records `artifact-identity.json` (head SHA, base
-SHA, lockfile hash, platform, arch, node ABI, bundler, build policy —
-`scripts/release/artifact-identity.mjs`) and attests the tarball in a separate job. Promoting
-a preview means installing that tarball: never rebuild from source.
-
-### The cut (3.9.0, after GO)
-
-1. GO recorded in [LTS_GO_NO_GO.md](./LTS_GO_NO_GO.md).
-2. `npm run release:dry-run-lts-cut -- --from v3.9.0` prints `RESULT: READY`.
-3. Create the branches on `origin` by hand with the commands the dry-run prints — the
-   script refuses to push to `origin`. To reuse a reviewed develop commit, run the
-   `--execute` rehearsal on the 3.9.0 tip against your fork first; it prints both SHAs, and
-   the same commits can be pushed:
-
-   ```bash
-   git push origin <stable-sha>:refs/heads/stable/v3 <develop-sha>:refs/heads/develop
-   ```
-
-4. Protect `stable/v3` and `develop` (rulesets + merge queue) before the first PR lands.
-5. The dormant workflows switch on by branch existence: `forward-port.yml` (push to
-   `stable/v3`), `validate-stable-pr.yml` (PRs to `stable/v3`) and `nightly-v4-build.yml`
-   (builds `develop`). Before go-live, set the `secrets.FORWARD_PORT_TOKEN` repository secret (so CI runs on
-   forward-port PRs); nightly publishing stays off until the owner sets the repository
-   variable `vars.NIGHTLY_PUBLISH` to `true` and npm Trusted Publishing accepts
-   `nightly-v4-build.yml`. Channel resolution is `scripts/release/dist-tag.mjs`, the same
-   resolver `npm-publish.yml` uses.
-6. Verify the channels: `npm view omniroute dist-tags --json` shows `latest` = 3.9.0 and no
-   `next` / `nightly` until v4 publishes.
-7. Rollback, if needed: `git push origin --delete refs/heads/stable/v3 refs/heads/develop`
-   and `npm dist-tag add omniroute@3.8.59 latest`.
-
----
+The fork removed upstream's LTS cut tooling (`dry-run-lts-cut.mjs`, the GO/NO-GO checklist and
+the merge queue). Cut long-lived branches by hand if the fork ever needs them.
 
 ## Rollback
 

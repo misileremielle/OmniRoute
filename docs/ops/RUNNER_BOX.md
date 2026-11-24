@@ -4,6 +4,9 @@ title: Self-Hosted Runner Box Operations
 
 # Self-Hosted Runner Box Operations (.113 pool)
 
+> **Upstream only.** The fork runs every workflow on GitHub-hosted runners and has no
+> self-hosted pool. The workflows and tests this page names were removed from the fork.
+
 The self-hosted pool runs on the **.113** box (`tomni-proxmox-113`). Since 2026-10-18 each
 OmniRoute runner has **one role**, one label, and a memory/CPU budget sized to what its workload
 measured. The Turbopack slot gets what the build needs; the other slots are sized to their
@@ -169,3 +172,10 @@ is the per-listener memory budget above (ceiling 6 listeners), not CPU. The rema
 are process ones: land campaign PRs through the Mergify queue (`label=queue`, batches share
 one `merge_group` CI run instead of one run per PR plus one per push), trim the CodeQL
 default-setup languages, and filter `release-acceptance.yml` by the files it reads.
+
+> **2026-11-19: the Mergify merge queue is retired** (owner's decision). `.mergify.yml` no
+> longer defines a queue and refuses the Mergify commands that merge or rewrite a pull request.
+> Release PRs are merged by hand under the repository ruleset "Require green gates on the active
+> release" (`Gate / CI` + `Gate / Quality`) until omni-queue runs in live mode, and through
+> omni-queue after that (upstream only: this fork does not carry omni-queue, see
+> [FORK_IDENTITY.md](./FORK_IDENTITY.md)). The Mergify lever above no longer exists.

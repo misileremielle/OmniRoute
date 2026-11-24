@@ -39,8 +39,7 @@ When osv or Trivy go red due to a newly disclosed CVE, the remedy is:
    `overrides` (transitive deps) or rebuild the image on a patched base.
 2. **If there is no upstream fix:**
    - **osv:** re-baseline `metrics.vulnCount` in `config/quality/quality-baseline.json`
-     (`npm run quality:ratchet -- --update` does not cover dedicated gates — edit the value by
-     hand, `direction:down`) with a justification note + tracking issue.
+     (edit the value by hand, `direction:down`) with a justification note + tracking issue.
    - **Trivy:** add an entry in `.trivyignore` (CVE-ID per line) with a justification
      comment + tracking issue. `ignore-unfixed: true` already covers CVEs without
      patches automatically.

@@ -50,7 +50,7 @@ export const LOCAL_ONLY_API_PREFIXES: ReadonlyArray<string> = [
   "/api/oauth/kiro/auto-import", // reads host-local Kiro credential files (homedir kiro-cli data) — must reach the loopback-only gate, not the PUBLIC /api/oauth/ prefix (GHSA-wgwc-crjm-pmwv, GHSA-gxv4-955v-v6cm). Excluded from PUBLIC in publicApiRoutes.ts.
   "/api/skills/collect/", // Chaos Mode dispatch: fans a task out across providers — the exact public entry in publicApiRoutes.ts covers the Bearer-authenticated POST; everything else under this prefix stays loopback-only
   "/api/discovery/", // Discovery tool (opt-in provider scanner): the scan route makes outbound probes to provider endpoints (SSRF-adjacent) and the whole surface is an admin research tool — strict-loopback only, no manage-scope bypass (NOT in LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES). See _tasks/features-v3.8.42/gaps/DISCOVERY_TOOL_DESIGN.md.
-  "/api/resilience/connections", // Per-account resilience state. NOTE: prefix matching also gates future /api/resilience/connections-* paths.
+  "/api/resilience/connections", // Per-account resilience state. Spawns nothing, so it is in the default manage-scope bypass list below: a remote caller needs an authenticated dashboard session or a manage-scope key, and an anonymous one still gets 403 (KEA-9357). NOTE: prefix matching also gates future /api/resilience/connections-* paths.
   // Dashboard HTML stays out of this list: a reverse proxy is not loopback, so
   // gating the page logged the session out. The JSON API above stays local-only.
   "/api/providers/agy-auth/apply-local", // spawns `secret-tool` through detectLocalAgyTokenRaw() and reads host-local token files (Hard Rules #15 + #16). Exact entry on purpose: the sibling import, import-bulk and zip-extract routes only parse what the request carries, and tunnel-served dashboards use them.
@@ -113,10 +113,21 @@ export { SPAWN_CAPABLE_PREFIXES, SPAWN_CAPABLE_PATTERNS };
  * consult this constant — it reads `getAuthzBypassSnapshot().prefixes`,
  * which is hot-reloaded on every settings PATCH.
  */
-export const LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES: ReadonlyArray<string> = [];
+export const LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES: ReadonlyArray<string> = [
+  // Read-only JSON behind Resilience > Connections. Without it the page can never
+  // load on a remote dashboard (managed instance, tunnel, reverse proxy): KEA-9357.
+  "/api/resilience/connections",
+];
 
 export const ALWAYS_PROTECTED_API_PATHS: ReadonlyArray<string> = [
   "/api/shutdown",
+  // Skill writers. generate with prune=true deletes every non-catalog directory under
+  // skills/ on the host; the two install routes register a global, enabled, auto-mode
+  // skill that is injected into every key's requests. Their handlers checked auth only
+  // when login was on, so requireLogin=false left them anonymous.
+  "/api/agent-skills/generate",
+  "/api/skills/marketplace/install",
+  "/api/skills/skillssh/install",
   "/api/providers/health-autopilot/actions",
   "/api/settings/database",
   // Full-database export/import: a credential dump and an irreversible replace.
@@ -287,6 +298,11 @@ export function isPrivateLanHost(hostHeader: string | null): boolean {
  *   bifrost/dario/mux/openwa call `getLatestVersion()` → `npm view` (execFile) on
  *   a cache miss, which a remote caller must never trigger (Hard Rules #15/#16),
  *   and 9router also supports `?reveal=key` (plaintext service credential).
+ *   /api/skills/executions — GET lists stored execution rows (two SQLite reads in
+ *   skillExecutor.listExecutions/countExecutions); only POST runs a skill and reaches
+ *   the sandbox container spawn (GHSA-jx89-f37j-pq89), and it stays LOCAL_ONLY.
+ *   Without the exemption Skills > Executions can never load on a remote dashboard
+ *   (KEA-9359). Same shape as the /api/mcp/audit exemption (#13941).
  */
 export const LOCAL_ONLY_API_GET_EXEMPTIONS: ReadonlySet<string> = new Set([
   "/api/system/version",
@@ -295,6 +311,7 @@ export const LOCAL_ONLY_API_GET_EXEMPTIONS: ReadonlySet<string> = new Set([
   "/api/version-manager/status",
   "/api/version-manager/check-update",
   "/api/services/cliproxy/status",
+  "/api/skills/executions",
 ]);
 
 /** Safe HTTP methods that can be exempted for read-only paths. */

@@ -36,19 +36,6 @@ describe("globals.css — no leftover hooks of the removed hand-rolled drawer", 
   });
 });
 
-// ─── persistLocale.ts ───────────────────────────────────────────────────────
-
-describe("persistLocale — flips <html> direction immediately on switch", () => {
-  const code = src("src/shared/lib/persistLocale.ts");
-
-  it("sets document.documentElement.dir from the RTL locale list", () => {
-    // router.refresh() never re-renders <html dir>, so the writer itself must
-    // flip direction or Arabic text renders inside a stale dir="ltr" tree.
-    expect(code).toContain("document.documentElement.dir");
-    expect(code).toContain("RTL_LOCALES");
-  });
-});
-
 // ─── Sidebar.tsx ─────────────────────────────────────────────────────────────
 
 describe("Sidebar — collapse toggle button uses logical margin", () => {
@@ -78,31 +65,6 @@ describe("Kit shell — the sidebar side follows the document direction", () => 
     const sidebar = src("src/shared/components/Sidebar.tsx");
     expect(sidebar).toContain("export function useSidebarSide()");
     expect(sidebar).toContain('document.documentElement.dir === "rtl" ? "right" : "left"');
-  });
-});
-
-// ─── LanguageSelector.tsx ─────────────────────────────────────────────────────
-
-describe("LanguageSelector — dropdown anchors to inline-end", () => {
-  const code = src("src/shared/components/LanguageSelector.tsx");
-
-  it('anchors the kit DropdownMenuContent to the inline end (align="end")', () => {
-    // KEA-7886: the hand-rolled absolute panel (`end-0`) became the kit DropdownMenu; its
-    // floating-ui positioning resolves align="end" against the element's direction, so it
-    // mirrors under dir=rtl without a physical offset class.
-    expect(code).toContain('align="end"');
-  });
-
-  it("does not use bare right-0 for the dropdown panel", () => {
-    expect(code).not.toContain("right-0");
-  });
-
-  it("uses text-start (not text-left) for lang name text alignment", () => {
-    expect(code).toContain("text-start");
-  });
-
-  it("does not use text-left for lang name text alignment", () => {
-    expect(code).not.toContain("text-left");
   });
 });
 

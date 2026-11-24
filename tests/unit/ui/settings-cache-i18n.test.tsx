@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CacheSettingsTab from "@/app/(dashboard)/dashboard/settings/components/CacheSettingsTab";
-import zh from "@/i18n/messages/zh-CN.json";
+import en from "@/i18n/messages/en.json";
 // The shared Select renders the kit (Radix) Select for `options` since KEA-7886: no DOM
 // <select>/<option>; the helpers read the menu items (data-value) and the controlled value.
 import { kitSelectOptions } from "../../helpers/kitSelect";
@@ -34,9 +34,9 @@ const fetchMock = vi.fn<typeof fetch>();
 function mount() {
   return render(
     <NextIntlClientProvider
-      locale="zh-CN"
+      locale="en"
       timeZone="UTC"
-      messages={{ settings: zh.settings, common: zh.common }}
+      messages={{ settings: en.settings, common: en.common }}
       onError={(error) => {
         throw error;
       }}
@@ -64,64 +64,70 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("cache settings with real Chinese catalogs", () => {
+describe("cache settings with the real English catalog", () => {
   it("localizes headings, metadata, accessible controls, Redis and advanced overrides", async () => {
     await loaded();
-    expect(screen.getByText("语义缓存")).toBeTruthy();
-    expect(screen.getByRole("switch", { name: "启用向量相似度层" })).toHaveProperty(
+    expect(screen.getByText("Semantic Caching")).toBeTruthy();
+    expect(screen.getByRole("switch", { name: "Enable vector similarity layer" })).toHaveProperty(
       "ariaChecked",
       "false"
     );
     const providerOptions = kitSelectOptions(document.getElementById("sem-provider")!);
-    expect(providerOptions.find((option) => option.label === "OpenAI（已配置）")?.value).toBe(
+    expect(providerOptions.find((option) => option.label === "OpenAI (Configured)")?.value).toBe(
       "openai"
     );
     const modelOptions = kitSelectOptions(document.getElementById("sem-model")!);
     expect(
-      modelOptions.find((option) => option.label === "text-embedding-3-small（1,536 维）")?.value
+      modelOptions.find((option) => option.label === "text-embedding-3-small (1,536 dimensions)")
+        ?.value
     ).toBe(model.rawId);
-    expect(screen.getByText("使用已配置的连接（默认 URL）")).toBeTruthy();
-    expect(screen.getByText("维度：1,536")).toBeTruthy();
-    expect(screen.getByText("词元上限：8,191")).toBeTruthy();
-    expect(screen.getByText("输入：文本和图像")).toBeTruthy();
-    fireEvent.click(screen.getByRole("radio", { name: "Redis 向量存储" }));
-    expect(screen.getByLabelText("Redis 键前缀")).toHaveProperty("value", "omniroute:semcache:");
+    expect(screen.getByText("Using configured connection (Default URL)")).toBeTruthy();
+    expect(screen.getByText("Dimensions: 1,536")).toBeTruthy();
+    expect(screen.getByText("Max tokens: 8,191")).toBeTruthy();
+    expect(screen.getByText("Input: Text and Image")).toBeTruthy();
+    fireEvent.click(screen.getByRole("radio", { name: "Redis Vector Store" }));
+    expect(screen.getByLabelText("Redis Key Prefix")).toHaveProperty(
+      "value",
+      "omniroute:semcache:"
+    );
     expect(screen.getByLabelText("Redis URL")).toHaveProperty(
       "placeholder",
       "redis://127.0.0.1:6379"
     );
-    fireEvent.click(screen.getByRole("button", { name: "显示高级端点覆盖设置" }));
-    expect(screen.getByLabelText("自定义嵌入 API 密钥")).toHaveProperty(
+    fireEvent.click(screen.getByRole("button", { name: "Show Advanced Endpoint Overrides" }));
+    expect(screen.getByLabelText("Custom Embedding API Key")).toHaveProperty(
       "placeholder",
-      "Bearer 令牌或 API 密钥"
+      "Bearer token or API key"
     );
     expect(
-      screen.getByRole("button", { name: "隐藏高级端点覆盖设置" }).getAttribute("aria-expanded")
+      screen
+        .getByRole("button", { name: "Hide Advanced Endpoint Overrides" })
+        .getAttribute("aria-expanded")
     ).toBe("true");
-    fireEvent.click(screen.getByRole("switch", { name: "启用语义缓存" }));
-    expect(screen.getByText("已禁用")).toBeTruthy();
+    fireEvent.click(screen.getByRole("switch", { name: "Enable semantic caching" }));
+    expect(screen.getByText("Disabled")).toBeTruthy();
   });
 
   it("renders translated TTL validation and saves the unchanged numeric API payload", async () => {
     await loaded();
-    const ttl = screen.getByLabelText(zh.settings.modelCatalogCacheTtlLabel);
+    const ttl = screen.getByLabelText(en.settings.modelCatalogCacheTtlLabel);
     fireEvent.change(ttl, { target: { value: "" } });
-    expect(screen.getByText("必填")).toBeTruthy();
-    const save = screen.getByRole("button", { name: zh.settings.modelCatalogCacheTtlSave });
+    expect(screen.getByText("Required")).toBeTruthy();
+    const save = screen.getByRole("button", { name: en.settings.modelCatalogCacheTtlSave });
     expect(save).toHaveProperty("disabled", true);
     fireEvent.change(ttl, { target: { value: "50" } });
     expect(save).toHaveProperty("disabled", true);
     fireEvent.change(ttl, { target: { value: "5000" } });
     fetchMock.mockResolvedValueOnce(reply({ modelCatalogCacheTtlMs: 5000 }));
     fireEvent.click(save);
-    await screen.findByText(zh.settings.cacheConfigSaveSuccess);
+    await screen.findByText(en.settings.cacheConfigSaveSuccess);
     const call = fetchMock.mock.calls.find(([, init]) => init?.method === "PUT");
     expect(JSON.parse(String(call?.[1]?.body))).toEqual({ modelCatalogCacheTtlMs: 5000 });
   });
 
   it("localizes saving feedback without translating provider/model/backend wire values", async () => {
     await loaded();
-    fireEvent.click(screen.getByRole("radio", { name: "Redis 向量存储" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Redis Vector Store" }));
     let resolve!: (value: Response) => void;
     fetchMock.mockImplementationOnce(
       () =>
@@ -129,10 +135,10 @@ describe("cache settings with real Chinese catalogs", () => {
           resolve = done;
         })
     );
-    fireEvent.click(screen.getByRole("button", { name: "保存语义缓存" }));
-    expect(screen.getByRole("button", { name: "正在保存…" })).toHaveProperty("disabled", true);
+    fireEvent.click(screen.getByRole("button", { name: "Save Semantic Cache" }));
+    expect(screen.getByRole("button", { name: "Saving..." })).toHaveProperty("disabled", true);
     resolve(reply({ ok: true }));
-    await screen.findByText("语义缓存设置已保存。");
+    await screen.findByText("Semantic cache settings saved successfully.");
     const body = JSON.parse(String(fetchMock.mock.calls.at(-1)?.[1]?.body));
     expect(body).toMatchObject({
       semanticCacheBackend: "redis",
@@ -144,8 +150,8 @@ describe("cache settings with real Chinese catalogs", () => {
       semanticCacheTTL: 1800000,
     });
     fetchMock.mockResolvedValueOnce(reply({}, 500));
-    fireEvent.click(screen.getByRole("button", { name: "保存语义缓存" }));
-    await screen.findByText("无法保存语义缓存设置。");
+    fireEvent.click(screen.getByRole("button", { name: "Save Semantic Cache" }));
+    await screen.findByText("Failed to save semantic cache settings.");
   });
 
   it.each([undefined, "https://example.com/v1"])(
@@ -155,13 +161,13 @@ describe("cache settings with real Chinese catalogs", () => {
       fetchMock.mockResolvedValueOnce(
         reply({ ok: true, dimensions: 1536, latencyMs: 25, resolvedBaseUrl: url })
       );
-      fireEvent.click(screen.getByRole("button", { name: "测试嵌入模型" }));
-      await screen.findByText("连接已验证：");
+      fireEvent.click(screen.getByRole("button", { name: "Test Embedding Model" }));
+      await screen.findByText("Connection Verified:");
       expect(
         screen.getByText(
           url
-            ? "已通过 https://example.com/v1 在 25 毫秒内生成 1,536 维嵌入。"
-            : "已在 25 毫秒内生成 1,536 维嵌入。"
+            ? "Successfully generated a 1,536-dimensional embedding in 25 ms via https://example.com/v1."
+            : "Successfully generated a 1,536-dimensional embedding in 25 ms."
         )
       ).toBeTruthy();
       expect(JSON.parse(String(fetchMock.mock.calls.at(-1)?.[1]?.body))).toMatchObject({
@@ -175,34 +181,34 @@ describe("cache settings with real Chinese catalogs", () => {
   it("localizes connection errors and missing diagnostics", async () => {
     await loaded();
     fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
-    fireEvent.click(screen.getByRole("button", { name: "测试嵌入模型" }));
-    await screen.findByText("无法测试嵌入连接。");
+    fireEvent.click(screen.getByRole("button", { name: "Test Embedding Model" }));
+    await screen.findByText("Could not test the embedding connection.");
     expect(screen.queryByText("Failed to fetch")).toBeNull();
     fetchMock.mockResolvedValueOnce(reply({ ok: false }, 400));
-    fireEvent.click(screen.getByRole("button", { name: "测试嵌入模型" }));
-    await screen.findByText("未知错误");
+    fireEvent.click(screen.getByRole("button", { name: "Test Embedding Model" }));
+    await screen.findByText("Unknown error");
     fetchMock.mockResolvedValueOnce(reply({ ok: false, error: "upstream-diagnostic-code" }));
-    fireEvent.click(screen.getByRole("button", { name: "测试嵌入模型" }));
+    fireEvent.click(screen.getByRole("button", { name: "Test Embedding Model" }));
     await screen.findByText("upstream-diagnostic-code");
   });
 
   it("localizes purge success and failure while retaining DELETE semantics", async () => {
     await loaded();
     fetchMock.mockResolvedValueOnce(reply({ ok: true }));
-    fireEvent.click(screen.getByRole("button", { name: "清空缓存" }));
-    await screen.findByText("语义缓存已清空。");
+    fireEvent.click(screen.getByRole("button", { name: "Clear Cache" }));
+    await screen.findByText("Semantic cache purged successfully.");
     expect(fetchMock).toHaveBeenLastCalledWith("/api/cache", { method: "DELETE" });
     fetchMock.mockResolvedValueOnce(reply({}, 500));
-    fireEvent.click(screen.getByRole("button", { name: "清空缓存" }));
-    await screen.findByText("无法清空缓存。 HTTP 500");
+    fireEvent.click(screen.getByRole("button", { name: "Clear Cache" }));
+    await screen.findByText("Failed to purge cache. HTTP 500");
     fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
-    fireEvent.click(screen.getByRole("button", { name: "清空缓存" }));
-    await screen.findByText("无法清空缓存。");
+    fireEvent.click(screen.getByRole("button", { name: "Clear Cache" }));
+    await screen.findByText("Failed to purge cache.");
   });
 
   it("localizes initial load failure", async () => {
     fetchMock.mockResolvedValueOnce(reply({}, 503));
     mount();
-    await screen.findByText(zh.settings.cacheConfigLoadFailed);
+    await screen.findByText(en.settings.cacheConfigLoadFailed);
   });
 });

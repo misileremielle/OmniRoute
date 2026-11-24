@@ -52,7 +52,9 @@ scripts/
 .vscode/
 .agents/
 .env*
-eslint.config.mjs
+.oxlintrc.json
+oxlint.complexity.json
+oxlint-suppressions.json
 prettier.config.mjs
 postcss.config.mjs
 next.config.mjs

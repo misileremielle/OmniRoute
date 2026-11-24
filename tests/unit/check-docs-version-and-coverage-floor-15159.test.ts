@@ -7,6 +7,7 @@ import {
   makeVersionClaimValidator,
   makeCoverageFloorClaimValidator,
 } from "../../scripts/check/check-docs-counts-sync.mjs";
+import { loadFactsSnapshot, readCoverageRatchetFloors } from "../../scripts/release/facts.mjs";
 
 // Regression guard for audit #15159 — G-06 (stale version strings the validator
 // cannot see) and G-08 (AGENTS.md advertises the wrong coverage floor).
@@ -34,6 +35,10 @@ import {
 // enforces 67.33 / 67.33 / 72.02 / 65.08. An agent reading AGENTS.md alone reds
 // the quality-gate job below the real floor. Worse, AGENTS.md was not in the
 // validator's file list at all, so nothing checked it.
+//
+// Fork: the coverage ratchet is gone (CI reports coverage on main only), so the floor the
+// validator uses falls back to the 60s that test:coverage enforces. The validator tests below
+// still feed it upstream's old ratchet values as a fixture.
 
 type Verdict = { ok: boolean; detail: string };
 
@@ -173,27 +178,52 @@ test("G-08: a docs file with no coverage claim is accepted", () => {
 test("G-08: AGENTS.md no longer advertises a floor below the blocking ratchet", () => {
   // The end state: the instruction surface an agent reads first must not send
   // them below the floor the blocking gate enforces.
+  //
+  // The floor AGENTS.md states is a DERIVED number (plan 2026-11-13): feature PRs no longer
+  // write it, `npm run release:refresh-derived` rewrites it and records the floors it used in
+  // docs/reference/derived-facts.json. So the document is judged against the snapshot (same
+  // refresh), not against the live baseline, which a ratchet PR may raise between releases.
+  // The live baseline comparison is release mode's job (the counts gate's "Coverage floor"
+  // check with the live facts).
   const root = path.resolve(import.meta.dirname, "..", "..");
   const agents = fs.readFileSync(path.join(root, "AGENTS.md"), "utf8");
+  const snapshot = loadFactsSnapshot() as { coverageFloors?: typeof REAL_FLOORS } | null;
+  assert.ok(
+    snapshot?.coverageFloors,
+    "docs/reference/derived-facts.json must record coverageFloors"
+  );
+  const floors = snapshot.coverageFloors;
+  for (const key of ["statements", "lines", "functions", "branches"] as const) {
+    // The snapshot never records a floor below the absolute 60% minimum (Hard Rule #9).
+    assert.ok(floors[key] >= 60, `derived-facts.json coverageFloors.${key}=${floors[key]} < 60`);
+  }
 
-  const result = validateCoverage(REAL_FLOORS)(agents);
+  const result = validateCoverage(floors)(agents);
   assert.equal(
     result.ok,
     true,
-    `AGENTS.md advertises a coverage floor below the blocking ratchet — ${result.detail}`
+    `AGENTS.md advertises a coverage floor below the snapshot ratchet — ${result.detail}`
   );
 });
 
-test("G-08: the blocking ratchet floors in quality-baseline.json are what we validate against", () => {
-  // Pin the source of truth so a future rebaseline that lowers these floors is a
-  // deliberate act visible in a test diff, not a silent doc/gate divergence.
+test("G-08: with no coverage ratchet the floors are the ones test:coverage enforces", () => {
   const root = path.resolve(import.meta.dirname, "..", "..");
   const baseline = JSON.parse(
     fs.readFileSync(path.join(root, "config/quality/quality-baseline.json"), "utf8")
   );
-
-  assert.equal(baseline.metrics["coverage.statements"].value, REAL_FLOORS.statements);
-  assert.equal(baseline.metrics["coverage.lines"].value, REAL_FLOORS.lines);
-  assert.equal(baseline.metrics["coverage.functions"].value, REAL_FLOORS.functions);
-  assert.equal(baseline.metrics["coverage.branches"].value, REAL_FLOORS.branches);
+  for (const key of ["statements", "lines", "functions", "branches"]) {
+    assert.equal(
+      baseline.metrics[`coverage.${key}`],
+      undefined,
+      `coverage.${key} is not ratcheted`
+    );
+  }
+  assert.deepEqual(readCoverageRatchetFloors(root), {
+    statements: 60,
+    lines: 60,
+    functions: 60,
+    branches: 60,
+  });
+  const { scripts } = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+  assert.match(scripts["test:coverage"], /--statements 60 --lines 60 --functions 60 --branches 60/);
 });

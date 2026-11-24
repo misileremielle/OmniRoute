@@ -54,7 +54,6 @@ describe("converted files use the kit components (source guard)", () => {
   const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
 
   it.each([
-    `${dash}/cli-code/components/CopilotToolCard.tsx`,
     `${dash}/search-tools/components/SearchToolsConfigPane.tsx`,
     `${dash}/search-tools/components/SearchForm.tsx`,
     `${dash}/search-tools/components/SearchConceptCard.tsx`,

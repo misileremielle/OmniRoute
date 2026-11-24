@@ -1,6 +1,5 @@
 {
   "schemaVersion": 1,
-  "admissionPolicy": "config/quality/admission-policy.json",
   "scope": "Validation-related package script aliases, not workflow jobs or matrix instances. Profiles list static scans only; no profile here proves release acceptance.",
   "aliases": [
     {
@@ -24,28 +23,13 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:api-docs-refs",
-      "command": "node scripts/check/check-api-docs-refs.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:build-scope",
       "command": "node scripts/check/check-build-scope.mjs",
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:bundle-size",
-      "command": "node scripts/check/check-bundle-size.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:changelog-integrity",
       "command": "node scripts/check/check-changelog-integrity.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:circular-deps",
-      "command": "node scripts/check/check-circular-deps.mjs",
       "disposition": "separately-invoked"
     },
     {
@@ -64,46 +48,6 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:cognitive-complexity",
-      "command": "node scripts/check/check-cognitive-complexity.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:complexity",
-      "command": "node scripts/check/check-complexity.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:complexity-ratchets",
-      "command": "node scripts/check/check-complexity-ratchets.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:compression-budget",
-      "command": "bun scripts/check/check-compression-budget.ts",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:boundary",
-      "command": "node scripts/quality/measure-boundary.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:boundary:ratchet",
-      "command": "node scripts/quality/measure-boundary.mjs --ratchet",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:cycles",
-      "command": "node scripts/check/check-cycles.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:cycles:ratchet",
-      "command": "node scripts/check/check-cycles.mjs --ratchet",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:dashboard-typecheck",
       "command": "node scripts/check/check-dashboard-typecheck.mjs",
       "disposition": "separately-invoked"
@@ -119,28 +63,8 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:dead-code",
-      "command": "node scripts/check/check-dead-code.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:deprecated-versions",
-      "command": "node scripts/check/check-deprecated-versions.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:deps",
       "command": "node scripts/check/check-deps.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:doc-links",
-      "command": "node scripts/check/check-doc-links.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:docs-all",
-      "command": "pnpm run check:docs-sync && pnpm run check:docs-counts && pnpm run check:env-doc-sync && pnpm run check:deprecated-versions && pnpm run check:doc-links && pnpm run check:fabricated-docs",
       "disposition": "separately-invoked"
     },
     {
@@ -154,18 +78,18 @@
       "disposition": "separately-invoked"
     },
     {
+      "name": "check:pr-derived-paths",
+      "command": "node scripts/check/check-pr-derived-paths.mjs",
+      "disposition": "separately-invoked"
+    },
+    {
+      "name": "check:generated-artifacts",
+      "command": "node --import tsx/esm scripts/check/check-generated-artifacts.mjs",
+      "disposition": "separately-invoked"
+    },
+    {
       "name": "check:docs-sync",
       "command": "node scripts/check/check-docs-sync.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:duplication",
-      "command": "node scripts/check/check-duplication.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:env-doc-sync",
-      "command": "node scripts/check/check-env-doc-sync.mjs",
       "disposition": "separately-invoked"
     },
     {
@@ -174,18 +98,8 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:fabricated-docs",
-      "command": "node scripts/check/check-fabricated-docs.mjs --strict",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:fetch-targets",
       "command": "node scripts/check/check-fetch-targets.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:file-size",
-      "command": "node scripts/check/check-file-size.mjs",
       "disposition": "separately-invoked"
     },
     {
@@ -259,23 +173,8 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:openapi-breaking",
-      "command": "node scripts/check/check-openapi-breaking.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:openapi-coverage",
-      "command": "node scripts/check/check-openapi-coverage.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:openapi-routes",
       "command": "node scripts/check/check-openapi-routes.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:openapi-security-tiers",
-      "command": "node scripts/check/check-openapi-security-tiers.mjs",
       "disposition": "separately-invoked"
     },
     {
@@ -294,23 +193,8 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:pr-evidence",
-      "command": "node scripts/check/check-pr-evidence.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:pr-test-policy",
-      "command": "node scripts/check/check-pr-test-policy.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:pricing-freshness",
       "command": "node scripts/check/check-pricing-freshness.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:provider-asset-provenance",
-      "command": "node scripts/check/check-provider-asset-provenance.mjs",
       "disposition": "separately-invoked"
     },
     {
@@ -331,16 +215,6 @@
     {
       "name": "check:public-creds",
       "command": "node scripts/check/check-public-creds.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:ratchet-bank",
-      "command": "node scripts/quality/verify-ratchet-bank.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:release-green",
-      "command": "node scripts/quality/validate-release-green.mjs",
       "disposition": "separately-invoked"
     },
     {
@@ -384,11 +258,6 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:test-masking",
-      "command": "node scripts/check/check-test-masking.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:test-runner-api",
       "command": "node scripts/check/check-test-runner-api.mjs",
       "disposition": "separately-invoked"
@@ -401,11 +270,6 @@
     {
       "name": "check:ts7-diagnostics-ratchet",
       "command": "node scripts/check/check-ts7-diagnostics-ratchet.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "check:type-coverage",
-      "command": "node scripts/check/check-type-coverage.mjs",
       "disposition": "separately-invoked"
     },
     {
@@ -435,12 +299,7 @@
     },
     {
       "name": "lint",
-      "command": "eslint . --cache --cache-location .eslintcache --suppressions-location config/quality/eslint-suppressions.json",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "lint:json",
-      "command": "node scripts/quality/run-eslint-json.mjs",
+      "command": "oxlint .",
       "disposition": "separately-invoked"
     },
     {
@@ -454,38 +313,8 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "quality:boundary",
-      "command": "node scripts/quality/measure-boundary.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "quality:collect",
-      "command": "node scripts/quality/collect-metrics.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "quality:gate",
-      "command": "pnpm run quality:collect && pnpm run quality:ratchet --allow-missing",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "quality:headroom",
-      "command": "node scripts/quality/baseline-headroom.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
-      "name": "quality:ratchet",
-      "command": "node scripts/quality/check-quality-ratchet.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "quality:refresh-model-lifecycle",
       "command": "node scripts/quality/refresh-model-lifecycle.mjs",
-      "disposition": "maintenance"
-    },
-    {
-      "name": "quality:relax-baselines",
-      "command": "node scripts/quality/relax-baselines.mjs",
       "disposition": "maintenance"
     },
     {
@@ -589,6 +418,11 @@
       "disposition": "separately-invoked"
     },
     {
+      "name": "test:migrations:fresh",
+      "command": "cross-env DISABLE_SQLITE_AUTO_BACKUP=true node --max-old-space-size=8192 --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit tests/unit/db/migrations-fresh-database.test.ts",
+      "disposition": "separately-invoked"
+    },
+    {
       "name": "test:mutation",
       "command": "stryker run",
       "disposition": "separately-invoked"
@@ -600,7 +434,7 @@
     },
     {
       "name": "test:property",
-      "command": "cross-env DISABLE_SQLITE_AUTO_BACKUP=true node --import tsx/esm --test --test-force-exit tests/unit/correctness/*.property.test.ts",
+      "command": "cross-env DISABLE_SQLITE_AUTO_BACKUP=true node --import tsx/esm --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit tests/unit/correctness/*.property.test.ts",
       "disposition": "separately-invoked"
     },
     {
@@ -704,11 +538,6 @@
       "disposition": "separately-invoked"
     },
     {
-      "name": "check:free-catalog-evidence",
-      "command": "node scripts/check/check-free-catalog-evidence.mjs",
-      "disposition": "separately-invoked"
-    },
-    {
       "name": "check:ui-kit-snapshot",
       "command": "node scripts/check/check-ui-kit-snapshot.mjs",
       "disposition": "separately-invoked"
@@ -716,6 +545,11 @@
     {
       "name": "check:ui-kit-upstream",
       "command": "node scripts/check/check-ui-kit-upstream.mjs",
+      "disposition": "separately-invoked"
+    },
+    {
+      "name": "audit:deps",
+      "command": "pnpm audit --audit-level=critical && (pnpm audit --audit-level=high || echo '::warning::high-severity advisories present (non-blocking)')",
       "disposition": "separately-invoked"
     }
   ],
@@ -735,23 +569,16 @@
         "check:public-creds",
         "check:error-helper",
         "check:fetch-targets",
-        "check:api-docs-refs",
         "check:deps",
         "check:db-rules",
-        "check:file-size",
-        "check:complexity-ratchets",
         "check:known-symbols",
         "check:route-guard-membership",
         "check:test-discovery",
-        "check:test-tla-order",
-        "check:test-masking",
-        "check:duplication",
-        "check:cycles:ratchet",
-        "check:boundary:ratchet"
+        "check:test-tla-order"
       ]
     },
     "quality-scan-fast": {
-      "description": "Static filesystem scan excluding duplication and cycles; not full acceptance.",
+      "description": "Same gates as quality-scan: the fork removed the slow duplication, cycle and boundary scans. Not full acceptance.",
       "aliases": [
         "check:gate-manifest",
         "check:tracked-artifacts",
@@ -765,16 +592,12 @@
         "check:public-creds",
         "check:error-helper",
         "check:fetch-targets",
-        "check:api-docs-refs",
         "check:deps",
         "check:db-rules",
-        "check:file-size",
-        "check:complexity-ratchets",
         "check:known-symbols",
         "check:route-guard-membership",
         "check:test-discovery",
-        "check:test-tla-order",
-        "check:test-masking"
+        "check:test-tla-order"
       ]
     }
   }

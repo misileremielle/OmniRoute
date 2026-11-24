@@ -18,6 +18,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { load as parseYaml } from "js-yaml";
 import {
   parseActionlintOutput,
   parseZizmorOutput,
@@ -162,36 +163,22 @@ test("admission workflows do not enable setup-node's redundant package-manager c
       assert.match(inputs, /package-manager-cache: false/, step);
       assert.doesNotMatch(inputs, /^\s*cache:/m, step);
     }
-    const admission = source
-      .slice(source.indexOf("\n  admission-verdict:\n"))
-      .split("\n  ci-summary:")[0];
-    for (const action of ["checkout", "setup-node", "upload-artifact"]) {
-      assert.match(admission, new RegExp(`actions/${action}@[a-f0-9]{40}`));
-    }
   }
 });
 
-test("integration candidates never restore PR dependency, lint or browser caches", () => {
-  for (const workflow of ["ci"]) {
-    const source = fs.readFileSync(
-      new URL(`../../../.github/workflows/${workflow}.yml`, import.meta.url),
-      "utf8"
-    );
-    const steps = source.split(/^      - /m).slice(1);
-    const installers = steps.filter((step) =>
-      step.includes("uses: ./.github/actions/pnpm-install-retry")
-    );
-    assert.ok(installers.length > 0);
-    for (const step of installers) {
-      assert.match(step, /cache: \$\{\{ github\.event_name == 'pull_request' \}\}/);
-    }
-    const caches = steps.filter((step) => /uses: actions\/cache(?:\/restore)?@/.test(step));
-    assert.ok(caches.length > 0);
-    for (const step of caches) {
-      assert.match(step, /if: github\.event_name == 'pull_request'/);
-      assert.match(step, /uses: actions\/cache@[a-f0-9]{40}/);
-    }
-  }
+// The fork caches node_modules on every event (exact-key restore inside the composite action),
+// and every direct actions/cache use is SHA-pinned.
+test("installs use the cached composite and direct caches are SHA-pinned", () => {
+  const source = readCiWorkflow();
+  const steps = source.split(/^      - /m).slice(1);
+  const installers = steps.filter((step) =>
+    step.includes("uses: ./.github/actions/pnpm-install-retry")
+  );
+  assert.ok(installers.length > 0);
+  for (const step of installers) assert.doesNotMatch(step, /cache:/, step);
+  const caches = steps.filter((step) => /uses: actions\/cache(?:\/restore)?@/.test(step));
+  assert.ok(caches.length > 0);
+  for (const step of caches) assert.match(step, /uses: actions\/cache@[a-f0-9]{40}/);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -390,7 +377,7 @@ test("isBinaryAvailable: node is available (sanity check for test environment)",
 
 // ─────────────────────────────────────────────────────────────────────────────
 // evaluateZizmorRatchet — ratchet direction:down, zizmorFindings ONLY (Etapa 2)
-// Regression when measured > baseline. actionlint is reported, not ratcheted.
+// Regression when measured > baseline. actionlint blocks separately (any finding fails).
 // ─────────────────────────────────────────────────────────────────────────────
 
 test("evaluateZizmorRatchet: measured == baseline passes (192 vs 192)", () => {
@@ -464,20 +451,25 @@ test("readBaselineZizmorValue: invalid JSON returns null (does not throw)", () =
 // quality.yml — release PR build gate regression coverage (#7307)
 // ─────────────────────────────────────────────────────────────────────────────
 
-test("CI admission covers both bases and implements required build/package checks", () => {
+test("tracked-artifacts runs in Security Scans, which docs-only PRs do not skip", () => {
+  type Job = { if?: string; steps?: Array<{ run?: string }> };
+  const jobs = (parseYaml(readCiWorkflow()) as { jobs: Record<string, Job> }).jobs;
+  const runsGuard = (job: Job) =>
+    (job.steps ?? []).some((step) => /pnpm run check:tracked-artifacts\b/.test(step.run ?? ""));
+  assert.ok(runsGuard(jobs.security), "security runs check:tracked-artifacts");
+  assert.doesNotMatch(String(jobs.security.if ?? ""), /outputs\.code/);
+  assert.ok(!runsGuard(jobs.lint), "not (only) in the docs-skipping Lint job");
+});
+
+test("CI runs for PRs into any base and gates build and package checks", () => {
   const ci = readCiWorkflow();
-  assert.match(ci, /pull_request:\n\s+branches: \[main, "release\/\*\*"\]/);
-  assert.match(ci, /merge_group:\n\s+types: \[checks_requested\]/);
-  const policy = JSON.parse(
-    fs.readFileSync(
-      new URL("../../../config/quality/admission-policy.json", import.meta.url),
-      "utf8"
-    )
-  );
+  const on = (parseYaml(ci) as { on: { pull_request: Record<string, unknown> } }).on;
+  assert.equal(on.pull_request.branches, undefined, "no PR base filter (stacked PRs get CI)");
   for (const job of ["build", "package-artifact"]) {
-    assert.equal(policy.profiles.ci.jobs[job].disposition, "required", job);
     assert.match(ci, new RegExp("\\n  " + job + ":\\n"), "CI implements " + job);
   }
-  assert.match(ci, /npm run build/);
-  assert.match(ci, /npm run check:pack-boot/);
+  const gate = (parseYaml(ci) as { jobs: { gate: { needs: string[] } } }).jobs.gate;
+  assert.ok(gate.needs.includes("build") && gate.needs.includes("package-artifact"));
+  assert.match(ci, /pnpm run build/);
+  assert.match(ci, /pnpm run check:pack-boot/);
 });

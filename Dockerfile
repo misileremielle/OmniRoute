@@ -163,7 +163,7 @@ FROM deps AS builder
 # validated 2026-07-05 with clean amd64 (12min14s, image smoke-tested:
 # /api/monitoring/health 200) and arm64 (qemu, exit 0, zero panic strings)
 # builds, and Turbopack cut the bare build from 17min to 9min on the same
-# 32-core box. See docs/ops/QUALITY_GATE_PLAYBOOK.md Parte 6.
+# 32-core box.
 #
 # Declared as ARG+ENV, not a bare ENV: a bare ENV shadows any same-named ARG for
 # the rest of the stage, so `--build-arg OMNIROUTE_USE_TURBOPACK=0` was silently
@@ -297,6 +297,10 @@ ENV OMNIROUTE_MIGRATIONS_DIR=/app/migrations
 # Docker healthcheck script — not traced by Next.js standalone output, so copy
 # it explicitly. The HEALTHCHECK CMD references it as `node healthcheck.mjs`.
 COPY --chown=node:node --from=builder /app/scripts/dev/healthcheck.mjs ./healthcheck.mjs
+
+# Next.js standalone tracing omits the root LICENSE, so the published image shipped
+# without the license text. Copy it explicitly.
+COPY --chown=node:node --from=builder /app/LICENSE ./LICENSE
 
 # Every COPY above hands its files to the baked-in `node` non-root user
 # (UID/GID 1000) at copy time. Do NOT add a `RUN chown -R node:node /app`

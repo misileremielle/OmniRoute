@@ -97,3 +97,9 @@ test("the live src/ tree stays within the type scale baseline", () => {
         .join("\n")
   );
 });
+
+// The fork runs the ratchet from the pre-commit hook only (CI blocks on correctness gates).
+test("the pre-commit hook runs the type scale ratchet", () => {
+  const hook = fs.readFileSync(path.join(ROOT, ".husky/pre-commit"), "utf8");
+  assert.match(hook, /^node scripts\/check\/check-type-scale-ratchet\.mjs --ratchet\b/m);
+});

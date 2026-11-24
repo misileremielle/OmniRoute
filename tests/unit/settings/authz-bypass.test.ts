@@ -33,10 +33,10 @@ const routeGuard = await import("../../../src/server/authz/routeGuard.ts");
 const settingsRoute = await import("../../../src/app/api/settings/route.ts");
 const apiKeysDb = await import("../../../src/lib/db/apiKeys.ts");
 
-// No prefix is bypassable by default. Each test starts from a seeded policy with one
-// non-spawning LOCAL_ONLY prefix (BYPASS) loaded into the runtime snapshot.
+// The default manage-scope bypass list is the read-only `/api/resilience/connections`
+// (KEA-9357). Each test starts from a seeded policy with that one non-spawning
+// LOCAL_ONLY prefix (BYPASS) loaded into the runtime snapshot.
 const BYPASS = "/api/resilience/connections";
-
 test.beforeEach(async () => {
   await fixture.resetStorage();
   apiKeysDb.resetApiKeyState();
@@ -195,8 +195,8 @@ test("AC-7: PATCH adds prefix → applyRuntimeSettings fires + getAuthzBypassSna
   const seeded = await settingsDb.getSettings();
   await runtime.applyRuntimeSettings(seeded);
 
-  // The compile-time default list is empty; the seeded policy carries BYPASS.
-  assert.deepEqual([...routeGuard.LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES], []);
+  // The compile-time default list and the seeded policy both carry BYPASS.
+  assert.deepEqual([...routeGuard.LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES], [BYPASS]);
   assert.deepEqual(runtime.getAuthzBypassSnapshot().prefixes, [BYPASS]);
 
   // Measure the snapshot-read latency (spec SLA: <50 ms).

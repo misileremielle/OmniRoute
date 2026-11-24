@@ -1,6 +1,5 @@
-// Runs the real shell scripts of .github/workflows/docker-publish.yml against a fake `docker`
-// (and a fake `git` for the prepare step). Policy under test: the Node and Web images publish to
-// GHCR only, each from exactly two validated digests (one linux/amd64, one linux/arm64).
+// Runs the real shell scripts of .github/workflows/docker-publish.yml against a fake `docker`.
+// Policy under test: the Node and Web images publish to GHCR only, each from exactly two validated digests (one linux/amd64, one linux/arm64).
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -254,31 +253,8 @@ test("Create GHCR version manifests: a failed manifest fails the step", () => {
   assert.deepEqual(result.created, [tag(""), tag("-web")]);
 });
 
-function runPromotion(scenario) {
-  return withSandbox((dir) => runScript(dir, "Promote GHCR latest tags", { scenario }));
-}
-
-const latest = (suffix) => `${GHCR}:latest${suffix}`;
-
-test("Promote GHCR latest tags: promotes both flavors", () => {
-  const result = runPromotion();
-  assert.equal(result.status, 0, result.combined);
-  assert.deepEqual(result.created, [latest(""), latest("-web")]);
-});
-
-test("Promote GHCR latest tags: an incomplete source moves no alias at all", () => {
-  const result = runPromotion({ tags: { [tag("-web")]: "amd64-only" } });
-  assert.notEqual(result.status, 0, result.combined);
-  assert.deepEqual(result.created, []);
-});
-
-const PREPARE = "Resolve version, latest-promotion, and skip flag";
-const TAG_PUSH = {
-  EVENT_NAME: "push",
-  REF_TYPE: "tag",
-  REF_NAME: "v1.0.0",
-  DEFAULT_BRANCH: "main",
-};
+const PREPARE = "Resolve version and skip flag";
+const TAG_PUSH = { EVENT_NAME: "release", REF_TYPE: "tag", REF_NAME: "v1.0.0" };
 const MANDATORY_REFS = [`${GHCR}:1.0.0`, `${GHCR}:1.0.0-web`];
 
 function runPrepare(env, scenario) {
@@ -327,27 +303,32 @@ test("prepare: a push to main publishes :latest without skipping or inspecting",
     EVENT_NAME: "push",
     REF_TYPE: "branch",
     REF_NAME: "main",
-    DEFAULT_BRANCH: "main",
   });
   assert.equal(result.status, 0, result.combined);
   assert.equal(result.outputs.version, "latest");
-  assert.equal(result.outputs.promote_latest, "false");
   assert.equal(result.outputs.skip, "false");
   assert.deepEqual(result.inspected, []);
 });
 
-test("prepare: floating channels never skip or inspect", () => {
+test("prepare: a release branch fails: the fork publishes no :next channel", () => {
   const result = runPrepare({
-    EVENT_NAME: "push",
+    EVENT_NAME: "workflow_dispatch",
     REF_TYPE: "branch",
     REF_NAME: "release/v1.0.0",
-    DEFAULT_BRANCH: "release/v1.0.0",
   });
-  assert.equal(result.status, 0, result.combined);
-  assert.equal(result.outputs.version, "next");
-  assert.equal(result.outputs.skip, "false");
+  assert.notEqual(result.status, 0, result.combined);
+  assert.equal(result.outputs.version, undefined);
   assert.deepEqual(result.inspected, []);
 });
+
+for (const refName of ["vlatest", "v1.0.0-web", "1.0.0", "vnext"]) {
+  test(`prepare: tag ${refName} never resolves to a publishable version`, () => {
+    const result = runPrepare({ EVENT_NAME: "release", REF_TYPE: "tag", REF_NAME: refName });
+    assert.notEqual(result.status, 0, result.combined);
+    assert.equal(result.outputs.version, undefined);
+    assert.deepEqual(result.created, []);
+  });
+}
 
 test("manual dispatch takes no inputs: every job builds the selected ref", () => {
   assert.match(workflow, /^  workflow_dispatch:\n/m);
@@ -360,7 +341,6 @@ test("prepare: a manual run on main publishes :latest like a push", () => {
     EVENT_NAME: "workflow_dispatch",
     REF_TYPE: "branch",
     REF_NAME: "main",
-    DEFAULT_BRANCH: "main",
   });
   assert.equal(result.status, 0, result.combined);
   assert.equal(result.outputs.version, "latest");
@@ -372,11 +352,18 @@ test("the image builds read only the dependency cache and export none", () => {
     "Build and push platform image by digest",
     "Build and push WEB platform image by digest",
   ]) {
-    assert.match(step(name), /cache-from: type=gha,scope=docker-deps-\$\{\{ matrix\.arch \}\}/, name);
+    assert.match(
+      step(name),
+      /cache-from: type=gha,scope=docker-deps-\$\{\{ matrix\.arch \}\}/,
+      name
+    );
     assert.doesNotMatch(step(name), /cache-to:/, name);
   }
   const deps = step("Cache the dependency layers");
   assert.match(deps, /target: deps/);
   assert.match(deps, /outputs: type=cacheonly/);
-  assert.match(deps, /cache-to: type=gha,scope=docker-deps-\$\{\{ matrix\.arch \}\},mode=max,ignore-error=true/);
+  assert.match(
+    deps,
+    /cache-to: type=gha,scope=docker-deps-\$\{\{ matrix\.arch \}\},mode=max,ignore-error=true/
+  );
 });

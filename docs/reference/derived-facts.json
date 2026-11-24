@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "version": "3.8.55",
+  "providers": 224,
+  "providerReferenceTotal": 224,
+  "migrations": 254,
+  "locales": 67,
+  "routingStrategies": 22,
+  "scoringFactors": 16,
+  "coverageFloors": {
+    "statements": 60,
+    "lines": 60,
+    "functions": 60,
+    "branches": 60
+  },
+  "executors": 117,
+  "oauthProviders": 30,
+  "a2aSkills": 0,
+  "cloudAgents": 0,
+  "code": {
+    "freeSteady": 1073425000,
+    "entries": 245,
+    "freeFirst": 1473925000,
+    "freeGated": 6000000,
+    "freePools": 24,
+    "engines": 11,
+    "cliTotal": 37,
+    "cliCode": 26,
+    "cliAgent": 11,
+    "mcpTools": 0,
+    "mcpScopes": 0,
+    "providers": 224,
+    "freeForever": 34,
+    "modePacks": [
+      "ship-fast",
+      "cost-saver",
+      "quality-first",
+      "offline-friendly",
+      "reliability-first"
+    ],
+    "catalogDate": "2026-11-09",
+    "sortBy": "reliability",
+    "intelligentKeys": 16,
+    "hardStop": 5,
+    "trainsOnPrompts": 1,
+    "freeTierCount": 55,
+    "freeTierReg": 55,
+    "manifestFreeTier": 55,
+    "freeTierBudget": {
+      "steady": 1073425000,
+      "first": 1473925000,
+      "boost": 24000000,
+      "gated": 6000000,
+      "poolCount": 24,
+      "modelCount": 245,
+      "discontinued": 7,
+      "avoidProviders": 10,
+      "pools": [
+        {
+          "provider": "mistral",
+          "name": "Mistral",
+          "tokens": 1000000000,
+          "caps": 0
+        },
+        {
+          "provider": "groq",
+          "name": "Groq",
+          "tokens": 30000000,
+          "caps": 5
+        },
+        {
+          "provider": "cloudflare-ai",
+          "name": "Cloudflare Workers AI",
+          "tokens": 30000000,
+          "caps": 0
+        },
+        {
+          "provider": "sambanova",
+          "name": "SambaNova",
+          "tokens": 6000000,
+          "caps": 0
+        },
+        {
+          "provider": "arcee-ai",
+          "name": "Arcee AI",
+          "tokens": 4800000,
+          "caps": 0
+        },
+        {
+          "provider": "openrouter",
+          "name": "OpenRouter",
+          "tokens": 1200000,
+          "caps": 0
+        },
+        {
+          "provider": "cohere",
+          "name": "Cohere",
+          "tokens": 800000,
+          "caps": 0
+        },
+        {
+          "provider": "morph",
+          "name": "Morph",
+          "tokens": 400000,
+          "caps": 0
+        },
+        {
+          "provider": "huggingface",
+          "name": "HuggingFace",
+          "tokens": 200000,
+          "caps": 0
+        },
+        {
+          "provider": "kiro",
+          "name": "Kiro AI",
+          "tokens": 25000,
+          "caps": 0
+        }
+      ],
+      "oneTime": [
+        {
+          "provider": "vertex",
+          "v": 300000000
+        },
+        {
+          "provider": "predibase",
+          "v": 25000000
+        },
+        {
+          "provider": "glm-cn",
+          "v": 20000000
+        },
+        {
+          "provider": "doubao",
+          "v": 15000000
+        },
+        {
+          "provider": "ai21",
+          "v": 10000000
+        },
+        {
+          "provider": "longcat",
+          "v": 10000000
+        },
+        {
+          "provider": "deepseek",
+          "v": 5000000
+        },
+        {
+          "provider": "hyperbolic",
+          "v": 5000000
+        },
+        {
+          "provider": "nscale",
+          "v": 5000000
+        },
+        {
+          "provider": "deepinfra",
+          "v": 1000000
+        },
+        {
+          "provider": "fireworks",
+          "v": 1000000
+        },
+        {
+          "provider": "nebius",
+          "v": 1000000
+        },
+        {
+          "provider": "qoder",
+          "v": 1000000
+        },
+        {
+          "provider": "scaleway",
+          "v": 1000000
+        },
+        {
+          "provider": "novita",
+          "v": 500000
+        }
+      ],
+      "uncappedNames": ["Agnes AI", "Baidu", "Gemini", "GLM Coding", "NVIDIA NIM", "SEA-LION"],
+      "gatedProviderNames": ["ModelScope"]
+    }
+  }
+}

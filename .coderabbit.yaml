@@ -85,8 +85,8 @@ reviews:
     - path: ".github/workflows/**"
       instructions: >-
         Never run fork pull-request code on self-hosted runners. Pin third-party actions by SHA.
-        Pass event fields to run: steps through env, never interpolate them. Job ids must stay in
-        sync with config/quality/admission-policy.json (Gate / CI and Gate / Quality).
+        Pass event fields to run: steps through env, never interpolate them. Every blocking ci.yml
+        job must be listed in the needs of the Gate / CI job.
     - path: "tests/**"
       instructions: >-
         Tests must isolate DATA_DIR and close DB handles. Flag weakened or removed assertions and
@@ -112,8 +112,8 @@ reviews:
           or bot, nor a "Generated with <AI tool>" footer (enforced by `check:ai-attribution`). Human
           co-authors are fine.
   tools:
-    # CI's lint applies the frozen suppressions in config/quality/eslint-suppressions.json;
-    # without them CodeRabbit's eslint run would re-report years of accepted debt.
+    # The repo lints with Oxlint and the frozen suppressions in oxlint-suppressions.json; a
+    # CodeRabbit run without them would re-report years of accepted debt.
     eslint:
       enabled: false
     # Docs have their own gates (npm run check:docs-all).

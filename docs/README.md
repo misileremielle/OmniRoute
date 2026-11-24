@@ -101,7 +101,7 @@ Pluggable subsystems exposed to clients, agents, and operators.
 
 Combo routing, scoring, and replay.
 
-- [AUTO-COMBO.md](routing/AUTO-COMBO.md) — Auto-Combo (multi-factor scoring, 21 strategies).
+- [AUTO-COMBO.md](routing/AUTO-COMBO.md) — Auto-Combo (multi-factor scoring, 22 strategies).
 - [QUOTA_SHARE.md](routing/QUOTA_SHARE.md) — quota sharing engine.
 - [REASONING_REPLAY.md](routing/REASONING_REPLAY.md) — reasoning replay cache.
 
@@ -151,17 +151,13 @@ Provider-specific integration guides.
 Release, deployment, proxies, tunnels, coverage, database, monitoring.
 
 - [RELEASE_CHECKLIST.md](ops/RELEASE_CHECKLIST.md) — release flow checklist.
-- [RELEASE_GREEN.md](ops/RELEASE_GREEN.md) — keeping the PR queue and release branch green.
 - [BRANCHING_MODEL.md](ops/BRANCHING_MODEL.md) — branching & release model.
 - [RELEASE_STRATEGY.md](ops/RELEASE_STRATEGY.md) — LTS rail: branches, npm channels, forward-port, rail labels.
-- [MERGE_TRAIN.md](ops/MERGE_TRAIN.md) — merge queue & manual merge-train runbook.
 - [HOMOLOGATION.md](ops/HOMOLOGATION.md) — homologation suite (`npm run homolog`).
-- [QUALITY_GATE_PLAYBOOK.md](ops/QUALITY_GATE_PLAYBOOK.md) — quality-gate playbook.
 - [RUNNER_BOX.md](ops/RUNNER_BOX.md) — self-hosted runner box operations.
 - [BRANCH_PROTECTION_MAIN.md](ops/BRANCH_PROTECTION_MAIN.md) — `main` branch protection.
 - [CONTRIBUTION_GOLDEN_PATH.md](ops/CONTRIBUTION_GOLDEN_PATH.md) — contribution golden path (focused checks per change type).
 - [COVERAGE_PLAN.md](ops/COVERAGE_PLAN.md) — test coverage plan.
-- [LTS_GO_NO_GO.md](ops/LTS_GO_NO_GO.md) — 3.9.0 LTS GO/NO-GO checklist (rail gates + closing battery).
 - [DATABASE_GUIDE.md](ops/DATABASE_GUIDE.md) — DB schema and operations.
 - [SQLITE_RUNTIME.md](ops/SQLITE_RUNTIME.md) — SQLite driver resolution chain.
 - [REDIS_PRODUCTION_CONFIG.md](ops/REDIS_PRODUCTION_CONFIG.md) — Redis production configuration.

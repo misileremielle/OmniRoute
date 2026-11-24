@@ -5,7 +5,7 @@
 If you discover a security vulnerability in OmniRoute, please report it responsibly:
 
 1. **DO NOT** open a public GitHub issue
-2. Use [GitHub Security Advisories](https://github.com/diegosouzapw/OmniRoute/security/advisories/new)
+2. Use [GitHub Security Advisories](https://github.com/cheaper-inference/OmniRoute/security/advisories/new)
 3. Include: description, reproduction steps, and potential impact
 
 ## Response Timeline
@@ -38,7 +38,7 @@ After 3.8.59 the next version is **3.9.0**, which opens the long-term support li
   whichever is later**. The resulting end date is recorded in the 3.9.0 release notes and in
   [`ROADMAP.md`](ROADMAP.md) when the cut happens.
 - **Reporting a vulnerability in the LTS line:** same channel as any other version —
-  a private [GitHub Security Advisory](https://github.com/diegosouzapw/OmniRoute/security/advisories/new),
+  a private [GitHub Security Advisory](https://github.com/cheaper-inference/OmniRoute/security/advisories/new),
   never a public issue. Say which version you tested (for example `3.9.2`); fixes land on
   `stable/v3` and are forward-ported to v4.
 - **Security baseline at the LTS cut:** measured scanner state, route-guard and
@@ -169,7 +169,7 @@ docker run -d \
 - Run `npm audit` regularly (`npm run audit:deps`)
 - Keep dependencies updated
 - The project uses `husky` + `lint-staged` for pre-commit checks (lint-staged + check-docs-sync + check:any-budget:t11)
-- CI pipeline runs ESLint security rules on every push (`no-eval`, `no-implied-eval`, `no-new-func` = error)
+- CI pipeline runs the Oxlint security rules on every push (`no-eval`, `no-implied-eval`, `no-new-func` = error)
 - Provider constants validated at module load via Zod (`src/shared/validation/schemas.ts`)
 - Secure-by-default libraries used: `dompurify` / `isomorphic-dompurify` (XSS), `jose` (JWT), `better-sqlite3` (no SQLi risk via parameterized queries), `bcryptjs` (password hashing)
 
@@ -178,7 +178,7 @@ docker run -d \
 These rules are enforced by tooling and reviewers:
 
 1. **Never commit secrets** — `.env` is gitignored; `.env.example` is the template (no literals, comments only — see PUBLIC_CREDS.md below)
-2. **Never use `eval()`, `new Function()`, or implied eval** — ESLint enforces
+2. **Never use `eval()`, `new Function()`, or implied eval** — Oxlint enforces
 3. **Never bypass Husky hooks** (`--no-verify`, `--no-gpg-sign`) without explicit operator approval
 4. **Never write raw SQL in routes** — always go through `src/lib/db/` (parameterized)
 5. **Always validate inputs with Zod** — `src/shared/validation/schemas.ts`

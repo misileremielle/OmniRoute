@@ -56,6 +56,7 @@ import ProviderModelsSection from "./components/ProviderModelsSection";
 import CustomModelsSection from "./components/CustomModelsSection";
 import ConnectionsListPanel from "./components/ConnectionsListPanel";
 import CoolingConnectionsPanel from "./components/CoolingConnectionsPanel";
+import { KEYCHAIN_IMPORT_ONLY_PROVIDERS } from "@/shared/constants/keychainImportOnly";
 import ConnectionsHeaderToolbar from "./components/ConnectionsHeaderToolbar";
 import { ChatGptPlanNotice } from "@/shared/components/ChatGptPlanUi";
 import { ConnectionPinTip } from "./components/ConnectionIdChip";
@@ -267,14 +268,17 @@ export default function ProviderDetailPageClient() {
   });
 
   const oauthProviderId = resolveProviderOAuthBackendId(providerId, providerInfo);
+  const isKeychainImportOnly = KEYCHAIN_IMPORT_ONLY_PROVIDERS.has(providerId);
+  // Keychain-import-only providers (zed) never get the OAuth add flow (#20573).
   const providerSupportsOAuth =
-    providerInfo?.toggleAuthType === "oauth" ||
-    providerInfo?.toggleAuthType === "free" ||
-    oauthProviderId !== providerId ||
-    // A no-auth provider can still offer a dashboard sign-in: MiniMax Code
-    // takes an account code here and writes the credential into the local
-    // MiniMax Code profile.
-    supportsDeviceCodeLogin(providerId);
+    !isKeychainImportOnly &&
+    (providerInfo?.toggleAuthType === "oauth" ||
+      providerInfo?.toggleAuthType === "free" ||
+      oauthProviderId !== providerId ||
+      // A no-auth provider can still offer a dashboard sign-in: MiniMax Code
+      // takes an account code here and writes the credential into the local
+      // MiniMax Code profile.
+      supportsDeviceCodeLogin(providerId));
   const subscriptionRisk = providerInfo?.subscriptionRisk === true;
 
   // ── Phase 1t.3: connection gate + risk-notice modal state ───────────────
@@ -398,6 +402,12 @@ export default function ProviderDetailPageClient() {
   }, [searchParams, gateConnectionFlow, openApiKeyAddFlow]);
 
   const openPrimaryAddFlow = useCallback(() => {
+    // Keychain-import-only providers (zed) have no OAuth/API-key add flow: the
+    // import card is the single path, so bring it into view (#20573).
+    if (KEYCHAIN_IMPORT_ONLY_PROVIDERS.has(providerId)) {
+      document.getElementById("keychain-import-card")?.scrollIntoView?.({ behavior: "smooth" });
+      return;
+    }
     if (providerId === "kimi-coding") return setShowKimiAuthMethodModal(true);
     if (isOAuth) {
       setShowOAuthModal(true);
@@ -580,7 +590,9 @@ export default function ProviderDetailPageClient() {
       <ProviderTosNotice providerId={providerId} />
 
       {providerId === "zed" && (
-        <ZedImportCard fetchConnections={fetchConnections} notify={notify} />
+        <div id="keychain-import-card">
+          <ZedImportCard fetchConnections={fetchConnections} notify={notify} />
+        </div>
       )}
       {providerId === "cursor" && <CursorAgentNudge />}
       {isCompatible && providerNode && (
@@ -788,7 +800,7 @@ export default function ProviderDetailPageClient() {
       {/* Models — hidden for search providers (they don't have models) */}
       {!isSearchProvider && !isUpstreamProxyProvider && (
         <Card>
-          <h2 className="text-lg font-semibold mb-4">{t("availableModels")}</h2>
+          <h2 className="text-lg mb-4">{t("availableModels")}</h2>
           <ProviderModelsSection
             providerId={providerId}
             providerAlias={providerAlias}

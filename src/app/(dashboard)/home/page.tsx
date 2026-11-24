@@ -4,6 +4,7 @@ import HomePageClient from "../dashboard/HomePageClient";
 import BootstrapBanner from "../dashboard/BootstrapBanner";
 import NewsBanner from "../dashboard/NewsBanner";
 import FirstRunReadinessCard from "../dashboard/FirstRunReadinessCard";
+import HomePageHeader from "./HomePageHeader";
 import HomeSystemMetricsCards from "./HomeSystemMetricsCards";
 import UnpricedUsageBanner from "../dashboard/UnpricedUsageBanner";
 
@@ -15,6 +16,7 @@ export default async function HomePage() {
   const isBootstrapped = process.env.OMNIROUTE_BOOTSTRAPPED === "true";
   return (
     <>
+      <HomePageHeader />
       {isBootstrapped && <BootstrapBanner />}
       <FirstRunReadinessCard setupComplete={Boolean(settings.setupComplete)} />
       <UnpricedUsageBanner />

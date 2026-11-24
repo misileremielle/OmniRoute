@@ -43,7 +43,6 @@ const getPageHasHeaderServer = () => false;
 import ThemeToggle from "./ThemeToggle";
 import TokenHealthBadge from "./TokenHealthBadge";
 import DegradationBadge from "./DegradationBadge";
-import LanguageSelector from "./LanguageSelector";
 import ProviderIcon from "./ProviderIcon";
 import { useTranslations } from "next-intl";
 import {
@@ -254,7 +253,7 @@ export default function Header({ onOpenCommandPalette }: HeaderProps) {
           </div>
         )}
       </div>
-      <div className="ms-auto flex items-center gap-2">
+      <div className="ms-auto flex shrink-0 items-center gap-2">
         <ProductSwitcher
           items={KEAK_PRODUCT_LINKS}
           activeProduct={KEAK_ACTIVE_PRODUCT}
@@ -289,7 +288,6 @@ export default function Header({ onOpenCommandPalette }: HeaderProps) {
             <Icon name="search" size={20} />
           </Button>
         )}
-        <LanguageSelector />
         <ThemeToggle />
         {!isE2EMode && <DegradationBadge />}
         {!isE2EMode && <TokenHealthBadge />}

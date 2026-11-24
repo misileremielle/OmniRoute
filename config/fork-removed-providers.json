@@ -4,7 +4,7 @@
     {
       "name": "web-cookie",
       "removedOn": "2026-11-15",
-      "migration": "240_remove_web_cookie_providers.sql",
+      "migration": "20261114000240_remove_web_cookie_providers.sql",
       "reason": "Browser-session (web-cookie) providers removed from the fork.",
       "providers": [
         {
@@ -165,7 +165,7 @@
     {
       "name": "cloud-agent",
       "removedOn": "2026-11-15",
-      "migration": "241_remove_cloud_agent_providers.sql",
+      "migration": "20261114000241_remove_cloud_agent_providers.sql",
       "reason": "Cloud coding-agent task providers removed from the fork.",
       "providers": [
         {
@@ -185,7 +185,7 @@
     {
       "name": "router-gateway",
       "removedOn": "2026-11-15",
-      "migration": "242_remove_router_gateway_providers.sql",
+      "migration": "20261114000242_remove_router_gateway_providers.sql",
       "reason": "Router/gateway providers outside the kept set (OpenRouter, Vercel AI Gateway, Chutes, Novita, NanoGPT, OpenCode Zen, OpenCode Go).",
       "providers": [
         {

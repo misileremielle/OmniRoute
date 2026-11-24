@@ -124,12 +124,14 @@ test("valid zero findings and existing frozen debt preserve the ratchet policy",
   assert.equal(run({ stdout: '[{"ident":"unpinned-uses"}]', baseline: 0 }).status, 1);
 });
 
-test("actionlint findings remain measured advisory debt in zizmor-only ratchet mode", posix, () => {
+// The fork blocks on actionlint: a correctness error fails --ratchet even when zizmor is clean.
+test("actionlint findings are measured and fail ratchet mode", posix, () => {
   const result = run({
     actionExit: 1,
     actionOutput: "fixture.yml:2:1: bad trigger [syntax-check]\n",
   });
-  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.status, 1, result.stderr);
   assert.match(result.stdout, /actionlintFindings=1/);
   assert.match(result.stdout, /workflowAuditState=MEASURED/);
+  assert.match(result.stderr, /1 actionlint finding\(s\)/);
 });

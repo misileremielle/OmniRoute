@@ -13,25 +13,10 @@ import { describe, expect, it } from "vitest";
 import { interpolateNodes, nodeArgs } from "@/shared/utils/interpolateNodes";
 import en from "@/i18n/messages/en.json";
 
-const t = createTranslator({ locale: "en", messages: en as never, namespace: "mcpDashboard" });
 const ta = createTranslator({ locale: "en", messages: en as never, namespace: "a2aDashboard" });
 
 describe("interpolateNodes", () => {
-  it("renders the mcpStep1 hint with its command as a <code> node", () => {
-    const { container } = render(
-      <p>
-        {interpolateNodes(
-          (t as never as (k: string, v: object) => string)("mcpStep1", nodeArgs(["code"])),
-          {
-            code: <code>omniroute --mcp</code>,
-          }
-        )}
-      </p>
-    );
-    expect(container.textContent).toBe("Run via omniroute --mcp");
-    expect(container.querySelector("code")?.textContent).toBe("omniroute --mcp");
-  });
-
+  // Fork: upstream's mcpStep1 case is gone with the removed MCP server and its messages.
   it("handles several arguments in one message (a2aStep2)", () => {
     const { container } = render(
       <p>

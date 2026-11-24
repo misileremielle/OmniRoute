@@ -62,6 +62,38 @@ test("production source → code", () => {
   assert.deepEqual(c, { code: true, docs: false, i18n: false, workflow: false, testsOnly: false });
 });
 
+test("truthful usage helpers, persistence, fixtures and UI retain the code CI lane", () => {
+  const paths = [
+    "open-sse/utils/finalizeStreamingUsage.ts",
+    "open-sse/utils/streamGeneratedContent.ts",
+    "open-sse/utils/streamUsageMerge.ts",
+    "open-sse/utils/passthroughTrailingUsage.ts",
+    "open-sse/utils/usageEstimation.ts",
+    "src/lib/usage/usageEvidence.ts",
+    "src/lib/usage/storedUsageEvidence.ts",
+    "src/lib/db/usageEvidenceAggregates.ts",
+    "src/lib/db/migrations/20261115112344_truthful_usage_evidence.sql",
+    "src/lib/db/migrations/20261115112345_daily_usage_evidence.sql",
+    "src/lib/db/settings/cacheMetrics.ts",
+    "src/lib/logExport/destinations/bigquery.ts",
+    "src/lib/usage/usageHistory.ts",
+    "src/shared/components/RequestLogTokens.tsx",
+    "src/shared/components/UsageEvidenceNotice.tsx",
+    "src/shared/utils/usageDisplay.ts",
+    "src/app/(dashboard)/dashboard/cache/page.tsx",
+    "src/app/(dashboard)/dashboard/cache/cacheUsageDisplay.ts",
+    "tests/unit/truthful-usage-evidence.test.ts",
+    "tests/unit/truthful-stream-integration.test.ts",
+    "tests/unit/truthful-usage-persistence.test.ts",
+    "tests/unit/usage-evidence-aggregates.test.ts",
+    "tests/unit/truthful-cache-metrics.test.ts",
+    "tests/unit/ui/truthful-usage-display.test.tsx",
+    "tests/unit/ui/truthful-cache-page.test.tsx",
+    "tests/fixtures/truthful-usage/synthetic.sse",
+  ];
+  for (const file of paths) assert.equal(classifyPaths([file]).code, true, file);
+});
+
 test("mixed docs + code → both flags (jobs union their filters)", () => {
   const c = classifyPaths(["docs/README.md", "src/lib/db/core.ts"]);
   assert.equal(c.docs, true);
@@ -106,8 +138,7 @@ test("testsOnly: empty change list → false (fail-safe)", () => {
 
 // ── One-CI-policy step 1 (rail 3.8.52, RFC #8084 D1-full) ─────────────────────
 // A second, ADDITIVE classification level: the set of real change *domains*.
-// Nothing consumes it yet — ci.yml / quality.yml only expose it as
-// `outputs.domains` so the future single policy can be measured in parallel.
+// Nothing consumes it: the fork's ci.yml reads only code, i18n and testsOnly.
 // classifyPaths() and the legacy five stdout lines MUST stay byte-identical.
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -294,18 +325,5 @@ for (const [files, legacy, domains] of LEGACY_STDOUT_CASES) {
   test(`regression: stdout keeps the legacy lines byte-identical, then appends domains (${files[0]})`, () => {
     const out = runCli(files);
     assert.equal(out, `${legacy}domains=${domains}\n`);
-  });
-}
-
-// Push / dispatch events skip the classifier and enable every lane; the inline
-// `domains=` literal in both workflows must therefore be the full domain set.
-for (const wf of ["ci.yml"]) {
-  test(`workflow ${wf}: changes job exposes outputs.domains and the push literal is the full set`, () => {
-    const src = fs.readFileSync(path.join(REPO_ROOT, ".github", "workflows", wf), "utf8");
-    assert.match(src, /^ {6}domains: \$\{\{ steps\.classify\.outputs\.domains \}\}$/m);
-    assert.ok(
-      src.includes(`echo "domains=${CHANGE_DOMAINS.join(",")}"`),
-      `${wf} must echo the full domain list for non-PR events`
-    );
   });
 }

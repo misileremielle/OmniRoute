@@ -55,7 +55,7 @@ export const RTL_LOCALES: readonly Locale[] = config.rtl as readonly Locale[];
 
 /**
  * Browser / OS language tags that resolve to a configured locale. Read by
- * `detectBrowserLocale` (client), `resolveRequestedLocale` (server cookie) and
+ * `resolveRequestedLocale` (server cookie) and
  * mirrored by the CLI (`bin/cli/i18n.mjs`). Keys are locale codes, values are
  * lower-case BCP-47 tags. Only locales that declare `aliases` appear here.
  */

@@ -31,7 +31,7 @@ without inventing new modules.
 | Database      | **SQLite** via `better-sqlite3` (singleton, WAL journaling)                                                              |
 | Tests         | **Node native test runner** (unit/integration), **Vitest** (MCP, autoCombo, cache), **Playwright** (e2e + protocols-e2e) |
 | Build         | Next.js standalone via `scripts/build/build-next-isolated.mjs`                                                           |
-| Lint/format   | ESLint flat config + Prettier (`lint-staged` via Husky pre-commit)                                                       |
+| Lint/format   | Oxlint (`.oxlintrc.json`) + Prettier (`lint-staged` via Husky pre-commit)                                                |
 | Module system | ESM everywhere (`"type": "module"`)                                                                                      |
 | Dashboard UI  | **Tailwind CSS 4** + the vendored **Keak CI UI Kit** (`packages/ui-kit`), Lucide icons — see `DESIGN_SYSTEM.md`          |
 | Workspaces    | npm workspaces — `open-sse`, `packages/browser-pool`, `packages/ui-kit`                                                  |
@@ -354,16 +354,25 @@ Tables created across the migrations (123 total):
 
 ### 3.3 `src/domain/` — Domain layer
 
-Pure business logic, no I/O. Imported by routes and handlers.
+Domain services and evaluation contracts. Some modules are called by the live
+request path; others remain standalone contracts. Do not assume this entire directory
+is free of I/O or that changing every module affects production routing.
+
+The live policy surfaces are `src/shared/utils/apiKeyPolicy.ts` and
+`src/sse/handlers/chat/resolvedModelPolicy.ts`. Live combo handling and target
+resolution use `open-sse/services/combo.ts`. The tested `policyEngine.ts` and
+`comboResolver.ts` contracts, together with `src/lib/container.ts`, are not the
+wiring of the inspected chat request path. Keep them separate from those active
+surfaces when planning a routing change.
 
 | File                                       | Purpose                                           |
 | ------------------------------------------ | ------------------------------------------------- |
-| `policyEngine.ts`                          | Top-level policy resolver                         |
+| `policyEngine.ts`                          | Reserved policy-evaluation contract               |
 | `fallbackPolicy.ts`                        | Fallback decision tree                            |
 | `costRules.ts`                             | Cost calculation rules                            |
 | `lockoutPolicy.ts`                         | Model lockout decisions                           |
 | `tagRouter.ts`                             | Tag-based routing                                 |
-| `comboResolver.ts`                         | Combo resolution from request → target list       |
+| `comboResolver.ts`                         | Reserved combo-selection contract                 |
 | `connectionModelRules.ts`                  | Per-connection model filters                      |
 | `modelAvailability.ts`                     | Model availability check                          |
 | `degradation.ts`                           | Degraded-mode transitions                         |
@@ -479,7 +488,7 @@ helpers (tool schemas, fetch/TTS adapters, quirk handlers). Executors include:
 (shared identity helper) and `index.ts` (registry).
 
 > Note: providers not listed here are served by `default.ts` using the generic
-> OpenAI-compatible executor. The full provider catalog (223 providers) lives in
+> OpenAI-compatible executor. The full provider catalog (224 providers) lives in
 > `src/shared/constants/providers.ts`.
 
 ### 4.3 `open-sse/translator/`
@@ -512,7 +521,7 @@ Highlights (full list under `open-sse/services/`):
 
 | Concern              | Files                                                                                                                                                                                                                                                    |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Combo routing        | `combo.ts` (21 strategies), `comboConfig.ts`, `comboMetrics.ts`, `comboManifestMetrics.ts`, `comboAgentMiddleware.ts`                                                                                                                                    |
+| Combo routing        | `combo.ts` (22 strategies), `comboConfig.ts`, `comboMetrics.ts`, `comboManifestMetrics.ts`, `comboAgentMiddleware.ts`                                                                                                                                    |
 | Auto Combo engine    | `autoCombo/` — `engine.ts`, `scoring.ts`, `taskFitness.ts`, `virtualFactory.ts`, `modePacks.ts`, `autoPrefix.ts`, `persistence.ts`, `providerDiversity.ts`, `providerRegistryAccessor.ts`, `routerStrategy.ts`, `selfHealing.ts`, `index.ts`             |
 | Resilience           | `accountFallback.ts` (cooldown + lockout), `errorClassifier.ts`, `requestRejectedStreak.ts`, `emergencyFallback.ts`, `rateLimitManager.ts`, `rateLimitSemaphore.ts`, `accountSemaphore.ts`, `accountSelector.ts`                                         |
 | Quotas               | `quotaMonitor.ts`, `quotaPreflight.ts`, `bailianQuotaFetcher.ts`, `codexQuotaFetcher.ts`, `deepseekQuotaFetcher.ts`, `openrouterQuotaFetcher.ts`, `openrouterFreeWindow.ts`, `llmgatewayQuotaFetcher.ts`, `crofUsageFetcher.ts`, `antigravityCredits.ts` |
@@ -545,7 +554,7 @@ Streaming primitives and provider helpers: `stream.ts`, `streamHandler.ts`,
 `streamHelpers.ts`, `streamPayloadCollector.ts`, `streamReadiness.ts`,
 `sseHeartbeat.ts`, `proxyFetch.ts`, `proxyDispatcher.ts`, `tlsClient.ts`,
 `networkProxy.ts`, `awsSigV4.ts`, `cacheControlPolicy.ts`,
-`cursorChecksum.ts`, `cursorAgentProtobuf.ts`, `cursorVersionDetector.ts`,
+`cursorAgentProtobuf.ts`, `cursorVersionDetector.ts`,
 `comfyuiClient.ts`, `kieTask.ts`, `bypassHandler.ts`, `aiSdkCompat.ts`,
 `thinkTagParser.ts`, `urlSanitize.ts`, `usageTracking.ts`, `requestLogger.ts`,
 `progressTracker.ts`, `cors.ts`, `error.ts`, `logger.ts`, `sleep.ts`,
@@ -628,10 +637,8 @@ Organized into 6 subfolders by purpose.
   unknown against a reference PR or the base-red issue) and `audit-worktree.sh`
   (dirty files, protected surfaces, removed asserts, suppression counts, leftover
   tmp tsconfigs, PR head vs local HEAD — before a worker's PR is accepted).
-- **`scripts/check/`** — `check-cycles.mjs`, `check-docs-sync.mjs`,
-  `check-docs-counts-sync.mjs`, `check-env-doc-sync.mjs`,
-  `check-deprecated-versions.mjs`, `check-route-validation.mjs`,
-  `check-t11-any-budget.mjs`, `check-pr-test-policy.mjs`,
+- **`scripts/check/`** — `check-docs-sync.mjs`, `check-docs-counts-sync.mjs`,
+  `check-route-validation.mjs`, `check-t11-any-budget.mjs`,
   `check-supported-node-runtime.ts`, `test-report-summary.mjs`.
 - **`scripts/docs/`** — `generate-docs-index.mjs`, `gen-provider-reference.ts`.
 - **`scripts/i18n/`** — `generate-multilang.mjs`, `run-visual-qa.mjs`,
@@ -639,7 +646,7 @@ Organized into 6 subfolders by purpose.
   `validate_translation.py`, `check_translations.py`,
   `untranslatable-keys.json`.
 - **`scripts/ad-hoc/`** — `cursor-tap.cjs`, `sync-cursor-models.mjs`,
-  `migrate-env.mjs`, `dbsetup.js`.
+  `dbsetup.js`.
 
 ---
 
@@ -661,7 +668,7 @@ Client request
      Cache check (semantic + read cache)
      Rate limit (rateLimitManager, accountSemaphore)
      Combo routing (if model resolves to a combo)
-       comboResolver → loop per target → handleSingleModel()
+       resolveComboTargets (open-sse/services/combo.ts) → per-target dispatch
      translateRequest()  (open-sse/translator/request/*)
      getExecutor(providerId).execute()  (open-sse/executors/*)
        fetch upstream → retry/backoff via accountFallback
@@ -713,8 +720,9 @@ See [RESILIENCE_GUIDE.md](./RESILIENCE_GUIDE.md) and the dedicated section in
 
 1. Create `src/lib/db/yourModule.ts` and import `getDbInstance()` from `./core.ts`.
 2. Export CRUD functions for your domain.
-3. If new tables: add a migration under `src/lib/db/migrations/`, numbered
-   sequentially, idempotent, transactional.
+3. If new tables: add a migration with `npm run db:new-migration -- <description>` (writes
+   `src/lib/db/migrations/YYYYMMDDHHMMSS_<description>.sql`, UTC; see
+   `docs/ops/DATABASE_GUIDE.md`), idempotent, transactional.
 4. Importers use direct imports from `@/lib/db/yourModule` (no barrel — the old `localDb.ts` re-export layer was removed).
 5. Add tests under `tests/unit/`.
 
@@ -731,8 +739,8 @@ See [RESILIENCE_GUIDE.md](./RESILIENCE_GUIDE.md) and the dedicated section in
 - **Imports**: external → internal (`@/`, `@omniroute/open-sse`) → relative.
 - **Naming**: files `camelCase` or `kebab-case`, components `PascalCase`,
   constants `UPPER_SNAKE`.
-- **ESLint**: `no-eval`, `no-implied-eval`, `no-new-func` = `error` everywhere;
-  `no-explicit-any` = `warn` in `open-sse/` and `tests/`, error elsewhere.
+- **Oxlint**: `no-eval`, `no-implied-eval`, `no-new-func` = `error` everywhere;
+  `no-explicit-any` = `error` in `open-sse/` and `tests/`.
 - **TypeScript**: `strict: false` (legacy posture). Prefer explicit types over
   inference for cross-module boundaries.
 - **Database**: never write raw SQL in routes or handlers — always go through

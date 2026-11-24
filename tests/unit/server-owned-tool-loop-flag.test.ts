@@ -83,7 +83,9 @@ describe("feature-flags-settings count update", () => {
     // masker and the prompt-injection guard drops a further five flags, taking
     // it to 108; removing the CLI configurators drops the two profile auto-sync
     // flags, taking it to 106.
-    assert.equal(FEATURE_FLAG_DEFINITIONS.length, 106);
+    // Upstream v3.8.55 sync adds the two System One backend flags, COMBO_JEV_STRATEGY_ENABLED
+    // and COMBO_DECISION_ROUTER_ENABLED: 110.
+    assert.equal(FEATURE_FLAG_DEFINITIONS.length, 110);
     // COMPRESSION_CACHE_AUTOMATIC_PREFIX_ESTIMATE (#17114, default off) to 114.
     // CURSOR_GROK_47_DROP_MAX_EFFORT (#17386, default off) to 112.
     // UNPRICED_USAGE_BUDGET_POLICY (#14604, default fail_closed) to 113.
@@ -112,9 +114,8 @@ describe("feature-flags-settings count update", () => {
   });
 });
 
-describe("i18n key parity for SERVER_OWNED_TOOL_LOOP_ENABLED", () => {
+describe("i18n keys for SERVER_OWNED_TOOL_LOOP_ENABLED", () => {
   let enMessages: Record<string, unknown>;
-  let ptBrMessages: Record<string, unknown>;
 
   before(async () => {
     const enRaw = fs.readFileSync(
@@ -122,11 +123,6 @@ describe("i18n key parity for SERVER_OWNED_TOOL_LOOP_ENABLED", () => {
       "utf8"
     );
     enMessages = JSON.parse(enRaw);
-    const ptBrRaw = fs.readFileSync(
-      path.resolve(__dirname, "../../src/i18n/messages/pt-BR.json"),
-      "utf8"
-    );
-    ptBrMessages = JSON.parse(ptBrRaw);
   });
 
   it("en.json has nested featureFlags.definitions.SERVER_OWNED_TOOL_LOOP_ENABLED.label", () => {
@@ -142,23 +138,6 @@ describe("i18n key parity for SERVER_OWNED_TOOL_LOOP_ENABLED", () => {
     assert.equal(
       flagDef.description,
       "Continue non-streaming server-owned tool calls until the model returns a client-usable response."
-    );
-  });
-
-  it("pt-BR.json has nested featureFlags.definitions.SERVER_OWNED_TOOL_LOOP_ENABLED.label", () => {
-    const defs = ptBrMessages.featureFlags as Record<string, unknown> | undefined;
-    assert.ok(defs, "pt-BR.json should have featureFlags section");
-    const definitions = (defs as Record<string, unknown>).definitions as
-      Record<string, unknown> | undefined;
-    assert.ok(definitions, "pt-BR.json featureFlags should have definitions");
-    const flagDef = definitions.SERVER_OWNED_TOOL_LOOP_ENABLED as
-      Record<string, unknown> | undefined;
-    assert.ok(flagDef, "definitions should contain SERVER_OWNED_TOOL_LOOP_ENABLED");
-    assert.equal(flagDef.label, "Loop de ferramentas controlado pelo servidor");
-    assert.equal(typeof flagDef.description, "string");
-    assert.ok(
-      ((flagDef.description as string) || "").length > 0,
-      "description should be non-empty"
     );
   });
 

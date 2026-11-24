@@ -93,6 +93,7 @@ import {
   persistNonEmptyDiscoveredModels,
 } from "@/lib/providerModels/modelDiscovery";
 import { buildProviderModelsUrl, getDiscoveryClientVersionOptions } from "./discoveryClientVersion";
+import { shouldKeepStoredCodexCatalog } from "./codexDegradedGuard";
 import { getSyncedAvailableModels, getCustomModels, getModelIsHidden } from "@/lib/db/models";
 import { isConnectionUnavailableToAuxiliaryActivity } from "@/lib/exclusiveLeaseIsolation";
 import { AUTHZ_HEADER_PEER_LOCALITY } from "@/server/authz/headers";
@@ -155,6 +156,7 @@ import {
   filterModelsForRoute,
   resolveNoAuthProviderId,
 } from "./modelRouteProjection";
+import { isCustomJsonProviderData } from "@omniroute/open-sse/utils/customJson.ts";
 
 /**
  * GET /api/providers/[id]/models - Get models list from provider
@@ -597,6 +599,16 @@ export async function GET(
       isLocalOpenAIStyleProvider(provider) ||
       isNamedOpenAIStyleProvider(provider)
     ) {
+      // Custom JSON API nodes expose no /models catalog: model IDs are configured by hand.
+      if (isCustomJsonProviderData(connection.providerSpecificData)) {
+        return buildResponse({
+          provider,
+          connectionId,
+          models: [],
+          source: "local_catalog",
+          warning: "Custom JSON endpoints use manually configured model IDs",
+        });
+      }
       const cachedResponse = maybeReturnCachedDiscovery();
       if (cachedResponse) return cachedResponse;
 
@@ -608,7 +620,7 @@ export async function GET(
           ? getRegistryEntry(provider)
           : null;
       const rawBaseUrl =
-        getProviderBaseUrl(connection.providerSpecificData) ||
+        getProviderBaseUrl(connection.providerSpecificData, provider) ||
         (typeof registryEntry?.baseUrl === "string" ? registryEntry.baseUrl : null);
       const baseUrl = rawBaseUrl;
       if (!baseUrl) {
@@ -1932,11 +1944,20 @@ export async function GET(
           githubCatalogModels && githubCatalogModels.length > 0
             ? enrichCodexModelsFromGithubCatalog(liveModels, githubCatalogModels)
             : liveModels;
-        const catalog = reconcileCodexCatalog(enrichedLiveModels);
-        await runWithCodexConnectionFence(codexFence, () =>
-          persistDiscoveredModels(provider, connectionId, catalog.activeModels)
-        );
+        const liveCatalog = reconcileCodexCatalog(enrichedLiveModels);
         const clientVersionSource = getCodexClientVersionSource();
+        // #16714: a degraded (refresh-failed) discovery must not shrink the stored catalog.
+        const keepStored = shouldKeepStoredCodexCatalog(
+          clientVersionSource,
+          liveCatalog.activeModels,
+          cachedDiscoveryModels
+        );
+        const catalog = keepStored ? reconcileCodexCatalog(cachedDiscoveryModels) : liveCatalog;
+        if (!keepStored) {
+          await runWithCodexConnectionFence(codexFence, () =>
+            persistDiscoveredModels(provider, connectionId, catalog.activeModels)
+          );
+        }
         return buildResponse({
           provider,
           connectionId,

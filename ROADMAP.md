@@ -65,7 +65,7 @@ branch model:
 
 New features land in the v4 channel. The LTS line is stability-first.
 
-See also: [LTS GO/NO-GO checklist](docs/ops/LTS_GO_NO_GO.md), the [3.9.0 cut runbook](docs/ops/RELEASE_CHECKLIST.md#390-lts-cut-rehearsed-in-3858) (dry-run, fork rehearsal, PR preview artifact), the [LTS security baseline](docs/security/LTS_SECURITY_BASELINE.md) and the [LTS performance baseline](docs/ops/PERF_BASELINE.md).
+See also: the [LTS security baseline](docs/security/LTS_SECURITY_BASELINE.md) and the [LTS performance baseline](docs/ops/PERF_BASELINE.md).
 
 ## Phase 4 — v4.0: the modular platform
 

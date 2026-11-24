@@ -67,12 +67,14 @@ interface RuntimeSettingsSnapshot {
   cliVersionOverrides: CliVersionOverrides;
 }
 
-// Default bypass policy: kill-switch on, no bypassable prefixes. Mirrors the
-// compile-time constant so the route guard works identically before the first
-// `applyRuntimeSettings` call (e.g. cold-boot requests).
+// Default bypass policy: kill-switch on, the read-only `/api/resilience/connections`
+// bypassable. Mirrors the compile-time constant
+// `LOCAL_ONLY_MANAGE_SCOPE_BYPASS_PREFIXES` (routeGuard.ts) and the stored default
+// in `src/lib/db/settings.ts`, so the route guard works identically before the
+// first `applyRuntimeSettings` call (e.g. cold-boot requests).
 const DEFAULT_AUTHZ_BYPASS_SNAPSHOT: AuthzBypassSnapshot = {
   enabled: true,
-  prefixes: [],
+  prefixes: ["/api/resilience/connections"],
 };
 
 const DEFAULT_RUNTIME_SETTINGS_SNAPSHOT: RuntimeSettingsSnapshot = {

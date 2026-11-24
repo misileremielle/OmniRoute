@@ -1,4 +1,4 @@
-import { hasQoderCallerTools } from "@omniroute/open-sse/services/qoderCapabilities";
+import { requiresQoderHttpTransport } from "@omniroute/open-sse/services/qoderCapabilities";
 import { getRequestedModelEndpointMismatch } from "@/lib/providerModels/modelEndpointGuard";
 import { randomUUID } from "crypto";
 import { resolveChatRequestBody } from "./requestBody";
@@ -36,6 +36,7 @@ import {
   resolveAvalancheSettings,
 } from "@omniroute/open-sse/services/accountFallback/antiAvalanche.ts";
 import { estimateTokens } from "@omniroute/open-sse/services/contextManager.ts";
+import { getCodexPlanType } from "@omniroute/open-sse/services/codexPlanEligibility.ts";
 import { getCombo, getComboForModel, getModelInfo } from "../services/model";
 import { stripContextWindowSuffix } from "@omniroute/open-sse/services/model.ts";
 import { resolveBareModelToConnectionDefault } from "@omniroute/open-sse/services/model.ts";
@@ -148,7 +149,12 @@ import {
 import { markAntigravityMissingCloudCodeProject } from "@omniroute/open-sse/services/antigravityProjectPersistence.ts";
 import { connectionHasExtraKeys } from "@omniroute/open-sse/services/apiKeyRotator.ts";
 import { wrapResponseWithOAuthSessionRelease } from "@omniroute/open-sse/services/oauthSessionOccupancy.ts";
-import { inheritProviderProbeResponse, inheritResponsePolicies } from "./chat/responsePolicies.ts";
+import {
+  inheritProviderProbeResponse,
+  inheritResponsePolicies,
+  isNoReplayResponse,
+  markCustomJsonNoReplay,
+} from "./chat/responsePolicies.ts";
 import { resolveProviderId } from "@/shared/constants/providers";
 import { createVirtualAutoCombo, resolveAutoRoutingState } from "./autoRouting";
 import { dispatchWithProviderFailover } from "./chat/providerFailover.ts";
@@ -1094,7 +1100,7 @@ async function handleChatImplementation(
         resolvedModel,
         {
           connectionRestrictionSources: restrictions.sources,
-          requireToolCalling: hasQoderCallerTools(body),
+          requireToolCalling: requiresQoderHttpTransport(body),
           sessionKey: sessionAffinityKey,
           preferredConnectionIds: apiKeyInfo?.preferredConnections ?? null,
           ...(target?.allowRateLimitedConnection ? { allowRateLimitedConnections: true } : {}),
@@ -1542,8 +1548,10 @@ async function handleSingleModelChat(
             sessionId: "", // safety-net redirect doesn't have session context
             forceLiveComboTest: false,
             authorizationContextModel: runtimeOptions.authorizationContextModel ?? modelStr,
-            forcedConnectionId: runtimeOptions?.forcedConnectionId ?? null,
-            allowedConnectionIds: null,
+            // The redirected combo's own target pin and allow-list win over the caller's pin.
+            forcedConnectionId:
+              resolvedTarget?.connectionId ?? runtimeOptions?.forcedConnectionId ?? null,
+            allowedConnectionIds: resolvedTarget?.allowedConnectionIds ?? null,
             comboStepId: null,
             comboExecutionKey: null,
             skipUpstreamRetry: resolvedTarget?.failoverBeforeRetry === true,
@@ -1732,6 +1740,7 @@ async function handleSingleModelChat(
   // without cooling or excluding its connection ID; never replay a successful response.
   let staleCodexReselected = false;
   let accountFallbacks = 0;
+  let selectedConnectionPlan: string | null = null;
   let sameAccountRetries = 0;
   let routingWaitMs = 0;
   const accountFallbackReasons: string[] = [];
@@ -1743,6 +1752,7 @@ async function handleSingleModelChat(
   };
   const routingTelemetry = () => ({
     accountFallbacks,
+    selectedConnectionPlan,
     accountFallbackReasons,
     sameAccountRetries,
     routingWaitMs,
@@ -1805,7 +1815,7 @@ async function handleSingleModelChat(
           model,
           {
             connectionRestrictionSources: restrictions.sources,
-            requireToolCalling: hasQoderCallerTools(body),
+            requireToolCalling: requiresQoderHttpTransport(body),
             sessionKey: museOwner ? null : occupancySessionKey,
             preferredConnectionIds: apiKeyInfo?.preferredConnections ?? null,
             reserveOAuthSession: true,
@@ -1981,6 +1991,8 @@ async function handleSingleModelChat(
           excludedConnectionIds.size > 0
             ? Array.from(excludedConnectionIds)[excludedConnectionIds.size - 1]
             : null;
+        // No account was selected for this response; don't report a previous attempt's plan.
+        selectedConnectionPlan = null;
         return withRoutingTelemetry(noCredsRes, lastFailedConnectionId);
       }
 
@@ -2003,6 +2015,9 @@ async function handleSingleModelChat(
         }
         pendingStreamRetryConnectionId = null;
       }
+      // Refresh on every selected credential so fallback never reports a stale plan.
+      selectedConnectionPlan =
+        provider === "codex" ? getCodexPlanType(credentials.providerSpecificData) : null;
       const accountId = credentials.connectionId.slice(0, 8);
       const releaseOAuthSession = credentials.releaseOAuthSession ?? (() => {});
       // Undefined whenever the lease flag is off, which makes every release/hold below a no-op.
@@ -2227,6 +2242,7 @@ async function handleSingleModelChat(
         return execution.localResourcePressureResult.response;
       }
       const { result, tlsFingerprintUsed, wasProviderProbe } = execution;
+      markCustomJsonNoReplay(result.response, credentials?.providerSpecificData);
       if (!result.success) releaseOAuthSession();
       if (result.success && agyLease.isStreamingAntigravityResponse(result.response))
         result.response = inheritProviderProbeResponse(
@@ -2279,10 +2295,12 @@ async function handleSingleModelChat(
         correlationId: rotationAttributionOn ? (runtimeOptions?.correlationId ?? null) : null,
       });
 
+      // An in-pipeline account rotation rewrites refreshedCredentials, not credentials.
+      const servedConnectionId = refreshedCredentials?.connectionId || credentials.connectionId;
       if (result.success) {
         if (isCodexResponseCurrent(result.response, true)) {
-          clearModelLock(provider, credentials.connectionId, model);
-          markQuotaHealthy(credentials.connectionId);
+          clearModelLock(provider, servedConnectionId, model);
+          markQuotaHealthy(servedConnectionId);
         }
         // Acquired probes were settled inside execute(); other successes settle here or in combo.
         if (
@@ -2298,7 +2316,7 @@ async function handleSingleModelChat(
         if (telemetry) telemetry.endPhase();
         const successResponse = withRoutingTelemetry(
           museOwner ? muse.museRecordOutput(museOwner, result.response) : result.response,
-          credentials?.connectionId
+          servedConnectionId
         );
         if (requestBody.stream === true) {
           return inheritResponsePolicies(
@@ -2309,6 +2327,12 @@ async function handleSingleModelChat(
         releaseOAuthSession();
         return successResponse;
       }
+      // Custom JSON API node: the business call may already have taken effect. Surface
+      // its failure as-is — no account cooldown, no replay on this or another connection.
+      if (isNoReplayResponse(result.response)) {
+        return withSelectedConnectionHeader(result.response, credentials.connectionId);
+      }
+
       // A trusted caller's deadline must not cool a shared connection.
       // A shorter *preferred* deadline may perform one in-request sibling hop,
       // without recording a connection failure or evicting session affinity.

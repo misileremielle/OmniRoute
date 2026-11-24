@@ -46,24 +46,6 @@ test("normalize rejeita código com caracteres especiais", async () => {
   resetForTests();
 });
 
-test("normalize aceita código válido com hífen (pt-BR)", async () => {
-  const { resetForTests, setLocale, getLocale } = await import("../../bin/cli/i18n.mjs");
-  resetForTests();
-  setLocale("pt-BR");
-  const locale = getLocale();
-  assert.equal(locale, "pt-BR");
-  resetForTests();
-});
-
-test("normalize converte underscore para hífen (pt_BR → pt-BR)", async () => {
-  const { resetForTests, setLocale, getLocale } = await import("../../bin/cli/i18n.mjs");
-  resetForTests();
-  setLocale("pt_BR");
-  const locale = getLocale();
-  assert.equal(locale, "pt-BR");
-  resetForTests();
-});
-
 // ── config lang get ────────────────────────────────────────────────────────────
 
 test("runConfigLangGetCommand retorna 0 e imprime o locale ativo", async () => {
@@ -128,7 +110,7 @@ test("runConfigLangListCommand --json lista locales com campo active", async () 
     assert.equal(exitCode, 0);
     const arr = JSON.parse(chunks.join(""));
     assert.ok(Array.isArray(arr), "Deve retornar array");
-    assert.ok(arr.length >= 2, "Deve ter ao menos en e pt-BR");
+    assert.ok(arr.length >= 1, "Deve ter ao menos en");
     const enEntry = arr.find((l: any) => l.code === "en");
     assert.ok(enEntry, "Deve ter entrada para en");
     assert.ok("active" in enEntry, "Deve ter campo active");
@@ -140,30 +122,6 @@ test("runConfigLangListCommand --json lista locales com campo active", async () 
 });
 
 // ── config lang set ────────────────────────────────────────────────────────────
-
-test("runConfigLangSetCommand salva locale no .env e chama setLocale imediatamente", async () => {
-  const { resetForTests, setLocale, getLocale } = await import("../../bin/cli/i18n.mjs");
-  const { runConfigLangSetCommand } = await import("../../bin/cli/commands/config.mjs");
-  resetForTests();
-  setLocale("en");
-
-  const chunks: string[] = [];
-  const origLog = console.log;
-  console.log = (...args: unknown[]) => chunks.push(args.join(" "));
-
-  try {
-    const exitCode = await runConfigLangSetCommand("pt-BR", {});
-    assert.equal(exitCode, 0);
-    const envPath = join(tmpDir, ".env");
-    assert.ok(existsSync(envPath), ".env deve existir após set");
-    const content = readFileSync(envPath, "utf8");
-    assert.ok(content.includes("OMNIROUTE_LANG=pt-BR"), "Deve persistir OMNIROUTE_LANG=pt-BR");
-    assert.equal(getLocale(), "pt-BR", "setLocale deve ter sido chamado imediatamente em-processo");
-  } finally {
-    console.log = origLog;
-    resetForTests();
-  }
-});
 
 test("runConfigLangSetCommand retorna 1 para código desconhecido", async () => {
   const { resetForTests, setLocale } = await import("../../bin/cli/i18n.mjs");
@@ -262,10 +220,10 @@ test("runConfigLangSetCommand atualiza chave sem duplicar quando já existe", as
   console.log = (...args: unknown[]) => chunks.push(args.join(" "));
 
   try {
-    const exitCode = await runConfigLangSetCommand("pt-BR", { force: true });
+    const exitCode = await runConfigLangSetCommand("en", { force: true });
     assert.equal(exitCode, 0);
     const content = readFileSync(envPath, "utf8");
-    assert.ok(content.includes("OMNIROUTE_LANG=pt-BR"), "Deve ter atualizado para pt-BR");
+    assert.ok(content.includes("OMNIROUTE_LANG=en"), "Deve ter atualizado para en");
     const matches = content.match(/OMNIROUTE_LANG=/g);
     assert.equal(matches?.length, 1, "Deve ter exatamente uma ocorrência de OMNIROUTE_LANG");
   } finally {

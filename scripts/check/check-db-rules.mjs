@@ -7,7 +7,7 @@
 // As antigas verificações (a) re-export completo via src/lib/localDb.ts e
 // (b) localDb.ts sem lógica foram REMOVIDAS: o barrel src/lib/localDb.ts foi
 // deletado (#11795) — consumidores importam módulos src/lib/db/* diretamente
-// (regra "never barrel-import", aplicada por eslint no-restricted-imports).
+// (regra "never barrel-import", aplicada por Oxlint no-restricted-imports).
 // Stale-enforcement (6A.3): entradas em EXTERNAL_DB_ALLOWED que não suprimem
 // nenhuma violação real → gate falha com instrução de remoção.
 import fs from "node:fs";

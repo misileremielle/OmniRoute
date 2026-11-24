@@ -695,7 +695,7 @@ export async function startFakeUpstream(port: number): Promise<{
     server.listen(port, "127.0.0.1", () => resolve());
   });
   return {
-    baseUrl: `http://127.0.0.1:${(server.address() as net.Address)?.port ?? port}/v1`,
+    baseUrl: `http://127.0.0.1:${(server.address() as net.AddressInfo)?.port ?? port}/v1`,
     stop: () => new Promise<void>((resolve) => server.close(() => resolve())),
   };
 }

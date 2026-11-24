@@ -278,13 +278,10 @@ vendor extension if the route is classified by `routeGuard.ts`:
 
 ### Validation
 
-Two scripts enforce consistency between YAML annotations and `routeGuard.ts`:
-
-- `scripts/check/check-openapi-coverage.mjs` — fails if coverage < 99%
-- `scripts/check/check-openapi-security-tiers.mjs` — fails if `x-loopback-only` or
-  `x-always-protected` annotations diverge from the compile-time constants
-
-Both scripts run in the pre-commit hook and in CI.
+The fork removed the OpenAPI coverage and security-tier checkers, so nothing checks that the
+`x-loopback-only` and `x-always-protected` annotations match `routeGuard.ts`; keep them in step
+by hand. `check:route-guard-membership` (CI `lint` job) still checks that every spawn-capable route is
+classified local-only by `isLocalOnlyPath()`.
 
 ### False Positive Rule
 

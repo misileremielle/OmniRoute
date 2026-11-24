@@ -1,0 +1,38 @@
+{
+  "family": "translation",
+  "description": "Files the English-only fork does not ship: non-English dashboard and CLI catalogs, docs/i18n mirrors and the translation ratchet baseline (docs/ops/FORK_IDENTITY.md). The guard only judges feature PRs: the writer branches below and translation-only PRs stay exempt, so it does not enforce English-only by itself. The compact error-boundary catalogs (src/i18n/global-error-messages) and the route-handler catalog (src/i18n/route-handler-messages.json) are companions: they are regenerated from en.json, and a feature PR that edits en.json publicSystem.globalError or a ROUTE_HANDLER_MESSAGE_KEYS string must still be able to regenerate them.",
+  "writers": ["release/v*", "docs/i18n-*", "chore/i18n-*", "chore/derived-*"],
+  "companions": [
+    "changelog.d/**",
+    "src/i18n/global-error-messages/*.json",
+    "src/i18n/route-handler-messages.json"
+  ],
+  "categories": [
+    {
+      "id": "ui-locale-catalogs",
+      "paths": ["src/i18n/messages/*.json"],
+      "except": ["src/i18n/messages/en.json"],
+      "why": "The fork ships English only (docs/ops/FORK_IDENTITY.md), so a feature PR that adds a non-English UI catalog fails here. A feature PR edits src/i18n/messages/en.json only.",
+      "refreshedBy": "Nothing: delete the file. An upstream merge drops new locale catalogs too (docs/ops/FORK_IDENTITY.md, merge step 4)."
+    },
+    {
+      "id": "cli-locale-catalogs",
+      "paths": ["bin/cli/locales/*.json"],
+      "except": ["bin/cli/locales/en.json"],
+      "why": "The fork ships English only (docs/ops/FORK_IDENTITY.md), so a feature PR that adds a non-English CLI catalog fails here. A feature PR edits bin/cli/locales/en.json only.",
+      "refreshedBy": "Nothing: delete the file. An upstream merge drops new locale catalogs too (docs/ops/FORK_IDENTITY.md, merge step 4)."
+    },
+    {
+      "id": "docs-i18n-mirrors",
+      "paths": ["docs/i18n/**", ".i18n-state.json"],
+      "why": "The fork removed the translated docs mirrors and their hash ledger; the docs are English-only.",
+      "refreshedBy": "Nothing: delete the file. The fork keeps no docs/i18n mirrors (docs/ops/FORK_IDENTITY.md)."
+    },
+    {
+      "id": "ui-translation-ratio-baseline",
+      "paths": ["config/quality/i18n-translation-baseline.json"],
+      "why": "The fork removed the real-translation ratchet together with the locale catalogs it measured.",
+      "refreshedBy": "Nothing: delete the file. The ratchet is gone with the locale catalogs (docs/ops/FORK_IDENTITY.md)."
+    }
+  ]
+}

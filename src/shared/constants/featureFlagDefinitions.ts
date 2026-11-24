@@ -1,6 +1,8 @@
 import type { FeatureFlagDefinition } from "./featureFlagTypes";
 import { SEARCH_FEATURE_FLAG_DEFINITIONS } from "./searchFeatureFlagDefinitions";
 import { CODE_ASSIST_LEGACY_TIER_FLAG } from "./featureFlagDefinitionsCodeAssist";
+import { SYSTEM_ONE_FEATURE_FLAG_DEFINITIONS } from "./featureFlagDefinitionsSystemOne";
+
 export type { FeatureFlagDefinition };
 
 export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
@@ -1256,4 +1258,5 @@ export const FEATURE_FLAG_DEFINITIONS: FeatureFlagDefinition[] = [
   },
   ...SEARCH_FEATURE_FLAG_DEFINITIONS,
   CODE_ASSIST_LEGACY_TIER_FLAG,
+  ...SYSTEM_ONE_FEATURE_FLAG_DEFINITIONS,
 ];

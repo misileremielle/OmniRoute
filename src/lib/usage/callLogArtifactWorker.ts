@@ -87,9 +87,12 @@ function writeHeld(entry: { key: number; rowId?: string }): CallLogArtifactWrite
   return writeSerializedCallArtifact(serialized, buildArtifactRelativePath(artifact.timestamp, id));
 }
 
-function handle(request: Request): unknown {
-  switch (request.kind) {
+// The project compiles without strictNullChecks, where `kind?: undefined` cannot discriminate the
+// union (undefined is comparable to every literal), so each branch narrows with an explicit cast.
+function handle(message: Request): unknown {
+  switch (message.kind) {
     case "serialize": {
+      const request = message as SerializeRequest;
       applyWriteEnvironment(request.environment);
       const serialized = serializeArtifactForStorage(request.artifact);
       held.set(request.key, {
@@ -101,6 +104,7 @@ function handle(request: Request): unknown {
       return { sizeBytes: Buffer.byteLength(serialized) };
     }
     case "write": {
+      const request = message as WriteHeldRequest;
       return {
         results: request.entries.map((entry) => {
           try {
@@ -112,18 +116,22 @@ function handle(request: Request): unknown {
       };
     }
     case "release":
-      for (const key of request.keys) held.delete(key);
+      for (const key of (message as ReleaseRequest).keys) held.delete(key);
       return {};
-    default:
+    default: {
+      const request = message as WriteRequest;
       // The writer reads these options lazily; mirror the caller's per-write environment snapshot.
       applyWriteEnvironment(request.environment);
       return { result: writeCallArtifact(request.artifact) };
+    }
   }
 }
 
 function failureReply(request: Request): unknown {
   if (request.kind === "serialize") return { sizeBytes: null };
-  if (request.kind === "write") return { results: request.entries.map(() => null) };
+  if (request.kind === "write") {
+    return { results: (request as WriteHeldRequest).entries.map(() => null) };
+  }
   if (request.kind === "release") return {};
   return { result: null };
 }

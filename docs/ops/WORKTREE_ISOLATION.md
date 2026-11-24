@@ -80,30 +80,21 @@ list` shows worktrees you didn't create, leave them alone. End every session wit
 
 ## Base-green check (PRs must not be born red)
 
-Before cutting a branch, merging the base into a PR branch, mass-retargeting PRs, or opening a
-PR: check whether the base tip is green. The `Release-Green (continuous)` workflow
-(`.github/workflows/nightly-release-green.yml`) publishes the verdict in a single deduplicated
-issue titled `🔴 Release branch not green: <branch>` (label `base-red`). One call replaces any
-local suite run for this purpose:
+Before cutting a branch, merging the base into a PR branch, or opening a PR, check that the base
+tip is green. The fork has no release-green workflow: look up the CI run for the exact base commit.
+CI runs on pushes to `main` and on pull requests, so a stacked base branch is tested through its
+own PR. A draft PR runs no tests and gets no `Gate / CI` result, and a docs-only change skips the
+test jobs, so a successful run alone proves nothing. The base is green only when, for that
+commit, `Gate / CI` succeeded and the Build, Unit and Vitest jobs ran and succeeded (not skipped).
 
 ```bash
-gh issue list --repo diegosouzapw/OmniRoute --state open \
-  --search "Release branch not green: <base> in:title"
+git fetch origin <base>
+run=$(gh run list --repo misileremielle/omniroute --workflow ci.yml \
+  --commit "$(git rev-parse origin/<base>)" --json databaseId --jq '.[0].databaseId')
+gh run view "$run" --repo misileremielle/omniroute --json jobs \
+  --jq '.jobs[] | "\(.name): \(.conclusion)"'
 ```
 
-If the base is red: never treat the inherited failures as your branch's defect; never "fix" them
-inside your feature branch (a base-red fix is its own freeze-gated `fix/release-vX.Y.Z-basereds`
-PR); and if you must open a PR anyway, add `⚠️ base-red inherited: #<issue>` to the PR body so
-reviewers and CI babysitters do not chase ghosts.
-
-## Sync-back landings are fast-forward, never squash
-
-A `main → release/vX+1` sync-back (Phase 5 of `/generate-release`, or any later "bring main's
-post-release commits over" PR) must reach the release branch as the merge commit it already is:
-`git merge-base --is-ancestor origin/release/vX+1 <head>` then
-`git push origin <head>:refs/heads/release/vX+1` (GitHub marks the PR merged). Squash-merging it
-drops `main` from the release branch's ancestry and the next sync-back re-conflicts on every file
-main touched (551 conflicts on the v3.8.50 → v3.8.51 sync before the two-step merge). After
-landing, `git merge-base --is-ancestor origin/main origin/release/vX+1` must be true — and check
-that `config/quality/eslint-suppressions.json` / `quality-baseline.json` carried main's freezes
-(they merge as "ours" silently). Details: `.agents/skills/generate-release/phases/phase-5-next-cycle.md`.
+If the base is red, never treat the inherited failures as your branch's defect and never fix them
+inside your feature branch: a base-red fix is its own PR. A PR opened anyway says
+`⚠️ base-red inherited` in its body, with the failing run.

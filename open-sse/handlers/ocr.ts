@@ -37,7 +37,7 @@ const VERTEX_OCR_DEFAULT_REGION = "us-central1";
  * the Service Account JSON credential (the same source VertexExecutor.buildUrl uses for the
  * chat/image pipeline — open-sse/executors/vertex.ts). Returns null when neither is available.
  * Kept in this handler (rather than the route) because routes may not import executors
- * directly (see EXECUTOR_IMPORT_RESTRICTION in eslint.config.mjs) — this stays behind the
+ * directly (see the executor `no-restricted-imports` pattern in .oxlintrc.json) — this stays behind the
  * open-sse handler boundary and is re-exported for the route to call.
  */
 function resolveVertexOcrProject(credentials: {

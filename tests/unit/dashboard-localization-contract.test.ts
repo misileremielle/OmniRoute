@@ -68,9 +68,9 @@ test("budget management does not expose deferred English-only states", () => {
 
 test("feature-flag descriptions are localized without changing flag values", () => {
   const card = readSource("src/app/(dashboard)/dashboard/settings/components/FeatureFlagCard.tsx");
-  const messages = JSON.parse(readSource("src/i18n/messages/vi.json"));
+  const messages = JSON.parse(readSource("src/i18n/messages/en.json"));
   assert.match(card, /enumValues\.\$\{val\}/);
-  assert.ok(messages.featureFlags.definitions.REQUIRE_API_KEY.description.includes("khóa API"));
+  assert.equal(typeof messages.featureFlags.definitions.REQUIRE_API_KEY.description, "string");
 });
 
 test("analytics charts localize calendar, account, and diversity labels", () => {
@@ -98,16 +98,6 @@ test("no-auth provider controls contain no raw English headings", () => {
   assert.equal(sources.includes(">Remove account<"), false);
 });
 
-test("Vietnamese navigation preserves engine and product names", () => {
-  const messages = JSON.parse(readSource("src/i18n/messages/vi.json"));
-  assert.equal(messages.sidebar.contextLite, "Lite");
-  assert.equal(messages.sidebar.contextAggressive, "Aggressive");
-  assert.equal(messages.sidebar.contextHeadroom, "Headroom");
-  assert.equal(messages.sidebar.contextSessionDedup, "Session Dedup");
-  assert.equal(messages.sidebar.compressionStudio, "Compression Studio");
-  assert.equal(messages.sidebar.trafficInspector, "Traffic Inspector");
-});
-
 test("CLI cards use packaged brand icons whenever an asset exists", () => {
   const catalog = readSource("src/shared/constants/cliTools.ts");
   for (const image of [
@@ -124,7 +114,9 @@ test("CLI cards use packaged brand icons whenever an asset exists", () => {
 });
 
 test("settings breadcrumbs use localized labels", () => {
-  const breadcrumbs = readSource("src/shared/components/Breadcrumbs.tsx");
+  // The segment → label-key map moved out of the component (pure rules, checked against the
+  // route tree by tests/unit/breadcrumb-trail-routes.test.ts).
+  const breadcrumbs = readSource("src/shared/utils/breadcrumbTrail.ts");
   assert.match(breadcrumbs, /general: "general"/);
   assert.match(breadcrumbs, /"feature-flags": "featureFlags"/);
 });

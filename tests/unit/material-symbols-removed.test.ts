@@ -53,7 +53,7 @@ test("the legacy shell, its CSS hooks and the UI_KIT_SHELL flag are removed", ()
   assert.doesNotMatch(read("src/app/(dashboard)/layout.tsx"), /isUiKitShellEnabled|shell=/);
   // The hand-rolled desktop column / mobile drawer hooks only the legacy shell rendered.
   assert.doesNotMatch(read("src/app/globals.css"), /\.dashboard-sidebar-(desktop|mobile)\b/);
-  for (const locale of ["en", "pt-BR", "vi"]) {
+  for (const locale of ["en"]) {
     assert.doesNotMatch(
       read(`src/i18n/messages/${locale}.json`),
       /featureFlagUiKitShellDescription/,
