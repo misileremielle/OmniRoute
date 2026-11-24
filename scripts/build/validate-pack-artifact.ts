@@ -204,11 +204,18 @@ async function main(): Promise<void> {
   // co-located *.test.* / __tests__ leaks; ban them explicitly on the real pack list.
   const leakedTestPaths: string[] = findLeakedTestArtifactPaths(artifactPaths);
 
+  // #20439 — each full locale catalog may be bundled into at most one server chunk.
+  const localeCatalogChunks: number = artifactPaths.filter(
+    (filePath) => localeCatalogChunkLocale(filePath) !== null
+  ).length;
+  const duplicatedCatalogChunks: string[] = findDuplicatedLocaleCatalogChunks(artifactPaths);
+
   console.log("📦 npm pack artifact summary");
   console.log(`   File:          ${packReport.filename}`);
   console.log(`   Entry count:   ${packReport.entryCount}`);
   console.log(`   Packed size:   ${formatBytes(packReport.size)}`);
   console.log(`   Unpacked size: ${formatBytes(packReport.unpackedSize)}`);
+  console.log(`   Locale catalog chunks: ${localeCatalogChunks}`);
 
   if (unexpectedPaths.length > 0) {
     console.error("\n❌ Unexpected files were found in the npm publish artifact:");
