@@ -133,7 +133,8 @@ test("reusable-workflow jobs (uses:) and unparseable YAML are not this rule's fi
 
 test("regression guard: no workflow in this repo publishes with --provenance from a self-hosted runner", () => {
   const files = readdirSync(WORKFLOWS).filter((f) => /\.ya?ml$/.test(f));
-  assert.ok(files.length >= 3, "expected the real workflow set");
+  // The fork keeps two workflows (ci.yml, docker-publish.yml).
+  assert.ok(files.length >= 2, "expected the real workflow set");
   const findings = files.flatMap((f) =>
     findProvenanceOnSelfHosted(readFileSync(join(WORKFLOWS, f), "utf8"), f)
   );

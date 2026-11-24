@@ -40,7 +40,6 @@ function checkScriptFiles(): Array<{ name: string; file: string }> {
 }
 
 const CHECK_KNOWN_SYMBOLS = "scripts/check/check-known-symbols.ts";
-const CHECK_COMPRESSION_BUDGET = "scripts/check/check-compression-budget.ts";
 const CHECK_ROUTE_GUARD = "scripts/check/check-route-guard-membership.ts";
 
 function trackTempDir(dirs: string[]): string {
@@ -160,14 +159,6 @@ test("known-symbols check leaves the default data dir untouched", () => {
   assertManifestEqual(before, snapshotDataDir(fakeHome), "check:known-symbols");
 });
 
-test("compression-budget check leaves the default data dir untouched", () => {
-  const { fakeHome } = makeFakeHome();
-  const before = snapshotDataDir(fakeHome);
-  const result = runCheck(BUN_BIN, [CHECK_COMPRESSION_BUDGET], fakeHome);
-  assert.equal(result.status, 0, result.stderr);
-  assertManifestEqual(before, snapshotDataDir(fakeHome), "check:compression-budget");
-});
-
 test("route-guard-membership check leaves the default data dir untouched", () => {
   const { fakeHome } = makeFakeHome();
   const before = snapshotDataDir(fakeHome);
@@ -183,7 +174,6 @@ test("explicit DATA_DIR is used as is", () => {
   const before = snapshotDataDir(fakeHome);
   for (const [command, args] of [
     [BUN_BIN, [CHECK_KNOWN_SYMBOLS]],
-    [BUN_BIN, [CHECK_COMPRESSION_BUDGET]],
     [process.execPath, ["--import", "tsx", CHECK_ROUTE_GUARD]],
   ] as Array<[string, string[]]>) {
     const result = runCheck(command, args, fakeHome, { DATA_DIR: explicit });
@@ -326,11 +316,7 @@ test("check scripts run in an isolated data directory", () => {
   const entries = checkScriptFiles();
   assert.ok(entries.length > 0, "expected check:* scripts in package.json");
   const names = entries.map((entry) => entry.name);
-  for (const expected of [
-    "check:known-symbols",
-    "check:compression-budget",
-    "check:route-guard-membership",
-  ]) {
+  for (const expected of ["check:known-symbols", "check:route-guard-membership"]) {
     assert.ok(
       names.includes(expected),
       `expected ${expected} in package.json, got ${names.join(", ")}`
@@ -374,7 +360,7 @@ test("check scripts run in an isolated data directory", () => {
 
 test("no check under test loads application modules through a static import", () => {
   const offenders: string[] = [];
-  for (const check of [CHECK_KNOWN_SYMBOLS, CHECK_COMPRESSION_BUDGET, CHECK_ROUTE_GUARD]) {
+  for (const check of [CHECK_KNOWN_SYMBOLS, CHECK_ROUTE_GUARD]) {
     const source = fs.readFileSync(path.join(REPO_ROOT, check), "utf8");
     offenders.push(...findStaticAppImports(source, check));
   }

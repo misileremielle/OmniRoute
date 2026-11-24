@@ -7,10 +7,17 @@
 //                           (Hard Rule #14: dismissed alerts do not count)
 import test from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 // @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
 import {
   parseCodeQLAlerts,
   evaluateCodeqlRatchet,
+  missingCodeqlLanguages,
+  codeqlRunVerdict,
 } from "../../../scripts/check/check-codeql-ratchet.mjs";
 
 type RatchetVerdict = { regressed: boolean; improved: boolean };
@@ -324,4 +331,406 @@ test("evaluateCodeqlRatchet: strict integer comparison — any increase regresse
   assert.equal(evaluate(6, 5).regressed, true);
   assert.equal(evaluate(5, 5).regressed, false);
   assert.equal(evaluate(4, 5).regressed, false);
+});
+
+// ---------------------------------------------------------------------------
+// --require-measurement (the fork's CI mode), driven through a fake `gh` on PATH
+// ---------------------------------------------------------------------------
+
+const SCRIPT = fileURLToPath(
+  new URL("../../../scripts/check/check-codeql-ratchet.mjs", import.meta.url)
+);
+
+function runWithFakeGh(
+  {
+    alerts,
+    analyses,
+    baseline = { metrics: { codeqlAlerts: { value: 5 } } },
+    runs = OK_RUNS,
+  }: {
+    alerts: string;
+    analyses: string;
+    baseline?: unknown;
+    runs?: string;
+  },
+  args: string[]
+) {
+  const dir = mkdtempSync(join(tmpdir(), "codeql-ratchet-"));
+  try {
+    writeFileSync(join(dir, "alerts.json"), alerts);
+    writeFileSync(join(dir, "analyses.json"), analyses);
+    writeFileSync(join(dir, "runs.json"), runs);
+    writeFileSync(
+      join(dir, "workflows.json"),
+      JSON.stringify({ workflows: [{ id: 7, path: "dynamic/github-code-scanning/codeql" }] })
+    );
+    const baselinePath = join(dir, "baseline.json");
+    writeFileSync(baselinePath, typeof baseline === "string" ? baseline : JSON.stringify(baseline));
+    // Answers `gh repo view` and the two `gh api` endpoints from the fixture files.
+    writeFileSync(
+      join(dir, "gh"),
+      [
+        "#!/bin/sh",
+        'if [ "$1" = repo ]; then echo owner/repo; exit 0; fi',
+        'echo "$2" >> "$FAKE_DIR/calls.log"',
+        'case "$2" in',
+        '  /repos/owner/repo) echo \'{"default_branch":"main"}\';;',
+        '  */actions/workflows/7/runs*) cat "$FAKE_DIR/runs.json";;',
+        '  */actions/workflows*) cat "$FAKE_DIR/workflows.json";;',
+        '  *analyses*) cat "$FAKE_DIR/analyses.json";;',
+        '  *alerts*) cat "$FAKE_DIR/alerts.json";;',
+        "esac",
+        "",
+      ].join("\n")
+    );
+    chmodSync(join(dir, "gh"), 0o755);
+    writeFileSync(join(dir, "calls.log"), "");
+    const result = spawnSync(
+      process.execPath,
+      [SCRIPT, "--quiet", "--baseline", baselinePath, ...args],
+      {
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          PATH: `${dir}:${process.env.PATH}`,
+          FAKE_DIR: dir,
+          GITHUB_REPOSITORY: "owner/repo",
+        },
+        timeout: 20_000,
+      }
+    );
+    const calls = readFileSync(join(dir, "calls.log"), "utf8").split("\n").filter(Boolean);
+    return { ...result, calls };
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+const MAIN = "refs/heads/main";
+const analysis = (language: string, extra: Record<string, unknown> = {}) => ({
+  ref: MAIN,
+  category: `/language:${language}`,
+  created_at: "2026-11-24T09:52:00Z",
+  error: "",
+  ...extra,
+});
+const run = (id: number, created_at: string, conclusion: string) => ({
+  id,
+  created_at,
+  status: "completed",
+  conclusion,
+});
+const OK_RUNS = JSON.stringify({ workflow_runs: [run(1, "2026-11-24T09:51:30Z", "success")] });
+
+test("codeqlRunVerdict: the newest finished run decides, cancelled and skipped runs do not", () => {
+  assert.deepEqual(codeqlRunVerdict([run(1, "2026-11-24T09:00:00Z", "success")]), { ok: true });
+  assert.equal(
+    codeqlRunVerdict([
+      run(1, "2026-11-24T09:00:00Z", "success"),
+      run(2, "2026-11-24T10:00:00Z", "failure"),
+    ]).ok,
+    false
+  );
+  // The newest run cancelled with nothing newer: the newest scan never succeeded.
+  assert.equal(
+    codeqlRunVerdict([
+      run(2, "2026-11-24T10:00:00Z", "cancelled"),
+      run(1, "2026-11-24T09:00:00Z", "success"),
+    ]).ok,
+    false
+  );
+  // Superseded: a newer run is in progress, so the cancelled one is passed over.
+  assert.equal(
+    codeqlRunVerdict([
+      { id: 3, created_at: "2026-11-24T11:00:00Z", status: "in_progress", conclusion: null },
+      run(2, "2026-11-24T10:00:00Z", "cancelled"),
+      run(1, "2026-11-24T09:00:00Z", "success"),
+    ]).ok,
+    true
+  );
+  assert.equal(codeqlRunVerdict([]).ok, false);
+  assert.equal(codeqlRunVerdict(undefined).ok, false);
+  // A malformed entry beside a success fails the measurement.
+  for (const bad of [null, 7, "x", []]) {
+    assert.equal(
+      codeqlRunVerdict([run(1, "2026-11-24T09:00:00Z", "success"), bad]).ok,
+      false,
+      JSON.stringify(bad)
+    );
+  }
+  // A pending and a cancelled run with the same newest time: nothing newer supersedes the
+  // cancellation, in either order.
+  const pending = { id: 3, created_at: "2026-11-24T10:00:00Z", status: "queued", conclusion: null };
+  const cancelled = run(2, "2026-11-24T10:00:00Z", "cancelled");
+  const older = run(1, "2026-11-24T09:00:00Z", "success");
+  assert.equal(codeqlRunVerdict([pending, cancelled, older]).ok, false);
+  assert.equal(codeqlRunVerdict([cancelled, pending, older]).ok, false);
+  // Equal timestamps: a failure listed after a success still decides.
+  assert.equal(
+    codeqlRunVerdict([
+      run(1, "2026-11-24T09:00:00Z", "success"),
+      run(2, "2026-11-24T09:00:00Z", "failure"),
+    ]).ok,
+    false
+  );
+  // A run without a valid created_at cannot be ordered, so the verdict fails closed.
+  assert.equal(
+    codeqlRunVerdict([
+      { id: 2, created_at: ["2026-11-24T10:00:00Z"], status: "completed", conclusion: "success" },
+    ]).ok,
+    false
+  );
+  assert.equal(
+    codeqlRunVerdict([
+      run(1, "2026-11-24T09:00:00Z", "success"),
+      { id: 2, created_at: "not a date", status: "completed", conclusion: "failure" },
+    ]).ok,
+    false
+  );
+  // A conclusion that contradicts the status fails: pending with a conclusion, completed
+  // without a known one.
+  for (const bad of [
+    { status: "in_progress", conclusion: "failure" },
+    { status: "in_progress" },
+    { status: "completed", conclusion: null },
+    { status: "completed", conclusion: "mystery" },
+  ]) {
+    assert.equal(
+      codeqlRunVerdict([
+        { id: 3, created_at: "2026-11-24T11:00:00Z", ...bad },
+        run(1, "2026-11-24T09:00:00Z", "success"),
+      ]).ok,
+      false,
+      JSON.stringify(bad)
+    );
+  }
+  // A malformed status on an OLDER record still fails: every record is validated first.
+  assert.equal(
+    codeqlRunVerdict([
+      run(2, "2026-11-24T11:00:00Z", "success"),
+      { id: 1, created_at: "2026-11-24T09:00:00Z", status: "mystery", conclusion: null },
+    ]).ok,
+    false
+  );
+  // A newest run with a missing or unknown status fails instead of being taken as pending.
+  for (const status of [undefined, "mystery"]) {
+    assert.equal(
+      codeqlRunVerdict([
+        { id: 3, created_at: "2026-11-24T11:00:00Z", status, conclusion: null },
+        run(1, "2026-11-24T09:00:00Z", "success"),
+      ]).ok,
+      false,
+      String(status)
+    );
+  }
+});
+
+const OK_ANALYSIS = JSON.stringify([
+  analysis("javascript-typescript"),
+  analysis("actions"),
+  analysis("python"),
+]);
+
+test("missingCodeqlLanguages needs a successful default-branch analysis per language", () => {
+  const all = ["javascript-typescript", "actions", "python"];
+  assert.deepEqual(missingCodeqlLanguages(JSON.parse(OK_ANALYSIS), MAIN), []);
+  assert.deepEqual(missingCodeqlLanguages({ message: "no analysis found" }, MAIN), all);
+  assert.deepEqual(
+    missingCodeqlLanguages(
+      [
+        analysis("javascript-typescript", { error: "failed" }),
+        analysis("javascript-typescript", { ref: "refs/pull/10/merge" }),
+        analysis("actions"),
+        analysis("python"),
+      ],
+      MAIN
+    ),
+    ["javascript-typescript"]
+  );
+});
+
+test("missingCodeqlLanguages judges each language by its newest analysis on the ref", () => {
+  const at = (language: string, created_at: string, error = "") =>
+    analysis(language, { created_at, error });
+  const rest = [analysis("actions"), analysis("python")];
+  // A newer failed scan is not covered by an older success.
+  assert.deepEqual(
+    missingCodeqlLanguages(
+      [
+        at("javascript-typescript", "2026-11-24T09:00:00Z"),
+        at("javascript-typescript", "2026-11-24T10:00:00Z", "failed"),
+        ...rest,
+      ],
+      MAIN
+    ),
+    ["javascript-typescript"]
+  );
+  // A malformed entry beside successful analyses fails every language.
+  for (const bad of [
+    null,
+    7,
+    "x",
+    [],
+    { error: "" },
+    { ref: MAIN, error: "", category: "custom" },
+    { ref: MAIN, category: "/language:python" },
+    { ref: MAIN, error: "", category: ["/language:python"] },
+  ]) {
+    assert.deepEqual(
+      missingCodeqlLanguages([...JSON.parse(OK_ANALYSIS), bad], MAIN),
+      ["javascript-typescript", "actions", "python"],
+      JSON.stringify(bad)
+    );
+  }
+  // An analysis without a valid created_at cannot be ordered: its language fails closed.
+  assert.deepEqual(
+    missingCodeqlLanguages(
+      [
+        at("javascript-typescript", "2026-11-24T10:00:00Z"),
+        at("javascript-typescript", "", "failed"),
+        analysis("javascript-typescript", { created_at: ["2026-11-24T11:00:00Z"] }),
+        ...rest,
+      ],
+      MAIN
+    ),
+    ["javascript-typescript"]
+  );
+  // A newer success replaces an older failure, whatever order the API lists them in.
+  assert.deepEqual(
+    missingCodeqlLanguages(
+      [
+        at("javascript-typescript", "2026-11-24T10:00:00Z"),
+        at("javascript-typescript", "2026-11-24T09:00:00Z", "failed"),
+        ...rest,
+      ],
+      MAIN
+    ),
+    []
+  );
+});
+
+test("require-measurement: a scan that failed before uploading fails despite older analyses", () => {
+  const runs = JSON.stringify({
+    workflow_runs: [
+      run(2, "2026-11-24T11:00:00Z", "failure"),
+      run(1, "2026-11-24T09:51:30Z", "success"),
+    ],
+  });
+  const result = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS, runs }, [
+    "--require-measurement",
+  ]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /run 2 ended failure/);
+  assert.deepEqual(
+    result.calls.filter((call) => /alerts/.test(call)),
+    []
+  );
+});
+
+test("require-measurement: actions and python alone (JS/TS still running) fail", () => {
+  const fixture = {
+    alerts: "[]",
+    analyses: JSON.stringify([analysis("actions"), analysis("python")]),
+  };
+  const result = runWithFakeGh(fixture, ["--require-measurement"]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /javascript-typescript/);
+});
+
+test("require-measurement: no CodeQL analysis fails, plain mode passes", () => {
+  const fixture = { alerts: "[]", analyses: "[]" };
+  assert.equal(runWithFakeGh(fixture, ["--require-measurement"]).status, 1);
+  assert.equal(runWithFakeGh(fixture, []).status, 0);
+});
+
+test("require-measurement: only failed analyses still fail", () => {
+  const fixture = {
+    alerts: "[]",
+    analyses: JSON.stringify(JSON.parse(OK_ANALYSIS).map((a: object) => ({ ...a, error: "boom" }))),
+  };
+  assert.equal(runWithFakeGh(fixture, ["--require-measurement"]).status, 1);
+});
+
+test("require-measurement: a usable analysis and alerts within the baseline pass", () => {
+  const result = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS }, ["--require-measurement"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /codeqlAlerts=0/);
+});
+
+test("require-measurement: the analysis check runs before the alerts are read", () => {
+  const { calls } = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS }, [
+    "--require-measurement",
+  ]);
+  const firstAlerts = calls.findIndex((call) => /\/code-scanning\/alerts\?/.test(call));
+  const analysesAt = calls.findIndex((call) => /\/code-scanning\/analyses\?/.test(call));
+  assert.ok(analysesAt >= 0 && firstAlerts > analysesAt, calls.join());
+  assert.ok(
+    calls.slice(firstAlerts).every((call) => /\/code-scanning\/alerts\?/.test(call)),
+    calls.join()
+  );
+  assert.ok(calls.length >= 2);
+});
+
+test("require-measurement: no analysis means the alerts are never read", () => {
+  const { calls, status } = runWithFakeGh({ alerts: "[]", analyses: "[]" }, [
+    "--require-measurement",
+  ]);
+  assert.equal(status, 1);
+  assert.deepEqual(
+    calls.filter((call) => /alerts/.test(call)),
+    []
+  );
+});
+
+test("require-measurement: a non-array alerts response fails instead of counting zero", () => {
+  const fixture = { alerts: '{"message":"oops"}', analyses: OK_ANALYSIS };
+  assert.equal(runWithFakeGh(fixture, ["--require-measurement"]).status, 1);
+  assert.equal(runWithFakeGh(fixture, []).status, 0);
+});
+
+test("require-measurement: alert entries that are not open CodeQL alerts fail the measurement", () => {
+  for (const alerts of [
+    '[{"number":1}]',
+    '[{"state":"open"}]',
+    "[null]",
+    '[{"state":"open","tool":{"name":["CodeQL"]}}]',
+  ]) {
+    const result = runWithFakeGh({ alerts, analyses: OK_ANALYSIS }, ["--require-measurement"]);
+    assert.equal(result.status, 1, alerts);
+  }
+  // A wrongly typed severity is a controlled failure, not a crash.
+  const badSeverity = JSON.stringify([
+    { state: "open", tool: { name: "CodeQL" }, rule: { security_severity_level: ["high"] } },
+  ]);
+  const crashed = runWithFakeGh({ alerts: badSeverity, analyses: OK_ANALYSIS }, [
+    "--require-measurement",
+  ]);
+  assert.equal(crashed.status, 1);
+  assert.match(crashed.stdout, /reason=unexpected-shape/);
+  assert.doesNotMatch(crashed.stderr, /TypeError/);
+  const real = JSON.stringify([{ number: 1, state: "open", tool: { name: "CodeQL" } }]);
+  const result = runWithFakeGh({ alerts: real, analyses: OK_ANALYSIS }, ["--require-measurement"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /codeqlAlerts=1/);
+});
+
+test("require-measurement: a missing or malformed baseline fails", () => {
+  for (const baseline of [
+    "{not json",
+    { metrics: {} },
+    { metrics: { codeqlAlerts: { value: "5" } } },
+  ]) {
+    const result = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS, baseline }, [
+      "--require-measurement",
+    ]);
+    assert.equal(result.status, 1, JSON.stringify(baseline));
+  }
+});
+
+test("ci.yml runs the CodeQL ratchet with --require-measurement", () => {
+  const ci = readFileSync(
+    fileURLToPath(new URL("../../../.github/workflows/ci.yml", import.meta.url)),
+    "utf8"
+  );
+  assert.match(ci, /pnpm run check:codeql-ratchet --require-measurement/);
 });

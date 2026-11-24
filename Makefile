@@ -1,6 +1,6 @@
 .PHONY: help install dev start build build-release lint typecheck typecheck-strict \
         test test-unit test-vitest test-coverage test-all test-integration test-e2e \
-        check check-cycles check-docs env-sync clean
+        check env-sync clean
 
 # OmniRoute — convenience wrapper around the npm scripts.
 # All targets delegate to the canonical package.json scripts (single source of truth).
@@ -55,12 +55,6 @@ test-e2e: ## E2E (Playwright)
 
 check: ## lint + test combined
 	npm run check
-
-check-cycles: ## Detect circular dependencies
-	npm run check:cycles
-
-check-docs: ## Validate documentation (incl. fabricated-docs)
-	npm run check:docs-all
 
 env-sync: ## Sync .env from .env.example
 	npm run env:sync

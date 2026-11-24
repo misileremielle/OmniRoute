@@ -32,21 +32,7 @@ function record(partial) {
   };
 }
 
-test("legacy computeVerdict still hard-fails pack-boot when pack-artifact times out", async () => {
-  const { computeVerdict } = await import("../../scripts/quality/validate-release-green.mjs");
-  const v = computeVerdict([
-    { id: "pack-artifact", kind: "hard", ok: false, detail: "timeout" },
-    {
-      id: "pack-boot",
-      kind: "hard",
-      ok: false,
-      detail: "skipped because package-artifact did not produce a valid dist/ build",
-    },
-  ]);
-  assert.equal(v.releaseGreen, false);
-});
-
-test("new reducer maps the same timeout to UNVERIFIED", () => {
+test("the reducer maps a pack-artifact timeout to UNVERIFIED", () => {
   const out = reduce(planPack, [record({ gate_id: "pack-artifact", status: "INFRA_ERROR" })]);
   assert.equal(out.verdict, "UNVERIFIED");
 });

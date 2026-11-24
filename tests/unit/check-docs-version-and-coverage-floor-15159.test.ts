@@ -7,7 +7,7 @@ import {
   makeVersionClaimValidator,
   makeCoverageFloorClaimValidator,
 } from "../../scripts/check/check-docs-counts-sync.mjs";
-import { loadFactsSnapshot } from "../../scripts/release/facts.mjs";
+import { loadFactsSnapshot, readCoverageRatchetFloors } from "../../scripts/release/facts.mjs";
 
 // Regression guard for audit #15159 — G-06 (stale version strings the validator
 // cannot see) and G-08 (AGENTS.md advertises the wrong coverage floor).
@@ -35,6 +35,10 @@ import { loadFactsSnapshot } from "../../scripts/release/facts.mjs";
 // enforces 67.33 / 67.33 / 72.02 / 65.08. An agent reading AGENTS.md alone reds
 // the quality-gate job below the real floor. Worse, AGENTS.md was not in the
 // validator's file list at all, so nothing checked it.
+//
+// Fork: the coverage ratchet is gone (CI reports coverage on main only), so the floor the
+// validator uses falls back to the 60s that test:coverage enforces. The validator tests below
+// still feed it upstream's old ratchet values as a fixture.
 
 type Verdict = { ok: boolean; detail: string };
 
@@ -202,16 +206,24 @@ test("G-08: AGENTS.md no longer advertises a floor below the blocking ratchet", 
   );
 });
 
-test("G-08: the blocking ratchet floors in quality-baseline.json are what we validate against", () => {
-  // Pin the source of truth so a future rebaseline that lowers these floors is a
-  // deliberate act visible in a test diff, not a silent doc/gate divergence.
+test("G-08: with no coverage ratchet the floors are the ones test:coverage enforces", () => {
   const root = path.resolve(import.meta.dirname, "..", "..");
   const baseline = JSON.parse(
     fs.readFileSync(path.join(root, "config/quality/quality-baseline.json"), "utf8")
   );
-
-  assert.equal(baseline.metrics["coverage.statements"].value, REAL_FLOORS.statements);
-  assert.equal(baseline.metrics["coverage.lines"].value, REAL_FLOORS.lines);
-  assert.equal(baseline.metrics["coverage.functions"].value, REAL_FLOORS.functions);
-  assert.equal(baseline.metrics["coverage.branches"].value, REAL_FLOORS.branches);
+  for (const key of ["statements", "lines", "functions", "branches"]) {
+    assert.equal(
+      baseline.metrics[`coverage.${key}`],
+      undefined,
+      `coverage.${key} is not ratcheted`
+    );
+  }
+  assert.deepEqual(readCoverageRatchetFloors(root), {
+    statements: 60,
+    lines: 60,
+    functions: 60,
+    branches: 60,
+  });
+  const { scripts } = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+  assert.match(scripts["test:coverage"], /--statements 60 --lines 60 --functions 60 --branches 60/);
 });

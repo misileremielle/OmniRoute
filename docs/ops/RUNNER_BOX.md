@@ -4,6 +4,9 @@ title: Self-Hosted Runner Box Operations
 
 # Self-Hosted Runner Box Operations (.113 pool)
 
+> **Upstream only.** The fork runs every workflow on GitHub-hosted runners and has no
+> self-hosted pool. The workflows and tests this page names were removed from the fork.
+
 The self-hosted pool runs on the **.113** box (`tomni-proxmox-113`). Since 2026-10-18 each
 OmniRoute runner has **one role**, one label, and a memory/CPU budget sized to what its workload
 measured. The Turbopack slot gets what the build needs; the other slots are sized to their

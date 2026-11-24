@@ -112,7 +112,7 @@ The baseline that counts for the LTS cut must come from an idle, dedicated host 
 
 ## Related
 
-- [`QUALITY_GATES.md`](../architecture/QUALITY_GATES.md): the `nightly-resilience`
-  workflow runs the heap-growth gate on a schedule.
+- [`QUALITY_GATES.md`](../architecture/QUALITY_GATES.md): what CI checks. The fork has no
+  scheduled `nightly-resilience` workflow, so the heap-growth gate does not run in CI.
 - `bin/cold-start-bench.sh`: a budget check (listen ≤ 800 ms, warm TTFB ≤ 200 ms) for a single
   boot, as opposed to this recorded baseline.

@@ -22,10 +22,12 @@ runs:
           echo "Invalid pinned pnpm version" >&2
           exit 1
         fi
-        if [ "$(pnpm --version 2>/dev/null || true)" != "$expected" ]; then
-          npm install --global "pnpm@$expected" --no-audit --no-fund
+        # Every network-touching command below is bounded; see the timing note on the install step.
+        if [ "$(timeout --kill-after=5 30 pnpm --version 2>/dev/null || true)" != "$expected" ]; then
+          timeout --kill-after=10 120 npm install --global "pnpm@$expected" --no-audit --no-fund ||
+            { sleep 15; timeout --kill-after=10 120 npm install --global "pnpm@$expected" --no-audit --no-fund; }
         fi
-        actual=$(pnpm --version)
+        actual=$(timeout --kill-after=5 30 pnpm --version)
         if [ "$actual" != "$expected" ]; then
           echo "pnpm version differs from the lockfile toolchain" >&2
           exit 1
@@ -53,6 +55,10 @@ runs:
       id: node-modules
       if: inputs.cache == 'true'
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      env:
+        # A stalled download segment aborts the restore (then pnpm installs) instead of
+        # waiting out the action's 10-minute default.
+        SEGMENT_DOWNLOAD_TIMEOUT_MINS: "3"
       with:
         path: node_modules
         key: node-modules-v4-${{ runner.os }}-${{ runner.arch }}-${{ steps.node.outputs.version }}-${{ steps.pnpm.outputs.version }}-${{ hashFiles('pnpm-lock.yaml', 'pnpm-workspace.yaml', 'scripts/build/postinstall.mjs', 'scripts/build/postinstallSupport.mjs', 'scripts/build/colocateOptionals.mjs', 'scripts/build/wreqJsNative.mjs', 'scripts/build/fixPlaywrightAndroid.mjs', 'scripts/build/native-binary-compat.mjs', 'scripts/build/betterSqlitePrebuildTarget.mjs', 'scripts/ci/verify-ci-install.mjs', '.github/actions/pnpm-install-retry/action.yml') }}
@@ -67,13 +73,23 @@ runs:
 
         max_attempts=3
         delay_seconds=20
+        # Each attempt is bounded. CI run 45321347928 (Build job 138203058220) sat 40 min in
+        # this install: the log stops after the root postinstall's .env sync and the runner
+        # later killed orphan pnpm/sh/node processes. A cold install of this whole action took
+        # 24-38 s on Linux in runs 45306431369 and 45321347928 (the fork has no Windows job now),
+        # so a hung attempt exits 124 at 150 s and the loop retries it.
+        # Worst case for the loop: 3 x (150 s + 30 s kill grace) + 20 s + 40 s backoff = 600 s;
+        # the 130 s verify bound and the pnpm bootstrap step above (up to 345 s) bring the
+        # bounded steps to 1,075 s (18 min). The node_modules cache restore is not capped. Every
+        # job timeout-minutes in ci.yml is sized as measured work plus a 20 min headroom target.
+        attempt_timeout_seconds=150
 
         for attempt in $(seq 1 "$max_attempts"); do
           if [ "$attempt" -gt 1 ]; then
             echo "pnpm install attempt $attempt/$max_attempts after transient failure"
           fi
 
-          if pnpm install --frozen-lockfile; then
+          if timeout --kill-after=30 "$attempt_timeout_seconds" pnpm install --frozen-lockfile; then
             exit 0
           else
             exit_code=$?
@@ -92,7 +108,7 @@ runs:
     - name: Verify installed native runtimes
       id: verify-install
       shell: bash
-      run: node scripts/ci/verify-ci-install.mjs
+      run: timeout --kill-after=10 120 node scripts/ci/verify-ci-install.mjs
 
     - name: node_modules restored from cache
       if: steps.node-modules.outputs.cache-hit == 'true'

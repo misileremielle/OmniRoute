@@ -36,7 +36,7 @@ test("the install action's cache-miss step also carries the skip flag", () => {
 });
 
 test("no workflow installs dependencies outside the audited action", () => {
-  for (const name of ["ci", "build"]) {
+  for (const name of ["ci"]) {
     const workflow = read<{ jobs: Record<string, Job> }>(`.github/workflows/${name}.yml`);
     for (const [job, def] of Object.entries(workflow.jobs)) {
       for (const step of def.steps ?? []) {

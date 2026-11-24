@@ -30,26 +30,71 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { load } from "js-yaml";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const workflowDir = path.join(repoRoot, ".github/workflows");
 
 /**
- * The GitHub owner of this repository (transferred to the organization on 2026-10-21): every
- * `github.repository` guard and every GHCR namespace must name it.
+ * The GitHub owner of this repository: every `github.repository` guard and every GHCR namespace
+ * must name it. The fork (misileremielle/omniroute) publishes only to its own GHCR namespace and
+ * has no Docker Hub repository (docs/ops/FORK_IDENTITY.md).
  */
-const OWNER = "cheaper-inference";
-/**
- * Docker Hub cannot move a repository between namespaces: the legacy personal repository keeps
- * its pull history and receives every release, and the organization repository is published in
- * parallel (docker-org-mirror.yml).
- */
-const DOCKERHUB_OWNERS = ["diegosouzapw", "cheaperinference"];
+const OWNER = "misileremielle";
 const REGISTRY_OWNERS: Record<string, string[]> = {
   "ghcr.io": [OWNER],
-  "docker.io": DOCKERHUB_OWNERS,
-  "index.docker.io": DOCKERHUB_OWNERS,
+  "docker.io": [],
+  "index.docker.io": [],
 };
+
+/**
+ * Every key and scalar of a parsed workflow, joined by newlines. Parsing drops YAML comments
+ * the way GitHub does, so prose in a comment never counts and a quoted value containing `#`
+ * is kept whole. Shell comments inside a `run:` block are part of the script and still count.
+ */
+function workflowStrings(text: string): string {
+  const out: string[] = [];
+  const walk = (node: unknown): void => {
+    if (Array.isArray(node)) node.forEach(walk);
+    else if (node && typeof node === "object") {
+      for (const [key, value] of Object.entries(node)) {
+        out.push(key);
+        walk(value);
+      }
+    } else if (node !== null && node !== undefined) out.push(String(node));
+  };
+  walk(load(text));
+  return out.join("\n");
+}
+
+function foreignRegistryTargets(text: string): string[] {
+  const found: string[] = [];
+  // ghcr.io/<owner>/... and index.docker.io/<owner>/... — the owner is the segment
+  // right after the registry host.
+  for (const m of workflowStrings(text).matchAll(
+    /\b(ghcr\.io|(?:index\.)?docker\.io)\/([A-Za-z0-9_.-]+)/g
+  )) {
+    const [, host, owner] = m;
+    if (!REGISTRY_OWNERS[host].includes(owner.toLowerCase())) found.push(m[0]);
+  }
+  return found;
+}
+
+test("registry targets in YAML comments are ignored, real ones are not", () => {
+  const yaml = [
+    "# Mirrors ghcr.io/someone-else/omniroute for reference",
+    "env:",
+    "  IMAGE: ghcr.io/other/omniroute # also see ghcr.io/third/x",
+    "  OURS: ghcr.io/misileremielle/omniroute",
+    "",
+  ].join("\n");
+  assert.deepEqual(foreignRegistryTargets(yaml), ["ghcr.io/other"]);
+});
+
+test("a quoted value containing ' #' does not hide a later target on the same line", () => {
+  const yaml = 'env: { NOTE: "tag #1", IMAGE: ghcr.io/other/omniroute }\n';
+  assert.deepEqual(foreignRegistryTargets(yaml), ["ghcr.io/other"]);
+});
 
 function workflowFiles(): string[] {
   return fs
@@ -62,14 +107,8 @@ test("no workflow publishes to another owner's container registry", () => {
   const offenders: string[] = [];
 
   for (const file of workflowFiles()) {
-    const text = fs.readFileSync(file, "utf-8");
-    // ghcr.io/<owner>/... and index.docker.io/<owner>/... — the owner is the segment
-    // right after the registry host.
-    for (const m of text.matchAll(/\b(ghcr\.io|(?:index\.)?docker\.io)\/([A-Za-z0-9_.-]+)/g)) {
-      const [, host, owner] = m;
-      if (!REGISTRY_OWNERS[host].includes(owner.toLowerCase())) {
-        offenders.push(`${path.basename(file)} → ${m[0]}`);
-      }
+    for (const target of foreignRegistryTargets(fs.readFileSync(file, "utf-8"))) {
+      offenders.push(`${path.basename(file)} → ${target}`);
     }
   }
 
@@ -86,7 +125,7 @@ test("no workflow job is gated on a different repository", () => {
   const offenders: string[] = [];
 
   for (const file of workflowFiles()) {
-    const text = fs.readFileSync(file, "utf-8");
+    const text = workflowStrings(fs.readFileSync(file, "utf-8"));
     // `if: github.repository == 'owner/name'` — a guard naming someone else's repo means
     // the workflow was written for a fork.
     for (const m of text.matchAll(/github\.repository\s*[=!]=\s*['"]([^'"]+)['"]/g)) {
