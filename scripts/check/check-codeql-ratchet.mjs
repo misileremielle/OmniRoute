@@ -261,6 +261,23 @@ function fetchCodeQLAlerts(ghBin, repo) {
     if (!Array.isArray(page_alerts)) {
       return { error: "unexpected-shape", message: `page ${page} is not an array` };
     }
+    // The query asks for open CodeQL alerts, so every entry must say so; anything else would be
+    // dropped by parseCodeQLAlerts and undercount.
+    const badAlert = page_alerts.find(
+      (a) =>
+        !a ||
+        typeof a !== "object" ||
+        Array.isArray(a) ||
+        a.state !== "open" ||
+        typeof a.tool?.name !== "string" ||
+        !/codeql/i.test(a.tool.name)
+    );
+    if (badAlert !== undefined) {
+      return {
+        error: "unexpected-shape",
+        message: `page ${page} has an alert that is not an open CodeQL alert`,
+      };
+    }
     if (page_alerts.length === 0) break;
 
     allAlerts.push(...page_alerts);
@@ -397,14 +414,34 @@ export const REQUIRED_CODEQL_LANGUAGES = ["javascript-typescript", "actions", "p
 export function missingCodeqlLanguages(analyses, ref, required = REQUIRED_CODEQL_LANGUAGES) {
   /** @type {Map<string, {time: number, ok: boolean}>} */
   const newest = new Map();
-  if (Array.isArray(analyses)) {
+  // An unexpected shape (not an array, or a non-object entry) fails every language.
+  // Every entry must be classifiable: string ref and error, and a `/language:<name>` category.
+  const malformed =
+    !Array.isArray(analyses) ||
+    analyses.some(
+      (a) =>
+        !a ||
+        typeof a !== "object" ||
+        Array.isArray(a) ||
+        typeof a.ref !== "string" ||
+        typeof a.error !== "string" ||
+        typeof a.category !== "string" ||
+        !/^\/language:.+$/.test(a.category)
+    );
+  if (malformed) return [...required];
+  {
     for (const a of analyses) {
-      if (!a || typeof a !== "object" || a.ref !== ref) continue;
+      if (a.ref !== ref) continue;
       const match = /^\/language:(.+)$/.exec(String(a.category ?? ""));
       if (!match) continue;
-      const parsed = Date.parse(String(a.created_at ?? ""));
-      const time = Number.isNaN(parsed) ? -Infinity : parsed;
+      const parsed = typeof a.created_at === "string" ? Date.parse(a.created_at) : NaN;
       const seen = newest.get(match[1]);
+      // A record without a valid created_at cannot be ordered: that language fails closed.
+      if (Number.isNaN(parsed) || seen?.time === Infinity) {
+        newest.set(match[1], { time: Infinity, ok: false });
+        continue;
+      }
+      const time = parsed;
       // On equal times a failure wins, so ambiguity fails closed.
       if (!seen || time > seen.time || (time === seen.time && a.error !== "")) {
         newest.set(match[1], { time, ok: a.error === "" });
@@ -503,15 +540,39 @@ const CODEQL_SETUP_PATH = "dynamic/github-code-scanning/codeql";
  * @param {unknown} runs - `workflow_runs` from GET /actions/workflows/{id}/runs
  * @returns {{ok: boolean, reason?: string}}
  */
+// Workflow-run statuses that mean "not finished yet" (GitHub Actions API).
+const PENDING_RUN_STATUSES = new Set(["queued", "in_progress", "waiting", "requested", "pending"]);
+
 export function codeqlRunVerdict(runs) {
   if (!Array.isArray(runs)) return { ok: false, reason: "runs response is not an array" };
-  const sorted = runs
-    .filter((r) => r && typeof r === "object")
-    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
-  for (const [index, r] of sorted.entries()) {
-    if (r.status !== "completed") continue;
+  if (runs.some((r) => !r || typeof r !== "object" || Array.isArray(r))) {
+    return { ok: false, reason: "runs response has a non-object entry" };
+  }
+  const records = [...runs];
+  // Runs that cannot be ordered make "newest" unknowable, so the check fails closed.
+  const unordered = records.find(
+    (r) => typeof r.created_at !== "string" || Number.isNaN(Date.parse(r.created_at))
+  );
+  if (unordered) {
+    return { ok: false, reason: `CodeQL run ${unordered.id} has no valid created_at` };
+  }
+  // Newest first; on equal times a success sorts last, so a tie never hides a failure.
+  const isSuccess = (r) => r.status === "completed" && r.conclusion === "success";
+  const sorted = records.sort(
+    (a, b) =>
+      Date.parse(b.created_at) - Date.parse(a.created_at) ||
+      Number(isSuccess(a)) - Number(isSuccess(b))
+  );
+  for (const r of sorted) {
+    if (PENDING_RUN_STATUSES.has(r.status)) continue;
+    // A missing or unknown status is a measurement failure, not a pending run.
+    if (r.status !== "completed") {
+      return { ok: false, reason: `CodeQL run ${r.id} has unrecognized status ${r.status}` };
+    }
     if (["cancelled", "skipped"].includes(r.conclusion)) {
-      if (index === 0) {
+      // Superseded only by a strictly newer run; a run with the same time proves nothing.
+      const time = Date.parse(r.created_at);
+      if (!sorted.some((other) => Date.parse(other.created_at) > time)) {
         return { ok: false, reason: `newest CodeQL run ${r.id} was ${r.conclusion}` };
       }
       continue;
@@ -601,7 +662,17 @@ function main() {
     return;
   }
 
-  const { alertCount, bySeverity, byRule } = parseCodeQLAlerts(result);
+  // Any field of an unexpected type is a measurement failure, reported like the others rather
+  // than as a crash.
+  let parsed;
+  try {
+    parsed = parseCodeQLAlerts(result);
+  } catch (err) {
+    console.log("codeqlAlerts=SKIP reason=unexpected-shape");
+    finishUnmeasured(REQUIRE_MEASUREMENT, `alert parse failed: ${String(err?.message ?? err)}`);
+    return;
+  }
+  const { alertCount, bySeverity, byRule } = parsed;
 
   // Emitir em formato KEY=VALUE para o coletor de métricas (collect-metrics.mjs)
   console.log(`codeqlAlerts=${alertCount}`);

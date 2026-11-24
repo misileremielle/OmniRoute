@@ -79,9 +79,9 @@ runs:
         # 24-38 s on Linux in runs 45306431369 and 45321347928 (the fork has no Windows job now),
         # so a hung attempt exits 124 at 150 s and the loop retries it.
         # Worst case for the loop: 3 x (150 s + 30 s kill grace) + 20 s + 40 s backoff = 600 s;
-        # with the 130 s verify bound that is 730 s (12.2 min). Every job timeout-minutes in ci.yml
-        # is its measured time plus at least 12.5 min. A hang in the pnpm bootstrap or the cache
-        # restore on top of that is bounded by its own timeout and then by the job timeout.
+        # the 130 s verify bound and the pnpm bootstrap step above (up to 345 s) bring the
+        # bounded steps to 1,075 s (18 min). The node_modules cache restore is not capped. Every
+        # job timeout-minutes in ci.yml is its measured work plus at least 20 min of headroom.
         attempt_timeout_seconds=150
 
         for attempt in $(seq 1 "$max_attempts"); do

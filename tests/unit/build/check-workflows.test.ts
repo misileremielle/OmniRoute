@@ -451,6 +451,16 @@ test("readBaselineZizmorValue: invalid JSON returns null (does not throw)", () =
 // quality.yml — release PR build gate regression coverage (#7307)
 // ─────────────────────────────────────────────────────────────────────────────
 
+test("tracked-artifacts runs in Security Scans, which docs-only PRs do not skip", () => {
+  type Job = { if?: string; steps?: Array<{ run?: string }> };
+  const jobs = (parseYaml(readCiWorkflow()) as { jobs: Record<string, Job> }).jobs;
+  const runsGuard = (job: Job) =>
+    (job.steps ?? []).some((step) => /pnpm run check:tracked-artifacts\b/.test(step.run ?? ""));
+  assert.ok(runsGuard(jobs.security), "security runs check:tracked-artifacts");
+  assert.doesNotMatch(String(jobs.security.if ?? ""), /outputs\.code/);
+  assert.ok(!runsGuard(jobs.lint), "not (only) in the docs-skipping Lint job");
+});
+
 test("CI runs for PRs into any base and gates build and package checks", () => {
   const ci = readCiWorkflow();
   const on = (parseYaml(ci) as { on: { pull_request: Record<string, unknown> } }).on;

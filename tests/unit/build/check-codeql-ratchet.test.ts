@@ -410,6 +410,7 @@ const MAIN = "refs/heads/main";
 const analysis = (language: string, extra: Record<string, unknown> = {}) => ({
   ref: MAIN,
   category: `/language:${language}`,
+  created_at: "2026-11-24T09:52:00Z",
   error: "",
   ...extra,
 });
@@ -449,6 +450,54 @@ test("codeqlRunVerdict: the newest finished run decides, cancelled and skipped r
   );
   assert.equal(codeqlRunVerdict([]).ok, false);
   assert.equal(codeqlRunVerdict(undefined).ok, false);
+  // A malformed entry beside a success fails the measurement.
+  for (const bad of [null, 7, "x", []]) {
+    assert.equal(
+      codeqlRunVerdict([run(1, "2026-11-24T09:00:00Z", "success"), bad]).ok,
+      false,
+      JSON.stringify(bad)
+    );
+  }
+  // A pending and a cancelled run with the same newest time: nothing newer supersedes the
+  // cancellation, in either order.
+  const pending = { id: 3, created_at: "2026-11-24T10:00:00Z", status: "queued", conclusion: null };
+  const cancelled = run(2, "2026-11-24T10:00:00Z", "cancelled");
+  const older = run(1, "2026-11-24T09:00:00Z", "success");
+  assert.equal(codeqlRunVerdict([pending, cancelled, older]).ok, false);
+  assert.equal(codeqlRunVerdict([cancelled, pending, older]).ok, false);
+  // Equal timestamps: a failure listed after a success still decides.
+  assert.equal(
+    codeqlRunVerdict([
+      run(1, "2026-11-24T09:00:00Z", "success"),
+      run(2, "2026-11-24T09:00:00Z", "failure"),
+    ]).ok,
+    false
+  );
+  // A run without a valid created_at cannot be ordered, so the verdict fails closed.
+  assert.equal(
+    codeqlRunVerdict([
+      { id: 2, created_at: ["2026-11-24T10:00:00Z"], status: "completed", conclusion: "success" },
+    ]).ok,
+    false
+  );
+  assert.equal(
+    codeqlRunVerdict([
+      run(1, "2026-11-24T09:00:00Z", "success"),
+      { id: 2, created_at: "not a date", status: "completed", conclusion: "failure" },
+    ]).ok,
+    false
+  );
+  // A newest run with a missing or unknown status fails instead of being taken as pending.
+  for (const status of [undefined, "mystery"]) {
+    assert.equal(
+      codeqlRunVerdict([
+        { id: 3, created_at: "2026-11-24T11:00:00Z", status, conclusion: null },
+        run(1, "2026-11-24T09:00:00Z", "success"),
+      ]).ok,
+      false,
+      String(status)
+    );
+  }
 });
 
 const OK_ANALYSIS = JSON.stringify([
@@ -468,8 +517,6 @@ test("missingCodeqlLanguages needs a successful default-branch analysis per lang
         analysis("javascript-typescript", { ref: "refs/pull/10/merge" }),
         analysis("actions"),
         analysis("python"),
-        null,
-        { error: "" },
       ],
       MAIN
     ),
@@ -487,6 +534,36 @@ test("missingCodeqlLanguages judges each language by its newest analysis on the 
       [
         at("javascript-typescript", "2026-11-24T09:00:00Z"),
         at("javascript-typescript", "2026-11-24T10:00:00Z", "failed"),
+        ...rest,
+      ],
+      MAIN
+    ),
+    ["javascript-typescript"]
+  );
+  // A malformed entry beside successful analyses fails every language.
+  for (const bad of [
+    null,
+    7,
+    "x",
+    [],
+    { error: "" },
+    { ref: MAIN, error: "", category: "custom" },
+    { ref: MAIN, category: "/language:python" },
+    { ref: MAIN, error: "", category: ["/language:python"] },
+  ]) {
+    assert.deepEqual(
+      missingCodeqlLanguages([...JSON.parse(OK_ANALYSIS), bad], MAIN),
+      ["javascript-typescript", "actions", "python"],
+      JSON.stringify(bad)
+    );
+  }
+  // An analysis without a valid created_at cannot be ordered: its language fails closed.
+  assert.deepEqual(
+    missingCodeqlLanguages(
+      [
+        at("javascript-typescript", "2026-11-24T10:00:00Z"),
+        at("javascript-typescript", "", "failed"),
+        analysis("javascript-typescript", { created_at: ["2026-11-24T11:00:00Z"] }),
         ...rest,
       ],
       MAIN
@@ -584,6 +661,32 @@ test("require-measurement: a non-array alerts response fails instead of counting
   const fixture = { alerts: '{"message":"oops"}', analyses: OK_ANALYSIS };
   assert.equal(runWithFakeGh(fixture, ["--require-measurement"]).status, 1);
   assert.equal(runWithFakeGh(fixture, []).status, 0);
+});
+
+test("require-measurement: alert entries that are not open CodeQL alerts fail the measurement", () => {
+  for (const alerts of [
+    '[{"number":1}]',
+    '[{"state":"open"}]',
+    "[null]",
+    '[{"state":"open","tool":{"name":["CodeQL"]}}]',
+  ]) {
+    const result = runWithFakeGh({ alerts, analyses: OK_ANALYSIS }, ["--require-measurement"]);
+    assert.equal(result.status, 1, alerts);
+  }
+  // A wrongly typed severity is a controlled failure, not a crash.
+  const badSeverity = JSON.stringify([
+    { state: "open", tool: { name: "CodeQL" }, rule: { security_severity_level: ["high"] } },
+  ]);
+  const crashed = runWithFakeGh({ alerts: badSeverity, analyses: OK_ANALYSIS }, [
+    "--require-measurement",
+  ]);
+  assert.equal(crashed.status, 1);
+  assert.match(crashed.stdout, /reason=unexpected-shape/);
+  assert.doesNotMatch(crashed.stderr, /TypeError/);
+  const real = JSON.stringify([{ number: 1, state: "open", tool: { name: "CodeQL" } }]);
+  const result = runWithFakeGh({ alerts: real, analyses: OK_ANALYSIS }, ["--require-measurement"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /codeqlAlerts=1/);
 });
 
 test("require-measurement: a missing or malformed baseline fails", () => {

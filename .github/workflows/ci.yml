@@ -27,9 +27,11 @@ env:
   OMNIROUTE_SKIP_SYSTEM_TRUST: "1"
   CI_NODE_VERSION: "26"
 
-# Job timeouts: the work measured in dispatch 45306431369 plus at least 12.5 minutes for the
-# install action's worst case (three timed-out attempts and the verify step, 730 s;
-# .github/actions/pnpm-install-retry).
+# Job timeouts: the work measured in dispatch 45306431369 and PR #10's first run, plus at least
+# 20 minutes of headroom. The install action's bounded steps total 18 min (pnpm bootstrap
+# 345 s, three timed-out install attempts 600 s, verify 130 s;
+# .github/actions/pnpm-install-retry). Checkout, setup-node and the cache restores have no
+# hard cap, so the headroom is an estimate, not a bound.
 
 jobs:
   changes:
@@ -75,7 +77,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: changes
     # Draft PRs and docs-only PRs skip the code lanes.
     if: ${{ github.event_name != 'pull_request' || (github.event.pull_request.draft == false && (needs.changes.outputs.code == 'true' || needs.changes.outputs.i18n == 'true')) }}
@@ -104,7 +106,6 @@ jobs:
       - run: pnpm run check:route-guard-membership
       - run: pnpm run check:route-validation:t06
       - run: pnpm run check:fetch-targets
-      - run: pnpm run check:tracked-artifacts
       # Duplicate and malformed migration numbers only; the PR-base comparison is off.
       - run: pnpm run check:migration-numbering --no-base
       # Routing correctness.
@@ -148,7 +149,7 @@ jobs:
   security:
     name: Security Scans
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: changes
     # Every ready PR, docs-only included: docs and catalogs can carry a committed secret too.
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
@@ -169,6 +170,9 @@ jobs:
           package-manager-cache: false
           node-version: ${{ env.CI_NODE_VERSION }}
       - uses: ./.github/actions/pnpm-install-retry
+      # In this job, not Lint, because docs-only PRs skip Lint and a Markdown file under a
+      # private root path (_tasks/...) is exactly what this guard rejects.
+      - run: pnpm run check:tracked-artifacts
       - run: pnpm run audit:deps
       - run: pnpm run check:lockfile
       - run: pnpm run check:licenses
@@ -184,8 +188,9 @@ jobs:
       - run: pnpm run check:vuln-ratchet --ratchet
       - run: pnpm run check:workflows --ratchet
       # --require-measurement: fail unless main's newest CodeQL scan succeeded for every
-      # language (rules in docs/architecture/QUALITY_GATES.md), so an empty alert list is never
-      # taken as zero alerts. The count covers main's open alerts, not this revision.
+      # language (rules in docs/architecture/QUALITY_GATES.md): an unmeasured count fails, and
+      # an empty list counts as zero only after a successful scan. The count covers main's open
+      # alerts, not this revision.
       - run: pnpm run check:codeql-ratchet --require-measurement
         env:
           GH_TOKEN: ${{ github.token }}
@@ -265,7 +270,7 @@ jobs:
   coverage-shard:
     name: Coverage Shard (${{ matrix.shard }}/8, report only)
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     needs: changes
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     continue-on-error: true
@@ -314,7 +319,7 @@ jobs:
   test-vitest:
     name: Vitest
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     needs: changes
     if: ${{ github.event_name != 'pull_request' || (github.event.pull_request.draft == false && needs.changes.outputs.code == 'true') }}
     env:
@@ -336,7 +341,7 @@ jobs:
   test-security:
     name: Security Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: changes
     if: ${{ github.event_name != 'pull_request' || (github.event.pull_request.draft == false && needs.changes.outputs.code == 'true') }}
     env:
@@ -408,8 +413,10 @@ jobs:
     name: E2E Tests (${{ matrix.shard }}/9)
     runs-on: ubuntu-latest
     # Balanced shards took 1.4-3.5 min (run 45306431369); the plain --shard fallback's worst
-    # shard was 24m47s, plus install and browser setup.
-    timeout-minutes: 45
+    # shard was 24m47s. Estimate for a slow run: that, the install action's bounded steps
+    # (18 min) and the Playwright install step (10 min) make 53 min; checkout, cache restores
+    # and the artifact download have no hard cap, so this is headroom, not a guarantee.
+    timeout-minutes: 60
     needs: build
     if: ${{ github.event_name != 'pull_request' }}
     strategy:
@@ -466,7 +473,7 @@ jobs:
   test-integration:
     name: Integration Tests (${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: changes
     if: ${{ github.event_name != 'pull_request' }}
     strategy:
@@ -519,7 +526,7 @@ jobs:
   test-bun-sqlite:
     name: Bun SQLite Compatibility
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: changes
     if: ${{ github.event_name != 'pull_request' }}
     steps:
