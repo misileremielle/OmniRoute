@@ -4,7 +4,6 @@ import { afterEach, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import en from "../../src/i18n/messages/en.json";
-import zh from "../../src/i18n/messages/zh-CN.json";
 import ProviderLimits from "@/app/(dashboard)/dashboard/usage/components/ProviderLimits";
 
 vi.unmock("next-intl");
@@ -117,7 +116,7 @@ function fixture(failCooldowns = false, malformed = false, providerIds: string[]
   return requests;
 }
 function mount(locale: string) {
-  const m = locale === "en" ? en : zh;
+  const m = en;
   render(
     <NextIntlClientProvider
       locale={locale}
@@ -145,7 +144,7 @@ it("renders the real page when browser storage is disabled", async () => {
   await waitFor(() => expect(document.querySelectorAll("[data-availability]")).toHaveLength(5));
   expect(document.querySelector("[data-drag-handle]")).toBeTruthy();
 });
-it.each(["en", "zh-CN"])(
+it.each(["en"])(
   "top counters, filter, blocks and full/compact layouts share one availability projection (%s)",
   async (locale) => {
     const requests = fixture();

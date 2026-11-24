@@ -7,7 +7,6 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { parse } from "@formatjs/icu-messageformat-parser";
 import en from "../../src/i18n/messages/en.json";
-import zh from "../../src/i18n/messages/zh-CN.json";
 import HealthAccountTooltip from "../../src/app/(dashboard)/dashboard/usage/components/ProviderLimits/HealthAccountTooltip";
 import { buildHealthAccount } from "../../src/app/(dashboard)/dashboard/usage/components/ProviderLimits/healthOverview";
 import { displayAccount } from "../../src/app/(dashboard)/dashboard/usage/components/ProviderLimits/availabilityDisplay";
@@ -24,10 +23,10 @@ const cases = [
     key: "healthFilteringBypass",
   },
 ] as const;
-for (const locale of ["en", "zh-CN"])
+for (const locale of ["en"])
   for (const row of cases)
     it(`${locale} tooltip explains ${row.key} while retaining the exhausted meter`, () => {
-      const messages = locale === "en" ? en : zh;
+      const messages = en;
       const raw = {
         quotas: {
           weekly: {
@@ -104,17 +103,17 @@ for (const locale of ["en", "zh-CN"])
       expect(view.fill).toBe(0);
     });
 for (const row of cases) {
-  it(`all 67 catalogs translate ${row.key} with the same empty ICU argument set`, () => {
+  // The fork ships English only (docs/ops/FORK_IDENTITY.md): en.json is the one catalog.
+  it(`the en catalog has ${row.key} with an empty ICU argument set`, () => {
     const directory = path.resolve("src/i18n/messages");
     const files = fs.readdirSync(directory).filter((file) => file.endsWith(".json"));
-    expect(files.length).toBe(67);
+    expect(files).toEqual(["en.json"]);
     for (const file of files) {
       const usage = JSON.parse(fs.readFileSync(path.join(directory, file), "utf8")).usage;
       expect(typeof usage[row.key], `${file}:${row.key}`).toBe("string");
       expect(usage[row.key].startsWith("__MISSING__:")).toBe(false);
       expect(usage[row.key].match(/[{}]/g)).toBeNull();
       expect(parse(usage[row.key]).every((node) => node.type === 0)).toBe(true);
-      if (file !== "en.json") expect(usage[row.key]).not.toBe(en.usage[row.key]);
     }
   });
 }

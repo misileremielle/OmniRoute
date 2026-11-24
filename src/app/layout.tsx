@@ -9,7 +9,6 @@ import routeNamespaces from "@/i18n/routeNamespaces.generated.json";
 import { getRootLayoutSettings } from "@/lib/db/rootLayoutSettings";
 import type { Viewport } from "next";
 import { PwaRegister } from "@/shared/components/PwaRegister";
-import { LocaleAutoDetect } from "@/shared/components/LocaleAutoDetect";
 import { HIDDEN_TAB_REVEAL_SCRIPT } from "@/shared/utils/hiddenTabReveal";
 import { BasePathNetworkProvider } from "@/shared/components/BasePathNetworkProvider";
 import { PWA_THEME_COLORS } from "@/shared/constants/pwaThemeColors";
@@ -155,7 +154,6 @@ export default async function RootLayout({ children }) {
         <NextIntlClientProvider locale={locale} messages={messages}>
           <BasePathNetworkProvider>
             <PwaRegister />
-            <LocaleAutoDetect />
             <ThemeProvider>{children}</ThemeProvider>
           </BasePathNetworkProvider>
         </NextIntlClientProvider>

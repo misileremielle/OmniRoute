@@ -114,10 +114,11 @@ test("the generator drops sentinels, non-strings and empty locales", () => {
   });
 });
 
-test("locale resolution matches request.ts: cookie, then x-locale, aliases, default", () => {
-  assert.equal(resolveRouteHandlerLocale("pt-BR", "de"), "pt-BR");
-  assert.equal(resolveRouteHandlerLocale("", "de"), "de");
-  assert.equal(resolveRouteHandlerLocale(undefined, "PT-br"), "pt-BR");
+test("locale resolution matches request.ts: cookie, then x-locale, default", () => {
+  // The fork ships English only: every request resolves to en.
+  assert.equal(resolveRouteHandlerLocale("en", null), "en");
+  assert.equal(resolveRouteHandlerLocale("pt-BR", "de"), "en");
+  assert.equal(resolveRouteHandlerLocale(undefined, "EN"), "en");
   assert.equal(resolveRouteHandlerLocale(null, null), "en");
   assert.equal(resolveRouteHandlerLocale("xx-unknown", null), "en");
 });

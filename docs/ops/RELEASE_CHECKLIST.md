@@ -190,9 +190,7 @@ Breaking changes: add `BREAKING CHANGE:` footer or `!` after the scope (e.g. `fe
 
 ### i18n
 
-- [ ] `npm run i18n:check-ui-coverage` exits 0 — every UI locale at or above the 80% coverage floor
-- [ ] `npm run i18n:sync-ui:dry` reports 0 missing keys across all 66 target locales (every locale except the `en` source)
-- [ ] Translation contributions can be deferred to next release if minor (track in CHANGELOG)
+- [ ] `pnpm run check:ui-icu` and `pnpm run check:cli-i18n` exit 0 (the fork ships English only)
 
 ### Database Migrations
 

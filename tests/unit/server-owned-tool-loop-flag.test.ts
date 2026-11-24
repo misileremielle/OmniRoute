@@ -114,9 +114,8 @@ describe("feature-flags-settings count update", () => {
   });
 });
 
-describe("i18n key parity for SERVER_OWNED_TOOL_LOOP_ENABLED", () => {
+describe("i18n keys for SERVER_OWNED_TOOL_LOOP_ENABLED", () => {
   let enMessages: Record<string, unknown>;
-  let ptBrMessages: Record<string, unknown>;
 
   before(async () => {
     const enRaw = fs.readFileSync(
@@ -124,11 +123,6 @@ describe("i18n key parity for SERVER_OWNED_TOOL_LOOP_ENABLED", () => {
       "utf8"
     );
     enMessages = JSON.parse(enRaw);
-    const ptBrRaw = fs.readFileSync(
-      path.resolve(__dirname, "../../src/i18n/messages/pt-BR.json"),
-      "utf8"
-    );
-    ptBrMessages = JSON.parse(ptBrRaw);
   });
 
   it("en.json has nested featureFlags.definitions.SERVER_OWNED_TOOL_LOOP_ENABLED.label", () => {
@@ -144,23 +138,6 @@ describe("i18n key parity for SERVER_OWNED_TOOL_LOOP_ENABLED", () => {
     assert.equal(
       flagDef.description,
       "Continue non-streaming server-owned tool calls until the model returns a client-usable response."
-    );
-  });
-
-  it("pt-BR.json has nested featureFlags.definitions.SERVER_OWNED_TOOL_LOOP_ENABLED.label", () => {
-    const defs = ptBrMessages.featureFlags as Record<string, unknown> | undefined;
-    assert.ok(defs, "pt-BR.json should have featureFlags section");
-    const definitions = (defs as Record<string, unknown>).definitions as
-      Record<string, unknown> | undefined;
-    assert.ok(definitions, "pt-BR.json featureFlags should have definitions");
-    const flagDef = definitions.SERVER_OWNED_TOOL_LOOP_ENABLED as
-      Record<string, unknown> | undefined;
-    assert.ok(flagDef, "definitions should contain SERVER_OWNED_TOOL_LOOP_ENABLED");
-    assert.equal(flagDef.label, "Loop de ferramentas controlado pelo servidor");
-    assert.equal(typeof flagDef.description, "string");
-    assert.ok(
-      ((flagDef.description as string) || "").length > 0,
-      "description should be non-empty"
     );
   });
 

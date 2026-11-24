@@ -7,7 +7,6 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import en from "../../../../src/i18n/messages/en.json";
-import ptBr from "../../../../src/i18n/messages/pt-BR.json";
 
 // Real next-intl (the global setup mocks it with en.json): the locale cases need a provider.
 vi.unmock("next-intl");
@@ -98,23 +97,6 @@ describe("Breadcrumbs: segments are translated", () => {
     const last = crumbs(container).at(-1)!;
     expect(last.text).toBe(label);
     if (rawFallback) expect(container.textContent).not.toContain(rawFallback);
-  });
-
-  it("uses the reader's locale for the labels that come from the sidebar", () => {
-    // Guard against a vacuous case: these labels really differ from English in pt-BR.
-    expect(ptBr.sidebar.systemGroup).not.toBe(en.sidebar.systemGroup);
-    expect(ptBr.sidebar.conversations).not.toBe(en.sidebar.conversations);
-
-    const proxy = renderAt("/dashboard/system/proxy", "pt-BR", ptBr);
-    expect(crumbs(proxy.container)).toEqual([
-      { text: ptBr.breadcrumbs.dashboard, href: "/dashboard" },
-      { text: ptBr.sidebar.systemGroup, href: null },
-      { text: ptBr.sidebar.proxy, href: null },
-    ]);
-    cleanup();
-
-    const conversations = renderAt("/dashboard/conversations", "pt-BR", ptBr);
-    expect(crumbs(conversations.container).at(-1)!.text).toBe(ptBr.sidebar.conversations);
   });
 
   it("falls back to the capitalised segment for data (a provider id)", () => {

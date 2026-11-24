@@ -3,17 +3,16 @@ import { afterEach, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import en from "../../src/i18n/messages/en.json";
-import zh from "../../src/i18n/messages/zh-CN.json";
 import HealthAccountTooltip from "@/app/(dashboard)/dashboard/usage/components/ProviderLimits/HealthAccountTooltip";
 import { buildHealthAccount } from "@/app/(dashboard)/dashboard/usage/components/ProviderLimits/healthOverview";
 import { displayAccount } from "@/app/(dashboard)/dashboard/usage/components/ProviderLimits/availabilityDisplay";
 vi.unmock("next-intl");
 afterEach(cleanup);
-for (const locale of ["en", "zh-CN"])
+for (const locale of ["en"])
   for (const reason of ["scopeCooldown", "peakHour", "modelLockout"] as const) {
     it(`${locale} renders ${reason} without inventing quota percentages`, () => {
       const now = Date.now();
-      const messages = locale === "en" ? en : zh;
+      const messages = en;
       const ready = {
         usable: true,
         blockers: [],

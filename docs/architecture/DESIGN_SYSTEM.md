@@ -189,10 +189,8 @@ lastUpdated: 2026-11-03
 4. Colors: semantic utilities (`text-success`, `bg-warning-bg`, `border-border`…) and
    `var(--color-chart-N)` for chart series; no hex values and no `dark:` variants that only repeat a color.
 5. Text: every string, including the labels you pass to kit components, comes from `useTranslations`. New
-   keys go into `src/i18n/messages/en.json` only; the release refresh fills the other locales
-   (`tests/_helpers/localeParityMode.ts` describes the two modes). A test that mounts a real
-   non-English catalog builds its messages as the runtime does, with `deepMergeFallback` from
-   `src/i18n/request.ts`, so a key that is still English-only falls back instead of throwing.
+   keys go into `src/i18n/messages/en.json`, the only catalog this fork ships
+   (`docs/guides/I18N.md`).
 6. Run the guards before the PR: `tests/unit/dashboard-kit-sweep.test.ts`,
    `tests/unit/icon-map-coverage.test.ts`, `tests/unit/icon-map-object-values.test.ts`,
    `npm run check:dashboard-typecheck` (the only check that catches a duplicated import in `iconMap.ts`),

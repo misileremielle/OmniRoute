@@ -2,7 +2,7 @@
 import React, { act } from "react";
 import { createRoot } from "react-dom/client";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import deMessages from "../../../src/i18n/messages/de.json";
+import enMessages from "../../../src/i18n/messages/en.json";
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
@@ -96,7 +96,7 @@ afterEach(() => {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe("FreePoolTab source toggles", () => {
-  it("has every render-critical German translation", () => {
+  it("has every render-critical English message", () => {
     const requiredKeys = [
       "freePoolTab",
       "proxyFreePoolFilterProtocol",
@@ -122,7 +122,7 @@ describe("FreePoolTab source toggles", () => {
     ] as const;
 
     for (const key of requiredKeys) {
-      expect(deMessages.settings[key], `missing settings.${key}`).toBeTruthy();
+      expect(enMessages.settings[key], `missing settings.${key}`).toBeTruthy();
     }
   });
 

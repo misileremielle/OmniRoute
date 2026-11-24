@@ -7,8 +7,7 @@
     "quality-extended",
     "docs-sync-strict",
     "pr-test-policy",
-    "i18n-ui-coverage",
-    "i18n-glossary-zhcn"
+    "i18n-ui-coverage"
   ],
   "exclusions": [
     {
@@ -371,67 +370,11 @@
       "command": "node scripts/i18n/check-translation-drift.mjs"
     },
     {
-      "id": "i18n:check-ui-coverage",
-      "job": "i18n-ui-coverage",
-      "args": ["run", "i18n:check-ui-coverage", "--", "--threshold=65"],
-      "kind": "hard",
-      "command": "node scripts/i18n/check-ui-keys-coverage.mjs"
-    },
-    {
       "id": "check:ui-icu",
       "job": "i18n-ui-coverage",
       "args": ["run", "check:ui-icu"],
       "kind": "hard",
       "command": "node scripts/i18n/check-ui-icu.mjs"
-    },
-    {
-      "id": "i18n:check-ratio",
-      "job": "i18n-ui-coverage",
-      "args": ["run", "i18n:check-ratio"],
-      "kind": "hard",
-      "command": "node scripts/i18n/check-translation-ratio.mjs"
-    },
-    {
-      "id": "i18n:check-value-drift",
-      "job": "i18n-ui-coverage",
-      "args": ["run", "i18n:check-value-drift"],
-      "kind": "hard",
-      "command": "node scripts/i18n/check-ui-value-drift.mjs"
-    },
-    {
-      "id": "i18n:check-new-keys",
-      "job": "i18n-ui-coverage",
-      "args": ["run", "i18n:check-new-keys"],
-      "kind": "hard",
-      "command": "node scripts/i18n/check-new-key-coverage.mjs"
-    },
-    {
-      "id": "i18n:check-keys",
-      "job": "i18n-ui-coverage",
-      "args": ["run", "i18n:check-keys"],
-      "kind": "hard",
-      "command": "node scripts/i18n/check-key-completeness.mjs"
-    },
-    {
-      "id": "i18n:check-keys:cli",
-      "job": "i18n-ui-coverage",
-      "args": ["run", "i18n:check-keys:cli"],
-      "kind": "hard",
-      "command": "node scripts/i18n/check-key-completeness.mjs --catalog=cli"
-    },
-    {
-      "id": "i18n:check-glossary:zh-CN",
-      "job": "i18n-glossary-zhcn",
-      "args": ["run", "i18n:check-glossary", "--", "--locale=zh-CN"],
-      "kind": "hard",
-      "command": "node scripts/i18n/check-glossary-consistency.mjs"
-    },
-    {
-      "id": "i18n:check-glossary:zh-TW",
-      "job": "i18n-glossary-zhcn",
-      "args": ["run", "i18n:check-glossary", "--", "--locale=zh-TW"],
-      "kind": "hard",
-      "command": "node scripts/i18n/check-glossary-consistency.mjs"
     },
     {
       "id": "audit:deps",

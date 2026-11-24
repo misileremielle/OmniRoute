@@ -13,7 +13,6 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 /**
  * Pure core: the compact catalog of one locale, serialized, from its full catalog and the English
  * one (only the keys en.json defines under publicSystem.globalError, only string values).
- * Shared with syncUiKeys (sync-ui-keys.mjs), which needs it in memory for a dry run.
  */
 export function renderGlobalErrorCatalog(english, source) {
   const keys = Object.keys(english.publicSystem.globalError);
@@ -51,7 +50,7 @@ export const ROUTE_HANDLER_MESSAGE_KEYS = Object.freeze([
   "auth.returnToDashboard",
 ]);
 
-/** Same sentinel as PLACEHOLDER_PREFIX in src/i18n/request.ts (sync-ui-keys.mjs writes it). */
+/** Same sentinel as PLACEHOLDER_PREFIX in src/i18n/request.ts. */
 const UNTRANSLATED_PREFIX = "__MISSING__:";
 
 function readPath(catalog, dottedKey) {
@@ -78,7 +77,7 @@ function writePath(target, dottedKey, value) {
  * from the full catalogs in config order. Only keys en.json defines as strings; a locale keeps
  * its own value unless it is missing, not a string or an untranslated `__MISSING__:` sentinel —
  * those fall back to English at runtime, exactly like deepMergeFallback in request.ts. A locale
- * with nothing of its own is left out. Shared with syncUiKeys (sync-ui-keys.mjs).
+ * with nothing of its own is left out.
  *
  * @param {Record<string, unknown>} english
  * @param {Array<[string, Record<string, unknown> | null]>} catalogsByCode

@@ -52,20 +52,6 @@ test("BigModel.cn and Z.AI expose distinct platform links and localized descript
   assert.equal(zai.apiHint, "Create an API key at https://z.ai/manage-apikey/apikey-list.");
 
   const en = JSON.parse(readFileSync("src/i18n/messages/en.json", "utf8"));
-  const zhCN = JSON.parse(readFileSync("src/i18n/messages/zh-CN.json", "utf8"));
-  const zhTW = JSON.parse(readFileSync("src/i18n/messages/zh-TW.json", "utf8"));
   assert.match(en.providers.onboardingProviderDescriptions.bigmodel, /BigModel\.cn/);
-  assert.match(zhCN.providers.onboardingProviderDescriptions.bigmodel, /智谱开放平台/);
-  assert.match(zhTW.providers.onboardingProviderDescriptions.bigmodel, /智譜開放平台/);
   assert.match(en.providers.onboardingProviderDescriptions.zai, /z\.ai\/manage-apikey/);
-  assert.match(zhCN.providers.onboardingProviderDescriptions.zai, /z\.ai\/manage-apikey/);
-  assert.match(zhTW.providers.onboardingProviderDescriptions.zai, /z\.ai\/manage-apikey/);
-
-  const ptBR = JSON.parse(readFileSync("src/i18n/messages/pt-BR.json", "utf8"));
-  const vi = JSON.parse(readFileSync("src/i18n/messages/vi.json", "utf8"));
-  const bigmodelKeyPath = /bigmodel\.cn\/usercenter\/proj-mgmt\/apikeys/;
-  assert.match(ptBR.providers.onboardingProviderDescriptions.bigmodel, bigmodelKeyPath);
-  assert.match(vi.providers.onboardingProviderDescriptions.bigmodel, bigmodelKeyPath);
-  assert.match(ptBR.providers.onboardingProviderDescriptions.zai, /z\.ai\/manage-apikey/);
-  assert.match(vi.providers.onboardingProviderDescriptions.zai, /z\.ai\/manage-apikey/);
 });

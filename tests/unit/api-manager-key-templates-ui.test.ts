@@ -474,9 +474,8 @@ test("ApiManagerPageClient, modals, and 6-tab editor preserve permanent row acti
   assert.ok(editorSrc.includes("\u2192"), "routing separator retains Unicode arrow");
 });
 
-test("en.json and pl.json contain all translation keys referenced across Key Templates UI files", () => {
+test("en.json contains all translation keys referenced across Key Templates UI files", () => {
   const en = JSON.parse(readFileSync(join(OVERLAY_ROOT, "src/i18n/messages/en.json"), "utf8"));
-  const pl = JSON.parse(readFileSync(join(OVERLAY_ROOT, "src/i18n/messages/pl.json"), "utf8"));
 
   const files = [
     join(API_MANAGER_DIR, "ApiManagerPageClient.tsx"),
@@ -500,7 +499,6 @@ test("en.json and pl.json contain all translation keys referenced across Key Tem
   ];
 
   const missingEn: string[] = [];
-  const missingPl: string[] = [];
 
   for (const file of files) {
     const src = readFileSync(file, "utf8");
@@ -511,14 +509,10 @@ test("en.json and pl.json contain all translation keys referenced across Key Tem
       if (typeof en.apiManager[key] !== "string") {
         missingEn.push(`${key} (in ${file})`);
       }
-      if (typeof pl.apiManager[key] !== "string") {
-        missingPl.push(`${key} (in ${file})`);
-      }
     }
   }
 
   assert.deepEqual(missingEn, []);
-  assert.deepEqual(missingPl, []);
 });
 
 test("fractional quota limits and budget warning thresholds survive an untouched template draft", () => {

@@ -15,7 +15,7 @@ import { FEATURE_FLAG_DEFINITIONS } from "../../src/shared/constants/featureFlag
 
 const MESSAGES_DIR = path.join(process.cwd(), "src", "i18n", "messages");
 
-test("operator-egress keys are present in all 67 locale catalogs and wired to code", () => {
+test("operator-egress keys are present in the en catalog and wired to code", () => {
   // Code side: the flag definition names the description key the locales carry.
   const definition = FEATURE_FLAG_DEFINITIONS.find(
     (d) => d.key === "PROXY_OPERATOR_EGRESS_ENABLED"
@@ -49,7 +49,7 @@ test("operator-egress keys are present in all 67 locale catalogs and wired to co
 
   // Locale side: every catalog carries both keys.
   const files = fs.readdirSync(MESSAGES_DIR).filter((f) => f.endsWith(".json"));
-  assert.equal(files.length, 67);
+  assert.deepEqual(files, ["en.json"]);
   const missing: string[] = [];
   for (const file of files) {
     const data = JSON.parse(fs.readFileSync(path.join(MESSAGES_DIR, file), "utf8")) as Record<

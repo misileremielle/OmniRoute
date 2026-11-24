@@ -106,17 +106,6 @@
           "disposition": "required",
           "domains": ["build", "cli", "i18n", "tests", "ui"]
         },
-        "i18n-glossary-zhcn": {
-          "when": "code-or-i18n",
-          "disposition": "required",
-          "domains": ["i18n", "tests"]
-        },
-        "i18n": {
-          "when": "i18n",
-          "disposition": "advisory",
-          "reason": "Existing untranslated-catalog report; UI coverage and glossary are required.",
-          "domains": ["build", "cli", "i18n", "tests", "ui"]
-        },
         "pr-test-policy": {
           "when": "pr",
           "disposition": "required",

@@ -673,6 +673,9 @@ async function stepE2eTimings(ctx) {
 
 async function stepUiKeys(ctx) {
   const scriptAbs = path.join(ctx.root, "scripts", "i18n", "sync-ui-keys.mjs");
+  // Fork: English only (docs/ops/FORK_IDENTITY.md) — no locale catalogs to sync.
+  if (!fs.existsSync(scriptAbs))
+    return { status: "skipped", detail: "English-only fork: no locale catalogs to sync" };
   const details = [];
   let changed = false;
   let untranslatedSkipped = false;

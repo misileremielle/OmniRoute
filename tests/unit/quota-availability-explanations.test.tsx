@@ -3,13 +3,12 @@ import { afterEach, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import en from "../../src/i18n/messages/en.json";
-import zh from "../../src/i18n/messages/zh-CN.json";
 import HealthAccountTooltip from "@/app/(dashboard)/dashboard/usage/components/ProviderLimits/HealthAccountTooltip";
 import { buildHealthAccount } from "@/app/(dashboard)/dashboard/usage/components/ProviderLimits/healthOverview";
 import type { QuotaAvailabilityDecision } from "@/lib/usage/availabilityTypes";
 vi.unmock("next-intl");
 afterEach(cleanup);
-for (const locale of ["en", "zh-CN"]) {
+for (const locale of ["en"]) {
   for (const [reason, key] of [
     ["recentSuccess", "healthRecentSuccessBypass"],
     ["purchasedBalance", "healthPurchasedBalanceBypass"],
@@ -17,7 +16,7 @@ for (const locale of ["en", "zh-CN"]) {
   ] as const) {
     it(`${locale} tooltip displays the server's ${reason} explanation`, () => {
       const now = Date.now();
-      const messages = locale === "en" ? en : zh;
+      const messages = en;
       const decision: QuotaAvailabilityDecision = {
         usable: true,
         fetchedAt: new Date(now).toISOString(),

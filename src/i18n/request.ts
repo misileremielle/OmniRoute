@@ -6,10 +6,10 @@ import { resolveRequestedLocale } from "./resolveRequestedLocale";
 const FALLBACK_LOCALE = "en";
 
 /**
- * Sentinel prefix written by `scripts/i18n/sync-ui-keys.mjs` when backfilling a
- * locale file with an untranslated key: `__MISSING__:<english value>`. Kept in
- * sync manually with the scripts (plain .mjs, no shared TS module) — see
- * `scripts/i18n/sync-ui-keys.mjs` and `scripts/i18n/check-ui-keys-coverage.mjs`.
+ * Sentinel prefix upstream's locale sync writes for an untranslated key:
+ * `__MISSING__:<english value>`. The fork ships English only, but the merge
+ * still treats the sentinel as absent so a stray marker never reaches users.
+ * Same constant as `scripts/i18n/generate-global-error-messages.mjs`.
  */
 export const PLACEHOLDER_PREFIX = "__MISSING__:";
 

@@ -1537,27 +1537,10 @@ value below unset in production deployments.
 | `OMNI_COVERAGE_ROOT` | _(unset)_ | `scripts/quality/coverage-node-register.mjs` | Repository root used by the coverage capture harness (Node register hook + Vitest provider) to resolve the exact-commit coverage source scope. Set by the quality harness only; leave unset in production. |
 | `CLI_DEVIN_BIN`                        | _(PATH lookup)_                  | `open-sse/executors/devin-cli.ts`         | Override the Devin CLI binary path.                                                                                                                                                                                                        |
 
-### UI translation backend
+### UI kit upstream check
 
-Used by `scripts/i18n/lib/translate-backend.mjs`, the client behind the UI and CLI
-message translators (`npm run i18n:translate-new-keys`, `sync-ui-keys.mjs --translate-markers`,
-`add-locale.mjs`). The docs are English-only. Every variable is unset by default — set
-them in `.env` only on machines that should be able to translate UI strings.
-
-| Variable                                 | Default   | Source File                              | Description                                                                                                                                                                               |
-| ---------------------------------------- | --------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `OMNIROUTE_TRANSLATION_API_URL`          | _(unset)_ | `scripts/i18n/lib/translate-backend.mjs` | OpenAI-compatible base URL for the translation backend.                                                                                                                                   |
-| `OMNIROUTE_TRANSLATION_API_KEY`          | _(unset)_ | `scripts/i18n/lib/translate-backend.mjs` | Bearer token for the translation backend (never logged).                                                                                                                                  |
-| `OMNIROUTE_TRANSLATION_MODEL`            | _(unset)_ | `scripts/i18n/lib/translate-backend.mjs` | Model id, e.g. `gpt-4o-mini` or `cx/gpt-5.4-mini`.                                                                                                                                        |
-| `OMNIROUTE_TRANSLATION_FALLBACK_MODELS`  | _(unset)_ | `scripts/i18n/lib/translate-backend.mjs` | Optional comma-separated model chain tried in order when the primary model fails (429 quota, 401/402, 5xx, timeout, network); a malformed request (400/413/422) is not retried elsewhere. |
-| `OMNIROUTE_TRANSLATION_TIMEOUT_MS`       | `60000`   | `scripts/i18n/lib/translate-backend.mjs` | Per-request timeout in milliseconds.                                                                                                                                                      |
-| `OMNIROUTE_TRANSLATION_REASONING_EFFORT` | _(unset)_ | `scripts/i18n/lib/translate-backend.mjs` | Optional reasoning control, sent as-is to the backend when set.                                                                                                                           |
-| `OMNIROUTE_TRANSLATION_CONCURRENCY`      | `4`       | `scripts/i18n/lib/translate-backend.mjs` | Parallel translation requests when running over multiple files / locales.                                                                                                                 |
-| `OMNIROUTE_TRANSLATION_ENGINE` | `llm` | `scripts/i18n/lib/translate-backend.mjs` | `llm` uses the backend above; `google` translates through the structure-safe Google engine and needs none of the LLM variables. |
-| `OMNIROUTE_TRANSLATION_GOOGLE_FALLBACK` | `1` | `scripts/i18n/lib/translate-backend.mjs` | With the `llm` engine, a chunk the model could not produce (output guard failed on every attempt, or a model error) is translated by Google instead of failing the locale. `0` disables it. |
-| `OMNIROUTE_TRANSLATION_GOOGLE_API_KEY` | _(unset)_ | `scripts/i18n/lib/google-translate.mjs` | Optional Cloud Translation v2 key. Unset uses the keyless web endpoint (rate-limited, fine for occasional waves). |
-| `OMNIROUTE_TRANSLATION_GOOGLE_CONCURRENCY` | `6` | `scripts/i18n/lib/google-translate.mjs` | Parallel Google requests shared by every locale of a run. |
-| `OMNIROUTE_TRANSLATION_GOOGLE_TIMEOUT_MS` | `30000` | `scripts/i18n/lib/google-translate.mjs` | Per-request timeout for the Google engine, in milliseconds. |
+| Variable | Default | Source File | Description |
+| -------- | ------- | ----------- | ----------- |
 | `UI_KIT_READ_TOKEN` | _(unset)_ | `scripts/check/check-ui-kit-upstream.mjs` | Read-only token for the private upstream UI kit repo, used by `npm run check:ui-kit-upstream` and the weekly "UI Kit upstream watch" workflow. Locally the check uses your git credentials. |
 
 ---

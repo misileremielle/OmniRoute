@@ -67,7 +67,7 @@ test("the raw-text rule leaves every other JSON file alone", () => {
 });
 
 test("parseLocaleMessages accepts raw text (webpack) and parsed objects (Turbopack, Node)", () => {
-  const raw = fs.readFileSync(path.join(repoRoot, "src/i18n/messages/de.json"), "utf-8");
+  const raw = fs.readFileSync(path.join(repoRoot, "src/i18n/messages/en.json"), "utf-8");
   const parsed = JSON.parse(raw);
   assert.deepEqual(parseLocaleMessages(raw), parsed);
   assert.equal(parseLocaleMessages(parsed), parsed);

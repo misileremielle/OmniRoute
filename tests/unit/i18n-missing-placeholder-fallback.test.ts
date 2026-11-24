@@ -83,31 +83,22 @@ test("#7258: deepMergeFallback replaces nested placeholder leaves too", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 2. General regression: for every shipped locale, the REAL production merge
-//    (locale ⟵ EN fallback) leaves zero raw __MISSING__: leaves.
+// 2. General regression: every shipped catalog is free of raw __MISSING__:
+//    leaves. The fork ships English only (docs/ops/FORK_IDENTITY.md), and
+//    en.json is also the fallback, so a marker there would reach users verbatim.
 // ---------------------------------------------------------------------------
 
-test("#7258: after the real EN-fallback merge, no locale has a raw __MISSING__: leaf", () => {
-  const en = loadLocale("en");
+test("#7258: no shipped catalog has a raw __MISSING__: leaf", () => {
   const locales = readdirSync(messagesDir)
     .filter((f) => f.endsWith(".json"))
-    .map((f) => f.replace(/\.json$/, ""))
-    .filter((locale) => locale !== "en");
-
-  assert.ok(locales.length > 0, "expected at least one non-EN locale file");
+    .map((f) => f.replace(/\.json$/, ""));
+  assert.deepEqual(locales, ["en"]);
 
   const offenders: Record<string, string[]> = {};
   for (const locale of locales) {
-    const localeMessages = loadLocale(locale);
-    const merged = deepMergeFallback({ ...localeMessages }, en);
     const leaves: string[] = [];
-    collectPlaceholderLeaves(merged, "", leaves);
+    collectPlaceholderLeaves(loadLocale(locale), "", leaves);
     if (leaves.length > 0) offenders[locale] = leaves;
   }
-
-  assert.deepEqual(
-    offenders,
-    {},
-    `expected zero __MISSING__: leaves after EN fallback merge, found: ${JSON.stringify(offenders)}`
-  );
+  assert.deepEqual(offenders, {}, `found __MISSING__: leaves: ${JSON.stringify(offenders)}`);
 });

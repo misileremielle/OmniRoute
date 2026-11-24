@@ -9,9 +9,6 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/dashboard/providers",
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }));
-vi.mock("@/shared/components/LanguageSelector", () => ({
-  default: () => <div data-testid="lang" />,
-}));
 
 const { default: Header } = await import("@/shared/components/Header");
 const { default: ThemeToggle } = await import("@/shared/components/ThemeToggle");

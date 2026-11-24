@@ -22,11 +22,7 @@ bin/cli/
 ├── provider-test.mjs       ← testProviderApiKey()
 ├── settings-store.mjs      ← DB CRUD for key_value settings
 ├── locales/
-│   ├── en.json             ← English strings (source of truth, 42 locales)
-│   ├── pt-BR.json          ← Portuguese (Brazil) — fully translated
-│   └── {locale}.json       ← 41 additional locales (ar, az, de, es, fr, ja, zh-CN, …)
-├── scripts/
-│   └── generate-locales.mjs ← scaffold new locale files from config/i18n.json
+│   └── en.json             ← English strings (the fork ships English only)
 └── commands/
     ├── setup.mjs
     ├── doctor.mjs
@@ -129,18 +125,14 @@ omniroute --lang de providers list    # run in German, not persisted
 OMNIROUTE_LANG=ja omniroute status    # same effect via env
 ```
 
-**Adding a new locale**: add entry to `config/i18n.json`, then run:
-
-```bash
-node bin/cli/scripts/generate-locales.mjs
-```
+The fork ships English only, so `en` is the one locale these commands accept.
 
 ## Adding a new command
 
 1. Create `bin/cli/commands/your-command.mjs`
 2. Export `registerYourCommand(program)` following the Commander pattern
 3. Register in `bin/cli/commands/registry.mjs`
-4. Add strings to `locales/en.json` and `locales/pt-BR.json`
+4. Add strings to `locales/en.json`
 5. Write test in `tests/unit/cli-your-command.test.ts`
 
 See `CONVENTIONS.md` for exit codes, flag naming, output format, and destructive-action rules.

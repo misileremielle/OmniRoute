@@ -9,7 +9,6 @@ import {
 } from "../../src/shared/constants/sidebarVisibility.ts";
 import { getActiveSidebarHref } from "../../src/shared/utils/sidebarRouteMatch.ts";
 import en from "../../src/i18n/messages/en.json" with { type: "json" };
-import zh from "../../src/i18n/messages/zh-CN.json" with { type: "json" };
 
 test("team costs participates in sidebar registry, visibility, longest route, search labels and header description", () => {
   assert.ok(HIDEABLE_SIDEBAR_ITEM_IDS.includes("costs-teams"));
@@ -19,7 +18,7 @@ test("team costs participates in sidebar registry, visibility, longest route, se
   assert.equal(team.href, "/dashboard/costs/teams");
   assert.equal(getActiveSidebarHref("/dashboard/costs/teams", items), team.href);
   assert.deepEqual(normalizeHiddenSidebarItems(["costs-teams"]), ["costs-teams"]);
-  for (const messages of [en, zh]) {
+  for (const messages of [en]) {
     assert.ok(messages.sidebar.costsTeams);
     assert.ok(messages.sidebar.costsTeamsSubtitle);
     assert.ok(messages.header.teamsDescription);
@@ -28,9 +27,8 @@ test("team costs participates in sidebar registry, visibility, longest route, se
   assert.match(header, /"costs-teams": "teamsDescription"/);
 });
 
-test("English and Chinese feature catalogs contain exactly the same keys without missing markers", () => {
-  assert.deepEqual(Object.keys(en.teamCosts).sort(), Object.keys(zh.teamCosts).sort());
-  for (const messages of [en.teamCosts, zh.teamCosts]) {
+test("the English feature catalog has no missing markers", () => {
+  for (const messages of [en.teamCosts]) {
     for (const value of Object.values(messages)) {
       assert.ok(value && !value.startsWith("__MISSING__:"));
     }

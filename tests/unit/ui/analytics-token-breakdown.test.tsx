@@ -6,10 +6,8 @@ import { NextIntlClientProvider } from "next-intl";
 import TokenBreakdownCards from "@/shared/components/analytics/TokenBreakdownCards";
 import type { AnalyticsTokenSummary } from "@/shared/utils/analyticsTokenBreakdown";
 import en from "@/i18n/messages/en.json";
-import fa from "@/i18n/messages/fa.json";
 import namespaces from "@/i18n/routeNamespaces.generated.json";
 import { pickMessages } from "@/i18n/pickMessages";
-import { deepMergeFallback } from "@/i18n/request";
 
 vi.unmock("next-intl");
 afterEach(cleanup);
@@ -32,10 +30,7 @@ function renderCards(
     <NextIntlClientProvider
       locale={locale}
       timeZone="UTC"
-      messages={pickMessages(
-        locale === "fa" ? deepMergeFallback(structuredClone(fa), en) : en,
-        namespaces.sections.analytics
-      )}
+      messages={pickMessages(en, namespaces.sections.analytics)}
       onError={(error) => {
         throw error;
       }}
@@ -149,15 +144,5 @@ describe("Analytics token cards", () => {
     expect(count("Input Tokens", en.common.noData)).toBeTruthy();
     expect(count("Cached Input Tokens", "12,000")).toBeTruthy();
     expect(screen.getByText(en.analytics.inputSplitUnavailable)).toBeTruthy();
-  });
-
-  it("preserves Persian labels and uses the production English fallback for untranslated keys", () => {
-    const localized = deepMergeFallback(structuredClone(fa), en) as typeof en;
-    renderCards(summary, "exact", "fa");
-    expect(fa.stats.totalInputTokens).not.toBe(en.stats.totalInputTokens);
-    expect(count(fa.stats.totalInputTokens, "10,000")).toBeTruthy();
-    expect(count(localized.analytics.cachedInputTokens, "6,000")).toBeTruthy();
-    expect(screen.getByText(localized.analytics.inputTokensHint)).toBeTruthy();
-    expect(screen.queryByText("analytics.cachedInputTokens")).toBeNull();
   });
 });

@@ -4,7 +4,6 @@ import { createRoot } from "react-dom/client";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import en from "../../../src/i18n/messages/en.json";
-import zh from "../../../src/i18n/messages/zh-CN.json";
 import type {
   Detail,
   Team,
@@ -115,7 +114,7 @@ async function flush() {
 async function render(locale = "en") {
   await act(async () => {
     root.render(
-      <NextIntlClientProvider locale={locale} messages={locale === "en" ? en : zh}>
+      <NextIntlClientProvider locale={locale} messages={en}>
         <TeamCostsPage />
       </NextIntlClientProvider>
     );
@@ -238,13 +237,13 @@ describe("real team costs components", () => {
   it("localizes the actual team-cost breadcrumb", async () => {
     await act(async () =>
       root.render(
-        <NextIntlClientProvider locale="zh-CN" messages={zh}>
+        <NextIntlClientProvider locale="en" messages={en}>
           <Breadcrumbs />
         </NextIntlClientProvider>
       )
     );
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe(
-      zh.teamCosts.selectTeam
+      en.teamCosts.selectTeam
     );
   });
   it("does not invite replaying a successful write after refresh fails", async () => {
@@ -414,14 +413,6 @@ describe("real team costs components", () => {
     expect(control("Team name").value).toBe("New team");
     expect(document.body.textContent).toContain(en.teamCosts.forbidden);
     expect(button("Save").disabled).toBe(false);
-  });
-  it("uses real Chinese catalog and keeps refresh failures visible", async () => {
-    await render("zh-CN");
-    expect(container.textContent).toContain("当前软预算");
-    expect(container.textContent).not.toContain("teamCosts.");
-    fetchMock.mockResolvedValue(response({}, 403));
-    await click("刷新");
-    expect(container.textContent).toContain(zh.teamCosts.forbidden);
   });
   it("searches inside the dropdown without changing the current report until selection", async () => {
     nav.query = "?team=missing";

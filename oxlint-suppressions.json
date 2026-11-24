@@ -1075,11 +1075,6 @@
       "count": 1
     }
   },
-  "src/shared/components/LanguageSelector.tsx": {
-    "next/no-img-element": {
-      "count": 1
-    }
-  },
   "src/shared/components/OAuthModal.tsx": {
     "no-unused-vars": {
       "count": 3
@@ -3012,11 +3007,6 @@
   "tests/unit/quota-cache-is-exhausted-per-window-5923.test.ts": {
     "typescript/no-explicit-any": {
       "count": 6
-    }
-  },
-  "tests/unit/quota-concept-card-i18n.test.ts": {
-    "typescript/no-explicit-any": {
-      "count": 2
     }
   },
   "tests/unit/quota-email-privacy.test.ts": {

@@ -156,8 +156,8 @@ test("PATCH route and API Manager wire the key policy end to end", () => {
   );
 });
 
-test("API Manager strings exist in English and Vietnamese", () => {
-  for (const locale of ["en", "vi"]) {
+test("API Manager strings exist in English", () => {
+  for (const locale of ["en"]) {
     const messages = JSON.parse(read(`src/i18n/messages/${locale}.json`));
     for (const key of ["ccDiscoveryAliasesTitle", "ccDiscoveryAliasesDesc"]) {
       const value = messages?.settings?.[key];

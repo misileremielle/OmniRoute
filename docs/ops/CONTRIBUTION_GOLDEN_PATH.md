@@ -110,37 +110,17 @@ or documented manual check appropriate to the change.
 
 **Contracts**
 
-- `src/i18n/messages/en.json` is the UI source; `config/i18n.json` is the locale source.
-- CLI catalogs live separately under `bin/cli/locales/`.
-- Preserve ICU placeholders and tags exactly. Do not translate product/provider/model names,
-  protocol and header names, commands, code/JSON identifiers, URLs, environment variables, or
-  protected terms such as `OmniRoute`, `OAuth`, `MCP`, and `A2A`. The current source list is
-  `scripts/i18n/glossary/protected-terms.json`.
-
-A feature PR edits only `src/i18n/messages/en.json` (CLI: `bin/cli/locales/en.json`); the other
-locales are completed once per release by the release refresh or a translation wave
-(`docs/guides/I18N.md` → "Feature PRs touch `en.json` only"). `npm run check:pr-derived-paths`
-fails a feature PR that edits another locale catalog.
+- The fork ships English only (`docs/guides/I18N.md`). `src/i18n/messages/en.json` holds the UI
+  strings and `bin/cli/locales/en.json` the CLI strings; `config/i18n.json` lists `en` only.
+- Preserve ICU placeholders and tags exactly.
 
 **Focused loop**
 
 ```bash
-npm run i18n:check-ui-coverage
-npm run check:ui-icu
-node scripts/i18n/check-key-completeness.mjs --mode=pr      # what CI runs on your PR
-node scripts/i18n/check-ui-value-drift.mjs --mode=pr
-node scripts/check/check-cli-i18n.mjs --mode=pr              # when CLI strings change
-npm run i18n:check-glossary
-npm run lint
+pnpm run check:ui-icu
+pnpm run check:cli-i18n     # when CLI strings change
+pnpm run lint
 ```
-
-Without `--mode=pr` these gates run in release mode locally and report every key the cycle added
-or rewrote in `en.json`; that is the release refresh's work, not your PR's.
-
-This is guidance for the existing system, not an invitation to expand its tooling or key model.
-Keep i18n patches surgical while the replacement system is being designed. Do not run translation
-commands that call external services unless the task explicitly requires generated translations and
-you have reviewed the resulting diff.
 
 ### CLI
 

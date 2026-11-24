@@ -23,7 +23,6 @@ vi.mock("@/shared/components/CommandPalette", () => ({ default: () => null }));
 vi.mock("@/shared/components/MaintenanceBanner", () => ({ default: () => null }));
 vi.mock("@/shared/components/NavigationProgress", () => ({ default: () => null }));
 vi.mock("@/shared/components/NotificationToast", () => ({ default: () => null }));
-vi.mock("@/shared/components/LanguageSelector", () => ({ default: () => null }));
 
 const { default: DashboardShell } = await import("@/shared/components/layouts/DashboardShell");
 

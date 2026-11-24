@@ -119,7 +119,7 @@ src/
 ├── domain/              # Pure domain logic (policy engine, fallback, cost, lockout, comboResolver, assessment)
 ├── server/              # Server-only modules (authz pipeline, cors, auth middleware) — cannot import from client
 ├── shared/              # Shared between server and client where safe (constants, types, validation, contracts, utils)
-├── i18n/                # next-intl config + per-locale message JSON (67 locales)
+├── i18n/                # next-intl config + message JSON (English only in this fork)
 ├── middleware/          # Next.js middleware (request enrichment, locale detection)
 ├── models/              # Model adapter glue (legacy shim)
 ├── scripts/             # In-tree maintenance scripts (e.g., backfillAggregation)
@@ -305,9 +305,6 @@ open-sse/
 | `check-supported-node-runtime.ts`   | Validate current Node version is supported                                 |
 | `check-pr-test-policy.mjs`          | Enforce "tests required" rule on production code changes                   |
 | **`gen-provider-reference.ts`**     | NEW: auto-generate `docs/reference/PROVIDER_REFERENCE.md` from catalog     |
-| `i18n/generate-multilang.mjs`       | Translate UI strings via Google Translate (deprecated)                     |
-| `validate_translation.py`           | Per-locale translation validation                                          |
-| `check_translations.py`             | Code-side i18n key check                                                   |
 | `run-playwright-tests.mjs`          | Playwright E2E runner                                                      |
 | `run-protocol-clients-tests.mjs`    | MCP/A2A E2E runner                                                         |
 | `run-ecosystem-tests.mjs`           | Ecosystem (provider integration) tests                                     |
@@ -346,7 +343,7 @@ open-sse/
 | `COVERAGE_PLAN.md`          | Coverage goals and current state                                                      |
 | `FREE_TIERS.md`             | Curated free-tier providers (48+ free + 11 OAuth)                                     |
 | `CLI-TOOLS.md`              | External CLI integrations + Internal OmniRoute CLI                                    |
-| `I18N.md`                   | i18n architecture, adding a language, 67 locales                                      |
+| `I18N.md`                   | i18n runtime and checks (English only in this fork)                                   |
 | `UNINSTALL.md`              | Clean uninstall steps                                                                 |
 | `PROVIDER_REFERENCE.md`     | **Auto-generated** catalog of 224 providers (regen: `npm run gen:provider-reference`) |
 
@@ -425,7 +422,7 @@ Shipped configuration templates plus the committed quality-gate baselines
 
 | Path                                          | Purpose                                                                          |
 | --------------------------------------------- | -------------------------------------------------------------------------------- |
-| `config/i18n.json`                            | Locale list + metadata (canonical source for the 42-locale count)                |
+| `config/i18n.json`                            | Locale list + metadata (`en` only in this fork)                                  |
 | `config/i18n-schema.json`                     | JSON schema validating `i18n.json`                                               |
 | `config/payloadRules.json`                    | Upstream payload sanitization rules                                              |
 | `config/quality/quality-baseline.json`        | Multi-metric ratchet baseline (`scripts/quality/check-quality-ratchet.mjs`)      |
