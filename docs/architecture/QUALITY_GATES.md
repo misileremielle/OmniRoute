@@ -50,8 +50,12 @@ for an i18n-only change.
   three-digit range) and turns off only the comparison with a base ref.
 - **`check:workflows --ratchet`** fails on any actionlint finding. zizmor findings are held to
   `metrics.zizmorFindings` in `config/quality/quality-baseline.json`.
-- **`check:codeql-ratchet`** counts open code-scanning alerts against `metrics.codeqlAlerts`.
-  It measures nothing unless code scanning is enabled for the repository.
+- **`check:codeql-ratchet`** counts the repository's open CodeQL alerts against
+  `metrics.codeqlAlerts`. GitHub's default setup (enabled 2026-11-24) analyzes `main` and PRs
+  into `main`; the step does not analyze the revision under test, so a stacked PR's own code is
+  checked only once it reaches a PR into `main`. CI passes `--require-measurement`: the step
+  fails when the API cannot be read, when none of the 20 newest CodeQL analyses succeeded, or
+  when the baseline is missing or invalid, so an empty alert list never counts as zero.
 - **`check:secrets`** and **`check:vuln-ratchet`** compare with `metrics.secretFindings` and
   `metrics.vulnCount`.
 

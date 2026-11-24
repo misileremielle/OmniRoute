@@ -61,9 +61,9 @@ function runInstall(codes: number[]) {
   };
 }
 
-test("every install attempt runs under the 240-second timeout", () => {
+test("every install attempt runs under the 150-second timeout", () => {
   const result = runInstall([42, 0]);
-  assert.deepEqual(result.timeouts, ["TIMEOUT:240", "TIMEOUT:240"]);
+  assert.deepEqual(result.timeouts, ["TIMEOUT:150", "TIMEOUT:150"]);
 });
 
 test("a timed-out attempt (exit 124) is retried", () => {

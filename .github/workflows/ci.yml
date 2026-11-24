@@ -27,8 +27,9 @@ env:
   OMNIROUTE_SKIP_SYSTEM_TRUST: "1"
   CI_NODE_VERSION: "26"
 
-# Job timeouts: the measured work plus at least 12 minutes for the install action, which
-# covers one hung install attempt and its retry (.github/actions/pnpm-install-retry).
+# Job timeouts: the work measured in dispatch 45306431369 plus at least 12.5 minutes for the
+# install action's worst case (three timed-out attempts and the verify step, 730 s;
+# .github/actions/pnpm-install-retry).
 
 jobs:
   changes:
@@ -66,7 +67,9 @@ jobs:
             exit 0
           fi
           # --no-renames lists both sides of a move, so moving code into docs/ still counts as code.
-          git diff --name-only --no-renames "$BASE_SHA" "$HEAD_SHA" > changed-files.txt
+          # Three dots: diff from the merge base, so commits that landed only on the base after the
+          # PR branched do not count as this PR's changes.
+          git diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" > changed-files.txt
           node scripts/quality/classify-pr-changes.mjs changed-files.txt >> "$GITHUB_OUTPUT"
 
   lint:
@@ -178,7 +181,10 @@ jobs:
       - run: pnpm run check:secrets --ratchet
       - run: pnpm run check:vuln-ratchet --ratchet
       - run: pnpm run check:workflows --ratchet
-      - run: pnpm run check:codeql-ratchet
+      # --require-measurement: fail when the API cannot be read or the repository has no CodeQL
+      # analysis, so an empty alert list is never taken as zero alerts. The count covers the
+      # repository's open alerts (default setup scans main), not this revision.
+      - run: pnpm run check:codeql-ratchet --require-measurement
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -227,7 +233,8 @@ jobs:
   test-unit:
     name: Unit Tests (${{ matrix.shard }}/8)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Shards took 12.8-16.6 min under c8 in dispatch 45306431369.
+    timeout-minutes: 35
     needs: changes
     if: ${{ github.event_name != 'pull_request' || (github.event.pull_request.draft == false && needs.changes.outputs.code == 'true') }}
     strategy:
@@ -327,7 +334,7 @@ jobs:
   test-security:
     name: Security Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     needs: changes
     if: ${{ github.event_name != 'pull_request' || (github.event.pull_request.draft == false && needs.changes.outputs.code == 'true') }}
     env:

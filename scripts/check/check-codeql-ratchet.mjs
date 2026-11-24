@@ -15,7 +15,8 @@
 // config/quality/quality-baseline.json e SAI 1 SE — E SOMENTE SE — a contagem
 // MEDIDA for MAIOR que o baseline (regressão real, mais alertas CodeQL abertos).
 // Qualquer falha de MEDIÇÃO (gh ausente / sem auth / sem repo / erro de API) é um
-// SKIP gracioso que SAI 0 — nunca bloqueia o build por falta de infraestrutura.
+// SKIP que SAI 0 — salvo com --require-measurement (CI do fork), que sai 1 nesses casos,
+// num repositório sem análise CodeQL e com baseline ausente ou inválido.
 // Direction: down (a contagem só pode CAIR). Suporta --update para ratchetar.
 //
 // Uso:
@@ -36,6 +37,9 @@ const UPDATE = process.argv.includes("--update");
 // --advisory: nunca falha pela contagem (modo coletor legado). Sem esta flag o
 // gate é BLOQUEANTE: sai 1 numa regressão real (medida > baseline).
 const ADVISORY = process.argv.includes("--advisory");
+// --require-measurement (CI): a SKIP (no gh, no repo, API or parse error) and a repository
+// with no CodeQL analysis at all exit 1, because an empty alert list then measures nothing.
+const REQUIRE_MEASUREMENT = process.argv.includes("--require-measurement");
 
 const ROOT = process.cwd();
 const BASELINE_PATH = path.resolve(
@@ -248,8 +252,12 @@ function fetchCodeQLAlerts(ghBin, repo) {
       return { error: "parse-error", message: String(parseErr.message ?? parseErr) };
     }
 
-    // A API retorna null quando não há mais páginas (ou array vazio)
-    if (!Array.isArray(page_alerts) || page_alerts.length === 0) break;
+    // The alerts endpoint always answers an array; anything else is a measurement failure,
+    // never "no more pages" (it would turn a bad response into zero or a partial count).
+    if (!Array.isArray(page_alerts)) {
+      return { error: "unexpected-shape", message: `page ${page} is not an array` };
+    }
+    if (page_alerts.length === 0) break;
 
     allAlerts.push(...page_alerts);
 
@@ -298,8 +306,12 @@ function readBaselineCodeqlValue() {
 export function applyRatchet(alertCount) {
   const baselineValue = readBaselineCodeqlValue();
 
-  // Sem baseline → modo coletor puro (emite a contagem, não falha).
+  // Sem baseline → modo coletor puro (emite a contagem, não falha), salvo --require-measurement.
   if (baselineValue === null) {
+    if (REQUIRE_MEASUREMENT) {
+      finishUnmeasured(true, "metrics.codeqlAlerts baseline missing or invalid");
+      return;
+    }
     if (!QUIET) {
       process.stderr.write(
         "[codeql-ratchet] baseline ausente (metrics.codeqlAlerts) — modo coletor, sem ratchet.\n"
@@ -341,6 +353,57 @@ export function applyRatchet(alertCount) {
 // Main
 // ---------------------------------------------------------------------------
 
+/**
+ * Ends a run that could not measure. Exit 0 by default; exit 1 under --require-measurement.
+ *
+ * @param {boolean} requireMeasurement
+ * @param {string} reason
+ * @returns {number} the exit code it set
+ */
+export function finishUnmeasured(requireMeasurement, reason) {
+  if (requireMeasurement) {
+    process.stderr.write(
+      `[codeql-ratchet] FAIL — no CodeQL measurement (${reason}); --require-measurement is set.\n`
+    );
+  }
+  process.exitCode = requireMeasurement ? 1 : 0;
+  return process.exitCode;
+}
+
+/**
+ * Counts usable analyses: the API lists an analysis with a non-empty `error` when it
+ * failed, so only `error: ""` counts.
+ *
+ * @param {unknown} analyses - body of GET /code-scanning/analyses
+ * @returns {number}
+ */
+export function countUsableAnalyses(analyses) {
+  if (!Array.isArray(analyses)) return 0;
+  return analyses.filter((a) => a && typeof a === "object" && a.error === "").length;
+}
+
+/**
+ * Counts usable CodeQL analyses among the 20 newest (0 vs at least 1 is what matters).
+ *
+ * @returns {number|{error: string, message: string}}
+ */
+function fetchCodeQLAnalysisCount(ghBin, repo) {
+  try {
+    const stdout = execFileSync(
+      ghBin,
+      ["api", `/repos/${repo}/code-scanning/analyses?tool_name=CodeQL&per_page=20`],
+      { encoding: "utf8", timeout: 30_000 }
+    );
+    return countUsableAnalyses(JSON.parse(stdout));
+  } catch (err) {
+    const errMsg = String(err.stderr ?? err.message ?? "");
+    // GitHub answers 404 "no analysis found" when code scanning never ran.
+    if (/HTTP 404|no analysis found/i.test(errMsg)) return 0;
+    const codeMatch = /HTTP (\d{3})/.exec(errMsg);
+    return { error: `api-error:${codeMatch ? codeMatch[1] : "unknown"}`, message: errMsg };
+  }
+}
+
 function main() {
   const ghBin = findGhCli();
 
@@ -349,11 +412,10 @@ function main() {
     if (!QUIET) {
       process.stderr.write(
         "[codeql-ratchet] SKIP — `gh` CLI não encontrado no PATH.\n" +
-          "[codeql-ratchet] Instale via: https://cli.github.com/\n" +
-          "[codeql-ratchet] ADVISORY — este gate sai 0 (ratchet entra no CI da Fase 7 INT).\n"
+          "[codeql-ratchet] Instale via: https://cli.github.com/\n"
       );
     }
-    process.exitCode = 0;
+    finishUnmeasured(REQUIRE_MEASUREMENT, "binary-absent");
     return;
   }
 
@@ -367,12 +429,28 @@ function main() {
           "[codeql-ratchet] Execute dentro de um repositório GitHub com `gh` autenticado.\n"
       );
     }
-    process.exitCode = 0;
+    finishUnmeasured(REQUIRE_MEASUREMENT, "no-repo");
     return;
   }
 
   if (!QUIET) {
     process.stderr.write(`[codeql-ratchet] Repositório detectado: ${repo}\n`);
+  }
+
+  // Confirm a successful analysis BEFORE reading alerts: read the other way round, an analysis
+  // finishing between the two requests would let a pre-analysis empty list pass as zero.
+  if (REQUIRE_MEASUREMENT) {
+    const analyses = fetchCodeQLAnalysisCount(ghBin, repo);
+    if (typeof analyses !== "number") {
+      console.log(`codeqlAlerts=SKIP reason=${analyses.error}`);
+      finishUnmeasured(true, analyses.error);
+      return;
+    }
+    if (analyses === 0) {
+      console.log("codeqlAlerts=SKIP reason=no-analysis");
+      finishUnmeasured(true, "no successful CodeQL analysis among the 20 newest");
+      return;
+    }
   }
 
   // Buscar alertas
@@ -387,7 +465,7 @@ function main() {
         `[codeql-ratchet] SKIP — erro ao consultar API GitHub: ${message.slice(0, 200)}\n`
       );
     }
-    process.exitCode = 0;
+    finishUnmeasured(REQUIRE_MEASUREMENT, error);
     return;
   }
 
@@ -423,7 +501,7 @@ function main() {
   }
 
   // Medição bem-sucedida → aplica o ratchet (bloqueante salvo --advisory).
-  // Qualquer falha de MEDIÇÃO acima já retornou com exit 0 (skip gracioso).
+  // Qualquer falha de MEDIÇÃO acima já retornou (exit 0, ou 1 com --require-measurement).
   applyRatchet(alertCount);
 }
 

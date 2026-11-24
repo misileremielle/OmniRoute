@@ -35,20 +35,15 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../
 const workflowDir = path.join(repoRoot, ".github/workflows");
 
 /**
- * The GitHub owner of this repository (transferred to the organization on 2026-10-21): every
- * `github.repository` guard and every GHCR namespace must name it.
+ * The GitHub owner of this repository: every `github.repository` guard and every GHCR namespace
+ * must name it. The fork (misileremielle/omniroute) publishes only to its own GHCR namespace and
+ * has no Docker Hub repository (docs/ops/FORK_IDENTITY.md).
  */
-const OWNER = "cheaper-inference";
-/**
- * Docker Hub cannot move a repository between namespaces: the legacy personal repository keeps
- * its pull history and receives every release, and the organization repository is published in
- * parallel (docker-org-mirror.yml).
- */
-const DOCKERHUB_OWNERS = ["diegosouzapw", "cheaperinference"];
+const OWNER = "misileremielle";
 const REGISTRY_OWNERS: Record<string, string[]> = {
   "ghcr.io": [OWNER],
-  "docker.io": DOCKERHUB_OWNERS,
-  "index.docker.io": DOCKERHUB_OWNERS,
+  "docker.io": [],
+  "index.docker.io": [],
 };
 
 function workflowFiles(): string[] {

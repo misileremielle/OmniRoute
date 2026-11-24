@@ -7,10 +7,16 @@
 //                           (Hard Rule #14: dismissed alerts do not count)
 import test from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 // @ts-expect-error — .mjs helper has no type declarations; runtime shape is known.
 import {
   parseCodeQLAlerts,
   evaluateCodeqlRatchet,
+  countUsableAnalyses,
 } from "../../../scripts/check/check-codeql-ratchet.mjs";
 
 type RatchetVerdict = { regressed: boolean; improved: boolean };
@@ -324,4 +330,136 @@ test("evaluateCodeqlRatchet: strict integer comparison — any increase regresse
   assert.equal(evaluate(6, 5).regressed, true);
   assert.equal(evaluate(5, 5).regressed, false);
   assert.equal(evaluate(4, 5).regressed, false);
+});
+
+// ---------------------------------------------------------------------------
+// --require-measurement (the fork's CI mode), driven through a fake `gh` on PATH
+// ---------------------------------------------------------------------------
+
+const SCRIPT = fileURLToPath(
+  new URL("../../../scripts/check/check-codeql-ratchet.mjs", import.meta.url)
+);
+
+function runWithFakeGh(
+  {
+    alerts,
+    analyses,
+    baseline = { metrics: { codeqlAlerts: { value: 5 } } },
+  }: {
+    alerts: string;
+    analyses: string;
+    baseline?: unknown;
+  },
+  args: string[]
+) {
+  const dir = mkdtempSync(join(tmpdir(), "codeql-ratchet-"));
+  try {
+    writeFileSync(join(dir, "alerts.json"), alerts);
+    writeFileSync(join(dir, "analyses.json"), analyses);
+    const baselinePath = join(dir, "baseline.json");
+    writeFileSync(baselinePath, typeof baseline === "string" ? baseline : JSON.stringify(baseline));
+    // Answers `gh repo view` and the two `gh api` endpoints from the fixture files.
+    writeFileSync(
+      join(dir, "gh"),
+      [
+        "#!/bin/sh",
+        'if [ "$1" = repo ]; then echo owner/repo; exit 0; fi',
+        'echo "$2" >> "$FAKE_DIR/calls.log"',
+        'case "$2" in',
+        '  *analyses*) cat "$FAKE_DIR/analyses.json";;',
+        '  *alerts*) cat "$FAKE_DIR/alerts.json";;',
+        "esac",
+        "",
+      ].join("\n")
+    );
+    chmodSync(join(dir, "gh"), 0o755);
+    writeFileSync(join(dir, "calls.log"), "");
+    const result = spawnSync(
+      process.execPath,
+      [SCRIPT, "--quiet", "--baseline", baselinePath, ...args],
+      {
+        encoding: "utf8",
+        env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, FAKE_DIR: dir },
+        timeout: 20_000,
+      }
+    );
+    const calls = readFileSync(join(dir, "calls.log"), "utf8").split("\n").filter(Boolean);
+    return { ...result, calls };
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+const OK_ANALYSIS = JSON.stringify([{ id: 1, error: "" }]);
+
+test("countUsableAnalyses counts only analyses without an error", () => {
+  assert.equal(countUsableAnalyses([{ error: "" }, { error: "failed" }, null, {}]), 1);
+  assert.equal(countUsableAnalyses({ message: "no analysis found" }), 0);
+});
+
+test("require-measurement: no CodeQL analysis fails, plain mode passes", () => {
+  const fixture = { alerts: "[]", analyses: "[]" };
+  assert.equal(runWithFakeGh(fixture, ["--require-measurement"]).status, 1);
+  assert.equal(runWithFakeGh(fixture, []).status, 0);
+});
+
+test("require-measurement: only failed analyses still fail", () => {
+  const fixture = { alerts: "[]", analyses: JSON.stringify([{ id: 1, error: "boom" }]) };
+  assert.equal(runWithFakeGh(fixture, ["--require-measurement"]).status, 1);
+});
+
+test("require-measurement: a usable analysis and alerts within the baseline pass", () => {
+  const result = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS }, ["--require-measurement"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /codeqlAlerts=0/);
+});
+
+test("require-measurement: the analysis check runs before the alerts are read", () => {
+  const { calls } = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS }, [
+    "--require-measurement",
+  ]);
+  assert.match(calls[0] ?? "", /\/code-scanning\/analyses\?/);
+  assert.ok(
+    calls.slice(1).every((call) => /\/code-scanning\/alerts\?/.test(call)),
+    calls.join()
+  );
+  assert.ok(calls.length >= 2);
+});
+
+test("require-measurement: no analysis means the alerts are never read", () => {
+  const { calls, status } = runWithFakeGh({ alerts: "[]", analyses: "[]" }, [
+    "--require-measurement",
+  ]);
+  assert.equal(status, 1);
+  assert.deepEqual(
+    calls.filter((call) => /alerts/.test(call)),
+    []
+  );
+});
+
+test("require-measurement: a non-array alerts response fails instead of counting zero", () => {
+  const fixture = { alerts: '{"message":"oops"}', analyses: OK_ANALYSIS };
+  assert.equal(runWithFakeGh(fixture, ["--require-measurement"]).status, 1);
+  assert.equal(runWithFakeGh(fixture, []).status, 0);
+});
+
+test("require-measurement: a missing or malformed baseline fails", () => {
+  for (const baseline of [
+    "{not json",
+    { metrics: {} },
+    { metrics: { codeqlAlerts: { value: "5" } } },
+  ]) {
+    const result = runWithFakeGh({ alerts: "[]", analyses: OK_ANALYSIS, baseline }, [
+      "--require-measurement",
+    ]);
+    assert.equal(result.status, 1, JSON.stringify(baseline));
+  }
+});
+
+test("ci.yml runs the CodeQL ratchet with --require-measurement", () => {
+  const ci = readFileSync(
+    fileURLToPath(new URL("../../../.github/workflows/ci.yml", import.meta.url)),
+    "utf8"
+  );
+  assert.match(ci, /pnpm run check:codeql-ratchet --require-measurement/);
 });
