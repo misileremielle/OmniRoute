@@ -487,6 +487,30 @@ test("codeqlRunVerdict: the newest finished run decides, cancelled and skipped r
     ]).ok,
     false
   );
+  // A conclusion that contradicts the status fails: pending with a conclusion, completed
+  // without a known one.
+  for (const bad of [
+    { status: "in_progress", conclusion: "failure" },
+    { status: "completed", conclusion: null },
+    { status: "completed", conclusion: "mystery" },
+  ]) {
+    assert.equal(
+      codeqlRunVerdict([
+        { id: 3, created_at: "2026-11-24T11:00:00Z", ...bad },
+        run(1, "2026-11-24T09:00:00Z", "success"),
+      ]).ok,
+      false,
+      JSON.stringify(bad)
+    );
+  }
+  // A malformed status on an OLDER record still fails: every record is validated first.
+  assert.equal(
+    codeqlRunVerdict([
+      run(2, "2026-11-24T11:00:00Z", "success"),
+      { id: 1, created_at: "2026-11-24T09:00:00Z", status: "mystery", conclusion: null },
+    ]).ok,
+    false
+  );
   // A newest run with a missing or unknown status fails instead of being taken as pending.
   for (const status of [undefined, "mystery"]) {
     assert.equal(

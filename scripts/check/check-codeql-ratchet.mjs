@@ -543,6 +543,19 @@ const CODEQL_SETUP_PATH = "dynamic/github-code-scanning/codeql";
 // Workflow-run statuses that mean "not finished yet" (GitHub Actions API).
 const PENDING_RUN_STATUSES = new Set(["queued", "in_progress", "waiting", "requested", "pending"]);
 
+// Conclusions a completed workflow run can have (GitHub Actions API).
+const RUN_CONCLUSIONS = new Set([
+  "success",
+  "failure",
+  "cancelled",
+  "skipped",
+  "timed_out",
+  "action_required",
+  "neutral",
+  "stale",
+  "startup_failure",
+]);
+
 export function codeqlRunVerdict(runs) {
   if (!Array.isArray(runs)) return { ok: false, reason: "runs response is not an array" };
   if (runs.some((r) => !r || typeof r !== "object" || Array.isArray(r))) {
@@ -556,6 +569,20 @@ export function codeqlRunVerdict(runs) {
   if (unordered) {
     return { ok: false, reason: `CodeQL run ${unordered.id} has no valid created_at` };
   }
+  // Validate every status before deciding, so a decisive newer run cannot hide a malformed
+  // older record. A missing or unknown status is a measurement failure, not a pending run.
+  // The conclusion must fit the status: null while pending, a known value once completed.
+  const inconsistent = records.find((r) =>
+    PENDING_RUN_STATUSES.has(r.status)
+      ? r.conclusion !== null && r.conclusion !== undefined
+      : r.status !== "completed" || !RUN_CONCLUSIONS.has(r.conclusion)
+  );
+  if (inconsistent) {
+    return {
+      ok: false,
+      reason: `CodeQL run ${inconsistent.id} has status ${inconsistent.status} with conclusion ${inconsistent.conclusion}`,
+    };
+  }
   // Newest first; on equal times a success sorts last, so a tie never hides a failure.
   const isSuccess = (r) => r.status === "completed" && r.conclusion === "success";
   const sorted = records.sort(
@@ -565,10 +592,6 @@ export function codeqlRunVerdict(runs) {
   );
   for (const r of sorted) {
     if (PENDING_RUN_STATUSES.has(r.status)) continue;
-    // A missing or unknown status is a measurement failure, not a pending run.
-    if (r.status !== "completed") {
-      return { ok: false, reason: `CodeQL run ${r.id} has unrecognized status ${r.status}` };
-    }
     if (["cancelled", "skipped"].includes(r.conclusion)) {
       // Superseded only by a strictly newer run; a run with the same time proves nothing.
       const time = Date.parse(r.created_at);

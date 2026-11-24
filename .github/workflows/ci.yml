@@ -27,8 +27,9 @@ env:
   OMNIROUTE_SKIP_SYSTEM_TRUST: "1"
   CI_NODE_VERSION: "26"
 
-# Job timeouts: the work measured in dispatch 45306431369 and PR #10's first run, plus at least
-# 20 minutes of headroom. The install action's bounded steps total 18 min (pnpm bootstrap
+# Job timeouts: sized as the work measured in dispatch 45306431369 and PR #10's first run plus
+# a target of 20 minutes of headroom (a sizing target, not an audited minimum: Unit's 35 min
+# leaves 18.4 min over the 16.6 min c8 shard of the dispatch, 26 min over PR #10's 9 min). The install action's bounded steps total 18 min (pnpm bootstrap
 # 345 s, three timed-out install attempts 600 s, verify 130 s;
 # .github/actions/pnpm-install-retry). Checkout, setup-node and the cache restores have no
 # hard cap, so the headroom is an estimate, not a bound.
@@ -187,10 +188,11 @@ jobs:
       - run: pnpm run check:secrets --ratchet
       - run: pnpm run check:vuln-ratchet --ratchet
       - run: pnpm run check:workflows --ratchet
-      # --require-measurement: fail unless main's newest CodeQL scan succeeded for every
-      # language (rules in docs/architecture/QUALITY_GATES.md): an unmeasured count fails, and
-      # an empty list counts as zero only after a successful scan. The count covers main's open
-      # alerts, not this revision.
+      # --require-measurement: fail unless main's newest FINISHED CodeQL scan succeeded for
+      # every language (rules in docs/architecture/QUALITY_GATES.md). A scan still running is
+      # passed over and the previous results stand. An unmeasured count fails, and an empty list
+      # counts as zero only after a successful scan. The count covers main's open alerts, not
+      # this revision.
       - run: pnpm run check:codeql-ratchet --require-measurement
         env:
           GH_TOKEN: ${{ github.token }}

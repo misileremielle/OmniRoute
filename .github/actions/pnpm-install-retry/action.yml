@@ -81,7 +81,7 @@ runs:
         # Worst case for the loop: 3 x (150 s + 30 s kill grace) + 20 s + 40 s backoff = 600 s;
         # the 130 s verify bound and the pnpm bootstrap step above (up to 345 s) bring the
         # bounded steps to 1,075 s (18 min). The node_modules cache restore is not capped. Every
-        # job timeout-minutes in ci.yml is its measured work plus at least 20 min of headroom.
+        # job timeout-minutes in ci.yml is sized as measured work plus a 20 min headroom target.
         attempt_timeout_seconds=150
 
         for attempt in $(seq 1 "$max_attempts"); do
