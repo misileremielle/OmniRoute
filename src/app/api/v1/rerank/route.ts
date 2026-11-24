@@ -59,7 +59,7 @@ export async function OPTIONS() {
  * `RERANK_REMOTE_PROVIDER_NODES` opt-in and must pass the provider outbound URL policy
  * (see `_shared/rerankProviderNodes.ts`).
  */
-async function postHandler(request, _context) {
+async function postHandler(request) {
   let rawBody;
   try {
     rawBody = await request.json();

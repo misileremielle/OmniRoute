@@ -211,7 +211,8 @@ export async function authorizeEmbedWsUpgrade(
     if (await isDashboardSessionAuthenticated(authRequest)) {
       return { allow: true, via: "dashboard_session" };
     }
-    const apiKey = extractApiKey(authRequest, { allowUrl: false });
+    // The fork's extractApiKey reads headers only (no URL tokens), so no option is needed.
+    const apiKey = extractApiKey(authRequest);
     if (apiKey && (await isValidApiKey(apiKey))) {
       const meta = await getApiKeyMetadata(apiKey);
       if (meta && hasManageScope(meta.scopes ?? [])) {

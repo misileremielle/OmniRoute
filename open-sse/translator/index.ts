@@ -737,7 +737,6 @@ export function translateRequest(
       options?.preserveCacheControl === true &&
       providerHonorsOpenAIFormatCacheControl(provider, connectionCacheOverride, model);
     result = filterToOpenAIFormat(result, {
-      normalizeFileUrls: normalizedProvider === "cheaperinference" || normalizedProvider === "cinf",
       preserveCacheControl: preserveOpenAICacheControl,
       preservePromptCacheBreakpoint: providerAcceptsPromptCacheBreakpoint(provider),
       // #4849 regression guard: keep client reasoning_content for replay providers.
