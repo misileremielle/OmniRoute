@@ -249,7 +249,9 @@ test("#9166 Docker explicitly installs and validates LLMLingua optionals", () =>
 
   // Dependencies install in the `deps` stage (cached on its own); `builder` builds on top of it.
   const builderStart = dockerfile.indexOf("FROM base AS deps");
-  const runnerStart = dockerfile.indexOf("FROM base AS runner-base");
+  // The runner stages start from the Wolfi `runtime-os` stage, not from `base`; the
+  // dependency and build stages end where it begins.
+  const runnerStart = dockerfile.search(/^FROM \S+ AS runtime-os$/m);
 
   assert.ok(builderStart >= 0, "Docker deps stage must exist");
   assert.ok(dockerfile.includes("FROM deps AS builder"), "Docker builder stage must build on deps");
