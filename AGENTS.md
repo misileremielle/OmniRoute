@@ -281,9 +281,9 @@ git push -u origin feat/your-feature
 Hard Rule #18: one worktree + dedicated branch per task, base branch confirmed with the
 operator first (usually the active `release/vX.Y.Z`). Non-negotiables:
 
-- 🔴 Worktrees live ONLY under `.claude/worktrees/` — anywhere else escapes the tsconfig /
-  `.dockerignore` build-scope excludes (tsconfig `include: **/*` globs ~70× the codebase →
-  `next build` OOM, incident 2026-06-25) and scatters worktrees.
+- 🔴 Never nest a worktree inside the checkout outside the tsconfig / `.dockerignore`
+  build-scope excludes: tsconfig `include: **/*` then globs it (~70× the codebase →
+  `next build` OOM, incident 2026-06-25). A worktree outside the checkout is fine.
 - Reuse the main checkout's node_modules via **hard links** (`cp -al`), **never `ln -s`** —
   Turbopack FATALs on a symlink resolving outside the project root while typecheck/lint/tests
   keep passing (incident 2026-07-31, #9043).
@@ -397,7 +397,7 @@ is a short form, its complete binding text, rationale and incident history are i
 20. **Release-freeze — the FROZEN release branch belongs to the release captain; development does NOT stop (parallel-cycle model, 2026-07-04).** _Fork: the fork has no release freezes; this rule applies only to PRs into upstream `cheaper-inference/OmniRoute`, never to fork PRs._ Before merging **any** PR, every campaign workflow **MUST** check `gh issue list --repo cheaper-inference/OmniRoute --label release-freeze --state open`. If active: **NEVER merge into the frozen `release/vX.Y.Z`** — retarget the PR to the **highest** `release/v*` (`gh pr edit <N> --base release/vX+1`, then VERIFY with `gh pr view <N> --json baseRefName` — the edit fails silently) and merge normally; **HOLD only when the highest release/v\* branch IS the frozen one**. **⛔ ONLY `/generate-release` may raise a release-freeze (Phase 0a; lifted at Phase 12c)** — never open, extend, re-open or close one autonomously (any other freeze needs the operator's explicit yes). Full text: `docs/ops/HARD_RULES_DETAIL.md` → Rule 20.
 21. **Cross-session safety — this repo is worked by MANY parallel sessions/agents at once; never step on another's in-flight work.** Two absolute bans (both recurring incidents):
     - **(a) Never `git stash` / `git stash pop` — ANYWHERE in this repo, including inside an isolated worktree, and including inside any subagent you dispatch.** `git stash` operates on the **shared repository object store**, not the per-worktree working tree — a stash in one session can silently clobber or resurrect another parallel session's uncommitted changes. Compare against a base ref with `git show <ref>:<path>` or `git diff <ref> -- <path>` instead — never stash your tree away to "get it clean". **Put this ban verbatim in the prompt of every subagent that touches git.**
-    - **(b) Never merge, push, rebase, or force-push a PR / branch / worktree that another session is actively working** — including a PR whose head is a live fix worktree in `.claude/worktrees/` you did **not** create, even when it shares your `diegosouzapw` identity: **HOLD, let the owning session merge it.** **Before** merging or pushing to any PR you did not create _this_ session, run `git worktree list` and re-check `gh pr view <N> --json state,headRefOid`. (Reinforces Rule #18.)
+    - **(b) Never merge, push, rebase, or force-push a PR / branch / worktree that another session is actively working** — including a PR whose head is a live fix worktree you did **not** create, even when it shares your `diegosouzapw` identity: **HOLD, let the owning session merge it.** **Before** merging or pushing to any PR you did not create _this_ session, run `git worktree list` and re-check `gh pr view <N> --json state,headRefOid`. (Reinforces Rule #18.)
 
     Full text + incidents: `docs/ops/HARD_RULES_DETAIL.md` → Rule 21.
 

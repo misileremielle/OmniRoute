@@ -100,7 +100,7 @@ if (count > MAX) {
     `\n❌ [build-scope] scope of ${count} files exceeds ${MAX} — something is leaking into the\n` +
       `   tsconfig include scope (worktree, vendored copy, or build output). This poisons\n` +
       `   \`next build\` (OOM/GC-livelock). Add the offending dir to tsconfig.json "exclude"\n` +
-      `   (and .dockerignore). Worktrees MUST live under .claude/worktrees/ (already excluded).\n` +
+      `   (and .dockerignore). Worktrees go outside the checkout or under .claude/worktrees/ (excluded).\n` +
       `   Heap size does NOT fix this — a clean scope does. See incident 2026-06-25.`
   );
   process.exit(1);

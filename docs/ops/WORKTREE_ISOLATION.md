@@ -1,7 +1,7 @@
 ---
 title: "Worktree Isolation Protocol"
 version: 3.8.52
-lastUpdated: 2026-10-18
+lastUpdated: 2026-11-25
 ---
 
 # Worktree Isolation Protocol
@@ -26,13 +26,12 @@ own dedicated branch, and you MUST confirm the base branch with the operator bef
    `main` or "whatever I'm on" — the answer is usually the active `release/vX.Y.Z`, but it can
    be another feature/release branch. Get the base explicitly.
 2. **Create an isolated worktree + branch off that base** (never reuse the main checkout).
-   **🔴 MANDATORY PATH: every worktree lives under `.claude/worktrees/` — and nowhere else.**
-   This is the single canonical location. It is gitignored AND in the `tsconfig.json` /
-   `.dockerignore` excludes, so worktrees never leak into the build scope. **Never** use
-   `.worktrees/`, repo-root, or any other path — a worktree outside `.claude/worktrees/`
-   (a) escapes the build-scope excludes and poisons `next build` (the `tsconfig`
-   `include: **/*` globs ~70× the codebase → OOM; incident 2026-06-25) and (b) scatters
-   worktrees across two dirs.
+   **🔴 PATH: outside the checkout (for example `~/.pi/worktrees/<name>`, where Pi's worktree
+   tools put it) or under `.claude/worktrees/`, which is gitignored and in the `tsconfig.json` /
+   `.dockerignore` excludes.** **Never** nest a worktree anywhere else inside the checkout
+   (`.worktrees/`, repo root, …): it escapes the build-scope excludes and poisons `next build`
+   (the `tsconfig` `include: **/*` globs ~70× the codebase → OOM; incident 2026-06-25). The
+   commands below use `.claude/worktrees/`.
 
    ```bash
    BASE_BRANCH="release/vX.Y.Z"          # ← the branch the operator confirmed in step 1
@@ -50,7 +49,7 @@ own dedicated branch, and you MUST confirm the base branch with the operator bef
    cp -a "$(git -C <main_checkout> rev-parse --show-toplevel)/.husky/_" .husky/_
    ```
 
-   `scripts/dev/new-worktree.sh <branch> [base]` does all of the above (canonical path,
+   `scripts/dev/new-worktree.sh <branch> [base]` does all of the above (`.claude/worktrees/` path,
    hard-linked `node_modules`, `.husky/_`) and then **verifies** the hook is actually
    executable, so prefer it over running the steps by hand.
 
@@ -72,7 +71,7 @@ is invalid, it points out of the filesystem root`) while typecheck, lint and the
 3. **Work, commit, push, open the PR — all from inside the worktree.** Never `git checkout` a
    different branch inside a worktree another session might share.
 4. **Tear down only your own** worktree + branch when done, from the main checkout:
-   `git worktree remove .claude/worktrees/<dir>` then `git branch -D <task>`. Never blanket-delete
+   `git worktree remove <worktree-path>` then `git branch -D <task>`. Never blanket-delete
    `fix/*`/`feat/*` — other sessions keep their own; delete only the branches you created, by name.
 5. **Never touch another session's worktree, branch, or uncommitted changes.** If `git worktree
 list` shows worktrees you didn't create, leave them alone. End every session with the main
