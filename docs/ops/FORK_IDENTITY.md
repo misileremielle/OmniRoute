@@ -68,7 +68,10 @@ they are dropped again.
   sidecar transcoder container, WASM decoders or turning conversion off. Tracked by PR #12,
   since issues are disabled on the fork.
   The operator's original conditions were that ffmpeg sees only valid audio or video, and
-  only for formats MAI does not take. The second holds. The first is not enforced: a
+  only for formats the upstream does not take. Conversion follows the chosen provider's
+  format list, so besides MAI's non-WAV/MP3/FLAC uploads it also runs for an MPEG program
+  stream sent to any OpenRouter model (OpenRouter's list has no `mpeg`). The first condition
+  is not enforced, and the operator accepted that (2026-11-25): a
   structural check of the container from the bytes (`sniffAudioContainer`), not the file
   name, picks the one demuxer ffmpeg may use, but malformed media can pass it and ffmpeg
   parses whatever passes. Any API-key holder's upload, hostile or not, reaches ffmpeg. Added
