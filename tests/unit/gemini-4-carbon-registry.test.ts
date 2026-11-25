@@ -97,8 +97,10 @@ test("gemini-4-carbon is recognized as a thinkingLevel model", async () => {
   assert.equal(isGeminiThinkingLevelModel("vertex/gemini-4-carbon"), true);
 });
 
-test("Carbon shares the Gemini 4 quota family with Argon", () => {
-  for (const id of TIERS) assert.equal(getAntigravityQuotaFamily(`agy/${id}`), "argon");
+// Antigravity meters Carbon "within the shared Gemini quota" on Pro, Ultra and Enterprise
+// (https://antigravity.google/docs/models/, checked 2026-11-25); only Argon had its own bucket.
+test("Carbon is in the Gemini quota family, not Argon", () => {
+  for (const id of TIERS) assert.equal(getAntigravityQuotaFamily(`agy/${id}`), "gemini");
 });
 
 test("Antigravity executor caps Carbon tiers at the declared 65535, not the 16384 fallback", async () => {

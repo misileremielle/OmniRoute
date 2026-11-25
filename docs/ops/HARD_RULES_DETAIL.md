@@ -122,8 +122,7 @@ keep happening):
   **Put this ban verbatim in the prompt of every subagent that touches git** (agents don't
   inherit AGENTS.md's context — the recurrence was a subagent).
 - **(b) Never merge, push, rebase, or force-push a PR / branch / worktree that another session
-  is actively working.** An open PR whose head is a live fix worktree in `.claude/worktrees/`
-  you did **not** create (e.g. `fix-5852`/`fix-5923` carrying fresh commits, even when they
+  is actively working.** An open PR whose head is a live fix worktree you did **not** create (e.g. `fix-5852`/`fix-5923` carrying fresh commits, even when they
   share your `diegosouzapw` identity), or any branch another session owns, is **off-limits —
   HOLD**, and let the owning session merge it. **Before** merging or pushing to any PR you did
   not create _this_ session, run `git worktree list` to check for a matching in-flight worktree
