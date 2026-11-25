@@ -79,6 +79,10 @@ const EXPECTED: Record<InventoryKind, Record<string, number>> = {
     // GHSA-3w2r: the local-override lookup now reuses the shared
     // resolveLocalOverrideCredentials (_shared/videoModelResolution.ts), 2->1.
     "src/app/api/v1/ocr/route.ts": 1,
+    // Fork: /v1/audio/transcriptions resolves its upstream credential with the same scoped
+    // quota-preflight lookup as /v1/ocr. It passes no lease, so applyExclusiveConnectionLeasePolicy
+    // skips connections leased to another owner; it never dispatches chat (class B).
+    "src/app/api/v1/audio/transcriptions/route.ts": 1,
     "src/app/api/v1/providers/[provider]/embeddings/route.ts": 1,
     "src/app/api/v1/rerank/route.ts": 2,
     "src/app/api/v1/search/route.ts": 2,

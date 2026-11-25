@@ -36,6 +36,7 @@ import {
   validateSnowflakeProvider,
   validateGigachatProvider,
   validateAzureOpenAIProvider,
+  validateAzureSpeechProvider,
   validateAzureAiProvider,
   validateWatsonxProvider,
   validateOciProvider,
@@ -290,6 +291,7 @@ export async function validateProviderApiKey({
     snowflake: validateSnowflakeProvider,
     gigachat: validateGigachatProvider,
     "azure-openai": validateAzureOpenAIProvider,
+    "azure-speech": validateAzureSpeechProvider,
     "azure-ai": validateAzureAiProvider,
     "voyage-ai": ({ apiKey, providerSpecificData }: any) => {
       const embeddingProvider = getEmbeddingProvider("voyage-ai");

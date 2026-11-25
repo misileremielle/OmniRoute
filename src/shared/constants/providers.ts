@@ -122,6 +122,7 @@ export const AGGREGATOR_PROVIDER_IDS = new Set([
 export const ENTERPRISE_CLOUD_PROVIDER_IDS = new Set([
   "azure-openai",
   "azure-ai",
+  "azure-speech",
   "bedrock",
   "watsonx",
   "oci",

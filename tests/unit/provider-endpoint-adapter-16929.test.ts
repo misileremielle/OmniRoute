@@ -9,6 +9,16 @@ test("#16929: Gemini AI Studio transcription is tagged but has no local adapter"
   assert.equal(adapter.embeddings, "available");
 });
 
+test("transcription registry providers have an audio-transcriptions adapter", () => {
+  for (const provider of ["azure-speech", "openrouter"]) {
+    assert.equal(
+      getRegisteredEndpointAdapterStatuses(provider)["audio-transcriptions"],
+      "available",
+      provider
+    );
+  }
+});
+
 test("#16929: providers without registered handlers remain unknown, not falsely available", () => {
   const adapter = getRegisteredEndpointAdapterStatuses("unregistered-16929-provider");
   assert.equal(adapter["audio-transcriptions"], "unavailable");

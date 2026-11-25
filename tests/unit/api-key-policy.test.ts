@@ -566,6 +566,70 @@ test("enforceApiKeyPolicy returns the token-limit reset instant", async () => {
   assert.equal(result.rejection.headers.get("Retry-After"), String(body.error?.retry_after));
 });
 
+test("validateApiKeyModelPolicy adds the model's token limit and authorization to a model-less pass", async () => {
+  const key = await createKeyWithPolicy({ allowedModels: ["azure-speech/*"] });
+  const metadata = await apiKeysDb.getApiKeyMetadata(key.key);
+  const limit = tokenLimitsDb.upsertTokenLimit({
+    apiKeyId: metadata.id,
+    scopeType: "model",
+    scopeValue: "azure-speech/mai-transcribe-2",
+    tokenLimit: 10,
+    resetInterval: "daily",
+    resetTime: "00:00",
+  });
+  const { windowStart } = tokenLimitsDb.resetWindowIfElapsed(limit);
+  tokenLimitsDb.incrementWindowTokens(limit.id, windowStart, 10);
+  const policy = await loadPolicy("model-policy-after-upload");
+
+  // Before the upload the model is unknown, so neither check can apply yet.
+  const admission = await policy.enforceApiKeyPolicy(makePolicyRequest(key.key), null);
+  assert.equal(admission.rejection, null);
+
+  const exhausted = await policy.validateApiKeyModelPolicy(
+    makePolicyRequest(key.key),
+    admission,
+    "azure-speech/mai-transcribe-2"
+  );
+  assert.equal(exhausted?.status, 429);
+  assert.match(String((await readErrorBody(exhausted)).error?.message), /Token limit exceeded/);
+
+  const forbidden = await policy.validateApiKeyModelPolicy(
+    makePolicyRequest(key.key),
+    admission,
+    "openrouter/openai/whisper-1"
+  );
+  assert.equal(forbidden?.status, 403);
+
+  assert.equal(
+    await policy.validateApiKeyModelPolicy(
+      makePolicyRequest(key.key),
+      admission,
+      "azure-speech/mai-transcribe-1.5"
+    ),
+    null
+  );
+});
+
+test("validateApiKeyModelPolicy charges no request-rate allowance", async () => {
+  const key = await createKeyWithPolicy({ rateLimits: [{ limit: 1, window: 60 }] });
+  const policy = await loadPolicy("model-policy-no-charge");
+  const admission = await policy.enforceApiKeyPolicy(makePolicyRequest(key.key), null);
+  assert.equal(admission.rejection, null);
+  for (let i = 0; i < 3; i++) {
+    assert.equal(
+      await policy.validateApiKeyModelPolicy(
+        makePolicyRequest(key.key),
+        admission,
+        "azure-speech/mai-transcribe-2"
+      ),
+      null
+    );
+  }
+  // The one allowed request went to the admission pass; the next request is refused.
+  const next = await policy.enforceApiKeyPolicy(makePolicyRequest(key.key), null);
+  assert.equal(next.rejection?.status, 429);
+});
+
 test("enforceApiKeyPolicy applies blockedModels in all-access mode", async () => {
   const key = await createKeyWithPolicy({
     modelAccessMode: "all",

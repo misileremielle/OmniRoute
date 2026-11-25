@@ -31,6 +31,23 @@ export const APIKEY_PROVIDERS_ENTERPRISE = {
       "Foundry uses the OpenAI v1 surface with deployment names as models. OmniRoute normalizes root resource URLs to the v1 chat and /models endpoints.",
     passthroughModels: true,
   },
+  // Speech-to-text only (POST /v1/audio/transcriptions): no chat models, so no
+  // providerRegistry entry. Models live in open-sse/config/transcriptionRegistry.ts.
+  "azure-speech": {
+    id: "azure-speech",
+    // "stt" keeps the dashboard from treating it as a chat provider (Test button).
+    serviceKinds: ["stt"],
+    alias: "azure-speech",
+    name: "Azure Speech",
+    icon: "graphic_eq",
+    color: "#0078D4",
+    textIcon: "AS",
+    website: "https://learn.microsoft.com/azure/ai-services/speech-service/mai-transcribe",
+    authHint:
+      "Use your Azure Speech (Foundry) resource key. Base URL is the resource endpoint, for example https://eastus.api.cognitive.microsoft.com or https://my-resource.cognitiveservices.azure.com. MAI-Transcribe needs a region that offers it.",
+    apiHint:
+      "Serves POST /v1/audio/transcriptions through Azure fast transcription with MAI-Transcribe. Uploads other than WAV, MP3 or FLAC are converted to FLAC with ffmpeg first.",
+  },
   bedrock: {
     id: "bedrock",
     serviceKinds: ["llm"],

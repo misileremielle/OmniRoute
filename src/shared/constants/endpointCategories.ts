@@ -61,6 +61,12 @@ export const ENDPOINT_CATEGORIES: readonly EndpointCategory[] = [
     prefixes: ["/v1/ocr"],
   },
   {
+    id: "audio-transcriptions",
+    label: "Speech to Text",
+    description: "Audio transcription",
+    prefixes: ["/v1/audio/transcriptions"],
+  },
+  {
     id: "web-fetch",
     label: "Web Fetch",
     description: "Web page fetching",

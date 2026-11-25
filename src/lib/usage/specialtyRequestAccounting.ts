@@ -76,6 +76,52 @@ export async function recordEmbeddingRequest(
   return pricing.priced ? pricing.costUsd : null;
 }
 
+/**
+ * One completed speech-to-text request, billed by audio second. Only a cost the upstream reports
+ * (OpenRouter `usage.cost`) is recorded; with none the row stays unpriced rather than guessed.
+ * Neither the audio nor the transcript is retained.
+ */
+export async function recordTranscriptionRequest(
+  input: Identity & { audioSeconds: number | null; reportedCostUsd: number | null }
+): Promise<number | null> {
+  const { audioSeconds, reportedCostUsd, ...identity } = input;
+  const costUsd =
+    typeof reportedCostUsd === "number" && Number.isFinite(reportedCostUsd) && reportedCostUsd >= 0
+      ? reportedCostUsd
+      : null;
+  const tokens = costUsd === null ? {} : { cost_usd: costUsd };
+  const latencyMs = Date.now() - input.startTime;
+  await saveRequestUsage(
+    {
+      ...identity,
+      tokens,
+      calculatedCostUsd: null,
+      billingUnit: "second",
+      billingQuantity:
+        typeof audioSeconds === "number" && Number.isFinite(audioSeconds) && audioSeconds >= 0
+          ? audioSeconds
+          : null,
+      status: "200",
+      success: true,
+      latencyMs,
+      endpoint: "/v1/audio/transcriptions",
+    },
+    { deduplicate: false }
+  );
+  recordBill(identity, costUsd, tokens);
+  await saveCallLog({
+    ...identity,
+    id: input.requestId,
+    method: "POST",
+    path: "/v1/audio/transcriptions",
+    requestType: "transcription",
+    status: 200,
+    duration: latencyMs,
+    tokens: {},
+  });
+  return costUsd;
+}
+
 /** OCR payloads are never retained here: only scalar billing and attribution metadata. */
 export async function recordOcrRequest(
   input: Identity & { usageInfo?: Record<string, unknown>; annotated: boolean }

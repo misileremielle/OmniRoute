@@ -55,6 +55,15 @@ test("resolveEndpointCategory: maps /v1/models to 'models'", () => {
   assert.equal(resolveEndpointCategory("/v1/models"), "models");
 });
 
+test("resolveEndpointCategory: maps /v1/audio/transcriptions to 'audio-transcriptions'", () => {
+  // A key limited to other categories must not reach speech-to-text by default.
+  assert.equal(resolveEndpointCategory("/v1/audio/transcriptions"), "audio-transcriptions");
+  assert.equal(
+    resolveEndpointCategory(resolveCanonicalEndpointPath("/api/v1/audio/transcriptions")),
+    "audio-transcriptions"
+  );
+});
+
 test("resolveEndpointCategory: maps /v1/ocr to 'ocr'", () => {
   assert.equal(resolveEndpointCategory("/v1/ocr"), "ocr");
 });
@@ -64,7 +73,7 @@ test("resolveEndpointCategory: removed media and agent endpoints no longer map t
     "/v1/images/generations",
     "/v1/images/edits",
     "/v1/audio/speech",
-    "/v1/audio/transcriptions",
+    "/v1/audio/translations",
     "/v1/videos/generations",
     "/v1/music/generations",
     "/v1/agents/tasks",

@@ -15,6 +15,7 @@ import {
 import { buildSyncedCapabilities, mergeSyncedCapabilities } from "./syncedCapabilities";
 import { getAllEmbeddingModels } from "@omniroute/open-sse/config/embeddingRegistry";
 import { getAllRerankModels } from "@omniroute/open-sse/config/rerankRegistry";
+import { getAllTranscriptionModels } from "@omniroute/open-sse/config/transcriptionRegistry";
 import {
   getRegistryModelThinkingEfforts,
   getRegistryThinkingEfforts,
@@ -1727,6 +1728,38 @@ async function buildUnifiedModelsResponseCore(
         owned_by: rerankModel.provider,
         root: rawModelId,
         type: "rerank",
+      });
+    }
+
+    // Add speech-to-text models (filtered by active providers). Clients such as Nomily pick their
+    // POST /v1/audio/transcriptions model from this list.
+    for (const sttModel of getAllTranscriptionModels()) {
+      await maybeYieldCatalogBuild();
+      if (!isProviderActive(sttModel.provider)) continue;
+      const rawModelId = getSpecialtyModelRelativeId(sttModel.id, sttModel.provider);
+      if (!providerSupportsModel(sttModel.provider, rawModelId)) continue;
+      if (isModelHiddenBulk(sttModel.provider, rawModelId, null, "audio-transcriptions")) continue;
+      const existingStt = findEquivalentSpecialtyModel(
+        sttModel.provider,
+        rawModelId,
+        "audio",
+        sttModel.id
+      );
+      if (existingStt) {
+        // Being in the transcription registry says what the model does; fill in what discovery
+        // left out.
+        existingStt.type ??= "audio";
+        existingStt.subtype ??= "transcription";
+        continue;
+      }
+      models.push({
+        id: sttModel.id,
+        object: "model",
+        created: timestamp,
+        owned_by: sttModel.provider,
+        root: rawModelId,
+        type: "audio",
+        subtype: "transcription",
       });
     }
 

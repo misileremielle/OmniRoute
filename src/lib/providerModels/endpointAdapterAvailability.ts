@@ -8,6 +8,7 @@
 import { getRegistryEntry } from "@omniroute/open-sse/config/providerRegistry";
 import { getEmbeddingProvider } from "@omniroute/open-sse/config/embeddingRegistry";
 import { getRerankProvider } from "@omniroute/open-sse/config/rerankRegistry";
+import { getTranscriptionProvider } from "@omniroute/open-sse/config/transcriptionRegistry";
 import {
   isTrustedEndpointCapabilitySource,
   normalizeModelSupportedEndpoints,
@@ -25,13 +26,15 @@ export function getRegisteredEndpointAdapterStatuses(provider: string): Endpoint
     responses: status(hasChatRegistry),
     embeddings: status(Boolean(getEmbeddingProvider(provider))),
     rerank: status(Boolean(getRerankProvider(provider))),
-    // Media endpoints no longer exist; rows still tagged with them are unrunnable.
+    // Speech-to-text runs only through the transcription registry, so any other provider is
+    // known to have no adapter.
+    "audio-transcriptions": status(Boolean(getTranscriptionProvider(provider)), true),
+    // The other media endpoints no longer exist; rows still tagged with them are unrunnable.
     images: "unavailable",
     "images-generations": "unavailable",
     videos: "unavailable",
     music: "unavailable",
     "audio-speech": "unavailable",
-    "audio-transcriptions": "unavailable",
   };
 }
 

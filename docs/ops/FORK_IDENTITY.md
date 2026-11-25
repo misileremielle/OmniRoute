@@ -30,7 +30,7 @@ they are dropped again.
 | Agent surfaces            | MCP server, A2A server, ACP agents, cloud agents (`jules`, `devin`, `codex-cloud`), agent skills (`skills/`, `src/lib/agentSkills`), VS Code integration                                                                                                                                                                                                                                    |
 | Memory and extensions     | Memory, skills registry and omni-skills pages, plugins (and `PLUGIN_PERMISSION_MODEL_ENABLED`), context sources (Obsidian, Notion, local corpus), webhooks dispatcher                                                                                                                                                                                                                       |
 | Guardrails                | PII masker, reversible PII vault (`src/lib/pii`, `PII_REVERSIBLE_VAULT_ENABLED`), prompt-injection guard, input sanitizer, video bridge promotion tooling. The vision bridge stays                                                                                                                                                                                                          |
-| Media                     | Image, audio (speech / transcription), video and music handlers and their registries; the media cache page                                                                                                                                                                                                                                                                                  |
+| Media                     | Image, audio speech and translation, video and music handlers and their registries; the media cache page. Transcription came back as the fork's own slim endpoint (see "Speech to text" below); upstream's audio stack stays removed                                                                                                                                                        |
 | Dashboard                 | Playground, Translator page (the translation engine stays), gamification, radar, in-app docs site, changelog page, Batch API and files pages                                                                                                                                                                                                                                                |
 | Engine                    | Batch API and files, CCR compression engine, chaos mode (and its mode pack), reasoning routing rules, legacy completions, system prompt injection, CLI tool configurators and `cli-code` pages                                                                                                                                                                                              |
 | Providers                 | Web-cookie providers, cloud-agent providers and about 100 router/gateway providers. The lists and their removal migrations are in `config/fork-removed-providers.json`; the policy is in [`REMOVED_PROVIDERS.md`](../reference/REMOVED_PROVIDERS.md). Kept gateways: OpenRouter, Vercel AI Gateway, Chutes, Novita, NanoGPT, OpenCode Zen, OpenCode Go                                      |
@@ -53,6 +53,34 @@ they are dropped again.
 - **`kagi-search`** search provider.
 - **Performance work**: batched log writes, the per-handle capabilities-table guard in
   `src/lib/modelsDevSync.ts`, the per-attempt body copy in `prepareUpstreamBody`.
+- **Speech to text**: `POST /v1/audio/transcriptions` (OpenAI's API) with two upstreams,
+  `azure-speech` (Azure Speech fast transcription with MAI-Transcribe 2 and 1.5) and
+  `openrouter`. It is the fork's own code, not upstream's ~40-provider audio stack:
+  `open-sse/config/transcriptionRegistry.ts`, `open-sse/handlers/audioTranscription.ts`,
+  `open-sse/utils/audioTranscode.ts` and `src/app/api/v1/audio/transcriptions/route.ts`. In a
+  merge, upstream's `audioRegistry.ts`, `audioTranscription.ts`, `openrouterTranscription.ts`
+  and its version of the route are deleted or resolved to the fork's side. MAI takes only
+  WAV/MP3/FLAC, so other uploads are converted to FLAC with ffmpeg. The operator chose to
+  run ffmpeg in process, with the route frozen in `KNOWN_UNCLASSIFIED_SOURCE_SPAWN`, over a
+  sidecar transcoder container or WASM decoders, knowing that any API-key holder's upload
+  reaches ffmpeg. It is tracked by PR #12, the operator's choice since issues are
+  disabled on the fork. The
+  gate's stale check will not notice when ffmpeg goes, because the route also reaches three
+  baseline spawn modules through shared imports; `tests/unit/stt-route-spawn-sinks.test.ts`
+  fails instead, and the entry goes then. The
+  operator's two conditions: ffmpeg sees only valid audio or video, and only for
+  formats MAI does not take. The code only narrows the first: a structural check of the
+  container from the bytes (`sniffAudioContainer`), not the file name, picks the one demuxer
+  ffmpeg may use. It does not prove the media is valid; ffmpeg itself still parses what
+  passes. Added on top, not operator conditions: an API key is
+  required for conversion, plus size, time and concurrency caps.
+  The freeze exempts the whole route. `tests/unit/stt-route-spawn-sinks.test.ts` fails when
+  the route can reach a new spawn module, but not when it gains a new path to a known one.
+- **Wolfi runtime image**: the Docker `runtime-os` stage is `cgr.dev/chainguard/wolfi-base`
+  (pinned digest) with `ffmpeg-9.1`, hand-ported from upstream PR #21177 while that PR is
+  open. The builder stays on Debian. When upstream merges its version, take its structure and
+  keep the fork's pnpm build, `NPM_REGISTRY` argument and the ffmpeg package and probes;
+  `tests/unit/build/dockerfile-wolfi-runtime.test.mjs` pins them.
 - **Workflows**: `.github/workflows/ci.yml` and `docker-publish.yml` are the fork's own; see
   "CI and CD" below. Upstream changes to them are not merged wholesale; port a gate by hand
   only when it checks correctness.
@@ -182,10 +210,11 @@ timestamp. The fork's own migrations therefore use timestamps too:
 
 ## Sync history
 
-| Date       | Upstream                      | Notes                                                                                                                                                         |
-| ---------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-11    | `release/v3.8.54` (two syncs) | Merge commit `4a2c8f44eb`                                                                                                                                     |
-| 2026-11-22 | `release/v3.8.55`             | Fork migrations moved to timestamps; docs-counts gate re-ported; `keenable` search/fetch, `custom-json` nodes, `jev` and decision routing taken from upstream |
-| 2026-11-23 | (no upstream change)          | Lint switched from ESLint to Oxlint; lint and complexity baselines regenerated                                                                                |
-| 2026-11-23 | (no upstream change)          | English only: non-`en` catalogs, the language switcher, translation tooling and per-locale gates removed                                                      |
-| 2026-11-24 | (no upstream change)          | CI slimmed to correctness gates; policy gates, ratchets, merge queue and release tooling removed; Docker `:latest` owned by `main`                            |
+| Date       | Upstream                      | Notes                                                                                                                                                           |
+| ---------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11    | `release/v3.8.54` (two syncs) | Merge commit `4a2c8f44eb`                                                                                                                                       |
+| 2026-11-22 | `release/v3.8.55`             | Fork migrations moved to timestamps; docs-counts gate re-ported; `keenable` search/fetch, `custom-json` nodes, `jev` and decision routing taken from upstream   |
+| 2026-11-23 | (no upstream change)          | Lint switched from ESLint to Oxlint; lint and complexity baselines regenerated                                                                                  |
+| 2026-11-23 | (no upstream change)          | English only: non-`en` catalogs, the language switcher, translation tooling and per-locale gates removed                                                        |
+| 2026-11-24 | (no upstream change)          | CI slimmed to correctness gates; policy gates, ratchets, merge queue and release tooling removed; Docker `:latest` owned by `main`                              |
+| 2026-11-25 | (no upstream change)          | Speech to text back as the fork's `/v1/audio/transcriptions` (Azure Speech MAI-Transcribe, OpenRouter); runtime image on Wolfi with ffmpeg (upstream PR #21177) |

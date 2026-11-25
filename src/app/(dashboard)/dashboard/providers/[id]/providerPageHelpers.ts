@@ -301,6 +301,9 @@ export function readBooleanToggle(value: unknown, fallback: boolean): boolean {
 export const CONFIGURABLE_BASE_URL_PROVIDERS = new Set([
   "azure-openai",
   "azure-ai",
+  // Azure Speech keys belong to one resource in one region; the endpoint (or bare region)
+  // decides where fast transcription runs.
+  "azure-speech",
   "xiaomi-mimo",
   "siliconflow",
   "heroku",
@@ -338,6 +341,7 @@ export const CONFIGURABLE_BASE_URL_PROVIDERS = new Set([
 export const DEFAULT_PROVIDER_BASE_URLS: Record<string, string> = {
   "azure-openai": "https://example-resource.openai.azure.com",
   "azure-ai": "https://example-resource.services.ai.azure.com/openai/v1",
+  "azure-speech": "https://eastus.api.cognitive.microsoft.com",
   "bailian-coding-plan": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
   "xiaomi-mimo": "https://api.xiaomimimo.com/v1",
   siliconflow: "https://api.siliconflow.com/v1",
@@ -441,6 +445,7 @@ export function getProviderBaseUrlHint(
 // of a switch so the function stays under the complexity cap as ids are added.
 const BUILTIN_BASE_URL_PLACEHOLDER_EXAMPLES: Readonly<Record<string, string>> = {
   "azure-openai": "https://my-resource.openai.azure.com",
+  "azure-speech": "https://eastus.api.cognitive.microsoft.com",
   siliconflow: "https://api.siliconflow.cn/v1",
   heroku: "https://us.inference.heroku.com",
   cerebrium: "https://api.cerebrium.ai/v4/p-xxxxxxxx/my-app/run",

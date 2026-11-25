@@ -453,6 +453,54 @@ export const v1OcrSchema = z
   })
   .catchall(z.unknown());
 
+/**
+ * Text fields of a POST /v1/audio/transcriptions multipart form, after repeated `name[]` parts are
+ * collected into arrays. Fields OmniRoute cannot honour are refused rather than ignored.
+ * Reference: developers.openai.com/api/reference/resources/audio/subresources/transcriptions
+ */
+export const V1_TRANSCRIPTION_RESPONSE_FORMATS = [
+  "json",
+  "text",
+  "srt",
+  "verbose_json",
+  "vtt",
+  "diarized_json",
+] as const;
+
+export const v1AudioTranscriptionFieldsSchema = z
+  .object({
+    model: modelIdSchema,
+    language: z
+      .string()
+      .trim()
+      .regex(/^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/, "language must be an ISO-639-1 code")
+      .optional(),
+    prompt: z.string().max(8000).optional(),
+    response_format: z.enum(V1_TRANSCRIPTION_RESPONSE_FORMATS).default("json"),
+    temperature: z.coerce.number().min(0).max(1).optional(),
+    timestamp_granularities: z
+      .array(z.enum(["word", "segment"]))
+      .max(2)
+      .default([]),
+    keywords: z.array(z.string().trim().min(1).max(200)).max(200).default([]),
+    // Accepted for OpenAI compatibility; both upstreams chunk on their own.
+    chunking_strategy: z.string().optional(),
+    stream: z
+      .enum(["false", "true"])
+      .optional()
+      .refine((value) => value !== "true", "stream=true is not supported for transcriptions"),
+    known_speaker_names: z
+      .array(z.string())
+      .max(0, "known_speaker_names is not supported for transcriptions")
+      .optional(),
+    known_speaker_references: z
+      .array(z.string())
+      .max(0, "known_speaker_references is not supported for transcriptions")
+      .optional(),
+    include: z.array(z.string()).max(0, "include is not supported for transcriptions").optional(),
+  })
+  .strict();
+
 export const v1RerankSchema = z
   .object({
     model: modelIdSchema,
