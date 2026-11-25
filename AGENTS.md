@@ -281,9 +281,10 @@ git push -u origin feat/your-feature
 Hard Rule #18: one worktree + dedicated branch per task, base branch confirmed with the
 operator first (usually the active `release/vX.Y.Z`). Non-negotiables:
 
-- 🔴 Never nest a worktree inside the checkout outside the tsconfig / `.dockerignore`
-  build-scope excludes: tsconfig `include: **/*` then globs it (~70× the codebase →
-  `next build` OOM, incident 2026-06-25). A worktree outside the checkout is fine.
+- 🔴 A worktree lives outside the checkout (e.g. `~/.pi/worktrees/<name>`) or under
+  `.claude/worktrees/` (gitignored, in the tsconfig / `.dockerignore` excludes). Never nest one
+  anywhere else in the checkout: tsconfig `include: **/*` globs it (~70× the codebase →
+  `next build` OOM, incident 2026-06-25).
 - Reuse the main checkout's node_modules via **hard links** (`cp -al`), **never `ln -s`** —
   Turbopack FATALs on a symlink resolving outside the project root while typecheck/lint/tests
   keep passing (incident 2026-07-31, #9043).
