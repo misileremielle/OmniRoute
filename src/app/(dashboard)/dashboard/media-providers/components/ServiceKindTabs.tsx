@@ -11,6 +11,7 @@ const KIND_ICON: Record<ServiceKind, string> = {
   webSearch: "search",
   webFetch: "language",
   ocr: "document_scanner",
+  stt: "mic",
 };
 
 interface ServiceKindTabsProps {

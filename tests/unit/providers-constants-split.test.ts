@@ -68,7 +68,8 @@ const P = await import("../../src/shared/constants/providers.ts");
 // (fal-ai, stability-ai, runwayml, …) are not carried — 250.
 // Router/gateway providers outside the kept set (and the beatapi/empiriolabs extracts)
 // removed from this fork — 147.
-const APIKEY_PROVIDER_COUNT = 147;
+// Fork: azure-speech (MAI-Transcribe speech to text) adds one apikey/enterprise-cloud entry — 148.
+const APIKEY_PROVIDER_COUNT = 148;
 
 test("barrel still exports every catalog + key helpers", () => {
   for (const name of [
