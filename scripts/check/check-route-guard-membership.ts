@@ -181,8 +181,8 @@ export const KNOWN_UNCLASSIFIED_SOURCE_SPAWN: Record<string, string> = {
     "G-09 #15965: detected through the import graph (route -> src/lib/providerModels/cursorAgent.ts), not a comment match.",
   // Fork decision, 2026-11-25: the operator chose in-process ffmpeg over a sidecar transcoder
   // container or WASM decoders, knowing that any API-key holder's upload reaches ffmpeg.
-  // Tracking: PENDING operator choice. Issues are disabled on misileremielle/omniroute, so the
-  // policy's issue number is missing. The stale check below will not fire when ffmpeg goes (the
+  // Tracking: misileremielle/omniroute PR #12 (operator's choice; issues are disabled on the
+  // fork). The stale check below will not fire when ffmpeg goes (the
   // route also reaches three G-09 baseline sinks); tests/unit/stt-route-spawn-sinks.test.ts
   // fails then, and this entry must go.
   // POST /v1/audio/transcriptions reaches ffmpeg through open-sse/handlers/audioTranscription.ts
@@ -201,7 +201,7 @@ export const KNOWN_UNCLASSIFIED_SOURCE_SPAWN: Record<string, string> = {
     "Fork decision 2026-11-25 (operator chose in-process ffmpeg over a sidecar): remote STT route " +
     "converts uploads MAI-Transcribe cannot take with ffmpeg. Gated at the call site: container picked " +
     "from the bytes (not proof of valid media), one forced demuxer, file protocol only, API key, size/time/" +
-    "concurrency caps. Tracking issue pending (repo issues disabled); see docs/ops/FORK_IDENTITY.md.",
+    "concurrency caps. Tracking: misileremielle/omniroute PR #12 (repo issues disabled).",
   // RESOLVED (6A.8 P1, 2026-06-13): /api/system/version and /api/db-backups/exportAll
   // are now classified in LOCAL_ONLY_API_PREFIXES (loopback-enforced before auth).
   // The stale-enforcement guard requires this set to stay empty until a NEW

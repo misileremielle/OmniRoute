@@ -63,7 +63,8 @@ they are dropped again.
   WAV/MP3/FLAC, so other uploads are converted to FLAC with ffmpeg. The operator chose to
   run ffmpeg in process, with the route frozen in `KNOWN_UNCLASSIFIED_SOURCE_SPAWN`, over a
   sidecar transcoder container or WASM decoders, knowing that any API-key holder's upload
-  reaches ffmpeg. Its tracking issue is pending: issues are disabled on the fork. The
+  reaches ffmpeg. It is tracked by PR #12, the operator's choice since issues are
+  disabled on the fork. The
   gate's stale check will not notice when ffmpeg goes, because the route also reaches three
   baseline spawn modules through shared imports; `tests/unit/stt-route-spawn-sinks.test.ts`
   fails instead, and the entry goes then. The
