@@ -60,27 +60,32 @@ they are dropped again.
   `open-sse/utils/audioTranscode.ts` and `src/app/api/v1/audio/transcriptions/route.ts`. In a
   merge, upstream's `audioRegistry.ts`, `audioTranscription.ts`, `openrouterTranscription.ts`
   and its version of the route are deleted or resolved to the fork's side. MAI takes only
-  WAV/MP3/FLAC, so other uploads are converted to FLAC with ffmpeg. The operator chose to
-  run ffmpeg in process, with the route frozen in `KNOWN_UNCLASSIFIED_SOURCE_SPAWN`, over a
-  sidecar transcoder container or WASM decoders, knowing that any API-key holder's upload
-  reaches ffmpeg. It is tracked by PR #12, the operator's choice since issues are
-  disabled on the fork. The
-  gate's stale check will not notice when ffmpeg goes, because the route also reaches three
-  baseline spawn modules through shared imports; `tests/unit/stt-route-spawn-sinks.test.ts`
-  fails instead, and the entry goes then. The
-  operator's two conditions: ffmpeg sees only valid audio or video, and only for
-  formats MAI does not take. The code only narrows the first: a structural check of the
-  container from the bytes (`sniffAudioContainer`), not the file name, picks the one demuxer
-  ffmpeg may use. It does not prove the media is valid; ffmpeg itself still parses what
-  passes. Added on top, not operator conditions: an API key is
-  required for conversion, plus size, time and concurrency caps.
+  WAV/MP3/FLAC, so other uploads are converted to FLAC with ffmpeg in the OmniRoute process.
+  This is an operator-approved waiver of Hard Rule #15: the route spawns ffmpeg but serves
+  remote clients, so it is not loopback-only. It is frozen in
+  `KNOWN_UNCLASSIFIED_SOURCE_SPAWN`, although that ledger is otherwise for pre-existing
+  violations and this spawn path is new; the operator waived that too (2026-11-25), over a
+  sidecar transcoder container, WASM decoders or turning conversion off. Tracked by PR #12,
+  since issues are disabled on the fork.
+  The operator's original conditions were that ffmpeg sees only valid audio or video, and
+  only for formats MAI does not take. The second holds. The first is not enforced: a
+  structural check of the container from the bytes (`sniffAudioContainer`), not the file
+  name, picks the one demuxer ffmpeg may use, but malformed media can pass it and ffmpeg
+  parses whatever passes. Any API-key holder's upload, hostile or not, reaches ffmpeg. Added
+  on top: an API key is required for conversion, plus size, time and concurrency caps.
   The freeze exempts the whole route. `tests/unit/stt-route-spawn-sinks.test.ts` fails when
   the route can reach a new spawn module, but not when it gains a new path to a known one.
+  The gate's stale check will not notice when ffmpeg goes, because the route also reaches
+  three baseline spawn modules through shared imports; that test fails instead, and the
+  ledger entry goes then.
 - **Wolfi runtime image**: the Docker `runtime-os` stage is `cgr.dev/chainguard/wolfi-base`
   (pinned digest) with `ffmpeg-9.1`, hand-ported from upstream PR #21177 while that PR is
   open. The builder stays on Debian. When upstream merges its version, take its structure and
   keep the fork's pnpm build, `NPM_REGISTRY` argument and the ffmpeg package and probes;
-  `tests/unit/build/dockerfile-wolfi-runtime.test.mjs` pins them.
+  `tests/unit/build/dockerfile-wolfi-runtime.test.mjs` pins them. `docker-publish.yml` builds
+  only `runner-base` and `runner-web` (first Wolfi publish passed on amd64 and arm64, merge
+  `4f8c0db452`). `runner-cli`, the default target of a plain `docker build .` and of the
+  compose CLI profile, and `runner-cli-no-docker` are on Wolfi too but no workflow builds them.
 - **Workflows**: `.github/workflows/ci.yml` and `docker-publish.yml` are the fork's own; see
   "CI and CD" below. Upstream changes to them are not merged wholesale; port a gate by hand
   only when it checks correctness.
