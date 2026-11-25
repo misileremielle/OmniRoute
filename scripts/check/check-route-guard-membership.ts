@@ -179,6 +179,29 @@ export const KNOWN_UNCLASSIFIED_SOURCE_SPAWN: Record<string, string> = {
     "so it cannot be path-classified without locking every other provider's remote model discovery. " +
     "Gated at the call site on the trusted x-omniroute-peer-locality loopback stamp instead (fail-closed). " +
     "G-09 #15965: detected through the import graph (route -> src/lib/providerModels/cursorAgent.ts), not a comment match.",
+  // Fork decision, 2026-11-25: the operator chose in-process ffmpeg over a sidecar transcoder
+  // container or WASM decoders, knowing that any API-key holder's upload reaches ffmpeg.
+  // Tracking: PENDING operator choice. Issues are disabled on misileremielle/omniroute, so the
+  // policy's issue number is missing. The stale check below will not fire when ffmpeg goes (the
+  // route also reaches three G-09 baseline sinks); tests/unit/stt-route-spawn-sinks.test.ts
+  // fails then, and this entry must go.
+  // POST /v1/audio/transcriptions reaches ffmpeg through open-sse/handlers/audioTranscription.ts
+  // -> open-sse/utils/audioTranscode.ts. The route serves remote clients (Nomily AI on a phone),
+  // so it cannot be loopback-only, and MAI-Transcribe takes only WAV/MP3/FLAC while those clients
+  // upload Ogg/Opus or M4A. The operator's condition: ffmpeg only for valid audio/video in a
+  // format MAI does not take. The code narrows, and does not prove, validity:
+  // sniffAudioContainer picks a container from the bytes (never the file name or MIME type) and
+  // only that demuxer may run (-f, -format_whitelist), local file protocol only; ffmpeg still
+  // parses whatever passes. Added beyond the operator's condition: an API key is required for
+  // conversion (keyless callers get 401), output size cap, SIGKILL timeout, 2 running + 4
+  // queued, 4 requests in flight. Background: docs/ops/FORK_IDENTITY.md -> "Speech to text".
+  // The freeze is route-wide. tests/unit/stt-route-spawn-sinks.test.ts fails on a new spawn
+  // module, not on a new path to a known one.
+  "src/app/api/v1/audio/transcriptions/route.ts":
+    "Fork decision 2026-11-25 (operator chose in-process ffmpeg over a sidecar): remote STT route " +
+    "converts uploads MAI-Transcribe cannot take with ffmpeg. Gated at the call site: container picked " +
+    "from the bytes (not proof of valid media), one forced demuxer, file protocol only, API key, size/time/" +
+    "concurrency caps. Tracking issue pending (repo issues disabled); see docs/ops/FORK_IDENTITY.md.",
   // RESOLVED (6A.8 P1, 2026-06-13): /api/system/version and /api/db-backups/exportAll
   // are now classified in LOCAL_ONLY_API_PREFIXES (loopback-enforced before auth).
   // The stale-enforcement guard requires this set to stay empty until a NEW

@@ -17,7 +17,7 @@ const removedRoutes = [
   "v1/images/generations",
   "v1/images/edits",
   "v1/audio/speech",
-  "v1/audio/transcriptions",
+  "v1/audio/translations",
   "v1/music/generations",
   "v1/videos/generations",
   "gamification/stream",
@@ -42,7 +42,8 @@ test("removed features have no API route or advertised endpoint", () => {
   for (const removed of [
     "/v1/completions",
     "/v1/images",
-    "/v1/audio",
+    "/v1/audio/speech",
+    "/v1/audio/translations",
     "/v1/videos",
     "/v1/moderations",
   ]) {
@@ -60,6 +61,8 @@ test("removed features have no API route or advertised endpoint", () => {
     "rerank",
     "search",
     "systemone",
+    // The fork brought speech-to-text back on purpose (docs/ops/FORK_IDENTITY.md).
+    "audio/transcriptions",
   ]) {
     assert.equal(existsSync(path.join(root, "src/app/api/v1", route, "route.ts")), true, route);
   }
@@ -80,9 +83,10 @@ test("compatible nodes reject deleted media APIs while retaining chat and embedd
   for (const apiType of ["chat", "responses", "embeddings"]) {
     assert.equal(createProviderNodeSchema.safeParse({ ...node, apiType }).success, true, apiType);
   }
-  for (const kind of ["image", "video", "music", "tts", "stt"]) {
+  for (const kind of ["image", "video", "music", "tts"]) {
     assert.equal((SERVICE_KIND_VALUES as readonly string[]).includes(kind), false, kind);
   }
+  assert.equal((SERVICE_KIND_VALUES as readonly string[]).includes("stt"), true);
 });
 
 test("startup and build no longer launch removed background jobs", () => {

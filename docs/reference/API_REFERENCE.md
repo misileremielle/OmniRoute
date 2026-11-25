@@ -22,6 +22,7 @@ Each deployment serves its own copy of the spec at `/openapi.yaml`, generated fr
 - [Embeddings](#embeddings)
 - [Image Generation](#image-generation)
 - [Document OCR](#document-ocr)
+- [Audio Transcription](#audio-transcription)
 - [List Models](#list-models)
 - [Provider Plugin Manifest](#provider-plugin-manifest)
 - [Compatibility Endpoints](#compatibility-endpoints)
@@ -415,6 +416,64 @@ otherwise the project is derived from the Service Account JSON's `project_id` an
 defaults to `us-central1`. Both resolutions happen in `open-sse/handlers/ocr.ts`
 (`resolveVertexOcrAccessToken`, `resolveVertexOcrBaseUrl`), consumed by
 `src/app/api/v1/ocr/route.ts` before dispatching to `handleOcr`.
+
+---
+
+## Audio Transcription
+
+```bash
+POST /v1/audio/transcriptions
+Authorization: Bearer your-api-key
+Content-Type: multipart/form-data
+
+model=azure-speech/mai-transcribe-2
+file=@memo.ogg
+response_format=verbose_json
+language=en
+```
+
+OpenAI's transcription API, served by the fork's own handler
+(`open-sse/handlers/audioTranscription.ts`, route `src/app/api/v1/audio/transcriptions/route.ts`).
+`model` must carry a provider prefix; an unknown or unprefixed model (such as `whisper-1`) is a
+`400`. Registered models are in `open-sse/config/transcriptionRegistry.ts` and are listed by
+`GET /v1/models` with `type: "audio"`, `subtype: "transcription"`.
+
+| Provider       | Models                                                                 | Upstream                                          |
+| -------------- | ---------------------------------------------------------------------- | ------------------------------------------------- |
+| `azure-speech` | `mai-transcribe-2`, `mai-transcribe-1.5`                               | Azure Speech fast transcription, API `2025-10-15` |
+| `openrouter`   | `microsoft/mai-transcribe-2`, `deepgram/nova-3`, `openai/whisper-1`, … | OpenRouter `/api/v1/audio/transcriptions`         |
+
+The `azure-speech` connection takes the Speech resource's key and its `https://` endpoint URL;
+a bare region name is refused.
+
+Form fields: `file` (required, up to 100 MiB), `model`, `language` (ISO-639-1), `prompt`,
+`temperature`, `timestamp_granularities[]` (`word`, `segment`), `keywords[]` (terms to bias
+recognition), `response_format` (`json` default, `text`, `srt`, `vtt`, `verbose_json`,
+`diarized_json`). `chunking_strategy` is accepted and ignored. `stream=true`,
+`known_speaker_names`, `known_speaker_references` and `include` are refused with `400`.
+Diarization is opt-in through `response_format=diarized_json`, on models that support it.
+
+The container is read from the file's bytes, never its name or MIME type. Azure takes only
+WAV, MP3 and FLAC, so other audio or video (Ogg, WebM/Matroska, M4A/MP4, AAC, MPEG) is
+converted to FLAC with the image's ffmpeg first. Conversion needs an API key (`401` without
+one). For OpenRouter, WAV, MP3, FLAC, Ogg and AAC are forwarded as
+sent, MP4 family files as `m4a` and Matroska as `webm`. OpenRouter documents only those format
+names, and support varies by model, so a video MP4 or MKV can still be refused upstream. An
+MPEG program stream is converted for it too.
+
+| Status | Cause                                                                            |
+| ------ | -------------------------------------------------------------------------------- |
+| `400`  | Bad field, unknown model, file not a recognised container, decode failure        |
+| `401`  | Conversion needed but the request has no API key                                 |
+| `408`  | Upload stalled (30 s idle, 15 min total) or the client disconnected              |
+| `413`  | Upload or converted audio over the size limit                                    |
+| `503`  | 4 requests already in flight, or the conversion queue is full (`Retry-After: 5`) |
+| `504`  | Conversion or upstream deadline passed (upstream: 10 min)                        |
+| `502`  | Upstream failure or an unexpected upstream body                                  |
+
+The API key's rate limit is charged once, before the upload is read, so a request refused for
+its model still counts against it. Usage rows record OpenRouter's reported cost; Azure rows
+are unpriced.
 
 ---
 

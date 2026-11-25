@@ -811,6 +811,27 @@ function validateTokenLimit(context: PolicyContext): Response | null {
   }
 }
 
+/**
+ * The model-scoped checks of enforceApiKeyPolicy, for a route that must run the policy before it
+ * can read the model: POST /v1/audio/transcriptions runs `enforceApiKeyPolicy(request, null)`
+ * before buffering an upload, then this once the model is parsed. It adds the model/combo/quota
+ * authorization and the model's token-limit window and charges nothing. The rate limit was
+ * already charged by the first call, so a request refused here still counts against it (the
+ * operator chose that over buffering uploads for rate-limited keys).
+ */
+export async function validateApiKeyModelPolicy(
+  request: Request,
+  policy: Pick<ApiKeyPolicyResult, "apiKey" | "apiKeyInfo">,
+  modelStr: string
+): Promise<Response | null> {
+  const { apiKey, apiKeyInfo } = policy;
+  if (!apiKey || !apiKeyInfo) return null;
+  return (
+    (await validateApiKeyRoutingTarget(request, apiKey, apiKeyInfo, modelStr)) ??
+    validateTokenLimit({ request, apiKey, apiKeyInfo, modelStr })
+  );
+}
+
 function validateKeyQuota(context: PolicyContext): Response | null {
   const { apiKeyInfo } = context;
   if (!apiKeyInfo.id) return null;

@@ -4,12 +4,15 @@ import * as bodySizeGuard from "../../src/shared/middleware/bodySizeGuard.ts";
 import {
   MAX_BODY_BYTES_IMPORT,
   MAX_BODY_BYTES_LLM_API,
+  MAX_BODY_BYTES_TRANSCRIPTION,
+  RequestBodyTimeoutError,
   RequestBodyTooLargeError,
   readRequestBodyWithLimit,
   getBodySizeLimit,
   checkBodySize,
 } from "../../src/shared/middleware/bodySizeGuard.ts";
 import { requestBodyLimitMbToBytes } from "../../src/shared/constants/bodySize.ts";
+import { MAX_TRANSCRIPTION_UPLOAD_BYTES } from "../../open-sse/config/transcriptionRegistry.ts";
 
 test("body size guard public surface excludes the removed default MB helper", () => {
   assert.equal(Object.hasOwn(bodySizeGuard, "getDefaultRequestBodyLimitMb"), false);
@@ -58,6 +61,86 @@ test("bounded body reader enforces actual bytes when Content-Length is absent", 
     () => readRequestBodyWithLimit(request, 5),
     (err: unknown) => err instanceof RequestBodyTooLargeError && err.limit === 5
   );
+});
+
+/** A streamed request whose body is driven by `pull`; `cancel` may be made to never settle. */
+function streamedRequest(source: UnderlyingDefaultSource<Uint8Array>) {
+  return new Request("http://localhost/api/v1/audio/transcriptions", {
+    method: "POST",
+    body: new ReadableStream(source),
+    duplex: "half",
+  } as RequestInit & { duplex: "half" });
+}
+const never = () => new Promise<void>(() => {});
+
+test("bounded body reader gives up on a stalled body even if cancel never settles", async () => {
+  const request = streamedRequest({
+    start(controller) {
+      controller.enqueue(new Uint8Array([1]));
+    },
+    pull: never,
+    cancel: never,
+  });
+  const started = Date.now();
+  await assert.rejects(
+    () => readRequestBodyWithLimit(request, 100, { idleTimeoutMs: 50 }),
+    (err: unknown) => err instanceof RequestBodyTimeoutError && err.reason === "idle"
+  );
+  assert.ok(Date.now() - started < 2000);
+});
+
+test("bounded body reader stops a trickling body at its total deadline", async () => {
+  const request = streamedRequest({
+    async pull(controller) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      controller.enqueue(new Uint8Array([1]));
+    },
+  });
+  await assert.rejects(
+    () => readRequestBodyWithLimit(request, 10_000, { idleTimeoutMs: 1000, totalTimeoutMs: 150 }),
+    (err: unknown) => err instanceof RequestBodyTimeoutError && err.reason === "total"
+  );
+});
+
+test("bounded body reader refuses queued data once the deadline has passed", async () => {
+  const request = streamedRequest({
+    start(controller) {
+      controller.enqueue(new Uint8Array([1]));
+      controller.close();
+    },
+  });
+  await assert.rejects(
+    () => readRequestBodyWithLimit(request, 100, { totalTimeoutMs: 0 }),
+    (err: unknown) => err instanceof RequestBodyTimeoutError && err.reason === "total"
+  );
+});
+
+test("bounded body reader answers too-large even if cancel never settles", async () => {
+  const request = streamedRequest({
+    pull(controller) {
+      controller.enqueue(new Uint8Array(8));
+    },
+    cancel: never,
+  });
+  await assert.rejects(
+    () => readRequestBodyWithLimit(request, 5),
+    (err: unknown) => err instanceof RequestBodyTooLargeError
+  );
+});
+
+test("bounded body reader with timeouts still returns a prompt body whole", async () => {
+  const request = streamedRequest({
+    start(controller) {
+      controller.enqueue(new Uint8Array([1, 2]));
+      controller.enqueue(new Uint8Array([3]));
+      controller.close();
+    },
+  });
+  const body = await readRequestBodyWithLimit(request, 10, {
+    idleTimeoutMs: 1000,
+    totalTimeoutMs: 5000,
+  });
+  assert.deepEqual([...body], [1, 2, 3]);
 });
 
 test("bounded body reader rejects a dishonest small Content-Length by actual byte count", async () => {
@@ -118,12 +201,32 @@ test("removed media routes no longer bypass the configured body-size limit", () 
     "/api/v1/images/generations",
     "/api/v1/images/edits",
     "/api/v1/videos/generations",
-    "/api/v1/audio/transcriptions",
+    "/api/v1/audio/speech",
+    "/api/v1/audio/transcriptions/extra",
     "/api/v1/providers/openai/images/generations",
     "/api/v1/providers/openai/chat/completions",
     "/api/v1/providers/openai/embeddings",
   ]) {
     assert.equal(getBodySizeLimit(pathname, { maxBodySizeMb: 10 }), configuredLimit);
+  }
+});
+
+test("audio transcription uploads get their own fixed limit, not the 10 MB default", () => {
+  assert.equal(
+    MAX_BODY_BYTES_TRANSCRIPTION,
+    MAX_TRANSCRIPTION_UPLOAD_BYTES + 1024 * 1024,
+    "room for one full upload plus the multipart framing"
+  );
+  for (const settings of [
+    undefined,
+    { maxBodySizeMb: 10 },
+    { maxBodySizeMb: 500, savedMaxBodySizeMb: 500 },
+    { maxBodySizeMb: 1, savedMaxBodySizeMb: 1 },
+  ]) {
+    assert.equal(
+      getBodySizeLimit("/api/v1/audio/transcriptions", settings),
+      MAX_BODY_BYTES_TRANSCRIPTION
+    );
   }
 });
 

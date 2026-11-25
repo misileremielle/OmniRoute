@@ -13,6 +13,7 @@ import { applyCustomUserAgent, buildBearerHeaders } from "./headers";
 import { toValidationErrorResult, validationRead, validationWrite } from "./transport";
 import { validateDirectChatProvider } from "./directChatProbe";
 import { getGigachatAccessToken } from "@omniroute/open-sse/services/gigachatAuth.ts";
+import { resolveAzureSpeechValidationUrl } from "@omniroute/open-sse/config/transcriptionRegistry.ts";
 import {
   AZURE_AI_DEFAULT_BASE_URL,
   buildAzureAiChatUrl,
@@ -186,6 +187,55 @@ export async function validateGigachatProvider({ apiKey, providerSpecificData = 
     },
     providerSpecificData,
   });
+}
+
+/**
+ * Azure Speech: `GET {endpoint}/speechtotext/models/base` (Models - List Base Models) is free
+ * and authenticated by the same subscription key fast transcription uses, so it checks the key
+ * and the endpoint without transcribing anything.
+ */
+export async function validateAzureSpeechProvider({ apiKey, providerSpecificData = {} }: any) {
+  const probeUrl = resolveAzureSpeechValidationUrl(providerSpecificData.baseUrl);
+  if (!probeUrl) {
+    return {
+      valid: false,
+      error:
+        "Azure Speech needs an https resource endpoint, for example https://eastus.api.cognitive.microsoft.com",
+    };
+  }
+  const headers = applyCustomUserAgent(
+    { "Ocp-Apim-Subscription-Key": apiKey },
+    providerSpecificData
+  );
+  try {
+    const response = await validationRead(probeUrl, { method: "GET", headers });
+    if (response.ok) {
+      // Any https origin is accepted, so a 200 only counts when it is the Speech API's own
+      // PaginatedBaseModels body: a generic page answering 200 proves nothing about the key.
+      const body = await response.json().catch(() => null);
+      if (
+        body &&
+        typeof body === "object" &&
+        Array.isArray((body as { values?: unknown }).values)
+      ) {
+        return { valid: true, error: null, method: "azure_speech_models" };
+      }
+      return { valid: false, error: "Endpoint did not answer like an Azure Speech resource" };
+    }
+    if (response.status === 401 || response.status === 403) {
+      return { valid: false, error: "Invalid API key" };
+    }
+    if (response.status === 404) {
+      return { valid: false, error: "Endpoint is not an Azure Speech resource (404)" };
+    }
+    if (response.status === 429) {
+      // Throttling happens before the key is checked, so it validates nothing.
+      return { valid: false, error: "Rate limited; the key could not be checked, try again" };
+    }
+    return { valid: false, error: `Provider unavailable (${response.status})` };
+  } catch (error) {
+    return toValidationErrorResult(error);
+  }
 }
 
 export async function validateAzureOpenAIProvider({ apiKey, providerSpecificData = {} }: any) {

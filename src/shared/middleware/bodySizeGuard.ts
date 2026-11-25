@@ -18,6 +18,7 @@ import {
   parseRequestBodyLimitBytes,
   requestBodyLimitMbToBytes,
 } from "../constants/bodySize";
+import { MAX_TRANSCRIPTION_UPLOAD_BYTES } from "@omniroute/open-sse/config/transcriptionRegistry.ts";
 
 /** Larger limit for backup/import routes: 100 MB */
 export const MAX_BODY_BYTES_IMPORT = 100 * 1024 * 1024;
@@ -27,6 +28,9 @@ export const MAX_BODY_BYTES_IMPORT = 100 * 1024 * 1024;
  * without one, this stays the floor so long-context agent payloads keep working.
  */
 export const MAX_BODY_BYTES_LLM_API = 50 * 1024 * 1024;
+
+/** Audio uploads: the largest accepted recording plus room for the multipart framing and fields. */
+export const MAX_BODY_BYTES_TRANSCRIPTION = MAX_TRANSCRIPTION_UPLOAD_BYTES + 1024 * 1024;
 
 /** Configured limit — reads from env or falls back to 10 MB */
 export const MAX_BODY_BYTES = parseRequestBodyLimitBytes(process.env.MAX_BODY_SIZE_BYTES);
@@ -42,6 +46,13 @@ type BodySizeRule = {
 
 const ROUTE_LIMITS: BodySizeRule[] = [
   { prefix: "/api/db-backups/import", limit: MAX_BODY_BYTES_IMPORT },
+  // The route reads at most this much itself, so a larger saved limit would not help.
+  {
+    prefix: "/api/v1/audio/transcriptions",
+    limit: MAX_BODY_BYTES_TRANSCRIPTION,
+    exactPath: true,
+    fixedLimit: true,
+  },
   { prefix: "/api/v1/chat/completions", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
   { prefix: "/api/v1/responses", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
   { prefix: "/api/v1/messages", limit: MAX_BODY_BYTES_LLM_API, savedLimitWins: true },
@@ -114,14 +125,57 @@ export class RequestBodyTooLargeError extends Error {
   }
 }
 
+export class RequestBodyTimeoutError extends Error {
+  constructor(readonly reason: "idle" | "total") {
+    super(reason === "idle" ? "Request body stalled" : "Request body took too long to arrive");
+    this.name = "RequestBodyTimeoutError";
+  }
+}
+
+export interface ReadRequestBodyTimeouts {
+  /** Longest wait for the next chunk. */
+  idleTimeoutMs?: number;
+  /** Longest the whole body may take. */
+  totalTimeoutMs?: number;
+}
+
+/** One chunk, or a RequestBodyTimeoutError when the chunk or the whole body is late. */
+function readChunkWithin(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  timeouts: ReadRequestBodyTimeouts,
+  deadline: number
+): Promise<ReadableStreamReadResult<Uint8Array>> {
+  const { idleTimeoutMs } = timeouts;
+  const totalLeft = Number.isFinite(deadline) ? deadline - Date.now() : Infinity;
+  // Checked before reading: a chunk or EOF already queued would otherwise win the race against
+  // a zero-delay timer and let the body finish after its deadline.
+  if (totalLeft <= 0) return Promise.reject(new RequestBodyTimeoutError("total"));
+  if (idleTimeoutMs === undefined && totalLeft === Infinity) return reader.read();
+  const idleFirst = idleTimeoutMs !== undefined && idleTimeoutMs <= totalLeft;
+  const waitMs = Math.max(0, idleFirst ? idleTimeoutMs : totalLeft);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new RequestBodyTimeoutError(idleFirst ? "idle" : "total")),
+      waitMs
+    );
+  });
+  return Promise.race([reader.read(), late]).finally(() => clearTimeout(timer));
+}
+
 /**
  * Read a request body while enforcing the actual streamed byte count. This closes the gap left by
- * Content-Length-only admission for chunked or deliberately mislabelled requests.
+ * Content-Length-only admission for chunked or deliberately mislabelled requests. The optional
+ * timeouts also bound a body that trickles in: a byte limit alone lets a stalled client hold the
+ * reader open indefinitely.
  */
 export async function readRequestBodyWithLimit(
   request: Request,
-  limit: number
+  limit: number,
+  timeouts: ReadRequestBodyTimeouts = {}
 ): Promise<Uint8Array<ArrayBuffer>> {
+  const deadline =
+    timeouts.totalTimeoutMs === undefined ? Infinity : Date.now() + timeouts.totalTimeoutMs;
   const declaredLength = Number.parseInt(request.headers.get("content-length") || "", 10);
   if (!Number.isNaN(declaredLength) && declaredLength > limit) {
     throw new RequestBodyTooLargeError(limit);
@@ -133,17 +187,33 @@ export async function readRequestBodyWithLimit(
   let total = 0;
   try {
     while (true) {
-      const { done, value } = await reader.read();
+      let chunk: ReadableStreamReadResult<Uint8Array>;
+      try {
+        chunk = await readChunkWithin(reader, timeouts, deadline);
+      } catch (error) {
+        if (error instanceof RequestBodyTimeoutError) {
+          // Not awaited: a cancel that never settles must not keep the caller (and the upload
+          // slot it holds) waiting.
+          void reader.cancel("request body timed out").catch(() => {});
+        }
+        throw error;
+      }
+      const { done, value } = chunk;
       if (done) break;
       total += value.byteLength;
       if (total > limit) {
-        await reader.cancel("request body too large");
+        // Not awaited, as for a timeout: the 413 must not wait on a cancel that never settles.
+        void reader.cancel("request body too large").catch(() => {});
         throw new RequestBodyTooLargeError(limit);
       }
       chunks.push(value);
     }
   } finally {
-    reader.releaseLock();
+    try {
+      reader.releaseLock();
+    } catch {
+      // A read the timeout abandoned can still be pending; the lock goes with the stream.
+    }
   }
 
   const output = new Uint8Array(total);

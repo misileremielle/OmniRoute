@@ -6,7 +6,15 @@
  * providers.ts and providerSchema.ts.
  */
 
-export type ServiceKind = "llm" | "embedding" | "imageToText" | "webSearch" | "webFetch" | "ocr";
+export type ServiceKind =
+  | "llm"
+  | "embedding"
+  | "imageToText"
+  | "webSearch"
+  | "webFetch"
+  | "ocr"
+  // Speech to text, POST /v1/audio/transcriptions.
+  | "stt";
 
 export const SERVICE_KIND_VALUES: readonly ServiceKind[] = [
   "llm",
@@ -15,4 +23,5 @@ export const SERVICE_KIND_VALUES: readonly ServiceKind[] = [
   "webSearch",
   "webFetch",
   "ocr",
+  "stt",
 ];

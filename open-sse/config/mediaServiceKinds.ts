@@ -17,11 +17,14 @@
  */
 import { EMBEDDING_PROVIDERS } from "./embeddingRegistry.ts";
 import { OCR_PROVIDERS } from "./ocrRegistry.ts";
+import { TRANSCRIPTION_PROVIDERS } from "./transcriptionRegistry.ts";
 
 /** Media kinds whose provider membership is defined by a backend registry. */
 export const MEDIA_KIND_REGISTRIES = {
   embedding: EMBEDDING_PROVIDERS,
   ocr: OCR_PROVIDERS,
+  // Speech to text, POST /v1/audio/transcriptions.
+  stt: TRANSCRIPTION_PROVIDERS,
 } as const satisfies Record<string, Record<string, unknown>>;
 
 export type RegistryMediaKind = keyof typeof MEDIA_KIND_REGISTRIES;
