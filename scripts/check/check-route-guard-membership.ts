@@ -180,7 +180,11 @@ export const KNOWN_UNCLASSIFIED_SOURCE_SPAWN: Record<string, string> = {
     "Gated at the call site on the trusted x-omniroute-peer-locality loopback stamp instead (fail-closed). " +
     "G-09 #15965: detected through the import graph (route -> src/lib/providerModels/cursorAgent.ts), not a comment match.",
   // Fork decision, 2026-11-25: the operator chose in-process ffmpeg over a sidecar transcoder
-  // container or WASM decoders, knowing that any API-key holder's upload reaches ffmpeg.
+  // container, WASM decoders or no conversion, knowing that any API-key holder's upload reaches
+  // ffmpeg. This is an explicit operator waiver of Hard Rule #15 (a spawn-capable route that is
+  // not loopback-only) and of this ledger's pre-existing-violations-only policy, since the
+  // spawn path is new. The valid-media condition is not enforced; see
+  // docs/ops/FORK_IDENTITY.md -> "Speech to text".
   // Tracking: misileremielle/omniroute PR #12 (operator's choice; issues are disabled on the
   // fork). The stale check below will not fire when ffmpeg goes (the
   // route also reaches three G-09 baseline sinks); tests/unit/stt-route-spawn-sinks.test.ts
@@ -198,7 +202,7 @@ export const KNOWN_UNCLASSIFIED_SOURCE_SPAWN: Record<string, string> = {
   // The freeze is route-wide. tests/unit/stt-route-spawn-sinks.test.ts fails on a new spawn
   // module, not on a new path to a known one.
   "src/app/api/v1/audio/transcriptions/route.ts":
-    "Fork decision 2026-11-25 (operator chose in-process ffmpeg over a sidecar): remote STT route " +
+    "Fork decision 2026-11-25, operator waiver of Hard Rule #15 for a new spawn path: remote STT route " +
     "converts uploads MAI-Transcribe cannot take with ffmpeg. Gated at the call site: container picked " +
     "from the bytes (not proof of valid media), one forced demuxer, file protocol only, API key, size/time/" +
     "concurrency caps. Tracking: misileremielle/omniroute PR #12 (repo issues disabled).",
