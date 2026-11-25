@@ -97,8 +97,9 @@ test("gemini API-key provider lists gemini-4-neon", () => {
   assert.equal(m.supportsVision, true);
 });
 
-test("Neon shares the Gemini 4 quota family", () => {
-  for (const id of TIERS) assert.equal(getAntigravityQuotaFamily(`agy/${id}`), "argon");
+// Google meters Neon in the shared Gemini pool; only Argon has its own weekly bucket (#20832).
+test("Neon is in the Gemini quota family, not Argon", () => {
+  for (const id of TIERS) assert.equal(getAntigravityQuotaFamily(`agy/${id}`), "gemini");
 });
 
 // The Neon spec uses the Argon/Carbon budget shape, so translated OpenAI requests go through
