@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 const { applyFingerprint } = await import("../../open-sse/config/cliFingerprints.ts");
 
-test("Codex CLI fingerprint orders prompt_cache_key before include", () => {
+test("Codex CLI fingerprint puts routing fields first, as the real client serializes them", () => {
   const body = {
     model: "gpt-5.5-low",
     stream: true,
@@ -21,16 +21,18 @@ test("Codex CLI fingerprint orders prompt_cache_key before include", () => {
   const result = applyFingerprint("codex", {}, body);
   const orderedKeys = Object.keys(JSON.parse(result.bodyString));
 
-  assert.deepEqual(orderedKeys.slice(0, 10), [
+  // openai/codex 0.172.0 ResponsesApiRequest field order: model and stream lead so a
+  // gateway can read routing before the (potentially huge) input.
+  assert.deepEqual(orderedKeys.slice(0, 9), [
     "model",
     "stream",
-    "input",
+    "service_tier",
     "instructions",
-    "store",
-    "reasoning",
-    "prompt_cache_key",
+    "input",
     "tools",
     "tool_choice",
-    "include",
+    "reasoning",
+    "store",
   ]);
+  assert.ok(orderedKeys.indexOf("include") < orderedKeys.indexOf("prompt_cache_key"));
 });

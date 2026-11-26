@@ -74,9 +74,12 @@ test("usage service covers GitHub free-plan parsing, auth denial and unsupported
   assert.equal(calls[0].headers.Authorization, "token gho-free");
   // #10952 re-based the Copilot wire identity on the live-captured CLI 1.0.88
   // (copilot-developer-cli integration id; API version 2026-08-01).
-  assert.equal(calls[0].headers["User-Agent"], "GitHubCopilotChat/1.0.91");
-  assert.equal(calls[0].headers["Editor-Version"], "copilot/1.0.91");
-  assert.equal(calls[0].headers["Editor-Plugin-Version"], "copilot-chat/1.0.91");
+  // All three carry the pinned CLI version — asserted from the pin, not a literal.
+  const copilotVersion = (await import("../../open-sse/config/providerHeaderProfiles.ts"))
+    .GITHUB_COPILOT_CLI_VERSION;
+  assert.equal(calls[0].headers["User-Agent"], `GitHubCopilotChat/${copilotVersion}`);
+  assert.equal(calls[0].headers["Editor-Version"], `copilot/${copilotVersion}`);
+  assert.equal(calls[0].headers["Editor-Plugin-Version"], `copilot-chat/${copilotVersion}`);
   assert.equal(calls[0].headers["X-GitHub-Api-Version"], "2026-08-01");
 
   globalThis.fetch = async () => new Response("forbidden", { status: 403 });

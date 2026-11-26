@@ -8,6 +8,8 @@
  * Based on CLIProxyAPI's ScrubProxyAndFingerprintHeaders (misc/header_utils.go).
  */
 
+import { ANTIGRAVITY_ACCEPT_ENCODING } from "./antigravityHeaders.ts";
+
 const HEADERS_TO_REMOVE = [
   // Proxy tracing
   "x-forwarded-for",
@@ -67,7 +69,7 @@ export function scrubProxyAndFingerprintHeaders(
     cleaned[key] = value;
   }
   // Set the standard Node.js accept-encoding
-  cleaned["Accept-Encoding"] = "gzip, deflate, br";
+  cleaned["Accept-Encoding"] = ANTIGRAVITY_ACCEPT_ENCODING;
   if (authorizationValue !== undefined) {
     cleaned["Authorization"] = authorizationValue;
   }

@@ -10,6 +10,8 @@ const {
   normalizeCliCompatProviderId,
 } = await import("../../src/shared/constants/cliCompatProviders.ts");
 const { CLI_TOOL_IDS } = await import("../../src/shared/services/cliRuntime.ts");
+const { GITHUB_COPILOT_CLI_VERSION } =
+  await import("../../open-sse/config/providerHeaderProfiles.ts");
 const { applyFingerprint, isCliCompatEnabled, setCliCompatProviders } =
   await import("../../open-sse/config/cliFingerprints.ts");
 
@@ -113,7 +115,7 @@ test("CLI fingerprint preserves Codex executor User-Agent and maps legacy Copilo
 
   // #10952 bumped GITHUB_COPILOT_CLI_VERSION 0.54.0 -> 1.0.88; the fingerprint
   // pin tracks the advertised upstream CLI version.
-  assert.equal(copilot.headers["User-Agent"], "GitHubCopilotChat/1.0.91");
+  assert.equal(copilot.headers["User-Agent"], `GitHubCopilotChat/${GITHUB_COPILOT_CLI_VERSION}`);
 });
 
 test("CLI fingerprint keeps legacy Copilot settings functional without exposing duplicate UI toggles", () => {

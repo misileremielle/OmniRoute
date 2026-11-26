@@ -40,8 +40,9 @@ async function withEnv<T>(
   }
 }
 
-test("#12417 Claude pin stays the captured 2.1.280 binary", () => {
-  assert.equal(canonical.CLAUDE_CODE_CLIENT_VERSION, "2.1.280");
+// The pin's *shape* is the contract; the value moves with every capture.
+test("#12417 Claude pin stays a pinned binary version", () => {
+  assert.match(canonical.CLAUDE_CODE_CLIENT_VERSION, /^\d+\.\d+\.\d+$/);
 });
 
 test("#12417 getClaudeCodeClientVersion falls back to the captured pin", async () => {
@@ -71,8 +72,8 @@ test("#12417 getClaudeCodeClientVersion ignores an unsafe env override", async (
   });
 });
 
-test("#12417 Copilot pin stays the supported 1.0.91 CLI", () => {
-  assert.equal(copilot.GITHUB_COPILOT_CLI_VERSION, "1.0.91");
+test("#12417 Copilot pin stays a pinned CLI version", () => {
+  assert.match(copilot.GITHUB_COPILOT_CLI_VERSION, /^\d+\.\d+\.\d+$/);
 });
 
 test("#12417 getGitHubCopilotCliVersion falls back to the captured pin", async () => {
@@ -114,7 +115,11 @@ test("#12417 applyFingerprint Copilot UA follows the env, pin const does not", a
       { model: "gpt-4o", messages: [] }
     );
     assert.equal(result.headers["User-Agent"], "GitHubCopilotChat/1.0.82");
-    assert.equal(copilot.GITHUB_COPILOT_CHAT_USER_AGENT, "GitHubCopilotChat/1.0.91");
+    assert.equal(
+      copilot.GITHUB_COPILOT_CHAT_USER_AGENT,
+      `GitHubCopilotChat/${copilot.GITHUB_COPILOT_CLI_VERSION}`,
+      "the frozen UA constant ignores the env; only the fingerprint getter follows it"
+    );
   });
 });
 

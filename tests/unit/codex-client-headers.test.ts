@@ -66,29 +66,33 @@ test("CodexExecutor.buildHeaders forwards the caller's Codex client version from
   const fromUserAgent = executor.buildHeaders({ accessToken: "codex-token" }, true, {
     "user-agent": "codex_cli_rs/0.160.2 (Mac OS 26.6.2; arm64)",
   });
-  assert.equal(fromUserAgent.Version, "0.160.2");
-  assert.equal(fromUserAgent["User-Agent"], "codex-cli/0.160.2 (Windows 10.0.26200; x64)");
+  assert.equal(fromUserAgent.Version, undefined);
+  assert.ok(fromUserAgent["User-Agent"].startsWith("codex_cli_rs/0.160.2 ("));
 
   const fromVersionHeader = executor.buildHeaders({ accessToken: "codex-token" }, true, {
     version: "9.9.9",
   });
-  assert.equal(fromVersionHeader.Version, "9.9.9");
-  assert.equal(fromVersionHeader["User-Agent"], "codex-cli/9.9.9 (Windows 10.0.26200; x64)");
+  assert.equal(fromVersionHeader.Version, undefined);
+  assert.ok(fromVersionHeader["User-Agent"].startsWith("codex_cli_rs/9.9.9 ("));
 });
 
 test("CodexExecutor.buildHeaders falls back to the default client version when clientHeaders is absent, empty, or unusable", () => {
   const executor = new CodexExecutor();
 
   const noHeaders = executor.buildHeaders({ accessToken: "codex-token" }, true);
-  assert.equal(noHeaders.Version, DEFAULT_CODEX_CLIENT_VERSION);
+  assert.ok(noHeaders["User-Agent"].startsWith(`codex_cli_rs/${DEFAULT_CODEX_CLIENT_VERSION} (`));
 
   const emptyHeaders = executor.buildHeaders({ accessToken: "codex-token" }, true, {});
-  assert.equal(emptyHeaders.Version, DEFAULT_CODEX_CLIENT_VERSION);
+  assert.ok(
+    emptyHeaders["User-Agent"].startsWith(`codex_cli_rs/${DEFAULT_CODEX_CLIENT_VERSION} (`)
+  );
 
   const nonCodexUserAgent = executor.buildHeaders({ accessToken: "codex-token" }, true, {
     "user-agent": "curl/8.4.0",
   });
-  assert.equal(nonCodexUserAgent.Version, DEFAULT_CODEX_CLIENT_VERSION);
+  assert.ok(
+    nonCodexUserAgent["User-Agent"].startsWith(`codex_cli_rs/${DEFAULT_CODEX_CLIENT_VERSION} (`)
+  );
 });
 
 test("CodexExecutor.buildHeaders rejects injection attempts in the caller's version/User-Agent headers", () => {
@@ -97,18 +101,40 @@ test("CodexExecutor.buildHeaders rejects injection attempts in the caller's vers
   const crlfVersion = executor.buildHeaders({ accessToken: "codex-token" }, true, {
     version: "1.0.0\r\nX-Injected: evil",
   });
-  assert.equal(crlfVersion.Version, DEFAULT_CODEX_CLIENT_VERSION);
+  assert.ok(crlfVersion["User-Agent"].startsWith(`codex_cli_rs/${DEFAULT_CODEX_CLIENT_VERSION} (`));
   assert.equal(crlfVersion["User-Agent"].includes("\r\n"), false);
 
   const overlongVersion = executor.buildHeaders({ accessToken: "codex-token" }, true, {
     version: "1.0.0-" + "a".repeat(30),
   });
-  assert.equal(overlongVersion.Version, DEFAULT_CODEX_CLIENT_VERSION);
+  assert.ok(
+    overlongVersion["User-Agent"].startsWith(`codex_cli_rs/${DEFAULT_CODEX_CLIENT_VERSION} (`)
+  );
 
   const injectedUserAgent = executor.buildHeaders({ accessToken: "codex-token" }, true, {
     "user-agent": "codex_cli_rs/1.0.0\r\nX-Evil: 1",
   });
-  assert.equal(injectedUserAgent.Version, "1.0.0");
+  assert.ok(injectedUserAgent["User-Agent"].startsWith("codex_cli_rs/1.0.0 ("));
   assert.equal(injectedUserAgent["User-Agent"].includes("\r\n"), false);
-  assert.equal(injectedUserAgent["User-Agent"], "codex-cli/1.0.0 (Windows 10.0.26200; x64)");
+});
+
+test("CodexExecutor.buildHeaders scopes the window header from the caller's session", () => {
+  const executor = new CodexExecutor();
+  const headers = executor.buildHeaders({ accessToken: "codex-token" }, true, {
+    "user-agent": "codex_cli_rs/0.172.0 (Mac OS 26.6.2; arm64)",
+    session_id: "11111111-2222-4333-8444-555555555555",
+  });
+
+  assert.equal(headers.session_id, "11111111-2222-4333-8444-555555555555");
+  // `{thread}:0` — real client shape (responses_metadata.rs compatibility_headers).
+  assert.equal(headers["x-codex-window-id"], "11111111-2222-4333-8444-555555555555:0");
+});
+
+test("CodexExecutor.buildHeaders omits the window header with no session at all", () => {
+  const executor = new CodexExecutor();
+  const headers = executor.buildHeaders({ accessToken: "codex-token" }, true, {
+    "user-agent": "curl/8.4.0",
+  });
+  assert.equal(headers.session_id, undefined);
+  assert.equal(headers["x-codex-window-id"], undefined);
 });

@@ -6,6 +6,7 @@ import { PROVIDER_MODELS } from "../../open-sse/config/providerModels.ts";
 import {
   GITHUB_COPILOT_CLI_INTEGRATION_ID,
   GITHUB_COPILOT_CHAT_INTEGRATION_ID,
+  GITHUB_COPILOT_CLI_VERSION,
 } from "../../open-sse/config/providerHeaderProfiles.ts";
 
 function registerModel(provider, model) {
@@ -292,8 +293,11 @@ test("GithubExecutor.buildHeaders prefers Copilot token and sets GitHub-specific
   assert.equal(headers.Authorization, "Bearer copilot-token");
   assert.equal(headers.Accept, "text/event-stream");
   // Copilot CLI wire identity (matches the `copilot` npm package, not VS Code).
-  assert.equal(headers["editor-version"], "copilot/1.0.91");
-  assert.equal(headers["user-agent"], `copilot/1.0.91 (${process.platform}) term/unknown`);
+  assert.equal(headers["editor-version"], `copilot/${GITHUB_COPILOT_CLI_VERSION}`);
+  assert.equal(
+    headers["user-agent"],
+    `copilot/${GITHUB_COPILOT_CLI_VERSION} (${process.platform}) term/unknown`
+  );
   assert.equal(headers["x-github-api-version"], "2026-08-01");
   assert.equal(headers["openai-intent"], "conversation-agent");
   assert.equal(headers["copilot-integration-id"], "copilot-developer-cli");

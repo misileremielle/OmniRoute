@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { SafeOutboundFetchOptions } from "@/shared/network/safeOutboundFetch";
 import { canStartBackgroundRefresh } from "@/shared/utils/backgroundRefresh";
 import {
+  buildCodexUserAgent,
   CODEX_CLI_RS_ORIGINATOR,
   DEFAULT_CODEX_CLIENT_VERSION,
   getCodexCliRsHeaders as buildCodexCliRsHeaders,
@@ -34,8 +35,6 @@ let cachedCodexVersion: string | null = null;
 let codexVersionRefreshAt = 0;
 let codexVersionRefresh: Promise<string> | null = null;
 let codexVersionSource: CodexClientVersionSource = "fallback";
-const DEFAULT_CODEX_USER_AGENT_PLATFORM = "Windows 10.0.26200";
-const DEFAULT_CODEX_USER_AGENT_ARCH = "x64";
 const CODEX_VERSION_OVERRIDE_ENV = "CODEX_CLIENT_VERSION";
 const CODEX_USER_AGENT_OVERRIDE_ENV = "CODEX_USER_AGENT";
 const CODEX_RELEASE_URL = "https://api.github.com/repos/openai/codex/releases/latest";
@@ -428,12 +427,15 @@ export function getCodexUserAgent(versionOverride?: string | null): string {
       ? versionOverride
       : getCodexClientVersion();
 
-  return `codex-cli/${version} (${DEFAULT_CODEX_USER_AGENT_PLATFORM}; ${DEFAULT_CODEX_USER_AGENT_ARCH})`;
+  return buildCodexUserAgent(version);
 }
 
+/**
+ * No `Version` header: 0.172.0 sends none (the version lives in the User-Agent
+ * only). `Openai-Beta` stays for the websocket transport, which does send it.
+ */
 export function getCodexDefaultHeaders(): Record<string, string> {
   return {
-    Version: getCodexClientVersion(),
     "Openai-Beta": "responses_websockets=2026-02-06",
     "User-Agent": getCodexUserAgent(),
   };

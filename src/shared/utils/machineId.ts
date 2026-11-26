@@ -1,4 +1,6 @@
+import { createHash } from "crypto";
 import { execFileSync, execSync } from "child_process";
+import { formatUuidV4 } from "./deviceUuid.ts";
 import { existsSync, readFileSync } from "fs";
 import os from "os";
 
@@ -178,6 +180,35 @@ export async function getConsistentMachineId(salt = null) {
     // Fallback to random ID if node-machine-id fails
     return getRandomMachineFallbackId();
   }
+}
+
+/**
+ * Sync variant of `getConsistentMachineId` for hot paths that cannot await (per-request
+ * header builders). Same value, same salt, no promise.
+ */
+export function getConsistentMachineIdSync(salt = "endpoint-proxy-salt"): string {
+  const saltValue = salt || process.env.MACHINE_ID_SALT || "endpoint-proxy-salt";
+  return createHash("sha256")
+    .update(getMachineIdRaw() + saltValue)
+    .digest("hex")
+    .substring(0, 16);
+}
+
+/**
+ * A deterministic UUID v4-SHAPED id derived from this machine plus a salt.
+ *
+ * For client fingerprints that carry a device UUID (e.g. the @github/copilot CLI's
+ * X-Client-Machine-Id): random per process makes every restart look like a new
+ * install, while persisting a row just for this is overkill. Same machine + same
+ * salt always yields the same id, and the version/variant bits are set so the
+ * value passes a v4 shape check at the far end.
+ */
+export function getStableDeviceUuid(salt: string): string {
+  return formatUuidV4(
+    createHash("sha256")
+      .update(getMachineIdRaw() + (salt || ""))
+      .digest("hex")
+  );
 }
 
 /**

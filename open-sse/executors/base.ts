@@ -3,6 +3,7 @@ import {
   selectHttpResponse,
   type HttpAttemptSelection,
 } from "../utils/providerHttpAttempts.ts";
+import { randomUUID } from "crypto";
 import { HTTP_STATUS, FETCH_TIMEOUT_MS } from "../config/constants.ts";
 import { getApiKeyCodexServiceTier } from "../../src/lib/providers/codexApiKeyServiceMode";
 import { resolveProviderUserAgentOverride } from "./providerUserAgentOverride.ts";
@@ -14,7 +15,6 @@ import {
 } from "../config/providers/alternateFormats.ts";
 import {
   applyStainlessHeaders,
-  getClaudeCliBillingVersion,
   mergeCcHeaders,
   mergeClientAnthropicBeta,
   normalizeAnthropicHeaderVariants,
@@ -22,6 +22,10 @@ import {
   syncSkillsBeta,
 } from "../config/anthropicHeaders.ts";
 import { applyContextEditingToBody } from "../config/contextEditing.ts";
+import {
+  computeFingerprint,
+  extractFirstUserMessageText,
+} from "../services/claudeCodeFingerprint.ts";
 import { createCopilotIdentityFallback } from "./copilotIdentityFallback.ts";
 import {
   replaceRedactedAdvisorResults,
@@ -31,7 +35,14 @@ import {
   recordLearnedThinkingCap,
   parseThinkingBudgetMax,
 } from "../services/learnedThinkingCaps.ts";
-import { applyFingerprint, isCliCompatEnabled, stripInternalBodyFields } from "../config/cliFingerprints.ts"; // prettier-ignore
+import {
+  // prettier-ignore
+  applyFingerprint,
+  CLI_FINGERPRINTS,
+  isCliCompatEnabled,
+  orderHeaders,
+  stripInternalBodyFields,
+} from "../config/cliFingerprints.ts";
 import { getThinkingBudgetConfig, ThinkingMode } from "../services/thinkingBudget.ts";
 import {
   recordFreeWindowAttempt,
@@ -97,7 +108,6 @@ import {
   requiresUserLastMessage,
   stripTrailingAssistantTurns,
 } from "../services/assistantPrefill.ts";
-import { randomUUID } from "node:crypto";
 import {
   getClaudeCodeVersion,
   CLAUDE_CODE_STAINLESS_VERSION,
@@ -687,6 +697,83 @@ export class BaseExecutor {
     return { status: response.status, message: bodyText || `HTTP ${response.status}` };
   }
 
+  /**
+   * The `x-anthropic-billing-header` system block. `cc_version` is the CLI's
+   * `<version>.<fingerprint>`; the cch token stays a placeholder until
+   * `signRequestBody` replaces it. Shared so no path can ship a half-built line.
+   */
+  protected buildClaudeBillingLine(tb: Record<string, unknown>): string {
+    const billingVersion = getClaudeCodeVersion();
+    const fingerprint = computeFingerprint(
+      extractFirstUserMessageText(tb.messages as Parameters<typeof extractFirstUserMessageText>[0]),
+      billingVersion
+    );
+    return (
+      "x-anthropic-billing-header: cc_version=" +
+      billingVersion +
+      "." +
+      fingerprint +
+      "; cc_entrypoint=cli; cch=00000;"
+    );
+  }
+
+  /**
+   * The Claude Code identity header set for the cloaked OAuth path. Shared by
+   * `execute` and `countTokens`: the real client posts `count_tokens` through the
+   * same SDK client, so it carries the same identity surface — a proxy that sends
+   * it bare is a different client per endpoint.
+   */
+
+  protected buildClaudeCloakHeaders(
+    tb: Record<string, unknown>,
+    model: string,
+    sessionId: string,
+    clientAnthropicBeta: string | null,
+    clientXApp?: string | null
+  ): Record<string, string> {
+    return {
+      Accept: "application/json",
+      "anthropic-version": "2023-06-01",
+      // #3974: merge the client's allowlisted betas (e.g. tool-search-tool)
+      // on top of the shape-derived set so deferred-tool requests are not
+      // rejected; selectBetaFlags still gates thinking/effort per #3415.
+      "anthropic-beta": mergeClientAnthropicBeta(
+        selectBetaFlags(tb, null, clientAnthropicBeta),
+        clientAnthropicBeta,
+        undefined,
+        // Gate the client-negotiated context-1m beta on the RESOLVED target:
+        // combo/fallback can route a request negotiated for a [1m] sibling onto a
+        // model that does not qualify (e.g. Haiku), which Anthropic rejects (#10119).
+        model,
+        // Gate skills-2025-10-02 on presence of code_execution tool in transformed body (#14200):
+        tb
+      ),
+      "anthropic-dangerous-direct-browser-access": "true",
+      // A background session (`CLAUDE_CODE_SESSION_KIND=bg`) sends `cli-bg` for the whole
+      // run, so the caller's own value wins over the interactive default.
+      "x-app": clientXApp === "cli-bg" ? "cli-bg" : "cli",
+      "User-Agent": `claude-cli/${getClaudeCodeVersion()} (external, cli)`,
+      // The real client folds these in as SDK `defaultHeaders`, i.e. after the
+      // Stainless block — see the order comment in cliFingerprints.
+      "X-Claude-Code-Session-Id": sessionId,
+      // First-party only, and a fresh value per attempt: the client gates it on the
+      // provider being first-party and takes the value from `randomUUID`. It is the id
+      // support asks for in an error report, so a request without one reads as
+      // non-first-party traffic.
+      "x-client-request-id": randomUUID(),
+      // The CLI classifies each request (`Tr(querySource)`) and sends the class
+      // for first-party traffic behind a flag; a proxied request is an ordinary
+      // main-loop turn, so both class headers say "main". Values and gating read
+      // out of the 2.1.332 binary (l6l/c6l/egn); exact placement is best-effort.
+      "x-claude-code-request-class": "main",
+      "x-claude-1p-request-class": "main",
+      "X-Stainless-Package-Version": CLAUDE_CODE_STAINLESS_VERSION,
+      "X-Stainless-Timeout": "600",
+      "accept-encoding": "gzip, deflate, br, zstd",
+      connection: "keep-alive",
+    };
+  }
+
   buildCountTokensUrl(model: string, credentials: ProviderCredentials | null = null) {
     void model;
     void credentials;
@@ -706,14 +793,47 @@ export class BaseExecutor {
     if (!url) return null;
     this.assertOutboundUrlAllowed(url); // GHSA-4f49
 
-    const headers = this.buildHeaders(credentials, false);
-    const requestBody =
+    let headers = this.buildHeaders(credentials, false);
+    let requestBody =
       body && typeof body === "object"
         ? {
             ...body,
             model,
           }
         : { model };
+
+    // The real client posts count_tokens through the same SDK client as messages:
+    // same identity headers, same billing block, same order. Sending it bare made
+    // the proxy two different clients depending on the endpoint.
+    const clientHasClaudeOAuthToken =
+      typeof credentials?.accessToken === "string" &&
+      credentials.accessToken.startsWith("sk-ant-oat") &&
+      !credentials?.apiKey;
+    if (this.config?.format === "claude" && clientHasClaudeOAuthToken) {
+      const tb = requestBody as Record<string, unknown>;
+      const sysBlocks: Array<Record<string, unknown>> = Array.isArray(tb.system)
+        ? (tb.system as Array<Record<string, unknown>>)
+        : typeof tb.system === "string"
+          ? [{ type: "text", text: tb.system }]
+          : [];
+      const sentinel = "You are Claude Code, Anthropic's official CLI for Claude.";
+      stripClaudeSystemPrefixBlocks(sysBlocks, sentinel);
+      sysBlocks.unshift({ type: "text", text: this.buildClaudeBillingLine(tb) });
+      tb.system = sysBlocks;
+
+      const sessionId = getSessionId(credentials?.connectionId ?? this.provider);
+      mergeCcHeaders(headers, this.buildClaudeCloakHeaders(tb, model, sessionId, null));
+      delete headers["X-Stainless-Helper-Method"];
+      applyStainlessHeaders(headers, { arch: stainlessArch(), os: stainlessOS() });
+      headers = orderHeaders(headers, CLI_FINGERPRINTS.claude.headerOrder);
+    }
+
+    // The billing block is only a placeholder until it is signed, exactly as on
+    // the messages path — an unsigned count_tokens body ships `cch=00000`.
+    let bodyString = JSON.stringify(requestBody);
+    if (this.config?.format === "claude" && clientHasClaudeOAuthToken) {
+      bodyString = await signRequestBody(bodyString);
+    }
 
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let activeSignal = signal || null;
@@ -733,7 +853,7 @@ export class BaseExecutor {
         {
           method: "POST",
           headers,
-          body: JSON.stringify(requestBody),
+          body: bodyString,
           signal: activeSignal || undefined,
         },
         credentials
@@ -1240,17 +1360,19 @@ export class BaseExecutor {
           const psd = activeCredentials?.providerSpecificData as
             Record<string, unknown> | undefined;
 
-          let identitySource:
-            "upstream-metadata" | "upstream-header" | "synthesized" | "synthesized-cloaked" =
+          let identitySource: "upstream-metadata" | "upstream-header" | "synthesized" =
             "synthesized";
           let sessionId: string;
           let deviceId: string;
           let accountUUID: string;
 
-          // For any Claude OAuth request, ignore client-supplied metadata.user_id /
-          // X-Claude-Code-Session-Id and synthesize per-account: the CC device_id from
-          // ~/.claude.json is shared across every account on one machine, which lets
-          // Anthropic correlate accounts behind one OmniRoute.
+          // For any Claude OAuth request, ignore client-supplied metadata.user_id and the
+          // device_id it carries: the CC device_id from ~/.claude.json is shared across every
+          // account on one machine, which lets Anthropic correlate accounts behind one
+          // OmniRoute.
+          //
+          // The client's X-Claude-Code-Session-Id is different — it is per conversation, not
+          // per machine — so it is still used when present and only synthesized when absent.
           const cloakIdentity = isClaudeCodeClient || hasClaudeOAuthToken;
           const upstreamUserId = cloakIdentity ? null : parseUpstreamMetadataUserId(tb);
           if (upstreamUserId) {
@@ -1259,24 +1381,33 @@ export class BaseExecutor {
             accountUUID = upstreamUserId.account_uuid;
             identitySource = "upstream-metadata";
           } else {
-            const headerSid = cloakIdentity
-              ? null
-              : passthroughUpstreamSessionId(
-                  clientHeaders as Record<string, string | undefined> | undefined
-                );
-            sessionId = headerSid ?? getSessionId(seed);
+            const headerSid =
+              passthroughUpstreamSessionId(
+                clientHeaders as Record<string, string | undefined> | undefined
+              ) ?? null;
+            // Fallback only: keyed by connection, not by token. Access tokens rotate on
+            // refresh, and a session id that changes on every refresh reads as a new CLI
+            // session every hour; one id per account connection matches how a long-running
+            // CLI (including its subagents) shares one session.
+            const sessionSeed = activeCredentials?.connectionId || seed;
+            sessionId = headerSid ?? getSessionId(sessionSeed);
             deviceId = resolveCliUserID(psd, seed);
-            accountUUID = resolveAccountUUID(psd, seed, activeCredentials?.accessToken);
-            identitySource = headerSid
-              ? "upstream-header"
-              : cloakIdentity
-                ? "synthesized-cloaked"
-                : "synthesized";
+            accountUUID = resolveAccountUUID(
+              psd,
+              seed,
+              activeCredentials?.accessToken,
+              activeCredentials?.connectionId
+            );
+            identitySource = headerSid ? "upstream-header" : "synthesized";
           }
 
           // system[0] (billing) and system[1] (sentinel) must not carry
           // cache_control — that belongs on upstream prompt blocks at [2..].
-          const billingLine = `x-anthropic-billing-header: cc_version=${getClaudeCliBillingVersion()}; cc_entrypoint=cli; cch=00000;`;
+          // The real binary builds this as `${VERSION}.${fingerprint}`, where the
+          // suffix is `sha256(SALT + firstUserMessage[4]+[7]+[20] + VERSION).slice(0,3)`
+          // — a per-request value, not a build number. Sending the static pin suffix
+          // made every request claim the same fingerprint for different prompts.
+          const billingLine = this.buildClaudeBillingLine(tb);
           const SENTINEL = "You are Claude Code, Anthropic's official CLI for Claude.";
 
           const sysBlocks: Array<Record<string, unknown>> = Array.isArray(tb.system)
@@ -1344,33 +1475,13 @@ export class BaseExecutor {
             // of force-injecting thinking/effort betas it never requested (#3415).
             const clientAnthropicBeta =
               clientHeaders?.["anthropic-beta"] ?? clientHeaders?.["Anthropic-Beta"] ?? null;
-            const ccHeaders: Record<string, string> = {
-              Accept: "application/json",
-              "anthropic-version": "2023-06-01",
-              // #3974: merge the client's allowlisted betas (e.g. tool-search-tool)
-              // on top of the shape-derived set so deferred-tool requests are not
-              // rejected; selectBetaFlags still gates thinking/effort per #3415.
-              "anthropic-beta": mergeClientAnthropicBeta(
-                selectBetaFlags(tb, null, clientAnthropicBeta),
-                clientAnthropicBeta,
-                undefined,
-                // Gate the client-negotiated context-1m beta on the RESOLVED target:
-                // combo/fallback can route a request negotiated for a [1m] sibling onto a
-                // model that does not qualify (e.g. Haiku), which Anthropic rejects (#10119).
-                model,
-                // Gate skills-2025-10-02 on presence of code_execution tool in transformed body (#14200):
-                tb
-              ),
-              "anthropic-dangerous-direct-browser-access": "true",
-              "x-app": "cli",
-              "User-Agent": `claude-cli/${getClaudeCodeVersion()} (external, cli)`,
-              "X-Stainless-Package-Version": CLAUDE_CODE_STAINLESS_VERSION,
-              "X-Stainless-Timeout": "600",
-              "accept-encoding": "gzip, deflate, br, zstd",
-              connection: "keep-alive",
-              "x-client-request-id": randomUUID(),
-              "X-Claude-Code-Session-Id": sessionId,
-            };
+            const ccHeaders = this.buildClaudeCloakHeaders(
+              tb,
+              model,
+              sessionId,
+              clientAnthropicBeta,
+              clientHeaders?.["x-app"] ?? clientHeaders?.["X-App"] ?? null
+            );
 
             mergeCcHeaders(headers, ccHeaders);
             if (usesCcWireImage(this.provider) && usesClaudeCodeProtocol) {
@@ -1527,6 +1638,10 @@ export class BaseExecutor {
         const shouldFingerprint =
           isCliCompatEnabled(fingerprintProvider) ||
           (this.provider === "claude" && (isClaudeCodeClient || hasClaudeOAuthToken));
+        // The billing block is ours (xxhash cch) on this path, so a retry that
+        // rewrites the body must replace the stale token. Bridge pipelines sign
+        // with their own algorithm and keep the placeholder-only behaviour.
+        const resignBilling = this.provider === "claude" && hasClaudeOAuthToken;
         let bodyString: string;
         if (shouldFingerprint) {
           // Serialize once: applyFingerprint produces the body string itself — an
@@ -1640,7 +1755,7 @@ export class BaseExecutor {
             delete (transformedBody as Record<string, unknown>).context_management;
             let retryBody = JSON.stringify(transformedBody);
             if (usesClaudeCodeProtocol || this.provider === "claude") {
-              retryBody = await signRequestBody(retryBody);
+              retryBody = await signRequestBody(retryBody, { resign: resignBilling });
             }
             log?.debug?.(
               "CONTEXT_EDITING",
@@ -1676,7 +1791,7 @@ export class BaseExecutor {
             if (clampNestedThinkingBudget(transformedBody, upstreamMax)) {
               let retryBody = JSON.stringify(transformedBody);
               if (usesClaudeCodeProtocol || this.provider === "claude") {
-                retryBody = await signRequestBody(retryBody);
+                retryBody = await signRequestBody(retryBody, { resign: resignBilling });
               }
               log?.info?.(
                 "THINKING_BUDGET",
@@ -1694,7 +1809,12 @@ export class BaseExecutor {
             ? applyFingerprint(fingerprintProvider, {}, b as Record<string, unknown>).bodyString
             : JSON.stringify(b);
           if (usesClaudeCodeProtocol || this.provider === "claude") {
-            retryBody = await signRequestBody(retryBody);
+            retryBody = await signRequestBody(retryBody, { resign: resignBilling });
+          }
+          // The client mints a new correlation id per attempt, not per request.
+          if (resignBilling) {
+            const retryHeaders = fetchOptions.headers as Record<string, string> | undefined;
+            if (retryHeaders) retryHeaders["x-client-request-id"] = randomUUID();
           }
           return retryBody;
         };

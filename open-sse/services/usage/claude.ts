@@ -9,11 +9,7 @@
  * getClaudePlanLabel (__testing).
  */
 
-import {
-  getClaudeCodeVersion,
-  fetchClaudeBootstrap,
-  type ClaudeBootstrap,
-} from "../../executors/claudeIdentity.ts";
+import { fetchClaudeBootstrap, type ClaudeBootstrap } from "../../executors/claudeIdentity.ts";
 import {
   computeClaudeUsageRetryMs,
   hashClaudeCredential,
@@ -23,6 +19,7 @@ import {
 import { boundedMap } from "../../../src/lib/quota/boundedMap.ts";
 import { sanitizeErrorMessage } from "../../utils/errorSanitization.ts";
 import { fetchWithConnectionProxy } from "../connectionProxyFetch.ts";
+import { claudeApiHeaders } from "../claudeResetCreditCount.ts";
 import { toRecord } from "./scalars.ts";
 import {
   claudeUsageWindowsComplete,
@@ -318,14 +315,7 @@ async function fetchClaudeUsage(
     const timer = setTimeout(() => ctrl.abort(), 10_000);
     const oauthInit: RequestInit = {
       method: "GET",
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip, compress, deflate, br",
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-        "User-Agent": `claude-code/${getClaudeCodeVersion()}`,
-        "anthropic-beta": "oauth-2025-04-20",
-      },
+      headers: claudeApiHeaders(accessToken),
       signal: ctrl.signal,
     };
     let oauthResponse: Response | null;

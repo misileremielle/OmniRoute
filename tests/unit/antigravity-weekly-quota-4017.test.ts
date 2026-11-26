@@ -12,6 +12,7 @@
  *     quotas alongside the existing per-model 5h quotas without clobbering them.
  */
 import test from "node:test";
+import { ANTIGRAVITY_CLI_FALLBACK_VERSION } from "../../open-sse/services/antigravityVersion.ts";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -146,7 +147,10 @@ test("getUsageForProvider(antigravity) merges weekly quotas with the selected CL
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = requestUrl(input);
     const headers = new Headers(init?.headers);
-    assert.match(headers.get("User-Agent") ?? "", /^antigravity\/cli\/1\.3\.4 /);
+    assert.match(
+      headers.get("User-Agent") ?? "",
+      new RegExp(`^antigravity/cli/${ANTIGRAVITY_CLI_FALLBACK_VERSION.replace(/\./g, "\\.")} `)
+    );
     assert.equal(headers.get("X-Goog-Api-Client"), null);
 
     if (url.includes("retrieveUserQuotaSummary")) {

@@ -472,8 +472,12 @@ export function buildProviderHeaders(provider, credentials, stream = true, body 
     headers["Authorization"] = `Bearer ${credentials.apiKey || credentials.accessToken}`;
   }
 
-  // Stream accept header
-  if (stream) {
+  // Stream accept header. The Antigravity Go CLI asks for SSE with `?alt=sse` and sends
+  // no Accept at all; the IDE build advertises `text/event-stream`, so only it gets one.
+  if (
+    stream &&
+    !(getTargetFormat(provider) === "antigravity" && headers["User-Agent"]?.includes("/cli/"))
+  ) {
     headers["Accept"] = "text/event-stream";
   }
 

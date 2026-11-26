@@ -1217,8 +1217,11 @@ export class CodexExecutor extends BaseExecutor {
     // version (e.g. "The 'gpt-6-astra' model requires a newer version of Codex"),
     // so a hardcoded value silently rots whenever the user upgrades their CLI.
     // Falls back to the configured/default version when the caller sends none.
+    // The version goes on the wire in the User-Agent only: the real 0.172.0 client
+    // sends no `Version` header, so emitting one is a fingerprint the binary never
+    // produces.
     const clientVersion = resolveCodexAdvertisedVersion(clientHeaders);
-    headers.Version = clientVersion;
+    delete headers.Version;
     setUserAgentHeader(headers, getCodexUserAgent(clientVersion));
 
     // Add workspace binding header if workspaceId is persisted
@@ -1243,6 +1246,10 @@ export class CodexExecutor extends BaseExecutor {
     const requestSessionId = this.getClientRequestSessionId(credentials, clientHeaders, body);
     if (requestSessionId) {
       headers["session_id"] = requestSessionId;
+      // Compatibility header the real client sets on every turn from the same thread
+      // id (`{thread}:0`, codex-rs/core/src/responses_metadata.rs). Without it the
+      // request looks like a client that never scopes a window.
+      headers["x-codex-window-id"] = `${requestSessionId}:0`;
     }
     applyCodexOriginalIdentityHeaders(headers, originalIdentityHeaders);
     applyCodexClientIdentityHeaders(headers, clientIdentity);

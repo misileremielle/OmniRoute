@@ -13,17 +13,50 @@ export interface AntigravityEnvelopeIdentity {
   labels: Record<string, string>;
 }
 
+/**
+ * Per-session trajectory state. The envelope requestId is
+ * `agent/<agent>/<ts>/<trajectory>/<step>` and the labels echo the trajectory and
+ * the last index — but every request used to mint a fresh agent + trajectory and
+ * hard-code step 2, so from the second turn on upstream saw "step 2 of a
+ * brand-new trajectory" forever, a shape no CLI produces. Both ids now persist for
+ * the session and the step advances, keyed by the session id (already
+ * account-scoped, and conversation-scoped when the client supplies one).
+ */
+const TRAJECTORY_STATE_LIMIT = 500;
+const trajectoryState = new Map<string, { agentId: string; trajectoryId: string; step: number }>();
+
+/** Test seam: forget every trajectory so ids are minted from scratch. */
+export function __resetAntigravityTrajectoryStateForTest(): void {
+  trajectoryState.clear();
+}
+
+function nextTrajectory(sessionId: string): {
+  agentId: string;
+  trajectoryId: string;
+  step: number;
+} {
+  const existing = trajectoryState.get(sessionId);
+  if (existing) {
+    existing.step += 1;
+    return existing;
+  }
+  const created = { agentId: crypto.randomUUID(), trajectoryId: crypto.randomUUID(), step: 2 };
+  if (trajectoryState.size >= TRAJECTORY_STATE_LIMIT) {
+    const oldest = trajectoryState.keys().next().value;
+    if (oldest !== undefined) trajectoryState.delete(oldest);
+  }
+  trajectoryState.set(sessionId, created);
+  return created;
+}
+
 export function buildAntigravityEnvelopeIdentity(args: {
   isClaude: boolean;
   credentials?: AntigravityCredentialsLike | null;
   sessionIdFallback?: string | null;
 }): AntigravityEnvelopeIdentity {
-  const agentId = crypto.randomUUID();
-  const trajectoryId = crypto.randomUUID();
-  const step = 2;
-  const requestId = `agent/${agentId}/${Date.now()}/${trajectoryId}/${step}`;
-
   const sessionId = getAntigravitySessionId(args.credentials, args.sessionIdFallback);
+  const { agentId, trajectoryId, step } = nextTrajectory(sessionId);
+  const requestId = `agent/${agentId}/${Date.now()}/${trajectoryId}/${step}`;
 
   const isClaudeStr = String(Boolean(args.isClaude));
   const labels: Record<string, string> = {

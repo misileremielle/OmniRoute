@@ -67,5 +67,12 @@ test("CLI content headers carry neither Accept nor x-goog-user-project", () => {
   // sends an Accept header, and a consumer account sends no quota-project header either.
   const headers = getAntigravityContentHeaders("cli", "token");
   const names = Object.keys(headers).map((name) => name.toLowerCase());
-  assert.deepEqual(names.sort(), ["authorization", "content-type", "user-agent"]);
+  // `accept-encoding` is the native Node default (`gzip, deflate, br`), not a header the
+  // client chooses per call; it belongs here so Node's `gzip, deflate` never leaks.
+  assert.deepEqual(names.sort(), [
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "user-agent",
+  ]);
 });

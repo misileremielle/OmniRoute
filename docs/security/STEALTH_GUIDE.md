@@ -1,7 +1,7 @@
 ---
 title: "Stealth Guide"
 version: 3.8.51
-lastUpdated: 2026-09-02
+lastUpdated: 2026-11-25
 ---
 
 # Stealth Guide
@@ -223,7 +223,7 @@ Touch points:
 
 ## CLI Fingerprint Registry — `open-sse/config/cliFingerprints.ts`
 
-Per-provider table that pins **exact** header ordering and JSON body field ordering captured from mitmproxy traces of the official CLIs. Currently registered: `codex`, `claude`, plus runtime-derived profiles in `providerHeaderProfiles.ts` for `antigravity` and `github`.
+Per-provider table that pins **exact** header ordering and JSON body field ordering captured from mitmproxy traces of the official CLIs. The `claude` order is the SDK's fold order (`buildHeaders` merges base headers, then auth, then client default headers), read out of the 2.1.332 binary — the identity headers sit after the Stainless block, not at the front. Currently registered: `codex`, `claude`, plus runtime-derived profiles in `providerHeaderProfiles.ts` for `antigravity` and `github`.
 
 ```ts
 interface CliFingerprint {
@@ -285,6 +285,125 @@ OmniRoute scrubs inbound client headers before forwarding so a request that arri
 5. If the TLS handshake itself changed, update the relevant provider wrapper or the wreq-js `browser:` option
 6. Run the provider-specific TLS tests and a manual canary against the live provider
 7. Ship in a patch release; document in `CHANGELOG.md`
+
+---
+
+## Account Ban Risk — What Actually Moves It
+
+A perfect wire fingerprint does not make a proxied account safe on its own. Vendors judge
+_behaviour_, and headers are only one input. Ranked by what the code can actually influence:
+
+1. **Refresh-token single flight.** Rotating refresh tokens are one-time-use; a replayed one can
+   revoke the whole token family. `open-sse/services/refreshSerializer.ts` serializes refreshes per
+   rotation group (`ROTATION_LOCK_GROUP`) with a settle gap (`CODEX_REFRESH_SPACING_MS`).
+   `wasRefreshTokenRotated()` keeps a connection alive when the failure was really a stale
+   concurrent refresh, not a dead account.
+2. **One stable device identity per account.** `cliUserID` (Claude) is persisted at OAuth
+   provisioning; the Codex installation id is salt-derived (`open-sse/config/codexIdentity.ts`);
+   the Copilot `X-Client-Machine-Id` is derived from the host machine plus a fixed salt, so it
+   survives restarts. A per-process random id makes every restart look like a new device.
+3. **A per-account concurrency ceiling.** `resolveAccountSemaphoreMaxConcurrency()`
+   (`open-sse/handlers/chatCore/executorHelpers.ts`) falls back to
+   `PROVIDER_DEFAULT_CONCURRENCY_CAP` for subscription providers when a connection configures
+   nothing. Override per connection with `maxConcurrent` / `rateLimitMaxConcurrent`, globally with
+   `OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY` (`0` disables the defaults, an explicit per-connection
+   value always wins).
+4. **One egress per account.** Subscription providers are pinned to one proxy member by default
+   (`isEgressPinnedScope`, `OMNIROUTE_EGRESS_PIN_PROVIDERS`), so one account is not spread across
+   exit IPs; the pool still moves the account when a member fails.
+5. **Version freshness.** Upstreams gate models on the advertised client version and reject stale
+   ones; `pnpm run check:cli-fingerprint-drift` fails when a captured pin falls a MAJOR or
+   MINOR line behind the published CLI, and on a patch gap deeper than three. Shallower patch
+   gaps are printed as advisory — copilot publishes most days, and a gate that fires on every
+   publish gets ignored. `--strict` collapses the tolerance to zero for the release checklist.
+
+What does **not** help on its own: header spoofing (vendors tightened checks rather than accepting
+it), TLS fingerprinting (widely implemented, never vendor-documented), and hosting location
+(OpenAI's terms ask for tokens to stay local). Treat 429s as expected and back off; a hard ban is
+rarer but real, and Antigravity answers it with a `403` citing its ToS.
+
+---
+
+## Identity Surface — Where Each Field Lives
+
+Every identifier OmniRoute synthesizes on a CLI's behalf, and what scope it holds. The rule that
+binds them: **an identity field is per account, never per request and never per process.** A
+per-request value says "new client" on every turn; a per-process value says "new device" on every
+restart. Identifier churn is one of the cheapest things a vendor can spot.
+
+| Field                                | Where it is sent                                                                       | Resolved by                                                                                                                            | Scope and persistence                                                                                                                                                                                                                                                 |
+| ------------------------------------ | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Claude `device_id`                   | `metadata.user_id.device_id`                                                           | `resolveCliUserID` (`open-sse/executors/claudeIdentity.ts:128`)                                                                        | Persisted as `providerSpecificData.cliUserID` at provisioning (`src/lib/oauth/providers/claude.ts:87`) and carried across refreshes (`src/app/api/oauth/[provider]/[action]/route.ts:114`).                                                                           |
+| Claude `account_uuid` + `cc_version` | `metadata.user_id.account_uuid`, system[0] `cc_version=`                               | `resolveAccountUUID` (`open-sse/executors/claudeIdentity.ts:249`), `computeFingerprint` (`open-sse/services/claudeCodeFingerprint.ts`) | The real uuid from login-time bootstrap, otherwise derived from the connection id. `cc_version` is `<version>.<3-char fingerprint of the first user message>`, recomputed per request exactly as the binary does (`sha256(SALT + msg[4,7,20] + version).slice(0,3)`). |
+| Claude session + request class       | `X-Claude-Code-Session-Id`, `x-claude-code-request-class`, `x-claude-1p-request-class` | `passthroughUpstreamSessionId` then `getSessionId` (`open-sse/executors/claudeIdentity.ts:101`)                                        | Session is the client's own when it sends a UUID, else per connection. The class pair is always `main` — the CLI's classification of an ordinary main-loop turn (`l6l`/`c6l` in the 2.1.332 binary).                                                                  |
+| Codex convergence seed               | derived installation / thread ids                                                      | `ensureCodexFingerprintSeed` (`open-sse/config/codexIdentity.ts:137`)                                                                  | Seed minted at connection create/update, read-only on the request path (`codexFingerprintSeed`); feeds `getCodexConvergedSessionId` / `getCodexConvergedThreadId`.                                                                                                    |
+| Codex session                        | `session_id`, `x-codex-window-id`                                                      | `getClientRequestSessionId` (`open-sse/executors/codex.ts:1272`)                                                                       | Per client request session.                                                                                                                                                                                                                                           |
+| Copilot machine id                   | `X-Client-Machine-Id`                                                                  | `getGitHubCopilotMachineId` (`open-sse/config/providerHeaderProfiles.ts:191`)                                                          | Host-derived via `getStableDeviceUuid` (`src/shared/utils/machineId.ts:205`), stable across restarts; `GITHUB_COPILOT_MACHINE_ID` overrides.                                                                                                                          |
+| Antigravity session                  | envelope `sessionId`                                                                   | `getAntigravitySessionId` / `deriveAntigravitySessionId` (`open-sse/services/antigravityIdentity.ts:165`)                              | Account-scoped hash, conversation-scoped when the client supplies a key.                                                                                                                                                                                              |
+| Antigravity agent + trajectory       | envelope `requestId`, `trajectory_id`, `last_step_index`                               | `buildAntigravityEnvelopeIdentity` (`open-sse/services/antigravityIdentity.ts`)                                                        | Held per session in `trajectoryState`; the step advances per request instead of restarting at 2.                                                                                                                                                                      |
+| Egress address                       | source IP                                                                              | `isEgressPinnedScope` (`open-sse/config/providerErrorRules.ts:551`)                                                                    | One proxy member per subscription connection, rotated only on failure.                                                                                                                                                                                                |
+
+When adding a field, follow the same shape: persist it at provisioning or connection create/update,
+or derive it from a stable per-account key. **Do not seed from the access token** — it rotates on
+refresh, which is how the Claude account uuid and session id both ended up churning once.
+
+### A retry re-signs
+
+`cch` covers the serialized body, so any retry that rewrites the body must replace
+the token: `signRequestBody(body, { resign: true })` is passed at every retry site on
+the cloak path. The default stays placeholder-only so a bridge pipeline that signed
+with its own algorithm is not overwritten. The token is always hashed over the
+placeholder bytes, never over the previous token.
+
+### Antigravity's two profiles
+
+The Go CLI and the Electron IDE are different clients and must not borrow each
+other's markers: the CLI sends no `X-Goog-Api-Client`, no `Client-Metadata`, no SSE
+`Accept` (it uses `?alt=sse`) and no quota-project header; the IDE sends the Accept.
+Both negotiate `gzip, deflate, br` — never the Electron `zstd` — and both drop
+proxy, Stainless and `Sec-Ch-*` headers with Authorization deferred last. The
+encoding is set on the content headers themselves so paths that bypass the scrubber
+(usage probes, project bootstrap) cannot fall back to Node's `gzip, deflate`.
+
+### The messages face is a fixed set
+
+The header set on `/v1/messages` is exactly the client's 22 names, in the client's
+order, with no proxy or OmniRoute marker in it. `x-client-request-id` is a fresh
+UUIDv4 on every attempt (`randomUUID` in the client, first-party traffic only) — it
+is the id support asks for, so a request without one reads as non-first-party.
+`traceparent` stays out: it needs `CLAUDE_CODE_PROPAGATE_TRACEPARENT` plus an
+inbound trace a proxy does not have. `x-app` is `cli`, and stays `cli-bg` when the
+caller is a background session (`CLAUDE_CODE_SESSION_KIND=bg`) — overwriting it
+would relabel every background turn as interactive.
+`tests/unit/claude-messages-face-headers.test.ts` pins the set for streams and
+non-streams, and pins that a cold token bootstraps first — the bootstrap goes out
+on the API face, before the messages call.
+
+### The API face is not the messages face
+
+Every non-`/v1/messages` call made on a subscription's behalf — bootstrap, the
+usage pollers, the reset-credit list and both claim profiles — answers as
+`claude-code/<version>` (`Li()` in the binary) with `Authorization`,
+`anthropic-beta: oauth-2025-04-20` and the axios defaults, and **without**
+`x-app`. They all go through `claudeApiHeaders()`, and
+`tests/unit/upstream-api-face-identity.test.ts` holds the shared property (with the
+Codex usage probe, which must not read as a half-identity beside inference traffic) so a new
+call site cannot invent a third identity.
+
+### bootstrap is its own shape
+
+`GET /api/claude_cli/bootstrap` is not a messages call: the CLI sends
+`User-Agent: claude-code/<version>` (no `(external, cli)` suffix), an `entrypoint=cli`
+query param, and the model when it has one. Borrowing the messages UA here is a
+shape no real client produces. The `Authorization` + `oauth-2025-04-20` pair _is_
+the CLI's own oat auth branch and stays.
+
+### count_tokens is not a separate client
+
+The real client posts `count_tokens` through the same SDK client, so it carries the same
+headers, the same billing block and the same order. `BaseExecutor.countTokens` reuses
+`buildClaudeCloakHeaders` / `buildClaudeBillingLine` and signs the body, exactly as
+`execute` does.
 
 ---
 

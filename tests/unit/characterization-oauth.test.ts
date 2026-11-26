@@ -291,7 +291,10 @@ test("exchangeTokens(claude): code#state split, token POST, bootstrap enrichment
       redirect_uri: constants.CLAUDE_CONFIG.redirectUri,
       code_verifier: "verifier-1",
     });
-    assert.equal(fetchMock.calls[1].url, "https://api.anthropic.com/api/claude_cli/bootstrap");
+    assert.equal(
+      fetchMock.calls[1].url,
+      "https://api.anthropic.com/api/claude_cli/bootstrap?entrypoint=cli"
+    );
 
     assert.equal(tokens.accessToken, "at-1");
     assert.equal(tokens.refreshToken, "rt-1");

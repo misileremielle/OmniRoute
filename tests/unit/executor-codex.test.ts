@@ -26,6 +26,7 @@ import {
 } from "../../open-sse/services/thinkingBudget.ts";
 import { runWithCapture } from "../../open-sse/utils/providerRequestLogging.ts";
 import { CODEX_CHAT_DEFAULT_INSTRUCTIONS } from "../../open-sse/config/codexInstructions.ts";
+import { DEFAULT_CODEX_CLIENT_VERSION } from "../../src/shared/constants/codexClient.ts";
 
 type MockCodexWebSocket = {
   send: (data: string) => void;
@@ -184,10 +185,12 @@ test("CodexExecutor.buildHeaders binds workspace ids and disables SSE accept for
   assert.equal(standardHeaders.Authorization, "Bearer codex-token");
   assert.equal(standardHeaders.Accept, "text/event-stream");
   assert.equal(standardHeaders["chatgpt-account-id"], "workspace-1");
-  assert.equal(standardHeaders.Version, "0.165.0");
+  assert.equal(standardHeaders.Version, undefined);
   assert.equal(standardHeaders["Openai-Beta"], "responses_websockets=2026-02-06");
   assert.equal(standardHeaders["X-Codex-Beta-Features"], undefined);
-  assert.equal(standardHeaders["User-Agent"], "codex-cli/0.165.0 (Windows 10.0.26200; x64)");
+  assert.ok(
+    standardHeaders["User-Agent"].startsWith(`codex_cli_rs/${DEFAULT_CODEX_CLIENT_VERSION} (`)
+  );
   assert.equal(compactHeaders.Accept, "application/json");
 });
 
@@ -201,8 +204,8 @@ test("CodexExecutor.buildHeaders honors safe env overrides for Version and User-
     },
     () => {
       const headers = executor.buildHeaders({ accessToken: "codex-token" }, true);
-      assert.equal(headers.Version, "0.144.0");
-      assert.equal(headers["User-Agent"], "codex-cli/0.144.0 (Windows 10.0.26200; x64)");
+      assert.equal(headers.Version, undefined);
+      assert.ok(headers["User-Agent"].startsWith("codex_cli_rs/0.144.0 ("));
     }
   );
 
@@ -213,7 +216,7 @@ test("CodexExecutor.buildHeaders honors safe env overrides for Version and User-
     },
     () => {
       const headers = executor.buildHeaders({ accessToken: "codex-token" }, true);
-      assert.equal(headers.Version, "0.165.0");
+      assert.equal(headers.Version, undefined);
       assert.equal(headers["User-Agent"], "custom-codex/9.9.9");
     }
   );

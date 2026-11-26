@@ -39,22 +39,34 @@ export const CLI_FINGERPRINTS: Record<string, CliFingerprint> = {
       "Authorization",
       "Accept",
       "User-Agent",
+      "x-codex-window-id",
       "Accept-Encoding",
     ],
+    // Field order is the real client's serialization order (openai/codex 0.172.0,
+    // codex-rs/codex-api/src/common.rs `ResponsesApiRequest`). Routing fields sit
+    // first on purpose there — gateways read the body incrementally before a
+    // potentially multi-megabyte `input`. `instructions` is kept where that struct
+    // would have carried it (0.172 folds base instructions into a developer input
+    // item) so a client that still sends it stays in a native-looking position.
     bodyFieldOrder: [
       "model",
       "stream",
-      "input",
+      "service_tier",
       "instructions",
-      "store",
-      "reasoning",
-      "prompt_cache_key",
+      "input",
       "tools",
       "tool_choice",
-      "include",
-      "service_tier",
-      "client_metadata",
       "parallel_tool_calls",
+      "reasoning",
+      "store",
+      "stream_options",
+      "include",
+      "prompt_cache_key",
+      "prompt_cache_options",
+      "text",
+      "client_metadata",
+      "access_programs",
+      "request_country",
       "metadata",
     ],
     // Codex builds mode-specific client headers in its executor/config. The CLI fingerprint must
@@ -62,32 +74,37 @@ export const CLI_FINGERPRINTS: Record<string, CliFingerprint> = {
     // executor-provided version or user override.
   },
   claude: {
-    // Header order matching real claude-cli: Title-Case (Stainless) keys
-    // alphabetically, then lowercase Anthropic keys alphabetically, then
-    // transport headers added by Node fetch.
+    // Order is the SDK's own merge order, not alphabetical: buildHeaders folds
+    // `[{Accept, User-Agent, X-Stainless-*...}, authHeaders, defaultHeaders, body,
+    // per-call]` with later writes keeping the first insertion point. The identity
+    // headers live in `defaultHeaders`, so they land AFTER the Stainless block, and
+    // `User-Agent` keeps position 2 because the base object already has the key.
+    // Read from the 2.1.332 binary (buildHeaders / le()).
     headerOrder: [
       "Accept",
-      "Authorization",
-      "Content-Type",
       "User-Agent",
-      "X-Claude-Code-Session-Id",
-      "X-Stainless-Arch",
-      "X-Stainless-Lang",
-      "X-Stainless-OS",
-      "X-Stainless-Package-Version",
       "X-Stainless-Retry-Count",
+      "X-Stainless-Timeout",
+      "X-Stainless-Lang",
+      "X-Stainless-Package-Version",
+      "X-Stainless-OS",
+      "X-Stainless-Arch",
       "X-Stainless-Runtime",
       "X-Stainless-Runtime-Version",
-      "X-Stainless-Timeout",
-      "anthropic-beta",
       "anthropic-dangerous-direct-browser-access",
       "anthropic-version",
+      "Authorization",
       "x-app",
+      "X-Claude-Code-Session-Id",
+      "x-claude-code-request-class",
+      "x-claude-1p-request-class",
+      "anthropic-beta",
       "x-client-request-id",
+      "Content-Type",
+      "Content-Length",
+      "Accept-Encoding",
       "Connection",
       "Host",
-      "Accept-Encoding",
-      "Content-Length",
     ],
     bodyFieldOrder: [
       "model",

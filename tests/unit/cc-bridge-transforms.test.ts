@@ -36,6 +36,12 @@ function bodyWithSystem(systemBlocks: Array<{ type: string; text: string }>, use
   };
 }
 
+type BillingMessages = Parameters<typeof buildBillingHeaderValue>[0];
+
+function userMessages(text: string): BillingMessages {
+  return [{ role: "user", content: text }] as unknown as BillingMessages;
+}
+
 function runPipeline(body: any, ops: any[]) {
   return applyCcBridgeTransformPipeline(body, { enabled: true, pipeline: ops });
 }
@@ -52,7 +58,11 @@ test("DEFAULT_CC_BRIDGE_PIPELINE places billing header at [0] and identity at [1
     DEFAULT_CC_BRIDGE_PIPELINE
   );
   const blocks = result.body.system as any[];
-  assert.ok(blocks[0].text.startsWith("x-anthropic-billing-header: cc_version=2.1.280.1e2;"));
+  assert.ok(blocks[0].text.startsWith("x-anthropic-billing-header: cc_version="));
+  assert.match(
+    blocks[0].text,
+    /^x-anthropic-billing-header: cc_version=\d+\.\d+\.\d+\.[0-9a-f]{3};/
+  );
   assert.equal(blocks[1].text, CLAUDE_AGENT_SDK_IDENTITY);
 });
 
@@ -282,7 +292,7 @@ test("inject_billing_header xxhash64-body uses 00000 placeholder", () => {
 // ── Algorithm primitives ───────────────────────────────────────────────────
 
 test("extractFirstUserMessageText handles string and block content", () => {
-  assert.equal(extractFirstUserMessageText([{ role: "user", content: "hello" }] as any), "hello");
+  assert.equal(extractFirstUserMessageText(userMessages("hello")), "hello");
   assert.equal(
     extractFirstUserMessageText([
       { role: "system", content: "ignore" } as any,
@@ -315,7 +325,7 @@ test("computeDaystampVersionSuffix yields 3-hex digest", () => {
 });
 
 test("buildBillingHeaderValue produces the expected ex-machina format", () => {
-  const value = buildBillingHeaderValue([{ role: "user", content: "hello" }] as any, {
+  const value = buildBillingHeaderValue(userMessages("hello"), {
     entrypoint: "sdk-cli",
     versionFormat: "ex-machina",
     cchAlgo: "sha256-first-user",
@@ -324,6 +334,35 @@ test("buildBillingHeaderValue produces the expected ex-machina format", () => {
     value,
     /^x-anthropic-billing-header: cc_version=\d+\.\d+\.\d+\.[0-9a-f]{3}; cc_entrypoint=sdk-cli; cch=[0-9a-f]{5};$/
   );
+});
+
+test("the default pipeline leaves buildRevision unset so the fingerprint is computed", () => {
+  const op = DEFAULT_CC_BRIDGE_PIPELINE.find((o) => o.kind === "inject_billing_header");
+  assert.ok(op);
+  assert.equal(op.buildRevision, undefined);
+
+  const one = buildBillingHeaderValue(userMessages("hello"), {
+    entrypoint: op.entrypoint,
+    versionFormat: op.versionFormat,
+    cchAlgo: op.cchAlgo,
+  });
+  const two = buildBillingHeaderValue(userMessages("goodbye"), {
+    entrypoint: op.entrypoint,
+    versionFormat: op.versionFormat,
+    cchAlgo: op.cchAlgo,
+  });
+  assert.notEqual(one, two, "a static revision would make both headers identical");
+  assert.doesNotMatch(one, /\.1e2;/);
+});
+
+test("an explicit buildRevision still wins over the fingerprint", () => {
+  const value = buildBillingHeaderValue(userMessages("hello"), {
+    entrypoint: "sdk-cli",
+    versionFormat: "ex-machina",
+    cchAlgo: "sha256-first-user",
+    buildRevision: "a1b",
+  });
+  assert.match(value, /\.a1b;/);
 });
 
 // ── Disabled config short-circuits ─────────────────────────────────────────
@@ -392,6 +431,10 @@ test("DEFAULT_CC_BRIDGE_PIPELINE produces T4-200 fixture shape on verbatim OpenC
   // Layout: [billing][identity][sanitized][memory][browser]
   assert.equal(blocks.length, 5, "expected 5 system blocks");
   assert.ok(blocks[0].text.startsWith("x-anthropic-billing-header:"));
+  assert.match(
+    blocks[0].text,
+    /^x-anthropic-billing-header: cc_version=\d+\.\d+\.\d+\.[0-9a-f]{3};/
+  );
   assert.equal(blocks[1].text, CLAUDE_AGENT_SDK_IDENTITY);
 
   const sanitized = blocks[2].text as string;

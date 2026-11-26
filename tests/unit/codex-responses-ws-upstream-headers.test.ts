@@ -121,11 +121,15 @@ test("connection custom headers apply on the WS bridge; model-level wins on the 
   assert.equal(header(headers, "x-shared"), "model");
 });
 
-test("control: without any override the WS bridge keeps the executor's own Version", async () => {
+test("control: without any override the WS bridge mirrors the executor's identity", async () => {
   await codexConnection();
 
   const { headers } = await prepare("codex/gpt-5.5");
 
-  assert.equal(header(headers, "version"), "0.100.0");
+  // codex-rs sends no `Version` header — not on the HTTP call and not on the WS
+  // upgrade (only `originator` + `User-Agent`, login/src/auth/default_client.rs
+  // default_headers). A `Version` only appears when a model overrides one.
+  assert.equal(header(headers, "version"), undefined);
+  assert.match(String(header(headers, "user-agent")), /^codex_cli_rs\/0\.100\.0 /);
   assert.equal(header(headers, "x-model-scoped"), undefined);
 });

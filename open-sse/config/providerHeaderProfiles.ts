@@ -1,4 +1,5 @@
 import { getAntigravityContentHeaders } from "../services/antigravityHeaders.ts";
+import { stableDeviceUuid } from "@/shared/utils/deviceUuid";
 import type { AntigravityClientProfile } from "@/shared/constants/antigravityClientProfile";
 import {
   BACKGROUND_REFRESH_RETRY_AFTER_FAILURE_MS,
@@ -11,11 +12,11 @@ import {
 // id is the catalog-unlock lever: it exposes the full entitled model set
 // (gemini-3.x, gpt-5.4-nano, the full opus reasoning range) where `vscode-chat`
 // returns a narrower list. The default version tracks the supported CLI
-// package (1.0.91) and follows a newer `@github/copilot` publish when the
+// package (1.0.116) and follows a newer `@github/copilot` publish when the
 // registry answers. Copilot gates models on that version and 400s a pin
 // that is behind.
 export const GITHUB_COPILOT_API_VERSION = "2026-08-01";
-export const GITHUB_COPILOT_CLI_VERSION = "1.0.91";
+export const GITHUB_COPILOT_CLI_VERSION = "1.0.116";
 const GITHUB_COPILOT_VERSION_OVERRIDE_ENV = "GITHUB_COPILOT_CLI_VERSION";
 const SAFE_COPILOT_VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
 const COPILOT_DOTTED_TRIPLE_PATTERN = /^\d+\.\d+\.\d+$/;
@@ -181,17 +182,23 @@ export function resolveCopilotIntegrationIdOverride(): string | null {
 // Stable per-install device fingerprint (the CLI's X-Client-Machine-Id). The
 // real @github/copilot CLI sends ONE stable UUID on every inference + /models
 // call (verified identical across all captured requests) — a per-call random id
-// would itself be an anti-fingerprint tell. We mint one per process and cache
-// it (env-overridable via GITHUB_COPILOT_MACHINE_ID), which keeps it stable for
-// the lifetime of a running OmniRoute instance, matching "one CLI install".
+// would itself be an anti-fingerprint tell, and so would a per-PROCESS one:
+// every restart would present a brand-new machine for the same account. The id
+// is therefore derived from the host machine + a fixed salt, so it survives
+// restarts and matches "one CLI install" (env override:
+// GITHUB_COPILOT_MACHINE_ID).
 let _copilotMachineId: string | null = null;
 export function getGitHubCopilotMachineId(): string {
   const override = (process?.env?.GITHUB_COPILOT_MACHINE_ID || "").trim();
   if (override) return override;
   if (_copilotMachineId) return _copilotMachineId;
-  _copilotMachineId =
-    crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  _copilotMachineId = stableDeviceUuid("omniroute-copilot-machine-id");
   return _copilotMachineId;
+}
+
+/** Test seam: forget the cached id so the derivation runs again. */
+export function __resetCopilotMachineIdForTest(): void {
+  _copilotMachineId = null;
 }
 
 export const QWEN_CLI_VERSION = "0.19.3";

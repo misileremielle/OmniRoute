@@ -180,3 +180,163 @@ describe("wire: executor CCH signing", () => {
     assert.match(billing, /cch=[0-9a-f]{5};/);
   });
 });
+
+describe("re-signing a mutated retry body", () => {
+  const billing = "x-anthropic-billing-header: cc_version=2.1.332.18b; cc_entrypoint=cli; cch=";
+  const body = (maxTokens: number, cch = "00000") =>
+    `{"model":"claude-sonnet-4-5","max_tokens":${maxTokens},` +
+    `"system":[{"type":"text","text":"${billing}${cch};"}],"messages":[{"role":"user","content":"hi"}]}`;
+
+  it("replaces a token the first send already wrote", async () => {
+    const signed = await signRequestBody(body(64));
+    // A retry rewrites the body — the token above is now stale. The change has to
+    // be one the hash view keeps: `max_tokens` is stripped from it.
+    const mutated = signed.replace('"content":"hi"', '"content":"hi again"');
+    const resigned = await signRequestBody(mutated, { resign: true });
+    // Same body, token reset to the placeholder → the reference signature.
+    const reference = await signRequestBody(mutated.replace(/cch=[0-9a-f]{5};/, "cch=00000;"));
+    assert.equal(resigned, reference);
+    assert.notEqual(resigned, mutated, "the stale token must be replaced");
+  });
+
+  it("still passes an already-signed header through without the flag", async () => {
+    const signed = await signRequestBody(body(64));
+    assert.equal(await signRequestBody(signed), signed);
+  });
+
+  it("re-signing without a token leaves the body alone", async () => {
+    const plain = '{"model":"claude-sonnet-4-5","messages":[{"role":"user","content":"hi"}]}';
+    assert.equal(await signRequestBody(plain, { resign: true }), plain);
+  });
+});
+
+describe("wire: a retry re-signs the body", () => {
+  it("replaces the cch on a thinking-budget clamp retry", async () => {
+    const calls: string[] = [];
+    globalThis.fetch = (async (_url: RequestInfo | URL, init?: RequestInit) => {
+      const body = String(init?.body ?? "");
+      if (!body) return new Response("{}", { status: 200 });
+      calls.push(body);
+      if (calls.length === 1) {
+        return new Response(
+          JSON.stringify({
+            type: "error",
+            error: { message: "thinking_budget must be in the range [-1, 8000]" },
+          }),
+          { status: 400, headers: { "content-type": "application/json" } }
+        );
+      }
+      return new Response("{}", { status: 200 });
+    }) as typeof fetch;
+
+    await new DefaultExecutor("claude").execute({
+      model: "claude-sonnet-4-5",
+      body: {
+        model: "claude-sonnet-4-5",
+        max_tokens: 16000,
+        thinking: { type: "enabled", budget_tokens: 32000 },
+        messages: [{ role: "user", content: "hello" }],
+      },
+      stream: false,
+      credentials: oauth(),
+      clientHeaders: CLI_HEADERS,
+    } as never);
+    globalThis.fetch = realFetch;
+
+    assert.equal(calls.length, 2, "the clamp must retry");
+    const first = JSON.parse(calls[0]).system[0].text.match(/cch=([0-9a-f]{5});/)![1];
+    const second = JSON.parse(calls[1]).system[0].text.match(/cch=([0-9a-f]{5});/)![1];
+    assert.notEqual(second, first, "the stale token must not ride a rewritten body");
+    assert.notEqual(second, "00000");
+  });
+});
+
+// Learned caps are recorded process-wide per provider+model, so each case needs
+// its own model id or a previous case pre-clamps the body and no 400 happens.
+const CAPTURE_MODEL = "claude-sonnet-4-5-hash-change";
+const NOHASH_MODEL = "claude-sonnet-4-5-nohash-change";
+
+describe("wire: every recovery re-signs", () => {
+  it("replaces the cch on a max_tokens ceiling retry", async () => {
+    const calls: string[] = [];
+    globalThis.fetch = (async (_url: RequestInfo | URL, init?: RequestInit) => {
+      const body = String(init?.body ?? "");
+      if (!body) return new Response("{}", { status: 200 });
+      calls.push(body);
+      if (calls.length === 1) {
+        return new Response(
+          JSON.stringify({
+            type: "error",
+            error: { message: "max_tokens: expected a value <= 8192" },
+          }),
+          { status: 400, headers: { "content-type": "application/json" } }
+        );
+      }
+      return new Response("{}", { status: 200 });
+    }) as typeof fetch;
+
+    await new DefaultExecutor("claude").execute({
+      model: CAPTURE_MODEL,
+      body: {
+        model: CAPTURE_MODEL,
+        // The clamp squeezes the budget to stay under the new max_tokens, and
+        // `budget_tokens` (unlike `max_tokens`) is part of the hash view — so the
+        // retry body really does differ in the hashed bytes here.
+        thinking: { type: "enabled", budget_tokens: 32000 },
+        max_tokens: 64000,
+        messages: [{ role: "user", content: "hello" }],
+      },
+      stream: false,
+      credentials: oauth(),
+      clientHeaders: CLI_HEADERS,
+    } as never);
+    globalThis.fetch = realFetch;
+
+    assert.equal(calls.length, 2, "the ceiling clamp must retry");
+    const first = JSON.parse(calls[0]).system[0].text.match(/cch=([0-9a-f]{5});/)![1];
+    const second = JSON.parse(calls[1]).system[0].text.match(/cch=([0-9a-f]{5});/)![1];
+    assert.notEqual(second, first, "a rewritten body must not keep the old token");
+  });
+});
+
+describe("a retry that only changes non-hashed fields", () => {
+  it("keeps the token when the hash view is unchanged, and it stays a live value", async () => {
+    // `max_tokens` is stripped from the hash view, so clamping it alone must not
+    // produce a different token — but it must still be a real one (never 00000).
+    const calls: string[] = [];
+    globalThis.fetch = (async (_url: RequestInfo | URL, init?: RequestInit) => {
+      const body = String(init?.body ?? "");
+      if (!body) return new Response("{}", { status: 200 });
+      calls.push(body);
+      if (calls.length === 1) {
+        return new Response(
+          JSON.stringify({
+            type: "error",
+            error: { message: "max_tokens: expected a value <= 8192" },
+          }),
+          { status: 400, headers: { "content-type": "application/json" } }
+        );
+      }
+      return new Response("{}", { status: 200 });
+    }) as typeof fetch;
+
+    await new DefaultExecutor("claude").execute({
+      model: NOHASH_MODEL,
+      body: {
+        model: NOHASH_MODEL,
+        max_tokens: 64000,
+        messages: [{ role: "user", content: "hello" }],
+      },
+      stream: false,
+      credentials: oauth(),
+      clientHeaders: CLI_HEADERS,
+    } as never);
+    globalThis.fetch = realFetch;
+
+    assert.equal(calls.length, 2);
+    const second = JSON.parse(calls[1]).system[0].text.match(/cch=([0-9a-f]{5});/)![1];
+    assert.notEqual(second, "00000");
+    const reference = await signRequestBody(calls[1].replace(/cch=[0-9a-f]{5};/, "cch=00000;"));
+    assert.match(reference, new RegExp(`cch=${second};`));
+  });
+});

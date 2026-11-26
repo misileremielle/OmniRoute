@@ -16,6 +16,7 @@ import {
   KIRO_AMZ_USER_AGENT,
   KIRO_SDK_USER_AGENT,
   QWEN_CLI_VERSION,
+  GITHUB_COPILOT_CLI_VERSION,
   getGitHubCopilotMachineId,
   getQwenCliUserAgent,
   getGitHubCopilotChatHeaders,
@@ -31,7 +32,10 @@ test("provider header profiles expose current GitHub chat and internal headers",
   const chatHeaders = getGitHubCopilotChatHeaders("text/event-stream", "agent");
   // Header shape follows the captured CLI identity; the version uses the current pin.
   assert.equal(chatHeaders["editor-version"], GITHUB_COPILOT_EDITOR_VERSION);
-  assert.equal(chatHeaders["user-agent"], `copilot/1.0.91 (${process.platform}) term/unknown`);
+  assert.equal(
+    chatHeaders["user-agent"],
+    `copilot/${GITHUB_COPILOT_CLI_VERSION} (${process.platform}) term/unknown`
+  );
   assert.equal(chatHeaders["x-github-api-version"], GITHUB_COPILOT_API_VERSION);
   assert.equal(chatHeaders["copilot-integration-id"], GITHUB_COPILOT_INTEGRATION_ID);
   assert.equal(chatHeaders["x-interaction-type"], GITHUB_COPILOT_INTERACTION_TYPE);

@@ -193,6 +193,10 @@ function git(cwd: string, args: string[]) {
       encoding: "utf-8",
       env: {
         ...cleanEnv(),
+        // Annotated tags open an editor and abort on an empty message, so the
+        // editor writes one.
+        GIT_EDITOR: `sh -c 'printf "test tag\\n" > "$1"' sh`,
+        EDITOR: `sh -c 'printf "test tag\\n" > "$1"' sh`,
         GIT_AUTHOR_NAME: "Migration Gate Test",
         GIT_AUTHOR_EMAIL: "gate-test@example.invalid",
         GIT_COMMITTER_NAME: "Migration Gate Test",

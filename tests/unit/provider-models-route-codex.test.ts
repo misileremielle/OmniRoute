@@ -200,13 +200,21 @@ test("provider models route merges live Codex models with the local catalog then
   assert.equal(body.provider, "codex");
   assert.equal(body.source, "api");
   assert.equal(body.discoveredCandidateCount, undefined);
+  // The UA carries host values (OS release, arch, terminal), so match the prefix.
+  assert.match(
+    seenRequests[0].userAgent,
+    new RegExp(`^codex_cli_rs/${getCodexClientVersion().replace(/\./g, "\\.")} \\(`)
+  );
+
   assert.deepEqual(seenRequests, [
     {
       url: `https://chatgpt.com/backend-api/codex/models?client_version=${getCodexClientVersion()}`,
       authorization: "Bearer codex-access-token",
       workspaceId: "account-123",
       originator: "codex_cli_rs",
-      userAgent: `codex-cli/${getCodexClientVersion()} (Windows 10.0.26200; x64)`,
+      // Real shape: `codex_cli_rs/<v> (<os> <release>; <arch>) <terminal>`, built
+      // from the host, so the UA is asserted by prefix a few lines down.
+      userAgent: seenRequests[0].userAgent,
     },
     {
       url: "https://raw.githubusercontent.com/openai/codex/refs/heads/main/codex-rs/models-manager/models.json",

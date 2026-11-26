@@ -39,17 +39,30 @@ function asRecord(value: unknown): JsonRecord {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as JsonRecord) : {};
 }
 
-/** Headers for the dashboard's reset-credit list and redeem requests (Claude Code CLI shape). */
-export function claudeResetCreditHeaders(accessToken: string): Record<string, string> {
+/**
+ * Headers for a Claude *API* request — the non-`/v1/messages` face (usage, reset
+ * list, reset claim, bootstrap).
+ *
+ * The CLI answers that face as `claude-code/<version>` (`Li()` in the binary, the
+ * same string the bootstrap call builds); `claude-cli/… (external, cli)` and
+ * `x-app: cli` belong to the messages client. One endpoint must not present two
+ * different clients, so every caller shares this shape.
+ */
+export function claudeApiHeaders(accessToken: string): Record<string, string> {
   return {
+    // axios defaults; the CLI reaches this face through its axios client, so both
+    // of these travel on every one of these calls.
     Accept: "application/json, text/plain, */*",
+    "Accept-Encoding": "gzip, compress, deflate, br",
     Authorization: `Bearer ${accessToken}`,
     "Content-Type": "application/json",
-    "User-Agent": `claude-cli/${getClaudeCodeVersion()} (external, cli)`,
-    "x-app": "cli",
+    "User-Agent": `claude-code/${getClaudeCodeVersion()}`,
     "anthropic-beta": "oauth-2025-04-20",
   };
 }
+
+/** @deprecated alias kept for callers that read the old name. */
+export const claudeResetCreditHeaders = claudeApiHeaders;
 
 export type JsonResponse = { ok: boolean; status: number; body: unknown; headers?: Headers | null };
 

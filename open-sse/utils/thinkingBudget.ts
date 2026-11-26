@@ -15,6 +15,7 @@ export function hasActiveClaudeThinking(body: Record<string, unknown>): boolean 
  * a thinking budget, wherever the provider's envelope nests it:
  *   - body.generationConfig.thinkingConfig            (native Gemini / openai→gemini)
  *   - body.request.generationConfig.thinkingConfig    (Antigravity Cloud Code envelope)
+ *   - body.thinking                                   (Anthropic native, `budget_tokens`)
  * Returns only objects that actually carry a `thinkingBudget`/`thinking_budget`
  * field — a request without thinking config is never mutated.
  */
@@ -31,10 +32,27 @@ export function collectThinkingConfigs(body: unknown): Array<Record<string, unkn
     const tc = (env as Record<string, unknown>).thinkingConfig;
     if (tc && typeof tc === "object") {
       const tcr = tc as Record<string, unknown>;
-      if ("thinkingBudget" in tcr || "thinking_budget" in tcr) configs.push(tcr);
+      if (hasBudgetField(tcr)) configs.push(tcr);
     }
   }
+  // Anthropic-native shape: `thinking: { type, budget_tokens }`. Without this the
+  // Gemini-envelope scan alone is blind to /v1/messages bodies, so the
+  // thinking-budget 400 clamp-and-retry never fired for Claude.
+  const thinking = root.thinking;
+  if (
+    thinking &&
+    typeof thinking === "object" &&
+    hasBudgetField(thinking as Record<string, unknown>)
+  ) {
+    configs.push(thinking as Record<string, unknown>);
+  }
   return configs;
+}
+
+const BUDGET_KEYS = ["thinkingBudget", "thinking_budget", "budget_tokens", "budgetTokens"] as const;
+
+function hasBudgetField(config: Record<string, unknown>): boolean {
+  return BUDGET_KEYS.some((key) => key in config);
 }
 
 /**
@@ -43,9 +61,10 @@ export function collectThinkingConfigs(body: unknown): Array<Record<string, unkn
  */
 export function readNestedThinkingBudget(body: unknown): number | null {
   for (const tc of collectThinkingConfigs(body)) {
-    const raw = tc.thinkingBudget ?? tc.thinking_budget;
-    const n = Number(raw);
-    if (Number.isFinite(n)) return n;
+    for (const key of BUDGET_KEYS) {
+      const n = Number(tc[key]);
+      if (Number.isFinite(n)) return n;
+    }
   }
   return null;
 }
@@ -60,7 +79,7 @@ export function readNestedThinkingBudget(body: unknown): number | null {
 export function clampNestedThinkingBudget(body: unknown, max: number): boolean {
   let changed = false;
   for (const tc of collectThinkingConfigs(body)) {
-    for (const key of ["thinkingBudget", "thinking_budget"] as const) {
+    for (const key of BUDGET_KEYS) {
       const n = Number(tc[key]);
       if (Number.isFinite(n) && n > max) {
         tc[key] = max;

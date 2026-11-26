@@ -25,9 +25,9 @@
  * (already used this week, not in the experiment, …) does not re-query on every request.
  */
 
-import { fetchClaudeBootstrap, getClaudeCodeVersion } from "../executors/claudeIdentity.ts";
+import { fetchClaudeBootstrap } from "../executors/claudeIdentity.ts";
 import {
-  claudeResetCreditHeaders,
+  claudeApiHeaders,
   fetchJsonWithTimeout,
   forgetClaudeResetCreditCount,
   respectClaudeUsageCooldown,
@@ -111,17 +111,8 @@ function stringOrNull(value: unknown): string | null {
   return typeof value === "string" && value.trim() !== "" ? value : null;
 }
 
-function oauthHeaders(accessToken: string): Record<string, string> {
-  // Same shape as the existing /api/oauth/usage poller (usage/claude.ts): axios-style
-  // `claude-code/<version>` UA, not the Stainless `claude-cli/…` one.
-  return {
-    Accept: "application/json, text/plain, */*",
-    Authorization: `Bearer ${accessToken}`,
-    "Content-Type": "application/json",
-    "User-Agent": `claude-code/${getClaudeCodeVersion()}`,
-    "anthropic-beta": "oauth-2025-04-20",
-  };
-}
+// One shape for every call on the non-messages face, shared with the rest of them.
+const oauthHeaders = claudeApiHeaders;
 
 /** Parse the `juniper_tide` block of a `/api/oauth/usage?at_wall=1` body. Null when absent/malformed. */
 export function parseClaudeLimitResetStatus(usageBody: unknown): ClaudeLimitResetStatus | null {
@@ -320,7 +311,7 @@ export async function claimClaudeResetCredit(
         method: "POST",
         headers:
           options.profile === "dashboard"
-            ? claudeResetCreditHeaders(accessToken)
+            ? claudeApiHeaders(accessToken)
             : oauthHeaders(accessToken),
         body: JSON.stringify(payload),
       },

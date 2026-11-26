@@ -20,6 +20,7 @@ import xxhashInit from "xxhash-wasm";
 
 const CCH_SEED = 0x4d659218e32a3268n;
 const CCH_PATTERN = /\bcch=([0-9a-f]{5});/;
+const CCH_TOKEN_PATTERN = /\bcch=(?:00000|[0-9a-f]{5});/;
 
 // The billing header is the only place a `cch=` value must be rewritten. It is
 // injected as a text block of the top-level `system` array (or a legacy
@@ -84,23 +85,32 @@ function systemValueRange(json: string): [number, number] | null {
   return stop >= 0 ? [keys[at].valueStart, stop] : null;
 }
 
-/** Index of the billing header's `cch=00000;` placeholder, or -1. */
-function findBillingPlaceholder(body: string): number {
+/**
+ * The `cch=` token inside the billing header, as `[start, length)`, or null.
+ *
+ * Takes either the literal placeholder or an already-written 5-hex token: a
+ * retry re-serializes the body and must replace the token it carries, because the
+ * token covers bytes that just changed. The hash is always computed over the
+ * placeholder bytes, so callers normalise the span to `cch=00000;` first.
+ */
+function findBillingToken(body: string): { at: number; length: number } | null {
   // Cheap exit: most bodies carry no billing header, so skip the scan below.
-  if (!body.includes("x-anthropic-billing-header")) return -1;
+  if (!body.includes("x-anthropic-billing-header")) return null;
   let from = body.indexOf(LEGACY_ANCHOR);
   if (from >= 0) {
     from += LEGACY_ANCHOR.length;
   } else {
     const system = systemValueRange(body);
     const at = system ? body.indexOf(SYSTEM_TEXT_ANCHOR, system[0]) : -1;
-    if (!system || at < 0 || at >= system[1]) return -1;
+    if (!system || at < 0 || at >= system[1]) return null;
     from = at + SYSTEM_TEXT_ANCHOR.length;
   }
-  // The placeholder must sit inside this one string value.
+  // The token must sit inside this one string value.
   const valueEnd = body.indexOf('"', from);
-  const placeholderAt = body.indexOf(CCH_PLACEHOLDER, from);
-  return placeholderAt >= 0 && (valueEnd < 0 || placeholderAt < valueEnd) ? placeholderAt : -1;
+  const match = CCH_TOKEN_PATTERN.exec(body.slice(from));
+  if (!match) return null;
+  const at = from + match.index;
+  return valueEnd < 0 || at < valueEnd ? { at, length: match[0].length } : null;
 }
 
 let xxhashPromise: Promise<void> | null = null;
@@ -133,19 +143,30 @@ export async function computeCCH(bodyBytes: Uint8Array): Promise<string> {
   return masked.toString(16).padStart(5, "0");
 }
 
-export async function signRequestBody(bodyString: string): Promise<string> {
-  // Sign only the literal placeholder inside the billing header. A first-match
-  // `cch=[0-9a-f]{5};` rewrite can hit user text (messages serialise before
-  // system), leaving the real billing header unsigned.
-  const placeholderAt = findBillingPlaceholder(bodyString);
-  if (placeholderAt < 0) return bodyString;
+/**
+ * Sign the billing header's `cch=` token.
+ *
+ * The default only fills the placeholder, so a body that a bridge pipeline
+ * already signed with another algorithm passes through untouched. `resign` also
+ * replaces an existing token — required on retries, where the body has just been
+ * re-serialized and the token it still carries is stale.
+ */
+export async function signRequestBody(
+  bodyString: string,
+  options: { resign?: boolean } = {}
+): Promise<string> {
+  const found = findBillingToken(bodyString);
+  if (!found) return bodyString;
+  const unsigned =
+    bodyString.slice(0, found.at) + CCH_PLACEHOLDER + bodyString.slice(found.at + found.length);
+  if (!options.resign && !bodyString.startsWith(CCH_PLACEHOLDER, found.at)) return bodyString;
   const encoder = new TextEncoder();
-  const bodyBytes = encoder.encode(hashView(bodyString));
+  const bodyBytes = encoder.encode(hashView(unsigned));
   const token = await computeCCH(bodyBytes);
   return (
-    bodyString.slice(0, placeholderAt) +
+    unsigned.slice(0, found.at) +
     `cch=${token};` +
-    bodyString.slice(placeholderAt + CCH_PLACEHOLDER.length)
+    unsigned.slice(found.at + CCH_PLACEHOLDER.length)
   );
 }
 

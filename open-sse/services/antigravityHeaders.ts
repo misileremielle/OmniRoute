@@ -51,6 +51,8 @@ function resolveAntigravityPlatformEnum(): number {
 
 export const ANTIGRAVITY_IDE_NODE_API_CLIENT = "google-api-nodejs-client/10.3.0";
 export const ANTIGRAVITY_IDE_NODE_X_GOOG_API_CLIENT = "gl-node/22.21.1";
+/** What the native Node.js client negotiates; never the Electron `zstd` addition. */
+export const ANTIGRAVITY_ACCEPT_ENCODING = "gzip, deflate, br";
 
 // Antigravity presents the native macOS desktop client fingerprint on the IDE path:
 // the upstream backend expects the Mac build, so the OS/arch token is pinned to
@@ -58,8 +60,9 @@ export const ANTIGRAVITY_IDE_NODE_X_GOOG_API_CLIENT = "gl-node/22.21.1";
 // CLI / IDE-Node User-Agent split (#8013) is preserved — only the platform token is fixed.
 //
 // The CLI path (agy, a Go binary) has no such constraint: it reports the real host in
-// Go's runtime.GOOS/GOARCH dialect, captured live from `agy 1.4.4` on Windows x64 as
-// `os_type=windows; arch=amd64`. Node's own names ("win32"/"x64") are a giveaway.
+// Go's runtime.GOOS/GOARCH dialect, captured live from `agy 1.4.4` on Windows x64 and
+// again from `agy 1.5.17` on Linux x64 as `os_type=linux; arch=amd64`. Node's own
+// names ("win32"/"x64") are a giveaway.
 const ANTIGRAVITY_OS_TYPE = "darwin";
 const ANTIGRAVITY_ARCH = "arm64";
 
@@ -96,8 +99,10 @@ export function resolveAntigravityGoPlatform(
 // `cl` is Google's internal Piper changelist for the build that shipped a given CLI
 // version — not derivable from the version, and not exposed by the public manifests
 // (only version/url/sha512 are). Seeded from the native capture; refresh when bumping.
+// 1.5.17's value came off the wire in the gateway capture (2026-11-25).
 const ANTIGRAVITY_KNOWN_CHANGELISTS: Record<string, string> = {
   "1.4.4": "1003595037",
+  "1.5.17": "1029496841",
 };
 
 /**
@@ -151,6 +156,10 @@ export function getAntigravityContentHeaders(
   return withOptionalBearerAuth(
     {
       "Content-Type": "application/json",
+      // The native client (Node.js) asks for br; Node's own fetch would only send
+      // `gzip, deflate`, which is a fingerprint mismatch on any path that does not go
+      // through the executor's scrubber (usage probes, project bootstrap).
+      "Accept-Encoding": ANTIGRAVITY_ACCEPT_ENCODING,
       "User-Agent": profile === "cli" ? antigravityCliUserAgent() : antigravityIdeUserAgent(),
     },
     accessToken

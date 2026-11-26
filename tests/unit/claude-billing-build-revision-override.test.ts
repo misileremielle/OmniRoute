@@ -1,7 +1,9 @@
 /**
- * The `cc_version=` suffix must be overridable alongside the version, so an
- * operator bumping past Anthropic's model gate does not advertise a
- * `version.revision` pair no real binary emits.
+ * The static `cc_version=` pair must be overridable alongside the version, so an
+ * operator bumping past Anthropic's model gate does not advertise a pair no real
+ * binary emits. The native OAuth path computes the real per-message fingerprint
+ * instead (see open-sse/services/claudeCodeFingerprint.ts); these helpers feed the
+ * bridge paths and validation payloads, which have no message body to hash.
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -57,7 +59,7 @@ test("a malformed override is ignored rather than put on the wire", async () => 
 });
 
 test("captured pin constants stay fixed so snapshot readers can detect drift", () => {
-  assert.equal(CLAUDE_CODE_CLIENT_VERSION, "2.1.280");
+  assert.equal(CLAUDE_CODE_CLIENT_VERSION, "2.1.332");
   assert.equal(CLAUDE_CODE_CLIENT_BUILD_REVISION, "1e2");
   assert.equal(
     CLAUDE_CODE_CLIENT_BILLING_VERSION,
@@ -84,7 +86,7 @@ test("overriding only the version still appends the pinned revision", async () =
 
 test("with no overrides the billing version is exactly the captured pin pair", async () => {
   await withEnv({ [ENV_VERSION]: undefined, [ENV_REVISION]: undefined }, () => {
-    assert.equal(getClaudeCodeClientBillingVersion(), "2.1.280.1e2");
+    assert.equal(getClaudeCodeClientBillingVersion(), `${CLAUDE_CODE_CLIENT_VERSION}.1e2`);
     assert.equal(getDefaultClaudeCodeBuildRevision(), "1e2");
   });
 });

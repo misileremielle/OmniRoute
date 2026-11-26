@@ -36,7 +36,11 @@ const LIST_URL = "https://api.anthropic.com/api/oauth/usage?at_wall=1&cedar_embe
 const BOOTSTRAP_URL = "https://api.anthropic.com/api/claude_cli/bootstrap";
 const claimUrl = (org: string) =>
   `https://api.anthropic.com/api/organizations/${org}/reset_rate_limits`;
-const CLI_UA = `claude-cli/${getClaudeCodeVersion()} (external, cli)`;
+// Non-messages endpoints (bootstrap, usage, reset claim) are answered by an agent
+// that identifies as `claude-code/<v>` — the messages UA is a different face.
+const API_UA = `claude-code/${getClaudeCodeVersion()}`;
+// The bootstrap names the agent (`claude-code/<v>`), not the messages client.
+const BOOTSTRAP_UA = `claude-code/${getClaudeCodeVersion()}`;
 
 type Recorded = {
   url: string;
@@ -60,7 +64,10 @@ function stubUpstream(routes: Record<string, Handler>) {
       body: typeof init?.body === "string" ? init.body : null,
     };
     requests.push(rec);
-    const handler = routes[`${rec.method} ${rec.url}`];
+    // Upstream calls may carry a query string (the bootstrap names its entrypoint);
+    // route on method + path so a new param never reads as "unrouted".
+    const handler =
+      routes[`${rec.method} ${rec.url}`] ?? routes[`${rec.method} ${rec.url.split("?")[0]}`];
     return handler ? handler(rec) : new Response("unrouted", { status: 599 });
   }) as typeof fetch;
 }
@@ -131,10 +138,10 @@ test("list: GET with the query string, CLI headers and the connection's bearer; 
   assert.equal(req.body, null);
   assert.deepEqual(req.headers, {
     Accept: "application/json, text/plain, */*",
+    "Accept-Encoding": "gzip, compress, deflate, br",
     Authorization: `Bearer access-${n}`,
     "Content-Type": "application/json",
-    "User-Agent": CLI_UA,
-    "x-app": "cli",
+    "User-Agent": API_UA,
     "anthropic-beta": "oauth-2025-04-20",
   });
   // The exhausted grant is not offered; the weekly session reset is appended.
@@ -242,10 +249,10 @@ test("redeem a grant: POST body is cedar_ember + grant_id + request_id = the cal
   });
   assert.deepEqual(posts[0].headers, {
     Accept: "application/json, text/plain, */*",
+    "Accept-Encoding": "gzip, compress, deflate, br",
     Authorization: `Bearer access-${n}`,
     "Content-Type": "application/json",
-    "User-Agent": CLI_UA,
-    "x-app": "cli",
+    "User-Agent": API_UA,
     "anthropic-beta": "oauth-2025-04-20",
   });
 });
@@ -401,10 +408,10 @@ test("redeem: without a persisted organization the bootstrap supplies it (CLI UA
   // Only the bootstrap can have produced this organization, so the claim URL proves its use.
   const postAt = requests.findIndex((r) => r.method === "POST");
   assert.equal(requests[postAt].url, claimUrl("org-from-bootstrap"));
-  const bootAt = requests.findIndex((r) => r.url === BOOTSTRAP_URL);
+  const bootAt = requests.findIndex((r) => r.url.split("?")[0] === BOOTSTRAP_URL);
   assert.ok(bootAt >= 0 && bootAt < postAt, "the bootstrap is read before the claim");
   assert.equal(requests[bootAt].headers.Authorization, `Bearer access-${noOrg.n}`);
-  assert.equal(requests[bootAt].headers["User-Agent"], CLI_UA);
+  assert.equal(requests[bootAt].headers["User-Agent"], BOOTSTRAP_UA);
 
   // Bootstrap refused: the redeem stops before any POST. (A fresh connection — the first
   // redeem's usage refresh may already have persisted the organization on `noOrg`.)

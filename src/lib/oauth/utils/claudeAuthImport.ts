@@ -4,7 +4,7 @@ import {
   createProviderConnection,
   updateProviderConnection,
 } from "@/lib/db/providers";
-import { getClaudeCodeUserAgent } from "@/shared/constants/claudeCodeClient";
+import { getClaudeCodeVersion } from "@omniroute/open-sse/executors/claudeIdentity.ts";
 import { ClaudeAuthFileError } from "@/lib/oauth/utils/claudeAuthFile";
 
 type JsonRecord = Record<string, unknown>;
@@ -134,13 +134,14 @@ export async function enrichWithBootstrap(
   const timer = setTimeout(() => controller.abort(), 8000);
 
   try {
-    const res = await fetch("https://api.anthropic.com/api/claude_cli/bootstrap", {
+    const res = await fetch("https://api.anthropic.com/api/claude_cli/bootstrap?entrypoint=cli", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${parsed.accessToken}`,
         "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
-        "User-Agent": getClaudeCodeUserAgent("cli"),
+        // Bootstrap answers a `claude-code/<v>` agent, not the messages UA.
+        "User-Agent": `claude-code/${getClaudeCodeVersion()}`,
         "anthropic-beta": "oauth-2025-04-20",
       },
       signal: controller.signal,

@@ -141,9 +141,11 @@ describe("ensureAntigravityProjectAssigned", () => {
 
     await ensureAntigravityProjectAssigned("cli-token", mockFetch, "cli");
 
+    // Version comes from the pin and the shape carries the changelist token the
+    // real client sends (`cl=…`), so neither is hard-coded here.
     assert.match(
       capturedHeaders?.get("User-Agent") || "",
-      /^antigravity\/cli\/1\.3\.4 \(aidev_client; os_type=.+; arch=.+; auth_method=consumer\)$/
+      /^antigravity\/cli\/\d+\.\d+\.\d+ \(aidev_client; os_type=[a-z]+; arch=[a-z0-9]+; cl=\d+; auth_method=consumer\)$/
     );
     assert.equal(capturedHeaders?.get("X-Goog-Api-Client"), null);
     assert.equal(capturedHeaders?.get("Client-Metadata"), null);

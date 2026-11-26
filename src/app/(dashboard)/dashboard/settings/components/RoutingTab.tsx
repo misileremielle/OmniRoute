@@ -15,7 +15,6 @@ import {
   normalizeCliCompatProviderId,
 } from "@/shared/constants/cliCompatProviders";
 import { AI_PROVIDERS } from "@/shared/constants/providers";
-import { getClaudeCodeClientBuildRevision } from "@/shared/constants/claudeCodeClient";
 import { compareTr } from "@/shared/utils/turkishText";
 import { HERMES } from "./systemTransformsHermesDefaults";
 
@@ -174,7 +173,8 @@ const DEFAULT_SYSTEM_TRANSFORMS_CLIENT = {
           entrypoint: "sdk-cli",
           versionFormat: "ex-machina",
           cchAlgo: "sha256-first-user",
-          buildRevision: getClaudeCodeClientBuildRevision(),
+          // No buildRevision: leaving it unset is what lets the per-message
+          // fingerprint fill `cc_version` (mirrors the server default).
         },
       ],
     },

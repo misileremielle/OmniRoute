@@ -16,7 +16,6 @@ process.env.APP_LOG_TO_FILE = "false";
 // required header or stops persisting the device identity.
 const { createConnectionFromAuthFile, enrichWithBootstrap, parseAndValidateClaudeAuth } =
   await import("../../src/lib/oauth/utils/claudeAuthImport.ts");
-import { getClaudeCodeUserAgent } from "../../src/shared/constants/claudeCodeClient.ts";
 import { cleanupTempDataDir } from "../_setup/tempDataDir.ts";
 
 const originalFetch = globalThis.fetch;
@@ -60,11 +59,16 @@ test("real enrichWithBootstrap sends the required CLI headers", async () => {
   });
   const enriched = await enrichWithBootstrap(parsed);
 
-  assert.equal(captured.url, "https://api.anthropic.com/api/claude_cli/bootstrap");
+  assert.equal(
+    captured.url,
+    "https://api.anthropic.com/api/claude_cli/bootstrap?entrypoint=cli",
+    "the CLI always names its entrypoint on this call"
+  );
   assert.equal(captured.headers.get("authorization"), "Bearer unit-test-access-token");
   assert.equal(captured.headers.get("anthropic-version"), "2023-06-01");
   assert.equal(captured.headers.get("content-type"), "application/json");
-  assert.equal(captured.headers.get("user-agent"), getClaudeCodeUserAgent("cli"));
+  // Bootstrap answers a `claude-code/<v>` agent — not the messages UA.
+  assert.match(captured.headers.get("user-agent") ?? "", /^claude-code\/\d+\.\d+\.\d+$/);
   assert.equal(captured.headers.get("anthropic-beta"), "oauth-2025-04-20");
   assert.equal(enriched.accountUUID, "unit-account-10144");
   assert.equal(enriched.email, "unit-10144@example.invalid");

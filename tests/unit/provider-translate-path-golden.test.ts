@@ -85,12 +85,17 @@ function sanitize(headers: Record<string, unknown>): Record<string, unknown> {
         /(muse-build\/\d+\.\d+\.\d+ \((?:non-)?interactive; )[a-z0-9]+-[a-z0-9_]+(;)/g,
         "$1<OS>-<ARCH>$2"
       )
+      // The CLI UA also carries a changelist (`cl=<n>`) between arch and auth_method.
       .replace(
-        /(antigravity\/cli\/\d+\.\d+\.\d+ \(aidev_client; os_type=)[^;]+(; arch=)[^;]+(; auth_method=[^)]+\))/g,
+        /(antigravity\/cli\/\d+\.\d+\.\d+ \(aidev_client; os_type=)[^;]+(; arch=)[^;]+((?:; cl=\d+)?; auth_method=[^)]+\))/g,
         "$1<OS>$2<ARCH>$3"
       )
+      .replace(/(; cl=)\d+/g, "$1<CL>")
       // Copilot's User-Agent embeds process.platform: "copilot/1.0.91 (darwin) term/unknown".
-      .replace(/(copilot\/[\d.]+ )\((?:darwin|linux|win32|freebsd|openbsd|aix|sunos)\)/g, "$1(<OS>)")
+      .replace(
+        /(copilot\/[\d.]+ )\((?:darwin|linux|win32|freebsd|openbsd|aix|sunos)\)/g,
+        "$1(<OS>)"
+      )
       .replace(/kimi-\d{10,}/g, "kimi-<TS>")
       .replace(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, "<UUID>");
     if (NODE_VERSION) s = s.split(NODE_VERSION).join("<NODE>");

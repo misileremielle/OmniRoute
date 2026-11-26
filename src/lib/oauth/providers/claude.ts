@@ -12,12 +12,13 @@ async function fetchClaudeBootstrap(accessToken) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), BOOTSTRAP_FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch("https://api.anthropic.com/api/claude_cli/bootstrap", {
+    const res = await fetch("https://api.anthropic.com/api/claude_cli/bootstrap?entrypoint=cli", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-        "User-Agent": `claude-cli/${getClaudeCodeVersion()} (external, cli)`,
+        "Content-Type": "application/json",
+        // Bootstrap answers a `claude-code/<v>` agent, not the messages UA.
+        "User-Agent": `claude-code/${getClaudeCodeVersion()}`,
         "anthropic-beta": "oauth-2025-04-20",
       },
       signal: ctrl.signal,

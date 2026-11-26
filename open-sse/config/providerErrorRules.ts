@@ -515,6 +515,49 @@ function effectiveEgressBucketedLockProviders(): Set<string> {
     : EGRESS_BUCKETED_LOCK_PROVIDERS;
 }
 
+/**
+ * Providers whose connection must keep ONE egress IP for its lifetime.
+ *
+ * Distinct from the IP-bucketed lockout list above: that one fans a 429 out to
+ * siblings sharing an IP because the upstream budget is per-IP. This one only
+ * decides whether the proxy pool may rotate the egress out from under a
+ * connection. Subscription OAuth accounts care about the second question and
+ * not the first — their limits are account-scoped, but a vendor reads a flap
+ * between exit IPs as a person teleporting, so the account should look like it
+ * is used from one place.
+ *
+ * Rotation still happens on FAILURE (a member set aside by
+ * PROXY_SKIP_RECENTLY_FAILED is never re-served from cache), so a dead proxy
+ * moves the account instead of pinning it to a corpse.
+ *
+ *   unset            → default set below
+ *   none/off/false/0 → empty set (pool rotates freely again)
+ *   "a,b,c"          → exact replacement set
+ */
+const EGRESS_PINNED_PROVIDERS_DEFAULT: Record<string, true> = {
+  claude: true,
+  codex: true,
+  agy: true,
+  antigravity: true,
+  copilot: true,
+};
+
+const EGRESS_PINNED_PROVIDERS = egressIpLockProvidersFromEnv(
+  process.env.OMNIROUTE_EGRESS_PIN_PROVIDERS,
+  EGRESS_PINNED_PROVIDERS_DEFAULT
+);
+
+/** Should this provider's connection hold one egress IP instead of rotating? */
+export function isEgressPinnedScope(provider: string | null | undefined): boolean {
+  if (!provider) return false;
+  return EGRESS_PINNED_PROVIDERS.has(provider.toLowerCase());
+}
+
+/** Sorted allowlist for SQL/data callers (mirrors egressBucketedLockProviders). */
+export function egressPinnedProviders(): string[] {
+  return [...EGRESS_PINNED_PROVIDERS].sort();
+}
+
 export function isEgressBucketedLockScope(provider: string | null | undefined): boolean {
   if (!provider) return false;
   const key = provider.toLowerCase();

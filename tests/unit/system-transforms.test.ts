@@ -559,7 +559,8 @@ const UI_DEFAULTS_SNAPSHOT = {
           entrypoint: "sdk-cli",
           versionFormat: "ex-machina",
           cchAlgo: "sha256-first-user",
-          buildRevision: "1e2",
+          // No buildRevision: unset is what lets the per-message fingerprint
+          // supply `cc_version`.
         },
       ],
     },

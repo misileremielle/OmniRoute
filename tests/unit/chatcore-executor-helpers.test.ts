@@ -8,6 +8,7 @@ import {
   buildClaudePromptCacheLogMeta,
 } from "../../open-sse/handlers/chatCore/executorHelpers.ts";
 import { FORMATS } from "../../open-sse/translator/formats.ts";
+import { PROVIDER_DEFAULT_CONCURRENCY_CAP } from "../../open-sse/services/providerDefaultRateLimit.ts";
 
 test("resolveAccountSemaphoreAccountKey prefers an explicit non-blank connectionId", () => {
   assert.equal(resolveAccountSemaphoreAccountKey("conn-1", { id: "ignored" }), "conn-1");
@@ -234,4 +235,72 @@ test("buildClaudePromptCacheLogMeta surfaces the Anthropic-Beta header even with
   );
   assert.ok(fromClient);
   assert.equal(fromClient.anthropicBeta, "client-beta");
+});
+
+// ---- built-in per-account concurrency defaults (ban-rate hardening) ----
+
+function withEnv<T>(vars: Record<string, string | undefined>, fn: () => T): T {
+  const saved: Record<string, string | undefined> = {};
+  for (const key of Object.keys(vars)) {
+    saved[key] = process.env[key];
+    if (vars[key] === undefined) delete process.env[key];
+    else process.env[key] = vars[key] as string;
+  }
+  try {
+    return fn();
+  } finally {
+    for (const key of Object.keys(saved)) {
+      if (saved[key] === undefined) delete process.env[key];
+      else process.env[key] = saved[key] as string;
+    }
+  }
+}
+
+test("an unconfigured OAuth account gets its provider's built-in cap", () => {
+  withEnv({ OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY: undefined }, () => {
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true, "claude"), 3);
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true, "codex"), 2);
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true, "agy"), 2);
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true, "antigravity"), 2);
+  });
+});
+
+test("a provider without a built-in default stays unbounded", () => {
+  withEnv({ OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY: undefined }, () => {
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true, "openrouter"), null);
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true), null);
+  });
+});
+
+test("an explicit connection cap still beats the built-in default", () => {
+  withEnv({ OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY: undefined }, () => {
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({ maxConcurrent: 9 }, true, "claude"), 9);
+    // explicit 0 means "unlimited", so it must beat the default too
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({ maxConcurrent: 0 }, true, "claude"), 0);
+  });
+});
+
+test("OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY=0 disables the built-in caps", () => {
+  withEnv({ OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY: "0" }, () => {
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true, "claude"), null);
+  });
+});
+
+test("a positive OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY replaces every default", () => {
+  withEnv({ OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY: "6" }, () => {
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true, "claude"), 6);
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, true, "openrouter"), 6);
+  });
+});
+
+test("the built-in cap is skipped while rate-limit protection is off", () => {
+  withEnv({ OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY: undefined }, () => {
+    assert.equal(resolveAccountSemaphoreMaxConcurrency({}, false, "claude"), null);
+  });
+});
+
+test("every subscription OAuth provider is capped by the default table", () => {
+  for (const provider of ["claude", "codex", "agy", "antigravity", "copilot", "grok-build"]) {
+    assert.ok((PROVIDER_DEFAULT_CONCURRENCY_CAP[provider] ?? 0) > 0, `${provider} needs a cap`);
+  }
 });

@@ -23,6 +23,7 @@ import { createHash } from "node:crypto";
 
 import {
   getClaudeCodeClientBuildRevision,
+  getConfiguredClaudeCodeBuildRevision,
   CLAUDE_CODE_CLIENT_VERSION,
   getClaudeCodeClientVersion,
 } from "@/shared/constants/claudeCodeClient";
@@ -194,7 +195,8 @@ export const DEFAULT_CC_BRIDGE_PIPELINE: TransformOp[] = [
     entrypoint: "sdk-cli",
     versionFormat: "ex-machina",
     cchAlgo: "sha256-first-user",
-    buildRevision: getDefaultClaudeCodeBuildRevision(),
+    // No buildRevision: leaving it undefined is what lets the per-message
+    // fingerprint be computed instead of sending one constant forever.
   },
 ];
 
@@ -308,6 +310,7 @@ export function buildBillingHeaderValue(
 
   const suffix =
     options.buildRevision ??
+    getConfiguredClaudeCodeBuildRevision() ??
     (options.versionFormat === "omniroute-daystamp"
       ? computeDaystampVersionSuffix(version, options.now)
       : computeExMachinaVersionSuffix(firstUserText, version));

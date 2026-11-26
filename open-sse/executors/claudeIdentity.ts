@@ -162,17 +162,31 @@ export type ClaudeBootstrap = {
   seat_tier: string | null;
 };
 
-/** GET /api/claude_cli/bootstrap with the same headers real CLI uses. */
-export async function fetchClaudeBootstrap(accessToken: string): Promise<ClaudeBootstrap | null> {
+/**
+ * GET /api/claude_cli/bootstrap.
+ *
+ * This is *not* the messages request and must not borrow its identity: the CLI
+ * sends `User-Agent: claude-code/<version>` here (no `(external, cli)` suffix) and
+ * an `entrypoint` query param, plus the model when it has one. Verified in the
+ * published 2.1.332 binary — `_e` builds exactly those two values and `_Vn` only
+ * adds the user's custom headers. The `Authorization` + `oauth-2025-04-20` pair is
+ * the CLI's own oat auth branch, kept here on purpose.
+ */
+export async function fetchClaudeBootstrap(
+  accessToken: string,
+  options: { model?: string } = {}
+): Promise<ClaudeBootstrap | null> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), BOOTSTRAP_FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch("https://api.anthropic.com/api/claude_cli/bootstrap", {
+    const query = new URLSearchParams({ entrypoint: "cli" });
+    if (options.model) query.set("model", options.model);
+    const res = await fetch(`https://api.anthropic.com/api/claude_cli/bootstrap?${query}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-        "User-Agent": `claude-cli/${getClaudeCodeVersion()} (external, cli)`,
+        "Content-Type": "application/json",
+        "User-Agent": `claude-code/${getClaudeCodeVersion()}`,
         "anthropic-beta": "oauth-2025-04-20",
       },
       signal: ctrl.signal,
@@ -235,24 +249,37 @@ export function uuidV4FromHash(hex64: string): string {
  * Resolve account_uuid in priority order:
  *   1. providerSpecificData.accountUUID / account_uuid (real, from bootstrap).
  *   2. in-memory cache from a background bootstrap fetch.
- *   3. deterministic UUIDv4 derived from the access token (shape-correct fallback).
+ *   3. deterministic UUIDv4 derived from the account's stable client id
+ *      (shape-correct fallback).
+ *
+ * The seed used to be the access token. Claude OAuth tokens rotate on refresh,
+ * which made the fallback a DIFFERENT UUID roughly every hour for the same
+ * account — the identifier churned exactly where it is supposed to say "same
+ * account". Both the cache key and the hash therefore use the stable per-account
+ * id now, which is what the device_id already derives from.
  *
  * Triggers a background bootstrap fetch when no real UUID is known yet.
  */
 export function resolveAccountUUID(
   providerSpecificData: Record<string, unknown> | undefined,
   seed: string,
-  accessToken?: string
+  accessToken?: string,
+  stableKey?: string
 ): string {
   const camel = providerSpecificData?.accountUUID;
   if (typeof camel === "string" && camel.length >= 32) return camel;
   const snake = providerSpecificData?.account_uuid;
   if (typeof snake === "string" && snake.length >= 32) return snake;
 
-  const cached = accountUuidCache.get(seed);
+  // The connection id outlives a token refresh and exists even for imported
+  // accounts that carry no cliUserID; the client id is the second choice.
+  const stableSeed =
+    (typeof stableKey === "string" && stableKey.trim()) ||
+    resolveCliUserID(providerSpecificData, seed);
+  const cached = accountUuidCache.get(stableSeed);
   if (cached?.uuid) return cached.uuid;
 
-  if (accessToken) void backgroundFetchAccountUUID(accessToken, seed);
+  if (accessToken) void backgroundFetchAccountUUID(accessToken, stableSeed);
 
   // CodeQL: This is intentionally SHA-256 for deterministic UUID generation from
   // a seed string — NOT password hashing. The output is a format-correct UUIDv4
@@ -260,7 +287,7 @@ export function resolveAccountUUID(
   // lgtm[js/insufficient-password-hash]
   return uuidV4FromHash(
     createHash("sha256")
-      .update("account:" + seed)
+      .update("account:" + stableSeed)
       .digest("hex") // nosemgrep: insufficient-password-hash
   );
 }

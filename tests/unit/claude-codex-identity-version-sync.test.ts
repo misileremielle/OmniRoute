@@ -49,12 +49,15 @@ test("Claude CLI pin clears Anthropic's Opus 5.5 model gate (>= 2.1.280)", () =>
   );
 });
 
-test("Claude CLI wire versions match the captured 2.1.280 binary", () => {
-  assert.equal(canonical.CLAUDE_CODE_CLIENT_VERSION, "2.1.280");
+test("Claude CLI wire versions match the captured 2.1.332 binary", () => {
+  assert.equal(canonical.CLAUDE_CODE_CLIENT_VERSION, "2.1.332");
+  // Unverified against a capture: the build revision has no published source and
+  // rides along from the earlier binary. The billing tests only need it to be a
+  // suffix, so a wrong revision is cosmetic until someone captures one.
   assert.equal(canonical.CLAUDE_CODE_CLIENT_BUILD_REVISION, "1e2");
-  assert.equal(canonical.CLAUDE_CODE_CLIENT_BILLING_VERSION, "2.1.280.1e2");
-  assert.equal(canonical.CLAUDE_CODE_SDK_PACKAGE_VERSION, "0.112.1");
-  assert.equal(canonical.CLAUDE_CODE_RUNTIME_VERSION, "v26.3.0");
+  assert.equal(canonical.CLAUDE_CODE_CLIENT_BILLING_VERSION, "2.1.332.1e2");
+  assert.equal(canonical.CLAUDE_CODE_SDK_PACKAGE_VERSION, "0.128.0");
+  assert.equal(canonical.CLAUDE_CODE_RUNTIME_VERSION, "v26.12.1");
   assert.equal(
     compat.CLAUDE_CODE_COMPATIBLE_STAINLESS_PACKAGE_VERSION,
     canonical.CLAUDE_CODE_SDK_PACKAGE_VERSION
@@ -102,14 +105,19 @@ test("Codex client version locksteps Dockerfile @openai/codex", () => {
   assert.notEqual(pinned, "0.149.0");
   assert.equal(codexCfg.DEFAULT_CODEX_CLIENT_VERSION, pinned);
   assert.equal(codexCfg.getCodexClientVersion(), pinned);
-  assert.equal(codexCfg.getCodexDefaultHeaders().Version, pinned);
-  assert.equal(codexCfg.getCodexCliRsHeaders()["User-Agent"], `codex_cli_rs/${pinned}`);
+  // The real 0.172.0 binary sends no `Version:` header (captured 2026-11-25); the
+  // version only appears inside the user-agent.
+  assert.equal(codexCfg.getCodexDefaultHeaders().Version, undefined);
+  assert.match(
+    codexCfg.getCodexCliRsHeaders()["User-Agent"],
+    new RegExp(`^codex_cli_rs/${pinned}`)
+  );
 });
 
 test("Codex client version env override still wins", async () => {
   await withEnv({ CODEX_CLIENT_VERSION: "0.99.0" }, () => {
     assert.equal(codexCfg.getCodexClientVersion(), "0.99.0");
-    assert.equal(codexCfg.getCodexDefaultHeaders().Version, "0.99.0");
+    assert.match(codexCfg.getCodexCliRsHeaders()["User-Agent"], /^codex_cli_rs\/0\.99\.0/);
   });
 });
 

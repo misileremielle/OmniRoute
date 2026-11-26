@@ -334,10 +334,10 @@ test("reset-credit list and redeem requests carry the query string and CLI heade
     upstream.requests.map((r) => `${r.method} ${r.url}`),
     [`GET ${RESET_CREDIT_LIST_URL}`, `POST ${CLAIM_URL}`]
   );
-  const cliUa = `claude-cli/${getClaudeCodeVersion()} (external, cli)`;
+  // Non-messages endpoints answer an agent that identifies as `claude-code/<v>`.
+  const apiUa = `claude-code/${getClaudeCodeVersion()}`;
   for (const request of upstream.requests) {
-    assert.equal(request.headers["User-Agent"], cliUa);
-    assert.equal(request.headers["x-app"], "cli");
+    assert.equal(request.headers["User-Agent"], apiUa);
     assert.equal(request.headers["anthropic-beta"], "oauth-2025-04-20");
   }
 });
@@ -467,6 +467,7 @@ test("the opt-in auto-reset keeps base's request shape and never seeds the count
   const { getClaudeCodeVersion } = await import("../../open-sse/executors/claudeIdentity.ts");
   const baseHeaders = (token: string) => ({
     Accept: "application/json, text/plain, */*",
+    "Accept-Encoding": "gzip, compress, deflate, br",
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
     "User-Agent": `claude-code/${getClaudeCodeVersion()}`,

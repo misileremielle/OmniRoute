@@ -21,11 +21,17 @@ import {
   type CliVersionSource,
 } from "@omniroute/open-sse/config/cliVersions.ts";
 
-export const CLAUDE_CODE_CLIENT_VERSION = "2.1.280";
+export const CLAUDE_CODE_CLIENT_VERSION = "2.1.332";
 export const CLAUDE_CODE_CLIENT_BUILD_REVISION = "1e2";
+/**
+ * Static `cc_version` snapshot. The native OAuth path does NOT send this: the real
+ * binary uses `<version>.<fingerprint of the first user message>`, so `1e2` is only
+ * the shape-compatible fallback for callers with no message body (bridge paths,
+ * validation payloads).
+ */
 export const CLAUDE_CODE_CLIENT_BILLING_VERSION = `${CLAUDE_CODE_CLIENT_VERSION}.${CLAUDE_CODE_CLIENT_BUILD_REVISION}`;
-export const CLAUDE_CODE_SDK_PACKAGE_VERSION = "0.112.1";
-export const CLAUDE_CODE_RUNTIME_VERSION = "v26.3.0";
+export const CLAUDE_CODE_SDK_PACKAGE_VERSION = "0.128.0";
+export const CLAUDE_CODE_RUNTIME_VERSION = "v26.12.1";
 
 export type ClaudeCodeEntrypoint = "cli" | "sdk-cli";
 
@@ -193,11 +199,19 @@ export function resetClaudeCodeClientVersionCache(): void {
  * the version above: it is captured alongside the version, so bumping only the
  * version advertises a `version.revision` pair no real binary emits.
  */
-export function getClaudeCodeClientBuildRevision(): string {
+/**
+ * The operator's override only, `undefined` when unset. Callers that can compute a
+ * real per-message fingerprint need to tell "configured" apart from "just the pin",
+ * otherwise a pinned fallback silently beats the fingerprint.
+ */
+export function getConfiguredClaudeCodeBuildRevision(): string | undefined {
   return (
-    getSafeEnvValue(CLAUDE_BUILD_REVISION_OVERRIDE_ENV, SAFE_HEADER_TOKEN_PATTERN) ||
-    CLAUDE_CODE_CLIENT_BUILD_REVISION
+    getSafeEnvValue(CLAUDE_BUILD_REVISION_OVERRIDE_ENV, SAFE_HEADER_TOKEN_PATTERN) || undefined
   );
+}
+
+export function getClaudeCodeClientBuildRevision(): string {
+  return getConfiguredClaudeCodeBuildRevision() ?? CLAUDE_CODE_CLIENT_BUILD_REVISION;
 }
 
 export function getClaudeCodeClientBillingVersion(): string {

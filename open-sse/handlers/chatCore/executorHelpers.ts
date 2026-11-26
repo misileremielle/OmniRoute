@@ -3,6 +3,7 @@ import {
   buildAccountSemaphoreKey,
   buildModelSemaphoreKey,
 } from "../../services/accountSemaphore.ts";
+import { getProviderConcurrencyCap } from "../../services/providerDefaultRateLimit.ts";
 import { getHeaderValueCaseInsensitive } from "./headers.ts";
 
 function toFiniteNumberOrNull(value: unknown): number | null {
@@ -41,15 +42,51 @@ export function resolveAccountSemaphoreAccountKey(
   return null;
 }
 
+/**
+ * Global escape hatch for the built-in per-account caps: `0` disables them, a
+ * positive number replaces every provider default. An explicit per-connection
+ * value still wins over both.
+ */
+const DEFAULT_ACCOUNT_CONCURRENCY_ENV = "OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY";
+
+function resolveDefaultAccountConcurrency(provider: string | null | undefined): number | null {
+  const rawEnv = process.env[DEFAULT_ACCOUNT_CONCURRENCY_ENV];
+  if (rawEnv !== undefined && rawEnv.trim().length > 0) {
+    const parsed = Number(rawEnv);
+    if (Number.isFinite(parsed)) {
+      return parsed > 0 ? parsed : null;
+    }
+  }
+  if (!provider) return null;
+  const cap = getProviderConcurrencyCap(provider, 0);
+  return cap > 0 ? cap : null;
+}
+
+/**
+ * Effective per-account concurrency cap for one execution attempt.
+ *
+ * Precedence: `rateLimitMaxConcurrent` (while rate-limit protection is on) →
+ * `maxConcurrent` (an explicit 0 means "unlimited", so it still wins) →
+ * `OMNIROUTE_DEFAULT_ACCOUNT_CONCURRENCY` → the provider's built-in default →
+ * no gate.
+ *
+ * The built-in default matters for ban risk: an OAuth-subscription account with
+ * no configured cap previously took unbounded parallel requests, which is a
+ * traffic shape no single CLI produces.
+ */
 export function resolveAccountSemaphoreMaxConcurrency(
   credentials: Record<string, unknown> | null | undefined,
-  rateLimitProtectionEnabled = true
+  rateLimitProtectionEnabled = true,
+  provider?: string | null
 ): number | null {
   const rateLimitOverride = toFiniteNumberOrNull(credentials?.rateLimitMaxConcurrent);
   if (rateLimitProtectionEnabled && rateLimitOverride !== null && rateLimitOverride > 0) {
     return rateLimitOverride;
   }
-  return toFiniteNumberOrNull(credentials?.maxConcurrent);
+  const explicit = toFiniteNumberOrNull(credentials?.maxConcurrent);
+  if (explicit !== null) return explicit;
+  if (!rateLimitProtectionEnabled) return null;
+  return resolveDefaultAccountConcurrency(provider);
 }
 
 /**

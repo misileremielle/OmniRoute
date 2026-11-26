@@ -16,7 +16,10 @@ import { isProxySkipRecentlyFailedEnabled } from "@/shared/utils/featureFlags";
 import { invalidateDbCache } from "./readCache";
 import { encrypt, decrypt } from "./encryption";
 import { getProxyRegistryGeneration, resolveProxyForScopeFromRegistry } from "./proxies";
-import { isEgressBucketedLockScope } from "@omniroute/open-sse/config/providerErrorRules.ts";
+import {
+  isEgressBucketedLockScope,
+  isEgressPinnedScope,
+} from "@omniroute/open-sse/config/providerErrorRules.ts";
 import { getComboModelProvider as getComboEntryProvider } from "@/lib/combos/steps";
 import {
   normalizeRequestBodyLimitMb,
@@ -658,7 +661,10 @@ function isCachedPoolMemberSetAside(entry: ProxyResolutionCacheEntry): boolean {
 // several IPs).
 function requiresStableEgress(provider: string | null): boolean {
   if (!provider) return false;
-  return isEgressBucketedLockScope(provider);
+  // IP-bucketed quota needs one egress so a connection's budget cannot fragment
+  // across IPs; a pinned subscription account needs one so it does not flap
+  // between exit addresses. Different reasons, same answer.
+  return isEgressBucketedLockScope(provider) || isEgressPinnedScope(provider);
 }
 
 // The chat-path cache (below) exists so a hot connection does not pay the full resolution

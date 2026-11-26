@@ -304,7 +304,8 @@ export async function executeProviderRequest(
             : undefined;
           const accountSemaphoreMaxConcurrency = resolveAccountSemaphoreMaxConcurrency(
             execCreds,
-            typeof attemptConnectionId === "string" && isRateLimitEnabled(attemptConnectionId)
+            typeof attemptConnectionId === "string" && isRateLimitEnabled(attemptConnectionId),
+            provider
           );
           const accountSemaphoreKey = resolveAccountSemaphoreKey({
             provider,

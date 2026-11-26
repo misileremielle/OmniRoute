@@ -63,7 +63,7 @@ const SERVER_ONLY = new Set([
  * Bare builtin names Next's client build polyfills (the client `resolve.fallback` map in
  * `next/dist/build/webpack-config.js`). Kept in sync by the drift test at the bottom.
  */
-const NEXT_CLIENT_POLYFILLED_BUILTINS = new Set([
+export const NEXT_CLIENT_POLYFILLED_BUILTINS = new Set([
   "assert",
   "buffer",
   "constants",

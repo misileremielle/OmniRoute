@@ -141,6 +141,7 @@ matrix automatically, without any label.
 
 ### Testing
 
+- [ ] `pnpm run check:cli-fingerprint-drift -- --strict` — no toleranced drift left at release time (the plain gate tolerates a patch gap of three; a release should ship the current pins)
 - [ ] `npm run test:unit:full` — pass
 - [ ] `npm run test:vitest` — pass (MCP server, autoCombo, cache)
 - [ ] `npm run test:coverage` — gate 60/60/60/60 satisfied (statements/lines/functions/branches)

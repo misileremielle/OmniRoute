@@ -23,6 +23,7 @@ import { applyProviderRequestDefaults } from "../services/providerRequestDefault
 import { stripUnsupportedParams } from "../translator/paramSupport.ts";
 import { getRotatingApiKey } from "../services/apiKeyRotator.ts";
 import { CLAUDE_CLI_STAINLESS_PACKAGE_VERSION } from "../config/anthropicHeaders.ts";
+import { getSessionId } from "./claudeIdentity.ts";
 import {
   getRuntimeVersion,
   normalizeStainlessArch,
@@ -342,7 +343,11 @@ export class GlmExecutor extends DefaultExecutor {
       "X-Stainless-OS": normalizeStainlessPlatform(),
       "X-Stainless-Runtime-Version": getRuntimeVersion(),
       "X-Stainless-Package-Version": CLAUDE_CLI_STAINLESS_PACKAGE_VERSION,
-      "X-Claude-Code-Session-Id": randomUUID(),
+      // One session per connection, not per call: a fresh UUID on every turn
+      // reads as a brand-new CLI session each time (see claudeIdentity.getSessionId).
+      "X-Claude-Code-Session-Id": getSessionId(
+        credentials.connectionId || getEffectiveKey(credentials)
+      ),
       "x-client-request-id": randomUUID(),
     };
   }

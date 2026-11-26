@@ -6,7 +6,19 @@ import { fetchCodexDiscoveryModels } from "../../src/app/api/providers/[id]/mode
 const REGISTRY_URL = "https://registry.npmjs.org/@openai%2Fcodex/latest";
 const originalVersion = process.env.CODEX_CLIENT_VERSION;
 const originalUserAgent = process.env.CODEX_USER_AGENT;
-const registryResponse = (version = "0.165.1") => Response.json({ name: "@openai/codex", version });
+// The registry has to advertise something the pin accepts (a lower version is a
+// downgrade and gets refused), so derive it from the pin instead of hard-coding a
+// value that ages out on every bump.
+const bumpPatch = (version: string): string => {
+  const [major, minor, patch] = version.split(".").map(Number);
+  return `${major}.${minor}.${patch + 1}`;
+};
+const NEWER = bumpPatch(codexClient.DEFAULT_CODEX_CLIENT_VERSION);
+const NEWER_AGAIN = bumpPatch(NEWER);
+// The agent is `codex_cli_rs/<v> (…)`, matching the real client's capture.
+const uaPattern = (version: string) =>
+  new RegExp(`^codex_cli_rs/${version.replace(/\./g, "\\.")} `);
+const registryResponse = (version = NEWER) => Response.json({ name: "@openai/codex", version });
 
 test.beforeEach(() => {
   delete process.env.CODEX_CLIENT_VERSION;
@@ -36,15 +48,16 @@ test("refresh uses official metadata without credentials and aligns synchronous 
     assert.ok(init.signal instanceof AbortSignal);
     return registryResponse();
   };
-  assert.equal(await codexClient.refreshCodexClientVersion(fetchImpl), "0.165.1");
-  assert.equal(codexClient.getCodexClientVersion(), "0.165.1");
-  assert.equal(codexClient.getCodexDefaultHeaders().Version, "0.165.1");
-  assert.match(codexClient.getCodexUserAgent(), /^codex-cli\/0\.165\.1 /);
+  assert.equal(await codexClient.refreshCodexClientVersion(fetchImpl), NEWER);
+  assert.equal(codexClient.getCodexClientVersion(), NEWER);
   assert.equal(
-    codexClient.getCodexCliRsHeaders()["User-Agent"],
-    `${codexClient.CODEX_CLI_RS_ORIGINATOR}/0.165.1`
+    codexClient.getCodexDefaultHeaders()["User-Agent"].includes(`/${NEWER} `),
+    true,
+    "the default headers carry the version in the user agent, not a Version header"
   );
-  assert.equal(codexClient.getCodexBackendIdentityHeaders().Version, "0.165.1");
+  assert.match(codexClient.getCodexUserAgent(), uaPattern(NEWER));
+  assert.match(codexClient.getCodexCliRsHeaders()["User-Agent"], uaPattern(NEWER));
+  assert.equal(codexClient.getCodexBackendIdentityHeaders().Version, NEWER);
   assert.equal(calls, 1);
 });
 
@@ -82,9 +95,9 @@ test("fresh cache avoids lookup; expiry rechecks and concurrent callers share lo
   assert.equal(
     await codexClient.refreshCodexClientVersion(async () => {
       calls++;
-      return registryResponse("0.166.0");
+      return registryResponse(NEWER_AGAIN);
     }),
-    "0.166.0"
+    NEWER_AGAIN
   );
   assert.equal(calls, 2);
 });
@@ -104,13 +117,10 @@ test("offline refresh preserves last-known-good; failures are retried after a bo
   await codexClient.refreshCodexClientVersion(offline);
   assert.equal(calls, 1);
   now += 5 * 60 * 1_000 + 1;
-  assert.equal(
-    await codexClient.refreshCodexClientVersion(async () => registryResponse()),
-    "0.165.1"
-  );
+  assert.equal(await codexClient.refreshCodexClientVersion(async () => registryResponse()), NEWER);
   now += 6 * 60 * 60 * 1_000 + 1;
-  assert.equal(await codexClient.refreshCodexClientVersion(offline), "0.165.1");
-  assert.equal(codexClient.getCodexClientVersion(), "0.165.1");
+  assert.equal(await codexClient.refreshCodexClientVersion(offline), NEWER);
+  assert.equal(codexClient.getCodexClientVersion(), NEWER);
 });
 
 test("malformed metadata, prereleases, HTTP errors and downgrades cannot replace a known-good version", async () => {
@@ -120,7 +130,7 @@ test("malformed metadata, prereleases, HTTP errors and downgrades cannot replace
   const invalid = [
     Response.json({ name: "wrong-package", version: "9.9.9" }),
     Response.json({ version: "9.9.9" }),
-    registryResponse("0.170.0-beta.1"),
+    registryResponse(`${NEWER}-beta.1`),
     registryResponse("0.01.0"),
     registryResponse("9.9.9\r\nInjected: evil"),
     registryResponse("0.9.0"),
@@ -129,7 +139,7 @@ test("malformed metadata, prereleases, HTTP errors and downgrades cannot replace
   ];
   for (const response of invalid) {
     now += 6 * 60 * 60 * 1_000 + 1;
-    assert.equal(await codexClient.refreshCodexClientVersion(async () => response), "0.165.1");
+    assert.equal(await codexClient.refreshCodexClientVersion(async () => response), NEWER);
   }
 });
 
@@ -144,9 +154,9 @@ test("discovery refreshes before authenticated model fetch and accepts remote-on
         assert.deepEqual(init.headers, { Accept: "application/json" });
         return registryResponse();
       }
-      assert.equal(new URL(url).searchParams.get("client_version"), "0.165.1");
-      assert.equal(init.headers.Version, "0.165.1");
-      assert.match(init.headers["User-Agent"], /^codex-cli\/0\.165\.1 /);
+      assert.equal(new URL(url).searchParams.get("client_version"), NEWER);
+      assert.equal("Version" in init.headers, false, "the models call sends no Version header");
+      assert.match(init.headers["User-Agent"], uaPattern(NEWER));
       assert.equal(init.headers.Authorization, "Bearer test-token");
       assert.equal(init.headers["chatgpt-account-id"], "test-account");
       return Response.json({

@@ -61,10 +61,32 @@ const CORE_NAME = new RegExp(
       "provider-metrics",
       "credential-health",
       "quota-preflight",
+      "cli-fingerprint",
+      "claude-codex-identity",
     ].join("|") +
     ")[^/]*\\.test\\.ts$",
   "i"
 );
+
+/**
+ * Second selection pass, matched ANYWHERE in the basename.
+ *
+ * CORE_NAME is start-anchored, so a suite whose filename leads with a vendor
+ * (`claude-codex-identity-version-sync`, `copilot-machine-id-stability`) never
+ * matched it and the disguises those files cover — the very thing most likely to
+ * rot — were only reached by the full run. Three such suites were found red or
+ * invisible before this existed. `cch` is here for the same reason: the integrity
+ * token is only exercised by suites whose filename leads with it, and `antigravity`
+ * because its user agent carries the most moving parts (OS, arch, changelist, auth
+ * method) and a stale literal in its suite sat red for want of selection.
+ * `codex` is the third vendor whose suites hard-code identity values and go stale
+ * on every pin bump. `bundle` because a disguise module carrying a `node:` import
+ * is exactly what quietly breaks the dashboard bundle. `messages-face` because the
+ * per-vendor request-surface suites are named `…-face-headers`, pin exact header
+ * sets, and are where a disguise edit does its damage.
+ */
+const CORE_CONTAINS =
+  /(?:identity|fingerprint|machine-id|user-agent|session|cch|antigravity|codex|bundle|messages-face)/i;
 
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
@@ -80,7 +102,8 @@ export function selectCoreTests() {
       selected.push(path.posix.join("tests/unit", dir, f.split(path.sep).join("/")));
   }
   for (const f of fs.readdirSync(UNIT)) {
-    if (CORE_NAME.test(f)) selected.push(`tests/unit/${f}`);
+    if (!f.endsWith(".test.ts")) continue; // .tsx belongs to the vitest suite
+    if (CORE_NAME.test(f) || CORE_CONTAINS.test(f)) selected.push(`tests/unit/${f}`);
   }
   return [...new Set(selected)].sort();
 }

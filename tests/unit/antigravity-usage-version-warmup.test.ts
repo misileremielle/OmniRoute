@@ -11,6 +11,10 @@
  * CLI version is warmed as well and that one call must carry the CLI version instead.
  */
 import test from "node:test";
+import {
+  ANTIGRAVITY_CLI_FALLBACK_VERSION,
+  ANTIGRAVITY_IDE_FALLBACK_VERSION,
+} from "../../open-sse/services/antigravityVersion.ts";
 import assert from "node:assert/strict";
 
 // Load usage.ts up-front so module-evaluation side effects finish before fetch is stubbed.
@@ -152,7 +156,8 @@ test("unreachable release feed falls back to the 2.5.5 floor and still fetches u
   const quotaCalls = calls.filter((call) => call.url.includes("fetchAvailableModels"));
   assert.equal(cliFeedCalls.length, 1, "the CLI release is attempted once");
   assert.ok(quotaCalls.length >= 1, "fetchAvailableModels must still be called");
-  assertFingerprints(calls, "2.5.5", "1.3.4");
+  // Both versions come from the pins, so a bump does not need this line touched.
+  assertFingerprints(calls, ANTIGRAVITY_IDE_FALLBACK_VERSION, ANTIGRAVITY_CLI_FALLBACK_VERSION);
   assert.ok(result && "quotas" in result, "usage result should carry quotas");
   if (result && "quotas" in result) {
     assert.ok(result.quotas["gemini-3.8-flash-high"], "quota bucket should be parsed");

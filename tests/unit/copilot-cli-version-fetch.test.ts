@@ -56,35 +56,41 @@ test("a fetched version newer than the pin appears in both Copilot header string
   const urls: string[] = [];
   const fetchMock = async (url: string | URL | Request) => {
     urls.push(String(url));
-    return jsonResponse({ version: "1.0.92" });
+    return jsonResponse({ version: "1.0.130" });
   };
 
   await withEnv({ GITHUB_COPILOT_CLI_VERSION: undefined }, async () => {
-    assert.equal(await copilot.resolveGitHubCopilotCliVersion(fetchMock as typeof fetch), "1.0.92");
-    assert.equal(copilot.getGitHubCopilotCliVersion(), "1.0.92");
+    assert.equal(
+      await copilot.resolveGitHubCopilotCliVersion(fetchMock as typeof fetch),
+      "1.0.130"
+    );
+    assert.equal(copilot.getGitHubCopilotCliVersion(), "1.0.130");
     const headers = copilot.getGitHubCopilotChatHeaders();
-    assert.equal(headers["editor-version"], "copilot/1.0.92");
-    assert.equal(headers["user-agent"], `copilot/1.0.92 (${process.platform}) term/unknown`);
-    assert.equal(copilot.getGitHubCopilotChatUserAgent(), "GitHubCopilotChat/1.0.92");
+    assert.equal(headers["editor-version"], "copilot/1.0.130");
+    assert.equal(headers["user-agent"], `copilot/1.0.130 (${process.platform}) term/unknown`);
+    assert.equal(copilot.getGitHubCopilotChatUserAgent(), "GitHubCopilotChat/1.0.130");
     const internal = copilot.getGitHubCopilotInternalUserHeaders("token gh");
-    assert.equal(internal["User-Agent"], "GitHubCopilotChat/1.0.92");
-    assert.equal(internal["Editor-Version"], "copilot/1.0.92");
+    assert.equal(internal["User-Agent"], "GitHubCopilotChat/1.0.130");
+    assert.equal(internal["Editor-Version"], "copilot/1.0.130");
   });
   assert.equal(urls.length, 1);
   assert.equal(urls[0], NPM_LATEST);
-  assert.equal(copilot.GITHUB_COPILOT_CLI_VERSION, "1.0.91");
+  assert.equal(copilot.GITHUB_COPILOT_CLI_VERSION, "1.0.116");
 });
 
-test("a fetch that rejects keeps the pinned 1.0.91", async () => {
+test("a fetch that rejects keeps the pinned 1.0.116", async () => {
   const fetchMock = async () => {
     throw new Error("registry unreachable");
   };
 
   await withEnv({ GITHUB_COPILOT_CLI_VERSION: undefined }, async () => {
-    assert.equal(await copilot.resolveGitHubCopilotCliVersion(fetchMock as typeof fetch), "1.0.91");
+    assert.equal(
+      await copilot.resolveGitHubCopilotCliVersion(fetchMock as typeof fetch),
+      "1.0.116"
+    );
     assert.equal(copilot.getGitHubCopilotCliVersion(), copilot.GITHUB_COPILOT_CLI_VERSION);
     const headers = copilot.getGitHubCopilotChatHeaders();
-    assert.equal(headers["editor-version"], "copilot/1.0.91");
-    assert.equal(copilot.getGitHubCopilotChatUserAgent(), "GitHubCopilotChat/1.0.91");
+    assert.equal(headers["editor-version"], "copilot/1.0.116");
+    assert.equal(copilot.getGitHubCopilotChatUserAgent(), "GitHubCopilotChat/1.0.116");
   });
 });

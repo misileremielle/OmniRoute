@@ -75,7 +75,7 @@ test("persistAttemptLogs redacts request.failed delivery/replay but keeps its in
       API_KEY_SECRET: "test-dashboard-failure-redaction-secret",
       // The subprocess is not a node:test worker. Pin this unrelated identity
       // so importing the real pipeline cannot start an npm registry refresh.
-      GITHUB_COPILOT_CLI_VERSION: "1.0.91",
+      GITHUB_COPILOT_CLI_VERSION: "1.0.116",
       CODEX_CLIENT_VERSION: DEFAULT_CODEX_CLIENT_VERSION,
       OMNIROUTE_ENABLE_LIVE_WS: "0",
     });
